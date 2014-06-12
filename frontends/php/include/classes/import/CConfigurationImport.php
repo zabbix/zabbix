@@ -548,7 +548,7 @@ class CConfigurationImport {
 			}
 		}
 
-		// refresh applications because templated ones can be inherited to host and used in items
+		// refresh applications beacuse templated ones can be inherited to host and used in items
 		$this->referencer->refreshApplications();
 	}
 
@@ -572,7 +572,7 @@ class CConfigurationImport {
 			foreach ($items as $item) {
 				$item['hostid'] = $hostid;
 
-				if (isset($item['applications']) && $item['applications']) {
+				if (!empty($item['applications'])) {
 					$applicationsIds = array();
 					foreach ($item['applications'] as $application) {
 						if ($applicationId = $this->referencer->resolveApplication($hostid, $application['name'])) {
@@ -586,11 +586,11 @@ class CConfigurationImport {
 					$item['applications'] = $applicationsIds;
 				}
 
-				if (isset($item['interface_ref']) && $item['interface_ref']) {
+				if (isset($item['interface_ref'])) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 
-				if (isset($item['valuemap']) && $item['valuemap']) {
+				if ($item['valuemap']) {
 					$valueMapId = $this->referencer->resolveValueMap($item['valuemap']['name']);
 					if (!$valueMapId) {
 						throw new Exception(_s(
@@ -604,7 +604,6 @@ class CConfigurationImport {
 				}
 
 				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-
 				if ($itemsId) {
 					$item['itemid'] = $itemsId;
 					$itemsToUpdate[] = $item;

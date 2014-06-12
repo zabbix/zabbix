@@ -660,15 +660,13 @@ abstract class CGraphGeneral extends CZBXAPI {
 				// if the current graph is templated and new items to be added
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
-					$itemIds = array();
-
 					foreach ($graph['gitems'] as $gitem) {
 						if (!isset($gitem['gitemid']) && isset($gitem['itemid'])) {
 							$itemIds[] = $gitem['itemid'];
 						}
 					}
 
-					if ($itemIds) {
+					if (isset($itemIds) && $itemIds) {
 						$itemHosts = API::Host()->get(array(
 							'itemids' => $itemIds,
 							'output' => array('hostid'),

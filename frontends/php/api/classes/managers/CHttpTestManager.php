@@ -153,7 +153,6 @@ class CHttpTestManager {
 			));
 
 			$checkItemsUpdate = $updateFields = array();
-			$itemids = array();
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.

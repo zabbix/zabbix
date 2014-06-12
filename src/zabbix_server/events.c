@@ -88,33 +88,40 @@ void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object,
  ******************************************************************************/
 static void	save_events()
 {
-	size_t		i;
-	zbx_db_insert_t	db_insert;
-	int		new_events = 0;
-	zbx_uint64_t	eventid;
+	char		*sql = NULL;
+	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	const char	*ins_event_sql = "insert into events (eventid,source,object,objectid,clock,ns,value) values ";
 
-	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
-			NULL);
+	sql = zbx_malloc(sql, sql_alloc);
 
-	for (i = 0; i < events_num; i++)
-	{
-		if (0 == events[i].eventid)
-			new_events++;
-	}
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	eventid = DBget_maxid_num("events", new_events);
+#ifdef HAVE_MULTIROW_INSERT
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_event_sql);
+#endif
 
 	for (i = 0; i < events_num; i++)
 	{
 		if (0 == events[i].eventid)
-			events[i].eventid = eventid++;
-
-		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
-				events[i].objectid, events[i].clock, events[i].ns, events[i].value);
+			events[i].eventid = DBget_maxid("events");
+#ifndef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_event_sql);
+#endif
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d)" ZBX_ROW_DL,
+			events[i].eventid, events[i].source, events[i].object, events[i].objectid, events[i].clock,
+			events[i].ns, events[i].value);
 	}
 
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+#ifdef HAVE_MULTIROW_INSERT
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -144,6 +151,8 @@ int	process_events(void)
 {
 	const char	*__function_name = "process_events";
 
+	size_t		i;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	if (0 != events_num)
@@ -152,7 +161,14 @@ int	process_events(void)
 
 		process_actions(events, events_num);
 
-		DBupdate_itservices(events, events_num);
+		for (i = 0; i < events_num; i++)
+		{
+			if (EVENT_SOURCE_TRIGGERS == events[i].source)
+			{
+				DBupdate_services(events[i].objectid, TRIGGER_VALUE_PROBLEM == events[i].value ?
+						events[i].trigger.priority : 0, events[i].clock);
+			}
+		}
 
 		clean_events();
 	}

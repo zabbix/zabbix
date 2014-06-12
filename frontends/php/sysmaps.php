@@ -108,7 +108,7 @@ if ($isExportData) {
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 
-	if (hasErrorMesssages()) {
+	if (!no_errors()) {
 		show_messages();
 	}
 	else {

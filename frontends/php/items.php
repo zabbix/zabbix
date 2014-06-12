@@ -1140,13 +1140,7 @@ else {
 		}
 	}
 
-	if ($data['sortfield'] === 'status') {
-		orderItemsByStatus($data['items'], getPageSortOrder());
-	}
-	else {
-		order_result($data['items'], $data['sortfield'], getPageSortOrder());
-	}
-
+	order_result($data['items'], $data['sortfield'], getPageSortOrder());
 	$data['paging'] = getPagingLine($data['items'], array('itemid'));
 
 	$itemTriggerIds = array();

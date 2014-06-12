@@ -161,8 +161,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$gotos['events'] = array(
 					'triggerid' => $elem['elementid'],
-					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
-					'period' => SEC_PER_WEEK
+					'nav_time' => time() - SEC_PER_WEEK
 				);
 				break;
 

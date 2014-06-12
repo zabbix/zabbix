@@ -196,21 +196,17 @@ class GlobalRegExp {
 			$paterns = array($expression['expression']);
 		}
 
-		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
+		$expectedResult = $expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED;
 
-		foreach ($paterns as $patern) {
-			if ($expression['case_sensitive']) {
-				$tmp = ((zbx_strstr($string, $patern) !== false) == $expectedResult);
-			}
-			else {
-				$tmp = ((zbx_stristr($string, $patern) !== false) == $expectedResult);
-			}
 
-			if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED && $tmp) {
-				return true;
+		if ($expression['case_sensitive']) {
+			foreach ($paterns as $patern) {
+				$result = $result && ((zbx_strstr($string, $patern) !== false) == $expectedResult);
 			}
-			else {
-				$result = ($result && $tmp);
+		}
+		else {
+			foreach ($paterns as $patern) {
+				$result = $result && ((zbx_stristr($string, $patern) !== false) == $expectedResult);
 			}
 		}
 

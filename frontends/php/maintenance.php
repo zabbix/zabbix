@@ -507,18 +507,16 @@ if (!empty($data['form'])) {
 	$maintenanceView->show();
 }
 else {
+	// get maintenances
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
-
-	// get only maintenance IDs for paging
 	$options = array(
-		'output' => array('maintenanceid'),
+		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1
 	);
-
 	if ($pageFilter->groupsSelected) {
 		if ($pageFilter->groupid > 0) {
 			$options['groupids'] = $pageFilter->groupid;
@@ -530,16 +528,7 @@ else {
 	else {
 		$options['groupids'] = array();
 	}
-
 	$data['maintenances'] = API::Maintenance()->get($options);
-	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
-
-	// get list of maintenances
-	$data['maintenances'] = API::Maintenance()->get(array(
-		'maintenanceids' => zbx_objectValues($data['maintenances'], 'maintenanceid'),
-		'output' => API_OUTPUT_EXTEND
-	));
-
 	foreach ($data['maintenances'] as $number => $maintenance) {
 		if ($maintenance['active_till'] < time()) {
 			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_EXPIRED;
@@ -552,7 +541,7 @@ else {
 		}
 	}
 	order_result($data['maintenances'], $sortfield, $sortorder);
-
+	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 	$data['pageFilter'] = $pageFilter;
 
 	// nodes

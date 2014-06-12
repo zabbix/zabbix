@@ -94,16 +94,8 @@ class DB {
 
 		if (is_null(self::$nodeId)) {
 			self::$nodeId = get_current_nodeid(false);
-			if (self::$nodeId == 0) {
-				self::$minNodeId = 0;
-				self::$maxNodeId = ZBX_STANDALONE_MAX_IDS;
-			}
-			else {
-				self::$minNodeId = bcadd(
-					bcmul(self::$nodeId, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0
-				);
-				self::$maxNodeId = bcadd(self::$minNodeId, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
-			}
+			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
+			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
 		}
 	}
 
@@ -193,7 +185,8 @@ class DB {
 
 		$sql = 'SELECT MAX('.$id_name.') AS id'.
 				' FROM '.$table.
-				' WHERE '.$id_name.' BETWEEN '.self::$minNodeId.' AND '.self::$maxNodeId;
+				' WHERE '.$id_name.'>='.self::$minNodeId.
+				' AND '.$id_name.'<='.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
 		$nextid = ($row && $row['id']) ? $row['id'] : self::$minNodeId;
@@ -475,9 +468,11 @@ class DB {
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
+		$fields = array_keys(reset($values));
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
+			$fields[] = $tableSchema['key'];
 		}
 
 		$newValues = array();
@@ -491,8 +486,6 @@ class DB {
 			self::checkValueTypes($table, $row);
 			$newValues[] = $row;
 		}
-
-		$fields = array_keys(reset($newValues));
 
 		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
 

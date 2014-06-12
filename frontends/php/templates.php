@@ -98,11 +98,11 @@ if ($exportData) {
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 
-	if (hasErrorMesssages()) {
-		show_messages();
+	if (no_errors()) {
+		print($exportData);
 	}
 	else {
-		print($exportData);
+		show_messages();
 	}
 	exit();
 }

@@ -1,5 +1,7 @@
 <script type="text/javascript">
-	jQuery(function($) {
+	jQuery(document).ready(function($) {
+		'use strict';
+
 		var iconMapTable = $('#iconMapTable'),
 			addMappindButton = $('#addMapping');
 
@@ -12,7 +14,7 @@
 		}
 
 		iconMapTable.sortable({
-			disabled: (iconMapTable.find('tr.sortable').length < 2),
+			disabled: (iconMapTable.find('tr.sortable').length <= 1),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -23,17 +25,8 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					var td = $(this);
-
-					td.width(td.width());
+					jQuery(this).width(jQuery(this).width());
 				});
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 4) + 'px');
-				}
-
 				return ui;
 			},
 			start: function(e, ui) {
@@ -45,7 +38,7 @@
 			.delegate('input.removeMapping', 'click', function() {
 				$(this).parent().parent().remove();
 
-				if (iconMapTable.find('tr.sortable').length < 2) {
+				if (iconMapTable.find('tr.sortable').length <= 1) {
 					iconMapTable.sortable('disable');
 				}
 				recalculateSortOrder();

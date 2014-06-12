@@ -241,7 +241,10 @@ int	zbx_default_int_compare_func(const void *d1, const void *d2)
 	const int	*i1 = (const int *)d1;
 	const int	*i2 = (const int *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(*i1, *i2);
+	if (*i1 < *i2)
+		return -1;
+	if (*i1 > *i2)
+		return +1;
 
 	return 0;
 }
@@ -251,7 +254,10 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 	const zbx_uint64_t	*i1 = (const zbx_uint64_t *)d1;
 	const zbx_uint64_t	*i2 = (const zbx_uint64_t *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(*i1, *i2);
+	if (*i1 < *i2)
+		return -1;
+	if (*i1 > *i2)
+		return +1;
 
 	return 0;
 }
@@ -274,7 +280,10 @@ int	zbx_default_ptr_compare_func(const void *d1, const void *d2)
 	const void	*p1 = *(const void **)d1;
 	const void	*p2 = *(const void **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(p1, p2);
+	if (p1 < p2)
+		return -1;
+	if (p1 > p2)
+		return +1;
 
 	return 0;
 }

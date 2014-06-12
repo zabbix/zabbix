@@ -20,6 +20,7 @@
 	</td>
 </tr>
 </script>
+
 <script type="text/javascript">
 	function removeSlide(obj) {
 		var step = obj.getAttribute('remove_slide');
@@ -96,7 +97,7 @@
 			jQuery('#screenListFooter').before(tpl.evaluate(value));
 		}
 
-		if (initSize < 2) {
+		if (initSize <= 1) {
 			initSortable();
 		}
 
@@ -104,55 +105,30 @@
 	}
 
 	function initSortable() {
-		var slideTable = jQuery('#slideTable'),
-			slideTableWidth = slideTable.width(),
-			slideTableColumns = jQuery('#slideTable .header td'),
-			slideTableColumnWidths = [];
+		jQuery(document).ready(function() {
+			jQuery('#slideTable').sortable({
+				disabled: (jQuery('#slideTable tr.sortable').length <= 1),
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				cursor: 'move',
+				handle: 'span.ui-icon-arrowthick-2-n-s',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				update: recalculateSortOrder,
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						jQuery(this).width(jQuery(this).width());
+					});
 
-		slideTableColumns.each(function() {
-			slideTableColumnWidths[slideTableColumnWidths.length] = jQuery(this).width();
-		});
-
-		slideTable.sortable({
-			disabled: (slideTable.find('tr.sortable').length < 2),
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			cursor: 'move',
-			handle: 'span.ui-icon-arrowthick-2-n-s',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: recalculateSortOrder,
-			create: function () {
-				// force not to change table width
-				slideTable.width(slideTableWidth);
-			},
-			helper: function(e, ui) {
-				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(slideTableColumnWidths[i]);
-				});
-
-				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
-				if (SF || IE8) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 4) + 'px');
+					return ui;
+				},
+				start: function(e, ui) {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 				}
-
-				slideTableColumns.each(function(i) {
-					jQuery(this).width(slideTableColumnWidths[i]);
-				});
-
-				return ui;
-			},
-			start: function(e, ui) {
-				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-			}
+			});
 		});
 	}
 
-	jQuery(function() {
-		initSortable();
-	});
+	initSortable();
 	createPlaceholders();
 </script>
