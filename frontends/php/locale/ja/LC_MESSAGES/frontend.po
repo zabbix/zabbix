@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:32+0300\n"
-"PO-Revision-Date: 2014-05-30 04:19+0300\n"
+"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"PO-Revision-Date: 2014-06-10 05:14+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401416376.0\n"
+"X-POOTLE-MTIME: 1402370068.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -616,13 +616,13 @@ msgstr "バイト単位でのメモリサイズ、もしくは全体からのパ
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
-msgstr ""
+msgstr "And"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:966
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr ""
+msgstr "And/Or"
 
 #: tr_status.php:258 tr_status.php:265
 msgid "Any"
@@ -958,7 +958,7 @@ msgstr "Base DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Basic"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
@@ -2858,12 +2858,12 @@ msgstr "アクションの実行条件"
 #: api/classes/CDiscoveryRule.php:859
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の条件\"%2$s\"は式\"%3$s\"内で利用されていません。"
 
 #: api/classes/CDiscoveryRule.php:858
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の式\"%3$s\"内で利用されている条件\"%2$s\"は設定されていません。"
 
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:980
@@ -4704,12 +4704,12 @@ msgstr "空白"
 #: api/classes/CHttpTest.php:906
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%1$s\"のためのSSL証明書ファイルが空白です。"
 
 #: api/classes/CHttpTest.php:899
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%1$s\"のためのSSL秘密鍵ファイルが空白です。"
 
 #: api/classes/CAction.php:1520 api/classes/CAction.php:1527
 #: api/classes/CAction.php:1534 api/classes/CAction.php:1541
@@ -4819,7 +4819,7 @@ msgstr "期間が空白です。"
 
 #: api/classes/CHttpTest.php:310
 msgid "Empty web scenario ID."
-msgstr ""
+msgstr "WebシナリオIDが空白です。"
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -5404,7 +5404,7 @@ msgstr "例外の更新間隔"
 
 #: include/views/configuration.httpconf.popup.php:93
 msgid "Follow redirects"
-msgstr ""
+msgstr "リダイレクトをたどる"
 
 #: profile.php:117 users.php:196
 msgid "For guest, password must be empty"
@@ -5950,7 +5950,7 @@ msgstr "ハードウェア (詳細)"
 #: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.httpconf.popup.php:91
 msgid "Headers"
-msgstr ""
+msgstr "ヘッダー"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:57
 #: include/views/configuration.graph.list.php:79
@@ -6875,12 +6875,12 @@ msgstr "SNMPコミュニティの値が正しくありません。"
 #: api/classes/CHttpTest.php:890
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%1$s\"のためのSSLホスト検証の値が正しくありません。"
 
 #: api/classes/CHttpTest.php:881
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%1$s\"のためのSSLピア検証の値が正しくありません。"
 
 #: api/classes/CService.php:959
 #, c-format
@@ -7077,7 +7077,7 @@ msgstr "ディスカバリルール\"%1$s\"の条件式が正しくありませ�
 #: api/classes/CDiscoveryRule.php:857
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のカスタム条件式\"%2$s\"が正しくありません: %3$s。"
 
 #: api/classes/CDRule.php:215
 msgid "Incorrect delay."
@@ -7146,7 +7146,7 @@ msgstr "アイテム\"%1$s\"の例外の更新間隔の設定が正しくあり�
 #: api/classes/CHttpTest.php:681
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%2$s\"のステップ\"%1$s\"のリダイレクトをたどる値が正しくありません。"
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1653 tr_testexpr.php:36
@@ -7385,7 +7385,7 @@ msgstr "Zabbixサーバー\"%1$s\"から正しくない値を受信しました�
 
 #: api/classes/CHttpTest.php:691
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
-msgstr ""
+msgstr "Webシナリオ\"%2$\"のステップ\"%1$s\"の取得モードの値が正しくありません。"
 
 #: api/classes/CScreenItem.php:676
 #, c-format
@@ -7561,7 +7561,7 @@ msgstr "プロキシのステータス\"%1$s\"に利用されている値が正�
 
 #: api/classes/CHttpTest.php:311
 msgid "Incorrect web scenario ID."
-msgstr ""
+msgstr "WebシナリオIDが正しくありません。"
 
 #: include/profiles.inc.php:312
 msgid "Incorrect working time."
@@ -9273,7 +9273,7 @@ msgstr "データなし"
 
 #: include/httptest.inc.php:29
 msgid "NTLM"
-msgstr ""
+msgstr "NTLM"
 
 #: actionconf.php:37 actionconf.php:154 adm.regexps.php:37 adm.regexps.php:138
 #: adm.regexps.php:171 applications.php:38 disc_prototypes.php:42
@@ -9502,12 +9502,12 @@ msgstr "テンプレートスクリーンに\"%1$s\"が定義されていませ�
 #: api/classes/CHttpTest.php:309
 #, c-format
 msgid "No \"%1$s\" given for web scenario."
-msgstr ""
+msgstr "Webシナリオに\"%1$s\"が定義されていません。"
 
 #: api/classes/CDiscoveryRule.php:895
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件の\"%2$s\"が定義されていません。"
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -9517,7 +9517,7 @@ msgstr "ホストのプロトタイプ\"%1$s\"に\"%2$s\"が定義されてい�
 #: api/classes/CDiscoveryRule.php:863
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルターの\"%2$s\"が定義されていません。"
 
 #: include/classes/import/CXmlImport18.php:1612
 #, c-format
@@ -10643,7 +10643,7 @@ msgstr "オペレータ"
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.triggers.edit.php:119
 msgid "Or"
-msgstr ""
+msgstr "Or"
 
 #: include/views/configuration.host.massupdate.php:68
 #: include/views/configuration.host.massupdate.php:121
@@ -10863,7 +10863,7 @@ msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:324
 msgid "PHP mbstring.func_overload"
-msgstr ""
+msgstr "PHP mbstring.func_overload"
 
 #: include/classes/class.frontendsetup.php:167
 msgid "PHP option max_execution_time"
@@ -11794,7 +11794,7 @@ msgstr "リトライの残り回数"
 
 #: include/views/configuration.httpconf.popup.php:95
 msgid "Retrieve only headers"
-msgstr ""
+msgstr "ヘッダーのみを取得"
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
 #: include/views/general.warning.php:40
@@ -12067,23 +12067,23 @@ msgstr "SSHエージェント"
 
 #: include/views/configuration.httpconf.edit.php:170
 msgid "SSL certificate file"
-msgstr ""
+msgstr "SSL証明書ファイル"
 
 #: include/views/configuration.httpconf.edit.php:176
 msgid "SSL key file"
-msgstr ""
+msgstr "SSL秘密鍵ファイル"
 
 #: include/views/configuration.httpconf.edit.php:182
 msgid "SSL key password"
-msgstr ""
+msgstr "SSL秘密鍵パスワード"
 
 #: include/views/configuration.httpconf.edit.php:166
 msgid "SSL verify host"
-msgstr ""
+msgstr "SSLホスト検証"
 
 #: include/views/configuration.httpconf.edit.php:163
 msgid "SSL verify peer"
-msgstr ""
+msgstr "SSLピア検証"
 
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
@@ -13427,7 +13427,7 @@ msgstr "テキスト"
 #: include/classes/api/clients/CLocalApiClient.php:79
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
-msgstr ""
+msgstr "メソッド\"%1$s.%2$s\"は\"auth\"パラメータなしで呼び出してください。"
 
 #: api/classes/CScreenItem.php:870
 #, c-format
@@ -13900,7 +13900,7 @@ msgstr "トリガーの深刻度"
 
 #: jsLoader.php:197
 msgid "Trigger status \"OK\""
-msgstr ""
+msgstr "トリガーのステータス \"正常\""
 
 #: jsLoader.php:198
 msgid "Trigger status \"Problem\""
@@ -14109,7 +14109,7 @@ msgstr "URL C"
 #: api/classes/CMap.php:469
 #, c-format
 msgid "URL name should be unique for map \"%s\"."
-msgstr ""
+msgstr "URLの名前はマップ\"%s\"上で重複できません。"
 
 #: include/html.inc.php:112
 msgid "URL parameter cannot be array."
@@ -14122,7 +14122,7 @@ msgstr "URLパラメータが設定されていません。"
 #: api/classes/CMap.php:463
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr ""
+msgstr "マップ\"%s\"上のURLは名前とURLの両方を設定する必要があります。"
 
 #: include/views/configuration.sysmap.edit.php:180
 #: include/views/js/configuration.sysmaps.js.php:180 jsLoader.php:221
@@ -14345,7 +14345,7 @@ msgstr "グループのプロトタイプではパラメータ\"%1$s\"は利用�
 #: api/classes/CDiscoveryRule.php:896
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件ではパラメータ\"%2$s\"はサポートされていません。"
 
 #: api/classes/CHostPrototype.php:209
 #, c-format
@@ -14360,7 +14360,7 @@ msgstr "ホストのプロトタイプ%1$sのホストインベントリでは�
 #: api/classes/CDiscoveryRule.php:864
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルターではパラメータ\"%2$s\"はサポートされていません。"
 
 #: include/blocks.inc.php:1257
 msgctxt "discovery results in dashboard"
@@ -14900,17 +14900,17 @@ msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありませ
 #: include/validate.inc.php:336 include/validate.inc.php:352
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "\"%1$s\"の値\"%2$s\"は小数点以下の桁数が多すぎます: %3$s桁を超える値は設定できません。"
 
 #: include/validate.inc.php:332
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "\"%1$s\"の値\"%2$s\"は小数点より前の桁数が多すぎます: %3$s桁を超える値は設定できません。"
 
 #: include/validate.inc.php:328
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "\"%1$s\"の値\"%2$s\"は長すぎます: 小数点より前は%3$s桁までで小数点以下は%4$sまでです。"
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15107,7 +15107,7 @@ msgstr "Webシナリオは少なくとも1つ以上のステップが設定さ�
 
 #: api/classes/CHttpTest.php:456 api/classes/CHttpTest.php:573
 msgid "Web scenario name cannot be empty."
-msgstr ""
+msgstr "Webシナリオの名前は必須項目です。"
 
 #: api/classes/CHttpTest.php:722
 #, c-format
@@ -15116,11 +15116,11 @@ msgstr "Webシナリオにステップ\"%1$s\"がすでに存在します。"
 
 #: api/classes/CHttpTest.php:669
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "WebシナリオのステップのURLは必須項目です。"
 
 #: api/classes/CHttpTest.php:664
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Webシナリオのステップの名前は必須項目です。"
 
 #: api/classes/CHttpTest.php:650
 msgid "Web scenario step name should contain only printable characters."
