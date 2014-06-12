@@ -901,13 +901,11 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 		}
 	});
 
-	// resize multiselect
+	// resize multiselects in the flicker
 	if (typeof flickerResizeMultiselect === 'undefined' && state == 1) {
 		flickerResizeMultiselect = true;
 
-		if (jQuery('.multiselect').length > 0) {
-			jQuery('#' + id).multiSelect.resize();
-		}
+		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
 	}
 }
 

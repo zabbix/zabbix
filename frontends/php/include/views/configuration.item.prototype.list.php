@@ -42,20 +42,16 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $itemTable = new CTableInfo(_('No item prototypes found.'));
 
-$sortLink = new CUrl();
-$sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
-$sortLink = $sortLink->getUrl();
-
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
-	make_sorting_header(_('Name'),'name', $sortLink),
-	make_sorting_header(_('Key'), 'key_', $sortLink),
-	make_sorting_header(_('Interval'), 'delay', $sortLink),
-	make_sorting_header(_('History'), 'history', $sortLink),
-	make_sorting_header(_('Trends'), 'trends', $sortLink),
-	make_sorting_header(_('Type'), 'type', $sortLink),
+	make_sorting_header(_('Name'),'name'),
+	make_sorting_header(_('Key'), 'key_'),
+	make_sorting_header(_('Interval'), 'delay'),
+	make_sorting_header(_('History'), 'history'),
+	make_sorting_header(_('Trends'), 'trends'),
+	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
-	make_sorting_header(_('Status'), 'status', $sortLink)
+	make_sorting_header(_('Status'), 'status')
 ));
 
 foreach ($this->data['items'] as $item) {
