@@ -1282,7 +1282,7 @@ function getSelementHostApplicationFilters(array $selements, array $selementIdTo
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
-					// first, add all filters set for host elements
+					// add all filters set for host elements
 					foreach ($subSysmap['selements'] as $subSysmapSelement) {
 						if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
 								|| $subSysmapSelement['application'] === '') {
