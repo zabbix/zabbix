@@ -189,12 +189,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			size_t	offset = 0;
 
-			if ('\r' == *s)
+			if ('\r' == *s || '\n' == *s)
 			{
-				*s = '\0';
-
-				if ('\n' == *(s + 1))
+				if ('\r' == *s && '\n' == *(s + 1))
 					offset++;
+
+				*s = '\0';
 
 				if (NULL != (ptr = zbx_regexp_sub(p, regexp, output)))
 					break;

@@ -182,7 +182,7 @@ err:
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr, *s, *p;
+	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
 	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	size_t	start_line, end_line, current_line = 0;
 	double	ts;
@@ -238,18 +238,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
-
-		for (s = utf8; '\0' != *s; s++)
-		{
-			if ('\r' == *s && '\n' == *(s + 1))
-			{
-				p = s + 1;
-
-				while ('\0' != (*s++ = *p++))
-					;
-			}
-		}
-
+		zbx_rtrim(utf8, "\r\n");
 		ptr = zbx_regexp_sub(utf8, regexp, output);
 		zbx_free(utf8);
 
@@ -342,6 +331,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
 			res = 1;
 		zbx_free(utf8);
