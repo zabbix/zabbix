@@ -1724,7 +1724,8 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 
 	timeout -= time(NULL) - start.sec;
 
-	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE, timeout)))
+	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE | ZBX_TCP_EXTERNAL,
+			timeout)))
 	{
 		if (EINTR == errno)
 			zbx_strlcpy(err, "timeout occured", err_size);

@@ -928,55 +928,58 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	total_bytes = 0;
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
+	expected_len = 16 * ZBX_MEBIBYTE;
 
 	*data = s->buf_stat;
 
-	left = ZBX_TCP_HEADER_LEN;
-
-	if (ZBX_TCP_ERROR == (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left)))
-		goto out;
-
-	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
+	if (0 == (flags & ZBX_TCP_EXTERNAL))
 	{
-		total_bytes += nbytes;
+		left = ZBX_TCP_HEADER_LEN;
 
-		left = sizeof(zbx_uint64_t);
-		if (left != (nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left)))
-		{
-			total_bytes = FAIL;
+		if (ZBX_TCP_ERROR == (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left)))
 			goto out;
-		}
 
-		expected_len = zbx_letoh_uint64(expected_len);
-
-		if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
+		if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s"
-					" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
-					expected_len, get_ip_by_socket(s), (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
-			total_bytes = FAIL;
-			goto cleanup;
+			total_bytes += nbytes;
+
+			left = sizeof(zbx_uint64_t);
+			if (left != (nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left)))
+			{
+				total_bytes = FAIL;
+				goto out;
+			}
+
+			expected_len = zbx_letoh_uint64(expected_len);
+
+			if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s"
+						" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
+						expected_len, get_ip_by_socket(s), (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+				total_bytes = FAIL;
+				goto cleanup;
+			}
+
+			flags |= ZBX_TCP_READ_UNTIL_CLOSE;
+		}
+		else
+		{
+			read_bytes = nbytes;
 		}
 
-		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
-	}
-	else
-	{
-		read_bytes = nbytes;
-		expected_len = 16 * ZBX_MEBIBYTE;
-	}
+		s->buf_stat[read_bytes] = '\0';
 
-	s->buf_stat[read_bytes] = '\0';
-
-	if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-	{
-		if (0 == nbytes)
-			goto cleanup;
-	}
-	else
-	{
-		if (nbytes < left)
-			goto cleanup;
+		if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+		{
+			if (0 == nbytes)
+				goto cleanup;
+		}
+		else
+		{
+			if (nbytes < left)
+				goto cleanup;
+		}
 	}
 
 	left = sizeof(s->buf_stat) - read_bytes - 1;

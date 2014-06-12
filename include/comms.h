@@ -114,6 +114,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s);
 void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
+#define ZBX_TCP_EXTERNAL		0x02
 
 #define	zbx_tcp_recv(s, data) 			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, 0))
 #define	zbx_tcp_recv_to(s, data, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, timeout))
