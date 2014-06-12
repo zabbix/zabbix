@@ -30,8 +30,6 @@ if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
 		_('Probe ID'),
 		_('Row result')
 	);
-
-	$noResultProbes = 0;
 }
 elseif ($this->data['type'] == RSM_RDDS) {
 	$headers = array(
@@ -69,10 +67,14 @@ $noResult = new CSpan(_('No result'), 'gray');
 $up = new CSpan(_('Up'), 'green');
 
 $offlineProbes = 0;
+$noResultProbes = 0;
 
 if ($this->data['type'] == RSM_DNSSEC) {
 	$testUp = 0;
 	$testDown = 0;
+}
+elseif ($this->data['type'] == RSM_RDDS || $this->data['type'] == RSM_EPP) {
+	$downProbes = 0;
 }
 
 foreach ($this->data['probes'] as $probe) {
@@ -175,11 +177,13 @@ foreach ($this->data['probes'] as $probe) {
 				$rdds43 = $noResult;
 				$rdds80 = $noResult;
 				$rdds = 'gray';
+				$noResultProbes++;
 			}
 			elseif ($probe['value'] == 0) {
 				$rdds43 = $down;
 				$rdds80 = $down;
 				$rdds = 'red';
+				$downProbes++;
 			}
 			elseif ($probe['value'] == 1) {
 				$rdds43 = $up;
@@ -190,20 +194,24 @@ foreach ($this->data['probes'] as $probe) {
 				$rdds43 = $up;
 				$rdds80 = $down;
 				$rdds = 'red';
+				$downProbes++;
 			}
 			elseif ($probe['value'] == 3) {
 				$rdds43 = $down;
 				$rdds80 = $up;
 				$rdds = 'red';
+				$downProbes++;
 			}
 		}
 		else {
 			// EPP
 			if (!isset($probe['value']) || $probe['value'] === null) {
 				$epp = $noResult;
+				$noResultProbes++;
 			}
 			elseif ($probe['value'] == 0) {
 				$epp = $down;
+				$downProbes++;
 			}
 			elseif ($probe['value'] == 1) {
 				$epp = $up;
@@ -242,7 +250,9 @@ foreach ($this->data['probes'] as $probe) {
 
 	$particularTestsTable->addRow($row);
 }
-if ($this->data['type'] == RSM_DNS) {
+if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_RDDS || $this->data['type'] == RSM_EPP) {
+	$downProbes = $this->data['type'] == RSM_DNS ? $this->data['downProbes'] : $downProbes;
+
 	$additionInfo = array(
 		new CSpan(array(bold(_('Probes total')), ':', SPACE, $this->data['totalProbes'])),
 		BR(),
@@ -255,10 +265,10 @@ if ($this->data['type'] == RSM_DNS) {
 		)),
 		BR(),
 		new CSpan(array(bold(_('Probes Up')), ':', SPACE,
-			$this->data['totalProbes'] - $offlineProbes - $noResultProbes - $this->data['downProbes']
+			$this->data['totalProbes'] - $offlineProbes - $noResultProbes - $downProbes
 		)),
 		BR(),
-		new CSpan(array(bold(_('Probes Down')), ':', SPACE, $this->data['downProbes']))
+		new CSpan(array(bold(_('Probes Down')), ':', SPACE, $downProbes))
 	);
 }
 elseif ($this->data['type'] == RSM_DNSSEC) {
@@ -311,12 +321,7 @@ $particularTests = array(
 	))
 );
 
-$tableHeader[] = $particularTests;
-if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
-	$tableHeader[] = $additionInfo;
-}
-
-$particularTestsInfoTable->addRow($tableHeader);
+$particularTestsInfoTable->addRow(array($particularTests, $additionInfo));
 
 $rsmWidget->additem($particularTestsInfoTable);
 

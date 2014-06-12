@@ -71,13 +71,16 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		date('Y', $data['time'])
 	);
 
+	$data['totalProbes'] = 0;
+
 	// macro
 	if ($data['type'] == RSM_DNS || $data['type'] == RSM_DNSSEC) {
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
-		$data['downProbes'] = 0;
-		$data['totalProbes'] = 0;
 
-		if ($data['type'] == RSM_DNSSEC) {
+		if ($data['type'] == RSM_DNS) {
+			$data['downProbes'] = 0;
+		}
+		else {
 			$data['totalTests'] = 0;
 		}
 	}
