@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2014-03-24 16:00+0300\n"
-"Last-Translator: Heilig <oleg.ivanivskyi@zabbix>\n"
+"PO-Revision-Date: 2014-06-08 10:44+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 1 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 2 : 3);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395669612.0\n"
+"X-POOTLE-MTIME: 1402217042.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1264,7 +1264,7 @@ msgstr "Не вдалося додати перетворення значенн
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Не вдалося змінити аутентифікацію"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1724,7 +1724,7 @@ msgstr "Не вдалося приєднати шаблон"
 
 #: api/classes/CUser.php:985
 msgid "Cannot login."
-msgstr ""
+msgstr "Не вдалося увійти в систему."
 
 #: api/classes/CUser.php:910
 msgid "Cannot logout."
@@ -4843,7 +4843,7 @@ msgstr "Назва графіку"
 #: api/classes/CGraphPrototype.php:881
 #, php-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип графіка \"%1$s\" містить прототипи елементів даних із декількох правил виявлення."
 
 #: api/classes/CGraphPrototype.php:887
 #, php-format
@@ -6873,7 +6873,7 @@ msgstr "LDAP аутентифікація"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP аутентифікацію змінено"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7218,7 +7218,7 @@ msgstr "Ім'я користувача \"%1$s\" не співпадає з ім�
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Некоректне ім'я користувача або пароль!"
 
 #: api/classes/CUser.php:875 api/classes/CUser.php:893
 #: api/classes/CUser.php:940
@@ -12023,12 +12023,12 @@ msgstr "Прототип тригера"
 #: api/classes/CTriggerPrototype.php:1106
 #, php-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип тригера \"%1$s\" містить прототипи елементів даних з декількох правил виявлення."
 
 #: api/classes/CTriggerPrototype.php:1112
 #, php-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Прототип тригера \"%1$s\" повинен містити принаймні один прототип елемента даних."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
@@ -13685,7 +13685,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "некоректний синтаксис біля \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13693,7 +13693,7 @@ msgstr "є"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "ключ пустий"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13921,7 +13921,7 @@ msgstr "тригер"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "несподіваний кінець ключа"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376
