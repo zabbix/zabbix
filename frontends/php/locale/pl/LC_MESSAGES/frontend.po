@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:58+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2014-06-04 11:15+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1526,7 +1526,7 @@ msgstr "Nie można utworzyć cyklicznych zależności."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie można utworzyć zależności do tego samego wyzwalacza."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Nie można utworzyć zasady wykrywania"
 
@@ -1577,12 +1577,12 @@ msgstr "Nie można usunąć aplikacji"
 msgid "Cannot delete dependency"
 msgstr "Nie można usunąć zależności"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Nie można usunąć reguły wykrywania"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Nie można usunąć reguł wykrywania"
 
@@ -1808,7 +1808,7 @@ msgstr[0] "Nie można wyłączyć akcji"
 msgstr[1] "Nie można wyłączyć akcji"
 msgstr[2] "Nie można wyłączyć akcji"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nie można wyłączyć reguły wykrywania"
@@ -1900,7 +1900,7 @@ msgstr[0] "Nie można włączyć akcji"
 msgstr[1] "Nie można włączyć akcji"
 msgstr[2] "Nie można włączyć akcji"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nie można włączyć reguły wykrywania"
@@ -2412,7 +2412,7 @@ msgstr "Nie można zaktualizować konfiguracji"
 msgid "Cannot update debug mode"
 msgstr "Nie można zaktualizować trybu debugowania"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Nie można zaktualizować reguły wykrywania"
 
@@ -4504,29 +4504,29 @@ msgstr "Reguła wykrywania \"%1$s:%2$s\" ma niepoprawny czas życia: \"%3$s\". (
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Reguła wykrywania \"%s\" już istnieje."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Utworzono regułę wykrywania"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Usunięto regułę wykrywania"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Wyłączono regułę wykrywania"
 msgstr[1] "Wyłączono reguły wykrywania"
 msgstr[2] "Wyłączono reguły wykrywania"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Włączono regułę wykrywania"
 msgstr[1] "Włączono reguły wykrywania"
 msgstr[2] "Włączono reguły wykrywania"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Zaktualizowano regułę wykrywania"
 
@@ -4539,7 +4539,7 @@ msgstr "Zaktualizowano regułę wykrywania"
 msgid "Discovery rules"
 msgstr "Reguły wykrywania"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Usunięto reguły wykrywania"
 
@@ -7340,7 +7340,7 @@ msgstr "Błędny rodzic dla serwisu \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Błędny serwis nadrzędny."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Błędny zakres portów."
 
@@ -7708,7 +7708,7 @@ msgstr "Nieprawidłowy klucz \"%1$s\" dla pozycji \"%2$s\" w \"%3$s\": %4$s."
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Nieprawidłowy klucz \"%1$s\" dla prototypu pozycji \"%2$s\" w \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "nieprawidłowy klucz \"%1$s\": %2$s."

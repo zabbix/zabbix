@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1508,7 +1508,7 @@ msgstr "不能创建循环依赖关系。"
 msgid "Cannot create dependency on trigger itself."
 msgstr "不能创建触发器本身的依赖."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "无法创建探索规则"
 
@@ -1559,12 +1559,12 @@ msgstr "无法删除应用集"
 msgid "Cannot delete dependency"
 msgstr "无法删除相依关係"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "无法删除探索规则"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "无法删除探索规则"
 
@@ -1786,7 +1786,7 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -1856,7 +1856,7 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2343,7 +2343,7 @@ msgstr "无法更新组态"
 msgid "Cannot update debug mode"
 msgstr "无法更新调试模式"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "无法更新探索规则"
 
@@ -4432,25 +4432,25 @@ msgstr "探索规则\"%1$s:%2$s\" 有不正确的存活时间: \"%3$s\". (最小
 msgid "Discovery rule \"%s\" already exists."
 msgstr "探索规则 \"%s\" 已存在."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "探索规则已创建"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "探索规则已删除"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "探索规则已更新"
 
@@ -4463,7 +4463,7 @@ msgstr "探索规则已更新"
 msgid "Discovery rules"
 msgstr "探索规则"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "探索规则已删除"
 
@@ -7257,7 +7257,7 @@ msgstr "予服务\"%1$s\"的不正确上层"
 msgid "Incorrect parent service."
 msgstr "不正确的上层服务."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "不正确的埠范围."
 
@@ -7625,7 +7625,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""

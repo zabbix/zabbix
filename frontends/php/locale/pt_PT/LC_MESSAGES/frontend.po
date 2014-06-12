@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1515,7 +1515,7 @@ msgstr "Não é possível criar uma dependência circular."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar uma dependência de um trigger com ele mesmo."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Não foi possível criar regra de descoberta"
 
@@ -1566,12 +1566,12 @@ msgstr "Não foi possível eliminar aplicação"
 msgid "Cannot delete dependency"
 msgstr "Não foi possível eliminar dependência"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Não foi possível eliminar regra de descoberta"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Não foi possível eliminar regras de descoberta"
 
@@ -1795,7 +1795,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -1876,7 +1876,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2376,7 +2376,7 @@ msgstr "Não foi possível actualizar a configuração"
 msgid "Cannot update debug mode"
 msgstr "Não foi possível actualizar o modo de debug"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Não foi possível actualizar a regra de descoberta"
 
@@ -4466,27 +4466,27 @@ msgstr "Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Regra de descoberta \"%s\" já existe."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Regra de descoberta criada"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Regra de descoberta eliminada"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Regra de descoberta actualizada"
 
@@ -4499,7 +4499,7 @@ msgstr "Regra de descoberta actualizada"
 msgid "Discovery rules"
 msgstr "Regras de descoberta"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Regras de descoberta eliminadas"
 
@@ -7296,7 +7296,7 @@ msgstr "Parâmetros inválidos para o serviço pai \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Serviço pai inválido."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Gama de portos incorrecto."
 
@@ -7664,7 +7664,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""

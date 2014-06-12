@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2013-12-17 21:07+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -1515,7 +1515,7 @@ msgstr "Cannot create circular dependencies."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Cannot create dependency on trigger itself."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Cannot create discovery rule"
 
@@ -1566,12 +1566,12 @@ msgstr "Cannot delete application"
 msgid "Cannot delete dependency"
 msgstr "Cannot delete dependency"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Cannot delete discovery rule"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Cannot delete discovery rules"
 
@@ -1795,7 +1795,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Cannot disable action"
 msgstr[1] "Cannot disable actions"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Cannot disable discovery rule"
@@ -1875,7 +1875,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Cannot enable action"
 msgstr[1] "Cannot enable actions"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Cannot enable discovery rule"
@@ -2374,7 +2374,7 @@ msgstr "Cannot update configuration"
 msgid "Cannot update debug mode"
 msgstr "Cannot update debug mode"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Cannot update discovery rule"
 
@@ -4464,27 +4464,27 @@ msgstr "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Discovery rule \"%s\" already exists."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Discovery rule created"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Discovery rule deleted"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Discovery rule disabled"
 msgstr[1] "Discovery rules disabled"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Discovery rule enabled"
 msgstr[1] "Discovery rules enabled"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Discovery rule updated"
 
@@ -4497,7 +4497,7 @@ msgstr "Discovery rule updated"
 msgid "Discovery rules"
 msgstr "Discovery rules"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Discovery rules deleted"
 
@@ -7294,7 +7294,7 @@ msgstr "Incorrect parent for service \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Incorrect parent service."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Incorrect port range."
 
@@ -7662,7 +7662,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""

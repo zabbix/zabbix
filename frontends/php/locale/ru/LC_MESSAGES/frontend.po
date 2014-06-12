@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:58+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2014-06-05 14:41+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1526,7 +1526,7 @@ msgstr "Не удалось создать закольцованные зави
 msgid "Cannot create dependency on trigger itself."
 msgstr "Невозможно создать зависимость триггера от самого себя."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Не удалось создать правило обнаружения"
 
@@ -1577,12 +1577,12 @@ msgstr "Невозможно удалить группу элементов да
 msgid "Cannot delete dependency"
 msgstr "Не удалось удалить зависимость"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Не удалось удалить правило обнаружения"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Не удалось удалить правила обнаружения"
 
@@ -1808,7 +1808,7 @@ msgstr[0] "Не удалось деактивировать действие"
 msgstr[1] "Не удалось деактивировать действия"
 msgstr[2] "Не удалось деактивировать действия"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Не удалось деактивировать правило обнаружения"
@@ -1900,7 +1900,7 @@ msgstr[0] "Не удалось деактивировать действие"
 msgstr[1] "Не удалось деактивировать действия"
 msgstr[2] "Не удалось деактивировать действия"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Не удалось деактивировать правило обнаружения"
@@ -2412,7 +2412,7 @@ msgstr "Не удалось обновить настройки"
 msgid "Cannot update debug mode"
 msgstr "Не удалось обновить режим отладки"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Не удалось обновить правило обнаружения"
 
@@ -4503,29 +4503,29 @@ msgstr "У правила обнаружения \"%1$s:%2$s\" некоррек�
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Правило обнаружения \"%s\" уже существует."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Правило обнаружения создано"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Правило обнаружения удалено"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Правило обнаружения деактивировано"
 msgstr[1] "Правила обнаружения деактивированы"
 msgstr[2] "Правила обнаружения деактивированы"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Правило обнаружения активировано"
 msgstr[1] "Правила обнаружения активированы"
 msgstr[2] "Правила обнаружения активированы"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
@@ -4538,7 +4538,7 @@ msgstr "Правило обнаружения обновлено"
 msgid "Discovery rules"
 msgstr "Правила обнаружения"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
@@ -7339,7 +7339,7 @@ msgstr "Некорректный родитель для услуги \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Некорректная родительская услуга."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Некорректный диапазон портов."
 
@@ -7707,7 +7707,7 @@ msgstr "Ошибочный ключ \"%1$s\" для элемента данны�
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Ошибочный ключ \"%1$s\" для прототипа элемента данных \"%2$s\" у \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Ошибочный ключ \"%1$s\": %2$s."

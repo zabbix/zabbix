@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2014-06-08 09:12+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1519,7 +1519,7 @@ msgstr "Não é possível criar dependências circulares."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar dependência entre uma trigger e ela mesma."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Não foi possível criar a regra de discovery"
 
@@ -1570,12 +1570,12 @@ msgstr "Aplicação não foi excluída"
 msgid "Cannot delete dependency"
 msgstr "Não é possível excluir dependência"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "A autobusca não pôde ser excluída"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Não foi possível excluir a autobusca"
 
@@ -1799,7 +1799,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desativar a ação"
 msgstr[1] "Não foi possível desativar as ações"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Não foi possível desativar regra de descoberta"
@@ -1880,7 +1880,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível ativar a ação"
 msgstr[1] "Não foi possível ativar as ações"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Não foi possível ativar a regra de descoberta"
@@ -2380,7 +2380,7 @@ msgstr "Não foi possível atualizar a configuração"
 msgid "Cannot update debug mode"
 msgstr "Modo de depuração não foi atualizado"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Regra de autobusca não foi atualizada"
 
@@ -4471,27 +4471,27 @@ msgstr "A autobusca \"%1$s:%2$s\" possui tempo de vida inválido: \"%3$s\" (min:
 msgid "Discovery rule \"%s\" already exists."
 msgstr "A regra de descoberta \"%s\" já existe."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "A regra de descoberta foi criada"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "A regra de autobusca excluída"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regra de descoberta desativada"
 msgstr[1] "Regras de descoberta desativadas"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regra de descoberta ativada"
 msgstr[1] "Regras de descoberta ativadas"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Regra de autobusca atualizada"
 
@@ -4504,7 +4504,7 @@ msgstr "Regra de autobusca atualizada"
 msgid "Discovery rules"
 msgstr "Regras de descoberta"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "A regra de descoberta foi excluída"
 
@@ -7302,7 +7302,7 @@ msgstr "Pai inválido para o serviço \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Pai inválido para o serviço."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Range de porta inválido."
 
@@ -7673,7 +7673,7 @@ msgstr "A chave \"%1$s\" é inválida para o item \"%2$s\" em \"%3$s\": %4$s."
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "A chave \"%1$s\" é inválida para o protótipo de item \"%2$s\" em \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Chave inválida \"%1$s\": %2$s."

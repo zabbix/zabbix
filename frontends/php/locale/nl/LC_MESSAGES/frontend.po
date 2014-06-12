@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1518,7 +1518,7 @@ msgstr "Kan geen circulaire afhankelijkheden maken."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Kan geen afhankelijkheid maken op de trigger zelf."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Kan discovery regel niet aanmaken"
 
@@ -1569,12 +1569,12 @@ msgstr "Kan applicatie niet verwijderen"
 msgid "Cannot delete dependency"
 msgstr "Kan de afhankelijkheid niet verwijderen"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Kan discovery regel niet verwijderen"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Kan discovery regels niet verwijderen"
 
@@ -1798,7 +1798,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -1880,7 +1880,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2380,7 +2380,7 @@ msgstr "Kan de configuratie niet bijwerken"
 msgid "Cannot update debug mode"
 msgstr "Kan debug modus niet bijwerken"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Kan discovery rule niet bijwerken"
 
@@ -4470,27 +4470,27 @@ msgstr "Ontdekkingsregel \"%1$s:%2$s\" heeft een foute levensduur: \"%3$s\". (mi
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Ontdekkingsregel \"%s\" bestaat al."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Ontdekkingsregel aangemaakt"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Ontdekkingsregel verwijderd"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Ontdekkingsregel aangepast"
 
@@ -4503,7 +4503,7 @@ msgstr "Ontdekkingsregel aangepast"
 msgid "Discovery rules"
 msgstr "Ontdekkingsregels"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Ontdekkingsregels verwijderd"
 
@@ -7301,7 +7301,7 @@ msgstr "Verkeerde ouder voor service \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Verkeerde ouder service."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Verkeerd poortbereik."
 
@@ -7669,7 +7669,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
