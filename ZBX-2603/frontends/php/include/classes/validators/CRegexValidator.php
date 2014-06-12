@@ -27,8 +27,7 @@ class CRegexValidator extends CValidator
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
+	public function validate($value) {
 		// validate for modifiers
 		if (preg_match('/^\//', $value) ||
 			// yes, four backslashes represent one backslash in PHP regex, no error here
