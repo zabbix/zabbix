@@ -42,8 +42,8 @@
 #define COMMAND_BUF_SIZE	1024
 #define XML_VALUE_BUF_SIZE	512
 
-#define EXPECTED_RESULT_CODE		"1000"
-#define EXPECTED_RESULT_CODE_LOGOUT	"1500"
+#define EPP_SUCCESS_CODE_GENERAL	"1000"
+#define EPP_SUCCESS_CODE_LOGOUT		"1500"
 
 #define COMMAND_LOGIN			"login"
 #define COMMAND_INFO			"info"
@@ -1401,7 +1401,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	FILE		*log_fd;
 	DC_ITEM		*items = NULL;
 	zbx_ns_t	*nss = NULL;
-	size_t		i, j, items_num = 0, nss_num;
+	size_t		i, j, items_num = 0, nss_num = 0;
 	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, rdds_enabled, res_ec = ZBX_EC_NOERROR,
 			rtt, upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
 
@@ -1549,7 +1549,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	/* set the value of our simple check item itself */
 	zbx_add_value_uint(item, item->nextcheck, ok_nss_num);
-
+out:
 	if (0 != nss_num)
 	{
 		zbx_clean_nss(nss, nss_num);
@@ -1569,7 +1569,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		else
 			ldns_resolver_free(res);
 	}
-out:
+
 	if (0 != ISSET_MSG(result))
 		zbx_rsm_err(log_fd, result->msg);
 
@@ -2711,10 +2711,10 @@ static int	command_login(const char *epp_commands, const char *name, SSL *ssl, i
 		goto out;
 	}
 
-	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	if (0 != strcmp(EPP_SUCCESS_CODE_GENERAL, xml_value))
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
-				name, xml_value, EXPECTED_RESULT_CODE);
+				name, xml_value, EPP_SUCCESS_CODE_GENERAL);
 		*rtt = ZBX_EC_EPP_LOGININVAL;
 		goto out;
 	}
@@ -2780,10 +2780,10 @@ static int	command_update(const char *epp_commands, const char *name, SSL *ssl, 
 		goto out;
 	}
 
-	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	if (0 != strcmp(EPP_SUCCESS_CODE_GENERAL, xml_value))
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
-				name, xml_value, EXPECTED_RESULT_CODE);
+				name, xml_value, EPP_SUCCESS_CODE_GENERAL);
 		*rtt = ZBX_EC_EPP_UPDATEINVAL;
 		goto out;
 	}
@@ -2844,10 +2844,10 @@ static int	command_info(const char *epp_commands, const char *name, SSL *ssl, in
 		goto out;
 	}
 
-	if (0 != strcmp(EXPECTED_RESULT_CODE, xml_value))
+	if (0 != strcmp(EPP_SUCCESS_CODE_GENERAL, xml_value))
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
-				name, xml_value, EXPECTED_RESULT_CODE);
+				name, xml_value, EPP_SUCCESS_CODE_GENERAL);
 		*rtt = ZBX_EC_EPP_INFOINVAL;
 		goto out;
 	}
@@ -2896,10 +2896,10 @@ static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, 
 		goto out;
 	}
 
-	if (0 != strcmp(EXPECTED_RESULT_CODE_LOGOUT, xml_value))
+	if (0 != strcmp(EPP_SUCCESS_CODE_LOGOUT, xml_value))
 	{
 		zbx_snprintf(err, err_size, "invalid result code in reply to \"%s\": \"%s\" (expected \"%s\")",
-				name, xml_value, EXPECTED_RESULT_CODE_LOGOUT);
+				name, xml_value, EPP_SUCCESS_CODE_LOGOUT);
 		goto out;
 	}
 
