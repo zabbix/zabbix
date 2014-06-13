@@ -153,13 +153,18 @@ class CConfigurationImport {
 			$this->processApplications();
 			$this->processItems();
 			$this->processDiscoveryRules();
+
+			// after discovery rules and prototypes have been processed, remove missing discovery rules and prototypes
+			$this->deleteMissingDiscoveryRules();
+
+			// triggers and graphs can be processed after prototypes are deleted, otherwise we lose those references
 			$this->processTriggers();
 			$this->processGraphs();
 
 			$this->deleteMissingTriggers();
 			$this->deleteMissingGraphs();
 
-			// items can be deleted after graphs are deleted
+			// items can be deleted after graphs are deleted, because graphs can have min/max value as items
 			$this->deleteMissingItems();
 
 			$this->processImages();
@@ -569,6 +574,10 @@ class CConfigurationImport {
 	 * Import items.
 	 */
 	protected function processItems() {
+		if (!$this->options['items']['createMissing'] && !$this->options['items']['updateExisting']) {
+			return;
+		}
+
 		$allItems = $this->getFormattedItems();
 
 		if (empty($allItems)) {
@@ -659,6 +668,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processDiscoveryRules() {
+		if (!$this->options['discoveryRules']['createMissing'] && !$this->options['discoveryRules']['updateExisting']) {
+			return;
+		}
+
 		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 
 		if (empty($allDiscoveryRules)) {
@@ -740,7 +753,7 @@ class CConfigurationImport {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
-				// if rule was not processed we should not create/upadate any of it's prototypes
+				// if rule was not processed we should not create/update any of it's prototypes
 				if (!isset($processedRules[$hostid][$item['key_']])) {
 					continue;
 				}
@@ -913,7 +926,7 @@ class CConfigurationImport {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
-				// if rule was not processed we should not create/upadate any of it's prototypes
+				// if rule was not processed we should not create/update any of it's prototypes
 				if (!isset($processedRules[$hostid][$item['key_']])) {
 					continue;
 				}
@@ -1037,6 +1050,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processGraphs() {
+		if (!$this->options['graphs']['createMissing'] && !$this->options['graphs']['updateExisting']) {
+			return;
+		}
+
 		$allGraphs = $this->getFormattedGraphs();
 
 		if (empty($allGraphs)) {
@@ -1140,6 +1157,10 @@ class CConfigurationImport {
 	 * Import triggers.
 	 */
 	protected function processTriggers() {
+		if (!$this->options['triggers']['createMissing'] && !$this->options['triggers']['updateExisting']) {
+			return;
+		}
+
 		$allTriggers = $this->getFormattedTriggers();
 
 		if (empty($allTriggers)) {
@@ -1306,6 +1327,10 @@ class CConfigurationImport {
 		$hostIdsXML = array();
 
 		foreach ($allItems as $host => $items) {
+			if (!$this->referencer->isProcessedHost($host)) {
+				continue;
+			}
+
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
 			$hostIdsXML[$hostId] = $hostId;
 
@@ -1316,6 +1341,11 @@ class CConfigurationImport {
 					$itemIdsXML[$itemId] = $itemId;
 				}
 			}
+		}
+
+		// no hosts have been processed
+		if (!$hostIdsXML) {
+			return;
 		}
 
 		$dbItemIds = API::Item()->get(array(
@@ -1364,8 +1394,17 @@ class CConfigurationImport {
 		$triggersXML = array();
 
 		foreach ($hosts as $host) {
+			if (!$this->referencer->isProcessedHost($host)) {
+				continue;
+			}
+
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
 			$hostIdsXML[$hostId] = $hostId;
+		}
+
+		// no hosts have been processed
+		if (!$hostIdsXML) {
+			return;
 		}
 
 		foreach ($allTriggers as $trigger) {
@@ -1405,6 +1444,8 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes graphs from DB that are missing in XML.
+	 *
+	 * @throws Exception if premission check fails.
 	 */
 	protected function deleteMissingGraphs() {
 		if (!$this->options['graphs']['deleteMissing']) {
@@ -1430,8 +1471,17 @@ class CConfigurationImport {
 		$hostIdsXML = array();
 
 		foreach ($hosts as $host) {
+			if (!$this->referencer->isProcessedHost($host)) {
+				continue;
+			}
+
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
 			$hostIdsXML[$hostId] = $hostId;
+		}
+
+		// no hosts have been processed
+		if (!$hostIdsXML) {
+			return;
 		}
 
 		$graphNames = array();
@@ -1496,6 +1546,183 @@ class CConfigurationImport {
 			if (!array_diff_key($graphHostIds, $hostIdsXML)) {
 				API::Graph()->delete(array($graphId));
 			}
+		}
+	}
+
+	/**
+	 * Deletes discovery rules and prototypes from DB that are missing in XML.
+	 */
+	protected function deleteMissingDiscoveryRules() {
+		if (!$this->options['discoveryRules']['deleteMissing']) {
+			return;
+		}
+
+		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
+
+		if (!$allDiscoveryRules) {
+			return;
+		}
+
+		$hostIdsXML = array();
+		$discoveryRuleIdsXML = array();
+
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			if (!$this->referencer->isProcessedHost($host)) {
+				continue;
+			}
+
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+
+			$hostIdsXML[$hostId] = $hostId;
+
+			foreach ($discoveryRules as $discoveryRule) {
+				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+				if ($discoveryRuleId) {
+					$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
+				}
+			}
+		}
+
+		// no hosts have been processed
+		if (!$hostIdsXML) {
+			return;
+		}
+
+		$dbDiscoveryRuleIds = API::DiscoveryRule()->get(array(
+			'output' => array('itemid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$discoveryRulesToDelete = array_diff_key($dbDiscoveryRuleIds, $discoveryRuleIdsXML);
+
+		if ($discoveryRulesToDelete) {
+			API::DiscoveryRule()->delete(array_keys($discoveryRulesToDelete));
+		}
+
+		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
+		$this->referencer->refreshItems();
+
+		$hostPrototypeIdsXML = array();
+		$triggerPrototypeIdsXML = array();
+		$graphPrototypeIdsXML = array();
+		$itemPrototypeIdsXML = array();
+		$graphPrototypeNames = array();
+
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+
+			foreach ($discoveryRules as $discoveryRule) {
+				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+
+				// gather host prototype IDs to delete
+				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
+					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $discoveryRuleId,
+						$hostPrototype['host']
+					);
+
+					if ($hostPrototypeId) {
+						$hostPrototypeIdsXML[$hostPrototypeId] = $hostPrototypeId;
+					}
+				}
+
+				// gather trigger prototype IDs to delete
+				foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
+					$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
+						$triggerPrototype['expression']
+					);
+
+					if ($triggerPrototypeId) {
+						$triggerPrototypeIdsXML[$triggerPrototypeId] = $triggerPrototypeId;
+					}
+				}
+
+				// gather graph prototype names for later usage
+				foreach ($discoveryRule['graph_prototypes'] as $graphPrototype) {
+					$graphPrototypeNames[] = $graphPrototype['name'];
+				}
+
+				// gather item prototype IDs to delete
+				foreach ($discoveryRule['item_prototypes'] as $itemPrototype) {
+					$itemPrototypeId = $this->referencer->resolveItem($hostId, $itemPrototype['key_']);
+
+					if ($itemPrototypeId) {
+						$itemPrototypeIdsXML[$itemPrototypeId] = $itemPrototypeId;
+					}
+				}
+			}
+		}
+
+		// delete missing host prototypes
+		$dbHostPrototypeIds = API::HostPrototype()->get(array(
+			'output' => array('hostid'),
+			'discoveryids' => $discoveryRuleIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$hostPrototypesToDelete = array_diff_key($dbHostPrototypeIds, $hostPrototypeIdsXML);
+
+		if ($hostPrototypesToDelete) {
+			API::HostPrototype()->delete(array_keys($hostPrototypesToDelete));
+		}
+
+		// delete missing trigger prototypes
+		$dbTriggerPrototypeIds = API::TriggerPrototype()->get(array(
+			'output' => array('triggerid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$triggerPrototypesToDelete = array_diff_key($dbTriggerPrototypeIds, $triggerPrototypeIdsXML);
+
+		// unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them
+		if ($triggerPrototypesToDelete) {
+			API::TriggerPrototype()->delete(array_keys($triggerPrototypesToDelete));
+		}
+
+		// delete missing graph prototypes
+		$graphPrototypeIdsXML = API::GraphPrototype()->get(array(
+			'output' => array('graphid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'filter' => array('name' => $graphPrototypeNames)
+		));
+
+		$dbGraphPrototypeIds = API::GraphPrototype()->get(array(
+			'output' => array('graphid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$graphPrototypesToDelete = array_diff_key($dbGraphPrototypeIds, $graphPrototypeIdsXML);
+
+		// unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them
+		if ($graphPrototypesToDelete) {
+			API::GraphPrototype()->delete(array_keys($graphPrototypesToDelete));
+		}
+
+		// delete missing item prototypes
+		$dbItemPrototypeIds = API::ItemPrototype()->get(array(
+			'output' => array('itemid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$itemPrototypesToDelete = array_diff_key($dbItemPrototypeIds, $itemPrototypeIdsXML);
+
+		if ($itemPrototypesToDelete) {
+			API::ItemPrototype()->delete(array_keys($itemPrototypesToDelete));
 		}
 	}
 

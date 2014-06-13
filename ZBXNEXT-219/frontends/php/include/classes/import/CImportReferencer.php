@@ -746,7 +746,10 @@ class CImportReferencer {
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
 				'selectHosts' => array('hostid'),
-				'filter' => array('description' => array_keys($this->triggers))
+				'filter' => array(
+					'description' => array_keys($this->triggers),
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+				)
 			));
 
 			foreach ($dbTriggers as $dbTrigger) {
