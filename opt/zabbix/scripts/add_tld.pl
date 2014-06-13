@@ -1136,70 +1136,30 @@ sub create_probe_template {
 sub update_root_servers {
     my $content = LWP::UserAgent->new->get('http://www.internic.net/zones/named.root')->{'_content'};
 
-    my $macro_value_v4;
-    my $macro_value_v6;
-    my $macros_v4;
-    my $macros_v6;
-    my $cnt_macros_v4 = 1;
-    my $cnt_macros_v6 = 1;
+    my $macro_value_v4 = "";
+    my $macro_value_v6 = "";
 
     return unless defined $content;
 
     for my $str (split("\n", $content)) {
-	if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/ and $OPTS{'ipv4'} == 1) {
-	    if (defined($macro_value_v4) and length($macro_value_v4.','.$1) > 255) {
-                $macros_v4 = $macros_v4.','.'{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' if defined($macros_v4);
-                $macros_v4 = '{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' unless defined $macros_v4;
-                create_macro('{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
-                undef $macro_value_v4;
-                $cnt_macros_v4++;
-            }
-
-	    $macro_value_v4 = $macro_value_v4.','.$1 if defined($macro_value_v4);
-	    $macro_value_v4 = $1 unless defined $macro_value_v4;
+	if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/) {
+	    $macro_value_v4 .= ',' if ($macro_value_v4 ne "");
+	    $macro_value_v4 .= $1;
 	}
 
-	if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/ and $OPTS{'ipv6'} == 1) {
-            if (defined($macro_value_v6) and length($macro_value_v6.','.$1) > 255) {
-                $macros_v6 = $macros_v6.','.'{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' if defined($macros_v6);
-                $macros_v6 = '{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' unless defined $macros_v6;
-                create_macro('{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
-                undef $macro_value_v6;
-                $cnt_macros_v6++;
-            }
-
-            $macro_value_v6 = $macro_value_v6.','.$1 if defined($macro_value_v6);
-            $macro_value_v6 = $1 unless defined $macro_value_v6;
+	if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/) {
+	    $macro_value_v6 .= ',' if ($macro_value_v6 ne "");
+	    $macro_value_v6 .= $1;
         }
     }
 
-    unless (defined($macros_v4)) {
-	if (defined($macro_value_v4)) {
-	    $macros_v4 = '{$RSM.IP4.ROOTSERVERS1}';
-	    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
-	}
-    }
-    else {
-	$macros_v4 = $macros_v4.','.'{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}';
-	create_macro('{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
-    }
+    print("macro_value_v4:$macro_value_v4\n");
+    print("macro_value_v6:$macro_value_v6\n");
 
-    unless (defined($macros_v6)) {
-	if (defined($macro_value_v6)) {
-            $macros_v6 = '{$RSM.IP6.ROOTSERVERS1}';
-            create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
-        }
-    }
-    else {
-        $macros_v6 = $macros_v6.','.'{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}';
-        create_macro('{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
-    }
+    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
+    create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
 
-    return '"'.$macros_v4.'","'.$macros_v6.'"' if defined $macros_v4 and defined $macros_v6;
-    return '"'.$macros_v4.'"' if defined $macros_v4 and !defined $macros_v6;
-    return ','.$macros_v6.'"' if !defined $macros_v4 and defined $macros_v6;
-
-    return ',,';
+    return '"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"';
 }
 
 sub trim
