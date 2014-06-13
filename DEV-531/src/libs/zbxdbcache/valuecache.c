@@ -2295,8 +2295,8 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item, zbx_vector_history_reco
 		if (FAIL == (ret = vch_item_get_values_by_count(item, values, count, timestamp)))
 			goto out;
 
-		if (records_read > count)
-			records_read = count;
+		if (records_read > values->values_num)
+			records_read = values->values_num;
 	}
 
 	hits = values->values_num - records_read;
