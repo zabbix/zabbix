@@ -33,7 +33,9 @@ class GlobalRegexpTest extends PHPUnit_Framework_TestCase
 			// "character string included", case-insensitive
 			array(
 				'expression' => $this->expr(EXPRESSION_TYPE_INCLUDED, 'testString', 0),
-				'success' => array('This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString', 'This is teststring', 'TeStString maybe?'),
+				'success' => array('This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString',
+					'This is teststring', 'TeStString maybe?'
+				),
 				'fail' => array('', 'orendswithTest String', 'this is not a TEST string')
 			),
 			// "character string NOT included", case-sensitive
@@ -46,7 +48,9 @@ class GlobalRegexpTest extends PHPUnit_Framework_TestCase
 			array(
 				'expression' => $this->expr(EXPRESSION_TYPE_NOT_INCLUDED, 'testString', 0),
 				'success' => array('', 'orendswithTest String', 'this is not a TEST string'),
-				'fail' => array('This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString', 'This is teststring', 'TeStString maybe?')
+				'fail' => array('This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString',
+					'This is teststring', 'TeStString maybe?'
+				)
 			),
 			// ANY character string included, case-sensitive
 			array(
@@ -57,7 +61,9 @@ class GlobalRegexpTest extends PHPUnit_Framework_TestCase
 			// ANY character string included, case-insensitive
 			array(
 				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, 'Error,Disaster,Critical', 0),
-				'success' => array('Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors', 'ERROR: error', 'Object state: CRITICAL', 'Log levels: DISASTER', 'Log levels: error'),
+				'success' => array('Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors',
+					'ERROR: error', 'Object state: CRITICAL', 'Log levels: DISASTER', 'Log levels: error'
+				),
 				'fail' => array('no errs or disastrs here')
 			),
 			// regular expressions, TRUE, case-sensitive
