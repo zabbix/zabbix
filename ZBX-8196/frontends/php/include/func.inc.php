@@ -1425,8 +1425,6 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, arr
 		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
 			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
 			invalid_url();
-			// we do not want the profile to be updated with wrong value
-			return;
 		}
 
 		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
@@ -1434,8 +1432,6 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, arr
 				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
 			));
 			invalid_url();
-			// we do not want the profile to be updated with wrong value
-			return;
 		}
 
 		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
