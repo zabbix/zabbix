@@ -1,0 +1,17 @@
+{
+	"jsonrpc": "2.0",
+	"method": "drule.create",
+	"params": {
+		"name": "test",
+		"iprange": "10.2.158.0\/24",
+		"dchecks": [
+			{
+				"type": "12",
+				"uniq": "1"
+			}
+		],
+		"proxy_hostid": "1010",
+		"delay": "3600",
+		"status": "0"
+	}
+}

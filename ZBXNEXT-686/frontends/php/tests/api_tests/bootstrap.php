@@ -1,0 +1,257 @@
+<?php
+ob_start();
+class ZbxApiTestBase extends PHPUnit_Framework_TestCase
+{
+	/**
+	 * Current auth key
+	 * @var string
+	 */
+	protected $authKey = null;
+
+	/**
+	 * Executes api request and checks if it throws exception with the expected message/data.
+	 *
+	 * @param string|array $fixtures fixtures to load, can be JSON string, array or fixture file path
+	 * @param string $message
+	 * @param string $messageData
+	 * @throws PHPUnit_Framework_ExpectationFailedException
+	 */
+	protected function expectApiException($fixtures, $message, $messageData)
+	{
+		$data = $this->loadFixtures($fixtures);
+
+		$response = $this->apiRequest($data);
+
+		if (!isset($response['error'])) {
+			throw new PHPUnit_Framework_ExpectationFailedException(
+				'API response does not look like exception (and it should be)'
+			);
+		}
+
+		if ($response['error']['message'] !== $message || $response['error']['data'] !== $messageData) {
+			throw new PHPUnit_Framework_ExpectationFailedException(
+				sprintf(
+					'API returned wrong exception ("%s/%s" expected, "%s/%s" actual)',
+					$message,
+					$messageData,
+					$response['error']['message'],
+					$response['error']['data']
+				)
+			);
+		}
+
+		$this->addToAssertionCount(1);
+	}
+
+	/**
+	 * Detects fixture type and loads them into array
+	 * (so they can be modified on request with auth variables, id and so on)
+	 *
+	 * @param string|array $fixtures
+	 * @throws PHPUnit_Framework_ExpectationFailedException
+	 *
+	 * @return array
+	 */
+	protected function loadFixtures($fixtures)
+	{
+		if (is_string($fixtures)) {
+			// TODO: make more sane check
+			if (strpos($fixtures, '/') !== false && is_readable($this->getTestRoot().'/'.$fixtures)) {
+				$fixtures = file_get_contents($this->getTestRoot() . '/' . $fixtures);
+			}
+
+			$json = json_decode($fixtures, true);
+
+			if (null === $json) {
+				throw new PHPUnit_Framework_ExpectationFailedException(
+					'The data provided for test is not a valid json text or fixture path.'
+				);
+			}
+
+			return $json;
+		}
+
+		return $fixtures;
+	}
+
+	protected function apiRequest(array $data)
+	{
+		if (!isset($data['method'])) {
+			throw new \InvalidArgumentException('No "method field" for json request');
+		}
+
+		if ($this->isMethodSecure($data['method'])) {
+			$data['auth'] = $this->authorize();
+		}
+
+		if (!isset($data['id'])) {
+			$data['id'] = rand(1, 655536);
+		}
+
+		$this->setStreamWrapper(json_encode($data));
+
+		$_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
+
+		if (function_exists('zbx_err_handler')) {
+			rename_function('zbx_err_handler', 'zbx_err_handler_'.rand(1, 10));
+		}
+
+		ob_start();
+		require $this->getApiEntryPoint();
+		$contents = ob_get_contents();
+		ob_end_clean();
+
+		$json = json_decode($contents, true);
+
+		if (null === $json) {
+			throw new \Exception('JSON returned by API call is not decodable');
+		}
+
+		$this->restoreStreamWrapper();
+
+		return $json;
+	}
+
+	/**
+	 * Returns path to api_jsonrpc.php
+	 *
+	 * @return string
+	 */
+	protected function getApiEntryPoint()
+	{
+		// TODO: remove hardcode
+		return realpath(__DIR__.'/../frontends/php/api_jsonrpc.php');
+	}
+
+	/**
+	 * Restores stream wrapper for php:// streams
+	 */
+	protected function restoreStreamWrapper()
+	{
+		stream_wrapper_restore('php');
+	}
+
+	/**
+	 * Sets wrapper for php://input and fills it with contents provided
+	 *
+	 * @param $contents
+	 */
+	protected function setStreamWrapper($contents)
+	{
+		stream_wrapper_unregister('php');
+		stream_wrapper_register('php', 'ZbxInputStreamWrapper');
+
+		file_put_contents('php://input', $contents);
+	}
+
+	/**
+	 * Authorizes user and caches auth key for future use
+	 *
+	 * @throws RuntimeException
+	 * @return string
+	 */
+	protected function authorize()
+	{
+		if (null !== $this->authKey) {
+			return $this->authKey;
+		}
+
+		// TODO: move to the config
+		$user = 'Admin';
+		$password = 'zabbix';
+
+		$result = $this->apiRequest(array(
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => array(
+				'user' => $user,
+				'password' => $password
+			)
+		));
+
+		if (!is_array($result) || !isset($result['result']) || !preg_match('/^[a-z0-9]{32}$/', $result['result'])) {
+			// TODO: check for API exception here
+			throw new RuntimeException('Api returned garbaged result');
+		} else {
+			$this->authKey = $result['result'];
+
+			return $this->authKey;
+		}
+	}
+
+	/**
+	 * Checks if method is secure.
+	 * TODO; return false for ALL public methods
+	 *
+	 * @param $method
+	 *
+	 * @return bool
+	 */
+	protected function isMethodSecure($method)
+	{
+		return !in_array($method, array('user.login'));
+	}
+
+	/**
+	 * Resolves test root
+	 * TODO: move this into config
+	 *
+	 * @return string
+	 */
+	protected function getTestRoot()
+	{
+		return realpath(__DIR__.'/tests');
+	}
+}
+
+/**
+ * TODO: document this
+ */
+class ZbxInputStreamWrapper
+{
+	protected static $data;
+	protected static $length;
+	protected static $position = 0;
+
+	public function stream_open($path, $mode, $options, &$opened_path)
+	{
+		if ($path !== 'php://input') {
+			throw new \Exception('Sorry, we support nothing but php://input at the moment');
+		}
+
+		self::$position = 0;
+
+		return true;
+	}
+
+	public function stream_write($data)
+	{
+		self::$data = $data;
+
+		self::$length = strlen($data);
+
+		return self::$length;
+	}
+
+	public function stream_read($index)
+	{
+		// check this code for really long data
+		$chunk = min($index, self::$length - self::$position);
+
+		$data = substr(self::$data, self::$position, $chunk);
+
+		self::$position += $chunk;
+
+		return $data;
+	}
+
+	public function stream_stat()
+	{
+		return array();
+	}
+
+	public function stream_eof()
+	{
+		return self::$position >= self::$length;
+	}
+}
