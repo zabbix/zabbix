@@ -412,6 +412,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		char	*file_name;
 
 		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, httptest->httptest.ssl_cert_file);
+		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
+
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
 		zbx_free(file_name);
 
@@ -427,6 +429,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		char	*file_name;
 
 		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, httptest->httptest.ssl_key_file);
+		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
+
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
 		zbx_free(file_name);
 

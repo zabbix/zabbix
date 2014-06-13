@@ -488,30 +488,15 @@ ZABBIX.apps.map = (function($) {
 				$('#elementType').change(function() {
 					var obj = $(this);
 
-					// clean element id and name
 					switch (obj.val()) {
 						// host
 						case '0':
-							$('#elementNameHost').multiSelectHelper({
-								objectName: 'hosts',
-								name: 'elementValue',
-								selectedLimit: 1,
-								objectOptions: {
-									editable: true
-								}
-							});
+							jQuery('#elementNameHost').multiSelect('clean');
 							break;
 
 						// host group
 						case '3':
-							$('#elementNameHostGroup').multiSelectHelper({
-								objectName: 'hostGroup',
-								name: 'elementValue',
-								selectedLimit: 1,
-								objectOptions: {
-									editable: true
-								}
-							});
+							jQuery('#elementNameHostGroup').multiSelect('clean');
 							break;
 
 						// others types
@@ -560,11 +545,11 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function() {
-					var data = $('elementNameHost').multiSelect.getData();
+					var data = $('#elementNameHost').multiSelect('getData');
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0) ? '&hostid='+ data[0].id : ''),
+						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : ''),
 						450, 450
 					);
 				});
@@ -1268,6 +1253,40 @@ ZABBIX.apps.map = (function($) {
 					});
 			}
 
+			// hosts
+			$('#elementNameHost').multiSelectHelper({
+				id: 'elementNameHost',
+				objectName: 'hosts',
+				name: 'elementValue',
+				selectedLimit: 1,
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
+						'&srcfld1=hostid&writeonly=1',
+					width: 450,
+					height: 450
+				}
+			});
+
+			// host group
+			$('#elementNameHostGroup').multiSelectHelper({
+				id: 'elementNameHostGroup',
+				objectName: 'hostGroup',
+				name: 'elementValue',
+				selectedLimit: 1,
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
+						'&srcfld1=groupid&writeonly=1',
+					width: 450,
+					height: 450
+				}
+			});
+
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -1353,34 +1372,26 @@ ZABBIX.apps.map = (function($) {
 					$('#use_iconmap').prop('disabled', true);
 				}
 
-				// set element id and name
-				switch (selement.elementtype) {
-					// host
-					case '0':
-						$('#elementNameHost').multiSelectHelper({
-							objectName: 'hosts',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1,
-							objectOptions: {
-								editable: true
-							}
-						});
-						break;
+				// set multiselect values
+				if (selement.elementtype == 0 || selement.elementtype == 3) {
+					var item = {
+						'id': selement.elementid,
+						'name': selement.elementName
+					};
 
-					// host group
-					case '3':
-						$('#elementNameHostGroup').multiSelectHelper({
-							objectName: 'hostGroup',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1,
-							objectOptions: {
-								editable: true
-							}
-						});
-						break;
+					switch (selement.elementtype) {
+						// host
+						case '0':
+							$('#elementNameHost').multiSelect('addData', item);
+							break;
+
+						// host group
+						case '3':
+							$('#elementNameHostGroup').multiSelect('addData', item);
+							break;
+					}
 				}
+
 			},
 
 			/**
@@ -1417,7 +1428,7 @@ ZABBIX.apps.map = (function($) {
 				switch (data.elementtype) {
 					// host
 					case '0':
-						var elementData = $('#elementNameHost').multiSelect.getData();
+						var elementData = $('#elementNameHost').multiSelect('getData');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
@@ -1431,7 +1442,7 @@ ZABBIX.apps.map = (function($) {
 
 					// host group
 					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect.getData();
+						var elementData = $('#elementNameHostGroup').multiSelect('getData');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
