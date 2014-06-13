@@ -266,6 +266,7 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/include/classes/core/GlobalRegexpTest.php -text
 frontends/php/tests/unit/include/classes/parsers/CParserTest.php -text
 frontends/php/tests/unit/include/classes/validators/CRegexValidatorTest.php -text
 man/zabbix_agentd.man -text

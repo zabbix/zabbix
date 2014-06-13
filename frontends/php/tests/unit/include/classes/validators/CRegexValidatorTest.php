@@ -37,6 +37,7 @@ class CRegexValidatorTest extends CValidatorTest
 			array(array(), '\\\\'),
 			array(array(), '[A-Z]+[0-9]{123}foo.*(bar|buz)[^A-K]{4}'),
 			array(array(), 'asd\('),
+			array(array(), '^Timestamp \[[0-9]{4}-[A-Za-z]{3}-[0-9]{1,2}\]: ERROR.*$'),
 		);
 	}
 
@@ -54,7 +55,9 @@ class CRegexValidatorTest extends CValidatorTest
 
 	public function invalidValuesWithObjectsProvider()
 	{
-		return array();
+		return array(
+			array(array(), 'test[', $this->pcreMessage('Compilation failed: missing terminating ] for character class at offset 5'))
+		);
 	}
 
 	protected function createValidator(array $params = array())
