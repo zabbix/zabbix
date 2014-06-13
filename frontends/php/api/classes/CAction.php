@@ -543,7 +543,7 @@ class CAction extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $dbAction['name']));
 		}
 
-		$createdActionIds = DB::insert('actions', $actions, true);
+		$createdActionIds = DB::insert('actions', $actions);
 
 		$conditions = array();
 		$operations = array();
@@ -649,7 +649,7 @@ class CAction extends CApiService {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectFilter' => array('formula', 'conditions', 'conditiontype', 'operator', 'value')
+			'selectFilter' => array('formula', 'conditions')
 		));
 
 		foreach ($actions as $action) {
@@ -881,7 +881,7 @@ class CAction extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for condition.'));
 			}
 		}
-		$resultIds = DB::insert('conditions', $conditions, true);
+		$resultIds = DB::insert('conditions', $conditions);
 
 		if ($conditions && $resultIds) {
 			reset($resultIds);
@@ -1868,7 +1868,6 @@ class CAction extends CApiService {
 				$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
 
-
 				foreach ($filters as &$filter) {
 					$filter['conditions'] = zbx_toHash($filter['conditions'], 'conditionid');
 
@@ -1889,7 +1888,7 @@ class CAction extends CApiService {
 					}
 					unset($condition);
 
-					// generated a letter based formula only for rules with custom expressions
+					// generated a letter based formula only for actions with custom expressions
 					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
 					}
