@@ -353,11 +353,13 @@
 				for (var id in this.expressions) {
 					expr = this.expressions[id];
 					exprResult = response.data.expressions[id];
+					error = response.data.errors[id];
 
 					tplData = {
 						expression: expr.data.expression,
 						type: expr.type2str(),
-						result: exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>,
+						result: error ? error:
+							exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>,
 						resultClass: exprResult ? 'green' : 'red'
 					};
 
