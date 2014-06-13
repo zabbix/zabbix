@@ -1431,8 +1431,8 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, arr
 
 		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
 			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN)
-			);
+				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
+			));
 			invalid_url();
 			// we do not want the profile to be updated with wrong value
 			return;
