@@ -417,7 +417,8 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover, input.formlist[type="button"],
-div.calendar input[type="button"] {
+div.calendar input[type="button"], input[type="button"].input[disabled].formlist,
+input[type="submit"].input[disabled].formlist {
 	border: 1px solid #DFDFDF;
 	background-color: #2F2F2F;
 	color: #DFDFDF;
