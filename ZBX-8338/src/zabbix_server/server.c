@@ -44,6 +44,7 @@
 #include "pinger/pinger.h"
 #include "poller/poller.h"
 #include "poller/checks_ipmi.h"
+#include "poller/checks_snmp.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
@@ -755,9 +756,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_server");
+		zbx_init_snmp("zabbix_server");
 #endif
-
 		INIT_SERVER(ZBX_PROCESS_TYPE_POLLER, CONFIG_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
@@ -765,9 +765,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_server");
+		zbx_init_snmp("zabbix_server");
 #endif
-
 		INIT_SERVER(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
@@ -817,9 +816,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_server");
+		zbx_init_snmp("zabbix_server");
 #endif
-
 		INIT_SERVER(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
 
 		main_discoverer_loop();

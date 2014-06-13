@@ -23,6 +23,13 @@
 
 #ifdef HAVE_SNMP
 
+void	zbx_init_snmp(const char *type)
+{
+	init_snmp(type);
+
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_BREAKDOWN_OIDS, 1);
+}
+
 typedef struct
 {
 	char		*oid;

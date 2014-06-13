@@ -43,6 +43,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/poller/checks_ipmi.h"
+#include "../zabbix_server/poller/checks_snmp.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
@@ -735,9 +736,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (proxy_num <= (proxy_count += CONFIG_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
+		zbx_init_snmp("zabbix_proxy");
 #endif
-
 		INIT_PROXY(ZBX_PROCESS_TYPE_POLLER, CONFIG_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
@@ -745,9 +745,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (proxy_num <= (proxy_count += CONFIG_UNREACHABLE_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
+		zbx_init_snmp("zabbix_proxy");
 #endif
-
 		INIT_PROXY(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
@@ -779,9 +778,8 @@ int	MAIN_ZABBIX_ENTRY()
 	else if (proxy_num <= (proxy_count += CONFIG_DISCOVERER_FORKS))
 	{
 #ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
+		zbx_init_snmp("zabbix_proxy");
 #endif
-
 		INIT_PROXY(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
 
 		main_discoverer_loop();
