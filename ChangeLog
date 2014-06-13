@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8330] fixed bug with grouped buttons in discovery rules for SNMP checks (Andrejs)
 ..F....... [ZBX-8318] added "d. m. Y" date format to recognized formats in frontend and set "Y-m-d H:i:s" as fallback (Krists)
 ..F....... [ZBXNEXT-2124] fixed submap problem count calculation in Monitoring / Maps when application filters are active (Krists)
 ..F....... [ZBX-8301] restricted "unique" attribute to Zabbix agent & SNMP checks in discovery rule creation (Andrejs)
