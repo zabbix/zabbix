@@ -207,29 +207,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 		if (SUCCEED != errcodes[i])
 		{
-			zbx_snprintf(error, max_error_len,
-					"Cannot evaluate function \"%s(%s)\":"
-					" item \"%s:%s\" does not exist.",
-					f->func, f->params, f->host, f->key);
-			ret = NOTSUPPORTED;
-			break;
-		}
-
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-		{
-			zbx_snprintf(error, max_error_len,
-					"Cannot evaluate function \"%s(%s)\":"
-					" item \"%s:%s\" is disabled.",
-					f->func, f->params, f->host, f->key);
-			ret = NOTSUPPORTED;
-			break;
-		}
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
-		{
-			zbx_snprintf(error, max_error_len,
-					"Cannot evaluate function \"%s(%s)\":"
-					" item \"%s:%s\" belongs to a disabled host.",
+			zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\":"
+					" item \"%s:%s\" does not exist, is disabled or belongs to a disabled host.",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;

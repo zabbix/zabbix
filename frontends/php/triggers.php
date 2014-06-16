@@ -350,7 +350,7 @@ else {
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
+		'groups' => array('not_proxy_hosts' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
@@ -383,7 +383,7 @@ else {
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers']);
+	$data['paging'] = getPagingLine($data['triggers'], array('triggerid'), array('hostid' => $_REQUEST['hostid']));
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
@@ -442,10 +442,14 @@ else {
 
 	// determine, show or not column of errors
 	if ($data['hostid'] > 0) {
-		$data['showInfoColumn'] = (bool) API::Host()->get(array(
-			'hostids' => $data['hostid'],
-			'output' => array('status')
+		$host = API::Host()->get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'output' => array('status'),
+			'templated_hosts' => true,
+			'editable' => true
 		));
+		$host = reset($host);
+		$data['showInfoColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
 		$data['showInfoColumn'] = true;

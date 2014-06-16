@@ -437,7 +437,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger)
+static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
 {
 	const char	*__function_name = "process_trigger";
 
@@ -472,25 +472,23 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*              |                                                                                 */
 	/*  ------------+------------------------------------------------------                           */
 	/*              |                                                                                 */
-	/*  OK          |   no           T+I          T+E         I                                       */
+	/*  OK          |   no           T            T+E         -                                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
+	/*  OK(?)       |   T            T(e)         T+E         -                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
+	/*  PROBLEM     |   T+E          -            T(m)+E(m)   T                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
+	/*  PROBLEM(?)  |   T+E          -            T+E(m)      T(e)                                    */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
 	/*                                                                                                */
-	/*  ?   - unknown state                                                                           */
 	/*  -   - should never happen                                                                     */
 	/*  no  - do nothing                                                                              */
 	/*  T   - update a trigger                                                                        */
 	/*  E   - generate an event                                                                       */
 	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
-	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
 	/**************************************************************************************************/
 
@@ -566,86 +564,33 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: helper function for process_triggers()                           *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
-{
-	const zbx_ptr_pair_t	*p1 = (const zbx_ptr_pair_t *)d1;
-	const zbx_ptr_pair_t	*p2 = (const zbx_ptr_pair_t *)d2;
-
-	const DC_TRIGGER	*t1 = (const DC_TRIGGER *)p1->first;
-	const DC_TRIGGER	*t2 = (const DC_TRIGGER *)p2->first;
-
-	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
-
-	return 0;
-}
-
 void	process_triggers(zbx_vector_ptr_t *triggers)
 {
-	const char		*__function_name = "process_triggers";
+	const char	*__function_name = "process_triggers";
 
-	int			i, count = 0;
-	char			*sql = NULL;
-	size_t			sql_alloc, sql_offset;
-	zbx_vector_ptr_pair_t	trigger_sqls;
+	char		*sql = NULL;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
+	DC_TRIGGER	*trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
 	if (0 == triggers->values_num)
 		goto out;
 
-	zbx_vector_ptr_pair_create(&trigger_sqls);
-	zbx_vector_ptr_pair_reserve(&trigger_sqls, triggers->values_num);
-
-	for (i = 0; i < triggers->values_num; i++)
-	{
-		zbx_ptr_pair_t	trigger_sql;
-
-		trigger_sql.first = triggers->values[i];
-		trigger_sql.second = NULL;
-
-		zbx_vector_ptr_pair_append(&trigger_sqls, trigger_sql);
-	}
-
-	zbx_vector_ptr_pair_sort(&trigger_sqls, zbx_trigger_topoindex_compare);
-
-	for (i = 0; i < trigger_sqls.values_num; i++)
-	{
-		zbx_ptr_pair_t	*trigger_sql = &trigger_sqls.values[i];
-		DC_TRIGGER	*trigger = (DC_TRIGGER *)trigger_sql->first;
-
-		sql_alloc = 0;
-		sql_offset = 0;
-
-		count += (SUCCEED == process_trigger((char **)&trigger_sql->second, &sql_alloc, &sql_offset, trigger));
-	}
-
-	if (0 == count)
-		goto clean;
-
-	zbx_vector_ptr_pair_sort(&trigger_sqls, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	sql_alloc = 16 * ZBX_KIBIBYTE;
-	sql_offset = 0;
-
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < trigger_sqls.values_num; i++)
+	for (i = 0; i < triggers->values_num; i++)
 	{
-		if (NULL == trigger_sqls.values[i].second)
-			continue;
+		trigger = (DC_TRIGGER *)triggers->values[i];
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, trigger_sqls.values[i].second);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-		zbx_free(trigger_sqls.values[i].second);
+		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, trigger))
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -654,8 +599,6 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
-clean:
-	zbx_vector_ptr_pair_destroy(&trigger_sqls);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1639,9 +1582,6 @@ int	DBtxn_ongoing()
 int	DBtable_exists(const char *table_name)
 {
 	char		*table_name_esc;
-#ifdef HAVE_POSTGRESQL
-	char		*table_schema_esc;
-#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -1665,18 +1605,12 @@ int	DBtable_exists(const char *table_name)
 				" and lower(tname)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
-	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-			"public" : CONFIG_DBSCHEMA);
-
 	result = DBselect(
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
-				" and table_schema='%s'",
-			table_name_esc, table_schema_esc);
-
-	zbx_free(table_schema_esc);
-
+				" and table_schema='public'",
+			table_name_esc);
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
@@ -1708,7 +1642,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_name_esc, *field_name_esc, *table_schema_esc;
+	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
 	char		*table_name_esc;
@@ -1763,8 +1697,6 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_POSTGRESQL)
-	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-			"public" : CONFIG_DBSCHEMA);
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
 
@@ -1772,13 +1704,11 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 			"select 1"
 			" from information_schema.columns"
 			" where table_name='%s'"
-				" and column_name='%s'"
-				" and table_schema='%s'",
-			table_name_esc, field_name_esc, table_schema_esc);
+				" and column_name='%s'",
+			table_name_esc, field_name_esc);
 
 	zbx_free(field_name_esc);
 	zbx_free(table_name_esc);
-	zbx_free(table_schema_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
@@ -2094,31 +2024,17 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
-#ifdef HAVE_ORACLE
-		size_t			str_alloc = 0, str_offset = 0;
-#endif
+
 		switch (field->type)
 		{
-			case ZBX_TYPE_LONGTEXT:
-				if (0 == field->length)
-				{
-#ifdef HAVE_ORACLE
-					row[i].str = zbx_strdup(NULL, value->str);
-#else
-					row[i].str = DBdyn_escape_string(value->str);
-#endif
-					break;
-				}
-				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = NULL;
-				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_n(value->str, field->length));
+				row[i].str = zbx_strdup(NULL, value->str);
 #else
-				row[i].str = DBdyn_escape_string_len(value->str, field->length);
+				row[i].str = DBdyn_escape_string(value->str);
 #endif
 				break;
 			default:
@@ -2440,7 +2356,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_autoincrement                                      *
+ * Function: zbx_db_insert_execute                                            *
  *                                                                            *
  * Purpose: executes the prepared database bulk insert operation              *
  *                                                                            *

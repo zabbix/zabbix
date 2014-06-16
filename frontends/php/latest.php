@@ -204,7 +204,7 @@ if ($items) {
 			$haystack = mb_strtolower($item['name_expanded']);
 			$needle = mb_strtolower($filterSelect);
 
-			if (mb_strpos($haystack, $needle) === false) {
+			if (!mb_strpos($haystack, $needle)) {
 				unset($items[$key]);
 			}
 		}
@@ -212,7 +212,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLast($items, 2);
 
 		// filter items without history
 		if (!$filterShowWithoutData) {

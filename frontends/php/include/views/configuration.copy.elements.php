@@ -106,11 +106,7 @@ $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form
 $triggersTab = new CTabView();
-
-$triggersTab->addTab('triggersTab',
-	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
-	$triggersFormList
-);
+$triggersTab->addTab('triggersTab', count($this->data['elements']).SPACE._('elements copy to ...'), $triggersFormList);
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form

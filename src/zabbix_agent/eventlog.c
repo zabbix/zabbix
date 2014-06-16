@@ -260,8 +260,6 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	}
 }
 
-#define MAX_INSERT_STRS 100
-
 /* get Nth error from event log. 1 is the first. */
 static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_handle, long which, char **out_source,
 		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
@@ -272,7 +270,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
 	wchar_t 	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL, *pCh,
-			aInsertStrings[MAX_INSERT_STRS];
+			**pInsertStrings = NULL;
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
@@ -284,7 +282,6 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	*out_severity	= 0;
 	*out_timestamp	= 0;
 	*out_eventid	= 0;
-	memset(aInsertStrings, 0, sizeof(aInsertStrings));
 
 	pELR = (EVENTLOGRECORD *)zbx_malloc((void *)pELR, buffer_size);
 
@@ -312,11 +309,13 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	/* prepare insert string array */
 	if (0 < pELR->NumStrings)
 	{
+		pInsertStrings = zbx_malloc(NULL, sizeof(wchar_t *) * pELR->NumStrings);
+
 		pCh = (wchar_t *)((unsigned char *)pELR + pELR->StringOffset);
 
-		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
+		for (i = 0; i < pELR->NumStrings; i++)
 		{
-			aInsertStrings[i] = pCh;
+			pInsertStrings[i] = pCh;
 			pCh += wcslen(pCh) + 1;
 		}
 	}
@@ -333,7 +332,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 
 		if (NULL != (hLib = zbx_load_message_file(pFile)))
 		{
-			if (NULL != (*out_message = zbx_format_message(hLib, pELR->EventID, aInsertStrings)))
+			if (NULL != (*out_message = zbx_format_message(hLib, pELR->EventID, pInsertStrings)))
 			{
 				err = SUCCEED;
 
@@ -347,6 +346,8 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 			FreeLibrary(hLib);
 		}
 	}
+
+	zbx_free(pInsertStrings);
 
 	zbx_free(pEventMessageFile);
 	zbx_free(pParamMessageFile);

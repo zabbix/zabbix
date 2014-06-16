@@ -19,10 +19,15 @@
 **/
 
 
-class CSetParserTest extends CParserTest {
+class CSetParserTest extends PHPUnit_Framework_TestCase {
 
-	protected function getParser() {
-		return new CSetParser(array('<', '>', '<>', 'and', 'or'));
+	/**
+	 * @var CSetParser
+	 */
+	protected $parser;
+
+	public function setUp() {
+		$this->parser = new CSetParser(array('<', '>', '<>', 'and', 'or'));
 	}
 
 	public function validProvider() {
@@ -53,6 +58,23 @@ class CSetParserTest extends CParserTest {
 		);
 	}
 
+	/**
+	 * @dataProvider validProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedMatch
+	 * @param $expectedLength
+	 */
+	public function testParseValid($string, $pos, $expectedMatch, $expectedLength) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertSame($expectedMatch, $result->match);
+		$this->assertSame($expectedLength, $result->length);
+		$this->assertSame($string, $result->source);
+		$this->assertSame($pos, $result->pos);
+	}
+
 	public function invalidProvider() {
 		return array(
 			array('', 0, 0),
@@ -63,5 +85,19 @@ class CSetParserTest extends CParserTest {
 			array('prefixand', 5, 5),
 			array('prefixand', 7, 9),
 		);
+	}
+
+	/**
+	 * @dataProvider invalidProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedEndPos
+	 */
+	public function testParseInvalid($string, $pos, $expectedEndPos) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertSame(false, $result);
+		$this->assertSame($expectedEndPos, $this->parser->getPos());
 	}
 }

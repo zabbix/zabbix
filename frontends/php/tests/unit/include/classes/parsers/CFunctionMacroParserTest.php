@@ -19,12 +19,15 @@
 **/
 
 
-class CFunctionMacroParserTest extends CParserTest {
+class CFunctionMacroParserTest extends PHPUnit_Framework_TestCase {
 
-	protected $resultClassName = 'CFunctionMacroParserResult';
+	/**
+	 * @var CSetParser
+	 */
+	protected $parser;
 
-	protected function getParser() {
-		return new CFunctionMacroParser();
+	public function setUp() {
+		$this->parser = new CFunctionMacroParser();
 	}
 
 	public function validProvider() {
@@ -43,6 +46,24 @@ class CFunctionMacroParserTest extends CParserTest {
 		);
 	}
 
+	/**
+	 * @dataProvider validProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedMatch
+	 * @param $expectedLength
+	 */
+	public function testParseValid($string, $pos, $expectedMatch, $expectedLength) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertTrue($result instanceof CFunctionMacroParserResult);
+		$this->assertSame($expectedMatch, $result->match);
+		$this->assertSame($expectedLength, $result->length);
+		$this->assertSame($string, $result->source);
+		$this->assertSame($pos, $result->pos);
+	}
+
 	public function invalidProvider() {
 		return array(
 			array('', 0,  0),
@@ -54,6 +75,20 @@ class CFunctionMacroParserTest extends CParserTest {
 			array('{host:item.func()', 0, 17),
 			array('{host.item.func()}', 0, 15),
 		);
+	}
+
+	/**
+	 * @dataProvider invalidProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedEndPos
+	 */
+	public function testParseInvalid($string, $pos, $expectedEndPos) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertSame(false, $result);
+		$this->assertSame($expectedEndPos, $this->parser->getPos());
 	}
 
 	public function testParseExpressionProvider() {
@@ -105,7 +140,7 @@ class CFunctionMacroParserTest extends CParserTest {
 	 * @param array     $expectedExpression
 	 */
 	public function testParseExpression($string, array $expectedExpression) {
-		$result = $this->getParser()->parse($string, 0);
+		$result = $this->parser->parse($string, 0);
 
 		$this->assertTrue($result instanceof CFunctionMacroParserResult);
 		$this->assertEquals($result->expression, $expectedExpression);

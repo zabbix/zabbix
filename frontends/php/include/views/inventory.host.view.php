@@ -192,7 +192,7 @@ if ($this->data['host']['description'] !== '') {
 }
 
 // latest data
-$overviewFormList->addRow(_('Monitoring'), array(
+$overviewFormList->addRow(_('Latest data'), array(
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
 	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
 		$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),

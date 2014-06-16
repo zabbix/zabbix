@@ -627,7 +627,7 @@ class CImportReferencer {
 			$this->hostsRefs = array();
 			// fetch only normal hosts, discovered hosts must not be imported
 			$dbHosts = API::Host()->get(array(
-				'filter' => array('host' => $this->hosts),
+				'filter' => array('host' => $this->hosts, 'flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				'output' => array('hostid', 'host'),
 				'preservekeys' => true,
 				'templated_hosts' => true,
