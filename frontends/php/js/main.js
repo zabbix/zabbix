@@ -1289,25 +1289,28 @@ jQuery(function ($) {
 					}
 				});
 			};
-			centerCellContents();
 
-			table.data('last-width', table.width());
+			if(!IE8) {
+				centerCellContents();
 
-			var requestAnimationFrameCallback = (function() {
-				var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function(fn){ return window.setTimeout(fn, 20); };
-				return function(fn) { return raf(fn); };
-			})();
+				table.data('last-width', table.width());
 
-			var tableWidthAdjuster = function() {
-				if (table.width() != table.data('last-width')) {
-					centerCellContents();
+				var requestAnimationFrameCallback = (function() {
+					var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function(fn){ return window.setTimeout(fn, 20); };
+					return function(fn) { return raf(fn); };
+				})();
+
+				var tableWidthAdjuster = function() {
+					if (table.width() != table.data('last-width')) {
+						centerCellContents();
+					}
+					requestAnimationFrameCallback(tableWidthAdjuster);
+				};
+
+				if (table.data('has-width-change-callback') != true) {
+					table.data('has-width-change-callback', true);
+					tableWidthAdjuster();
 				}
-				requestAnimationFrameCallback(tableWidthAdjuster);
-			};
-
-			if (table.data('has-width-change-callback') != true) {
-				table.data('has-width-change-callback', true);
-				tableWidthAdjuster();
 			}
 		});
 	};
