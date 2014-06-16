@@ -40,93 +40,9 @@ class CTableInfo extends CTable {
 			define('IS_VERTICAL_ROTATION_JS_INSERTED', true);
 
 			insert_js(
-				'jQuery(function($) {
-					$.fn.makeVerticalRotation = function () {
-						var cellsToRotate = $(".vertical_rotation", this),
-							betterCells = [];
-
-						// insert spans
-						cellsToRotate.each(function () {
-							var cell = $(this);
-
-							var text = $("<span>", {
-								text: cell.html()
-							});
-
-							if (IE) {
-								text.css({"font-family": "monospace"});
-							}
-
-							cell.text("").append(text);
-						});
-
-						// rotate cells
-						cellsToRotate.each(function () {
-							var cell = $(this),
-								span = cell.children(),
-								height = cell.height(),
-								width = span.width(),
-								transform = (width / 2) + "px " + (width / 2) + "px";
-
-							var css = {
-								"transform-origin": transform,
-								"-webkit-transform-origin": transform,
-								"-moz-transform-origin": transform,
-								"-o-transform-origin": transform
-							};
-
-							if (IE) {
-								css["font-family"] = "monospace";
-								css["-ms-transform-origin"] = "50% 50%";
-							}
-
-							if (IE9) {
-								css["-ms-transform-origin"] = transform;
-							}
-
-							var divInner = $("<div>", {
-								"class": "vertical_rotation_inner"
-							})
-							.css(css)
-							.append(span.text());
-
-							var div = $("<div>", {
-								height: width,
-								width: height
-							})
-							.append(divInner);
-
-							betterCells.push(div);
-						});
-
-						cellsToRotate.each(function (i) {
-							$(this).html(betterCells[i]);
-						});
-
-						// align text to cell center
-						cellsToRotate.each(function () {
-							var cell = $(this),
-								width = cell.width();
-
-							if (width > 30) {
-								cell.children().each(function () {
-									var child = $(this);
-
-									var leftInPixels = cell.width() / 2 - cell.height() / 2 + child.width() / 2;
-									var leftInPercents = leftInPixels / cell.width() * 100;
-
-									child.css({
-										position: "relative",
-										left: leftInPercents + "%"
-									});
-								});
-							}
-						});
-					};
-				});
-
-				jQuery(document).ready(function() {
-					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
+				'jQuery(document).ready(function() {
+					jQuery(".'.$this->getAttribute('class').'")
+						.makeVerticalRotation();
 
 					if (IE8) {
 						jQuery(".vertical_rotation_inner").css({
@@ -144,8 +60,9 @@ class CTableInfo extends CTable {
 							"writing-mode": "tb-rl"
 						});
 					}
-				});'
-			, true);
+				});',
+				true
+			);
 		}
 	}
 }

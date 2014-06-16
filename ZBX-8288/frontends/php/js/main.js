@@ -1191,3 +1191,124 @@ function getConditionFormula(conditions, evalType) {
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));
+
+jQuery(function ($) {
+	$.fn.makeVerticalRotation = function() {
+
+		this.each(function() {
+
+			var table = $(this);
+
+			if(table.data('rotated')) {
+				return;
+			}
+			table.data('rotated', true);
+
+			var cellsToRotate = $(".vertical_rotation", table),
+				betterCells = [];
+
+			// insert spans
+			cellsToRotate.each(function() {
+				var cell = $(this);
+
+				var text = $("<span>", {
+					text: cell.html()
+				});
+
+				if (IE) {
+					text.css({"font-family": "monospace"});
+				}
+
+				cell.text("").append(text);
+			});
+
+			// rotate cells
+			cellsToRotate.each(function() {
+				var cell = $(this),
+					span = cell.children(),
+					height = cell.height(),
+					width = span.width(),
+					transform = (width / 2) + "px " + (width / 2) + "px";
+
+				var css = {
+					"transform-origin": transform,
+					"-webkit-transform-origin": transform,
+					"-moz-transform-origin": transform,
+					"-o-transform-origin": transform
+				};
+
+				if (IE) {
+					css["font-family"] = "monospace";
+					css["-ms-transform-origin"] = "50% 50%";
+				}
+
+				if (IE9) {
+					css["-ms-transform-origin"] = transform;
+				}
+
+				var divInner = $("<div>", {
+					"class": "vertical_rotation_inner"
+				})
+					.css(css)
+					.append(span.text());
+
+				var div = $("<div>", {
+					height: width,
+					width: height
+				})
+					.append(divInner);
+
+				betterCells.push(div);
+			});
+
+			cellsToRotate.each(function(i) {
+				$(this).html(betterCells[i]);
+			});
+
+			var centerCellContents = function() {
+				// align text to cell center
+
+				cellsToRotate.each(function () {
+					var cell = $(this),
+						width = cell.width();
+
+					if (width > 15) {
+						cell.children().each(function() {
+							var child = $(this);
+
+							var halfCellWidth = cell.width() / 2;
+							var halfChildWidth = child.width() / 2;
+
+							var leftInPixels = (halfCellWidth - halfChildWidth);
+
+							child.css({
+								position: "relative",
+								left: leftInPixels + 'px'
+							});
+						});
+					}
+				});
+			};
+			centerCellContents();
+
+			table.data('last-width', table.width());
+
+			var requestAnimationFrameCallback = (function() {
+				var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function(fn){ return window.setTimeout(fn, 20); };
+				return function(fn) { return raf(fn); };
+			})();
+
+			var tableWidthAdjuster = function() {
+				if (table.width() != table.data('last-width')) {
+					centerCellContents();
+				}
+				requestAnimationFrameCallback(tableWidthAdjuster);
+			};
+
+			if (table.data('has-width-change-callback') != true) {
+				table.data('has-width-change-callback', true);
+				tableWidthAdjuster();
+			}
+		});
+	};
+});
