@@ -277,7 +277,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0))
 	{
-		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server [%s]: %s",
+		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_tcp_strerror());
 		goto close;
 	}
@@ -290,7 +290,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	}
 	if (0 != strncmp(response, OK_220, strlen(OK_220)))
 	{
-		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", response);
+		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server \"%s\"", response);
 		goto out;
 	}
 
@@ -313,7 +313,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		}
 		if (0 != strncmp(response, OK_250, strlen(OK_250)))
 		{
-			zbx_snprintf(error, max_error_len, "wrong answer on HELO [%s]", response);
+			zbx_snprintf(error, max_error_len, "wrong answer on HELO \"%s\"", response);
 			goto out;
 		}
 	}
@@ -337,7 +337,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	}
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
-		zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM [%s]", response);
+		zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM \"%s\"", response);
 		goto out;
 	}
 
@@ -361,7 +361,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
 	if (0 != strncmp(response, OK_250, strlen(OK_250)) && 0 != strncmp(response, OK_251, strlen(OK_251)))
 	{
-		zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO [%s]", response);
+		zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
 		goto out;
 	}
 
@@ -380,7 +380,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	}
 	if (0 != strncmp(response, OK_354, strlen(OK_354)))
 	{
-		zbx_snprintf(error, max_error_len, "wrong answer on DATA [%s]", response);
+		zbx_snprintf(error, max_error_len, "wrong answer on DATA \"%s\"", response);
 		goto out;
 	}
 
@@ -448,7 +448,8 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	if (-1 == err)
 	{
-		zbx_snprintf(error, max_error_len, "error sending headers and mail body to mailserver: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending headers and mail body to mailserver: %s",
+				zbx_strerror(errno));
 		goto out;
 	}
 
@@ -467,7 +468,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	}
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
-		zbx_snprintf(error, max_error_len, "wrong answer on end of data [%s]", response);
+		zbx_snprintf(error, max_error_len, "wrong answer on end of data \"%s\"", response);
 		goto out;
 	}
 
