@@ -367,12 +367,18 @@ typedef struct
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*variables;
+	char		*headers;
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
 	char		*http_proxy;
+	char		*ssl_cert_file;
+	char		*ssl_key_file;
+	char		*ssl_key_password;
 	int		authentication;
 	int		retries;
+	int		verify_peer;
+	int		verify_host;
 }
 DB_HTTPTEST;
 
@@ -388,6 +394,9 @@ typedef struct
 	int		no;
 	int		timeout;
 	char		*variables;
+	int		follow_redirects;
+	int		retrieve_mode;
+	char		*headers;
 }
 DB_HTTPSTEP;
 
@@ -433,7 +442,6 @@ DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
-int		process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin();
@@ -470,8 +478,10 @@ typedef struct
 }
 ZBX_GRAPH_ITEMS;
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	process_triggers(zbx_vector_ptr_t *triggers);
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
+
+int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
