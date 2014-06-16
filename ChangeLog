@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ..F....... [ZBX-8053] changed label "Latest data" to "Monitoring" in host inventory view (Ivo)
 ..F....... [ZBX-8333] renamed screen item add, update and delete messages (Ivo)
 ..F....... [ZBX-8197] fixed all data not being shown on graph if period is set to or more than 2 years (Krists)
@@ -192,6 +193,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc3
 
 Bug fixes:
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc2
@@ -1182,6 +1184,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
