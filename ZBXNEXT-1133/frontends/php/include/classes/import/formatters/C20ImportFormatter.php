@@ -27,14 +27,14 @@ class C20ImportFormatter extends CImportFormatter {
 	/**
 	 * Converter for trigger expressions.
 	 *
-	 * @var C24TriggerConverter
+	 * @var C24TriggerExpressionConverter
 	 */
 	protected $triggerExpressionConverter;
 
 	/**
-	 * @param C24TriggerConverter $triggerExpressionConverter
+	 * @param C24TriggerExpressionConverter $triggerExpressionConverter
 	 */
-	public function __construct(C24TriggerConverter $triggerExpressionConverter) {
+	public function __construct(C24TriggerExpressionConverter $triggerExpressionConverter) {
 		$this->triggerExpressionConverter = $triggerExpressionConverter;
 	}
 

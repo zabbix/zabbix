@@ -65,12 +65,8 @@ $_REQUEST['dchecks'] = get_request('dchecks', array());
 if (isset($_REQUEST['druleid'])) {
 	$dbDRule = API::DRule()->get(array(
 		'druleids' => get_request('druleid'),
-		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
-		'selectDChecks' => array(
-			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
-			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-			'snmpv3_contextname'
-		),
+		'output' => API_OUTPUT_EXTEND,
+		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
 	if (empty($dbDRule)) {
@@ -270,13 +266,14 @@ else {
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
-		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
-		'selectDChecks' => array('type'),
+		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => getPageSortField('name'),
+		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
 
 	if ($data['drules']) {
-		foreach ($data['drules'] as $key => $drule) {
+		foreach ($data['drules'] as $druleId => $drule) {
 			// checks
 			$checks = array();
 
@@ -286,15 +283,15 @@ else {
 
 			order_result($checks);
 
-			$data['drules'][$key]['checks'] = $checks;
+			$data['drules'][$druleId]['checks'] = $checks;
 
 			// description
-			$data['drules'][$key]['description'] = array();
+			$data['drules'][$druleId]['description'] = array();
 
 			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
 
-				array_push($data['drules'][$key]['description'], $proxy['host'].NAME_DELIMITER);
+				array_push($data['drules'][$druleId]['description'], $proxy['host'].NAME_DELIMITER);
 			}
 		}
 
@@ -302,7 +299,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules']);
+	$data['paging'] = getPagingLine($data['drules'], array('druleid'));
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

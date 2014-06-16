@@ -499,14 +499,7 @@ function getItemFilterForm(&$items) {
 				'objectOptions' => array(
 					'editable' => true
 				),
-				'data' => $groupFilter,
-				'popup' => array(
-					'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
-						'&srcfld1=groupid&writeonly=1',
-					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
-				)
+				'data' => $groupFilter
 			))
 		), 'col1'),
 		new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -544,14 +537,7 @@ function getItemFilterForm(&$items) {
 					'editable' => true,
 					'templated_hosts' => true
 				),
-				'data' => $hostFilterData,
-				'popup' => array(
-					'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
-						'&srcfld1=hostid&writeonly=1',
-					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
-				)
+				'data' => $hostFilterData
 			))
 		), 'col1'),
 		new CCol($updateIntervalLabel, 'label'),

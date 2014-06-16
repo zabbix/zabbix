@@ -386,7 +386,7 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['discoveries']);
+	$data['paging'] = getPagingLine($data['discoveries'], array('itemid'), array('hostid' => get_request('hostid')));
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

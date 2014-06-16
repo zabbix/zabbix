@@ -90,7 +90,9 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
+					<div>
+						<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
+					</div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
@@ -118,7 +120,7 @@
 				<td><?php echo _('Application'); ?></td>
 				<td>
 					<input size="50" id="application" name="application" class="input">
-					<input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
+					<span id="application-select" class="link"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 
@@ -486,10 +488,4 @@ jQuery(document).ready(function() {
 		return false;
 	});
 })
-
-function addPopupValues(data) {
-	if (data.object == 'name') {
-		jQuery('#application').val(data.values[0].name);
-	}
-}
 </script>

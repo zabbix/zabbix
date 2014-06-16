@@ -21,7 +21,7 @@
 /**
  * A class for implementing conversions used by the trigger wizard.
  */
-class CTextTriggerConstructor {
+class CRegexpTriggerConstructor {
 
 	const EXPRESSION_TYPE_MATCH = 0;
 	const EXPRESSION_TYPE_NO_MATCH = 1;

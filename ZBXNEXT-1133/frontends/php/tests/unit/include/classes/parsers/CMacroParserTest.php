@@ -19,10 +19,15 @@
 **/
 
 
-class CMacroParserTest extends CParserTest {
+class CMacroParserTest extends PHPUnit_Framework_TestCase {
 
-	protected function getParser() {
-		return new CMacroParser('#');
+	/**
+	 * @var CSetParser
+	 */
+	protected $parser;
+
+	public function setUp() {
+		$this->parser = new CMacroParser('#');
 	}
 
 	public function validProvider() {
@@ -32,6 +37,24 @@ class CMacroParserTest extends CParserTest {
 			array('{#MACRO} = 0', 0, '{#MACRO}', 8),
 			array('not {#MACRO} = 0', 4, '{#MACRO}', 8),
 		);
+	}
+
+	/**
+	 * @dataProvider validProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedMatch
+	 * @param $expectedLength
+	 */
+	public function testParseValid($string, $pos, $expectedMatch, $expectedLength) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertTrue($result instanceof CParserResult);
+		$this->assertSame($expectedMatch, $result->match);
+		$this->assertSame($expectedLength, $result->length);
+		$this->assertSame($string, $result->source);
+		$this->assertSame($pos, $result->pos);
 	}
 
 	public function invalidProvider() {
@@ -45,5 +68,19 @@ class CMacroParserTest extends CParserTest {
 			array('{#a}', 0, 2),
 			array('{#+}', 0, 2),
 		);
+	}
+
+	/**
+	 * @dataProvider invalidProvider
+	 *
+	 * @param $string
+	 * @param $pos
+	 * @param $expectedEndPos
+	 */
+	public function testParseInvalid($string, $pos, $expectedEndPos) {
+		$result = $this->parser->parse($string, $pos);
+
+		$this->assertSame(false, $result);
+		$this->assertSame($expectedEndPos, $this->parser->getPos());
 	}
 }

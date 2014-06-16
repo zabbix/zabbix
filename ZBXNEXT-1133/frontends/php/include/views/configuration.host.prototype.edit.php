@@ -72,13 +72,14 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
+	$interfaces = array();
 	$existingInterfaceTypes = array();
-
 	foreach ($parentHost['interfaces'] as $interface) {
+		$interface['locked'] = true;
 		$existingInterfaceTypes[$interface['type']] = true;
+		$interfaces[$interface['interfaceid']] = $interface;
 	}
-
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($parentHost['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
@@ -178,13 +179,7 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	),
 	'data' => $groups,
-	'disabled' => (bool) $hostPrototype['templateid'],
-	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1',
-		'width' => 450,
-		'height' => 450
-	)
+	'disabled' => (bool) $hostPrototype['templateid']
 )));
 
 // new group prototypes
@@ -246,13 +241,7 @@ if (!$hostPrototype['templateid']) {
 	$newTemplateTable->addRow(array(new CMultiSelect(array(
 		'name' => 'add_templates[]',
 		'objectName' => 'templates',
-		'ignored' => $ignoreTemplates,
-		'popup' => array(
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'ignored' => $ignoreTemplates
 	))));
 
 	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));

@@ -72,7 +72,7 @@ $item = API::Item()->get(array(
 $item = reset($item);
 $host = reset($item['hosts']);
 
-$constructor = new CTextTriggerConstructor(new CTriggerExpression());
+$constructor = new CRegexpTriggerConstructor(new CTriggerExpression());
 
 /**
  * Save a trigger
@@ -257,8 +257,8 @@ if(isset($_REQUEST['sform'])){
 
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id', 'expr_type');
-	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
-	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
 	$ctb = new CTextBox('expression','',80);
 	$ctb->setAttribute('id','logexpr');
@@ -295,7 +295,7 @@ if(isset($_REQUEST['sform'])){
 
 		$row = new CRow(array(
 			htmlspecialchars($expr['value']),
-			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
+			($expr['type'] == CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
 			array($imgup, SPACE, $imgdn),
 			$del_url
 		));

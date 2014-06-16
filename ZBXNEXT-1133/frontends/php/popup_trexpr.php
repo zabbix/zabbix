@@ -632,7 +632,7 @@ else {
 	// fetch item
 	$item = API::Item()->get(array(
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-		'selectHosts' => array('host', 'name'),
+		'selectHosts' => array('host'),
 		'itemids' => $itemId,
 		'webitems' => true,
 		'filter' => array('flags' => null)
@@ -646,12 +646,12 @@ if ($itemId) {
 
 	$itemValueType = $item['value_type'];
 	$itemKey = $item['key_'];
-	$itemHostData = reset($item['hosts']);
-	$description = $itemHostData['name'].NAME_DELIMITER.$item['name_expanded'];
+	$itemHost = reset($item['hosts']);
+	$itemHost = $itemHost['host'];
+	$description = $itemHost.NAME_DELIMITER.$item['name_expanded'];
 }
 else {
-	$itemKey = '';
-	$description = '';
+	$itemKey = $itemHost = $description = '';
 	$itemValueType = null;
 }
 
@@ -675,6 +675,7 @@ $data = array(
 	'paramtype' => $paramType,
 	'description' => $description,
 	'functions' => $functions,
+	'item_host' => $itemHost,
 	'item_key' => $itemKey,
 	'itemValueType' => $itemValueType,
 	'selectedFunction' => null,
@@ -725,7 +726,7 @@ if (isset($data['insert'])) {
 			}
 
 			$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
-				$itemHostData['host'],
+				$data['item_host'],
 				$data['item_key'],
 				$function,
 				rtrim(implode(',', $quotedParams), ','),

@@ -196,7 +196,7 @@ function get_icon($type, $params = array()) {
 			return $icon;
 
 		case 'fullscreen':
-			$url = new CUrl();
+			$url = new Curl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 
 			return new CIcon(

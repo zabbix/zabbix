@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/items.inc.php';
 function httptest_authentications($type = null) {
 	$authentication_types = array(
 		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM')
+		HTTPTEST_AUTH_BASIC => _('Basic authentication'),
+		HTTPTEST_AUTH_NTLM => _('NTLM authentication')
 	);
 
 	if (is_null($type)) {

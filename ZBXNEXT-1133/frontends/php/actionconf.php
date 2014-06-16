@@ -518,7 +518,7 @@ else {
 
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['actions']);
+	$data['paging'] = getPagingLine($data['actions'], array('actionid'));
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

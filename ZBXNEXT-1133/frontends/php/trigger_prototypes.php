@@ -297,7 +297,14 @@ else {
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers']);
+	$data['paging'] = getPagingLine(
+		$data['triggers'],
+		array('triggerid'),
+		array(
+			'hostid' => get_request('hostid', $data['discovery_rule']['hostid']),
+			'parent_discoveryid' => get_request('parent_discoveryid')
+		)
+	);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
