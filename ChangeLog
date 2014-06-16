@@ -2,6 +2,7 @@ Changes for 2.2.4rc3
 
 Bug fixes:
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+..F....... [ZBX-8358] fixed vertical table header cell text centering (Krists)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc2
@@ -10,7 +11,6 @@ New features:
 A.F....... [ZBX-1357] updated Italian, German and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-8358] fixed vertical table header cell text centering (Krists)
 .......PS. [ZBX-8095] fixed a bug in item queue that updated item's nextcheck but not its position in the queue (asaveljevs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 .......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
