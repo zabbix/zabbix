@@ -170,10 +170,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/parsers/results/CFunctionMacroParserResult.php -text
-frontends/php/include/classes/parsers/results/CParserResult.php -text
-frontends/php/include/classes/parsers/results/CTriggerExpressionParserResult.php -text
-frontends/php/include/classes/services/CServicesSlaCalculator.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/menupopup.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
@@ -269,11 +265,6 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/helpers/CConditionHelperTest.php -text
-frontends/php/tests/unit/include/classes/parsers/CConditionFormulaTest.php -text
-frontends/php/tests/unit/include/classes/parsers/CFunctionMacroParserTest.php -text
-frontends/php/tests/unit/include/classes/parsers/CMacroParserTest.php -text
-frontends/php/tests/unit/include/classes/parsers/CSetParserTest.php -text
-frontends/php/tests/unit/include/classes/triggers/CRegexpTriggerConstructorTest.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

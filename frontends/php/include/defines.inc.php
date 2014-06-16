@@ -19,9 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.0');
-define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030096);
+define('ZABBIX_VERSION',     '2.3.2');
+define('ZABBIX_API_VERSION', '2.3.2');
+define('ZABBIX_DB_VERSION',	 2030105);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -33,6 +33,10 @@ define('ZBX_MIN_PERIOD',		3600); // 1 hour
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+
+// the maximum period to display history data for the latest data and item overview pages in seconds
+// by default set to 86400 seconds (24 hours)
+define('ZBX_HISTORY_PERIOD', 86400);
 
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -121,7 +125,6 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_PERIOD',		3);
 define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
@@ -632,6 +635,18 @@ define('HTTPSTEP_ITEM_TYPE_TIME',		1);
 define('HTTPSTEP_ITEM_TYPE_IN',			2);
 define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 define('HTTPSTEP_ITEM_TYPE_LASTERROR',	4);
+
+define('HTTPTEST_STEP_RETRIEVE_MODE_CONTENT', 0);
+define('HTTPTEST_STEP_RETRIEVE_MODE_HEADERS', 1);
+
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF', 0);
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON', 1);
+
+define('HTTPTEST_VERIFY_PEER_OFF', 0);
+define('HTTPTEST_VERIFY_PEER_ON', 1);
+
+define('HTTPTEST_VERIFY_HOST_OFF', 0);
+define('HTTPTEST_VERIFY_HOST_ON', 1);
 
 define('EVENT_ACK_DISABLED',	'0');
 define('EVENT_ACK_ENABLED',		'1');
