@@ -2,7 +2,7 @@
 
 OPT_REVERT=0
 OPT_ARGS=
-OPT_TEST_PATH="/home/wiper/git/zabbix/tests"
+OPT_TEST_PATH=
 OPT_REPORT_PATH="."
 OPT_MODE="basic"
 OPT_CONFIGURE="yes"
