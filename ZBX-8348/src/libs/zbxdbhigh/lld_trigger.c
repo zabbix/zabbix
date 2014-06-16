@@ -509,7 +509,7 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 	return buffer;
 }
 
-static void	lld_function_make(zbx_vector_ptr_t *functions, zbx_lld_function_t *function_proto, zbx_uint64_t itemid)
+static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions, zbx_uint64_t itemid)
 {
 	int			i;
 	zbx_lld_function_t	*function;
@@ -622,7 +622,7 @@ static int	lld_functions_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 		else
 			itemid = item_proto->itemid;
 
-		lld_function_make(functions, function_proto, itemid);
+		lld_function_make(function_proto, functions, itemid);
 	}
 
 	lld_functions_delete(functions);
