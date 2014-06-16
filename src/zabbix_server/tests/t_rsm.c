@@ -16,9 +16,9 @@ int	main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	ns = argv[1];
-	ns_ip = argv[2];
-	tld = argv[3];
+	tld = argv[1];
+	ns = argv[2];
+	ns_ip = argv[3];
 
 	/* create resolver */
 	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
