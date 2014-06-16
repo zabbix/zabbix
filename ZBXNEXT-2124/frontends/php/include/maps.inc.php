@@ -916,16 +916,16 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	$allTriggers = array();
 
 	if (!empty($triggerIdToSelementIds)) {
-		$triggers = API::Trigger()->get(array(
+		$triggersFromMonitoredHosts = API::Trigger()->get(array(
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => array('state' => null),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		$allTriggers = array_merge($allTriggers, $triggers);
+		$allTriggers = array_merge($allTriggers, $triggersFromMonitoredHosts);
 
-		foreach ($triggers as $triggerId => $trigger) {
+		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
 			foreach ($triggerIdToSelementIds[$triggerId] as $selementId) {
 				$selements[$selementId]['triggers'][$triggerId] = $triggerId;
 			}
@@ -934,7 +934,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from submaps, skip dependent
 	if (!empty($subSysmapTriggerIdToSelementIds)) {
-		$triggers = API::Trigger()->get(array(
+		$triggersFromMonitoredHosts = API::Trigger()->get(array(
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
@@ -943,13 +943,13 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'preservekeys' => true
 		));
 
-		foreach ($triggers as $triggerId => $trigger) {
+		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
 			foreach ($subSysmapTriggerIdToSelementIds[$triggerId] as $selementId) {
 				$selements[$selementId]['triggers'][$triggerId] = $triggerId;
 			}
 		}
 
-		$allTriggers = array_merge($allTriggers, $triggers);
+		$allTriggers = array_merge($allTriggers, $triggersFromMonitoredHosts);
 	}
 
 	$monitoredHostIds = array();
@@ -961,7 +961,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if ($monitoredHostIds) {
-		$triggers = API::Trigger()->get(array(
+		$triggersFromMonitoredHosts = API::Trigger()->get(array(
 			'hostids' => $monitoredHostIds,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
@@ -973,7 +973,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'preservekeys' => true
 		));
 
-		foreach ($triggers as $triggerId => $trigger) {
+		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				$hostId = $host['hostid'];
 
@@ -988,9 +988,9 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$submapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
 			$hostsFromHostGroups
 		);
-		$selements = filterSysmapTriggers($selements, $submapHostApplicationFilters, $triggers);
+		$selements = filterSysmapTriggers($selements, $submapHostApplicationFilters, $triggersFromMonitoredHosts);
 
-		$allTriggers = array_merge($allTriggers, $triggers);
+		$allTriggers = array_merge($allTriggers, $triggersFromMonitoredHosts);
 	}
 
 	$allTriggers = zbx_toHash($allTriggers, 'triggerid');
@@ -1166,17 +1166,24 @@ function getSelementsInfo($sysmap, array $options = array()) {
  *
  * @param array $selements                          selements of current sysmap
  * @param array $selementHostApplicationFilters     a list of application filters applied to each host under each element
- *                                                  @see getSelementHostApplicationFilters()
- * @param array $triggers                           triggers that are relevant to filtering
+ *
+ * @see getSelementHostApplicationFilters()
+ *
+ * @param array $triggersFromMonitoredHosts                           triggers that are relevant to filtering
  *
  * @return array
  */
-function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggers) {
+function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggersFromMonitoredHosts) {
 	// calculate list of triggers that might get removed from $selement['triggers']
 	$triggersToFilter = array();
 	foreach ($selements as $selementId => $selement) {
 		foreach ($selement['triggers'] as $triggerId) {
-			$trigger = $triggers[$triggerId];
+			if (!isset($triggersFromMonitoredHosts[$triggerId])) {
+				continue;
+			}
+
+			$trigger = $triggersFromMonitoredHosts[$triggerId];
+
 			foreach ($trigger['hosts'] as $host) {
 				$hostId = $host['hostid'];
 				if (isset($selementHostApplicationFilters[$selementId][$hostId])) {
