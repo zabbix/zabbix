@@ -177,17 +177,11 @@ if (isset($_REQUEST['save'])) {
 	if (!empty($_REQUEST['screenitemid'])) {
 		$screenItem['screenitemid'] = $_REQUEST['screenitemid'];
 
-		$messageSuccess = _('Item updated');
-		$messageFailed = _('Cannot update item');
-
 		$result = API::ScreenItem()->update($screenItem);
 	}
 	else {
 		$screenItem['x'] = get_request('x');
 		$screenItem['y'] = get_request('y');
-
-		$messageSuccess = _('Item added');
-		$messageFailed = _('Cannot add item');
 
 		$result = API::ScreenItem()->create($screenItem);
 	}
@@ -202,7 +196,7 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
-	show_messages($result, $messageSuccess, $messageFailed);
+	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
@@ -219,7 +213,7 @@ elseif (isset($_REQUEST['delete'])) {
 	unset($_REQUEST['x']);
 
 	$result = DBend($screenitemid);
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (isset($_REQUEST['add_row'])) {
 	DBstart();
