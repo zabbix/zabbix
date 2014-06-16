@@ -79,12 +79,19 @@ function DBconnect(&$error) {
 					$result = false;
 				}
 				else {
-					DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'));
+					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
 
-					if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-						if ((int) $pgsql_version >= 9) {
-							// change the output format for values of type bytea from hex (the default) to escape
-							DBexecute('SET bytea_output = escape');
+					if(!$schemaSet) {
+						clear_messages();
+						$error = pg_last_error();
+						$result = false;
+					}
+					else {
+						if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
+							if ((int) $pgsql_version >= 9) {
+								// change the output format for values of type bytea from hex (the default) to escape
+								DBexecute('SET bytea_output = escape');
+							}
 						}
 					}
 				}
