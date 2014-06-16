@@ -210,6 +210,35 @@ function get_viewed_nodes() {
 	return $result;
 }
 
+/**
+ * Get node name by given array of object IDs.
+ *
+ * @global array $ZBX_NODES				array of node names
+ * @global array $ZBX_VIEWED_NODES		array of node view parameters
+ * @param array  $objectIds				array of object IDs
+ * @param bool   $forceWithAllNodes		force display nodes
+ * @param string $delimiter				node name delimiter
+ *
+ * @return array						return node names of given objects if they have any
+ */
+function getNodeNamesByElids($objectIds, $forceWithAllNodes = null, $delimiter = '') {
+	global $ZBX_NODES, $ZBX_VIEWED_NODES;
+
+	$result = array();
+	foreach ($objectIds as $objectId) {
+		if ($forceWithAllNodes === false || ($forceWithAllNodes === null && $ZBX_VIEWED_NODES['selected'] != 0)) {
+			$result[$objectId] = null;
+		}
+		else {
+			$nodeId = id2nodeid($objectId);
+
+			$result[$objectId] = isset($ZBX_NODES[$nodeId]) ? $ZBX_NODES[$nodeId]['name'].$delimiter : null;
+		}
+	}
+
+	return $result;
+}
+
 function get_node_name_by_elid($objectId, $forceWithAllNodes = null, $delimiter = '') {
 	global $ZBX_NODES, $ZBX_VIEWED_NODES;
 

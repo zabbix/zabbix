@@ -86,13 +86,14 @@
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
 .latest-mon .tableinfo td.latest-node { width: 5%; }
-.latest-mon .tableinfo td.latest-host { width: 9%; }
+.latest-mon .tableinfo td.latest-host.no-details { width: 17%; }
+.latest-mon .tableinfo td.latest-host.with-details { width: 13%; }
 .latest-mon .tableinfo td.latest-interval { width: 5%; }
 .latest-mon .tableinfo td.latest-history { width: 5%; }
 .latest-mon .tableinfo td.latest-trends { width: 5%; }
 .latest-mon .tableinfo td.latest-type { width: 8%; }
 .latest-mon .tableinfo td.latest-lastcheck { width: 14%; }
-.latest-mon .tableinfo td.latest-lastvalue { width: 22%; }
+.latest-mon .tableinfo td.latest-lastvalue { width: 14%; }
 .latest-mon .tableinfo td.latest-data { width: 10%; }
 .latest-mon .tableinfo td.latest-actions { width: 5%; }
 .latest-mon .tableinfo td.latest-info { width: 27px; }
@@ -123,7 +124,7 @@
 .item-list table.filter tr td.label.col4 { width: 8%; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
-.item-list .filter .multiselect { height: 10px; top: -10px; }
+.item-list .filter .multiselect .selected ul { margin: 0;}
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -154,6 +155,7 @@
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
+#selementForm .multiselect .selected ul { margin: 0;}
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

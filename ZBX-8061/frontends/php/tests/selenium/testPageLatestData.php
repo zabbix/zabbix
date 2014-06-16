@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageLatestData extends CWebTest {
 	public function testPageLatestData_CheckLayout() {
 		$this->zbxTestLogin('latest.php');
-		$this->zbxTestCheckTitle('Latest data \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('Latest data \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('LATEST DATA');
 		$this->zbxTestTextPresent('Items');
 		$this->zbxTestTextPresent(array('Host', 'Group'));
@@ -34,7 +34,7 @@ class testPageLatestData extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageLatestData_NoHostNames() {
 		$this->zbxTestLogin('latest.php');
-		$this->zbxTestCheckTitle('Latest data \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('Latest data \[refreshed every 30 sec.\]');
 		$this->checkNoRealHostnames();
 	}
 }

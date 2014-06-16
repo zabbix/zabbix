@@ -34,11 +34,6 @@
 
 			$users = API::User()->get($options);
 			$user = reset($users);
-
-			$data['auth_type'] = get_user_system_auth($userid);
-		}
-		else {
-			$data['auth_type'] = $config['authentication_type'];
 		}
 
 		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
@@ -107,6 +102,16 @@
 				$data['messages']['triggers.severities'] = array();
 			}
 			$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
+		}
+
+		// authentication type
+		if ($data['user_groups']) {
+			$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
+		}
+		else {
+			$data['auth_type'] = ($userid === null)
+				? $config['authentication_type']
+				: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
 		}
 
 		// set autologout
@@ -523,7 +528,14 @@
 					'objectOptions' => array(
 						'editable' => true
 					),
-					'data' => $groupFilter
+					'data' => $groupFilter,
+					'popup' => array(
+						'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
+							'&srcfld1=groupid&writeonly=1',
+						'width' => 450,
+						'height' => 450,
+						'buttonClass' => 'input filter-multiselect-select-button'
+					)
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -562,7 +574,14 @@
 						'editable' => true,
 						'templated_hosts' => true
 					),
-					'data' => $hostFilterData
+					'data' => $hostFilterData,
+					'popup' => array(
+						'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
+							'&srcfld1=hostid&writeonly=1',
+						'width' => 450,
+						'height' => 450,
+						'buttonClass' => 'input filter-multiselect-select-button'
+					)
 				))
 			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
@@ -578,7 +597,7 @@
 			new CCol(array(
 				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_app', _('Select'),
-					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+					'return PopUp("popup.php?srctbl=applications&srcfld1=applicationid'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 						'&with_applications=1'.
 						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'

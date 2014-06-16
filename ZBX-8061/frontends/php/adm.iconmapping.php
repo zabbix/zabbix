@@ -138,8 +138,8 @@ $data = array(
 );
 
 $iconList = API::Image()->get(array(
+	'output' => array('imageid', 'name'),
 	'filter' => array('imagetype' => IMAGE_TYPE_ICON),
-	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
 order_result($iconList, 'name');
