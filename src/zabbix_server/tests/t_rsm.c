@@ -1,15 +1,24 @@
 #include "t_rsm.h"
 #include "../poller/checks_simple_rsm.c"
 
-int main()
+int	main(int argc, char *argv[])
 {
-	char		err[256], *res_ip = "156.154.102.25", *ns = "ns3.cctld.co", *ns_ip = "156.154.102.25",
-			*domain = "co", proto = ZBX_RSM_UDP, ipv4_enabled = 1, ipv6_enabled = 1,
-			*testprefix = "www.nonexistent.23242432";
+	char		err[256], *res_ip = "127.0.0.1", *ns, *ns_ip, *tld, proto = ZBX_RSM_UDP, ipv4_enabled = 1,
+			ipv6_enabled = 1, *testprefix = "www.nonexistent.23242432";
 	int		res_ec, rtt;
 	ldns_resolver	*res = NULL;
 	ldns_rr_list	*keys = NULL;
 	FILE		*log_fd = stdout;
+
+	if (4 != argc)
+	{
+		fprintf(stderr, "usage: %s <tld> <ns> <ip>\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	ns = argv[1];
+	ns_ip = argv[2];
+	tld = argv[3];
 
 	/* create resolver */
 	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, proto, ipv4_enabled, ipv6_enabled, log_fd,
@@ -19,14 +28,14 @@ int main()
 		goto out;
 	}
 
-	if (SUCCEED != zbx_get_dnskeys(res, domain, res_ip, &keys, log_fd, &res_ec, err, sizeof(err)))
+	if (SUCCEED != zbx_get_dnskeys(res, tld, res_ip, &keys, log_fd, &res_ec, err, sizeof(err)))
 	{
 		zbx_rsm_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != zbx_get_ns_ip_values(res, ns, ns_ip, keys, testprefix, domain, log_fd, &rtt,
-			NULL, ipv4_enabled, ipv6_enabled, 0, err, sizeof(err)))
+	if (SUCCEED != zbx_get_ns_ip_values(res, ns, ns_ip, keys, testprefix, tld, log_fd, &rtt, NULL, ipv4_enabled,
+			ipv6_enabled, 0, err, sizeof(err)))
 	{
 		zbx_rsm_err(log_fd, err);
 	}
@@ -44,5 +53,5 @@ out:
 			ldns_resolver_free(res);
 	}
 
-	return 0;
+	exit(EXIT_SUCCESS);
 }
