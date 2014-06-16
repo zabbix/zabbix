@@ -63,13 +63,15 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
+	$autoLogin = getRequest('autologin', 0);
+
 	DBstart();
-	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
+	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''), $autoLogin);
 	DBend(true);
 
 	if ($loginSuccess) {
 		// save remember login preference
-		$user = array('autologin' => getRequest('autologin', 0));
+		$user = array('autologin' => $autologin);
 
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			API::User()->updateProfile($user);

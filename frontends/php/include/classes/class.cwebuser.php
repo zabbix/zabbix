@@ -23,7 +23,7 @@ class CWebUser {
 
 	public static $data = null;
 
-	public static function login($login, $password) {
+	public static function login($login, $password, $autoLogin) {
 		try {
 			self::setDefault();
 
@@ -57,11 +57,12 @@ class CWebUser {
 			}
 
 			// remove guest session after successful login
+
 			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie('zbx_sessionid')));
 
 			if ($result) {
 				zbx_setcookie('zbx_sessionid', self::$data['sessionid'],
-					self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0
+					$autoLogin ? time() + SEC_PER_DAY * 31 : 0
 				);
 
 				add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, self::$data['userid'], '', null, null, null);
@@ -106,7 +107,9 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
+			if (self::$data['autologin']) {
+				zbx_setcookie('zbx_sessionid', $sessionid,  time() + SEC_PER_DAY * 31);
+			}
 
 			return true;
 		}
@@ -114,6 +117,8 @@ class CWebUser {
 			self::setDefault();
 			return false;
 		}
+
+		return $sessionid;
 	}
 
 	public static function setDefault() {
