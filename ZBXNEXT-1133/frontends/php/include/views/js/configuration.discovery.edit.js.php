@@ -391,9 +391,9 @@
 					var radioObj = jQuery('input[name=' + name + ']');
 
 					if (radioObj.attr('type') == 'radio') {
-						radioObj.removeAttr('checked');
+						radioObj.prop('checked', false);
 
-						jQuery('#' + name + '_' + itemObj.val()).attr('checked', 'checked');
+						jQuery('#' + name + '_' + itemObj.val()).prop('checked', true);
 					}
 				}
 			});
@@ -638,7 +638,7 @@
 	}
 
 	function selectUniquenessCriteriaDefault() {
-		jQuery('#uniqueness_criteria_ip').attr('checked', 'checked');
+		jQuery('#uniqueness_criteria_ip').prop('checked', true);
 	}
 
 	jQuery(document).ready(function() {

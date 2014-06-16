@@ -390,7 +390,7 @@ jQuery(function($) {
 		},
 
 		getCalculatedSTime: function(screen) {
-			if (!empty(timeControl.timeline) && screen.timeline.period >= timeControl.timeline.maxperiod) {
+			if (!empty(timeControl.timeline) && screen.timeline.period > timeControl.timeline.maxperiod) {
 				return new CDate(timeControl.timeline.starttime() * 1000).getZBXDate();
 			}
 
