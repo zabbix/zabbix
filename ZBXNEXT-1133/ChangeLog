@@ -1,3 +1,65 @@
+Changes for 2.3.2
+
+New features:
+A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-7399] improved multiselect by adding popup select window (Oleg)
+..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
+
+Bug fixes:
+.......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+..F....... [ZBX-8053] changed label "Latest data" to "Monitoring" in host inventory view (Ivo)
+..F....... [ZBX-8333] renamed screen item add, update and delete messages (Ivo)
+..F....... [ZBX-8197] fixed all data not being shown on graph if period is set to or more than 2 years (Krists)
+..F....... [ZBX-8330] fixed bug with grouped buttons in discovery rules for SNMP checks (Andrejs)
+..F....... [ZBX-8318] added "d. m. Y" date format to recognized formats in frontend and set "Y-m-d H:i:s" as fallback (Krists)
+..F....... [ZBXNEXT-2124] fixed submap problem count calculation in Monitoring / Maps when application filters are active (Krists)
+..F....... [ZBX-8301] restricted "unique" attribute to Zabbix agent & SNMP checks in discovery rule creation (Andrejs)
+.......PS. [ZBX-8095] fixed a bug in item queue that updated item's nextcheck but not its position in the queue (asaveljevs)
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
+.......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
+........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
+...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
+....I..... [ZBX-8306] added Percona database support when compiling with --with-mysql configuration option (wiper)
+.......PS. [ZBX-8287] added truncating of long text values to maximum field length before inserting into database (Andris)
+........S. [ZBX-3163] fixed trigger evaluation order so that it takes dependencies into account (asaveljevs)
+A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
+..F....... [ZBX-8200] improved performance of Monitoring / Events page (Krists)
+..F....... [ZBX-7536] now host visible names are shown in popups instead of hostname (Andrejs)
+..F....... [ZBX-8292] fixed host prototype creation (Krists)
+..F.....S. [ZBX-8092] changed the way the number of active triggers is calculated in the dashboard and zabbix[triggers] item (Andrejs, igors)
+........S. [ZBX-8092] added disabled triggers to the configuration cache for correct macro expansion in notifications (igors)
+........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
+...G...PS. [ZBX-8172] fixed null JSON value decoding (wiper)
+.......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
+..F....... [ZBX-8216] fixed screen import error (Andrejs)
+..F....... [ZBX-8245] fixed repeating of actions while sorting / paging (Andrejs)
+A.F....... [ZBX-5567] removed parameter "not_proxy_hosts" from hostgroup.get API method and frontend code (Krists)
+..F....... [ZBX-8271] fixed importing of maps with LLD discovered hosts (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.3.1
+
+New features:
+A.F....PS. [ZBXNEXT-282] implemented additional options and HTTP header support for web scenarios (dimir, Krists)
+.......PS. [ZBXNEXT-2254] DBSchema configuration parameter now applies to PostgreSQL as well as IBM DB2 (Juris)
+A.F....... [ZBX-1357] updated Japanese, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-8276] fixed latest data filtering by name (Ivo)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
+...G...PS. [ZBX-8172] fixed translation of \uxxxx sequences in JSON string values (wiper)
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
+A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+..F....... [ZBX-7535] trivial change from 'Link' to 'URL' in error messages (Andrejs)
+..F....... [ZBX-8259] fixed padding for widgets in screen (Andrejs)
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
+..F....... [ZBX-8221] corrected labels while copying items (Andrejs)
+........S. [ZBX-8092] added disabled hosts and disabled items to the configuration cache for correct macro expansion in notifications (igors)
+
 --------------------------------------------------------------------------------
 Changes for 2.3.0
 
@@ -54,6 +116,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+........S. [ZBX-8014] fixed evaluation of calculated item and trigger expressions not being precise enough (asaveljevs)
 ..F....... [ZBX-8212] it is not possible to add triggers from templates to maps anymore (Andrejs)
 A......... [ZBX-8227] fixed the "applicationids" parameter in trigger.get overriding the "groupids" parameter (Pavels)
 A......... [ZBX-8169] fixed SLA period calculation to account for DST changes (Krists)
@@ -128,15 +191,56 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.4rc3
+
+Bug fixes:
+.......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4rc2
+
+New features:
+A.F....... [ZBX-1357] updated Italian, German and Spanish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-8095] fixed a bug in item queue that updated item's nextcheck but not its position in the queue (asaveljevs)
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
+.......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
+........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.4rc1
 
 New features:
+..F....... [ZBX-7399] improved multiselect, added popup select window (Oleg)
 .......... [ZBX-7811] added example robots.txt file (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian, Russian, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Polish, Romanian, Russian, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
+..F....... [ZBX-8302] fixed ordering of discovery rules (Andrejs)
+..F....... [ZBX-8209] improved host and item name column widths on Monitoring / Latest data page (Krists)
+.......PS. [ZBX-8287] added truncating of long text values to maximum field length before inserting into database (Andris)
+........S. [ZBX-3163] fixed trigger evaluation order so that it takes dependencies into account (asaveljevs)
+A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
+..F....... [ZBX-8200] improved performance of Monitoring / Events page (Krists)
+A.F....... [ZBX-7983] improved performance of "System status" widget (Eduard, Ivo)
+........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
+.......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
+........S. [ZBX-8243] added log message when the reason for an item being in an unsupported state changes (Juris)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
+...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
 .......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
+..F.....S. [ZBX-8092] changed the way the number of active triggers is calculated in the dashboard and zabbix[triggers] item (Andrejs, igors)
+........S. [ZBX-8092] added disabled triggers to the configuration cache for correct macro expansion in notifications (igors)
+........S. [ZBX-8092] added disabled hosts and disabled items to the configuration cache for correct macro expansion in notifications (igors)
 ........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
 ...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
@@ -1079,8 +1183,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.13rc1
 
 New features:
+A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
+...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
+.......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
+.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 ...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
@@ -2632,6 +2746,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 

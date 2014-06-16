@@ -14,6 +14,9 @@
 		jQuery('#steps_' + step + '_variables').remove();
 		jQuery('#steps_' + step + '_required').remove();
 		jQuery('#steps_' + step + '_status_codes').remove();
+		jQuery('#steps_' + step + '_headers').remove();
+		jQuery('#steps_' + step + '_retrieve_mode').remove();
+		jQuery('#steps_' + step + '_follow_redirects').remove();
 
 		if (table.find('tr.sortable').length <= 1) {
 			table.sortable('disable');
@@ -42,6 +45,9 @@
 			jQuery('#steps_' + step + '_variables').attr('id', 'tmp_steps_' + step + '_variables');
 			jQuery('#steps_' + step + '_required').attr('id', 'tmp_steps_' + step + '_required');
 			jQuery('#steps_' + step + '_status_codes').attr('id', 'tmp_steps_' + step + '_status_codes');
+			jQuery('#steps_' + step + '_headers').attr('id', 'tmp_steps_' + step + '_headers');
+			jQuery('#steps_' + step + '_follow_redirects').attr('id', 'tmp_steps_' + step + '_follow_redirects');
+			jQuery('#steps_' + step + '_retrieve_mode').attr('id', 'tmp_steps_' + step + '_retrieve_mode');
 			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
 
 			// set order number
@@ -69,6 +75,9 @@
 			jQuery('#tmp_steps_' + n + '_variables').attr('id', 'steps_' + newStep + '_variables');
 			jQuery('#tmp_steps_' + n + '_required').attr('id', 'steps_' + newStep + '_required');
 			jQuery('#tmp_steps_' + n + '_status_codes').attr('id', 'steps_' + newStep + '_status_codes');
+			jQuery('#tmp_steps_' + n + '_headers').attr('id', 'steps_' + newStep + '_headers');
+			jQuery('#tmp_steps_' + n + '_follow_redirects').attr('id', 'steps_' + newStep + '_follow_redirects');
+			jQuery('#tmp_steps_' + n + '_retrieve_mode').attr('id', 'steps_' + newStep + '_retrieve_mode');
 
 			jQuery('#remove_' + newStep).attr('remove_step', newStep);
 			jQuery('#name_' + newStep).attr('name_step', newStep);
@@ -84,6 +93,9 @@
 			jQuery('#steps_' + newStep + '_variables').attr('name', 'steps[' + newStep + '][variables]');
 			jQuery('#steps_' + newStep + '_required').attr('name', 'steps[' + newStep + '][required]');
 			jQuery('#steps_' + newStep + '_status_codes').attr('name', 'steps[' + newStep + '][status_codes]');
+			jQuery('#steps_' + newStep + '_headers').attr('name', 'steps[' + newStep + '][headers]');
+			jQuery('#steps_' + newStep + '_retrieve_mode').attr('name', 'steps[' + newStep + '][retrieve_mode]');
+			jQuery('#steps_' + newStep + '_follow_redirects').attr('name', 'steps[' + newStep + '][follow_redirects]');
 
 			// set new step order position
 			currStep.attr('id', 'current_step_' + newStep);
@@ -153,7 +165,7 @@
 					stepNames += '&steps_names[]=' + $(stepName).val();
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames, 600, 510);
+				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames, 600, 542);
 			});
 		<?php endif ?>
 
@@ -177,7 +189,10 @@
 					+ '<?php echo url_param($step['required'], false, 'required'); ?>'
 					+ '<?php echo url_param($step['status_codes'], false, 'status_codes'); ?>'
 					+ '<?php echo url_param($step['name'], false, 'old_name'); ?>'
-					+ stepNames, 600, 510);
+					+ '<?php echo url_param($step['headers'], false, 'headers'); ?>'
+					+ '<?php echo url_param($step['retrieve_mode'], false, 'retrieve_mode'); ?>'
+					+ '<?php echo url_param($step['follow_redirects'], false, 'follow_redirects'); ?>'
+					+ stepNames, 600, 542);
 			});
 		<?php endforeach ?>
 	});

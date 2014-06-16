@@ -268,7 +268,7 @@ else {
 
 	// sorting & paging
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['proxies'], array('proxyid'));
+	$data['paging'] = getPagingLine($data['proxies']);
 
 	// calculate performance
 	$dbPerformance = DBselect(
