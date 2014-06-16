@@ -371,7 +371,7 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
  */
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
-		'not_proxy_hosts' => true,
+		'with_hosts_and_templates' => true,
 		'editable' => true
 	),
 	'hosts' => array(
@@ -627,14 +627,7 @@ else {
 
 	order_result($data['graphs'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine(
-		$data['graphs'],
-		array('graphid'),
-		array(
-			'hostid' => get_request('hostid'),
-			'parent_discoveryid' => get_request('parent_discoveryid')
-		)
-	);
+	$data['paging'] = getPagingLine($data['graphs']);
 
 	// get graphs after paging
 	$options = array(

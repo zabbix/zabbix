@@ -345,7 +345,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['paging'] = getPagingLine($groups, array('groupid'));
+	$data['paging'] = getPagingLine($groups);
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count
