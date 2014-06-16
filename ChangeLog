@@ -1,6 +1,7 @@
 Changes for 2.2.4rc3
 
 Bug fixes:
+.......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ..F....... [ZBX-8358] fixed vertical table header cell text centering (Krists)
 
