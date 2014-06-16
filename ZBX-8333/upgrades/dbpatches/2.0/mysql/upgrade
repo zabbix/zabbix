@@ -1,0 +1,182 @@
+#!/bin/bash
+
+echo " WARNING: backup your database before performing upgrade
+
+ This is an UNSUPPORTED Zabbix upgrade script from 1.8 to 2.0 for MySQL
+ It does the following things:
+  1. Updates indexes that might require changes;
+  2. Patches the database from 1.8 schema to 2.0 schema;
+  3. Adds 'Disabled' and 'Debug' usergroup if any missing;
+  4. Checks for hosts not belonging to any group and adds them to one if any found.
+
+ Usage: pass required MySQL parameters to this script (like database, user, password etc).
+"
+read -n 1 -p "Continue ? (y/n) " RESPONSE
+
+[ "$RESPONSE" == "y" ] || {
+	echo
+	exit
+}
+
+# groupname to use for hosts that do not belong to any group, if any. literar string.
+# if missing, will be added, if existing, hosts will be added to it
+GROUPFORHOSTS="none"
+
+MYSQL="$(which mysql)"
+MYSQLPARAMS="$@"
+echo
+
+fail() {
+	echo "$1"
+	exit 1
+}
+
+[[ "$MYSQL" ]] || fail "No mysql binary in path."
+
+timer() {
+	TIMER=$(echo "$@" | cut -d" " -f 2- | tr " " _)
+	case "$1" in
+	start)
+		let START_$TIMER=$(date +%s)
+		;;
+	stop)
+		let TOTALTIME=$(date +%s)-START_$TIMER
+		let TOTALHOURS=TOTALTIME/3600
+		let TOTALMINUTES=(TOTALTIME-TOTALHOURS*3600)/60
+		let TOTALSECONDS=TOTALTIME%60
+	echo "$(echo $TIMER | tr _ " ") took $TOTALHOURS:$(printf "%02d" $TOTALMINUTES):$(printf "%02d" $TOTALSECONDS)"
+	esac
+}
+
+increaseid() {
+# accepts table name and field as parameters
+# increases corresponding id if found, searches the table for max id and inserts one if not
+# returns freshly inserted id to be used with new entry
+	CURRENTID=$(echo "select nextid from ids where table_name='$1' and field_name='$2';" | $MYSQL $MYSQLPARAMS -N)
+
+	[[ "$CURRENTID" ]] && {
+		echo "update ids set nextid='$[$CURRENTID+1]' where table_name='$1' and field_name='$2';" | $MYSQL $MYSQLPARAMS
+	} || {
+		CURRENTID=$(echo "select $2 from $1 order by $2 desc limit 1;" | $MYSQL $MYSQLPARAMS -N)
+		echo "insert into ids values (0,'$1','$2',$[$CURRENTID+1]);" | $MYSQL $MYSQLPARAMS
+	}
+	echo $[$CURRENTID+1]
+}
+
+drop_index() {
+	echo "alter table $1 drop index $2;" | $MYSQL $MYSQLPARAMS 2>&1 | grep -v "check that column/key exists"
+}
+
+create_index() {
+	# 1- index name
+	# 2- table
+	# 3- columns
+	echo "create index $1 on $2 ($3);" | $MYSQL $MYSQLPARAMS 2>&1 | grep -v "Duplicate key name"
+}
+
+# ********************   1
+
+#echo "Dropping indexes that might need re-creation..."
+
+#timer start dropping of indexes
+#for i in\
+# "node_cksum_1 node_cksum_cksum_1"; do
+#	drop_index $i
+#done
+#echo -n " ... "
+#timer stop dropping of indexes
+
+#echo "Creating possibly missing indexes..."
+
+#timer start creating of indexes
+# create_index index_name table_name columns
+#timer stop creating of indexes
+
+# ********************   2
+
+echo "Patching the database"
+
+timer start patching of the database
+$MYSQL $MYSQLPARAMS < patch.sql || fail "Failed to patch Zabbix database. Restore from backup"
+echo -n " ... "
+timer stop patching of the database
+
+# ********************   3
+
+[[ "$(echo $BASH_VERSION | cut -d. -f1,2 )" < "4.1" ]] && {
+	# bash < 4.1 version
+	echo "bash < 4.1 detected"
+	# groupname,columnname
+	for group in "Disabled,users_status" "Debug,debug_mode"; do
+		groupname=$(echo $group | cut -d, -f1)
+		column=$(echo $group | cut -d, -f2)
+		echo -n "Checking for '$groupname' user group... "
+
+		[[ "$(echo "select name from usrgrp where name='$groupname';" | $MYSQL $MYSQLPARAMS -N)" ]] && {
+			echo "found, not doing anything."
+		} || {
+			echo "not found, adding."
+			dbcolumn=$(echo $group | cut -d, -f2)
+			# avoiding eval
+			declare $dbcolumn=1
+			usrgrouptoadd=$(increaseid usrgrp usrgrpid)
+			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$debug_mode');" | $MYSQL $MYSQLPARAMS
+			unset $dbcolumn
+		}
+	done
+} || {
+	echo "bash >= 4.1 detected"
+	# bash >= 4.1 version
+	# ["groupname"]=columnname
+	# associative arrays supported since bash 4.0
+	# groups with spaces in their names don't work in bash 4.0 (works in 4.1)
+
+	declare -A groupstoadd
+	groupstoadd=(
+["Disabled"]=users_status
+["Debug"]=debug_mode
+)
+
+	# loop over array keys
+	for groupname in "${!groupstoadd[@]}"; do
+		echo -n "Checking for '$groupname' user group... "
+		[[ "$(echo "select name from usrgrp where name='$groupname';" | $MYSQL $MYSQLPARAMS -N)" ]] && {
+			echo "found, not doing anything."
+		} || {
+			echo "not found, adding."
+			declare ${groupstoadd[$groupname]}=1
+			usrgrouptoadd=$(increaseid usrgrp usrgrpid)
+			echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,debug_mode) values ('$usrgrouptoadd','$groupname','0','$users_status','$debug_mode');" | $MYSQL $MYSQLPARAMS
+			unset ${groupstoadd[$groupname]}
+		}
+	done
+}
+
+# ********************   4
+
+echo -n "Checking for hosts not belonging to any group... "
+
+timer start checking for hosts not belonging to any group
+HOSTSWOGROUP=$(echo "select hosts.hostid from hosts left join hosts_groups on hosts.hostid=hosts_groups.hostid where hosts_groups.hostid is null;" | $MYSQL $MYSQLPARAMS -N)
+
+[[ "$HOSTSWOGROUP" ]] && {
+	echo "found."
+	GROUPFORHOSTSID=$(echo "select groupid from groups where name='$GROUPFORHOSTS'" | $MYSQL $MYSQLPARAMS -N)
+	[[ "$GROUPFORHOSTSID" ]] && {
+		echo "Group '$GROUPFORHOSTS' already exists, adding all orphaned hosts to it."
+	} || {
+		echo "Group '$GROUPFORHOSTS' does not exist, creating it and adding all orphaned hosts to it."
+		GROUPFORHOSTSID=$(increaseid groups groupid)
+		echo "insert into groups (groupid,name,internal) values ('$GROUPFORHOSTSID','$GROUPFORHOSTS','0');" | $MYSQL $MYSQLPARAMS
+	}
+	for ORPHANHOST in $HOSTSWOGROUP; do
+		MAPPINGID=$(increaseid hosts_groups hostgroupid)
+		echo "insert into hosts_groups (hostgroupid,hostid,groupid) values ('$MAPPINGID','$ORPHANHOST','$GROUPFORHOSTSID');" | $MYSQL $MYSQLPARAMS
+		((HOSTSADDED++))
+	done
+	echo "Added $HOSTSADDED hosts to group '$GROUPFORHOSTS'. Move them to correct groups manually."
+} || {
+	echo "not found any"
+}
+echo -n " ... "
+timer stop checking for hosts not belonging to any group
