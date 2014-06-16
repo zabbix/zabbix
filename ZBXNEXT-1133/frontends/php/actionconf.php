@@ -120,7 +120,7 @@ elseif (hasRequest('save')) {
 		'r_longdata'	=> get_request('r_longdata', ''),
 		'filter'		=> array(
 			'conditions'	=> getRequest('conditions', array()),
-			'evaltype'		=> getRequest('evaltype', 0),
+			'evaltype'		=> getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			'formula'		=> getRequest('formula')
 		),
 		'operations'	=> get_request('operations', array())
@@ -481,8 +481,7 @@ if (hasRequest('form')) {
 				'esc_period' => 0,
 				'esc_step_from' => 1,
 				'esc_step_to' => 1,
-				'evaltype' => 0,
-				''
+				'evaltype' => 0
 			);
 		}
 	}
