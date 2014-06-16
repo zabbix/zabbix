@@ -369,12 +369,14 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
+		$sessiond = CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
+
+		if (!$sessiond) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = get_cookie('zbx_sessionid');
+		API::getWrapper()->auth = $sessiond;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
