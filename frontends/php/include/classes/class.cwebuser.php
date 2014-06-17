@@ -62,7 +62,7 @@ class CWebUser {
 
 			if ($result) {
 				zbx_setcookie('zbx_sessionid', self::$data['sessionid'],
-					$autoLogin ? time() + SEC_PER_DAY * 31 : 0
+					$autoLogin ? strtotime('+1 month') : 0
 				);
 
 				add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, self::$data['userid'], '', null, null, null);
@@ -108,17 +108,15 @@ class CWebUser {
 			}
 
 			if (self::$data['autologin']) {
-				zbx_setcookie('zbx_sessionid', $sessionid,  time() + SEC_PER_DAY * 31);
+				zbx_setcookie('zbx_sessionid', $sessionid,  strtotime('+1 month'));
 			}
 
-			return true;
+			return $sessionid;
 		}
 		catch (Exception $e) {
 			self::setDefault();
 			return false;
 		}
-
-		return $sessionid;
 	}
 
 	public static function setDefault() {

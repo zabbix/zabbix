@@ -71,9 +71,9 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 
 	if ($loginSuccess) {
 		// save remember login preference
-		$user = array('autologin' => $autologin);
+		$user = array('autologin' => $autoLogin);
 
-		if (CWebUser::$data['autologin'] != $user['autologin']) {
+		if (CWebUser::$data['autologin'] != $autoLogin) {
 			API::User()->updateProfile($user);
 		}
 
