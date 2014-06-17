@@ -84,7 +84,7 @@ typedef struct
 }
 zbx_sock_t;
 
-const char	*zbx_tcp_strerror();
+const char	*zbx_tcp_strerror(void);
 
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
