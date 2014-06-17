@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Zabbix agent start/stop script.
+#
+# Written by Alexei Vladishev <alexei.vladishev@zabbix.com>.
+
+NAME=zabbix_agentd
+DAEMON=/usr/local/sbin/${NAME}
+DESC="Zabbix agent daemon"
+PID=/tmp/$NAME.pid
+
+test -f $DAEMON || exit 0
+
+case "$1" in
+  start)
+	echo "Starting $DESC: $NAME"
+	start-stop-daemon --oknodo --start --pidfile $PID \
+		--exec $DAEMON
+	;;
+  stop)
+	echo "Stopping $DESC: $NAME"
+	start-stop-daemon --oknodo --stop  --pidfile $PID \
+		--exec $DAEMON
+	;;
+  restart|force-reload)
+	$0 stop
+	$0 start
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
