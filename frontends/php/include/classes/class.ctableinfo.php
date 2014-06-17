@@ -29,6 +29,54 @@ class CTableInfo extends CTable {
 		$this->attributes['cellspacing'] = 1;
 		$this->headerClass = 'header';
 		$this->footerClass = 'footer';
+		$this->addMakeVerticalRotationJs = false;
+	}
+
+	public function toString($destroy = true) {
+		$tableId = $this->getAttribute('id');
+
+		if(!$tableId) {
+			$tableId = uniqid('t');
+			$this->setAttribute('id', $tableId);
+		}
+
+		$string = parent::toString($destroy);
+
+		if($this->addMakeVerticalRotationJs) {
+			$string .= get_js(
+				'var makeVerticalRotationForTable = function() {
+					var table = jQuery("#'.$tableId.'");
+
+					table.makeVerticalRotation();
+
+					if (IE8) {
+						jQuery(".vertical_rotation_inner", table).css({
+							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
+						});
+					}
+					else if (IE9) {
+						jQuery(".vertical_rotation_inner", table).css({
+							"-ms-transform": "rotate(270deg)"
+						});
+					}
+
+					if (!IE9) {
+						jQuery(".vertical_rotation_inner", table).css({
+							"writing-mode": "tb-rl"
+						});
+					}
+				}
+
+				if(!jQuery.isReady) {
+					jQuery(document).ready(makeVerticalRotationForTable);
+				}
+				else {
+					makeVerticalRotationForTable();
+				}',
+			true);
+		}
+
+		return $string;
 	}
 
 	/**
@@ -36,33 +84,6 @@ class CTableInfo extends CTable {
 	 * Cells must be marked with "vertical_rotation" class.
 	 */
 	public function makeVerticalRotation() {
-		if (!defined('IS_VERTICAL_ROTATION_JS_INSERTED')) {
-			define('IS_VERTICAL_ROTATION_JS_INSERTED', true);
-
-			insert_js(
-				'jQuery(document).ready(function() {
-					jQuery(".'.$this->getAttribute('class').'")
-						.makeVerticalRotation();
-
-					if (IE8) {
-						jQuery(".vertical_rotation_inner").css({
-							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
-						});
-					}
-					else if (IE9) {
-						jQuery(".vertical_rotation_inner").css({
-							"-ms-transform": "rotate(270deg)"
-						});
-					}
-
-					if (!IE9) {
-						jQuery(".vertical_rotation_inner").css({
-							"writing-mode": "tb-rl"
-						});
-					}
-				});',
-				true
-			);
-		}
+		$this->addMakeVerticalRotationJs = true;
 	}
 }
