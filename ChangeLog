@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
