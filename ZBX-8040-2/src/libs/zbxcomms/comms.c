@@ -928,7 +928,7 @@ static const char*	zbx_sock_find_line(zbx_sock_t *s)
 		line = s->next_line;
 		s->next_line = ptr + 1;
 
-		if (ptr > s->next_line && '\r' == *(ptr - 1))
+		if (ptr > line && '\r' == *(ptr - 1))
 			ptr--;
 
 		*ptr = '\0';
