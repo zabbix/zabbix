@@ -928,7 +928,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (ZBX_COMMAND_ERROR == rc)
 						err_msg = "Invalid item key format.";
 					else if (ZBX_COMMAND_WITHOUT_PARAMS == rc)
-						err_msg = "Mandatory first parameter missing.";
+						err_msg = "Invalid number of parameters.";
 
 					break;
 				}
@@ -1012,8 +1012,13 @@ static void	process_active_checks(char *server, unsigned short port)
 			{
 				const char	*p;
 
-				p = (NULL != err_msg) ? err_msg : ((NULL != err_msg_dyn) ? err_msg_dyn :
-						ZBX_NOTSUPPORTED);
+				if (NULL != err_msg)
+					p = err_msg;
+				else if (NULL != err_msg_dyn)
+					p = err_msg_dyn;
+				else
+					p = ZBX_NOTSUPPORTED;
+
 				active_metrics[i].error_count = 0;
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 
