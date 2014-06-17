@@ -1223,7 +1223,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 					' FROM group_prototype hg'.
 					' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.groupid!=0'
+					' AND hg.groupid IS NOT NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApi()->select('group_prototype', array(
@@ -1245,7 +1245,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 				' FROM group_prototype hg'.
 				' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.name NOT LIKE '.zbx_dbstr('')
+					' AND hg.groupid IS NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApi()->select('group_prototype', array(
