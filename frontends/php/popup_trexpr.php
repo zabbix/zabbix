@@ -599,7 +599,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 			// find the item
 			$item = API::Item()->get(array(
 				'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-				'selectHosts' => array('host'),
+				'selectHosts' => array('name'),
 				'webitems' => true,
 				'filter' => array(
 					'host' => $functionMacroToken['data']['host'],
