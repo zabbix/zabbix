@@ -1411,25 +1411,32 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @param string $sort
  * @param string $sortorder
+ * @param array $allowedColumns
  *
- * @retur void
+ * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
 	$_REQUEST['sort'] = getPageSortField($sort);
 	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
-		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
+		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
+			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
+			invalid_url();
+		}
+
+		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
+			));
+			invalid_url();
+		}
+
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
-
-	if (!str_in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		$_REQUEST['sortorder'] = ZBX_SORT_UP;
-	}
-
-	CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 }
 
 // creates header col for sorting in table header

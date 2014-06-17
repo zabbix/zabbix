@@ -79,7 +79,7 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,			null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('alias', ZBX_SORT_UP);
+validate_sort_and_sortorder('alias', ZBX_SORT_UP, array('alias', 'name', 'surname', 'type'));
 
 /*
  * Permissions
