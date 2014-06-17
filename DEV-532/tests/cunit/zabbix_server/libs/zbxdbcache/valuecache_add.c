@@ -195,12 +195,10 @@ static void	cuvc_suite_add1_testN()
 
 static void	cuvc_suite_add2_test1()
 {
-	int				i, found = 0;
 	zbx_timespec_t			ts = {1006, 0};
 	history_value_t			value = {.str = "1006:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
-	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 
@@ -214,7 +212,7 @@ static void	cuvc_suite_add2_test1()
 
 static void	cuvc_suite_add2_test2()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1006, 0};
 	history_value_t			value = {.str = "1006:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -240,7 +238,7 @@ static void	cuvc_suite_add2_test2()
 
 static void	cuvc_suite_add2_test3()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1005, 0};
 	history_value_t			value = {.str = "1005:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -266,7 +264,7 @@ static void	cuvc_suite_add2_test3()
 
 static void	cuvc_suite_add2_test4()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1005, 700};
 	history_value_t			value = {.str = "1005:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -294,7 +292,7 @@ static void	cuvc_suite_add2_test4()
 
 static void	cuvc_suite_add2_test5()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1000, 000};
 	history_value_t			value = {.str = "1000:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -328,7 +326,7 @@ static void	cuvc_suite_add2_test5()
 
 static void	cuvc_suite_add2_test6()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1001, 000};
 	history_value_t			value = {.str = "1001:200"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -379,12 +377,11 @@ static void	cuvc_suite_add2_testN()
 
 static void	cuvc_suite_add3_test1()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1006, 0};
 	history_value_t			value = {.str = "1006:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
-	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 
@@ -402,7 +399,7 @@ static void	cuvc_suite_add3_test1()
 
 static void	cuvc_suite_add3_test2()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1006, 0};
 	history_value_t			value = {.str = "1006:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -433,7 +430,7 @@ static void	cuvc_suite_add3_test2()
 
 static void	cuvc_suite_add3_test3()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1005, 0};
 	history_value_t			value = {.str = "1005:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -464,7 +461,7 @@ static void	cuvc_suite_add3_test3()
 
 static void	cuvc_suite_add3_test4()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1005, 700};
 	history_value_t			value = {.str = "1005:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
@@ -514,9 +511,8 @@ static void	cuvc_suite_add3_testN()
 
 static void	cuvc_suite_add4_test1()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1006, 0};
-	history_value_t			value = {.str = "1006:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
 	zbx_history_record_t		record;
@@ -538,12 +534,10 @@ static void	cuvc_suite_add4_test1()
 
 static void	cuvc_suite_add4_test2()
 {
-	int				i, found = 0;
 	zbx_timespec_t			ts = {1006, 0};
 	history_value_t			value = {.str = "1006:0"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
-	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 
@@ -575,7 +569,7 @@ static void	cuvc_suite_add4_testN()
 
 static void	cuvc_suite_add5_test1()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1004, 0};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
@@ -602,12 +596,11 @@ static void	cuvc_suite_add5_test1()
 
 static void	cuvc_suite_add5_test2()
 {
-	int				i, found = 0;
+	int				found = 0;
 	zbx_timespec_t			ts = {1065, 0};
 	history_value_t			value = {.str = "1065:000"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
-	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 

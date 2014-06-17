@@ -593,68 +593,12 @@ static int	cuvc_clean_str_lowmem()
 	return cuvc_clean_str();
 }
 
-static void	zbx_vc_print_record(zbx_vc_item_t *item, zbx_history_record_t *record)
-{
-	char	value[4096], *pvalue = value;
-
-	switch (item->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(value, sizeof(value), "%f", record->value.dbl);
-			break;
-
-		case ITEM_VALUE_TYPE_UINT64:
-			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, record->value.ui64);
-			break;
-
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			pvalue = record->value.str;
-			break;
-
-		case ITEM_VALUE_TYPE_LOG:
-			zbx_snprintf(value, sizeof(value), "%d %d %d [%s] %s",
-					record->value.log->timestamp, record->value.log->logeventid,
-					record->value.log->severity, record->value.log->source,
-					record->value.log->value);
-
-	}
-	printf("\t\t\t%d.%d %s\n", record->timestamp.sec, record->timestamp.ns, pvalue);
-}
-
-static void	zbx_vc_dump_cache(zbx_vc_item_t *item)
-{
-	zbx_vc_chunk_t	*chunk = item->tail;
-
-	printf("ITEM DUMP: " ZBX_FS_UI64 " (type=%d, records=%d, recount=%d, hits=" ZBX_FS_UI64,
-			item->itemid, item->value_type, item->values_total, item->refcount, item->hits);
-
-	printf(", status=%d, range=%d)\n", item->status, item->range);
-
-	while (NULL != chunk)
-	{
-		int i;
-
-		printf("\tchunk: %d-%d\n", chunk->slots[chunk->first_value].timestamp.sec,
-				chunk->slots[chunk->last_value].timestamp.sec);
-		printf("\t\trecords: %d-%d\n", chunk->first_value, chunk->last_value);
-
-		for (i = chunk->first_value; i <= chunk->last_value; i++)
-		{
-			zbx_vc_print_record(item, &chunk->slots[i]);
-		}
-
-		chunk = chunk->next;
-	}
-	printf("========\n");
-}
-
-
 /*
  * include test suites grouped by functionality
  */
 #include "valuecache_get.c"
 #include "valuecache_add.c"
+#include "valuecache_misc.c"
 
 /******************************************************************************
  *                                                                            *
@@ -894,6 +838,26 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "get value", cuvc_suite_add5_test1);
 	ZBX_CU_ADD_TEST(suite, "add value", cuvc_suite_add5_test2);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add5_testN);
+
+	/* test suite: misc #1                                                                     */
+	if (NULL == (suite = CU_add_suite("valuecache access synchronization",  cuvc_init_str, cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "add value of different type when item is held by other proces", cuvc_suite_misc1_test1);
+	ZBX_CU_ADD_TEST(suite, "load the same value range from multiple proceses", cuvc_suite_misc1_test2);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc1_testN);
+
+	/* test suite: misc #2                                                                     */
+	if (NULL == (suite = CU_add_suite("valuecache forced cleanup",  cuvc_init_all_types, cuvc_clean_all_types)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "remove stale data", cuvc_suite_misc2_test1);
+	ZBX_CU_ADD_TEST(suite, "remove less accessed data in low memory mode", cuvc_suite_misc2_test2);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc2_testN);
 
 	return CUE_SUCCESS;
 }

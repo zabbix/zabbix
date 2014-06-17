@@ -53,26 +53,30 @@
 static void	cuvc_suite_get1_test_type(int value_type)
 {
 	int				i, now;
-	zbx_vector_history_record_t	recordsin;
-	zbx_vector_history_record_t	recordsout;
+	zbx_vector_history_record_t	expected;
+	zbx_vector_history_record_t	actual;
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	zbx_history_record_vector_create(&recordsin);
-	zbx_history_record_vector_create(&recordsout);
+	zbx_history_record_vector_create(&expected);
+	zbx_history_record_vector_create(&actual);
 
-	cuvc_generate_records1(&recordsin, value_type);
+	/* generate the expected values */
+	cuvc_generate_records1(&expected, value_type);
 
 	now = time(NULL);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(CUVC_ITEMID_BASE + value_type, value_type, &recordsout, now, 0, now));
-	ZBX_CU_ASSERT_INT_EQ_FATAL(recordsout.values_num, recordsin.values_num);
+	/* get all history data */
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(CUVC_ITEMID_BASE + value_type, value_type, &actual, now, 0, now));
 
-	for (i = 0; i < recordsin.values_num; i++)
-		cuvc_history_record_compare(&recordsout.values[i], &recordsin.values[i], value_type);
+	/* check the retrieved data */
+	ZBX_CU_ASSERT_INT_EQ_FATAL(actual.values_num, expected.values_num);
 
-	zbx_history_record_vector_destroy(&recordsout, value_type);
-	zbx_history_record_vector_destroy(&recordsin, value_type);
+	for (i = 0; i < expected.values_num; i++)
+		cuvc_history_record_compare(&actual.values[i], &expected.values[i], value_type);
+
+	zbx_history_record_vector_destroy(&actual, value_type);
+	zbx_history_record_vector_destroy(&expected, value_type);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
