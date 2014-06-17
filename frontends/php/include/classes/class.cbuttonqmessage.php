@@ -69,7 +69,7 @@ class CButtonQMessage extends CSubmit {
 
 		if (isset($this->vars)) {
 			$link = $page['file'].'?'.$this->name.'=1'.$this->vars;
-			$url = new CUrl($link);
+			$url = new Curl($link);
 			$action = "redirect('".$url->getUrl()."')";
 		}
 		else {

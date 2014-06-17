@@ -21,9 +21,9 @@
 
 class CSetupWizard extends CForm {
 
-	function __construct($ZBX_CONFIG) {
+	function __construct(&$ZBX_CONFIG) {
 		$this->DISABLE_NEXT_BUTTON = false;
-		$this->ZBX_CONFIG = $ZBX_CONFIG;
+		$this->ZBX_CONFIG = &$ZBX_CONFIG;
 
 		$this->stage = array(
 			0 => array(
@@ -71,7 +71,7 @@ class CSetupWizard extends CForm {
 
 	function doNext() {
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] + 1;
+			$this->ZBX_CONFIG['step']++;
 
 			return true;
 		}
@@ -81,7 +81,7 @@ class CSetupWizard extends CForm {
 
 	function doBack() {
 		if (isset($this->stage[$this->getStep() - 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] - 1;
+			$this->ZBX_CONFIG['step']--;
 
 			return true;
 		}

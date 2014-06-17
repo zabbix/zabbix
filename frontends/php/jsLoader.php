@@ -173,8 +173,7 @@ $tranStrings = array(
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
-		'new' => _('new'),
-		'Select' => _('Select')
+		'new' => _('new')
 	),
 	'menupopup.js' => array(
 		'Acknowledge' => _('Acknowledge'),

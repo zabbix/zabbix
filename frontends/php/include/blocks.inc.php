@@ -318,7 +318,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
+		'selectLastEvent' => API_OUTPUT_EXTEND,
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -326,29 +326,27 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
+		'output' =>  API_OUTPUT_EXTEND,
 		'selectHosts' => array('name'),
 		'selectGroups' => array('groupid'),
 		'preservekeys' => true
 	));
 
+	// get acknowledges
 	$eventIds = array();
-
-	foreach ($triggers as $triggerId => $trigger) {
-		if ($trigger['lastEvent']) {
+	foreach ($triggers as $tnum => $trigger) {
+		if (!empty($trigger['lastEvent'])) {
 			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
 		}
 
-		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
-		unset($triggers[$triggerId]['lastEvent']);
+		$triggers[$tnum]['event'] = $trigger['lastEvent'];
+		unset($triggers[$tnum]['lastEvent']);
 	}
-
-	// get acknowledges
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
 			'output' => array('eventid'),
 			'eventids' => $eventIds,
-			'select_acknowledges' => array('eventid', 'clock', 'message', 'alias', 'name', 'surname'),
+			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
 	}
@@ -359,17 +357,17 @@ function make_system_status($filter) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		// event
-		if ($trigger['event']) {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
-				: 0;
-		}
-		else {
+		if (empty($trigger['event'])) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
 				'value' => $trigger['value']
 			);
+		}
+		else {
+			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
+				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+				: 0;
 		}
 
 		// groups
@@ -377,7 +375,6 @@ function make_system_status($filter) {
 			if (!isset($groups[$group['groupid']])) {
 				continue;
 			}
-
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
@@ -398,8 +395,6 @@ function make_system_status($filter) {
 	}
 	unset($triggers);
 
-	$config = select_config();
-
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
@@ -417,13 +412,13 @@ function make_system_status($filter) {
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions));
 			}
 
 			switch ($filter['extAck']) {
@@ -1283,11 +1278,12 @@ function make_discovery_status() {
  * @param array $triggers
  * @param array $ackParams
  * @param array $actions
- * @param array $config
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
+function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
+	$config = select_config();
+
 	$popupTable = new CTableInfo();
 	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(

@@ -27,26 +27,24 @@ class CHistoryManager {
 	/**
 	 * Returns the last $limit history objects for the given items.
 	 *
-	 * @param array $items      an array of items with the 'itemid' and 'value_type' properties
-	 * @param int   $limit
-	 * @param int   $period     the maximum period to retrieve data for
+	 * @param array $items  an array of items with the 'itemid' and 'value_type' properties
+	 * @param int $limit
 	 *
 	 * @return array    an array with items IDs as keys and arrays of history objects as values
 	 */
-	public function getLast(array $items, $limit = 1, $period = null) {
+	public function getLast(array $items, $limit = 1) {
 		$rs = array();
 		foreach ($items as $item) {
-			$values = DBfetchArray(DBselect(
+			$table = self::getTableName($item['value_type']);
+			$query = DBselect(
 				'SELECT *'.
-				' FROM '.self::getTableName($item['value_type']).' h'.
+				' FROM '.$table.' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-					($period ? ' AND h.clock>'.(time() - $period) : '').
 				' ORDER BY h.clock DESC',
 				$limit
-			));
-
-			if ($values) {
-				$rs[$item['itemid']] = $values;
+			);
+			while ($history = DBfetch($query)) {
+				$rs[$history['itemid']][] = $history;
 			}
 		}
 

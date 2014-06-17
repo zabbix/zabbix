@@ -43,11 +43,15 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $hostTable = new CTableInfo(_('No host prototypes found.'));
 
+$sortLink = new CUrl();
+$sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
+$sortLink = $sortLink->getUrl();
+
 $hostTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
-	make_sorting_header(_('Name'),'name'),
+	make_sorting_header(_('Name'),'name', $sortLink),
 	_('Templates'),
-	make_sorting_header(_('Status'),'status')
+	make_sorting_header(_('Status'),'status', $sortLink)
 ));
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {

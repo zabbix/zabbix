@@ -19,7 +19,7 @@
 **/
 
 
-class CUrl {
+class Curl {
 
 	private $url;
 	protected $reference;
@@ -66,7 +66,6 @@ class CUrl {
 
 	public function formatGetArguments() {
 		$this->arguments = $_GET;
-
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
 		}
@@ -143,15 +142,5 @@ class CUrl {
 
 	public function toString() {
 		return $this->getUrl();
-	}
-
-	public function getArguments()
-	{
-		return $this->arguments;
-	}
-
-	public function setArguments($arguments)
-	{
-		$this->arguments = $arguments;
 	}
 }

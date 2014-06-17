@@ -106,8 +106,6 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-var_dump(preg_match('/^([a-z]+)$/', 'ffFZ'));
-
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -251,7 +249,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$templateIds = array();
-		if (isset($visible['templates'])) {
+		if (isset($visible['template_table'])) {
 			$templateIds = $_REQUEST['templates'];
 		}
 
@@ -334,7 +332,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if ($templateIds && isset($visible['templates'])) {
+		if ($templateIds && isset($visible['template_table'])) {
 			$add['templates'] = $templateIds;
 		}
 
@@ -878,7 +876,7 @@ else {
 
 	// sorting && paging
 	order_result($hosts, $sortfield, $sortorder);
-	$paging = getPagingLine($hosts);
+	$paging = getPagingLine($hosts, array('hostid'));
 
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
