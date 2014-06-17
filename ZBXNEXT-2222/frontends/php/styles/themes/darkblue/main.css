@@ -461,14 +461,15 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover, input.formlist[type="button"],
-div.calendar input[type="button"] {
+div.calendar input[type="button"], input[type="button"].input[disabled].formlist,
+input[type="submit"].input[disabled].formlist {
 	border: 1px solid #B3C9D6;
 	background: #2F6487;
 	color: #FFF;
 }
 .input option { background: #2F6487; color: #FFFFFF; }
 .input:focus, .input:hover { border-color: #77B7DA; }
-.input[readonly], .input[readonly]:hover {
+.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover {
 /* NOTE: Ignored by IE */
 	border-color: #4E738C;
 	background: #2B495E;

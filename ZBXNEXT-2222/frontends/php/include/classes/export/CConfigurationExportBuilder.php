@@ -845,6 +845,7 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
+				'application' => $element['application'],
 				'urls' => $this->formatMapElementUrls($element['urls'])
 			);
 		}

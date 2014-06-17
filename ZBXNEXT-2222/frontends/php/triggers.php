@@ -80,7 +80,7 @@ $fields = array(
 $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
+validate_sort_and_sortorder('description', ZBX_SORT_UP, array('priority', 'description', 'status'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
@@ -383,7 +383,7 @@ else {
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers'], array('triggerid'), array('hostid' => $_REQUEST['hostid']));
+	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
