@@ -28,7 +28,21 @@
 #define CUVC_ITEMID_UINT64	100003
 #define CUVC_ITEMID_TEXT	100004
 
+/* Free space in value cache.                                       */
+/* Commonly this is set during test suite initialization and tested */
+/* in the last (cleanup) test of the test suite to check valuecache */
+/* shared memory leaks.                                             */
 static zbx_uint64_t	cuvc_free_space;
+
+/* The cuvc_time variable together with cuvc_time_func() is used to */
+/* manipulate valuecache current time functionality in unit tests.  */
+static time_t	cuvc_time;
+
+static time_t	cuvc_time_func(time_t *ptime)
+{
+	return cuvc_time;
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -579,18 +593,81 @@ static int	cuvc_clean_str_lowmem()
 	return cuvc_clean_str();
 }
 
+static void	zbx_vc_print_record(zbx_vc_item_t *item, zbx_history_record_t *record)
+{
+	char	value[4096], *pvalue = value;
+
+	switch (item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_snprintf(value, sizeof(value), "%f", record->value.dbl);
+			break;
+
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, record->value.ui64);
+			break;
+
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			pvalue = record->value.str;
+			break;
+
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_snprintf(value, sizeof(value), "%d %d %d [%s] %s",
+					record->value.log->timestamp, record->value.log->logeventid,
+					record->value.log->severity, record->value.log->source,
+					record->value.log->value);
+
+	}
+	printf("\t\t\t%d.%d %s\n", record->timestamp.sec, record->timestamp.ns, pvalue);
+}
+
+static void	zbx_vc_dump_cache(zbx_vc_item_t *item)
+{
+	zbx_vc_chunk_t	*chunk = item->tail;
+
+	printf("ITEM DUMP: " ZBX_FS_UI64 " (type=%d, records=%d, recount=%d, hits=" ZBX_FS_UI64,
+			item->itemid, item->value_type, item->values_total, item->refcount, item->hits);
+
+	printf(", status=%d, range=%d)\n", item->status, item->range);
+
+	while (NULL != chunk)
+	{
+		int i;
+
+		printf("\tchunk: %d-%d\n", chunk->slots[chunk->first_value].timestamp.sec,
+				chunk->slots[chunk->last_value].timestamp.sec);
+		printf("\t\trecords: %d-%d\n", chunk->first_value, chunk->last_value);
+
+		for (i = chunk->first_value; i <= chunk->last_value; i++)
+		{
+			zbx_vc_print_record(item, &chunk->slots[i]);
+		}
+
+		chunk = chunk->next;
+	}
+	printf("========\n");
+}
+
+
 /*
  * include test suites grouped by functionality
  */
 #include "valuecache_get.c"
+#include "valuecache_add.c"
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Value cache test suite setup                                      *
+ *                                                                            *
+ ******************************************************************************/
 int	ZBX_CU_MODULE(valuecache)
 {
 	CU_pSuite	suite = NULL;
 
 	/* test suite: get #1                                                                       */
 	/*   check if all value types are properly cached/returned                                  */
-	if (NULL == (suite = CU_add_suite("valuecache value type storage tests", cuvc_init_all_types,
+	if (NULL == (suite = CU_add_suite("valuecache storage of all value types", cuvc_init_all_types,
 			cuvc_clean_all_types)))
 	{
 		return CU_get_error();
@@ -605,7 +682,7 @@ int	ZBX_CU_MODULE(valuecache)
 
 	/* test suite: get #2                                                                       */
 	/*   check if the data is being correctly cached and retrieved by time based requests.      */
-	if (NULL == (suite = CU_add_suite("valuecache basic time based request tests", cuvc_init_str, cuvc_clean_str)))
+	if (NULL == (suite = CU_add_suite("valuecache basic time based requests", cuvc_init_str, cuvc_clean_str)))
 		return CU_get_error();
 
 	ZBX_CU_ADD_TEST(suite, "get time 1 from 1004", cuvc_suite_get2_test1);
@@ -618,7 +695,7 @@ int	ZBX_CU_MODULE(valuecache)
 
 	/* test suite: get #3                                                                       */
 	/*   check if the data is being correctly cached and retrieved by count based requests.     */
-	if (NULL == (suite = CU_add_suite("valuecache basic count based request tests", cuvc_init_str, cuvc_clean_str)))
+	if (NULL == (suite = CU_add_suite("valuecache basic count based requests", cuvc_init_str, cuvc_clean_str)))
 		return CU_get_error();
 
 	ZBX_CU_ADD_TEST(suite, "get count 1 from 1004", cuvc_suite_get3_test1);
@@ -630,7 +707,7 @@ int	ZBX_CU_MODULE(valuecache)
 
 	/* test suite: get #4                                                                       */
 	/*   check  if the data is being correctly cached and retrieved by timestamp based requests */
-	if (NULL == (suite = CU_add_suite("valuecache basic timestamp based request tests",
+	if (NULL == (suite = CU_add_suite("valuecache basic timestamp based requests",
 			cuvc_init_str, cuvc_clean_str)))
 	{
 		return CU_get_error();
@@ -650,7 +727,7 @@ int	ZBX_CU_MODULE(valuecache)
 
 	/* test suite: get #5                                                                       */
 	/*   if the data is being correctly cached and retrieved by mixed request types             */
-	if (NULL == (suite = CU_add_suite("valuecache basic mixed request tests",
+	if (NULL == (suite = CU_add_suite("valuecache basic mixed requests",
 			cuvc_init_str, cuvc_clean_str)))
 	{
 		return CU_get_error();
@@ -668,7 +745,7 @@ int	ZBX_CU_MODULE(valuecache)
 	/* test suite: get #6                                                                       */
 	/*   check if the data is being correctly retrieved by all request types on empty history   */
 	/*   tables                                                                                 */
-	if (NULL == (suite = CU_add_suite("valuecache empty database request tests",
+	if (NULL == (suite = CU_add_suite("valuecache empty database requests",
 			cuvc_init_empty, cuvc_clean_empty)))
 	{
 		return CU_get_error();
@@ -682,7 +759,7 @@ int	ZBX_CU_MODULE(valuecache)
 	/* test suite: get #7                                                                       */
 	/*   check if the data is being correctly retrieved by all request types when the requested */
 	/*   value type differs from the cached value type (item value type has been changed)       */
-	if (NULL == (suite = CU_add_suite("valuecache different value type request tests",
+	if (NULL == (suite = CU_add_suite("valuecache different value type requests",
 			cuvc_init_str, cuvc_clean_str)))
 	{
 		return CU_get_error();
@@ -702,7 +779,7 @@ int	ZBX_CU_MODULE(valuecache)
 	/* test suite: get #8                                                                       */
 	/*   check if the data is being correctly retrieved (and not cached) by time based requests */
 	/*   in low memory mode                                                                     */
-	if (NULL == (suite = CU_add_suite("valuecache basic time based request tests in low memory mode",
+	if (NULL == (suite = CU_add_suite("valuecache basic time based requests in low memory mode",
 			cuvc_init_str_lowmem, cuvc_clean_str_lowmem)))
 	{
 		return CU_get_error();
@@ -718,7 +795,7 @@ int	ZBX_CU_MODULE(valuecache)
 	/* test suite: get #9                                                                       */
 	/*   check if the data is being correctly retrieved (and not cached) by count based         */
 	/*   requests in low memory mode                                                            */
-	if (NULL == (suite = CU_add_suite("valuecache basic count based request tests in low memory mode",
+	if (NULL == (suite = CU_add_suite("valuecache basic count based requests in low memory mode",
 			cuvc_init_str_lowmem, cuvc_clean_str_lowmem)))
 	{
 		return CU_get_error();
@@ -732,7 +809,7 @@ int	ZBX_CU_MODULE(valuecache)
 	/* test suite: get #10                                                                       */
 	/*   check if the data is being correctly retrieved (and not cached) by timestamp based      */
 	/*   requests in low memory mode                                                             */
-	if (NULL == (suite = CU_add_suite("valuecache basic timestamp based request tests in low memory mode",
+	if (NULL == (suite = CU_add_suite("valuecache basic timestamp based requests in low memory mode",
 			cuvc_init_str_lowmem, cuvc_clean_str_lowmem)))
 	{
 		return CU_get_error();
@@ -749,6 +826,74 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "get timestamp 1002.600", cuvc_suite_get10_test9);
 	ZBX_CU_ADD_TEST(suite, "get timestamp 1001.000", cuvc_suite_get10_test10);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get10_testN);
+
+	/* test suite: add #1                                                                        */
+	/*   check if all item value types are correctly added to cache                              */
+	if (NULL == (suite = CU_add_suite("valuecache adding of all value types",  cuvc_init_all_types,
+			cuvc_clean_all_types)))
+	{
+		return CU_get_error();
+	}
+	ZBX_CU_ADD_TEST(suite, "ITEM_VALUE_TYPE_FLOAT", cuvc_suite_add1_test1);
+	ZBX_CU_ADD_TEST(suite, "ITEM_VALUE_TYPE_STR", cuvc_suite_add1_test2);
+	ZBX_CU_ADD_TEST(suite, "ITEM_VALUE_TYPE_LOG", cuvc_suite_add1_test3);
+	ZBX_CU_ADD_TEST(suite, "ITEM_VALUE_TYPE_UINT64", cuvc_suite_add1_test4);
+	ZBX_CU_ADD_TEST(suite, "ITEM_VALUE_TYPE_TEXT", cuvc_suite_add1_test5);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add1_testN);
+
+	/* test suite: add #2                                                                     */
+	/*   check if the value is added to cache in the right location - after cached data,      */
+	/*   inside cached data, before cached data                                               */
+	if (NULL == (suite = CU_add_suite("valuecache value adding",  cuvc_init_str, cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "add not cached item value", cuvc_suite_add2_test1);
+	ZBX_CU_ADD_TEST(suite, "add value at end", cuvc_suite_add2_test2);
+	ZBX_CU_ADD_TEST(suite, "add value in middle", cuvc_suite_add2_test3);
+	ZBX_CU_ADD_TEST(suite, "add value at beginning", cuvc_suite_add2_test4);
+	ZBX_CU_ADD_TEST(suite, "add value at beginning, all data was cached", cuvc_suite_add2_test5);
+	ZBX_CU_ADD_TEST(suite, "add value after beginning, all data was cached", cuvc_suite_add2_test6);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add2_testN);
+
+	/* test suite: add #3                                                                     */
+	/*   check if the values are added in low memory situation                                */
+	if (NULL == (suite = CU_add_suite("valuecache value adding in low memory mode",  cuvc_init_str,
+			cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "add not cached item value", cuvc_suite_add3_test1);
+	ZBX_CU_ADD_TEST(suite, "add value at end", cuvc_suite_add3_test2);
+	ZBX_CU_ADD_TEST(suite, "add value in middle", cuvc_suite_add3_test3);
+	ZBX_CU_ADD_TEST(suite, "add value at beginning", cuvc_suite_add3_test4);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add3_testN);
+
+	/* test suite: add #4                                                                     */
+	/*   check  if the value type change is handled correctly                                 */
+	if (NULL == (suite = CU_add_suite("valuecache value adding different type",  cuvc_init_str,
+			cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "get value", cuvc_suite_add4_test1);
+	ZBX_CU_ADD_TEST(suite, "add value of different type", cuvc_suite_add4_test2);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add4_testN);
+
+	/* test suite: add #5                                                                     */
+	/*   check if the old data (outside request range) are correctly dropped when current     */
+	/*   time is advanced and a new value added to cache                                      */
+	if (NULL == (suite = CU_add_suite("valuecache old data cleanup",  cuvc_init_str, cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "get value", cuvc_suite_add5_test1);
+	ZBX_CU_ADD_TEST(suite, "add value", cuvc_suite_add5_test2);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add5_testN);
 
 	return CUE_SUCCESS;
 }

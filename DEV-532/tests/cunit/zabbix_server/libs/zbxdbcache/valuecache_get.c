@@ -18,8 +18,8 @@
 **/
 
 /*
- * The valuecache_get.c file contains value cache basic get requests. It tests:
- * 1) proper data retrieval of all item value types
+ * The valuecache_get.c file contains value cache basic get request tests:
+ * 1) data retrieval of all item value types
  * 2) the caching and retrieval of all request types (count, time and timestamp
  *    based) when requesting uncached, partially cached, not cached and not
  *    existing data.
@@ -31,7 +31,7 @@
  *
  * In all test cases after value cache request the following data is checked:
  * 1) data returned by request
- * 2) data cached by value cache
+ * 2) value cache contents
  * 3) number of database queries made to fulfill the request
  * 4) value cache statistics (hits/misses) increase
  * 5) heap memory leaks
@@ -49,7 +49,6 @@
  * retrieved.
  *
  */
-
 
 static void	cuvc_suite_get1_test_type(int value_type)
 {
