@@ -36,7 +36,8 @@ $filterForm->addVar('hostid', $filter['hostId']);
 // trigger status
 $filterForm->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, array(
 	TRIGGERS_OPTION_ALL => _('Any'),
-	TRIGGERS_OPTION_ONLYTRUE => _('Problem')
+	TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
+	TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
 )));
 
 // ack status
@@ -52,10 +53,12 @@ if ($config['event_ack_enable']) {
 if (!$overview) {
 	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, array(
 		EVENTS_OPTION_NOEVENT => _('Hide all'),
-		EVENTS_OPTION_ALL => _('Show all').' ('._n('%1$s day', '%1$s days', $config['event_expire']).')'
+		EVENTS_OPTION_ALL => _n('Show all (%1$s day)', 'Show all (%1$s days)', $config['event_expire'])
 	));
 	if ($config['event_ack_enable']) {
-		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
+		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK,
+			_n('Show unacknowledged (%1$s day)', 'Show unacknowledged (%1$s days)', $config['event_expire'])
+		);
 	}
 	$filterForm->addRow(_('Events'), $eventsComboBox);
 }
@@ -87,11 +90,6 @@ $statusChangeCheckBox->addStyle('vertical-align: middle;');
 $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
 $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
-
-// show details
-if (!$overview) {
-	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', getRequest('show_details'), null, 1));
-}
 
 // name
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
@@ -139,6 +137,11 @@ $filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 $filterForm->addRow(_('Show hosts in maintenance'),
 	new CCheckBox('show_maintenance', $filter['showMaintenance'], null, 1)
 );
+
+// show details
+if (!$overview) {
+	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
+}
 
 // buttons
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
