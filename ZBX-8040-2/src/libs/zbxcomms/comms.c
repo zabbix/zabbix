@@ -928,8 +928,8 @@ static const char*	zbx_sock_find_line(zbx_sock_t *s)
 		line = s->next_line;
 		s->next_line = ptr + 1;
 
-		if ('\r' != *(--ptr))
-			ptr++;
+		if (ptr > s->next_line && '\r' == *(ptr - 1))
+			ptr--;
 
 		*ptr = '\0';
 	}
@@ -966,17 +966,19 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 
 	ZBX_TCP_START();
 
-	/* find the size of leftover data from the last read line operation */
+	/* Find the size of leftover data from the last read line operation and copy */
+	/* the leftover data to the static buffer and reset the dynamic buffer.      */
+	/* Because we are reading data in ZBX_STAT_BUF_LEN chunks the leftover       */
+	/* data will always fit the static buffer.                                   */
 	if (NULL != s->next_line)
+	{
 		left = s->read_bytes - (s->next_line - s->buffer);
+		memmove(s->buf_stat, s->next_line, left);
+	}
 	else
 		left = 0;
 
-	/* Copy the leftover data to the static buffer and reset the dynamic buffer. */
-	/* Because we are reading data in ZBX_STAT_BUF_LEN chunks the leftover       */
-	/* data will always fit the static buffer.                                   */
 	s->read_bytes = left;
-	memmove(s->buf_stat, s->next_line, left);
 	s->next_line = s->buf_stat;
 
 	zbx_tcp_free(s);
