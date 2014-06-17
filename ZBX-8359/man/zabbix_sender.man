@@ -1,0 +1,70 @@
+.TH ZABBIX_SENDER 8 "10 November 2011"
+.if n .ad l
+.SH NAME
+zabbix_sender \- Zabbix sender utility.
+.SH SYNOPSIS
+.B zabbix_sender [-hpzvIV] {-kso | [-T] -i \fI<inputfile>\fB} [-c \fI<config-file>\fB]
+.SH DESCRIPTION
+.B zabbix_sender
+is a command line utility for sending data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
+
+.SS Options
+.IP "-c, --config \fI<config-file>\fR"
+Use \fIconfig-file\fR. Zabbix sender reads server details from the agent configuration file. By default Zabbix sender does not read any configuration file.
+Absolute path should be specified. Only parameters \fBHostname\fR, \fBServerActive\fR and \fBSourceIP\fR are supported. First entry from the \fBServerActive\fR parameter is used.
+.IP "-z, --zabbix-server \fI<server>\fR"
+Hostname or IP address of Zabbix server. If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
+.IP "-p, --port \fI<port>\fR"
+Specify port number of server trapper running on the server. Default is 10051.
+.IP "-s, --host \fI<host>\fR"
+Specify host name as registered in Zabbix front-end. Host IP address and DNS name will not work.
+.IP "-I, --source-address \fI<IP>\fR"
+Specify source IP address.
+.IP "-k, --key \fI<key>\fR"
+Specify item key to send value to.
+.IP "-o, --value \fI<value>\fR"
+Specify value.
+.IP "-i, --input-file \fI<inputfile>\fR"
+Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. \
+Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument. All entries are sent in a sequential order top-down.
+.IP "-T, --with-timestamps"
+Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format. \
+If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
+.IP "-r, --real-time"
+Send values one by one as soon as they are received. This can be used when reading from standard input.
+.IP "-v, --verbose"
+Verbose mode, -vv for more details.
+.IP "-h, --help"
+Display this help and exit.
+.IP "-V, --version"
+Output version information and exit.
+
+.SH "EXIT STATUS"
+The exit status is 0 if the values were sent and all of them were successfully processed by server.
+If data was sent, but processing of at least one of the values failed, the exit status is 2.
+If data sending failed, the exit status is 1.
+
+.SH "EXAMPLES"
+.B zabbix_sender -c /usr/local/etc/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
+
+Send \fB342.45\fR as the value for \fBmysql.queries\fR key in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
+
+.B zabbix_sender -z 192.168.1.113 -i data_values.txt
+
+Send values from file \fBdata_values.txt\fR to server with IP \fB192.168.1.113\fR. Host names and keys are defined in the file.
+
+.B echo """- hw.serial.number 1287872261 SQ4321ASDF""" | zabbix_sender -c /usr/local/etc/zabbix_agentd.conf -T -i -
+
+Send a timestamped value from the commandline to Zabbix server, specified in the agent daemon configuration file. Dash in the input data indicates that hostname also should be used from the same configuration file.
+
+.B echo '"Zabbix server" trapper.item \&"\&"' | zabbix_sender -z 192.168.1.113 -p 10000 -i -
+
+Send empty value of an item to the Zabbix server with IP address \fB192.168.1.113\fR on port \fB10000\fR from the commandline. Empty values must be indicated by double empty double quotes.
+
+.SH "SEE ALSO"
+.BR zabbix_agentd (8),
+.BR zabbix_get (8),
+.BR zabbix_proxy (8),
+.BR zabbix_server (8)
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>
