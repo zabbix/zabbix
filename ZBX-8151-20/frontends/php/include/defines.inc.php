@@ -835,6 +835,9 @@ define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
+// XML import flags
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
+
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);

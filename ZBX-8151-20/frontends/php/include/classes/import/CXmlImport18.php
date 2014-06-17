@@ -390,12 +390,13 @@ class CXmlImport18 {
 		return $array;
 	}
 
-	public static function import($file) {
+	public static function import($source) {
 
 		libxml_use_internal_errors(true);
+		libxml_disable_entity_loader(true);
 
 		$xml = new DOMDocument();
-		if (!$xml->loadXML($file)) {
+		if (!$xml->loadXML($source, LIBXML_IMPORT_FLAGS)) {
 			$text = '';
 			foreach (libxml_get_errors() as $error) {
 				switch ($error->level) {
