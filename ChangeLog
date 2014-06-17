@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
 ..F....... [ZBX-8320] corrected help item strings by removing double spaces in sentences and "IP" used in uppercase letters (Ivo)
 .......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
@@ -196,6 +197,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc3
 
 Bug fixes:
+A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
 .......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 
