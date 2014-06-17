@@ -8,6 +8,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8196] added validation for sorting parameters (Andrejs)
 A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
 ..F....... [ZBX-8320] corrected help item strings by removing double spaces in sentences and "IP" used in uppercase letters (Ivo)
 .......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
