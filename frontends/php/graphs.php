@@ -83,7 +83,7 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());
@@ -627,14 +627,7 @@ else {
 
 	order_result($data['graphs'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine(
-		$data['graphs'],
-		array('graphid'),
-		array(
-			'hostid' => get_request('hostid'),
-			'parent_discoveryid' => get_request('parent_discoveryid')
-		)
-	);
+	$data['paging'] = getPagingLine($data['graphs']);
 
 	// get graphs after paging
 	$options = array(

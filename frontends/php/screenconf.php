@@ -63,7 +63,7 @@ $fields = array(
 	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 CProfile::update('web.screenconf.config', get_request('config', 0), PROFILE_TYPE_INT);
 $_REQUEST['go'] = get_request('go', 'none');
@@ -305,11 +305,7 @@ else {
 	order_result($data['screens'], $sortfield, getPageSortOrder());
 
 	// paging
-	$data['paging'] = getPagingLine(
-		$data['screens'],
-		array('screenid'),
-		array('templateid' => get_request('templateid'))
-	);
+	$data['paging'] = getPagingLine($data['screens']);
 
 	// render view
 	$screenView = new CView('configuration.screen.list', $data);

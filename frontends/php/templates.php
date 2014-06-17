@@ -77,7 +77,7 @@ $fields = array(
 	'form_refresh'		=> array(T_ZBX_STR, O_OPT, null,		null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 
@@ -522,7 +522,7 @@ else {
 
 	// sorting && paging
 	order_result($templates, $sortfield, $sortorder);
-	$paging = getPagingLine($templates, array('templateid'));
+	$paging = getPagingLine($templates);
 
 	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
