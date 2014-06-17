@@ -1193,16 +1193,49 @@ function getConditionFormula(conditions, evalType) {
 }(jQuery));
 
 jQuery(function ($) {
+	var verticalHeaderTables = {};
+
+	var tablesWidthChangeChecker = function() {
+		for (var tableId in verticalHeaderTables) {
+			if (verticalHeaderTables.hasOwnProperty(tableId)) {
+				var table = verticalHeaderTables[tableId];
+
+				if (table && table.width() != table.data('last-width')) {
+					centerVerticalCellContents(table);
+				}
+			}
+		}
+		setTimeout(tablesWidthChangeChecker, 100);
+	};
+
+	var centerVerticalCellContents = function(table) {
+		var verticalCells = $('.vertical_rotation', table);
+
+		verticalCells.each(function() {
+			var cell = $(this),
+				cellWidth = cell.width();
+
+			if (cellWidth > 30) {
+				cell.children().css({
+					position: 'relative',
+					left: (cellWidth / 2 - 12) + 'px'
+				});
+			}
+		});
+
+		table.data('last-width', table.width());
+	};
+
+	tablesWidthChangeChecker();
+
 	$.fn.makeVerticalRotation = function() {
-
 		this.each(function(i) {
-
 			var table = $(this);
 
-			if(table.data('rotated')) {
+			if (table.data('rotated') == 1) {
 				return;
 			}
-			table.data('rotated', true);
+			table.data('rotated', 1);
 
 			var cellsToRotate = $('.vertical_rotation', table),
 				betterCells = [];
@@ -1265,37 +1298,13 @@ jQuery(function ($) {
 				$(this).html(betterCells[i]);
 			});
 
-			var centerCellContents = function() {
-				var cellsToRotate = $('.vertical_rotation', table);
+			centerVerticalCellContents(table);
 
-				cellsToRotate.each(function () {
-					var cell = $(this),
-						cellWidth = cell.width();
+			table.on('remove', function() {
+				delete verticalHeaderTables[table.attr('id')];
+			});
 
-					if (cellWidth > 30) {
-						cell.children().css({
-							position: 'relative',
-							left: (cellWidth / 2 - 12) + 'px'
-						});
-					}
-				});
-
-				table.data('last-width', table.width());
-			};
-
-			centerCellContents();
-
-			var tableWidthAdjuster = function() {
-				if (table.width() != table.data('last-width')) {
-					centerCellContents();
-				}
-				setTimeout(tableWidthAdjuster, 100);
-			};
-
-			if (table.data('has-width-change-callback') != true) {
-				table.data('has-width-change-callback', true);
-				tableWidthAdjuster();
-			}
+			verticalHeaderTables[table.attr('id')] = table;
 		});
 	};
 });
