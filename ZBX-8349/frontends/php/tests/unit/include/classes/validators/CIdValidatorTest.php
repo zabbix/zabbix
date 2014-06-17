@@ -25,7 +25,6 @@ class CIdValidatorTest extends CValidatorTest {
 		return array(
 			array(array(
 				'empty' => true,
-				'messageType' => 'Invalid ID',
 				'messageEmpty' => 'Empty color',
 				'messageRegex' => 'Incorrect color',
 			))
@@ -37,6 +36,7 @@ class CIdValidatorTest extends CValidatorTest {
 			array(array(), 1),
 			array(array(), '1'),
 			array(array(), '9223372036854775807'),
+			array(array(), '9223372036854775808'),
 			array(array('empty' => true), 0),
 			array(array('empty' => true), '0'),
 		);
@@ -45,33 +45,18 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID'),
-				'',
-				'Invalid ID'
-			),
-			array(
-				array('messageType' => 'Invalid ID'),
-				array(),
-				'Invalid ID'
-			),
-			array(
 				array('messageEmpty' => 'Empty ID'),
-				0,
+				'',
 				'Empty ID'
 			),
 			array(
 				array('messageEmpty' => 'Empty ID'),
-				'0',
+				array(),
 				'Empty ID'
 			),
 			array(
 				array('messageRegex' => 'Incorrect ID "%1$s"'),
 				'-1',
-				'Incorrect ID "-1"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect ID "%1$s"'),
-				'9223372036854775808',
 				'Incorrect ID "-1"'
 			),
 			array(
@@ -85,33 +70,18 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageEmpty' => 'Invalid ID for "%1$s"'),
 				'',
 				'Invalid ID for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageEmpty' => 'Invalid ID for "%1$s"'),
 				array(),
 				'Invalid ID for "object"'
 			),
 			array(
-				array('messageEmpty' => 'Empty ID for "%1$s"'),
-				0,
-				'Empty ID for "object"'
-			),
-			array(
-				array('messageEmpty' => 'Empty ID for "%1$s"'),
-				'0',
-				'Empty ID for "object"'
-			),
-			array(
 				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
 				'-1',
-				'Incorrect ID "-1" for "object"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
-				'9223372036854775808',
 				'Incorrect ID "-1" for "object"'
 			),
 			array(
