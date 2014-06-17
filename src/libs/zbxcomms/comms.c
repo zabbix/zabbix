@@ -51,7 +51,7 @@
 
 static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
-const char	*zbx_tcp_strerror()
+const char	*zbx_tcp_strerror(void)
 {
 	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0';	/* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
@@ -923,7 +923,7 @@ static const char*	zbx_sock_find_line(zbx_sock_t *s)
 		return NULL;
 
 	/* check if the buffer contains the next line */
-	if (s->next_line - s->buffer <= s->read_bytes && NULL != (ptr = strchr(s->next_line, '\n')))
+	if ((size_t)(s->next_line - s->buffer) <= s->read_bytes && NULL != (ptr = strchr(s->next_line, '\n')))
 	{
 		line = s->next_line;
 		s->next_line = ptr + 1;
@@ -957,8 +957,8 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 
 	char		buffer[ZBX_STAT_BUF_LEN], *ptr = NULL;
 	const char	*line;
-	int		nbytes, left, line_length;
-	size_t		alloc = 0, offset = 0;
+	ssize_t		nbytes;
+	size_t		alloc = 0, offset = 0, line_length, left;
 
 	/* check if the buffer already contains the next line */
 	if (NULL != (line = zbx_sock_find_line(s)))
