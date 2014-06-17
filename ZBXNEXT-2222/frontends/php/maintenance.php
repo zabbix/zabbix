@@ -522,7 +522,7 @@ else {
 		));
 	}
 
-	$data['paging'] = getPagingLine($data['maintenances']);
+	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 
 	// get list of maintenances
 	$data['maintenances'] = API::Maintenance()->get(array(

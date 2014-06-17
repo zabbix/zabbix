@@ -299,7 +299,7 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps']);
+	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

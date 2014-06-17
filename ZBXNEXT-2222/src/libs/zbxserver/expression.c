@@ -1329,29 +1329,27 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		unsigned char		value_type;
-		zbx_uint64_t		valuemapid;
-		zbx_history_record_t	vc_value;
-		zbx_timespec_t		ts;
-		int			found;
+		unsigned char			value_type;
+		zbx_uint64_t			valuemapid;
+		zbx_vector_history_record_t	values;
 
-		ts.sec = time(NULL);
-		ts.ns = 999999999;
+		zbx_history_record_vector_create(&values);
 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
+		if (SUCCEED == zbx_vc_get_value_range(itemid, value_type, &values, 0, 1, time(NULL)) &&
+				0 < values.values_num)
 		{
 			char	tmp[MAX_STRING_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
-			zbx_history_record_clear(&vc_value, value_type);
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &values.values[0].value, value_type);
 			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
 			ret = SUCCEED;
 		}
+		zbx_history_record_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
 out:
@@ -1366,8 +1364,14 @@ out:
  *                                                                            *
  * Purpose: retrieve item value by trigger expression and number of function  *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns)

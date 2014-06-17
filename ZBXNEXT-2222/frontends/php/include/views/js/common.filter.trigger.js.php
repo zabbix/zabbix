@@ -20,7 +20,7 @@
 <script type="text/javascript">
 	(function($) {
 		$(function() {
-			$('#inventory-filter').elementTable({ template: '#inventory-filter-row' });
+			$('#inventory-filter').dynamicRows({ template: '#inventory-filter-row' });
 		});
 	})(jQuery);
 </script>

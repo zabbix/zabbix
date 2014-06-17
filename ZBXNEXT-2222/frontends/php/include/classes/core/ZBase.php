@@ -226,7 +226,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/include/classes/parsers/results',
-			$this->rootDir.'/include/classes/routing',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/classes/managers',
 			$this->rootDir.'/api/rpc'

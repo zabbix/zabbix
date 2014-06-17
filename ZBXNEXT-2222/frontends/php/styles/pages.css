@@ -130,7 +130,6 @@ table.tableinfo-overview-hint { width: 200px; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
 .item-list .menuPopup { width: 200px; }
-.item-list .filter .multiselect .selected ul { margin: 0;}
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -162,8 +161,6 @@ table.tableinfo-overview-hint { width: 200px; }
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
-#selementForm .multiselect .selected ul { margin: 0;}
-#map-window #application-select-row .link_menu { margin-left: 3px; }
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

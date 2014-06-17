@@ -288,13 +288,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => array(
-				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid&writeonly=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'selectedLimit' => 1
 		)));
 	}
 	else {
@@ -316,13 +310,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => array(
-				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=hostid&writeonly=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'selectedLimit' => 1
 		)));
 	}
 
@@ -389,13 +377,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
-		'selectedLimit' => 1,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'selectedLimit' => 1
 	)));
 	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
 }
@@ -463,13 +445,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 		'defaultValue' => 0,
-		'selectedLimit' => 1,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'selectedLimit' => 1
 	)));
 }
 
