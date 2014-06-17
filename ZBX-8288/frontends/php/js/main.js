@@ -1195,7 +1195,7 @@ function getConditionFormula(conditions, evalType) {
 jQuery(function ($) {
 	$.fn.makeVerticalRotation = function() {
 
-		this.each(function() {
+		this.each(function(i) {
 
 			var table = $(this);
 
@@ -1204,22 +1204,22 @@ jQuery(function ($) {
 			}
 			table.data('rotated', true);
 
-			var cellsToRotate = $(".vertical_rotation", table),
+			var cellsToRotate = $('.vertical_rotation', table),
 				betterCells = [];
 
 			// insert spans
 			cellsToRotate.each(function() {
 				var cell = $(this);
 
-				var text = $("<span>", {
+				var text = $('<span>', {
 					text: cell.html()
 				});
 
 				if (IE) {
-					text.css({"font-family": "monospace"});
+					text.css({'font-family': 'monospace'});
 				}
 
-				cell.text("").append(text);
+				cell.text('').append(text);
 			});
 
 			// rotate cells
@@ -1228,7 +1228,7 @@ jQuery(function ($) {
 					span = cell.children(),
 					height = cell.height(),
 					width = span.width(),
-					transform = (width / 2) + "px " + (width / 2) + "px";
+					transform = (width / 2) + 'px ' + (width / 2) + 'px';
 
 				var css = {
 					"transform-origin": transform,
@@ -1238,21 +1238,21 @@ jQuery(function ($) {
 				};
 
 				if (IE) {
-					css["font-family"] = "monospace";
-					css["-ms-transform-origin"] = "50% 50%";
+					css['font-family'] = 'monospace';
+					css['-ms-transform-origin'] = '50% 50%';
 				}
 
 				if (IE9) {
-					css["-ms-transform-origin"] = transform;
+					css['-ms-transform-origin'] = transform;
 				}
 
-				var divInner = $("<div>", {
-					"class": "vertical_rotation_inner"
+				var divInner = $('<div>', {
+					'class': 'vertical_rotation_inner'
 				})
 					.css(css)
 					.append(span.text());
 
-				var div = $("<div>", {
+				var div = $('<div>', {
 					height: width,
 					width: height
 				})
@@ -1266,51 +1266,35 @@ jQuery(function ($) {
 			});
 
 			var centerCellContents = function() {
-				// align text to cell center
+				var cellsToRotate = $('.vertical_rotation', table);
 
 				cellsToRotate.each(function () {
 					var cell = $(this),
-						width = cell.width();
+						cellWidth = cell.width();
 
-					if (width > 15) {
-						cell.children().each(function() {
-							var child = $(this);
-
-							var halfCellWidth = cell.width() / 2;
-							var halfChildWidth = child.width() / 2;
-
-							var leftInPixels = (halfCellWidth - halfChildWidth);
-
-							child.css({
-								position: "relative",
-								left: leftInPixels + 'px'
-							});
+					if (cellWidth > 30) {
+						cell.children().css({
+							position: 'relative',
+							left: (cellWidth / 2 - 12) + 'px'
 						});
 					}
 				});
-			};
-
-			if(!IE8) {
-				centerCellContents();
 
 				table.data('last-width', table.width());
+			};
 
-				var requestAnimationFrameCallback = (function() {
-					var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function(fn){ return window.setTimeout(fn, 20); };
-					return function(fn) { return raf(fn); };
-				})();
+			centerCellContents();
 
-				var tableWidthAdjuster = function() {
-					if (table.width() != table.data('last-width')) {
-						centerCellContents();
-					}
-					requestAnimationFrameCallback(tableWidthAdjuster);
-				};
-
-				if (table.data('has-width-change-callback') != true) {
-					table.data('has-width-change-callback', true);
-					tableWidthAdjuster();
+			var tableWidthAdjuster = function() {
+				if (table.width() != table.data('last-width')) {
+					centerCellContents();
 				}
+				setTimeout(tableWidthAdjuster, 100);
+			};
+
+			if (table.data('has-width-change-callback') != true) {
+				table.data('has-width-change-callback', true);
+				tableWidthAdjuster();
 			}
 		});
 	};
