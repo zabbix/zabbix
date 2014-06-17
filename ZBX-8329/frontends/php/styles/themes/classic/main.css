@@ -54,7 +54,7 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 }
 .footer.ui-widget-content { background: url("images/widget_header.gif") repeat-x scroll #4E6EA7; }
 .border_dotted { border-color: #777; }
-.link_menu[disabled] { color: #AAA; background-color: #EEEEEE; }
+.link_menu[disabled] { color: #aaa; background-color: #eee; }
 
 .classic .ui-state-default, .classic .ui-widget-content .ui-state-default, .classic .ui-widget-header .ui-state-default {
 	background: #EEE; color: #383838;
