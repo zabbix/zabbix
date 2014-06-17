@@ -243,7 +243,7 @@ if ($type == SHOW_TRIGGERS) {
 		));
 	}
 
-	$triggers = API::Trigger()->get(array(
+	$options = array(
 		'output' => array(
 			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 		),
@@ -260,7 +260,17 @@ if ($type == SHOW_TRIGGERS) {
 		'monitored' => true,
 		'skipDependent' => true,
 		'sortfield' => 'description'
-	));
+	);
+
+	// trigger status filter
+	if ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) {
+		$options['only_true'] = true;
+	}
+	elseif ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) {
+		$options['filter']['value'] = TRIGGER_VALUE_TRUE;
+	}
+
+	$triggers = API::Trigger()->get($options);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
