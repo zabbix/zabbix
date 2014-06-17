@@ -40,6 +40,7 @@ class CImportReferencer {
 	protected $iconMaps = array();
 	protected $maps = array();
 	protected $screens = array();
+	protected $templateScreens = array();
 	protected $macros = array();
 	protected $proxies = array();
 	protected $hostPrototypes = array();
@@ -54,6 +55,7 @@ class CImportReferencer {
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
+	protected $templateScreensRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
 	protected $hostPrototypeRefs;
@@ -121,6 +123,7 @@ class CImportReferencer {
 		if ($this->templatesRefs === null) {
 			$this->selectTemplates();
 		}
+
 		return isset($this->templatesRefs[$host]) ? $this->templatesRefs[$host] : false;
 	}
 
@@ -271,6 +274,23 @@ class CImportReferencer {
 		}
 
 		return isset($this->screensRefs[$name]) ? $this->screensRefs[$name] : false;
+	}
+
+	/**
+	 * Get templated screen ID by template ID and screen name.
+	 *
+	 * @param string $screenName
+	 *
+	 * @return string|bool
+	 */
+	public function resolveTemplateScreen($templateId, $screenName) {
+		if ($this->templateScreensRefs === null) {
+			$this->selectTemplateScreens();
+		}
+
+		return isset($this->templateScreensRefs[$templateId][$screenName])
+			? $this->templateScreensRefs[$templateId][$screenName]
+			: false;
 	}
 
 	/**
@@ -511,6 +531,15 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Add templated screen names that need association with a database screen id.
+	 *
+	 * @param array $screens
+	 */
+	public function addTemplateScreens(array $screens) {
+		$this->templateScreens = array_unique(array_merge($this->templateScreens, $screens));
+	}
+
+	/**
 	 * Add screen name association with screen id.
 	 *
 	 * @param string $name
@@ -622,10 +651,10 @@ class CImportReferencer {
 		if (!empty($this->templates)) {
 			$this->templatesRefs = array();
 			$dbTemplates = API::Template()->get(array(
-				'filter' => array('host' => $this->templates),
-				'output' => array('hostid', 'host'),
+				'output' => array('host', 'templateid'),
 				'preservekeys' => true,
-				'editable' => true
+				'editable' => true,
+				'filter' => array('host' => $this->templates)
 			));
 			foreach ($dbTemplates as $template) {
 				$this->templatesRefs[$template['host']] = $template['templateid'];
@@ -850,6 +879,28 @@ class CImportReferencer {
 			}
 
 			$this->screens = array();
+		}
+	}
+
+	/**
+	 * Select template screen IDs for previously added screen names and template IDs.
+	 */
+	protected function selectTemplateScreens() {
+		if ($this->templateScreens) {
+			$this->templateScreensRefs = array();
+
+			$dbScreens = DBselect(
+				'SELECT s.screenid, s.name, s.templateid'.
+				' FROM screens s'.
+				' WHERE s.templateid IS NOT NULL '.
+					' AND '.dbConditionString('s.name', $this->templateScreens)
+			);
+
+			while ($dbScreen = DBfetch($dbScreens)) {
+				$this->templateScreensRefs[$dbScreen['templateid']][$dbScreen['name']] = $dbScreen['screenid'];
+			}
+
+			$this->templateScreens = array();
 		}
 	}
 

@@ -72,13 +72,13 @@ class CConfigurationImport {
 			'groups' => array('createMissing' => false),
 			'hosts' => array('updateExisting' => false, 'createMissing' => false),
 			'templates' => array('updateExisting' => false, 'createMissing' => false),
-			'templateScreens' => array('updateExisting' => false, 'createMissing' => false),
+			'templateScreens' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
 			'applications' => array('updateExisting' => false, 'createMissing' => false),
 			'templateLinkage' => array('createMissing' => false),
-			'items' => array('updateExisting' => false, 'createMissing' => false),
-			'discoveryRules' => array('updateExisting' => false, 'createMissing' => false),
-			'triggers' => array('updateExisting' => false, 'createMissing' => false),
-			'graphs' => array('updateExisting' => false, 'createMissing' => false),
+			'items' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
+			'discoveryRules' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
+			'triggers' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
+			'graphs' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
 			'screens' => array('updateExisting' => false, 'createMissing' => false),
 			'maps' => array('updateExisting' => false, 'createMissing' => false),
 			'images' => array('updateExisting' => false, 'createMissing' => false)
@@ -196,6 +196,7 @@ class CConfigurationImport {
 		$iconMapsRefs = array();
 		$mapsRefs = array();
 		$screensRefs = array();
+		$templateScreensRefs = array();
 		$macrosRefs = array();
 		$proxyRefs = array();
 		$hostPrototypeRefs = array();
@@ -440,6 +441,8 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedTemplateScreens() as $screens) {
 			foreach ($screens as $screen) {
+				$templateScreensRefs[$screen['name']] = $screen['name'];
+
 				if (!empty($screen['screenitems'])) {
 					foreach ($screen['screenitems'] as $screenItem) {
 						$resource = $screenItem['resource'];
@@ -470,6 +473,7 @@ class CConfigurationImport {
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
 		$this->referencer->addScreens($screensRefs);
+		$this->referencer->addTemplateScreens($templateScreensRefs);
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
 		$this->referencer->addHostPrototypes($hostPrototypeRefs);
@@ -1307,6 +1311,7 @@ class CConfigurationImport {
 		if ($screens = $this->getFormattedTemplateScreens()) {
 			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer);
 			$screenImporter->import($screens);
+			$screenImporter->delete($screens);
 		}
 	}
 

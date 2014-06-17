@@ -29,20 +29,22 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 	 * @return void
 	 */
 	public function import(array $allScreens) {
+		if (!$this->options['templateScreens']['createMissing']
+				&& !$this->options['templateScreens']['updateExisting']) {
+			return;
+		}
+
 		$screensToCreate = array();
 		$screensToUpdate = array();
-		foreach ($allScreens as $template => $screens) {
-			// TODO: select all at once out of loop
-			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
-					' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template)).
-					' AND '.dbConditionString('s.name', array_keys($screens)));
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$screens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-			}
 
-			foreach ($screens as $screen) {
+		foreach ($allScreens as $template => $screens) {
+			$templateId = $this->referencer->resolveTemplate($template);
+
+			foreach ($screens as $screenName => $screen) {
+				$screen['screenid'] = $this->referencer->resolveTemplateScreen($templateId, $screenName);
+
 				$screen = $this->resolveScreenReferences($screen);
-				if (isset($screen['screenid'])) {
+				if ($screen['screenid']) {
 					$screensToUpdate[] = $screen;
 				}
 				else {
@@ -55,8 +57,60 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
 			API::TemplateScreen()->create($screensToCreate);
 		}
+
 		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
 			API::TemplateScreen()->update($screensToUpdate);
+		}
+	}
+
+	/**
+	 * Deletes missing template screens.
+	 *
+	 * @param array $allScreens
+	 */
+	public function delete(array $allScreens) {
+		if (!$this->options['templateScreens']['deleteMissing']) {
+			return;
+		}
+
+		$templateIdsXML = array();
+		$templateScreenIdsXML = array();
+
+		foreach ($allScreens as $template => $screens) {
+			$templateId = $this->referencer->resolveTemplate($template);
+
+			// it's possible that we didn't check template update/create,
+			// so we have no template ID here and we'll skip deleting templated screens
+			if ($templateId) {
+				$templateIdsXML[$templateId] = $templateId;
+
+				foreach ($screens as $screenName => $screen) {
+					$templateScreenId = $this->referencer->resolveTemplateScreen($templateId, $screenName);
+
+					if ($templateScreenId) {
+						$templateScreenIdsXML[$templateScreenId] = $templateScreenId;
+					}
+				}
+			}
+		}
+
+		// no templates have been processed
+		if (!$templateIdsXML) {
+			return;
+		}
+
+		$dbTemplateScreenIds = API::TemplateScreen()->get(array(
+			'output' => array('screenid'),
+			'hostids' => $templateIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'noInheritance' => true
+		));
+
+		$templateScreensToDelete = array_diff_key($dbTemplateScreenIds, $templateScreenIdsXML);
+
+		if ($templateScreensToDelete) {
+			API::TemplateScreen()->delete(array_keys($templateScreensToDelete));
 		}
 	}
 }
