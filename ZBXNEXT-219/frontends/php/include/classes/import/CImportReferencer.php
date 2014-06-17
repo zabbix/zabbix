@@ -201,7 +201,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get trigger id by trigger name and expression.
+	 * Get trigger ID by trigger name and expression.
 	 *
 	 * @param string $name
 	 * @param string $expression
@@ -279,6 +279,7 @@ class CImportReferencer {
 	/**
 	 * Get templated screen ID by template ID and screen name.
 	 *
+	 * @param string $templateId
 	 * @param string $screenName
 	 *
 	 * @return string|bool
@@ -294,7 +295,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get macro id by host id and macro name.
+	 * Get macro ID by host ID and macro name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
@@ -547,6 +548,16 @@ class CImportReferencer {
 	 */
 	public function addScreenRef($name, $screenId) {
 		$this->screensRefs[$name] = $screenId;
+	}
+
+	/**
+	 * Add template screen name association with template screen ID.
+	 *
+	 * @param string $screenName
+	 * @param string $templateScreenId
+	 */
+	public function addTemplateScreenRef($screenName, $templateScreenId) {
+		$this->templateScreensRefs[$screenName] = $templateScreenId;
 	}
 
 	/**

@@ -26,7 +26,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 	 *
 	 * @param array $allScreens
 	 *
-	 * @return void
+	 * @return null
 	 */
 	public function import(array $allScreens) {
 		if (!$this->options['templateScreens']['createMissing']
@@ -55,7 +55,11 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		}
 
 		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
-			API::TemplateScreen()->create($screensToCreate);
+			$newScreenIds = API::TemplateScreen()->create($screensToCreate);
+			foreach ($screensToCreate as $num => $newScreen) {
+				$screenId = $newScreenIds['screenids'][$num];
+				$this->referencer->addTemplateScreenRef($newScreen['name'], $screenId);
+			}
 		}
 
 		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
@@ -67,6 +71,8 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 	 * Deletes missing template screens.
 	 *
 	 * @param array $allScreens
+	 *
+	 * @return null
 	 */
 	public function delete(array $allScreens) {
 		if (!$this->options['templateScreens']['deleteMissing']) {
@@ -102,9 +108,8 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$dbTemplateScreenIds = API::TemplateScreen()->get(array(
 			'output' => array('screenid'),
 			'hostids' => $templateIdsXML,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'noInheritance' => true
+			'editable' => true,
+			'preservekeys' => true
 		));
 
 		$templateScreensToDelete = array_diff_key($dbTemplateScreenIds, $templateScreenIdsXML);

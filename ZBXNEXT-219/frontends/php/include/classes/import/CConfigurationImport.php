@@ -1317,6 +1317,8 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes items from DB that are missing in XML.
+	 *
+	 * @return null
 	 */
 	protected function deleteMissingItems() {
 		if (!$this->options['items']['deleteMissing']) {
@@ -1374,6 +1376,8 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes triggers from DB that are missing in XML.
+	 *
+	 * @return null
 	 */
 	protected function deleteMissingTriggers() {
 		if (!$this->options['triggers']['deleteMissing']) {
@@ -1451,6 +1455,8 @@ class CConfigurationImport {
 	 * Deletes graphs from DB that are missing in XML.
 	 *
 	 * @throws Exception if premission check fails.
+	 *
+	 * @return null
 	 */
 	protected function deleteMissingGraphs() {
 		if (!$this->options['graphs']['deleteMissing']) {
@@ -1556,6 +1562,8 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes discovery rules and prototypes from DB that are missing in XML.
+	 *
+	 * @return null
 	 */
 	protected function deleteMissingDiscoveryRules() {
 		if (!$this->options['discoveryRules']['deleteMissing']) {
