@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	libs \
+	tests \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender \
