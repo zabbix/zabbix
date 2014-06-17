@@ -53,6 +53,8 @@
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
 
+static time_t (*vc_time)(time_t *) = time;
+
 static zbx_mem_info_t	*vc_mem = NULL;
 
 static ZBX_MUTEX	vc_lock;
@@ -69,6 +71,8 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 #define VC_ITEMS_INIT_SIZE	(1000)
 
 #define VC_MAX_NANOSECONDS	999999999
+
+#define VC_MIN_RANGE	SEC_PER_MIN
 
 /* the data chunk used to store data fragment */
 typedef struct _zbx_vc_chunk_t
@@ -163,7 +167,7 @@ typedef struct
 }
 zbx_vc_item_t;
 
-#define ZBX_VC_TIME()	time(NULL)
+#define ZBX_VC_TIME()	vc_time(NULL)
 
 /* the value cache data  */
 typedef struct
@@ -2151,8 +2155,8 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_r
 		{
 			item->range = seconds + now - timestamp;
 
-			if (SEC_PER_MIN > item->range)
-				item->range = SEC_PER_MIN;
+			if (VC_MIN_RANGE > item->range)
+				item->range = VC_MIN_RANGE;
 		}
 	}
 
@@ -2232,8 +2236,8 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item, zbx_vector_history_
 		{
 			item->range = now - values->values[values->values_num - 1].timestamp.sec;
 
-			if (SEC_PER_MIN > item->range)
-				item->range = SEC_PER_MIN;
+			if (VC_MIN_RANGE > item->range)
+				item->range = VC_MIN_RANGE;
 		}
 	}
 out:
@@ -2382,8 +2386,8 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	{
 		item->range = now - value->timestamp.sec;
 
-		if (SEC_PER_MIN > item->range)
-			item->range = SEC_PER_MIN;
+		if (VC_MIN_RANGE > item->range)
+			item->range = VC_MIN_RANGE;
 	}
 
 	*found = 1;
