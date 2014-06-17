@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"POT-Creation-Date: 2014-06-17 16:29+0300\n"
 "PO-Revision-Date: 2014-06-10 17:19+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -244,7 +244,7 @@ msgstr "SLA Aceitável"
 msgid "Access denied!"
 msgstr "Acesso negado!"
 
-#: include/func.inc.php:1755
+#: include/func.inc.php:1762
 msgid "Access denied."
 msgstr "Acesso negado."
 
@@ -1219,11 +1219,10 @@ msgstr "Informação de CPU - Apresenta informação sobre todas as CPUs por pad
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
 msgstr "Carga da(s) CPU(s). Carga de processamento. A cpu e o modo são opcionais. Se a cpu estiver ausente, todas serão utilizadas. Se o modo estiver ausente, será apresentado a média (avg1). Observe que este parâmetro não retornará um percentual."
 
-# double space before "if" in original text:  "used. If type i"
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
-msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Utilização da(s) CPU(s). Carga de processamento em percentual. O tipo, modo e a cpu são opcionais.  Se o tipo estiver ausente o usuário é utilizado. Se a CPU estiver ausente, todas serão utilizadas. Se o modo estiver ausente, será apresentado a média (avg1)."
+msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:523
@@ -1241,8 +1240,8 @@ msgstr "Calcula a verificação integridade de um arquivo. A integridade do arqu
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
-msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr "Calcula o espaço em disco de um determinado volume. O resultado é apresentado em KB. Se o parâmetro modo não for informado é retornado o valor total. Em caso de volume montado o espaço livre do sistema de arquivos será retornado. Exemplo: vfs.fs.size[/tmp,free]."
+msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
+msgstr ""
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
 #: include/views/configuration.graph.edit.php:165
@@ -1354,7 +1353,7 @@ msgstr "Imagem não foi incluída"
 msgid "Cannot add image."
 msgstr "Não foi possível adicionar a imagem."
 
-#: items.php:480 screenedit.php:190
+#: items.php:480
 msgid "Cannot add item"
 msgstr "Item não foi adicionado"
 
@@ -1652,7 +1651,7 @@ msgstr "A imagem não foi excluída"
 msgid "Cannot delete inventory."
 msgstr "Não foi possível remover inventário."
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Cannot delete item"
 msgstr "Item não foi removido"
 
@@ -2261,6 +2260,11 @@ msgstr "Não foi possível definir o \"templateid\" para o protótipo de trigger
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Não é possível configurar campos do inventário com o inventário desativado."
 
+#: include/func.inc.php:1426
+#, c-format
+msgid "Cannot sort by field \"%1$s\"."
+msgstr ""
+
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
 msgstr "Não foi possível mudar a interface do host."
@@ -2468,7 +2472,7 @@ msgstr "Não foi possível atualizar a imagem."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Não é possível atualizar a interface para o host descoberto \"%1$s\"."
 
-#: items.php:477 screenedit.php:181
+#: items.php:477
 msgid "Cannot update item"
 msgstr "Item não foi atualizado"
 
@@ -2518,7 +2522,7 @@ msgstr "Não é possível atualizar o proxy para o host descoberto \"%1$s\"."
 msgid "Cannot update regular expression"
 msgstr "Não foi possível atualizar expressão regular"
 
-#: screenconf.php:132
+#: screenconf.php:132 screenedit.php:199 screenedit.php:216
 msgid "Cannot update screen"
 msgstr "Tela não foi atualizada"
 
@@ -2667,17 +2671,15 @@ msgstr "Verifica se o arquivo existe. 0 - arquivo não existe, 1 - arquivo exist
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica se o serviço está disponível. 0 - serviço não está disponível, 1 - serviço disponível. Se <ip> estiver ausente, IP ou o nome de DNS é recuperado pela definição do host. Se <port> estiver ausente, a porta de serviço padrão é utilizada."
 
-# The FTP port number is wrong. The default numer is 21 not 45.
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
-msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr "Verifica se o serviço está disponível. 0 - serviço não está disponível, 1 - serviço disponível. Se <ip> estiver ausente, 127.0.0.1 é utilizado. Se <port> estiver ausente, a porta de serviço padrão é utilizada. Exemplo: net.tcp.service[ftp,21]."
+msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
+msgstr ""
 
-# Has a double space before "If Port Number..." in original text.
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
-msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
-msgstr "Verifica a performance do serviço \"service\". 0 - serviço está fora do ar, sec - número de segundos gastos para a conexão com o serviço. Se o IP estiver faltando será utilizado 127.0.0.1. Se o número de porta estiver faltando a porta padrão será utilizada."
+msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2698,8 +2700,8 @@ msgstr "Verificar tipo"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
-msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr "Verifica se é possível estabelecer conexão TCP com um número de porta. 0 - não é possível conectar, 1 - é possível. O endereço de IP é opcional. Se o IP estiver ausente será utilizado 127.0.0.1. Exemplo: net.tcp.port[,80]"
+msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
+msgstr ""
 
 #: include/views/configuration.discovery.edit.php:63
 #: include/views/configuration.discovery.list.php:43
@@ -2839,11 +2841,11 @@ msgstr "A cor \"%1$s\" não é correta: é esperada cor no formato hexadecimal (
 msgid "Colour (OK)"
 msgstr "Cor (OK)"
 
-#: screenedit.php:264
+#: screenedit.php:258
 msgid "Column added"
 msgstr "Coluna adicionada"
 
-#: screenedit.php:339
+#: screenedit.php:333
 msgid "Column deleted"
 msgstr "Coluna excluída"
 
@@ -4214,7 +4216,7 @@ msgid "Description updated"
 msgstr "Descrição atualizada"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
-#: include/func.inc.php:1871
+#: include/func.inc.php:1878
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:349
@@ -4548,7 +4550,7 @@ msgstr "Status autobusca"
 msgid "Display OK triggers for"
 msgstr "Mostrar as triggers OK para"
 
-#: include/func.inc.php:1649
+#: include/func.inc.php:1656
 msgid "Displaying"
 msgstr "Mostrando"
 
@@ -4700,7 +4702,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:1840
+#: include/func.inc.php:1847
 msgid "ERROR"
 msgstr "ERRO"
 
@@ -5434,7 +5436,7 @@ msgstr "Finlandês (fi_FI)"
 msgid "First"
 msgstr "Primeiro"
 
-#: include/func.inc.php:1594
+#: include/func.inc.php:1601
 msgctxt "page navigation"
 msgid "First"
 msgstr "Primeiro"
@@ -5642,7 +5644,7 @@ msgstr "Ir"
 msgid "Go to"
 msgstr "Ir para"
 
-#: include/func.inc.php:1773
+#: include/func.inc.php:1780
 msgid "Go to dashboard"
 msgstr "Ir para o dashboard"
 
@@ -6778,7 +6780,7 @@ msgstr "Ícones"
 msgid "Identical expression already exists"
 msgstr "Já existe uma expressão idêntica"
 
-#: include/func.inc.php:1763 include/func.inc.php:1783
+#: include/func.inc.php:1770 include/func.inc.php:1790
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Se você entende que esta mensagem está errada, por favor consulte os administradores sobre como conseguir as permissões necessárias."
 
@@ -6858,12 +6860,12 @@ msgstr "Importar arquivo"
 msgid "Imported successfully"
 msgstr "A importação foi concluída com sucesso"
 
-#: hostinventories.php:180
+#: hostinventories.php:182
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Impossível filtrar pelo campo de inventário \"%s\", ele não existe."
 
-#: screenedit.php:307 screenedit.php:347
+#: screenedit.php:301 screenedit.php:341
 msgid "Impossible to remove last row and column."
 msgstr "Não é possível remover a última linha e coluna."
 
@@ -7475,6 +7477,11 @@ msgstr "Tipo incorreto de hora para o serviço."
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Ordem inválida para o serviço \"%1$s\"."
 
+#: include/func.inc.php:1431
+#, c-format
+msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
+msgstr ""
+
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
 msgstr "Valor de origem inválido."
@@ -7957,7 +7964,7 @@ msgstr "O item \"%1$s\" foi ignorado - regra de usuário."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "O item \"%1$s:%2$s\" possui uma porta inválida: \"%3$s\"."
 
-#: items.php:480 screenedit.php:189
+#: items.php:480
 msgid "Item added"
 msgstr "Item incluído"
 
@@ -7965,7 +7972,7 @@ msgstr "Item incluído"
 msgid "Item count"
 msgstr "Contagem de itens"
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Item deleted"
 msgstr "Item removido"
 
@@ -8046,7 +8053,7 @@ msgstr "Protótipos de item excluídos"
 msgid "Item prototypes of"
 msgstr "Protótipos de itens de"
 
-#: items.php:477 screenedit.php:180
+#: items.php:477
 msgid "Item updated"
 msgstr "Item atualizado"
 
@@ -8314,7 +8321,7 @@ msgstr "Língua"
 msgid "Last"
 msgstr "Última"
 
-#: include/func.inc.php:1634
+#: include/func.inc.php:1641
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Último"
@@ -8395,9 +8402,9 @@ msgstr "Último valor"
 msgid "Last week graph"
 msgstr "Gráfico última semana"
 
-#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:197 jsLoader.php:205 latest.php:26
-#: search.php:134 search.php:220 search.php:274 search.php:327
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:197
+#: jsLoader.php:205 latest.php:26 search.php:134 search.php:220 search.php:274
+#: search.php:327
 msgid "Latest data"
 msgstr "Dados recentes"
 
@@ -8590,7 +8597,7 @@ msgstr "Registrar traps SNMP não correspondentes"
 msgid "Logged in as"
 msgstr "Conectado como"
 
-#: auditlogs.php:137 include/func.inc.php:1769 include/func.inc.php:1786
+#: auditlogs.php:137 include/func.inc.php:1776 include/func.inc.php:1793
 #: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8928,7 +8935,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Máximo de eventos por trigger a exibir"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Maximize"
 msgstr "Maximizar"
 
@@ -9128,7 +9135,7 @@ msgid "Middle"
 msgstr "Centro"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Minimize"
 msgstr "Minimizar"
 
@@ -9280,7 +9287,7 @@ msgstr "Monitorado por proxy"
 msgid "Monitored host"
 msgstr "Host monitorado"
 
-#: include/menu.inc.php:26
+#: include/menu.inc.php:26 include/views/inventory.host.view.php:195
 msgid "Monitoring"
 msgstr "Monitoramento"
 
@@ -9541,13 +9548,13 @@ msgstr "Novo horário de serviço"
 msgid "Next"
 msgstr "Próximo"
 
-#: include/func.inc.php:1627
+#: include/func.inc.php:1634
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Próximo"
 
 #: events.php:816 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2103 include/triggers.inc.php:1522
+#: include/func.inc.php:2110 include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -10087,7 +10094,7 @@ msgstr "Sem permissão de acesso ao sistema."
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:625 api/classes/CUser.php:804
 #: api/classes/CUser.php:824 api/classes/CUser.php:883
-#: api/classes/CUser.php:1277 include/func.inc.php:1743
+#: api/classes/CUser.php:1277 include/func.inc.php:1750
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Sem permissão para o objeto referenciado ou ele não existe!"
 
@@ -11288,7 +11295,7 @@ msgstr "Visualizar"
 msgid "Previous"
 msgstr "Anterior"
 
-#: include/func.inc.php:1600
+#: include/func.inc.php:1607
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Anterior"
@@ -11926,11 +11933,11 @@ msgstr "Direita"
 msgid "Romanian (ro_RO)"
 msgstr "Romênio (ro_RO)"
 
-#: screenedit.php:241
+#: screenedit.php:235
 msgid "Row added"
 msgstr "Linha adicionada"
 
-#: screenedit.php:299
+#: screenedit.php:293
 msgid "Row deleted"
 msgstr "Linha excluída"
 
@@ -12362,11 +12369,11 @@ msgstr "Configuração de célula de tela"
 msgid "Screen deleted"
 msgstr "A tela foi excluída"
 
-#: screenedit.php:306 screenedit.php:346
+#: screenedit.php:300 screenedit.php:340
 msgid "Screen should contain at least one row and column."
 msgstr "Uma tela deve conter, no mínimo, uma linha e uma coluna."
 
-#: screenconf.php:131
+#: screenconf.php:131 screenedit.php:199 screenedit.php:216
 msgid "Screen updated"
 msgstr "Tela atualizada"
 
@@ -15486,7 +15493,7 @@ msgstr "Anual"
 
 #: events.php:816 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
-#: include/events.inc.php:376 include/func.inc.php:2103
+#: include/events.inc.php:376 include/func.inc.php:2110
 #: include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
@@ -15507,7 +15514,7 @@ msgstr "Não é possível selecionar alguns idiomas, o suporte aos idiomas adici
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Você não tem permissão para alterar os privilégios para o usuário \"%s\"."
 
-#: include/func.inc.php:1779
+#: include/func.inc.php:1786
 msgid "You are not logged in."
 msgstr "Você não está logado."
 
@@ -15558,15 +15565,15 @@ msgstr "Você não tem permissão para alterar outros usuários."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Você não tem permissão para atualizar o usuário ou o usuário não existe."
 
-#: include/func.inc.php:1761
+#: include/func.inc.php:1768
 msgid "You have no permissions to access this page."
 msgstr "Você não possui permissão para acessar esta página."
 
-#: include/func.inc.php:1781
+#: include/func.inc.php:1788
 msgid "You must login to view this page."
 msgstr "Você deve logar para ver esta página."
 
-#: include/func.inc.php:1757
+#: include/func.inc.php:1764
 msgid "Your are logged in as"
 msgstr "Você está conectado como"
 
@@ -15838,7 +15845,7 @@ msgstr "a expressão está vazia"
 msgid "fixed"
 msgstr "corrigido"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1666
 msgid "found"
 msgstr "encontrados"
 
@@ -16025,7 +16032,7 @@ msgid "now"
 msgstr "agora"
 
 #: include/blocks.inc.php:440 include/blocks.inc.php:779
-#: include/func.inc.php:1656
+#: include/func.inc.php:1663
 msgid "of"
 msgstr "de"
 
@@ -16131,7 +16138,7 @@ msgstr "mostrar mapeamento de valores"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "template ID \"%1$s\" foi definido %2$s vezes"
 
-#: include/func.inc.php:1652
+#: include/func.inc.php:1659
 msgid "to"
 msgstr "para"
 

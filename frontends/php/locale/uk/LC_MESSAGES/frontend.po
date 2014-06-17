@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"POT-Creation-Date: 2014-06-17 16:29+0300\n"
 "PO-Revision-Date: 2013-11-05 18:31+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -262,7 +262,7 @@ msgstr "Допустимий рівень SLA"
 msgid "Access denied!"
 msgstr "Доступ заборонено!"
 
-#: include/func.inc.php:1755
+#: include/func.inc.php:1762
 msgid "Access denied."
 msgstr "Доступ заборонено."
 
@@ -1249,7 +1249,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
-msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
+msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:265
@@ -1268,7 +1268,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
-msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
+msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 msgstr ""
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
@@ -1381,7 +1381,7 @@ msgstr "Не вдалося додати картинку"
 msgid "Cannot add image."
 msgstr "Не вдалось додати картинку."
 
-#: items.php:480 screenedit.php:190
+#: items.php:480
 msgid "Cannot add item"
 msgstr "Не вдалося додати елемент даних"
 
@@ -1685,7 +1685,7 @@ msgstr "Не вдалося видалити картинку"
 msgid "Cannot delete inventory."
 msgstr "Не вдалося видалити інвентарні дані."
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Cannot delete item"
 msgstr "Не вдалося видалити елемент даних"
 
@@ -2350,6 +2350,11 @@ msgstr "Не вдалося встановити \"templateid\" для прот�
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
+#: include/func.inc.php:1426
+#, c-format
+msgid "Cannot sort by field \"%1$s\"."
+msgstr ""
+
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
 msgstr "Не вдалося переключити вузел мережі на інтерфейс."
@@ -2557,7 +2562,7 @@ msgstr "Не вдалось оновити фонове зображення."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити інтерфейс для виявленого вузла мережі \"%1$s\"."
 
-#: items.php:477 screenedit.php:181
+#: items.php:477
 msgid "Cannot update item"
 msgstr "Не вдалося оновити елемент даних"
 
@@ -2607,7 +2612,7 @@ msgstr "Не вдалося оновити проксі для виявлено�
 msgid "Cannot update regular expression"
 msgstr "Не вдалося оновити регулярний вираз"
 
-#: screenconf.php:132
+#: screenconf.php:132 screenedit.php:199 screenedit.php:216
 msgid "Cannot update screen"
 msgstr "Не вдалося оновити комплексний екран"
 
@@ -2758,12 +2763,12 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
-msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
+msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
-msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
+msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:587
@@ -2785,7 +2790,7 @@ msgstr "Тип перевірки"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
-msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
+msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
 msgstr ""
 
 #: include/views/configuration.discovery.edit.php:63
@@ -2926,11 +2931,11 @@ msgstr ""
 msgid "Colour (OK)"
 msgstr "Колір (ОК)"
 
-#: screenedit.php:264
+#: screenedit.php:258
 msgid "Column added"
 msgstr ""
 
-#: screenedit.php:339
+#: screenedit.php:333
 msgid "Column deleted"
 msgstr ""
 
@@ -4305,7 +4310,7 @@ msgid "Description updated"
 msgstr ""
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
-#: include/func.inc.php:1871
+#: include/func.inc.php:1878
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:349
@@ -4643,7 +4648,7 @@ msgstr "Стан виявлення"
 msgid "Display OK triggers for"
 msgstr "Відображати тригери ОК протягом"
 
-#: include/func.inc.php:1649
+#: include/func.inc.php:1656
 msgid "Displaying"
 msgstr "Відображено"
 
@@ -4795,7 +4800,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "Е"
 
-#: include/func.inc.php:1840
+#: include/func.inc.php:1847
 msgid "ERROR"
 msgstr "ПОМИЛКА"
 
@@ -5529,7 +5534,7 @@ msgstr "Фінська (fi_FI)"
 msgid "First"
 msgstr "Перший"
 
-#: include/func.inc.php:1594
+#: include/func.inc.php:1601
 msgctxt "page navigation"
 msgid "First"
 msgstr "Перша"
@@ -5737,7 +5742,7 @@ msgstr "Виконати"
 msgid "Go to"
 msgstr "Перейти до"
 
-#: include/func.inc.php:1773
+#: include/func.inc.php:1780
 msgid "Go to dashboard"
 msgstr ""
 
@@ -6887,7 +6892,7 @@ msgstr "Іконки"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:1763 include/func.inc.php:1783
+#: include/func.inc.php:1770 include/func.inc.php:1790
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до Вашого адміністратора для отримання необхідних прав доступу."
 
@@ -6967,12 +6972,12 @@ msgstr "Імпорт файлу"
 msgid "Imported successfully"
 msgstr "Імпортовано успішно"
 
-#: hostinventories.php:180
+#: hostinventories.php:182
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Неможливо фільтрувати по неіснуючому полю інвентарних даних \"%s\"."
 
-#: screenedit.php:307 screenedit.php:347
+#: screenedit.php:301 screenedit.php:341
 msgid "Impossible to remove last row and column."
 msgstr "Неможливо видалити останній рядок та стовпчик."
 
@@ -7584,6 +7589,11 @@ msgstr "Некоректний тип часу послуги."
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Некоректний порядок сортування для послуги \"%1$s\"."
 
+#: include/func.inc.php:1431
+#, c-format
+msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
+msgstr ""
+
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
 msgstr ""
@@ -8061,7 +8071,7 @@ msgstr "Елемент даних \"%1$s\" пропущено - правило �
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент даних \"%1$s:%2$s\" має неправильний порт: \"%3$s\"."
 
-#: items.php:480 screenedit.php:189
+#: items.php:480
 msgid "Item added"
 msgstr "Елемент додано"
 
@@ -8069,7 +8079,7 @@ msgstr "Елемент додано"
 msgid "Item count"
 msgstr "Кількість елементів даних"
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Item deleted"
 msgstr "Елемент даних видалено"
 
@@ -8158,7 +8168,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr "Прототипи елементів даних для"
 
-#: items.php:477 screenedit.php:180
+#: items.php:477
 msgid "Item updated"
 msgstr "Елемент оновлено"
 
@@ -8423,7 +8433,7 @@ msgstr "Мова"
 msgid "Last"
 msgstr "Останній"
 
-#: include/func.inc.php:1634
+#: include/func.inc.php:1641
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Остання"
@@ -8506,9 +8516,9 @@ msgstr "Останнє значення"
 msgid "Last week graph"
 msgstr "Графік за останній тиждень"
 
-#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:197 jsLoader.php:205 latest.php:26
-#: search.php:134 search.php:220 search.php:274 search.php:327
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:197
+#: jsLoader.php:205 latest.php:26 search.php:134 search.php:220 search.php:274
+#: search.php:327
 msgid "Latest data"
 msgstr "Останні дані"
 
@@ -8701,7 +8711,7 @@ msgstr "Записувати не співпадаючі SNMP трапи"
 msgid "Logged in as"
 msgstr "Підключено до системи як"
 
-#: auditlogs.php:137 include/func.inc.php:1769 include/func.inc.php:1786
+#: auditlogs.php:137 include/func.inc.php:1776 include/func.inc.php:1793
 #: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -9037,7 +9047,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Макс. кількість подій у тригера для відображення"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Maximize"
 msgstr "Розгорнути"
 
@@ -9253,7 +9263,7 @@ msgid "Middle"
 msgstr "Посередині"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Minimize"
 msgstr "Згорнути"
 
@@ -9407,7 +9417,7 @@ msgstr "Спостерігається через проксі"
 msgid "Monitored host"
 msgstr "Вузел мережі під спостереженням"
 
-#: include/menu.inc.php:26
+#: include/menu.inc.php:26 include/views/inventory.host.view.php:195
 msgid "Monitoring"
 msgstr "Моніторинг"
 
@@ -9668,13 +9678,13 @@ msgstr "Новий період послуги"
 msgid "Next"
 msgstr "Далі"
 
-#: include/func.inc.php:1627
+#: include/func.inc.php:1634
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Наступна"
 
 #: events.php:816 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2103 include/triggers.inc.php:1522
+#: include/func.inc.php:2110 include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -10210,7 +10220,7 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:625 api/classes/CUser.php:804
 #: api/classes/CUser.php:824 api/classes/CUser.php:883
-#: api/classes/CUser.php:1277 include/func.inc.php:1743
+#: api/classes/CUser.php:1277 include/func.inc.php:1750
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Немає прав доступу до запитуваного об'єкту або він не існує!"
 
@@ -11411,7 +11421,7 @@ msgstr "Попередній перегляд"
 msgid "Previous"
 msgstr "Назад"
 
-#: include/func.inc.php:1600
+#: include/func.inc.php:1607
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Попередня"
@@ -12051,11 +12061,11 @@ msgstr "З правого боку"
 msgid "Romanian (ro_RO)"
 msgstr ""
 
-#: screenedit.php:241
+#: screenedit.php:235
 msgid "Row added"
 msgstr ""
 
-#: screenedit.php:299
+#: screenedit.php:293
 msgid "Row deleted"
 msgstr ""
 
@@ -12485,11 +12495,11 @@ msgstr "Налаштування елемента комплексного ек�
 msgid "Screen deleted"
 msgstr "Комплексний екран видалено"
 
-#: screenedit.php:306 screenedit.php:346
+#: screenedit.php:300 screenedit.php:340
 msgid "Screen should contain at least one row and column."
 msgstr "Комплексний екран повинен містити як мінімум один рядок та стовпчик."
 
-#: screenconf.php:131
+#: screenconf.php:131 screenedit.php:199 screenedit.php:216
 msgid "Screen updated"
 msgstr "Комплексний екран оновлено"
 
@@ -15627,7 +15637,7 @@ msgstr "Щороку"
 
 #: events.php:816 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
-#: include/events.inc.php:376 include/func.inc.php:2103
+#: include/events.inc.php:376 include/func.inc.php:2110
 #: include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
@@ -15648,7 +15658,7 @@ msgstr "Ви не можете вибрати деякі з мов, тому щ�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не дозволено змінювати привілеї користувача \"%s\"."
 
-#: include/func.inc.php:1779
+#: include/func.inc.php:1786
 msgid "You are not logged in."
 msgstr "Ви не увійшли в систему."
 
@@ -15698,15 +15708,15 @@ msgstr "У вас немає повноважень для оновлення і
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас немає повноважень для оновлення користувача або користувач не існує."
 
-#: include/func.inc.php:1761
+#: include/func.inc.php:1768
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:1781
+#: include/func.inc.php:1788
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
-#: include/func.inc.php:1757
+#: include/func.inc.php:1764
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15978,7 +15988,7 @@ msgstr ""
 msgid "fixed"
 msgstr "фіксов."
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1666
 msgid "found"
 msgstr "знайдених"
 
@@ -16163,7 +16173,7 @@ msgid "now"
 msgstr "зараз"
 
 #: include/blocks.inc.php:440 include/blocks.inc.php:779
-#: include/func.inc.php:1656
+#: include/func.inc.php:1663
 msgid "of"
 msgstr "із"
 
@@ -16269,7 +16279,7 @@ msgstr "перетворення значень"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 
-#: include/func.inc.php:1652
+#: include/func.inc.php:1659
 msgid "to"
 msgstr "до"
 
