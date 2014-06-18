@@ -36,6 +36,13 @@ class CSetValidator extends CValidator {
 	public $messageInvalid;
 
 	/**
+	 * Error message if the value is not of an acceptable type
+	 *
+	 * @var string
+	 */
+	public $messageType;
+
+	/**
 	 * Checks if the given value belongs to some set.
 	 *
 	 * @param $value
@@ -44,6 +51,12 @@ class CSetValidator extends CValidator {
 	 */
 	public function validate($value)
 	{
+		if (!is_scalar($value)) {
+			$this->error($this->messageType);
+
+			return false;
+		}
+
 		$values = array_flip($this->values);
 
 		if (!isset($values[$value])) {

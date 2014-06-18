@@ -52,9 +52,9 @@ class CCollectionValidator extends CValidator {
 	/**
 	 * Error message if the given value is not an array.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	public $messageInvalid = array();
+	public $messageType;
 
 	/**
 	 * Error message if duplicate objects exist.
@@ -62,6 +62,52 @@ class CCollectionValidator extends CValidator {
 	 * @var string
 	 */
 	public $messageDuplicate;
+
+	/**
+	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
+	 *
+	 * @param array $options
+	 */
+	public function __construct(array $options = array()) {
+		if (isset($options['messageInvalid'])) {
+			$options['messageType'] = $options['messageInvalid'];
+			unset($options['messageInvalid']);
+		}
+
+		parent::__construct($options);
+	}
+
+	/**
+	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
+	 *
+	 * @param $name
+	 * @param $value
+	 *
+	 * @throws \Exception
+	 */
+	public function __set($name, $value) {
+		if ($name === 'messageInvalid') {
+			$this->messageType = $value;
+
+			return;
+		}
+
+		parent::__set($name, $value);
+	}
+
+	/**
+	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
+	 *
+	 * @param $name
+	 * @return string
+	 */
+	public function __get($name) {
+		if ($name === 'messageInvalid') {
+			return $this->messageType;
+		}
+
+		return null;
+	}
 
 	/**
 	 * Checks if the given array of objects is valid.
@@ -73,7 +119,7 @@ class CCollectionValidator extends CValidator {
 	public function validate($value)
 	{
 		if (!is_array($value)) {
-			$this->error($this->messageInvalid);
+			$this->error($this->messageType);
 
 			return false;
 		}
@@ -88,7 +134,14 @@ class CCollectionValidator extends CValidator {
 		// check for objects with duplicate values
 		if ($this->uniqueField) {
 			if ($duplicate = CArrayHelper::findDuplicate($value, $this->uniqueField, $this->uniqueField2)) {
-				$this->error($this->messageDuplicate, $duplicate[$this->uniqueField]);
+				// since second unique parameter can be absent, we call it in ugly way
+				$params = array($this->messageDuplicate, $duplicate[$this->uniqueField]);
+
+				if ($this->uniqueField2) {
+					$params[] = $duplicate[$this->uniqueField2];
+				}
+
+				call_user_func_array(array($this, 'error'), $params);
 
 				return false;
 			}

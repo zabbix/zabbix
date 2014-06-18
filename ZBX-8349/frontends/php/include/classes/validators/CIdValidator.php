@@ -28,4 +28,34 @@ class CIdValidator extends CStringValidator {
 	 */
 	public $regex = '/^\d+$/';
 
+	/**
+	 * Error message if the id is not in range 0..ZBX_DB_MAX_ID
+	 *
+	 * @var string
+	 */
+	public $messageRange;
+
+	/**
+	 * Validates ID value
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
+	public function validate($value) {
+		// CStringValidator uses zbx_empty, which considers '0' as non-empty value. We do an additional check.
+		if (!$this->empty && empty($value)) {
+			$this->error($this->messageEmpty);
+
+			return false;
+		}
+
+		if (bccomp($value, 0)  == -1 || bccomp($value, ZBX_DB_MAX_ID) == 1) {
+			$this->error($this->messageRange, $value);
+
+			return false;
+		}
+
+		return parent::validate($value);
+	}
 }

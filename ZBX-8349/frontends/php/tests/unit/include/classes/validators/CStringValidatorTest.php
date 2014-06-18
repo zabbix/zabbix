@@ -43,7 +43,6 @@ class CStringValidatorTest extends CValidatorTest {
 			array(array(), 0),
 
 			array(array('empty' => true), ''),
-			array(array('empty' => true), null),
 
 			array(array('maxLength' => 6), 'string'),
 			array(array('maxLength' => 6), 123456),

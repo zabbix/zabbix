@@ -41,6 +41,22 @@ class CLdapAuthValidatorTest extends CValidatorTest {
 		return array();
 	}
 
+	public function testValidateValid()
+	{
+		$this->markTestIncomplete('This test is not yet written');
+	}
+
+	public function testValidateInvalid()
+	{
+		$this->markTestIncomplete('This test is not yet written');
+	}
+
+	public function testValidateInvalidWithObject()
+	{
+		$this->markTestIncomplete('This test is not yet written');
+	}
+
+
 	protected function createValidator(array $params = array()) {
 		return new CLdapAuthValidator($params);
 	}
