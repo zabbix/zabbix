@@ -139,7 +139,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('host', 'name', 'lastclock'));
 
 $sortField = getPageSortField();
 $sortOrder = getPageSortOrder();
@@ -212,7 +212,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2);
+		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
 		if (!$filterShowWithoutData) {

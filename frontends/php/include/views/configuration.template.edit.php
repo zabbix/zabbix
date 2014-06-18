@@ -423,7 +423,13 @@ $newTemplateTable->attr('style', 'min-width: 400px;');
 $newTemplateTable->addRow(array(new CMultiSelect(array(
 	'name' => 'add_templates[]',
 	'objectName' => 'templates',
-	'ignored' => $ignoredTemplates
+	'ignored' => $ignoredTemplates,
+	'popup' => array(
+		'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
+		'width' => 450,
+		'height' => 450
+	)
 ))));
 
 $newTemplateTable->addRow(
