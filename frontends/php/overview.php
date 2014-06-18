@@ -233,23 +233,12 @@ if ($type == SHOW_TRIGGERS) {
 		'preservekeys' => true
 	));
 
-	// application filter
-	$applications = array();
-	if ($filter['application'] !== '') {
-		$applications = API::Application()->get(array(
-			'output' => array('applicationid'),
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'search' => array('name' => $filter['application'])
-		));
-	}
-
 	$options = array(
 		'output' => array(
 			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 		),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
-		'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
 		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
@@ -268,6 +257,16 @@ if ($type == SHOW_TRIGGERS) {
 	}
 	elseif ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) {
 		$options['filter']['value'] = TRIGGER_VALUE_TRUE;
+	}
+
+	// application filter
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'search' => array('name' => $filter['application'])
+		));
+		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 	}
 
 	$triggers = API::Trigger()->get($options);
