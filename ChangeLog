@@ -8,6 +8,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish, Russian and Slovak t
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+.......PS. [ZBX-8040] wait for proper SMTP response before sending first command (wiper)
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 ..F....... [ZBX-8196] added validation for sorting parameters (Andrejs)
 A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
