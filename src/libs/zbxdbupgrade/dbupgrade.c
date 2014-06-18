@@ -660,14 +660,13 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i, total = 0, optional_num = 0;
+	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
-	int			current = 0, completed, last_completed = -1;
+	int			total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	required = ZBX_FIRST_DB_VERSION;
@@ -713,6 +712,7 @@ int	DBcheck_version(void)
 
 	DBget_version(&db_mandatory, &db_optional);
 
+#ifndef HAVE_SQLITE3
 	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
@@ -727,7 +727,6 @@ int	DBcheck_version(void)
 		}
 	}
 
-#ifndef HAVE_SQLITE3
 	if (required < db_mandatory)
 #else
 	if (required != db_mandatory)
