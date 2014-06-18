@@ -64,6 +64,13 @@ class CStringValidator extends CValidator {
 	public $messageRegex;
 
 	/**
+	 * Error message if not a string, integer or decimal is provided
+	 *
+	 * @var string
+	 */
+	public $messageType;
+
+	/**
 	 * Checks if the given string is:
 	 * - empty
 	 * - not too long
@@ -74,6 +81,12 @@ class CStringValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
+		if (!(is_string($value) || is_numeric($value))) {
+			$this->error($this->messageType);
+
+			return false;
+		}
+
 		if (zbx_empty($value)) {
 			if ($this->empty) {
 				return true;
@@ -86,7 +99,7 @@ class CStringValidator extends CValidator {
 		}
 
 		if ($this->maxLength && mb_strlen($value) > $this->maxLength) {
-			$this->error($this->messageMaxLength, $this->maxLength);
+			$this->error($this->messageMaxLength, $value, $this->maxLength);
 
 			return false;
 		}

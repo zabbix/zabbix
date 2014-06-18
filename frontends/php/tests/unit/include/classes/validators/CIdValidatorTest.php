@@ -45,12 +45,12 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID'),
+				array('messageEmpty' => 'Invalid ID'),
 				'',
 				'Invalid ID'
 			),
 			array(
-				array('messageType' => 'Invalid ID'),
+				array('messageEmpty' => 'Invalid ID'),
 				array(),
 				'Invalid ID'
 			),
@@ -65,19 +65,24 @@ class CIdValidatorTest extends CValidatorTest {
 				'Empty ID'
 			),
 			array(
-				array('messageRegex' => 'Incorrect ID "%1$s"'),
+				array('messageRange' => 'Incorrect ID "%1$s"'),
 				'-1',
 				'Incorrect ID "-1"'
 			),
 			array(
-				array('messageRegex' => 'Incorrect ID "%1$s"'),
+				array('messageRange' => 'Incorrect ID "%1$s"'),
 				'9223372036854775808',
-				'Incorrect ID "-1"'
+				'Incorrect ID "9223372036854775808"'
 			),
 			array(
 				array('messageRegex' => 'Incorrect ID "%1$s"'),
 				'A',
 				'Incorrect ID "A"'
+			),
+			array(
+				array('messageRegex' => 'Incorrect ID "%1$s"'),
+				'1A',
+				'Incorrect ID "1A"'
 			)
 		);
 	}
@@ -85,12 +90,12 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageEmpty' => 'Invalid ID for "%1$s"'),
 				'',
 				'Invalid ID for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageEmpty' => 'Invalid ID for "%1$s"'),
 				array(),
 				'Invalid ID for "object"'
 			),
@@ -105,20 +110,25 @@ class CIdValidatorTest extends CValidatorTest {
 				'Empty ID for "object"'
 			),
 			array(
-				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
+				array('messageRange' => 'Incorrect ID "%2$s" for "%1$s"'),
 				'-1',
 				'Incorrect ID "-1" for "object"'
 			),
 			array(
-				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
+				array('messageRange' => 'Incorrect ID "%2$s" for "%1$s"'),
 				'9223372036854775808',
-				'Incorrect ID "-1" for "object"'
+				'Incorrect ID "9223372036854775808" for "object"'
 			),
 			array(
 				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
 				'A',
 				'Incorrect ID "A" for "object"'
 			),
+			array(
+				array('messageRegex' => 'Incorrect ID "%2$s" for "%1$s"'),
+				'1A',
+				'Incorrect ID "1A" for "object"'
+			)
 		);
 	}
 
