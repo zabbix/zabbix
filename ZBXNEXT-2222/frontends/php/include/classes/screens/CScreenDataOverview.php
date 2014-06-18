@@ -39,7 +39,7 @@ class CScreenDataOverview extends CScreenBase {
 			$applications = API::Application()->get(array(
 				'output' => array('applicationid'),
 				'hostids' => $hostids,
-				'filter' => array('name' => $this->screenitem['application'])
+				'search' => array('name' => $this->screenitem['application'])
 			));
 			$applicationIds = zbx_objectValues($applications, 'applicationid');
 		}
