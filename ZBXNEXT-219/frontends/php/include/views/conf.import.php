@@ -61,7 +61,7 @@ foreach ($titles as $key => $title) {
 
 	if (isset($rules[$key]['deleteMissing'])) {
 		$cbDeleted = new CCheckBox('rules['.$key.'][deleteMissing]', $rules[$key]['deleteMissing'], null, 1);
-		$cbDeleted->setAttribute('class', 'deleteMissing');
+		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
 	}
 
 	$rulesTable->addRow(array(

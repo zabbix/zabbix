@@ -1360,7 +1360,7 @@ class CConfigurationImport {
 			'hostids' => $hostIdsXML,
 			'webitems' => true,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
@@ -1430,7 +1430,7 @@ class CConfigurationImport {
 			'hostids' => $hostIdsXML,
 			'selectHosts' => array('hostid'),
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
@@ -1542,7 +1542,7 @@ class CConfigurationImport {
 			'hostids' => $hostIdsXML,
 			'selectHosts' => array('hostid'),
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
@@ -1605,7 +1605,7 @@ class CConfigurationImport {
 			'output' => array('itemid'),
 			'hostids' => $hostIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
@@ -1673,7 +1673,7 @@ class CConfigurationImport {
 			'output' => array('hostid'),
 			'discoveryids' => $discoveryRuleIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
@@ -1688,7 +1688,7 @@ class CConfigurationImport {
 			'output' => array('triggerid'),
 			'hostids' => $hostIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
@@ -1712,7 +1712,7 @@ class CConfigurationImport {
 			'output' => array('graphid'),
 			'hostids' => $hostIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
@@ -1728,7 +1728,7 @@ class CConfigurationImport {
 			'output' => array('itemid'),
 			'hostids' => $hostIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
