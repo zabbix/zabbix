@@ -789,7 +789,7 @@ sub push_value
 #
 sub send_values
 {
-    return if (defined($OPTS{'test'}));
+    return if (defined($OPTS{'debug'}));
 
     if (scalar(@_sender_values) == 0)
     {
@@ -1156,7 +1156,7 @@ sub process_slv_ns_curmon
 
 	info("$ns: ", $successful_values{$ns}, "/", $total_values{$ns}, " successful values");
 
-	curmon_log_values("CURMON-UDP-DNS-RTT", $ns, $successful_values{$ns}, $total_values{$ns}) unless (defined($OPTS{'test'}));
+	curmon_log_values("CURMON-UDP-DNS-RTT", $ns, $successful_values{$ns}, $total_values{$ns});
     }
 }
 
@@ -1215,7 +1215,7 @@ sub check_lastclock
     my $value_ts = shift;
     my $interval = shift;
 
-    return SUCCESS if (defined($OPTS{'test'}));
+    return SUCCESS if (defined($OPTS{'debug'}));
 
     if ($lastclock + $interval > $value_ts)
     {
@@ -1306,7 +1306,7 @@ sub slv_exit
 
 sub exit_if_running
 {
-    return if (defined($OPTS{'test'}));
+    return if (defined($OPTS{'debug'}));
 
     my $filename = __get_pidfile();
 
@@ -1374,7 +1374,11 @@ sub trim
 
 sub parse_opts
 {
-    usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!"));
+    my @opts;
+
+    push(@opts, "debug!", @_);
+
+    usage() unless (GetOptions(\%OPTS, @opts));
     $tld = $ARGV[0] if (defined($ARGV[0]));
 }
 
@@ -1397,9 +1401,14 @@ sub curmon_log_values
     my $successful = shift;
     my $total = shift;
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '-' . __script() . '.log';
+    if (defined($OPTS{'debug'}))
+    {
+	print(ts_str(), " $prefix $tld $target: $successful/$total successful results\n");
+	return;
+    }
 
-    __write_log($file, join('', ts_str(), " [$target] [$successful] [$total]\n"));
+    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '.log';
+    __write_log($file, ts_str() . " [$target] [$successful] [$total]\n");
 }
 
 sub curmon_log_downtime
@@ -1407,21 +1416,25 @@ sub curmon_log_downtime
     my $prefix = shift;
     my $downtime = shift;
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '-' . __script() . '.log';
+    if (defined($OPTS{'debug'}))
+    {
+	print(ts_str(), " $prefix $tld: $downtime minutes of downtime\n");
+	return;
+    }
 
-    __write_log($file, join('', ts_str(), " [$downtime]\n"));
+    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '.log';
+    __write_log($file, ts_str() . " [$downtime]\n");
 }
 
 sub usage
 {
     print("usage: $0 <tld> [options]\n");
     print("Options:\n");
-    print("    --debug    print more details\n");
-    print("    --stdout   print output to stdout instead of log file\n");
-    print("    --test     run the script in test mode, this means:\n");
+    print("    --debug    run the script in debug mode, this means:\n");
     print("               - skip checks if need to recalculate value\n");
     print("               - do not send the value to the server\n");
-    print("               - print the output to stdout instead of logging it (implies --stdout)\n");
+    print("               - print the output to stdout instead of writing to the log file\n");
+    print("               - print more information\n");
     exit(FAIL);
 }
 
@@ -1447,8 +1460,7 @@ sub __log
 {
     my $msg = shift;
 
-    if (defined($OPTS{'test'}) or
-	defined($OPTS{'stdout'}) or
+    if (defined($OPTS{'debug'}) or
 	not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
