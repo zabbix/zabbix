@@ -38,27 +38,28 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$hostIds = zbx_objectValues($hosts, 'hostid');
 
+		$options = array(
+			'output' => array(
+				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+			),
+			'selectHosts' => array('hostid', 'name', 'status'),
+			'hostids' => $hostIds,
+			'monitored' => true,
+			'skipDependent' => true,
+			'sortfield' => 'description'
+		);
+
 		// application filter
-		$applications = array();
 		if ($this->screenitem['application'] !== '') {
 			$applications = API::Application()->get(array(
 				'output' => array('applicationid'),
 				'hostids' => $hostIds,
 				'search' => array('name' => $this->screenitem['application'])
 			));
+			$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 		}
 
-		$triggers = API::Trigger()->get(array(
-			'output' => array(
-				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
-			),
-			'selectHosts' => array('hostid', 'name', 'status'),
-			'hostids' => $hostIds,
-			'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
-			'monitored' => true,
-			'skipDependent' => true,
-			'sortfield' => 'description'
-		));
+		$triggers = API::Trigger()->get($options);
 
 		return $this->getOutput(getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'],
 			$this->screenid
