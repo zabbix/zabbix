@@ -43,7 +43,7 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
 	access_deny();
 }
 
-validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN);
+validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN, array('inventory_field', 'host_count'));
 
 if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
