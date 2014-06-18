@@ -836,6 +836,11 @@ define('XML_TAG_DEPENDENCY',		'dependency');
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
 define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
 
 // API errors
