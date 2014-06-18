@@ -632,6 +632,48 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	return ret;
 }
 
+#define ZBX_OID_INDEX_STRING	0
+#define ZBX_OID_INDEX_NUMERIC	1
+
+static int	zbx_snmp_print_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len, int format)
+{
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_BREAKDOWN_OIDS, format);
+
+	return snprint_objid(buffer, buffer_len, objid, objid_len);
+}
+
+static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len,
+		size_t root_string_len, size_t root_numeric_len, const oid *root_objid, size_t root_objid_len)
+{
+	oid	parsed_oid[MAX_OID_LEN];
+	size_t	parsed_oid_len = MAX_OID_LEN;
+	char	printed_oid[MAX_STRING_LEN];
+
+	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_STRING))
+		goto numeric;
+
+	if (NULL == strchr(printed_oid, '"') && NULL == strchr(printed_oid, '\''))
+	{
+		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		return SUCCEED;
+	}
+
+	if (NULL == snmp_parse_oid(printed_oid, parsed_oid, &parsed_oid_len))
+		goto numeric;
+
+	if (parsed_oid_len == objid_len && 0 == memcmp(parsed_oid, objid, parsed_oid_len * sizeof(oid)))
+	{
+		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		return SUCCEED;
+	}
+numeric:
+	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_NUMERIC))
+		return FAIL;
+
+	zbx_strlcpy(buffer, printed_oid + root_numeric_len + 1, buffer_len);
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_snmp_walk                                                    *
@@ -673,7 +715,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
-	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
+	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
 	int			bulk, status, level, running, num_vars, ret = SUCCEED;
@@ -692,14 +734,25 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		goto out;
 	}
 
-	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
+	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_STRING))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
+				" cannot print OID \"%s\" with string indices.", OID));
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
-	OID_len = strlen(snmp_oid);
+	root_string_len = strlen(snmp_oid);
+
+	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_NUMERIC))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
+				" cannot print OID \"%s\" with numeric indices.", OID));
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	root_numeric_len = strlen(snmp_oid);
 
 	/* copy rootOID to anOID */
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
@@ -801,11 +854,13 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
-				if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), var->name, var->name_length))
+				if (SUCCEED != zbx_snmp_choose_index(snmp_oid, sizeof(snmp_oid), var->name,
+						var->name_length, root_string_len, root_numeric_len, rootOID,
+						rootOID_len))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-							"snprint_objid(): buffer is not large enough:"
-							" OID: \"%s\" snmp_oid: \"%s\".", OID, snmp_oid));
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_choose_index():"
+							" cannot choose appropriate index while walking for"
+							" OID \"%s\".", OID));
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -818,14 +873,12 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				{
 					if (ZBX_SNMP_WALK_MODE_CACHE == mode)
 					{
-						cache_put_snmp_index(item, (char *)OID, snmp_result.str,
-								&snmp_oid[OID_len + 1]);
+						cache_put_snmp_index(item, (char *)OID, snmp_result.str, snmp_oid);
 					}
 					else
 					{
 						zbx_json_addobject(&j, NULL);
-						zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
-								ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&j, "{#SNMPINDEX}", snmp_oid, ZBX_JSON_TYPE_STRING);
 						zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
 								ZBX_JSON_TYPE_STRING);
 						zbx_json_close(&j);
@@ -837,7 +890,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 					msg = GET_MSG_RESULT(&snmp_result);
 
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot get OID '%s' string value: %s",
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							snmp_oid, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
 
