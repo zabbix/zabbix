@@ -645,12 +645,73 @@ static int	zbx_snmp_print_oid(char *buffer, size_t buffer_len, const oid *objid,
 static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len,
 		size_t root_string_len, size_t root_numeric_len, const oid *root_objid, size_t root_objid_len)
 {
+	const char	*__function_name = "zbx_snmp_choose_index";
+
 	oid	parsed_oid[MAX_OID_LEN];
 	size_t	parsed_oid_len = MAX_OID_LEN;
 	char	printed_oid[MAX_STRING_LEN];
 
+	/**************************************************************************************************************/
+	/*                                                                                                            */
+	/* When we are providing a value for {#SNMPINDEX}, we would like to provide a pretty value. This is only a    */
+	/* concern for OIDs with string indices. For instance, suppose we are walking the following OID:              */
+	/*                                                                                                            */
+	/*   SNMP-VIEW-BASED-ACM-MIB::vacmGroupName                                                                   */
+	/*                                                                                                            */
+	/* Suppose also that we are currently looking at this OID:                                                    */
+	/*                                                                                                            */
+	/*   SNMP-VIEW-BASED-ACM-MIB::vacmGroupName.3."authOnlyUser"                                                  */
+	/*                                                                                                            */
+	/* Then, we would like to provide {#SNMPINDEX} with this value:                                               */
+	/*                                                                                                            */
+	/*   3."authOnlyUser"                                                                                         */
+	/*                                                                                                            */
+	/* An alternative approach would be to provide {#SNMPINDEX} with numeric value. While it is equivalent to the */
+	/* string representation above, the string representation is more readable and thus more useful to users:     */
+	/*                                                                                                            */
+	/*   3.12.97.117.116.104.79.110.108.121.85.115.101.114                                                        */
+	/*                                                                                                            */
+	/* Here, 12 is the length of "authOnlyUser" and the rest is the string encoding using ASCII characters.       */
+	/*                                                                                                            */
+	/* There are two problems with always providing {#SNMPINDEX} that has an index representation as a string.    */
+	/*                                                                                                            */
+	/* The first problem is indices of type InetAddress. The Net-SNMP library has code for pretty-printing IP     */
+	/* addresses, but no way to parse them back. As an example, consider the following OID:                       */
+	/*                                                                                                            */
+	/*   .1.3.6.1.2.1.4.34.1.4.1.4.192.168.3.255                                                                  */
+	/*                                                                                                            */
+	/* Its pretty representation is like this:                                                                    */
+	/*                                                                                                            */
+	/*   IP-MIB::ipAddressType.ipv4."192.168.3.255"                                                               */
+	/*                                                                                                            */
+	/* However, when trying to parse it, it turns into this OID:                                                  */
+	/*                                                                                                            */
+	/*   .1.3.6.1.2.1.4.34.1.4.1.13.49.57.50.46.49.54.56.46.51.46.50.53.53                                        */
+	/*                                                                                                            */
+	/* Apparently, this is different than the original.                                                           */
+	/*                                                                                                            */
+	/* The second problem is indices of type OCTET STRING, which might contains unprintable characters:           */
+	/*                                                                                                            */
+	/*   1.3.6.1.2.1.17.4.3.1.1.0.0.240.122.113.21                                                                */
+	/*                                                                                                            */
+	/* Its pretty representation is like this (note the single quotes which stand for a fixed-length string):     */
+	/*                                                                                                            */
+	/*   BRIDGE-MIB::dot1dTpFdbAddress.'...zq.'                                                                   */
+	/*                                                                                                            */
+	/* Here, '...zq.' stands for 0.0.240.122.113.21, where only 'z' (122) and 'q' (113) are printable.            */
+	/*                                                                                                            */
+	/* Apparently, this cannot be turned back into the numeric representation.                                    */
+	/*                                                                                                            */
+	/* So what we try to do is first print it pretty. If there is no string-looking index, return it as output.   */
+	/* If there is such an index, we check that it can be parsed and that the result is the same as the original. */
+	/*                                                                                                            */
+	/**************************************************************************************************************/
+
 	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_STRING))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print OID with string indices", __function_name);
 		goto numeric;
+	}
 
 	if (NULL == strchr(printed_oid, '"') && NULL == strchr(printed_oid, '\''))
 	{
@@ -659,7 +720,10 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 	}
 
 	if (NULL == snmp_parse_oid(printed_oid, parsed_oid, &parsed_oid_len))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __function_name, printed_oid);
 		goto numeric;
+	}
 
 	if (parsed_oid_len == objid_len && 0 == memcmp(parsed_oid, objid, parsed_oid_len * sizeof(oid)))
 	{
@@ -668,7 +732,10 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 	}
 numeric:
 	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_NUMERIC))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print OID with numeric indices", __function_name);
 		return FAIL;
+	}
 
 	zbx_strlcpy(buffer, printed_oid + root_numeric_len + 1, buffer_len);
 	return SUCCEED;
