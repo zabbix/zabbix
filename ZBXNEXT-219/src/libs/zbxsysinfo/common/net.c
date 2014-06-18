@@ -31,15 +31,12 @@
 #	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
-/*
- * 0 - NOT OK
- * 1 - OK
- * */
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int)
+		int(*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
-	int		net, val = SUCCEED;
+	const char	*buf;
+	int		net, val = ZBX_TCP_EXPECT_OK;
 
 	*value_int = 0;
 
@@ -49,23 +46,29 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	if (NULL != request)
 		net = zbx_tcp_send_raw(&s, request);
 
-	if (NULL != expect && SUCCEED == net)
+	if (NULL != validate_func && SUCCEED == net)
 	{
-		if (SUCCEED == (net = zbx_tcp_recv(&s)))
+		val = ZBX_TCP_EXPECT_FAIL;
+
+		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
-			if (0 != strncmp(s.buffer, expect, strlen(expect)))
+			val = validate_func(buf);
+
+			if (ZBX_TCP_EXPECT_OK == val)
+				break;
+
+			if (ZBX_TCP_EXPECT_FAIL == val)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]",
-						expect, s.buffer);
-				val = FAIL;
+				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error, received [%s]", buf);
+				break;
 			}
 		}
 	}
 
-	if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
+	if (NULL != sendtoclose && SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
 		zbx_tcp_send_raw(&s, sendtoclose);
 
-	if (SUCCEED == net && SUCCEED == val)
+	if (SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
 		*value_int = 1;
 
 	zbx_tcp_close(&s);

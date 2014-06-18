@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"POT-Creation-Date: 2014-06-17 16:29+0300\n"
 "PO-Revision-Date: 2014-04-13 14:12+0300\n"
 "Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -234,7 +234,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "غير قابل دسترسي!"
 
-#: include/func.inc.php:1755
+#: include/func.inc.php:1762
 msgid "Access denied."
 msgstr ""
 
@@ -1206,7 +1206,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
-msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
+msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:265
@@ -1225,7 +1225,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
-msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
+msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 msgstr ""
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
@@ -1338,7 +1338,7 @@ msgstr "تصویر نمی تواند اضافه شود"
 msgid "Cannot add image."
 msgstr ""
 
-#: items.php:480 screenedit.php:190
+#: items.php:480
 msgid "Cannot add item"
 msgstr "آیتم نمی تواند اضافه شود"
 
@@ -1636,7 +1636,7 @@ msgstr "تصویر نمی‌تواند حذف شود"
 msgid "Cannot delete inventory."
 msgstr "فهرست نمی‌تواند حذف شود."
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Cannot delete item"
 msgstr "آیتم نمی‌تواند حذف شود"
 
@@ -2219,6 +2219,11 @@ msgstr ""
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
+#: include/func.inc.php:1426
+#, c-format
+msgid "Cannot sort by field \"%1$s\"."
+msgstr ""
+
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
 msgstr ""
@@ -2426,7 +2431,7 @@ msgstr ""
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:477 screenedit.php:181
+#: items.php:477
 msgid "Cannot update item"
 msgstr "آیتم نمی‌تواند بروز شود"
 
@@ -2476,7 +2481,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "عبارت منظم نمی تواند بروز شود"
 
-#: screenconf.php:132
+#: screenconf.php:132 screenedit.php:199 screenedit.php:216
 msgid "Cannot update screen"
 msgstr "صفحه نمایش نمی تواند بروز شود"
 
@@ -2627,12 +2632,12 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
-msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
+msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
-msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
+msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:587
@@ -2654,7 +2659,7 @@ msgstr "نوع تطبیق"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
-msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
+msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
 msgstr ""
 
 #: include/views/configuration.discovery.edit.php:63
@@ -2795,11 +2800,11 @@ msgstr ""
 msgid "Colour (OK)"
 msgstr "رنگ (تصویب)"
 
-#: screenedit.php:264
+#: screenedit.php:258
 msgid "Column added"
 msgstr ""
 
-#: screenedit.php:339
+#: screenedit.php:333
 msgid "Column deleted"
 msgstr ""
 
@@ -4157,7 +4162,7 @@ msgid "Description updated"
 msgstr ""
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
-#: include/func.inc.php:1871
+#: include/func.inc.php:1878
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:349
@@ -4489,7 +4494,7 @@ msgstr "وضعیت کشف"
 msgid "Display OK triggers for"
 msgstr "نمایش هشدار های رفع شده برای"
 
-#: include/func.inc.php:1649
+#: include/func.inc.php:1656
 msgid "Displaying"
 msgstr "نمایش"
 
@@ -4641,7 +4646,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:1840
+#: include/func.inc.php:1847
 msgid "ERROR"
 msgstr "خطا"
 
@@ -5375,7 +5380,7 @@ msgstr ""
 msgid "First"
 msgstr "ابتدا"
 
-#: include/func.inc.php:1594
+#: include/func.inc.php:1601
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -5583,7 +5588,7 @@ msgstr "برو"
 msgid "Go to"
 msgstr "برو به"
 
-#: include/func.inc.php:1773
+#: include/func.inc.php:1780
 msgid "Go to dashboard"
 msgstr ""
 
@@ -6714,7 +6719,7 @@ msgstr "نشانها"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:1763 include/func.inc.php:1783
+#: include/func.inc.php:1770 include/func.inc.php:1790
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -6794,12 +6799,12 @@ msgstr "واردات پرونده"
 msgid "Imported successfully"
 msgstr ""
 
-#: hostinventories.php:180
+#: hostinventories.php:182
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr ""
 
-#: screenedit.php:307 screenedit.php:347
+#: screenedit.php:301 screenedit.php:341
 msgid "Impossible to remove last row and column."
 msgstr ""
 
@@ -7411,6 +7416,11 @@ msgstr ""
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr ""
 
+#: include/func.inc.php:1431
+#, c-format
+msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
+msgstr ""
+
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
 msgstr ""
@@ -7888,7 +7898,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:480 screenedit.php:189
+#: items.php:480
 msgid "Item added"
 msgstr ""
 
@@ -7896,7 +7906,7 @@ msgstr ""
 msgid "Item count"
 msgstr "تعداد آیتم"
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Item deleted"
 msgstr ""
 
@@ -7973,7 +7983,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:477 screenedit.php:180
+#: items.php:477
 msgid "Item updated"
 msgstr ""
 
@@ -8238,7 +8248,7 @@ msgstr "زبان"
 msgid "Last"
 msgstr "آخرین"
 
-#: include/func.inc.php:1634
+#: include/func.inc.php:1641
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -8318,9 +8328,9 @@ msgstr "آخرین مقدار"
 msgid "Last week graph"
 msgstr "نمودار هفته گذشته"
 
-#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:197 jsLoader.php:205 latest.php:26
-#: search.php:134 search.php:220 search.php:274 search.php:327
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:197
+#: jsLoader.php:205 latest.php:26 search.php:134 search.php:220 search.php:274
+#: search.php:327
 msgid "Latest data"
 msgstr "آخرین اطلاعات"
 
@@ -8513,7 +8523,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr "واردشده به عنوان"
 
-#: auditlogs.php:137 include/func.inc.php:1769 include/func.inc.php:1786
+#: auditlogs.php:137 include/func.inc.php:1776 include/func.inc.php:1793
 #: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8849,7 +8859,7 @@ msgid "Max count of events per trigger to show"
 msgstr "حداکثر تعداد رویداد در هشدارها"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Maximize"
 msgstr "بزرگ‌سازی"
 
@@ -9042,7 +9052,7 @@ msgid "Middle"
 msgstr "وسط"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Minimize"
 msgstr "حداقل کردن"
 
@@ -9193,7 +9203,7 @@ msgstr "مانیتور شده با پروکسی"
 msgid "Monitored host"
 msgstr "هاست مانیتور شده"
 
-#: include/menu.inc.php:26
+#: include/menu.inc.php:26 include/views/inventory.host.view.php:195
 msgid "Monitoring"
 msgstr "مانیتورینگ"
 
@@ -9454,13 +9464,13 @@ msgstr "زمان سرویس جدید"
 msgid "Next"
 msgstr "بعدی"
 
-#: include/func.inc.php:1627
+#: include/func.inc.php:1634
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:816 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2103 include/triggers.inc.php:1522
+#: include/func.inc.php:2110 include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -9996,7 +10006,7 @@ msgstr ""
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:625 api/classes/CUser.php:804
 #: api/classes/CUser.php:824 api/classes/CUser.php:883
-#: api/classes/CUser.php:1277 include/func.inc.php:1743
+#: api/classes/CUser.php:1277 include/func.inc.php:1750
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -11197,7 +11207,7 @@ msgstr "پیش‌نمایش"
 msgid "Previous"
 msgstr "قبلی"
 
-#: include/func.inc.php:1600
+#: include/func.inc.php:1607
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -11834,11 +11844,11 @@ msgstr "راست"
 msgid "Romanian (ro_RO)"
 msgstr ""
 
-#: screenedit.php:241
+#: screenedit.php:235
 msgid "Row added"
 msgstr ""
 
-#: screenedit.php:299
+#: screenedit.php:293
 msgid "Row deleted"
 msgstr ""
 
@@ -12268,11 +12278,11 @@ msgstr "پیکربندی سلول‌های صفحات نمایش"
 msgid "Screen deleted"
 msgstr ""
 
-#: screenedit.php:306 screenedit.php:346
+#: screenedit.php:300 screenedit.php:340
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:131
+#: screenconf.php:131 screenedit.php:199 screenedit.php:216
 msgid "Screen updated"
 msgstr ""
 
@@ -15377,7 +15387,7 @@ msgstr "سالانه"
 
 #: events.php:816 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
-#: include/events.inc.php:376 include/func.inc.php:2103
+#: include/events.inc.php:376 include/func.inc.php:2110
 #: include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
@@ -15398,7 +15408,7 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:1779
+#: include/func.inc.php:1786
 msgid "You are not logged in."
 msgstr "شما وارد نشدید"
 
@@ -15448,15 +15458,15 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/func.inc.php:1761
+#: include/func.inc.php:1768
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:1781
+#: include/func.inc.php:1788
 msgid "You must login to view this page."
 msgstr "شما باید وارد شوید تا این صفحه را ببینید"
 
-#: include/func.inc.php:1757
+#: include/func.inc.php:1764
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15725,7 +15735,7 @@ msgstr ""
 msgid "fixed"
 msgstr "ثابت"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1666
 msgid "found"
 msgstr "پیدا شده"
 
@@ -15910,7 +15920,7 @@ msgid "now"
 msgstr "حالا"
 
 #: include/blocks.inc.php:440 include/blocks.inc.php:779
-#: include/func.inc.php:1656
+#: include/func.inc.php:1663
 msgid "of"
 msgstr "از"
 
@@ -16016,7 +16026,7 @@ msgstr "نمایش مقادیر نگاشت شده"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1652
+#: include/func.inc.php:1659
 msgid "to"
 msgstr "به"
 
