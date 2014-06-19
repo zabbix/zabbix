@@ -909,13 +909,13 @@ void	zbx_tcp_free(zbx_sock_t *s)
  *                                                                            *
  * Purpose: finds the next line in socket data buffer                         *
  *                                                                            *
- * Parameters:  s  - [IN] the socket                                          *
+ * Parameters: s - [IN] the socket                                            *
  *                                                                            *
  * Return value: A pointer to the next line or NULL if the socket data buffer *
  *               contains no more lines.                                      *
  *                                                                            *
  ******************************************************************************/
-static const char*	zbx_sock_find_line(zbx_sock_t *s)
+static const char	*zbx_sock_find_line(zbx_sock_t *s)
 {
 	char	*ptr, *line = NULL;
 
@@ -943,7 +943,7 @@ static const char*	zbx_sock_find_line(zbx_sock_t *s)
  *                                                                            *
  * Purpose: reads next line from a socket                                     *
  *                                                                            *
- * Parameters:  s        - [IN] the socket                                    *
+ * Parameters: s - [IN] the socket                                            *
  *                                                                            *
  * Return value: a pointer to the line in socket buffer or NULL if there are  *
  *               no more lines (socket was closed or an error occurred)       *
@@ -1445,4 +1445,3 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #endif
 	return FAIL;
 }
-
