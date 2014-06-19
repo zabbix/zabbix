@@ -1208,7 +1208,7 @@ function make_webmon_overview($filter) {
 	foreach ($groups as $group) {
 		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
-				$group['name'],
+				new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
 				new CSpan(
 					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],

@@ -225,7 +225,7 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 /*
  * Page sorting
  */
-validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
+validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN, array('priority', 'lastchange', 'description'));
 
 /*
  * Display

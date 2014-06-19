@@ -961,7 +961,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if ($monitoredHostIds) {
-		$triggers = API::Trigger()->get(array(
+		$triggersFromMonitoredHosts = API::Trigger()->get(array(
 			'hostids' => $monitoredHostIds,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
@@ -973,7 +973,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'preservekeys' => true
 		));
 
-		foreach ($triggers as $triggerId => $trigger) {
+		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				$hostId = $host['hostid'];
 
@@ -985,12 +985,14 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
-		$submapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
+		$subSysmapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
 			$hostsFromHostGroups
 		);
-		$selements = filterSysmapTriggers($selements, $submapHostApplicationFilters, $triggers);
+		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggersFromMonitoredHosts,
+			$subSysmapTriggerIdToSelementIds
+		);
 
-		$allTriggers = array_merge($allTriggers, $triggers);
+		$allTriggers = array_merge($allTriggers, $triggersFromMonitoredHosts);
 	}
 
 	$allTriggers = zbx_toHash($allTriggers, 'triggerid');
@@ -1167,16 +1169,29 @@ function getSelementsInfo($sysmap, array $options = array()) {
  * @param array $selements                          selements of current sysmap
  * @param array $selementHostApplicationFilters     a list of application filters applied to each host under each element
  *                                                  @see getSelementHostApplicationFilters()
- * @param array $triggers                           triggers that are relevant to filtering
+ * @param array $triggersFromMonitoredHosts         triggers that are relevant to filtering
+ * @param array $subSysmapTriggerIdToSelementIds    a map of triggers in sysmaps to selement IDs
  *
  * @return array
  */
-function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggers) {
+function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggersFromMonitoredHosts, array $subSysmapTriggerIdToSelementIds) {
+	// pick only host, host group or map selements
+	$filterableSelements = array();
+	foreach ($selements as $selementId => $selement) {
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+			$filterableSelements[$selementId] = $selement;
+		}
+	}
 	// calculate list of triggers that might get removed from $selement['triggers']
 	$triggersToFilter = array();
-	foreach ($selements as $selementId => $selement) {
+	foreach ($filterableSelements as $selementId => $selement) {
 		foreach ($selement['triggers'] as $triggerId) {
-			$trigger = $triggers[$triggerId];
+			if (!isset($triggersFromMonitoredHosts[$triggerId])) {
+				continue;
+			}
+			$trigger = $triggersFromMonitoredHosts[$triggerId];
 			foreach ($trigger['hosts'] as $host) {
 				$hostId = $host['hostid'];
 				if (isset($selementHostApplicationFilters[$selementId][$hostId])) {
@@ -1209,18 +1224,20 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
 	$triggerApplications = array();
 	$hostIdToTriggers = array();
 	foreach ($triggersToFilter as $trigger) {
+		$triggerId = $trigger['triggerid'];
+
 		foreach ($trigger['items'] as $item) {
-			foreach ($items[$item['itemid']]['applications'] as $app) {
-				$triggerApplications[$trigger['triggerid']][$app['name']] = true;
+			foreach ($items[$item['itemid']]['applications'] as $application) {
+				$triggerApplications[$triggerId][$application['name']] = true;
 			}
 		}
 
 		foreach ($trigger['hosts'] as $host) {
-			$hostIdToTriggers[$host['hostid']][$trigger['triggerid']] = $trigger;
+			$hostIdToTriggers[$host['hostid']][$triggerId] = $trigger;
 		}
 	}
 
-	foreach ($selements as $selementId => &$selement) {
+	foreach ($filterableSelements as $selementId => &$selement) {
 		// walk through each host of a submap and apply its filters to all its triggers
 		foreach ($selement['hosts'] as $hostId) {
 			// skip hosts that don't have any filters or triggers to filter
@@ -1231,17 +1248,30 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
 			// remove the triggers that don't have applications or don't match the filter
 			$filteredApplicationNames = $selementHostApplicationFilters[$selementId][$hostId];
 			foreach ($hostIdToTriggers[$hostId] as $trigger) {
-				$applicationNamesForTrigger = isset($triggerApplications[$trigger['triggerid']])
-					? array_keys($triggerApplications[$trigger['triggerid']])
+				$triggerId = $trigger['triggerid'];
+
+				// skip if this trigger is standalone trigger and those are not filtered
+				if (isset($subSysmapTriggerIdToSelementIds[$triggerId])
+						&& isset($subSysmapTriggerIdToSelementIds[$triggerId][$selementId])) {
+					continue;
+				}
+
+				$applicationNamesForTrigger = isset($triggerApplications[$triggerId])
+					? array_keys($triggerApplications[$triggerId])
 					: array();
 
 				if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
-					unset($selement['triggers'][$trigger['triggerid']]);
+					unset($selement['triggers'][$triggerId]);
 				}
 			}
 		}
 	}
 	unset($selement);
+
+	// put back updated selements
+	foreach ($filterableSelements as $selementId => $selement) {
+		$selements[$selementId] = $selement;
+	}
 
 	return $selements;
 }
