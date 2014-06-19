@@ -98,19 +98,8 @@ if (hasRequest('filter_set')) {
 	}
 
 	// ack status
-	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
-
-	if (hasRequest('ack_status')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			$ackStatus = ZBX_ACK_STS_ANY;
-		}
-
-		CProfile::update('web.overview.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
-	}
-
-	// status change days
-	if (hasRequest('status_change_days')) {
-		CProfile::update('web.overview.filter.status_change_days', getRequest('status_change_days'), PROFILE_TYPE_INT);
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
+		CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
 	}
 
 	// update host inventory filter

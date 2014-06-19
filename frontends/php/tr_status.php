@@ -123,26 +123,13 @@ if (hasRequest('filter_set')) {
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
-
-	if (hasRequest('show_events')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			if (!str_in_array($showEvents, array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
-				$showEvents = EVENTS_OPTION_NOEVENT;
-			}
-		}
-
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED || $showEvents != EVENTS_OPTION_NOT_ACK) {
 		CProfile::update('web.tr_status.filter.show_events', $showEvents, PROFILE_TYPE_INT);
 	}
 
 	// ack status
-	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
-
-	if (hasRequest('ack_status')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			$ackStatus = ZBX_ACK_STS_ANY;
-		}
-
-		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
+		CProfile::update('web.tr_status.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
 	}
 
 	// update host inventory filter
