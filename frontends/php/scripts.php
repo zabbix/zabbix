@@ -60,7 +60,7 @@ check_fields($fields);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
@@ -302,7 +302,7 @@ else {
 
 	// sorting & paging
 	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['scripts'], array('scriptid'));
+	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view
 	$scriptView = new CView('administration.script.list', $data);

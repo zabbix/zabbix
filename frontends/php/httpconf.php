@@ -76,7 +76,7 @@ $fields = array(
 $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $showDisabled = getRequest('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_INT);
@@ -564,7 +564,7 @@ else {
 
 		order_result($httpTests, $sortField, getPageSortOrder());
 
-		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
+		$data['paging'] = getPagingLine($httpTests);
 
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.

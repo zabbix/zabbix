@@ -47,7 +47,7 @@ if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
+validate_sort_and_sortorder('name', ZBX_SORT_DOWN, array('hostname', 'name'));
 
 $options = array(
 	'groups' => array(
