@@ -1079,6 +1079,8 @@ static void	DCsync_items(DB_RESULT result)
 
 	DB_ROW			row;
 
+	ZBX_DC_HOST		*host;
+
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_NUMITEM		*numitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
@@ -1125,7 +1127,9 @@ static void	DCsync_items(DB_RESULT result)
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
-		delay = atoi(row[15]);
+
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
 
 		/* array of selected items */
 		zbx_vector_uint64_append(&ids, itemid);
@@ -1225,9 +1229,10 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
+		delay = atoi(row[15]);
 		old_poller_type = item->poller_type;
 
-		if (ITEM_STATUS_ACTIVE == item->status)
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
 			item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
 
@@ -1239,26 +1244,17 @@ static void	DCsync_items(DB_RESULT result)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (0 == found)
-			{
-				old_nextcheck = 0;
+			old_nextcheck = (0 == found ? 0 : item->nextcheck);
 
+			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
+					(ITEM_STATE_NORMAL == item->state && delay != item->delay)))
+			{
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
 					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 							item->type, config->config->refresh_unsupported, NULL, now);
 				}
 				else
-				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, delay, row[16], now);
-				}
-			}
-			else
-			{
-				old_nextcheck = item->nextcheck;
-
-				if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 				{
 					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 							item->type, delay, row[16], now);
@@ -1356,7 +1352,8 @@ static void	DCsync_items(DB_RESULT result)
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
-					ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
+					ZBX_NO_POLLER != item->poller_type && ITEM_STATE_NOTSUPPORTED != item->state &&
+					old_nextcheck == item->nextcheck)
 			{
 				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 						item->delay, flexitem->delay_flex, now);
@@ -1369,7 +1366,8 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(flexitem->delay_flex);
 			zbx_hashset_remove(&config->flexitems, &itemid);
 
-			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
+			if (ZBX_NO_POLLER != item->poller_type && ITEM_STATE_NOTSUPPORTED != item->state &&
+					old_nextcheck == item->nextcheck)
 			{
 				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
 						item->delay, NULL, now);
@@ -2907,7 +2905,7 @@ void	DCsync_configuration(void)
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result);
+	DCsync_items(item_result);	/* relies on host status, must be after DCsync_hosts() */
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
