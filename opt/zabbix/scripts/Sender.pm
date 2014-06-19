@@ -11,9 +11,10 @@ use Net::Domain;
 
 require Exporter;
 our @ISA = qw(Exporter);
-@Zabbix::Sender::EXPORT = qw(send_arrref);
+@Zabbix::Sender::EXPORT = qw(send_arrref sender_err);
 
 my %ZOPTS;
+my $err_msg = "";
 
 sub new
 {
@@ -47,8 +48,13 @@ sub keepalive { return $ZOPTS{'keepalive'} }
 sub _last_sent { return $ZOPTS{'_last_sent'} }
 sub _json { return $ZOPTS{'_json'} }
 
-sub _socket
-{
+sub _sender_err {
+    my $self = shift;
+
+    $err_msg = join('', @_);
+}
+
+sub _socket {
     my $self = shift;
 
     return $ZOPTS{'_socket'} unless (@_);
@@ -137,13 +143,12 @@ sub send_arrref {
         }
     }
 
-    if ($status) {
-        return 1;
-    }
-    else {
-        return;
-    }
+    return 1 if ($status == 1);
+    return;
+}
 
+sub sender_err {
+    return $err_msg;
 }
 
 sub _send {
@@ -156,7 +161,11 @@ sub _send {
         sleep $sleep;
     }
 
-    $self->_connect() unless $self->_socket();
+    unless ($self->_socket()) {
+	unless ($self->_connect() == 1) {
+	    return;
+	}
+    }
     $self->_socket()->send( $self->_encode_request( $data_ref ) );
     my $Select  = IO::Select::->new($self->_socket());
     my @Handles = $Select->can_read( $self->timeout() );
@@ -170,12 +179,9 @@ sub _send {
         }
     }
     $self->_disconnect() unless $self->keepalive();
-    if ($status) {
-        return $status;
-    }
-    else {
-        return;
-    }
+
+    return $status if ($status);
+    return;
 }
 
 sub _connect {
@@ -186,7 +192,12 @@ sub _connect {
         PeerPort => $self->port(),
         Proto    => 'tcp',
         Timeout  => $self->timeout(),
-    ) or die("Could not create socket (".$self->server().":".$self->port()."): $!");
+    );
+
+    if (!$Socket) {
+	$self->_sender_err("cannot create socket (".$self->server().":".$self->port()."): $!");
+	return 0;
+    }
 
     $self->_socket($Socket);
 

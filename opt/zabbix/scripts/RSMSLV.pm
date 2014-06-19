@@ -815,7 +815,7 @@ sub send_values
 
 	unless (defined($sender->send_arrref(\@suba)))
 	{
-	    wrn("cannot send data to Zabbix server:");
+	    my $msg = "Cannot send data to Zabbix server: " . $sender->sender_err() . ". The query was:\n";
 
 	    foreach my $entry (@suba)
 	    {
@@ -825,8 +825,10 @@ sub send_values
 
 		$line .= '}';
 
-		wrn($line);
+		$msg .= "  $line\n";
 	    }
+
+	    fail($msg);
 	}
     }
 }
@@ -1337,27 +1339,23 @@ sub dbg
 {
     return unless (defined($OPTS{'debug'}));
 
-    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [DBG] ', @_, "\n"));
+    __log('DBG', join('', @_));
 }
 
 sub info
 {
-    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
+
+    __log('INF', join('', @_));
 }
 
 sub wrn
 {
-    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
+    __err('WRN', join('', (defined($tld) ? "$tld: " : ''), @_));
 }
 
 sub fail
 {
-    my $msg = join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n");
-
-    # log failures to the general log (not TLD-specific)
-    $tld = undef;
-
-    __log($msg);
+    __err('ERR', join('', (defined($tld) ? "$tld: " : ''), @_));
 
     exit(FAIL);
 }
@@ -1458,20 +1456,34 @@ sub __write_log
 
 sub __log
 {
+    my $msg_prefix = shift;
     my $msg = shift;
+    my $file = shift;
 
-    if (defined($OPTS{'debug'}) or
-	not defined($config) or
+    if (not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
     {
-	print($msg);
+	my $line = ts_str() . " [$msg_prefix] " . (defined($tld) ? "$tld: " : '') . $msg . "\n";
+	print($line);
 	return;
     }
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log';
+    $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log' unless (defined($file));
 
-    __write_log($file, $msg);
+    my $line = ts_str() . " [$msg_prefix] " . $msg . "\n";
+
+    __write_log($file, $line);
+}
+
+sub __err
+{
+    my $msg_prefix = shift;
+    my $msg = shift;
+
+    my $file = $config->{'slv'}->{'logdir'} . '/' . __script() . '.err';
+
+    __log($msg_prefix, $msg, $file);
 }
 
 sub __get_macro
