@@ -29,6 +29,54 @@ class CTableInfo extends CTable {
 		$this->attributes['cellspacing'] = 1;
 		$this->headerClass = 'header';
 		$this->footerClass = 'footer';
+		$this->addMakeVerticalRotationJs = false;
+	}
+
+	public function toString($destroy = true) {
+		$tableId = $this->getAttribute('id');
+
+		if(!$tableId) {
+			$tableId = uniqid('t');
+			$this->setAttribute('id', $tableId);
+		}
+
+		$string = parent::toString($destroy);
+
+		if($this->addMakeVerticalRotationJs) {
+			$string .= get_js(
+				'var makeVerticalRotationForTable = function() {
+					var table = jQuery("#'.$tableId.'");
+
+					table.makeVerticalRotation();
+
+					if (IE8) {
+						jQuery(".vertical_rotation_inner", table).css({
+							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
+						});
+					}
+					else if (IE9) {
+						jQuery(".vertical_rotation_inner", table).css({
+							"-ms-transform": "rotate(270deg)"
+						});
+					}
+
+					if (!IE9) {
+						jQuery(".vertical_rotation_inner", table).css({
+							"writing-mode": "tb-rl"
+						});
+					}
+				}
+
+				if(!jQuery.isReady) {
+					jQuery(document).ready(makeVerticalRotationForTable);
+				}
+				else {
+					makeVerticalRotationForTable();
+				}',
+			true);
+		}
+
+		return $string;
 	}
 
 	/**
@@ -36,109 +84,6 @@ class CTableInfo extends CTable {
 	 * Cells must be marked with "vertical_rotation" class.
 	 */
 	public function makeVerticalRotation() {
-		if (!defined('IS_VERTICAL_ROTATION_JS_INSERTED')) {
-			define('IS_VERTICAL_ROTATION_JS_INSERTED', true);
-
-			insert_js(
-				'jQuery(function($) {
-					$.fn.makeVerticalRotation = function () {
-						var cellsToRotate = $(".vertical_rotation", this),
-							betterCells = [];
-
-						// insert spans
-						cellsToRotate.each(function () {
-							var cell = $(this);
-
-							var text = $("<span>", {
-								text: $.escapeHtml(cell.text())
-							});
-
-							if (IE) {
-								text.css({"font-family": "monospace"});
-							}
-
-							cell.text("").append(text);
-						});
-
-						// rotate cells
-						cellsToRotate.each(function () {
-							var cell = $(this),
-								span = cell.children(),
-								height = cell.height(),
-								width = span.width(),
-								transform = (width / 2) + "px " + (width / 2) + "px";
-
-							var css = {
-								"transform-origin": transform,
-								"-webkit-transform-origin": transform,
-								"-moz-transform-origin": transform,
-								"-o-transform-origin": transform
-							};
-
-							if (IE) {
-								css["font-family"] = "monospace";
-								css["-ms-transform-origin"] = "50% 50%";
-							}
-
-							if (IE9) {
-								css["-ms-transform-origin"] = transform;
-							}
-
-							var divInner = $("<div>", {
-								"class": "vertical_rotation_inner"
-							})
-							.css(css)
-							.append(span.text());
-
-							var div = $("<div>", {
-								height: width,
-								width: height
-							})
-							.append(divInner);
-
-							betterCells.push(div);
-						});
-
-						cellsToRotate.each(function (i) {
-							$(this).html(betterCells[i]);
-						});
-
-						// align text to cell center
-						cellsToRotate.each(function () {
-							var cell = $(this),
-								width = cell.width();
-
-							if (width > 30) {
-								cell.children().css({
-									position: "relative",
-									left: width / 2 - 12
-								});
-							}
-						});
-					};
-				});
-
-				jQuery(document).ready(function() {
-					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
-
-					if (IE8) {
-						jQuery(".vertical_rotation_inner").css({
-							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
-						});
-					}
-					else if (IE9) {
-						jQuery(".vertical_rotation_inner").css({
-							"-ms-transform": "rotate(270deg)"
-						});
-					}
-
-					if (!IE9) {
-						jQuery(".vertical_rotation_inner").css({
-							"writing-mode": "tb-rl"
-						});
-					}
-				});'
-			, true);
-		}
+		$this->addMakeVerticalRotationJs = true;
 	}
 }
