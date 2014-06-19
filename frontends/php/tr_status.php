@@ -217,7 +217,7 @@ validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN, array('priority', 'last
 /*
  * Display
  */
-$triggerWidget = new CWidget(null, 'trigger-mon');
+$triggerWidget = new CWidget();
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
