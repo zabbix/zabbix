@@ -21,19 +21,25 @@
 
 function init_mbstrings() {
 	$res = true;
-	$res &= mbstrings_available();
-	ini_set('mbstring.internal_encoding', 'UTF-8');
-	$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
+	$res &= extension_loaded('mbstring');
+
+	if (version_compare(PHP_VERSION, '5.6', '<')) {
+		ini_set('mbstring.internal_encoding', 'UTF-8');
+		$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
+	} else {
+		ini_set('default_charset', 'UTF-8');
+		$res &= (ini_get('default_charset') == 'UTF-8');
+		ini_set('php.internal_encoding', 'UTF-8');
+		$res &= (ini_get('php.internal_encoding') == 'UTF-8');
+	}
+
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
 	if ($res) {
 		define('ZBX_MBSTRINGS_ENABLED', true);
 	}
+	var_dump($res);
 	return $res;
-}
-
-function mbstrings_available() {
-	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
 }
 
 /**
