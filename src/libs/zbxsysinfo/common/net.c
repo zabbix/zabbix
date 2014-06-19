@@ -32,7 +32,7 @@
 #endif
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		int(*validate_func)(const char *), const char *sendtoclose, int *value_int)
+		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	const char	*buf;
