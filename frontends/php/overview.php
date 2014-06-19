@@ -151,7 +151,7 @@ $type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
 if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
-$viewStyle = CProfile::get('web.overview.view_style', SHOW_TRIGGERS);
+$viewStyle = CProfile::get('web.overview.view_style', STYLE_TOP);
 
 if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
 	$showTriggers = TRIGGERS_OPTION_ALL;
