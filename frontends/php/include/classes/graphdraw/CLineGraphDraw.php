@@ -1391,7 +1391,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// first && last
 		// start
-		$str = zbx_date2str(_('d.m H:i'), $this->stime);
+		$str = zbx_date2str(_x('d.m H:i', DATE_FORMAT_CONTEXT), $this->stime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText(
 			$this->im,
@@ -1406,7 +1406,7 @@ class CLineGraphDraw extends CGraphDraw {
 		// end
 		$endtime = $this->to_time;
 
-		$str = zbx_date2str(_('d.m H:i'), $endtime);
+		$str = zbx_date2str(_x('d.m H:i', DATE_FORMAT_CONTEXT), $endtime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText(
 			$this->im,
