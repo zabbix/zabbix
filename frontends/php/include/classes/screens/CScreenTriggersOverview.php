@@ -36,7 +36,7 @@ class CScreenTriggersOverview extends CScreenBase {
 			'preservekeys' => true
 		));
 
-		$hostIds = zbx_objectValues($hosts, 'hostid');
+		$hostIds = array_keys($hosts);
 
 		$options = array(
 			'output' => array(
