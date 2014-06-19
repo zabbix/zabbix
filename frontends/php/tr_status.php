@@ -261,7 +261,7 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'showMaintenance' => $showMaintenance,
 		'hostId' => getRequest('hostid'),
 		'groupId' => getRequest('groupid'),
-		'fullScreen' => getRequest('fullScreen')
+		'fullScreen' => getRequest('fullscreen')
 	)
 ));
 $filterForm = $filterFormView->render();
