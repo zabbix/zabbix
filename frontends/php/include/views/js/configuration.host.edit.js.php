@@ -7,6 +7,10 @@
 	</td>
 	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
+		<div class="interface-bulk">
+			<input class="input checkbox pointer" type="checkbox" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
+			Use bulk requests
+		</div>
 	</td>
 	<td class="interface-dns">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" maxlength="64" value="#{iface.dns}" />
@@ -148,7 +152,8 @@
 				disabled: '',
 				checked_dns: '',
 				checked_ip: '',
-				checked_main: ''
+				checked_main: '',
+				checked_bulk: ''
 			};
 
 			if (hostInterface.items) {
@@ -164,6 +169,10 @@
 
 			if (hostInterface.main) {
 				attrs.checked_main = 'checked="checked"';
+			}
+
+			if (hostInterface.bulk == 1) {
+				attrs.checked_bulk = 'checked="checked"';
 			}
 
 			return attrs;
@@ -219,7 +228,8 @@
 				useip: 1,
 				type: getHostInterfaceNumericType(hostInterfaceType),
 				port: ports[hostInterfaceType],
-				ip: '127.0.0.1'
+				ip: '127.0.0.1',
+				bulk: 1
 			};
 
 			newInterface.interfaceid = 1;
@@ -308,7 +318,7 @@
 			disable: function() {
 				jQuery('.interface-drag-control, .interface-control').html('');
 				jQuery('.interfaceRow').find('input').attr('readonly', true);
-				jQuery('.interfaceRow').find('input[type="radio"]').attr('disabled', true);
+				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
 				jQuery('.interface-connect-to').find('input').button('disable');
 			}
 		}

@@ -43,6 +43,8 @@
 .hostprototype-edit .interface-row .interface-port { width: 11em; }
 .host-edit .interface-row .interface-default,
 .hostprototype-edit .interface-row .interface-default { width: 4em; }
+.host-edit .interface-row .interface-bulk,
+.hostprototype-edit .interface-row .interface-bulk { height: 25px; margin-top: 5px; }
 .host-edit .interface-row-first .dd,
 .hostprototype-edit .interface-row-first .dd { padding-top: 2px; }
 .host-edit .interface-row-first .objectgroup,
