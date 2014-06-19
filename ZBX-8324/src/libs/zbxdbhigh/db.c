@@ -1255,7 +1255,8 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 	if (MAX_EXPRESSIONS < num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 
 	for (i = 0; i < num; i++)
 	{
@@ -1263,11 +1264,15 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 		{
 			cnt = 0;
 			(*sql_offset)--;
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 		}
 
 		value_esc = DBdyn_escape_string(values[i]);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s',", value_esc);
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");
 		zbx_free(value_esc);
 
 		cnt++;
