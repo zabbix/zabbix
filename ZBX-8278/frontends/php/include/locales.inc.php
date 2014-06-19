@@ -41,7 +41,7 @@ function init_mbstrings() {
 	if ($res) {
 		define('ZBX_MBSTRINGS_ENABLED', true);
 	}
-	var_dump($res);
+
 	return $res;
 }
 
