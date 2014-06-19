@@ -862,7 +862,6 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
 				(const char **)names.values, names.values_num);
 

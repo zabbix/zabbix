@@ -442,12 +442,12 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				" from hosts"
 				" where status in (%d,%d,%d)"
 					" and flags<>%d"
-					" and ",
+					" and",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (");
 
 		if (0 != tnames.values_num)
 		{
@@ -456,7 +456,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		}
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or");
 
 		if (0 != vnames.values_num)
 		{
@@ -1108,8 +1108,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where");
-
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
 				(const char **)names.values, names.values_num);
 

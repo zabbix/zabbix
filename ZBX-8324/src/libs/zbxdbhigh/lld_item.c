@@ -470,7 +470,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				" where hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "key_",
 				(const char **)keys.values, keys.values_num);
 

@@ -900,7 +900,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.description",
 				(const char **)descriptions.values, descriptions.values_num);
 
