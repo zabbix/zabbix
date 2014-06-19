@@ -173,6 +173,10 @@ elseif (isset($_REQUEST['save'])) {
 			);
 			DBend(true);
 			ob_end_clean();
+
+			// update auto-login cookie
+			CWebUser::setSessionCookie(CWebUser::getCurrentSessionId(), $user['autologin']);
+
 			redirect(CWebUser::$data['last_page']['url']);
 		}
 		else {
