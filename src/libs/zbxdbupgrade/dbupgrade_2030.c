@@ -1115,6 +1115,14 @@ static int	DBpatch_2030105(void)
 
 	return DBadd_field("httpstep", &field);
 }
+
+static int	DBpatch_2030106(void)
+{
+	const ZBX_FIELD	field = {"bulk", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -1226,5 +1234,6 @@ DBPATCH_ADD(2030102, 0, 1)
 DBPATCH_ADD(2030103, 0, 1)
 DBPATCH_ADD(2030104, 0, 1)
 DBPATCH_ADD(2030105, 0, 1)
+DBPATCH_ADD(2030106, 0, 1)
 
 DBPATCH_END()
