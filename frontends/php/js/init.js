@@ -130,11 +130,12 @@ jQuery(function($) {
 				}
 			}
 		}
-		else {
+		else if (typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
-			if (typeof addPopupValues !== 'undefined') {
-				addPopupValues(data);
-			}
+			addPopupValues(data);
+		}
+		else {
+			jQuery('#' + data.parentId).val(data.values[0].name);
 		}
 	});
 
