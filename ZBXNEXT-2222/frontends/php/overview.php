@@ -221,13 +221,14 @@ if ($type == SHOW_TRIGGERS) {
 		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
 		'preservekeys' => true
 	));
+	$hostIds = array_keys($hosts);
 
 	$options = array(
 		'output' => array(
 			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 		),
 		'selectHosts' => array('hostid', 'name', 'status'),
-		'hostids' => zbx_objectValues($hosts, 'hostid'),
+		'hostids' => $hostIds,
 		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
@@ -252,7 +253,7 @@ if ($type == SHOW_TRIGGERS) {
 	if ($filter['application'] !== '') {
 		$applications = API::Application()->get(array(
 			'output' => array('applicationid'),
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'hostids' => $hostIds,
 			'search' => array('name' => $filter['application'])
 		));
 		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
