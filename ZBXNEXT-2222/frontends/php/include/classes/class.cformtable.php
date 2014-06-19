@@ -139,10 +139,13 @@ class CFormTable extends CForm {
 		$this->bottom_items->addItem($value);
 	}
 
+	/**
+	 * Sets the class for the table element.
+	 *
+	 * @param string $class
+	 */
 	public function setTableClass($class) {
-		if (is_string($class)) {
-			$this->tableclass = $class;
-		}
+		$this->tableclass = $class;
 	}
 
 	public function bodyToString() {
