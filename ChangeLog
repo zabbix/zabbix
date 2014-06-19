@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish, Russian and Slovak t
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F.I..... [ZBX-7921] fixed default values for screen item colspan/rowspan to 1 in frontend and database (Krists, wiper)
 ..F....... [ZBX-8288] fixed problems with vertical table headers sometimes being offset (Krists)
 ...G...... [ZBX-8213] fixed possible crash when processing eventlog on Windows 2000,2003,XP (wiper)
 .......PS. [ZBX-8040] wait for proper SMTP response before sending first command (wiper)
