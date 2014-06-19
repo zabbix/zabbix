@@ -1,6 +1,7 @@
 Changes for 2.2.4rc4
 
 Bug fixes:
+...G...... [ZBX-8213] fixed possible crash when processing eventlog on Windows 2000,2003,XP (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc3
