@@ -1,0 +1,245 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2014 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+/* messages */
+div.messagecontainer { position: absolute; top: 84px; right: 0; background-color: #94A1BB; border: 2px solid #FFFFFF; z-index: 1000; }
+div.messagecontainer .header { height: 18px; padding: 2px 80px 2px 2px; margin: 0 2px 0 2px; }
+div.messagecontainer .header .headertext { font-weight: bold; color: #FFFFFF; font-size: 10pt; margin: 0; }
+div.messagecontainer .header .controls { position: absolute; right: 1px; top: 2px; }
+div.messagecontainer ul { clear: right; padding: 0; margin: 0 0 2px 1px; list-style: none; }
+div.messagecontainer ul li.listItem { margin: 1px 2px 1px 2px; border: 1px solid #FFFFFF; }
+div.messagecontainer ul li.listItem .message { white-space: nowrap; }
+div.messagecontainer .message .messagebox {
+	color: #EAEAEA; padding: 0 22px 2px 6px; margin-left: 20px; background-color: #4F4F4F;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+div.messagecontainer .message .messagebox span.title { line-height: 22px; font-size: 10pt; font-weight: bold; white-space: nowrap; }
+div.messagecontainer .messagebox span.title a { font-size: 10pt; color: #EAEAEA; white-space: nowrap; line-height: 22px; }
+div.messagecontainer .messagebox span.body { line-height: 14px; font-size: 7pt; white-space: nowrap; }
+div.messagecontainer .messagebox span.body a { color: #EAEAEA; line-height: 14px; font-size: 7pt; white-space: nowrap; }
+#message-global-wrap { z-index: 999; display: none; position: fixed; left: 25%; right: 25%; text-align : center; padding: 0 10px 10px; }
+#message-global { color: #FFF; background-color: #C33; border: 5px solid #C33; border-radius: 5px; font-size: 1.5em; }
+
+/* scrollbar */
+div.scrollbar {
+	position: relative; border: 1px #4F6FA8 solid; height: 56px; background-color: #DDDDDD; margin: 0 auto; line-height: 1em;
+}
+div.scrollbar .info { height: 14px; font-size: 10px; vertical-align:bottom; }
+div.scrollbar .info .zoom { float: left; border: 0 #FF00FF solid; white-space:nowrap; height: 14px; line-height: 14px; }
+div.scrollbar .info .zoom .text { padding-left: 2px; padding-right: 5px; font-weight: bold; font-size: 11px; color: #333333; }
+div.scrollbar .info .zoom .links { font-size: 10px; white-space: nowrap; }
+div.scrollbar .info .zoom .links .link { padding-left: 3px; padding-right: 3px; line-height: 14px; vertical-align: top; }
+div.scrollbar .info .timeline {
+	float: right; border: 0 #FF00FF solid; white-space: nowrap; height: 14px; font-size: 10px; vertical-align: bottom;
+}
+div.scrollbar .info .timeline .info_left {
+	border: 0 black solid; padding-right: 5px; line-height: 12px; vertical-align: bottom; text-decoration: none;
+}
+div.scrollbar .info .timeline .info_sep1 {
+	border: 0 black solid; padding-right: 5px; line-height: 14px; vertical-align: bottom;
+}
+div.scrollbar .info .timeline .info_right {
+	border: 0 black solid; padding-right: 2px; line-height: 12px; vertical-align: bottom; text-decoration: none;
+}
+div.scrollbar .sublevel .bg { height: 27px; background: url(../images/general/bar/bg.png) repeat-x; }
+div.scrollbar .sublevel .left {
+	float: left; width: 17px; height: 27px; background-image: url(../images/general/bar/left.png); cursor: pointer;
+}
+div.scrollbar .sublevel .right {
+	float: right; width: 17px; height: 27px; background-image: url(../images/general/bar/right.png); cursor: pointer;
+}
+div.scrollbar .overlevel { position:absolute; top: 14px; border: 0 green solid; height: 27px; left: 17px; }
+div.scrollbar .overlevel .bar {
+	position:absolute; left: 74px; width: 140px; height: 25px; border: 1px black solid; z-index: 1;
+}
+div.scrollbar .overlevel .bar .icon {
+	position: relative; height: 25px; background: url(../images/general/bar/bar_bg.png) repeat-x;
+}
+div.scrollbar .overlevel .bar .icon .center {
+	background: url(../images/general/bar/bar_middle.png) no-repeat center; height: 25px;
+}
+div.scrollbar .overlevel .ghost {
+	position: absolute; top: 0; left: 74px; height: 25px; width: 140px; line-height: 25px; border: 1px black solid;
+}
+div.scrollbar .overlevel .left_arr {
+	position: absolute; top: 8px; left: 70px; width: 9px; height: 13px; z-index: 99; cursor: e-resize;
+	background-image: url(../images/general/bar/left_arr.png);
+}
+div.scrollbar .overlevel .right_arr {
+	position: absolute; top: 8px; left: 211px; width: 9px; height: 13px; z-index: 99;
+	background-image: url(../images/general/bar/right_arr.png); cursor: e-resize;
+}
+div.scrollbar .subline { height: 14px; border: 0 blue solid;}
+div.scrollbar .subline .nav_links {
+	float: left; border: 0 black solid; padding-left: 2px; padding-right: 5px; line-height: 12px;
+}
+div.scrollbar .subline .nav_links .link { padding-left: 3px; padding-right: 3px; line-height: 10px; vertical-align: top; }
+div.scrollbar .subline .nav_links .text { line-height: 12px; vertical-align: top; color: #333333; }
+div.scrollbar .subline .period { float: right; width: 60px; text-align: right; }
+div.scrollbar .subline .period .period_state_begin { padding-left: 2px; line-height: 12px; color: #888888; }
+div.scrollbar .subline .period .period_state_end { padding-right: 2px; line-height: 12px; color: #888888; }
+div.scrollbar .subline .period .period_state { line-height: 12px; color: #888888; }
+div.scrollbar .subline .info_period {
+	float: right; padding-left: 2px; padding-right: 2px; line-height: 14px; vertical-align: bottom; color: #333333;
+}
+
+/* gtlc - time control */
+div#selection_box {
+	position: absolute; filter: alpha(opacity=40); opacity: .40; background-color: #0000FF; border: 1px black solid;
+	width: 1px; height: 1px; z-index: 4; overflow: hidden;
+}
+div.box_on { position: absolute; z-index: 99; border: 0 red solid; }
+span#period_span { font-weight: bold; font-size: 11px; color: #FFFFFF; position: absolute; top: 2px; right: 4px; text-decoration: none; }
+
+/* calendar */
+div.calendar { position: absolute; width: 180px; top: 10px; right: 30px; border: 1px blue solid; z-index: 100; }
+div.calendardays { border: 1px orange solid; }
+div.calendartime { background-color: #DDEEFF; text-align: center; padding-top: 2px; padding-bottom: 2px; height: 42px; }
+div.calendar input[type="button"] {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; border: 1px solid #00888B; background: #AADDEE; cursor: pointer;
+}
+table.calendarhat {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; text-align: center; background-color: #DDEEFF; font-weight: bold;
+}
+table.calendarhat tr td { height: 18px; width: 22px; }
+table.calendarhat tr td.long { text-align: center; width: 116px; overflow: hidden; }
+table.calendartab {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; text-align: center; background-color: #EEEEEE; border-spacing: 1px;
+}
+table.calendartab tr.header td:hover { cursor:default; }
+table.calendartab tr td { height: 18px; width: 22px; background-color: #FFFFFF; }
+table.calendartab tr td:hover { cursor: pointer; }
+table.calendartab tr td.holiday { background-color: #AADDEE; }
+table.calendartab tr td.grey { color: #AFAFAF; }
+table.calendartab tr td.selected { background-color: #008888; color: #eeeeee; }
+div.calendar span.title { text-align: center; color: #000099; }
+div.calendar span.clndr_left_arrow { padding-left: 5px; }
+div.calendar span.clndr_left_arrow:hover { cursor: pointer; }
+div.calendar span.clndr_right_arrow { padding-right: 5px; }
+div.calendar span.clndr_right_arrow:hover { cursor: pointer; }
+div.calendar input.calendar_textbox {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; text-align: center; width: 26px;
+	height: 14px; vertical-align: middle;
+}
+
+/* menu */
+.pum_o_item {
+	font-family: sans-serif; font-size: 12px; text-decoration: none; background-color: #ECECFF; border: black 1px solid;
+	margin: 0; overflow: hidden;
+}
+.pum_o_item:hover { cursor: pointer; text-decoration: underline; background-color: #FDFDFF; }
+.pum_i_item { margin: 3px 0 0 8px; white-space: nowrap; overflow: hidden; }
+
+/* menu menu item with submenu */
+.pum_b_submenu {
+	font-family: sans-serif; font-size: 12px; text-decoration: none; font-weight: bold;
+	background: #ECECFF; border: black 1px solid; margin: 0;
+}
+.pum_b_submenu:hover { cursor: pointer; text-decoration: none; background-color: #FDFDFF; }
+.pum_o_submenu {
+	font-family: sans-serif; font-size: 12px; text-decoration: none; background: #ECECFF;
+	border: black 1px solid; margin: 0;
+}
+.pum_o_submenu:hover { cursor:pointer; text-decoration: none; background-color: #FDFDFF; }
+.pum_i_submenu { margin: 3px 0 0 8px; }
+.pum_oheader {
+	cursor: default; text-decoration: none; border: black 1px solid; margin: 0;
+	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
+}
+.pum_oheader:hover { text-decoration: none; }
+.pum_iheader { color: #FFFFFF; font-weight: bold; margin: 3px 0 0 8px; }
+
+/* hint box */
+div.hintbox {
+	top: 0; z-index: 1000; position: absolute; background-color: #FFFFE0; padding: 2px; font-size: 1em;
+	line-height:15px; border: 1px solid black; border-left: none; border-top: none; color: #1F1F1F;
+}
+.hintbox > table > tbody > tr > td { overflow: hidden; }
+#hint_box {
+	top: 0; z-index: 100; position: absolute; background-color: #FFFFE0; padding: 2px; line-height: 15px; border-top: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt; border: 1px solid black; border-left: none; visibility: hidden;
+}
+
+/* search */
+#zbx_search { padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px; }
+#zbx_search input[type=text] {
+	margin-right: 0; vertical-align: top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD;
+}
+#zbx_search input.button { margin: 0 3px 0 0; height: 18px; line-height: 17px; padding-top: 0; padding-bottom: 0; }
+#search_wdgt { padding: 5px; }
+#search_wdgt .widget { display: inline-block; }
+
+/* triggers info */
+table.triggers_info { width: 100%; background-color: #FFFFFF; border: 0; }
+table.triggers_info tr td {
+	border: 0; white-space: nowrap; word-spacing: 0; padding: 0 5px; font-weight: bold; color: #191970;
+	font-size: 1.1em; height: 18px; text-align: left;
+}
+table.triggers_info tr td.header { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.triggers_info tr td { background-color: #CCCCCC; }
+
+/* hosts info */
+table.hosts_info { width: 100%; background-color: #FFFFFF; border: 1px gray dotted; }
+table.hosts_info tr td {
+	border: 0; white-space: nowrap; word-spacing: 0; padding-left: 5px; padding-right: 5px; font-weight: bold;
+	color: #191970; text-align: left; font-size: 1.1em;
+}
+table.hosts_info tr td.header { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.hosts_info tr td.avail { background-color: #99F099; }
+table.hosts_info tr td.notav { background-color: #F09999; }
+table.hosts_info tr td.uncn { background-color: #CCCCCC; }
+
+/* server info */
+table.server_info { width: 100%; background-color: #EFEFEF; border: 1px gray dotted; }
+table.server_info tr td { border: 0; padding-left: 5px; padding-right: 5px; text-align: left; font-size: 1.1em; background-color: #EFEFEF; white-space: nowrap; word-spacing: 0; }
+table.server_info tr td.header { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.server_info tr.status td { white-space: nowrap; word-spacing: 0; }
+
+/* screen table */
+table.screen_edit { background-color: #FFFFFF; width: 100%; border: 1px outset #DDDDDD; }
+table.screen_edit td { border: 1px inset #DDDDDD; text-align: center; vertical-align: middle; }
+table.screen_edit tr td.def_def { text-align: center; vertical-align: middle; }
+table.screen_edit tr td.def_top { text-align: center; vertical-align: top; }
+table.screen_edit tr td.def_mdl { text-align: center; vertical-align: middle; }
+table.screen_edit tr td.def_btm { text-align: center; vertical-align: bottom; }
+table.screen_edit tr td.left_top { text-align: left; vertical-align: top; }
+table.screen_edit tr td.left_mdl { text-align: left; vertical-align: middle; }
+table.screen_edit tr td.left_bttm { text-align: left; vertical-align: bottom; }
+table.screen_edit tr td.cntr_top { text-align: center; vertical-align: top; }
+table.screen_edit tr td.cntr_mdl { text-align: center; vertical-align: middle; }
+table.screen_edit tr td.cntr_bttm { text-align: center; vertical-align: bottom; }
+table.screen_edit tr td.right_top { text-align: right; vertical-align: top; }
+table.screen_edit tr td.right_mdl { text-align: right; vertical-align: middle; }
+table.screen_edit tr td.right_bttm { text-align: right; vertical-align: bottom; }
+table.screen_view { background-color: #FFFFFF; width: 100%; border: 1px #DDDDDD; }
+table.screen_view td { border: 1px #DDDDDD; text-align: center; vertical-align: middle; }
+table.screen_view tr td.def_def { text-align: center; vertical-align: middle; }
+table.screen_view tr td.def_top { text-align: center; vertical-align: top; }
+table.screen_view tr td.def_mdl { text-align: center; vertical-align: middle; }
+table.screen_view tr td.def_btm { text-align: center; vertical-align: bottom; }
+table.screen_view tr td.left_top { text-align: left; vertical-align: top; }
+table.screen_view tr td.left_mdl { text-align: left; vertical-align: middle; }
+table.screen_view tr td.left_bttm { text-align: left; vertical-align: bottom; }
+table.screen_view tr td.cntr_top { text-align: center; vertical-align: top; }
+table.screen_view tr td.cntr_mdl { text-align: center; vertical-align: middle; }
+table.screen_view tr td.cntr_bttm { text-align: center; vertical-align: bottom; }
+table.screen_view tr td.right_top { text-align: right; vertical-align: top; }
+table.screen_view tr td.right_mdl { text-align: right; vertical-align: middle; }
+table.screen_view tr td.right_bttm { text-align: right; vertical-align: bottom; }
+table.screen_edit .draggable, table.screen_view .draggable { padding: 1px 1px 0 0; }
