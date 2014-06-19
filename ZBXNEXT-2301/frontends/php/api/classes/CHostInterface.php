@@ -469,7 +469,8 @@ class CHostInterface extends CApiService {
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
-					'port' => $interface['port']
+					'port' => $interface['port'],
+					'bulk' => $interface['bulk']
 				)
 			));
 			if ($interfacesToRemove) {
@@ -499,7 +500,8 @@ class CHostInterface extends CApiService {
 				'hostid' => $data['hostids'],
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
-				'port' => $interface['port']
+				'port' => $interface['port'],
+				'bulk' => $interface['bulk']
 			));
 		}
 

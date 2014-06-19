@@ -418,6 +418,10 @@ elseif (hasRequest('save')) {
 					continue;
 				}
 
+				if (!isset($interface['bulk'])) {
+					$interfaces[$key]['bulk'] = 0;
+				}
+
 				if ($interface['isNew']) {
 					unset($interfaces[$key]['interfaceid']);
 				}
