@@ -73,7 +73,7 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,		 null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
 $_REQUEST['debug_mode'] = get_request('debug_mode', 0);
@@ -465,7 +465,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['usergroups'], array('usrgrpid'));
+	$data['paging'] = getPagingLine($data['usergroups']);
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.list', $data);
