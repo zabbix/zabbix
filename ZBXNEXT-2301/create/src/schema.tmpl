@@ -224,6 +224,7 @@ FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ip		|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_PROXY
+FIELD		|bulk		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
 
@@ -1276,4 +1277,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030105	|2030105
+ROW		|2030106	|2030106
