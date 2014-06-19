@@ -175,7 +175,7 @@ elseif (isset($_REQUEST['save'])) {
 			ob_end_clean();
 
 			// update auto-login cookie
-			CWebUser::setSessionCookie(CWebUser::getCurrentSessionId(), $user['autologin']);
+			CWebUser::setSessionId(CWebUser::getSessionId(), $user['autologin']);
 
 			redirect(CWebUser::$data['last_page']['url']);
 		}
