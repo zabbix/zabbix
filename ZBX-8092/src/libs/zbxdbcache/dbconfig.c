@@ -1245,6 +1245,8 @@ static void	DCsync_items(DB_RESULT result)
 
 		if ('\0' != *row[16])
 		{
+			int	found;
+
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
 			delay_flex_changed = (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]));
