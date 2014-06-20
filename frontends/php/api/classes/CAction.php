@@ -463,6 +463,27 @@ class CAction extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+
+			foreach ($result as &$rule) {
+				// unset the fields that are returned in the filter
+				unset($rule['formula'], $rule['evaltype']);
+
+				if ($options['selectFilter'] !== null) {
+					$filter = $this->unsetExtraFields(
+						array($rule['filter']),
+						array('conditions', 'formula', 'evaltype'),
+						$options['selectFilter']
+					);
+					$filter = reset($filter);
+
+					if (isset($filter['conditions'])) {
+						$filter['conditions'] = array_values($filter['conditions']);
+					}
+
+					$rule['filter'] = $filter;
+				}
+			}
+			unset($rule);
 		}
 
 		// removing keys (hash -> array)
@@ -497,7 +518,7 @@ class CAction extends CApiService {
 	/**
 	 * Add actions
 	 *
-	 * @param _array $actions multidimensional array with actions data
+	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['expression']
 	 * @param array $actions[0,...]['description']
 	 * @param array $actions[0,...]['type'] OPTIONAL
@@ -511,121 +532,65 @@ class CAction extends CApiService {
 	public function create($actions) {
 		$actions = zbx_toArray($actions);
 
-		// check fields
-		$actionDbFields = array(
-			'name' => null,
-			'eventsource' => null
-		);
-		$duplicates = array();
-		foreach ($actions as $action) {
-			if (!check_db_fields($actionDbFields, $action)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect parameter for action "%1$s".', $action['name']));
-			}
-			if (isset($action['esc_period']) && $action['esc_period'] < SEC_PER_MIN && $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).', $action['name'], SEC_PER_MIN));
-			}
-			if (isset($duplicates[$action['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
-			}
-			else {
-				$duplicates[$action['name']] = $action['name'];
-			}
-		}
+		$this->validateCreate($actions);
 
-		$dbActions = $this->get(array(
-			'filter' => array('name' => $duplicates),
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => true,
-			'nopermissions' => true
-		));
-		foreach ($dbActions as $dbAction) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $dbAction['name']));
-		}
-
-		$createdActionIds = DB::insert('actions', $actions);
-
-		$conditions = array();
-		$operations = array();
-
-		$filterValidator = new CSchemaValidator($this->getFilterSchema());
-		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-
-		foreach ($actions as $actionNumber => &$action) {
-			$createdActionId = $createdActionIds[$actionNumber];
-
-			$action['actionid'] = $createdActionId;
-
+		// Set "evaltype" if specified in "filter" section of action.
+		foreach ($actions as &$action) {
 			if (isset($action['filter'])) {
-				$filterValidator->setObjectName($action['name']);
-				$this->checkValidator($action['filter'], $filterValidator);
-
-				foreach ($action['filter']['conditions'] as &$condition) {
-					$filterConditionValidator->setObjectName($action['name']);
-					$this->checkValidator($condition, $filterConditionValidator);
-					$condition['actionid'] = $createdActionId;
-					$conditions[] = $condition;
-				}
-				unset($condition);
-			}
-
-			if (!isset($action['operations']) || empty($action['operations'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect parameter for action "%1$s".', $action['name']));
-			}
-			else {
-				foreach ($action['operations'] as &$operation) {
-					$operation['actionid'] = $createdActionId;
-					$operations[] = $operation;
-				}
-				unset($operation);
+				$action['evaltype'] = $action['filter']['evaltype'];
 			}
 		}
 		unset($action);
-		$actions = zbx_toHash($actions, 'actionid');
 
-		self::validateConditions($conditions);
-		$conditions = $this->addConditions($conditions);
+		// Insert actions into db, get array of newly created action IDs back.
+		$actions = DB::save('actions', $actions);
 
+		// Collect conditions and operations to be created and set appropriate action ID.
+		$conditionsToCreate = array();
+		$operationsToCreate = array();
+
+		foreach ($actions as $actionId => &$action) {
+			if (isset($action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					$condition['actionid'] = $actionId;
+					$conditionsToCreate[] = $condition;
+				}
+			}
+
+			foreach ($action['operations'] as $operation) {
+				$operation['actionid'] = $actionId;
+				$operationsToCreate[] = $operation;
+			}
+		}
+		unset($action);
+
+		$createdConditions = $this->addConditions($conditionsToCreate);
+
+		// Group back created action conditions by action ID to be used for updating action formula.
 		$conditionsForActions = array();
-		foreach($conditions as $condition) {
+		foreach ($createdConditions as $condition) {
 			$conditionsForActions[$condition['actionid']][$condition['conditionid']] = $condition;
 		}
 
-		$actionUpdates = array();
+		// Update "formula" field if evaltype is custom expression.
 		foreach ($actions as $createdActionId => $action) {
 			if (isset($action['filter'])) {
-				$values = array('evaltype' => $action['filter']['evaltype']);
-
 				if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$formulaIds = array();
-					foreach ($conditionsForActions[$createdActionId] as $condition) {
-						$formulaIds[$condition['formulaid']] = $condition['conditionid'];
-					}
-
-					$values['formula'] = CConditionHelper::replaceLetterIds($action['filter']['formula'], $formulaIds);
+					$this->updateFormula($createdActionId, $action['filter']['formula'], $conditionsForActions[$createdActionId]);
 				}
-
-				$actionUpdates[] = array(
-					'values' => $values,
-					'where' => array('actionid' => $createdActionId)
-				);
 			}
 		}
-		if ($actionUpdates) {
-			DB::update('actions', $actionUpdates);
-		}
 
-		$this->validateOperations($operations);
-		$this->addOperations($operations);
+		// Add operations.
+		$this->addOperations($operationsToCreate);
 
-		return array('actionids' => $createdActionIds);
+		return array('actionids' => array_keys($actions));
 	}
 
 	/**
 	 * Update actions
 	 *
-	 * @param _array $actions multidimensional array with actions data
+	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['actionid']
 	 * @param array $actions[0,...]['expression']
 	 * @param array $actions[0,...]['description']
@@ -639,165 +604,95 @@ class CAction extends CApiService {
 	 */
 	public function update($actions) {
 		$actions = zbx_toArray($actions);
-		$actionIds = zbx_objectValues($actions, 'actionid');
+		$actions = zbx_toHash($actions, 'actionid');
+		$actionIds = array_keys($actions);
+
+		$actionsDb = $this->get(
+			array(
+				'actionids'        => $actionIds,
+				'editable'         => true,
+				'output'           => API_OUTPUT_EXTEND,
+				'preservekeys'     => true,
+				'selectOperations' => API_OUTPUT_EXTEND,
+				'selectFilter'     => array('formula', 'conditions')
+			)
+		);
+
+		$this->validateUpdate($actions, $actionsDb);
 
 		$actionUpdates = array();
 
-		$actionsDb = $this->get(array(
-			'actionids' => $actionIds,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectFilter' => array('formula', 'conditions')
-		));
+		$operationsToCreate = array();
+		$operationsToUpdate = array();
+		$operationIdsForDelete = array();
 
-		foreach ($actions as $action) {
-			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!'));
-			}
-		}
+		$conditionsToCreate = array();
+		$conditionsToUpdate = array();
+		$conditionIdsForDelete = array();
 
-		// check fields
-		$duplicates = array();
-		foreach ($actions as $action) {
-			$actionName = isset($action['name']) ? $action['name'] : $actionsDb[$action['actionid']]['name'];
+		$defaultConditionFields = array('conditiontype', 'operator', 'value');
 
-			if (!check_db_fields(array('actionid' => null), $action)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect parameters for action update method "%1$s".',
-					$actionName
-				));
-			}
-
-			// check if user changed esc_period for trigger eventsource
-			if (isset($action['esc_period'])
-					&& $action['esc_period'] < SEC_PER_MIN
-					&& $actionsDb[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
-					$actionName,
-					SEC_PER_MIN
-				));
-			}
-
-			$this->checkNoParameters($action, array('eventsource'), _('Cannot update "%1$s" for action "%2$s".'),
-				$actionName
-			);
-
-			if (!isset($action['name'])) {
-				continue;
-			}
-
-			if (isset($duplicates[$action['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
-			}
-			else {
-				$duplicates[$action['name']] = $action['name'];
-			}
-		}
-
-		$operationsCreate = array();
-		$operationsUpdate = array();
-		$operationIdsDelete = array();
-		$conditionsCreate = array();
-		$conditionsUpdate = array();
-		$conditionIdsDelete = array();
-
-		$filterValidator = new CSchemaValidator($this->getFilterSchema());
-		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-
-		foreach ($actions as $action) {
-			$actionId = $action['actionid'];
-
-			if (isset($action['name'])) {
-				$actionName = $action['name'];
-
-				$actionExists = $this->get(array(
-					'filter' => array('name' => $actionName),
-					'output' => array('actionid'),
-					'editable' => true,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				if (($actionExist = reset($actionExists))
-						&& (bccomp($actionExist['actionid'], $actionId) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $actionName));
-				}
-			}
-			else {
-				$actionName = $actionsDb[$actionId]['name'];
-			}
-
+		foreach ($actions as $actionId => $action) {
 			if (isset($action['filter'])) {
-
-				$filterValidator->setObjectName($actionName);
-				$this->checkValidator($action['filter'], $filterValidator);
-
 				$conditionsDb = isset($actionsDb[$actionId]['filter']['conditions'])
 					? $actionsDb[$actionId]['filter']['conditions']
 					: array();
 				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
 
 				foreach ($action['filter']['conditions'] as $condition) {
-					$filterConditionValidator->setObjectName($actionName);
-					$this->checkValidator($condition, $filterConditionValidator);
-
 					if (!isset($condition['conditionid'])) {
 						$condition['actionid'] = $actionId;
-						$conditionsCreate[] = $condition;
-					}
-					elseif (isset($conditionsDb[$condition['conditionid']])) {
-						// value and operator validation depends on condition type
-						$defaultFields = array('conditiontype', 'operator', 'value');
-						foreach ($defaultFields as $field) {
-							$condition[$field] = isset($condition[$field])
-								? $condition[$field]
-								: $conditionsDb[$condition['conditionid']][$field];
-						}
-
-						$conditionsUpdate[] = $condition;
-						unset($conditionsDb[$condition['conditionid']]);
+						$conditionsToCreate[] = $condition;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action filter conditionid.'));
+						$conditionId = $condition['conditionid'];
+
+						if (isset($conditionsDb[$conditionId])) {
+							// value and operator validation depends on condition type
+							foreach ($defaultConditionFields as $field) {
+								$condition[$field] = isset($condition[$field])
+									? $condition[$field]
+									: $conditionsDb[$conditionId][$field];
+							}
+
+							$conditionsToUpdate[] = $condition;
+							unset($conditionsDb[$conditionId]);
+						}
 					}
 				}
 
 				$action['evaltype'] = $action['filter']['evaltype'];
 
-				$conditionIdsDelete = array_merge($conditionIdsDelete, array_keys($conditionsDb));
+				$conditionIdsForDelete = array_merge($conditionIdsForDelete, array_keys($conditionsDb));
 			}
 
-			if (isset($action['operations']) && empty($action['operations'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $actionName));
-			}
-			elseif (isset($action['operations'])) {
-				$this->validateOperations($action['operations']);
-
+			if (isset($action['operations'])) {
 				$operationsDb = $actionsDb[$action['actionid']]['operations'];
 				$operationsDb = zbx_toHash($operationsDb, 'operationid');
-				foreach ($action['operations'] as $operation) {
-					$operation['actionid'] = $action['actionid'];
 
+				foreach ($action['operations'] as $operation) {
 					if (!isset($operation['operationid'])) {
-						$operationsCreate[] = $operation;
-					}
-					elseif (isset($operationsDb[$operation['operationid']])) {
-						$operationsUpdate[] = $operation;
-						unset($operationsDb[$operation['operationid']]);
+						$operation['actionid'] = $action['actionid'];
+						$operationsToCreate[] = $operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+						$operationId = $operation['operationid'];
+
+						if (isset($operationsDb[$operationId])) {
+							$operationsToUpdate[] = $operation;
+							unset($operationsDb[$operationId]);
+						}
+						else {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+						}
 					}
 				}
-				$operationIdsDelete = array_merge($operationIdsDelete, array_keys($operationsDb));
+				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actionId = $action['actionid'];
-			unset($action['actionid'], $action['conditions'], $action['operations']);
-			if (!empty($action)) {
+			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter'], $action['evaltype']);
+
+				if (!empty($action)) {
 				$actionUpdates[] = array(
 					'values' => $action,
 					'where' => array('actionid' => $actionId)
@@ -805,62 +700,45 @@ class CAction extends CApiService {
 			}
 		}
 
-		DB::update('actions', $actionUpdates);
-
-		self::validateConditions($conditionsCreate);
-		self::validateConditions($conditionsUpdate, true);
-
-		$newConditions = $this->addConditions($conditionsCreate);
-		$this->updateConditions($conditionsUpdate);
-		if (!empty($conditionIdsDelete)) {
-			$this->deleteConditions($conditionIdsDelete);
+		if($actionUpdates) {
+			DB::update('actions', $actionUpdates);
 		}
 
+		// Add, update and delete operations.
+		$this->addOperations($operationsToCreate);
+		$this->updateOperations($operationsToUpdate, $actionsDb);
+		if (!empty($operationIdsForDelete)) {
+			$this->deleteOperations($operationIdsForDelete);
+		}
+
+		// Add, update and delete conditions. Group newly created conditions by actions.
+		$newConditions = $this->addConditions($conditionsToCreate);
 		$newConditionsForActions = array();
 		foreach ($newConditions as $newCondition) {
 			$newConditionsForActions[$newCondition['actionid']][$newCondition['formulaid']] = $newCondition;
 		}
+		$this->updateConditions($conditionsToUpdate);
+		if (!empty($conditionIdsForDelete)) {
+			$this->deleteConditions($conditionIdsForDelete);
+		}
+
+		$conditionsForActions = array();
+		foreach ($actions as $actionId => $action) {
+			$conditionsForActions[$actionId] = zbx_toHash($action['filter']['conditions'], 'formulaid');
+		}
 		foreach ($newConditionsForActions as $actionId => $newConditionsForAction) {
-			foreach ($actions as &$action) {
-				if (isset($action['actionid']) && $action['actionid'] == $actionId) {
-					foreach ($action['filter']['conditions'] as &$condition) {
-						if (!isset($condition['conditionid']) && isset($newConditionsForAction[$condition['formulaid']])) {
-							$condition['conditionid'] = $newConditionsForAction[$condition['formulaid']]['conditionid'];
-						}
-					}
-					unset($condition);
-				}
+			foreach ($newConditionsForAction as $newCondition) {
+				$conditionsForActions[$actionId][$newCondition['formulaid']] = $newCondition;
 			}
-			unset($action);
 		}
+		foreach ($conditionsForActions as $actionId => $conditionsForAction) {
+			$actionFilter = $actions[$actionId]['filter'];
 
-		$this->addOperations($operationsCreate);
-		$this->updateOperations($operationsUpdate, $actionsDb);
-		if (!empty($operationIdsDelete)) {
-			$this->deleteOperations($operationIdsDelete);
-		}
+			$formula = $actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+				? $actionFilter['formula']
+				: '';
 
-		$actionUpdates = array();
-		foreach ($actions as $action) {
-			$updateValues = array();
-			if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$formulaIds = array();
-				foreach ($action['filter']['conditions'] as $condition) {
-					$formulaIds[$condition['formulaid']] = $condition['conditionid'];
-				}
-				$updateValues['formula'] = CConditionHelper::replaceLetterIds($action['filter']['formula'], $formulaIds);
-			}
-			else {
-				$updateValues['formula'] = '';
-			}
-
-			$actionUpdates[] = array(
-				'values' => $updateValues,
-				'where' => array('actionid' => $action['actionid'])
-			);
-		}
-		if ($actionUpdates) {
-			DB::update('actions', $actionUpdates);
+			$this->updateFormula($actionId, $formula, $conditionsForAction);
 		}
 
 		return array('actionids' => $actionIds);
@@ -881,28 +759,18 @@ class CAction extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for condition.'));
 			}
 		}
-		$resultIds = DB::insert('conditions', $conditions);
 
-		if ($conditions && $resultIds) {
-			reset($resultIds);
-			foreach ($conditions as &$condition) {
-				$condition['conditionid'] = current($resultIds);
-				next($resultIds);
-			}
-			unset($condition);
-		}
-
-		return $conditions;
+		return DB::save('conditions', $conditions);
 	}
 
 	protected function updateConditions($conditions) {
 		$update = array();
 		foreach ($conditions as $condition) {
-			$conditionid = $condition['conditionid'];
+			$conditionId = $condition['conditionid'];
 			unset($condition['conditionid']);
 			$update = array(
 				'values' => $condition,
-				'where' => array('conditionid' => $conditionid)
+				'where' => array('conditionid' => $conditionId)
 			);
 		}
 		DB::update('conditions', $update);
@@ -914,6 +782,11 @@ class CAction extends CApiService {
 		DB::delete('conditions', array('conditionid' => $conditionids));
 	}
 
+	/**
+	 * @param array $operations
+	 *
+	 * @return bool
+	 */
 	protected function addOperations($operations) {
 		foreach ($operations as $operation) {
 			$operationDbFields = array(
@@ -925,73 +798,80 @@ class CAction extends CApiService {
 			}
 		}
 
-		$operationids = DB::insert('operations', $operations);
+		$operations = DB::save('operations', $operations);
+		$operations = zbx_toHash($operations, 'operationid');
 
-		$opmessage = $opcommand = $opmessageGrp = $opmessageUsr = $opcommandHst = $opcommandGrp = $opgroup = $optemplate = array();
-		$opconditionInserts = array();
-		foreach ($operations as $onum => $operation) {
-			$operationid = $operationids[$onum];
+		$opMessagesToInsert = array();
+		$opCommandsToInsert = array();
+		$opMessageGrpsToInsert = array();
+		$opMessageUsrsToInsert = array();
+		$opCommandHstsToInsert = array();
+		$opCommandGroupInserts = array();
+		$opGroupsToInsert = array();
+		$opTemplatesToInsert = array();
+		$opConditionsToInsert = array();
 
+		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
 					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
-						$operation['opmessage']['operationid'] = $operationid;
-						$opmessage[] = $operation['opmessage'];
+						$operation['opmessage']['operationid'] = $operationId;
+						$opMessagesToInsert[] = $operation['opmessage'];
 					}
 					if (isset($operation['opmessage_usr'])) {
 						foreach ($operation['opmessage_usr'] as $user) {
-							$opmessageUsr[] = array(
-								'operationid' => $operationid,
+							$opMessageUsrsToInsert[] = array(
+								'operationid' => $operationId,
 								'userid' => $user['userid']
 							);
 						}
 					}
 					if (isset($operation['opmessage_grp'])) {
-						foreach ($operation['opmessage_grp'] as $usrgrp) {
-							$opmessageGrp[] = array(
-								'operationid' => $operationid,
-								'usrgrpid' => $usrgrp['usrgrpid']
+						foreach ($operation['opmessage_grp'] as $userGroup) {
+							$opMessageGrpsToInsert[] = array(
+								'operationid' => $operationId,
+								'usrgrpid' => $userGroup['usrgrpid']
 							);
 						}
 					}
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (isset($operation['opcommand']) && !empty($operation['opcommand'])) {
-						$operation['opcommand']['operationid'] = $operationid;
-						$opcommand[] = $operation['opcommand'];
+						$operation['opcommand']['operationid'] = $operationId;
+						$opCommandsToInsert[] = $operation['opcommand'];
 					}
 					if (isset($operation['opcommand_hst'])) {
-						foreach ($operation['opcommand_hst'] as $hst) {
-							$opcommandHst[] = array(
-								'operationid' => $operationid,
-								'hostid' => $hst['hostid']
+						foreach ($operation['opcommand_hst'] as $host) {
+							$opCommandHstsToInsert[] = array(
+								'operationid' => $operationId,
+								'hostid' => $host['hostid']
 							);
 						}
 					}
 					if (isset($operation['opcommand_grp'])) {
-						foreach ($operation['opcommand_grp'] as $grp) {
-							$opcommandGrp[] = array(
-								'operationid' => $operationid,
-								'groupid' => $grp['groupid']
+						foreach ($operation['opcommand_grp'] as $hostGroup) {
+							$opCommandGroupInserts[] = array(
+								'operationid' => $operationId,
+								'groupid' => $hostGroup['groupid']
 							);
 						}
 					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					foreach ($operation['opgroup'] as $grp) {
-						$opgroup[] = array(
-							'operationid' => $operationid,
-							'groupid' => $grp['groupid']
+					foreach ($operation['opgroup'] as $hostGroup) {
+						$opGroupsToInsert[] = array(
+							'operationid' => $operationId,
+							'groupid' => $hostGroup['groupid']
 						);
 					}
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					foreach ($operation['optemplate'] as $tpl) {
-						$optemplate[] = array(
-							'operationid' => $operationid,
-							'templateid' => $tpl['templateid']
+					foreach ($operation['optemplate'] as $template) {
+						$opTemplatesToInsert[] = array(
+							'operationid' => $operationId,
+							'templateid' => $template['templateid']
 						);
 					}
 					break;
@@ -1001,58 +881,62 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_HOST_DISABLE:
 			}
 			if (isset($operation['opconditions'])) {
-				foreach ($operation['opconditions'] as $opcondition) {
-					$opcondition['operationid'] = $operationid;
-					$opconditionInserts[] = $opcondition;
+				foreach ($operation['opconditions'] as $opCondition) {
+					$opCondition['operationid'] = $operationId;
+					$opConditionsToInsert[] = $opCondition;
 				}
 			}
 		}
-		DB::insert('opconditions', $opconditionInserts);
-		DB::insert('opmessage', $opmessage, false);
-		DB::insert('opcommand', $opcommand, false);
-		DB::insert('opmessage_grp', $opmessageGrp);
-		DB::insert('opmessage_usr', $opmessageUsr);
-		DB::insert('opcommand_hst', $opcommandHst);
-		DB::insert('opcommand_grp', $opcommandGrp);
-		DB::insert('opgroup', $opgroup);
-		DB::insert('optemplate', $optemplate);
+		DB::insert('opconditions', $opConditionsToInsert);
+		DB::insert('opmessage', $opMessagesToInsert, false);
+		DB::insert('opcommand', $opCommandsToInsert, false);
+		DB::insert('opmessage_grp', $opMessageGrpsToInsert);
+		DB::insert('opmessage_usr', $opMessageUsrsToInsert);
+		DB::insert('opcommand_hst', $opCommandHstsToInsert);
+		DB::insert('opcommand_grp', $opCommandGroupInserts);
+		DB::insert('opgroup', $opGroupsToInsert);
+		DB::insert('optemplate', $opTemplatesToInsert);
 
 		return true;
 	}
 
+	/**
+	 * @param array $operations
+	 * @param array $actionsDb
+	 */
 	protected function updateOperations($operations, $actionsDb) {
 		$operationsUpdate = array();
 
 		// messages
-		$opmessageCreate = array();
-		$opmessageUpdate = array();
-		$opmessageDeleteByOpId = array();
+		$opMessagesToInsert = array();
+		$opMessagesToUpdate = array();
+		$opMessagesToDeleteByOpId = array();
 
-		$opmessageGrpCreate = array();
-		$opmessageUsrCreate = array();
-		$opmessageGrpDeleteByOpId = array();
-		$opmessageUsrDeleteByOpId = array();
+		$opMessageGrpsToInsert = array();
+		$opMessageUsrsToInsert = array();
+		$opMessageGrpsToDeleteByOpId = array();
+		$opMessageUsrsToDeleteByOpId = array();
 
 		// commands
-		$opcommandCreate = array();
-		$opcommandUpdate = array();
-		$opcommandDeleteByOpId = array();
+		$opCommandsToInsert = array();
+		$opCommandsToUpdate = array();
+		$opCommandsToDeleteByOpId = array();
 
-		$opcommandGrpCreate = array();
-		$opcommandHstCreate = array();
-
-		$opcommandGrpDeleteByOpId = array();
-		$opcommandHstDeleteByOpId = array();
+		$opCommandGrpsToInsert = array();
+		$opCommandHstsToInsert = array();
+		$opCommandGrpsToDeleteByOpId = array();
+		$opCommandHstsToDeleteByOpId = array();
 
 		// groups
-		$opgroupCreate = array();
-		$opgroupDeleteByOpId = array();
+		$opGroupsToInsert = array();
+		$opGroupsToDeleteByOpId = array();
 
 		// templates
-		$optemplateCreate = array();
-		$optemplateDeleteByOpId = array();
+		$opTemplateToInsert = array();
+		$opTemplatesToDeleteByOpId = array();
 
-		$opconditionsCreate = array();
+		// operation conditions
+		$opConditionsToInsert = array();
 
 		foreach ($operations as $operation) {
 			$operationsDb = zbx_toHash($actionsDb[$operation['actionid']]['operations'], 'operationid');
@@ -1064,14 +948,14 @@ class CAction extends CApiService {
 
 				switch ($operationDb['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
-						$opmessageDeleteByOpId[] = $operationDb['operationid'];
-						$opmessageGrpDeleteByOpId[] = $operationDb['operationid'];
-						$opmessageUsrDeleteByOpId[] = $operationDb['operationid'];
+						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
+						$opMessageGrpsToDeleteByOpId[] = $operationDb['operationid'];
+						$opMessageUsrsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_COMMAND:
-						$opcommandDeleteByOpId[] = $operationDb['operationid'];
-						$opcommandHstDeleteByOpId[] = $operationDb['operationid'];
-						$opcommandGrpDeleteByOpId[] = $operationDb['operationid'];
+						$opCommandsToDeleteByOpId[] = $operationDb['operationid'];
+						$opCommandHstsToDeleteByOpId[] = $operationDb['operationid'];
+						$opCommandGrpsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_GROUP_ADD:
 						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
@@ -1081,7 +965,7 @@ class CAction extends CApiService {
 						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
 							break;
 						}
-						$opgroupDeleteByOpId[] = $operationDb['operationid'];
+						$opGroupsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 					case OPERATION_TYPE_TEMPLATE_ADD:
 						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
@@ -1091,7 +975,7 @@ class CAction extends CApiService {
 						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
 							break;
 						}
-						$optemplateDeleteByOpId[] = $operationDb['operationid'];
+						$opTemplatesToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 				}
 			}
@@ -1125,32 +1009,32 @@ class CAction extends CApiService {
 
 					if ($typeChanged) {
 						$operation['opmessage']['operationid'] = $operation['operationid'];
-						$opmessageCreate[] = $operation['opmessage'];
+						$opMessagesToInsert[] = $operation['opmessage'];
 
-						$opmessageGrpCreate = array_merge($opmessageGrpCreate, $operation['opmessage_grp']);
-						$opmessageUsrCreate = array_merge($opmessageUsrCreate, $operation['opmessage_usr']);
+						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $operation['opmessage_grp']);
+						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $operation['opmessage_usr']);
 					}
 					else {
-						$opmessageUpdate[] = array(
+						$opMessagesToUpdate[] = array(
 							'values' => $operation['opmessage'],
 							'where' => array('operationid'=>$operation['operationid'])
 						);
 
 						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
-						$opmessageGrpCreate = array_merge($opmessageGrpCreate, $diff['first']);
+						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $diff['first']);
 
-						foreach ($diff['second'] as $omgrp) {
+						foreach ($diff['second'] as $opMessageGrp) {
 							DB::delete('opmessage_grp', array(
-								'usrgrpid' => $omgrp['usrgrpid'],
+								'usrgrpid' => $opMessageGrp['usrgrpid'],
 								'operationid' => $operation['operationid']
 							));
 						}
 
 						$diff = zbx_array_diff($operation['opmessage_usr'], $operationDb['opmessage_usr'], 'userid');
-						$opmessageUsrCreate = array_merge($opmessageUsrCreate, $diff['first']);
-						foreach ($diff['second'] as $omusr) {
+						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $diff['first']);
+						foreach ($diff['second'] as $opMessageUsr) {
 							DB::delete('opmessage_usr', array(
-								'userid' => $omusr['userid'],
+								'userid' => $opMessageUsr['userid'],
 								'operationid' => $operation['operationid']
 							));
 						}
@@ -1180,10 +1064,10 @@ class CAction extends CApiService {
 
 					if ($typeChanged) {
 						$operation['opcommand']['operationid'] = $operation['operationid'];
-						$opcommandCreate[] = $operation['opcommand'];
+						$opCommandsToInsert[] = $operation['opcommand'];
 
-						$opcommandGrpCreate = array_merge($opcommandGrpCreate, $operation['opcommand_grp']);
-						$opcommandHstCreate = array_merge($opcommandHstCreate, $operation['opcommand_hst']);
+						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $operation['opcommand_grp']);
+						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $operation['opcommand_hst']);
 					}
 					else {
 						// clear and reset fields to default values on type change
@@ -1210,23 +1094,23 @@ class CAction extends CApiService {
 							$operation['opcommand']['privatekey'] = '';
 						}
 
-						$opcommandUpdate[] = array(
+						$opCommandsToUpdate[] = array(
 							'values' => $operation['opcommand'],
 							'where' => array('operationid' => $operation['operationid'])
 						);
 
 						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
-						$opcommandGrpCreate = array_merge($opcommandGrpCreate, $diff['first']);
+						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $diff['first']);
 
-						foreach ($diff['second'] as $omgrp) {
+						foreach ($diff['second'] as $opMessageGrp) {
 							DB::delete('opcommand_grp', array(
-								'groupid' => $omgrp['groupid'],
+								'groupid' => $opMessageGrp['groupid'],
 								'operationid' => $operation['operationid']
 							));
 						}
 
 						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
-						$opcommandHstCreate = array_merge($opcommandHstCreate, $diff['first']);
+						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $diff['first']);
 						$opCommandHostIds = zbx_objectValues($diff['second'], 'opcommand_hstid');
 						if ($opCommandHostIds) {
 							DB::delete('opcommand_hst', array(
@@ -1249,10 +1133,10 @@ class CAction extends CApiService {
 					}
 
 					$diff = zbx_array_diff($operation['opgroup'], $operationDb['opgroup'], 'groupid');
-					$opgroupCreate = array_merge($opgroupCreate, $diff['first']);
-					foreach ($diff['second'] as $ogrp) {
+					$opGroupsToInsert = array_merge($opGroupsToInsert, $diff['first']);
+					foreach ($diff['second'] as $opGroup) {
 						DB::delete('opgroup', array(
-							'groupid' => $ogrp['groupid'],
+							'groupid' => $opGroup['groupid'],
 							'operationid' => $operation['operationid']
 						));
 					}
@@ -1271,11 +1155,11 @@ class CAction extends CApiService {
 					}
 
 					$diff = zbx_array_diff($operation['optemplate'], $operationDb['optemplate'], 'templateid');
-					$optemplateCreate = array_merge($optemplateCreate, $diff['first']);
+					$opTemplateToInsert = array_merge($opTemplateToInsert, $diff['first']);
 
-					foreach ($diff['second'] as $otpl) {
+					foreach ($diff['second'] as $opTemplate) {
 						DB::delete('optemplate', array(
-							'templateid' => $otpl['templateid'],
+							'templateid' => $opTemplate['templateid'],
 							'operationid' => $operation['operationid']
 						));
 					}
@@ -1292,71 +1176,71 @@ class CAction extends CApiService {
 			self::validateOperationConditions($operation['opconditions']);
 
 			$diff = zbx_array_diff($operation['opconditions'], $operationDb['opconditions'], 'opconditionid');
-			$opconditionsCreate = array_merge($opconditionsCreate, $diff['first']);
+			$opConditionsToInsert = array_merge($opConditionsToInsert, $diff['first']);
 
-			$opconditionsidDelete = zbx_objectValues($diff['second'], 'opconditionid');
-			if (!empty($opconditionsidDelete)) {
-				DB::delete('opconditions', array('opconditionid' => $opconditionsidDelete));
+			$opConditionsIdsToDelete = zbx_objectValues($diff['second'], 'opconditionid');
+			if (!empty($opConditionsIdsToDelete)) {
+				DB::delete('opconditions', array('opconditionid' => $opConditionsIdsToDelete));
 			}
 
-			$operationid = $operation['operationid'];
+			$operationId = $operation['operationid'];
 			unset($operation['operationid']);
 			if (!empty($operation)) {
 				$operationsUpdate[] = array(
 					'values' => $operation,
-					'where' => array('operationid' => $operationid)
+					'where' => array('operationid' => $operationId)
 				);
 			}
 		}
 
 		DB::update('operations', $operationsUpdate);
 
-		if (!empty($opmessageDeleteByOpId)) {
-			DB::delete('opmessage', array('operationid' => $opmessageDeleteByOpId));
+		if (!empty($opMessagesToDeleteByOpId)) {
+			DB::delete('opmessage', array('operationid' => $opMessagesToDeleteByOpId));
 		}
-		if (!empty($opcommandDeleteByOpId)) {
-			DB::delete('opcommand', array('operationid' => $opcommandDeleteByOpId));
+		if (!empty($opCommandsToDeleteByOpId)) {
+			DB::delete('opcommand', array('operationid' => $opCommandsToDeleteByOpId));
 		}
-		if (!empty($opmessageGrpDeleteByOpId)) {
-			DB::delete('opmessage_grp', array('operationid' => $opmessageGrpDeleteByOpId));
+		if (!empty($opMessageGrpsToDeleteByOpId)) {
+			DB::delete('opmessage_grp', array('operationid' => $opMessageGrpsToDeleteByOpId));
 		}
-		if (!empty($opmessageUsrDeleteByOpId)) {
-			DB::delete('opmessage_usr', array('operationid' => $opmessageUsrDeleteByOpId));
+		if (!empty($opMessageUsrsToDeleteByOpId)) {
+			DB::delete('opmessage_usr', array('operationid' => $opMessageUsrsToDeleteByOpId));
 		}
-		if (!empty($opcommandHstDeleteByOpId)) {
-			DB::delete('opcommand_hst', array('operationid' => $opcommandHstDeleteByOpId));
+		if (!empty($opCommandHstsToDeleteByOpId)) {
+			DB::delete('opcommand_hst', array('operationid' => $opCommandHstsToDeleteByOpId));
 		}
-		if (!empty($opcommandGrpDeleteByOpId)) {
-			DB::delete('opcommand_grp', array('operationid' => $opcommandGrpDeleteByOpId));
+		if (!empty($opCommandGrpsToDeleteByOpId)) {
+			DB::delete('opcommand_grp', array('operationid' => $opCommandGrpsToDeleteByOpId));
 		}
-		if (!empty($opcommandGrpDeleteByOpId)) {
-			DB::delete('opcommand_grp', array('opcommand_grpid' => $opcommandGrpDeleteByOpId));
+		if (!empty($opCommandGrpsToDeleteByOpId)) {
+			DB::delete('opcommand_grp', array('opcommand_grpid' => $opCommandGrpsToDeleteByOpId));
 		}
-		if (!empty($opcommandHstDeleteByOpId)) {
-			DB::delete('opcommand_hst', array('opcommand_hstid' => $opcommandHstDeleteByOpId));
+		if (!empty($opCommandHstsToDeleteByOpId)) {
+			DB::delete('opcommand_hst', array('opcommand_hstid' => $opCommandHstsToDeleteByOpId));
 		}
-		if (!empty($opgroupDeleteByOpId)) {
-			DB::delete('opgroup', array('operationid' => $opgroupDeleteByOpId));
+		if (!empty($opGroupsToDeleteByOpId)) {
+			DB::delete('opgroup', array('operationid' => $opGroupsToDeleteByOpId));
 		}
-		if (!empty($optemplateDeleteByOpId)) {
-			DB::delete('optemplate', array('operationid' => $optemplateDeleteByOpId));
+		if (!empty($opTemplatesToDeleteByOpId)) {
+			DB::delete('optemplate', array('operationid' => $opTemplatesToDeleteByOpId));
 		}
 
-		DB::insert('opmessage', $opmessageCreate, false);
-		DB::insert('opcommand', $opcommandCreate, false);
-		DB::insert('opmessage_grp', $opmessageGrpCreate);
-		DB::insert('opmessage_usr', $opmessageUsrCreate);
-		DB::insert('opcommand_grp', $opcommandGrpCreate);
-		DB::insert('opcommand_hst', $opcommandHstCreate);
-		DB::insert('opgroup', $opgroupCreate);
-		DB::insert('optemplate', $optemplateCreate);
-		DB::update('opmessage', $opmessageUpdate);
-		DB::update('opcommand', $opcommandUpdate);
-		DB::insert('opconditions', $opconditionsCreate);
+		DB::insert('opmessage', $opMessagesToInsert, false);
+		DB::insert('opcommand', $opCommandsToInsert, false);
+		DB::insert('opmessage_grp', $opMessageGrpsToInsert);
+		DB::insert('opmessage_usr', $opMessageUsrsToInsert);
+		DB::insert('opcommand_grp', $opCommandGrpsToInsert);
+		DB::insert('opcommand_hst', $opCommandHstsToInsert);
+		DB::insert('opgroup', $opGroupsToInsert);
+		DB::insert('optemplate', $opTemplateToInsert);
+		DB::update('opmessage', $opMessagesToUpdate);
+		DB::update('opcommand', $opCommandsToUpdate);
+		DB::insert('opconditions', $opConditionsToInsert);
 	}
 
-	protected function deleteOperations($operationids) {
-		DB::delete('operations', array('operationid' => $operationids));
+	protected function deleteOperations($operationIds) {
+		DB::delete('operations', array('operationid' => $operationIds));
 	}
 
 	/**
@@ -1390,7 +1274,12 @@ class CAction extends CApiService {
 		return array('actionids' => $actionids);
 	}
 
-	public function validateOperations($operations) {
+	/**
+	 * @param array $operations
+	 *
+	 * @return bool
+	 */
+	public function validateOperationsIntegrity($operations) {
 		$operations = zbx_toArray($operations);
 
 		foreach ($operations as $operation) {
@@ -1582,7 +1471,7 @@ class CAction extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public static function validateConditions($conditions, $update = false) {
+	public static function validateConditionsIntegrity($conditions, $update = false) {
 		$conditions = zbx_toArray($conditions);
 
 		$hostGroupIdsAll = array();
@@ -1860,8 +1749,8 @@ class CAction extends CApiService {
 
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				$conditions = API::getApiService()->select('conditions', array(
-					'output' => $this->outputExtend($options['selectFilter'], array('actionid', 'conditionid')),
-					'filter' => array('actionid' => $actionIds),
+						'output' => array('actionid', 'conditionid', 'conditiontype', 'operator', 'value'),
+						'filter' => array('actionid' => $actionIds),
 					'preservekeys' => true
 				));
 
@@ -1877,8 +1766,11 @@ class CAction extends CApiService {
 					}
 					// in other cases - generate the formula automatically
 					else {
-						$conditionIds = array_keys(zbx_toHash($conditions, 'conditionid'));
-						$formula = CConditionHelper::getFormula(array_combine($conditionIds, $conditionIds), $filter['evaltype']);
+						$conditionsForFormula = array();
+						foreach ($filter['conditions'] as $condition) {
+							$conditionsForFormula[$condition['conditionid']] = $condition['conditiontype'];
+						}
+						$formula = CConditionHelper::getFormula($conditionsForFormula, $filter['evaltype']);
 					}
 
 					// generate formulaids from the effective formula
@@ -1887,6 +1779,13 @@ class CAction extends CApiService {
 						$condition['formulaid'] = $formulaIds[$condition['conditionid']];
 					}
 					unset($condition);
+
+					$sortFields = array(
+						array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+						array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+						array('field' => 'value', 'order' => ZBX_SORT_DOWN)
+					);
+					CArrayHelper::sort($filter['conditions'], $sortFields);
 
 					// generated a letter based formula only for actions with custom expressions
 					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
@@ -2173,19 +2072,328 @@ class CAction extends CApiService {
 				'operator' => new CSetValidator(array(
 						'values' => $operators,
 						'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
-					)),
-				'actionid' => new CIdValidator(array(
-						'empty' => true,
-						'messageRegex' => _('Incorrect action ID for action "%1$s".')
-					)),
-				'conditionid' => new CIdValidator(array(
-						'empty' => true,
-						'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
-					)),
+					))
 			),
 			'required' => array('conditiontype', 'value'),
 			'messageRequired' => _('No "%2$s" given for a filter condition of action "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of action "%1$s".')
 		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['countOutput'] === null) {
+			// add filter fields
+			if ($this->outputIsRequested('formula', $options['selectFilter'])
+				|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
+				|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
+
+				$sqlParts = $this->addQuerySelect('a.formula', $sqlParts);
+				$sqlParts = $this->addQuerySelect('a.evaltype', $sqlParts);
+			}
+			if ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
+				$sqlParts = $this->addQuerySelect('a.evaltype', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	/**
+	 * Converts a formula with letters to a formula with IDs and updates it.
+	 *
+	 * @param string 	$actionId
+	 * @param string 	$formulaWithLetters		formula with letters
+	 * @param array 	$conditions
+	 */
+	protected function updateFormula($actionId, $formulaWithLetters, array $conditions) {
+		$formulaIdToConditionId = array();
+
+		foreach ($conditions as $condition) {
+			$formulaIdToConditionId[$condition['formulaid']] = $condition['conditionid'];
+		}
+		$formula = CConditionHelper::replaceLetterIds($formulaWithLetters, $formulaIdToConditionId);
+
+		DB::updateByPk(
+			'actions',
+			$actionId,
+			array('formula' => $formula)
+		);
+	}
+
+	/**
+	 * Validate input given to action.create API call.
+	 *
+	 * @param $actions
+	 */
+	public function validateCreate($actions) {
+		$actionDbFields = array(
+			'name'        => null,
+			'eventsource' => null
+		);
+
+		$duplicates = array();
+		foreach ($actions as $action) {
+			if (!check_db_fields($actionDbFields, $action)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect parameter for action "%1$s".', $action['name'])
+				);
+			}
+			if (isset($action['esc_period']) && $action['esc_period'] < SEC_PER_MIN
+				&& $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s(
+						'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
+						$action['name'],
+						SEC_PER_MIN
+					)
+				);
+			}
+			if (isset($duplicates[$action['name']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
+			}
+			else {
+				$duplicates[$action['name']] = $action['name'];
+			}
+		}
+
+		$dbActionsWithSameName = $this->get(array(
+			'filter' => array('name' => $duplicates),
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => true,
+			'nopermissions' => true
+		));
+		if ($dbActionsWithSameName) {
+			$dbActionWithSameName = reset($dbActionsWithSameName);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $dbActionWithSameName['name']));
+		}
+
+		$filterValidator = new CSchemaValidator($this->getFilterSchema());
+		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
+
+		$conditionsToValidate = array();
+		$operationsToValidate = array();
+
+		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
+		// is present and is not empty. Also collect conditions and operations for more validation.
+		foreach ($actions as $action) {
+			if (isset($action['filter'])) {
+				$filterValidator->setObjectName($action['name']);
+				$this->checkValidator($action['filter'], $filterValidator);
+
+				foreach ($action['filter']['conditions'] as $condition) {
+					$filterConditionValidator->setObjectName($action['name']);
+					$this->checkValidator($condition, $filterConditionValidator);
+					$conditionsToValidate[] = $condition;
+				}
+			}
+
+			if (!isset($action['operations']) || empty($action['operations'])) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect parameter for action "%1$s".', $action['name'])
+				);
+			}
+			else {
+				foreach ($action['operations'] as $operation) {
+					$operationsToValidate[] = $operation;
+				}
+			}
+		}
+
+		// Validate conditions and operations in regard to whats in database now.
+		if ($conditionsToValidate) {
+			$this->validateConditionsIntegrity($conditionsToValidate);
+		}
+		$this->validateOperationsIntegrity($operationsToValidate);
+	}
+
+	/**
+	 * Validate input given to action.update API call.
+	 *
+	 * @param array $actions
+	 * @param array $actionsDb
+	 *
+	 * @internal param array $actionDb
+	 */
+	public function validateUpdate($actions, $actionsDb) {
+		foreach ($actions as $action) {
+			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
+				self::exception(
+					ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+		$actions = zbx_toHash($actions, 'actionid');
+
+		// check fields
+		$duplicates = array();
+		foreach ($actions as $action) {
+			$actionName = isset($action['name']) ? $action['name'] : $actionsDb[$action['actionid']]['name'];
+
+			if (!check_db_fields(array('actionid' => null), $action)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s(
+						'Incorrect parameters for action update method "%1$s".',
+						$actionName
+					)
+				);
+			}
+
+			// check if user changed esc_period for trigger eventsource
+			if (isset($action['esc_period'])
+				&& $action['esc_period'] < SEC_PER_MIN
+				&& $actionsDb[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s(
+						'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
+						$actionName,
+						SEC_PER_MIN
+					)
+				);
+			}
+
+			$this->checkNoParameters(
+				$action,
+				array('eventsource'),
+				_('Cannot update "%1$s" for action "%2$s".'),
+				$actionName
+			);
+
+			if (!isset($action['name'])) {
+				continue;
+			}
+
+			if (isset($duplicates[$action['name']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
+			}
+			else {
+				$duplicates[$action['name']] = $action['name'];
+			}
+		}
+
+		// Unset accidentally passed in "evaltype" and "formula" fields.
+		foreach ($actions as &$action) {
+			unset($action['evaltype'], $action['formula']);
+		}
+		unset($action);
+
+		$filterValidator = new CSchemaValidator($this->getFilterSchema());
+
+		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
+		$filterConditionValidator->setValidator(
+			'actionid',
+			new CIdValidator(array(
+				'empty'        => true,
+				'messageRegex' => _('Incorrect action ID for action "%1$s".')
+			))
+		);
+		$filterConditionValidator->setValidator(
+			'conditionid',
+			new CIdValidator(array(
+				'empty'        => true,
+				'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
+			))
+		);
+
+		$conditionsToValidateForCreate = array();
+		$conditionsToValidateForUpdate = array();
+		$operationsToValidate = array();
+
+		foreach ($actions as $actionId => $action) {
+			if (isset($action['name'])) {
+				$actionName = $action['name'];
+
+				$actionExists = $this->get(
+					array(
+						'filter'        => array('name' => $actionName),
+						'output'        => array('actionid'),
+						'editable'      => true,
+						'nopermissions' => true,
+						'preservekeys'  => true
+					)
+				);
+				if (($actionExist = reset($actionExists))
+					&& (bccomp($actionExist['actionid'], $actionId) != 0)
+				) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $actionName));
+				}
+			}
+			else {
+				$actionName = $actionsDb[$actionId]['name'];
+			}
+
+			if (isset($action['filter'])) {
+
+				$filterValidator->setObjectName($actionName);
+				$this->checkValidator($action['filter'], $filterValidator);
+
+				$conditionsDb = isset($actionsDb[$actionId]['filter']['conditions'])
+					? $actionsDb[$actionId]['filter']['conditions']
+					: array();
+				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
+
+				foreach ($action['filter']['conditions'] as $condition) {
+					$filterConditionValidator->setObjectName($actionName);
+					$this->checkValidator($condition, $filterConditionValidator);
+
+					if (!isset($condition['conditionid'])) {
+						$conditionsToValidateForCreate[] = $condition;
+					}
+					elseif (isset($conditionsDb[$condition['conditionid']])) {
+						// value and operator validation depends on condition type
+						$defaultConditionFields = array('conditiontype', 'operator', 'value');
+						foreach ($defaultConditionFields as $field) {
+							$condition[$field] = isset($condition[$field])
+								? $condition[$field]
+								: $conditionsDb[$condition['conditionid']][$field];
+						}
+
+						$conditionsToValidateForUpdate[] = $condition;
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action filter conditionid.'));
+					}
+				}
+			}
+
+			if (isset($action['operations']) && empty($action['operations'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $actionName));
+			}
+			elseif (isset($action['operations'])) {
+				$operationsDb = $actionsDb[$action['actionid']]['operations'];
+				$operationsDb = zbx_toHash($operationsDb, 'operationid');
+				foreach ($action['operations'] as $operation) {
+					if (!isset($operation['operationid'])) {
+						$operationsToValidate[] = $operation;
+					}
+					elseif (isset($operationsDb[$operation['operationid']])) {
+						$operationsToValidate[] = $operation;
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+					}
+				}
+			}
+		}
+
+		if ($conditionsToValidateForCreate) {
+			$this->validateConditionsIntegrity($conditionsToValidateForCreate);
+		}
+		if ($conditionsToValidateForUpdate) {
+			$this->validateConditionsIntegrity($conditionsToValidateForUpdate, true);
+		}
+		if ($operationsToValidate) {
+			$this->validateOperationsIntegrity($operationsToValidate);
+		}
 	}
 }
