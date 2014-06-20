@@ -333,9 +333,10 @@ typedef struct
 	const char	*ip;
 	const char	*dns;
 	const char	*port;
-	unsigned char	useip;
 	unsigned char	type;
 	unsigned char	main;
+	unsigned char	useip;
+	unsigned char	bulk;
 	unsigned char	max_snmp_succeed;
 	unsigned char	min_snmp_fail;
 }
@@ -512,8 +513,21 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  ******************************************************************************/
 static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	if (ITEM_TYPE_JMX == item->type || SUCCEED == is_snmp_type(item->type))
+	if (ITEM_TYPE_JMX == item->type)
 		return item->interfaceid;
+
+	if (SUCCEED == is_snmp_type(item->type))
+	{
+		ZBX_DC_INTERFACE	*interface;
+
+		if (NULL == (interface = zbx_hashset_search(&config->interfaces, &item->interfaceid)) ||
+				0 == interface->bulk)
+		{
+			return item->itemid;
+		}
+
+		return item->interfaceid;
+	}
 
 	if (ITEM_TYPE_SIMPLE == item->type)
 	{
@@ -2391,7 +2405,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
-	unsigned char		reset_snmp_stats;
+	unsigned char		bulk, reset_snmp_stats;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 
@@ -2415,9 +2429,10 @@ static void	DCsync_interfaces(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(interfaceid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		type = (unsigned char)atoi(row[2]);
-		main_ = (unsigned char)atoi(row[3]);
-		useip = (unsigned char)atoi(row[4]);
+		ZBX_STR2UCHAR(type, row[2]);
+		ZBX_STR2UCHAR(main_, row[3]);
+		ZBX_STR2UCHAR(useip, row[4]);
+		ZBX_STR2UCHAR(bulk, row[8]);
 
 		/* array of selected interfaces */
 		zbx_vector_uint64_append(&ids, interfaceid);
@@ -2458,8 +2473,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		/* store new information in interface structure */
 
-		if (0 == found || interface->hostid != hostid || interface->type != type || interface->useip != useip)
+		if (0 == found || interface->hostid != hostid || interface->type != type ||
+				interface->useip != useip || (interface->bulk != bulk && 1 == bulk))
+		{
 			reset_snmp_stats = 1;
+		}
 		else
 			reset_snmp_stats = 0;
 
@@ -2467,6 +2485,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		interface->type = type;
 		interface->main = main_;
 		interface->useip = useip;
+		interface->bulk = bulk;
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
@@ -2857,7 +2876,7 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (if_result = DBselect(
-			"select interfaceid,hostid,type,main,useip,ip,dns,port"
+			"select interfaceid,hostid,type,main,useip,ip,dns,port,bulk"
 			" from interface")))
 	{
 		goto out;
@@ -4385,7 +4404,7 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
+	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) && 1 == dc_interface->bulk)
 	{
 		if (dc_interface->max_snmp_succeed < max_snmp_succeed)
 			dc_interface->max_snmp_succeed = (unsigned char)max_snmp_succeed;
@@ -4397,53 +4416,45 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 	UNLOCK_CACHE;
 }
 
-static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, int *max_snmp_succeed,
-		int *min_snmp_fail)
+static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int *bulk)
 {
-	int			ret = FAIL;
+	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
+	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
+	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
+
+	int			num;
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
-	{
-		*max_snmp_succeed = dc_interface->max_snmp_succeed;
-		*min_snmp_fail = dc_interface->min_snmp_fail;
+	dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid);
 
-		ret = SUCCEED;
-	}
+	if (NULL != bulk)
+		*bulk = (NULL == dc_interface ? 0 : dc_interface->bulk);
 
-	return ret;
+	if (NULL == dc_interface || 0 == dc_interface->bulk)
+		return 1;
+
+	if (1 >= dc_interface->max_snmp_succeed || MAX_SNMP_ITEMS + 1 != dc_interface->min_snmp_fail)
+		num = dc_interface->max_snmp_succeed + 1;
+	else
+		num = dc_interface->max_snmp_succeed * 3 / 2;
+
+	if (num < dc_interface->min_snmp_fail)
+		return num;
+
+	return dc_interface->min_snmp_fail - 1;
 }
 
-int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail)
+int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
 {
 	int	ret;
 
 	LOCK_CACHE;
 
-	ret = DCconfig_get_interface_snmp_stats_nolock(interfaceid, max_snmp_succeed, min_snmp_fail);
+	ret = DCconfig_get_suggested_snmp_vars_nolock(interfaceid, bulk);
 
 	UNLOCK_CACHE;
 
 	return ret;
-}
-
-int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
-{
-	int	num;
-
-	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
-	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
-	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
-
-	if (1 >= max_snmp_succeed || MAX_SNMP_ITEMS + 1 != min_snmp_fail)
-		num = max_snmp_succeed + 1;
-	else
-		num = max_snmp_succeed * 3 / 2;
-
-	if (num < min_snmp_fail)
-		return num;
-
-	return min_snmp_fail - 1;
 }
 
 /******************************************************************************
@@ -4686,13 +4697,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
 					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
 			{
-				int	max_snmp_succeed, min_snmp_fail;
-
-				if (SUCCEED == DCconfig_get_interface_snmp_stats_nolock(dc_item->interfaceid,
-						&max_snmp_succeed, &min_snmp_fail))
-				{
-					max_items = DCconfig_get_suggested_snmp_vars(max_snmp_succeed, min_snmp_fail);
-				}
+				max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
 			}
 		}
 	}
