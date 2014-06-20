@@ -5,8 +5,6 @@ use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
 
-my $key_udp_dns = 'rsm.slv.dns.avail';
-
 parse_opts("tld=s", "from=n", "till=n", "service=s");
 
 if (defined($OPTS{'debug'}))
