@@ -1333,7 +1333,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 			regerror(reg_error, &re, err_buf, sizeof(err_buf));
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename"
-					" pattern: %s", format, err_buf);
+					" pattern: %s", err_buf);
 			ret = FAIL;
 			goto clean1;
 		}
