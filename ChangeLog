@@ -1,6 +1,7 @@
 Changes for 2.3.2
 
 New features:
+..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
 ..F....... [ZBX-8339] removed auto login/logout controls while editing guest user (Andrejs)
 ...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris,asaveljevs)
 ..F....... [ZBXNEXT-2254] added support for custom PostgreSQL schema to frontend and updated setup wizard (Krists)
