@@ -1287,10 +1287,11 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
  *                  application names as values
  */
 function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps, array $hostsFromHostGroups) {
-	$groupIdToHostIds = array();
+	$hostIdsForHostGroupId = array();
 	foreach ($hostsFromHostGroups as $host) {
+		$hostId = $host['hostid'];
 		foreach ($host['groups'] as $group) {
-			$groupIdToHostIds[$group['groupid']][$host['hostid']] = $host['hostid'];
+			$hostIdsForHostGroupId[$group['groupid']][$hostId] = $hostId;
 		}
 	}
 
@@ -1342,21 +1343,25 @@ function getSelementHostApplicationFilters(array $selements, array $selementIdTo
 
 					// Combine application filters for hosts from host group selements with
 					// application filters set.
-					foreach($hostGroupSelementsWithApplication as $hostGroupSelement) {
+					foreach ($hostGroupSelementsWithApplication as $hostGroupSelement) {
 						$hostGroupId = $hostGroupSelement['elementid'];
 
-						foreach ($groupIdToHostIds[$hostGroupId] as $hostId) {
-							$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+						if (isset($hostIdsForHostGroupId[$hostGroupId])) {
+							foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
+								$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+							}
 						}
 					}
 
 					// Unset all application filters for hosts in host group selements without any filters.
 					// This might reset application filters set by previous foreach.
-					foreach($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
+					foreach ($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
 						$hostGroupId = $hostGroupSelement['elementid'];
 
-						foreach ($groupIdToHostIds[$hostGroupId] as $hostId) {
-							unset($selementHostApplicationFilters[$selementId][$hostId]);
+						if (isset($hostIdsForHostGroupId[$hostGroupId])) {
+							foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
+								unset($selementHostApplicationFilters[$selementId][$hostId]);
+							}
 						}
 					}
 				}
