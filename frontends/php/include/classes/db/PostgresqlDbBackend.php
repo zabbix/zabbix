@@ -32,10 +32,13 @@ class PostgresqlDbBackend extends DbBackend {
 	protected function checkDbVersionTable() {
 		global $DB;
 
+		$schema = zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public');
+
 		$tableExists = DBfetch(DBselect('SELECT 1 FROM information_schema.tables'.
 			' WHERE table_catalog='.zbx_dbstr($DB['DATABASE']).
-				" AND table_schema='public'".
-				" AND table_name='dbversion'"));
+				' AND table_schema='.$schema.
+				" AND table_name='dbversion'"
+		));
 
 		if (!$tableExists) {
 			$this->setError(_('The frontend does not match Zabbix database.'));

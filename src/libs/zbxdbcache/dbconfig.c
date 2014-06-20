@@ -1543,7 +1543,6 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		DCstrpool_replace(found, &trigger->expression, row[2]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
-		trigger->lastchange = atoi(row[8]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
 
 		if (0 == found)
@@ -1551,6 +1550,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 			DCstrpool_replace(found, &trigger->error, row[3]);
 			ZBX_STR2UCHAR(trigger->value, row[6]);
 			ZBX_STR2UCHAR(trigger->state, row[7]);
+			trigger->lastchange = atoi(row[8]);
 			trigger->locked = 0;
 		}
 

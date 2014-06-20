@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.2');
 define('ZABBIX_API_VERSION', '2.3.2');
-define('ZABBIX_DB_VERSION',	 2030105);
+define('ZABBIX_DB_VERSION',	 2030109);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -914,6 +914,9 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
 define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
+
+// date format context, usable for translators
+define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
 // actions
 define('LONG_DESCRIPTION',	0);
