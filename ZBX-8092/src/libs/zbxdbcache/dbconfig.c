@@ -1202,22 +1202,26 @@ static void	DCsync_items(DB_RESULT result)
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
 		}
-		else if (NULL != item->triggers && NULL == item->triggers[0])
+		else
 		{
-			/* free the memory if no triggers were found during last sync */
+			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
+				item->data_expected_from = now;
 
-			config->items.mem_free_func(item->triggers);
-			item->triggers = NULL;
+			if (NULL != item->triggers)
+			{
+				if (NULL == item->triggers[0])
+				{
+					/* free the memory if no triggers were found during last sync */
+					config->items.mem_free_func(item->triggers);
+					item->triggers = NULL;
+				}
+				else
+				{
+					/* we can reuse the same memory if the trigger list has not changed */
+					item->triggers[0] = NULL;
+				}
+			}
 		}
-		else if (NULL != item->triggers)
-		{
-			/* we can reuse the same memory if the trigger list has not changed */
-
-			item->triggers[0] = NULL;
-		}
-
-		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
-			item->data_expected_from = now;
 
 		/* update items_hk index using new data, if not done already */
 
