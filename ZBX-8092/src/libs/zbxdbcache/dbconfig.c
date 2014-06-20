@@ -1102,7 +1102,7 @@ static void	DCsync_items(DB_RESULT result)
 	unsigned char		old_poller_type, old_status;
 	int			delay, delay_flex_changed, found;
 	int			update_index, old_nextcheck;
-	zbx_uint64_t		itemid, hostid, proxy_hostid;
+	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 
@@ -1126,7 +1126,6 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
@@ -1180,8 +1179,6 @@ static void	DCsync_items(DB_RESULT result)
 			item->history = atoi(row[36]);
 		ZBX_STR2UCHAR(item->inventory_link, row[38]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
-		old_status = item->status;
-		item->status = (unsigned char)atoi(row[42]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
@@ -1192,6 +1189,7 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->triggers = NULL;
 			item->lastclock = 0;
+			item->status = (unsigned char)atoi(row[2]);
 			item->state = (unsigned char)atoi(row[20]);
 			item->db_state = item->state;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
@@ -1205,6 +1203,8 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else
 		{
+			old_status = item->status;
+			item->status = (unsigned char)atoi(row[2]);
 			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
 				item->data_expected_from = now;
 
@@ -1261,7 +1261,8 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
+			item->poller_type = poller_by_item(itemid, host->proxy_hostid, item->type, item->key,
+					item->flags);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -1508,7 +1509,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == proxy_hostid)
+		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxy_hostid)
 		{
 			interface_snmpitem = DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -2755,13 +2756,13 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (item_result = DBselect(
-			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
+			"select i.itemid,i.hostid,i.status,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,i.delay_flex,"
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,i.delta,i.multiplier,"
-				"i.formula,i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.status"
+				"i.formula,i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
