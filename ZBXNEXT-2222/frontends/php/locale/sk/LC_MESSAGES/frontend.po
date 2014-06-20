@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"POT-Creation-Date: 2014-06-17 16:29+0300\n"
 "PO-Revision-Date: 2014-06-14 00:31+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -253,7 +253,7 @@ msgstr "Akceptovateľná SLA"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: include/func.inc.php:1755
+#: include/func.inc.php:1762
 msgid "Access denied."
 msgstr "Prístup zamietnutý."
 
@@ -1234,8 +1234,8 @@ msgstr "Vyťaženie CPU. Vyťaženie procesora. cpu a mode sú nepovinné. Ak cp
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
-msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Využitie CPU. Vyťaženie procesora v percentách. cpu, type a mode sú nepovinné. Ak cpu chýba, je použité all. Ak type chýba, je použité user. Ak mode chýba, je použité avg1."
+msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:523
@@ -1253,8 +1253,8 @@ msgstr "Vypočíta kontrolný súčet súboru. Kontrolný súčet súboru je vyp
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
-msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr "Vypočíta priestor diskového oddielu. Priestor je v KB. Ak mode chýba, je použitý total. V prípade pripojeného oddielu je vypočítané nepoužité miesto súborového systému. Príklad: vfs.fs.size[/tmp,free]."
+msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
+msgstr ""
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
 #: include/views/configuration.graph.edit.php:165
@@ -1366,7 +1366,7 @@ msgstr "Nie je možné pridať obrázok"
 msgid "Cannot add image."
 msgstr "Nie je možné pridať obrázok."
 
-#: items.php:480 screenedit.php:190
+#: items.php:480
 msgid "Cannot add item"
 msgstr "Nie je možné pridať položku"
 
@@ -1666,7 +1666,7 @@ msgstr "Nie je možné zmazať obrázok"
 msgid "Cannot delete inventory."
 msgstr "Nie je možné zmazať inventár."
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Cannot delete item"
 msgstr "Nie je možné zmazať položku"
 
@@ -2302,6 +2302,11 @@ msgstr "Nie je možné nastaviť \"templateid\" pre prototyp spúšťača \"%1$s
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 
+#: include/func.inc.php:1426
+#, c-format
+msgid "Cannot sort by field \"%1$s\"."
+msgstr ""
+
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
 msgstr "Nie je môžné prepnúť hosta pre interface."
@@ -2509,7 +2514,7 @@ msgstr "Nie je možné aktualizovať obrázok."
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Nie je možné aktualizovať rozhranie pre zisteného hosta \"%1$s\"."
 
-#: items.php:477 screenedit.php:181
+#: items.php:477
 msgid "Cannot update item"
 msgstr "Nie je možné aktualizovať prototyp položky"
 
@@ -2559,7 +2564,7 @@ msgstr "Nie je možné aktualizovať proxy pre zisteného hosta \"%1$s\"."
 msgid "Cannot update regular expression"
 msgstr "Nie je možné aktualizovať regulárny výraz"
 
-#: screenconf.php:132
+#: screenconf.php:132 screenedit.php:199 screenedit.php:216
 msgid "Cannot update screen"
 msgstr "Nie je možné aktualizovať obrazovku"
 
@@ -2710,13 +2715,13 @@ msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služ
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
-msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak chýba IP, potom je použité 127.0.0.1. Ak chýba port, potom je použitý predvolený port služby. Príklad: net.tcp.service[ftp,,45]."
+msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
-msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
-msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojenia ku službe. Ak chýba IP, potom je použité 127.0.0.1. Ak chýba port, potom je použitý predvolený port služby."
+msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2737,8 +2742,8 @@ msgstr "Typ kontroly"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
-msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr "Kontrola, či je možné vytvoriť TCP spojenie na zadaný port. 0 - nie je možné spojenie, 1 - je možné spojenie. IP adresa je voliteľná. Ak IP chýba, potom je použitá 127.0.0.1. Príklad: net.tcp.port[,80]"
+msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
+msgstr ""
 
 #: include/views/configuration.discovery.edit.php:63
 #: include/views/configuration.discovery.list.php:43
@@ -2878,11 +2883,11 @@ msgstr "Farba \"%1$s\" nie je v správnom formáte: očakávaný je kód farby v
 msgid "Colour (OK)"
 msgstr "Farba (OK)"
 
-#: screenedit.php:264
+#: screenedit.php:258
 msgid "Column added"
 msgstr "Stĺpec pridaný"
 
-#: screenedit.php:339
+#: screenedit.php:333
 msgid "Column deleted"
 msgstr "Stĺpec zmazaný"
 
@@ -4255,7 +4260,7 @@ msgid "Description updated"
 msgstr "Poznámka bola aktualizovaná"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
-#: include/func.inc.php:1871
+#: include/func.inc.php:1878
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:349
@@ -4591,7 +4596,7 @@ msgstr "Stav zisťovania"
 msgid "Display OK triggers for"
 msgstr "Zobrazovať spúšťače v stave OK po dobu"
 
-#: include/func.inc.php:1649
+#: include/func.inc.php:1656
 msgid "Displaying"
 msgstr "Zobrazujem"
 
@@ -4743,7 +4748,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:1840
+#: include/func.inc.php:1847
 msgid "ERROR"
 msgstr "CHYBA"
 
@@ -5477,7 +5482,7 @@ msgstr "Fínsky (fi_FI)"
 msgid "First"
 msgstr "Prvý"
 
-#: include/func.inc.php:1594
+#: include/func.inc.php:1601
 msgctxt "page navigation"
 msgid "First"
 msgstr "Prvá"
@@ -5685,7 +5690,7 @@ msgstr "Vykonať"
 msgid "Go to"
 msgstr "Choď na"
 
-#: include/func.inc.php:1773
+#: include/func.inc.php:1780
 msgid "Go to dashboard"
 msgstr "Choď na konzolu"
 
@@ -6827,7 +6832,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr "Identický výraz už existuje"
 
-#: include/func.inc.php:1763 include/func.inc.php:1783
+#: include/func.inc.php:1770 include/func.inc.php:1790
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Pokiaľ si myslíte, že táto správa je zlá, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
 
@@ -6907,12 +6912,12 @@ msgstr "Importovaný súbor"
 msgid "Imported successfully"
 msgstr "Import úspešný"
 
-#: hostinventories.php:180
+#: hostinventories.php:182
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Nie je možné filtrovať podľa inventárneho pola \"%s\", ktoré neexistuje."
 
-#: screenedit.php:307 screenedit.php:347
+#: screenedit.php:301 screenedit.php:341
 msgid "Impossible to remove last row and column."
 msgstr "Nie je možné zmazať posledný riadok a stĺpec."
 
@@ -7524,6 +7529,11 @@ msgstr "Neplatný typ času služby."
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Neplatné poradie sorder pre službu \"%1$s\"."
 
+#: include/func.inc.php:1431
+#, c-format
+msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
+msgstr ""
+
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
 msgstr "Neplatná zdrojová hodnota."
@@ -8001,7 +8011,7 @@ msgstr "Položka \"%1$s\" preskočená - používateľské pravidlo."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
 
-#: items.php:480 screenedit.php:189
+#: items.php:480
 msgid "Item added"
 msgstr "Položka pridaná"
 
@@ -8009,7 +8019,7 @@ msgstr "Položka pridaná"
 msgid "Item count"
 msgstr "Počet položiek"
 
-#: items.php:367 screenedit.php:222
+#: items.php:367
 msgid "Item deleted"
 msgstr "Položka zmazaná"
 
@@ -8094,7 +8104,7 @@ msgstr "Prototypu položiek zmazané"
 msgid "Item prototypes of"
 msgstr "Prototypy položiek pre"
 
-#: items.php:477 screenedit.php:180
+#: items.php:477
 msgid "Item updated"
 msgstr "Položka aktualizovaná"
 
@@ -8359,7 +8369,7 @@ msgstr "Jazyk"
 msgid "Last"
 msgstr "Posledný"
 
-#: include/func.inc.php:1634
+#: include/func.inc.php:1641
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Posledná"
@@ -8441,9 +8451,9 @@ msgstr "Posledná hodnota"
 msgid "Last week graph"
 msgstr "Graf posledného týždňa"
 
-#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:197 jsLoader.php:205 latest.php:26
-#: search.php:134 search.php:220 search.php:274 search.php:327
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:197
+#: jsLoader.php:205 latest.php:26 search.php:134 search.php:220 search.php:274
+#: search.php:327
 msgid "Latest data"
 msgstr "Posledné údaje"
 
@@ -8636,7 +8646,7 @@ msgstr "Logovať aj nenastavené SNMP trapy"
 msgid "Logged in as"
 msgstr "Prihlásený ako"
 
-#: auditlogs.php:137 include/func.inc.php:1769 include/func.inc.php:1786
+#: auditlogs.php:137 include/func.inc.php:1776 include/func.inc.php:1793
 #: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8972,7 +8982,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maximálny počet zobrazovaných udalostí spúšťača"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Maximize"
 msgstr "Maximalizovať"
 
@@ -9179,7 +9189,7 @@ msgid "Middle"
 msgstr "Stred"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:1873
+#: include/func.inc.php:1880
 msgid "Minimize"
 msgstr "Minimimalizovať"
 
@@ -9332,7 +9342,7 @@ msgstr "Monitorovanie cez proxy"
 msgid "Monitored host"
 msgstr "Monitorovaný host"
 
-#: include/menu.inc.php:26
+#: include/menu.inc.php:26 include/views/inventory.host.view.php:195
 msgid "Monitoring"
 msgstr "Monitorovanie"
 
@@ -9593,13 +9603,13 @@ msgstr "Nový čas služby"
 msgid "Next"
 msgstr "Nasledujúce"
 
-#: include/func.inc.php:1627
+#: include/func.inc.php:1634
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Nasledujúce"
 
 #: events.php:816 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2103 include/triggers.inc.php:1522
+#: include/func.inc.php:2110 include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -10135,7 +10145,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:625 api/classes/CUser.php:804
 #: api/classes/CUser.php:824 api/classes/CUser.php:883
-#: api/classes/CUser.php:1277 include/func.inc.php:1743
+#: api/classes/CUser.php:1277 include/func.inc.php:1750
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -11336,7 +11346,7 @@ msgstr "Náhľad"
 msgid "Previous"
 msgstr "Predchádzajúce"
 
-#: include/func.inc.php:1600
+#: include/func.inc.php:1607
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Predchádzajúca"
@@ -11975,11 +11985,11 @@ msgstr "Vpravo"
 msgid "Romanian (ro_RO)"
 msgstr "Rumunsky (ro_RO)"
 
-#: screenedit.php:241
+#: screenedit.php:235
 msgid "Row added"
 msgstr "Riadok pridaný"
 
-#: screenedit.php:299
+#: screenedit.php:293
 msgid "Row deleted"
 msgstr "Riadok zmazaný"
 
@@ -12409,11 +12419,11 @@ msgstr "Nastavenie bunky obrazovky"
 msgid "Screen deleted"
 msgstr "Obrazovka zmazaná"
 
-#: screenedit.php:306 screenedit.php:346
+#: screenedit.php:300 screenedit.php:340
 msgid "Screen should contain at least one row and column."
 msgstr "Obrazovka musí obsahovať najmenej jeden riadok a stĺpec."
 
-#: screenconf.php:131
+#: screenconf.php:131 screenedit.php:199 screenedit.php:216
 msgid "Screen updated"
 msgstr "Obrazovka aktualizovaná"
 
@@ -15540,7 +15550,7 @@ msgstr "Ročne"
 
 #: events.php:816 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
-#: include/events.inc.php:376 include/func.inc.php:2103
+#: include/events.inc.php:376 include/func.inc.php:2110
 #: include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
@@ -15561,7 +15571,7 @@ msgstr "Nemôžete si vybrať niektoré jazyky pretože locales pre ne nie sú n
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Nie je Vám dovolené meniť privilégiá pre používateľa \"%s\"."
 
-#: include/func.inc.php:1779
+#: include/func.inc.php:1786
 msgid "You are not logged in."
 msgstr "Nie ste prihlásený."
 
@@ -15611,15 +15621,15 @@ msgstr "Nemáte oprávnenia na aktualizáciu iných používateľov."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nemáte oprávnenia na aktulizáciu používateľa alebo používateľ neexistuje."
 
-#: include/func.inc.php:1761
+#: include/func.inc.php:1768
 msgid "You have no permissions to access this page."
 msgstr "Nemáte oprávnenia k prístupu k tejto stránke."
 
-#: include/func.inc.php:1781
+#: include/func.inc.php:1788
 msgid "You must login to view this page."
 msgstr "Musíte byť prihlásený pre zobrazenie tejto stránky."
 
-#: include/func.inc.php:1757
+#: include/func.inc.php:1764
 msgid "Your are logged in as"
 msgstr "Ste prihlásený ako"
 
@@ -15891,7 +15901,7 @@ msgstr "výraz je prázdny"
 msgid "fixed"
 msgstr "pevný"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1666
 msgid "found"
 msgstr "nájdených"
 
@@ -16076,7 +16086,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:440 include/blocks.inc.php:779
-#: include/func.inc.php:1656
+#: include/func.inc.php:1663
 msgid "of"
 msgstr "z"
 
@@ -16182,7 +16192,7 @@ msgstr "zobraziť párovanie hodnôt"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "šablóna ID \"%1$s\" je použitá %2$s krát"
 
-#: include/func.inc.php:1652
+#: include/func.inc.php:1659
 msgid "to"
 msgstr "do"
 

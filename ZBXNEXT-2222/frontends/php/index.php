@@ -63,15 +63,17 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
+	$autoLogin = getRequest('autologin', 0);
+
 	DBstart();
 	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
 	DBend(true);
 
 	if ($loginSuccess) {
 		// save remember login preference
-		$user = array('autologin' => getRequest('autologin', 0));
+		$user = array('autologin' => $autoLogin);
 
-		if (CWebUser::$data['autologin'] != $user['autologin']) {
+		if (CWebUser::$data['autologin'] != $autoLogin) {
 			API::User()->updateProfile($user);
 		}
 
@@ -90,7 +92,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 }
 else {
 	// login the user from the session, if the session id is empty - login as a guest
-	CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
+	CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 }
 
 // the user is not logged in, display the login form
