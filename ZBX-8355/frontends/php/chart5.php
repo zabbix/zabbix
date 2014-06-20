@@ -134,7 +134,7 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
 	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_x('d.M', DATE_FORMAT_CONTEXT), $period_start));
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
 	$period_start += 7 * 24 * 3600;
 }
 
