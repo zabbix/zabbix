@@ -1200,12 +1200,16 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
+			old_poller_type = ZBX_NO_POLLER;
+			old_nextcheck = 0;
 		}
 		else
 		{
 			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
 				item->data_expected_from = now;
+
+			old_poller_type = item->poller_type;
+			old_nextcheck = item->nextcheck;
 
 			if (NULL != item->triggers)
 			{
@@ -1234,7 +1238,6 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		delay = atoi(row[15]);
-		old_poller_type = item->poller_type;
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
@@ -1247,8 +1250,6 @@ static void	DCsync_items(DB_RESULT result)
 			{
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
-
-			old_nextcheck = (0 == found ? 0 : item->nextcheck);
 
 			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
 					(ITEM_STATE_NORMAL == item->state && delay != item->delay)))
