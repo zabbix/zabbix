@@ -1,0 +1,8 @@
+# comments can be prefixed like this.
+# each line starts with table name, then blacklisted fields - all separated by spaces
+drules nextcheck
+hosts disable_until error available errors_from lastaccess ipmi_disable_until ipmi_available snmp_disable_until snmp_available maintenanceid maintenance_status maintenance_type maintenance_from ipmi_errors_from snmp_errors_from ipmi_error snmp_error jmx_disable_until jmx_available jmx_errors_from jmx_error
+httptest lastcheck nextcheck curstate curstep lastfailedstep error time
+items lastvalue lastclock prevvalue prevorgvalue error lastlogsize mtime lastns
+triggers value lastchange error value_flags
+users attempt_failed attempt_ip attempt_clock
