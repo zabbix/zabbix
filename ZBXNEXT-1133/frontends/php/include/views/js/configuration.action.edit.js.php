@@ -507,6 +507,15 @@
 	}
 
 	function processTypeOfCalculation() {
+		if(jQuery('#evaltype').val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+			jQuery('#conditionLabel').hide();
+			jQuery('#formula').show();
+		}
+		else {
+			jQuery('#conditionLabel').show();
+			jQuery('#formula').hide();
+		}
+
 		var labels = jQuery('#conditionTable .label');
 
 		if (labels.length > 1) {
