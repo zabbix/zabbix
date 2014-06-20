@@ -867,7 +867,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-	unsigned char		status, old_status;
+	unsigned char		status;
 	time_t			now;
 	signed char		ipmi_authtype;
 	unsigned char		ipmi_privilege;
@@ -883,7 +883,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
-		status = (unsigned char)atoi(row[22]);
+		ZBX_STR2UCHAR(status, row[22]);
 
 		/* array of selected hosts */
 		zbx_vector_uint64_append(&ids, hostid);
@@ -923,8 +923,6 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		old_status = host->status;
-		host->status = status;
 
 		if (0 == found)
 		{
@@ -946,9 +944,13 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
 		}
+		else
+		{
+			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
+				host->data_expected_from = now;
+		}
 
-		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != old_status)
-			host->data_expected_from = now;
+		host->status = status;
 
 		/* update hosts_h index using new data, if not done already */
 
@@ -1099,7 +1101,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type, old_status;
+	unsigned char		old_poller_type, status;
 	int			delay, delay_flex_changed, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid;
@@ -1126,6 +1128,7 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
+		ZBX_STR2UCHAR(status, row[2]);
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
@@ -1189,7 +1192,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->triggers = NULL;
 			item->lastclock = 0;
-			item->status = (unsigned char)atoi(row[2]);
 			item->state = (unsigned char)atoi(row[20]);
 			item->db_state = item->state;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
@@ -1203,9 +1205,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else
 		{
-			old_status = item->status;
-			item->status = (unsigned char)atoi(row[2]);
-			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
+			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
 
 			old_poller_type = item->poller_type;
@@ -1226,6 +1226,8 @@ static void	DCsync_items(DB_RESULT result)
 				}
 			}
 		}
+
+		item->status = status;
 
 		/* update items_hk index using new data, if not done already */
 
