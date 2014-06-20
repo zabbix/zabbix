@@ -1100,7 +1100,7 @@ static void	DCsync_items(DB_RESULT result)
 
 	time_t			now;
 	unsigned char		old_poller_type, old_status;
-	int			delay, found;
+	int			delay, delay_flex_changed, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
@@ -1239,6 +1239,26 @@ static void	DCsync_items(DB_RESULT result)
 
 		delay = atoi(row[15]);
 
+		/* items with flexible intervals */
+
+		if ('\0' != *row[16])
+		{
+			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
+
+			delay_flex_changed = (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]));
+		}
+		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+		{
+			/* remove delay_flex parameter for non-flexible item and update nextcheck */
+
+			zbx_strpool_release(flexitem->delay_flex);
+			zbx_hashset_remove(&config->flexitems, &itemid);
+
+			delay_flex_changed = 1;
+		}
+		else
+			delay_flex_changed = 0;
+
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
 			item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
@@ -1252,7 +1272,8 @@ static void	DCsync_items(DB_RESULT result)
 			}
 
 			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
-					(ITEM_STATE_NORMAL == item->state && delay != item->delay)))
+					(ITEM_STATE_NORMAL == item->state &&
+					(delay != item->delay || 0 != delay_flex_changed))))
 			{
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
@@ -1348,35 +1369,6 @@ static void	DCsync_items(DB_RESULT result)
 			/* remove IPMI parameters for non-IPMI item */
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
 			zbx_hashset_remove(&config->ipmiitems, &itemid);
-		}
-
-		/* items with flexible intervals */
-
-		if ('\0' != *row[16])
-		{
-			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
-
-			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
-					ZBX_NO_POLLER != item->poller_type && ITEM_STATE_NOTSUPPORTED != item->state &&
-					old_nextcheck == item->nextcheck)
-			{
-				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-						item->delay, flexitem->delay_flex, now);
-			}
-		}
-		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-		{
-			/* remove delay_flex parameter for non-flexible item and update nextcheck */
-
-			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove(&config->flexitems, &itemid);
-
-			if (ZBX_NO_POLLER != item->poller_type && ITEM_STATE_NOTSUPPORTED != item->state &&
-					old_nextcheck == item->nextcheck)
-			{
-				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-						item->delay, NULL, now);
-			}
 		}
 
 		/* trapper items */
