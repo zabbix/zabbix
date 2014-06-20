@@ -130,8 +130,7 @@ class CWebUser {
 	 * @param string $sessionId		Session ID string
 	 */
 	public static function setSessionCookie($sessionId) {
-		$autoLogin = self::isGuest() ? false :
-			self::$data && self::$data['autologin'] ? true : false;
+		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
 
 		zbx_setcookie('zbx_sessionid', $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
 	}
