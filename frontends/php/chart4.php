@@ -121,7 +121,7 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 
 for ($i = 0, $periodStart = $start; $i <= $sizeX; $i += $sizeX / 52) {
 	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_x('d.M', DATE_FORMAT_CONTEXT), $periodStart));
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_('d.M'), $periodStart));
 
 	$periodStart += SEC_PER_WEEK;
 }
