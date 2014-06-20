@@ -1237,9 +1237,9 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		delay = atoi(row[15]);
+		/* update item nextcheck and process items with flexible intervals */
 
-		/* items with flexible intervals */
+		delay = atoi(row[15]);
 
 		if ('\0' != *row[16])
 		{
@@ -1249,7 +1249,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
-			/* remove delay_flex parameter for non-flexible item and update nextcheck */
+			/* remove delay_flex parameter for non-flexible item */
 
 			zbx_strpool_release(flexitem->delay_flex);
 			zbx_hashset_remove(&config->flexitems, &itemid);
