@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use DBI;
 use Getopt::Long;
+use Pod::Usage;
 use Exporter qw(import);
 use Zabbix;
 use Sender;
@@ -48,7 +49,7 @@ use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 with
 
 our ($result, $dbh, $tld);
 
-our %OPTS; # command-line options
+our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld %OPTS
 		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT
@@ -57,13 +58,15 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
-		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_lastclock get_tlds
+		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_itemids get_lastclock
+		get_tlds
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
 		process_slv_ns_curmon get_item_values check_lastclock get_downtime avail_result_msg
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str curmon_log_values curmon_log_downtime);
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str curmon_log_values curmon_log_downtime
+		usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -284,6 +287,37 @@ sub get_itemid
     return $rows_ref->[0]->[0];
 }
 
+sub get_itemids
+{
+    my $host = shift;
+    my $key_part = shift;
+
+    my $res = db_select(
+	"select i.itemid,i.key_".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+		" and i.key_ like '$key_part%'");
+
+    my $rows_ref = $res->fetchall_arrayref();
+
+    fail("cannot find items ($key_part*) at host ($host)") if (scalar(@$rows_ref) == 0);
+
+    my %result;
+
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $itemid = $row_ref->[0];
+	my $key = $row_ref->[1];
+
+	my $ns = get_ns_from_key($key);
+
+	$result{$ns} = $itemid;
+    }
+
+    return \%result;
+}
+
 sub get_lastclock
 {
     my $host = shift;
@@ -323,9 +357,18 @@ sub get_tlds
 {
     my $service = shift;
 
+    if (defined($service))
+    {
+	$service = uc($service);
+    }
+    else
+    {
+	$service = 'DNS';
+    }
+
     my $sql;
 
-    unless (defined($service))
+    if ($service eq 'DNS')
     {
 	$sql =
 	    "select h.host".
@@ -345,7 +388,7 @@ sub get_tlds
 	    	" and h2.name=concat('Template ', h.host)".
 	    	" and g.name='TLDs'".
 	    	" and h2.hostid=hm.hostid".
-	    	" and hm.macro='{\$RSM.TLD.".uc($service).".ENABLED}'".
+	    	" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
 	    	" and hm.value!=0".
 	    	" and h.status=0";
     }
@@ -1233,8 +1276,10 @@ sub get_downtime
     my $itemid = shift;
     my $from = shift;
     my $till = shift;
+    my $no_incidents_check = shift;
 
-    my $eventtimes = __get_eventtimes($itemid, $from, $till);
+    my $eventtimes = [];
+    $eventtimes = __get_eventtimes($itemid, $from, $till) unless ($no_incidents_check);
 
     my $count = 0;
 
@@ -1372,12 +1417,8 @@ sub trim
 
 sub parse_opts
 {
-    my @opts;
-
-    push(@opts, "debug!", @_);
-
-    usage() unless (GetOptions(\%OPTS, @opts));
-    $tld = $ARGV[0] if (defined($ARGV[0]));
+    GetOptions(\%OPTS, "help!", "debug!", @_) or pod2usage(2);
+    pod2usage(1) if ($OPTS{'help'});
 }
 
 sub ts_str
@@ -1411,29 +1452,27 @@ sub curmon_log_values
 
 sub curmon_log_downtime
 {
+    my $from = shift;
+    my $till = shift;
     my $prefix = shift;
     my $downtime = shift;
+    my $target = shift;
+
+    $target = (defined($target) ? " [$target]" : "");
 
     if (defined($OPTS{'debug'}))
     {
-	print(ts_str(), " $prefix $tld: $downtime minutes of downtime\n");
+	print(ts_str(), " $prefix $tld$target: $downtime minutes from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)\n");
 	return;
     }
 
     my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '.log';
-    __write_log($file, ts_str() . " [$downtime]\n");
+    __write_log($file, ts_str() . "$target [$downtime]\n");
 }
 
 sub usage
 {
-    print("usage: $0 <tld> [options]\n");
-    print("Options:\n");
-    print("    --debug    run the script in debug mode, this means:\n");
-    print("               - skip checks if need to recalculate value\n");
-    print("               - do not send the value to the server\n");
-    print("               - print the output to stdout instead of writing to the log file\n");
-    print("               - print more information\n");
-    exit(FAIL);
+    pod2usage(shift);
 }
 
 #################
@@ -1460,7 +1499,8 @@ sub __log
     my $msg = shift;
     my $file = shift;
 
-    if (not defined($config) or
+    if (defined($OPTS{'debug'}) or
+	not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
     {
