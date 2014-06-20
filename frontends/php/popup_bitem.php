@@ -95,7 +95,7 @@ else {
 
 	$frmGItem = new CFormTable(_('New item for the graph'));
 	$frmGItem->setName('graph_item');
-	$frmGItem->setHelp('web.graph.item.php');
+	$frmGItem->addHelpIcon();
 
 	$frmGItem->addVar('dstfrm', $_REQUEST['dstfrm']);
 
