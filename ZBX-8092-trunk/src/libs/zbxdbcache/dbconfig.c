@@ -867,7 +867,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-	unsigned char		status, old_status;
+	unsigned char		status;
 	time_t			now;
 	signed char		ipmi_authtype;
 	unsigned char		ipmi_privilege;
@@ -883,7 +883,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
-		status = (unsigned char)atoi(row[22]);
+		ZBX_STR2UCHAR(status, row[22]);
 
 		/* array of selected hosts */
 		zbx_vector_uint64_append(&ids, hostid);
@@ -923,8 +923,6 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		old_status = host->status;
-		host->status = status;
 
 		if (0 == found)
 		{
@@ -946,9 +944,13 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
 		}
+		else
+		{
+			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
+				host->data_expected_from = now;
+		}
 
-		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != old_status)
-			host->data_expected_from = now;
+		host->status = status;
 
 		/* update hosts_h index using new data, if not done already */
 
@@ -1079,6 +1081,8 @@ static void	DCsync_items(DB_RESULT result)
 
 	DB_ROW			row;
 
+	ZBX_DC_HOST		*host;
+
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_NUMITEM		*numitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
@@ -1097,10 +1101,10 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type, old_status;
-	int			delay, found;
+	unsigned char		old_poller_type, status;
+	int			delay, delay_flex_changed, found;
 	int			update_index, old_nextcheck;
-	zbx_uint64_t		itemid, hostid, proxy_hostid;
+	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 
@@ -1124,8 +1128,10 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
-		delay = atoi(row[15]);
+		ZBX_STR2UCHAR(status, row[2]);
+
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
 
 		/* array of selected items */
 		zbx_vector_uint64_append(&ids, itemid);
@@ -1176,8 +1182,6 @@ static void	DCsync_items(DB_RESULT result)
 			item->history = atoi(row[36]);
 		ZBX_STR2UCHAR(item->inventory_link, row[38]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
-		old_status = item->status;
-		item->status = (unsigned char)atoi(row[42]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
@@ -1196,24 +1200,34 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
+			old_poller_type = ZBX_NO_POLLER;
+			old_nextcheck = 0;
 		}
-		else if (NULL != item->triggers && NULL == item->triggers[0])
+		else
 		{
-			/* free the memory if no triggers were found during last sync */
+			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
+				item->data_expected_from = now;
 
-			config->items.mem_free_func(item->triggers);
-			item->triggers = NULL;
+			old_poller_type = item->poller_type;
+			old_nextcheck = item->nextcheck;
+
+			if (NULL != item->triggers)
+			{
+				if (NULL == item->triggers[0])
+				{
+					/* free the memory if no triggers were found during last sync */
+					config->items.mem_free_func(item->triggers);
+					item->triggers = NULL;
+				}
+				else
+				{
+					/* we can reuse the same memory if the trigger list has not changed */
+					item->triggers[0] = NULL;
+				}
+			}
 		}
-		else if (NULL != item->triggers)
-		{
-			/* we can reuse the same memory if the trigger list has not changed */
 
-			item->triggers[0] = NULL;
-		}
-
-		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
-			item->data_expected_from = now;
+		item->status = status;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1225,11 +1239,34 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		old_poller_type = item->poller_type;
+		/* update item nextcheck and process items with flexible intervals */
 
-		if (ITEM_STATUS_ACTIVE == item->status)
+		delay = atoi(row[15]);
+
+		if ('\0' != *row[16])
 		{
-			item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
+			int	found;
+
+			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
+
+			delay_flex_changed = (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]));
+		}
+		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+		{
+			/* remove delay_flex parameter for non-flexible item */
+
+			zbx_strpool_release(flexitem->delay_flex);
+			zbx_hashset_remove(&config->flexitems, &itemid);
+
+			delay_flex_changed = 1;
+		}
+		else
+			delay_flex_changed = 0;
+
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		{
+			item->poller_type = poller_by_item(itemid, host->proxy_hostid, item->type, item->key,
+					item->flags);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -1239,26 +1276,16 @@ static void	DCsync_items(DB_RESULT result)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (0 == found)
+			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
+					(ITEM_STATE_NORMAL == item->state &&
+					(delay != item->delay || 0 != delay_flex_changed))))
 			{
-				old_nextcheck = 0;
-
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
 					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 							item->type, config->config->refresh_unsupported, NULL, now);
 				}
 				else
-				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, delay, row[16], now);
-				}
-			}
-			else
-			{
-				old_nextcheck = item->nextcheck;
-
-				if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 				{
 					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
 							item->type, delay, row[16], now);
@@ -1347,33 +1374,6 @@ static void	DCsync_items(DB_RESULT result)
 			/* remove IPMI parameters for non-IPMI item */
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
 			zbx_hashset_remove(&config->ipmiitems, &itemid);
-		}
-
-		/* items with flexible intervals */
-
-		if ('\0' != *row[16])
-		{
-			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
-
-			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
-					ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
-			{
-				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-						item->delay, flexitem->delay_flex, now);
-			}
-		}
-		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-		{
-			/* remove delay_flex parameter for non-flexible item and update nextcheck */
-
-			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove(&config->flexitems, &itemid);
-
-			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
-			{
-				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-						item->delay, NULL, now);
-			}
 		}
 
 		/* trapper items */
@@ -1513,7 +1513,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == proxy_hostid)
+		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxy_hostid)
 		{
 			interface_snmpitem = DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -2756,13 +2756,13 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (item_result = DBselect(
-			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
+			"select i.itemid,i.hostid,i.status,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,i.delay_flex,"
 				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
 				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,i.delta,i.multiplier,"
-				"i.formula,i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error,i.status"
+				"i.formula,i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
@@ -2884,7 +2884,7 @@ void	DCsync_configuration(void)
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result);
+	DCsync_items(item_result);	/* relies on host status, must be after DCsync_hosts() */
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2955,6 +2955,14 @@ void	DCsync_configuration(void)
 			csec + hsec + isec + tsec + dsec + fsec + hisec + htsec + gmsec + hmsec + ifsec + expr_sec +
 			total2);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
+			config->proxies.num_data, config->proxies.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
+			config->hosts.num_data, config->hosts.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
+			config->hosts_h.num_data, config->hosts_h.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
+			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __function_name,
@@ -2996,14 +3004,6 @@ void	DCsync_configuration(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
 				i, config->time_triggers[i].values_num, config->time_triggers[i].values_alloc);
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
-			config->hosts.num_data, config->hosts.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
-			config->hosts_h.num_data, config->hosts_h.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
-			config->proxies.num_data, config->proxies.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
-			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
 			config->htmpls.num_data, config->htmpls.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
