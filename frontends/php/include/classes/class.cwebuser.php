@@ -28,13 +28,12 @@ class CWebUser {
 	 *
 	 * @param string $login			user login
 	 * @param string $password		user password
-	 * @param bool	 $autoLogin		determines cookie lifetime (1 month if true, session if false)
 	 *
 	 * @throws Exception if user cannot be logged in
 	 *
 	 * @return bool
 	 */
-	public static function login($login, $password, $autoLogin) {
+	public static function login($login, $password) {
 		try {
 			self::setDefault();
 
@@ -71,7 +70,7 @@ class CWebUser {
 			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie('zbx_sessionid')));
 
 			if ($result) {
-				self::setSessionId(self::$data['sessionid'], $autoLogin);
+				self::setSessionCookie(self::$data['sessionid']);
 
 				add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, self::$data['userid'], '', null, null, null);
 			}
@@ -85,7 +84,7 @@ class CWebUser {
 	}
 
 	public static function logout() {
-		self::$data['sessionid'] = self::getSessionId();
+		self::$data['sessionid'] = self::getSessionCookie();
 		self::$data = API::User()->logout();
 		zbx_unsetcookie('zbx_sessionid');
 	}
@@ -115,12 +114,7 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			if (self::isGuest()) {
-				self::setSessionId($sessionId, false);
-			}
-			elseif (self::$data['autologin']) {
-				self::setSessionId($sessionId, true);
-			}
+			self::setSessionCookie($sessionId);
 
 			return $sessionId;
 		}
@@ -134,18 +128,20 @@ class CWebUser {
 	 * Shorthand method for setting current session ID in cookies.
 	 *
 	 * @param string $sessionId		Session ID string
-	 * @param bool	 $autoLogin		if false, cookie is set for session only and if true, cookie is set for 1 month
 	 */
-	public static function setSessionId($sessionId, $autoLogin) {
+	public static function setSessionCookie($sessionId) {
+		$autoLogin = self::isGuest() ? false :
+			self::$data && self::$data['autologin'] ? true : false;
+
 		zbx_setcookie('zbx_sessionid', $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
 	}
 
 	/**
-	 * Retrieves current session from zbx_sessionid cookie.
+	 * Retrieves current session ID from zbx_sessionid cookie.
 	 *
 	 * @return string
 	 */
-	public static function getSessionId() {
+	public static function getSessionCookie() {
 		return get_cookie('zbx_sessionid');
 	}
 

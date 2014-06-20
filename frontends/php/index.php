@@ -66,7 +66,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	$autoLogin = getRequest('autologin', 0);
 
 	DBstart();
-	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''), $autoLogin);
+	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
 	DBend(true);
 
 	if ($loginSuccess) {
@@ -92,7 +92,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 }
 else {
 	// login the user from the session, if the session id is empty - login as a guest
-	CWebUser::checkAuthentication(CWebUser::getSessionId());
+	CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 }
 
 // the user is not logged in, display the login form
