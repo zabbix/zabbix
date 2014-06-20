@@ -994,47 +994,45 @@ class CXmlImport18 {
 						$current_host = reset($current_host);
 					}
 
-					$current_main_interfaces = array();
-					foreach ($current_host['interfaces'] as $interface) {
-						if ($interface['main'] == INTERFACE_PRIMARY) {
-							$current_main_interfaces[$interface['type']] = $interface;
+					$currentMainInterfaces = array();
+					$currentInterfacesByType = array();
+					foreach ($current_host['interfaces'] as $currentInterface) {
+						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
+							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
 						}
+						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
 					}
 
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
-						// for every interface we got based on XML
-						foreach ($interfaces as &$interface_db) {
-							// checking every interface of current host
-							foreach ($current_host['interfaces'] as $interface) {
-								if ($interface['main'] == INTERFACE_PRIMARY && $interface_db['main'] == INTERFACE_PRIMARY
-										&& $interface['type'] == $interface_db['type']) {
-									$interface_db['interfaceid'] = $interface['interfaceid'];
-									break;
-								}
+						// Loop through all interfaces we got from XML
+						foreach ($interfaces as &$interfaceXml) {
+							$interfaceXmlType = $interfaceXml['type'];
 
-								if ($interface['type'] == INTERFACE_TYPE_SNMP && $interface_db['type'] == INTERFACE_TYPE_SNMP
-										&& $interface['main'] == INTERFACE_SECONDARY && $interface['ip'] == $current_main_interfaces[INTERFACE_TYPE_AGENT]['ip']
-										&& $interface['port'] == $interface_db['port']) {
-									$interface_db['interfaceid'] = $interface['interfaceid'];
-									break;
-								}
-
-								// if all parameters of interface are identical
-								if (
-									$interface['type'] == $interface_db['type']
-									&& $interface['ip'] == $interface_db['ip']
-									&& $interface['dns'] == $interface_db['dns']
-									&& $interface['port'] == $interface_db['port']
-									&& $interface['useip'] == $interface_db['useip']
-								) {
-									// this interface is the same as existing one!
-									$interface_db['interfaceid'] = $interface['interfaceid'];
-									break;
+							// If this is primary interface of some type and we have default
+							// interface of same type in current (target) host, re-use interfaceid of
+							// the matching default interface in current host.
+							if($interfaceXml['main'] == INTERFACE_PRIMARY && isset($currentMainInterfaces[$interfaceXmlType])) {
+								$interfaceXml['interfaceid'] = $currentMainInterfaces[$interfaceXmlType]['interfaceid'];
+							}
+							else {
+								// Otherwise, loop through all current (target) host interfaces with type of current
+								// imported interface and re-use interfaceid in case if all interface parameters match.
+								if (isset($currentInterfacesByType[$interfaceXmlType])) {
+									foreach ($currentInterfacesByType[$interfaceXmlType] as $currentInterface) {
+										if ($currentInterface['ip'] == $interfaceXml['ip']
+												&& $currentInterface['dns'] == $interfaceXml['dns']
+												&& $currentInterface['port'] == $interfaceXml['port']
+												&& $currentInterface['useip'] == $interfaceXml['useip']) {
+											$interfaceXml['interfaceid'] = $currentInterface['interfaceid'];
+											break;
+										}
+									}
 								}
 							}
-							unset($interface_db);
 						}
+						unset($interfaceXml);
+
 						$host_db['interfaces'] = $interfaces;
 					}
 					$interfaces_created_with_host = true;
