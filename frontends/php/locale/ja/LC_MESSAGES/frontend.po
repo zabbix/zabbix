@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-21 12:06+0300\n"
-"PO-Revision-Date: 2014-06-10 05:14+0300\n"
+"POT-Creation-Date: 2014-06-21 12:08+0300\n"
+"PO-Revision-Date: 2014-06-20 05:36+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402370068.0\n"
+"X-POOTLE-MTIME: 1403235375.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -11905,7 +11905,7 @@ msgstr "コマンドを実行"
 
 #: include/actions.inc.php:479
 msgid "Run custom commands on Zabbix agent"
-msgstr "Zabbixエージェント城でカスタムコマンドを実行"
+msgstr "Zabbixエージェント上でカスタムコマンドを実行"
 
 #: include/actions.inc.php:482
 msgid "Run custom commands on Zabbix server"

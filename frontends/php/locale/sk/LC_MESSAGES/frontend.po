@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-21 12:06+0300\n"
-"PO-Revision-Date: 2014-06-14 00:31+0300\n"
+"POT-Creation-Date: 2014-06-21 12:08+0300\n"
+"PO-Revision-Date: 2014-06-18 21:35+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402698707.0\n"
+"X-POOTLE-MTIME: 1403120123.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -1236,7 +1236,7 @@ msgstr "Vyťaženie CPU. Vyťaženie procesora. cpu a mode sú nepovinné. Ak cp
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Využitie CPU. Využitie procesora v percentách. cpu, type a mode sú voliteľné. Ak cpu chýba, je použité all. Ak type chýba, je použitý user. Ak mode chýba, je použité avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:523
@@ -1255,7 +1255,7 @@ msgstr "Vypočíta kontrolný súčet súboru. Kontrolný súčet súboru je vyp
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Vypočíta veľkosť diskového priestoru daného diskového oddielu. Veľkosť je v KB. Ak mode chýba, je použitý total. V prípade pripojeného oddielu je vrátená veľkosť voľného priestoru. Príklad: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
 #: include/views/configuration.graph.edit.php:165
@@ -2306,7 +2306,7 @@ msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 #: include/func.inc.php:1426
 #, c-format
 msgid "Cannot sort by field \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné zoradiť podľa pola \"%1$s\"."
 
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2717,16 +2717,16 @@ msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služ
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak IP chýba, potom je použitá 127.0.0.1. Ak port chýba, potom je použitý predvolený port služby. Príklad: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojeniu ku službe. Ak IP chýba, potom je použitá 127.0.0.1. Ak port chýba, potom je použitý predvolený port služby."
 
 #: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojenia ku službe. Ak chýba <ip>, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak chýba <port>, potom je použitý predvolený port služby."
+msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojeniu ku službe. Ak chýba <ip>, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak chýba <port>, potom je použitý predvolený port služby."
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:315
@@ -2744,7 +2744,7 @@ msgstr "Typ kontroly"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Kontrola či je možné urobiť TCP spojenie na daný port. 0 - spojenie je nedostupné, 1 - spojenie je možné. IP je voliteľná. Ak chýba IP, potom je použitá 127.0.0.1. Príklad: net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:63
 #: include/views/configuration.discovery.list.php:43
@@ -7534,7 +7534,7 @@ msgstr "Neplatné poradie sorder pre službu \"%1$s\"."
 #: include/func.inc.php:1431
 #, c-format
 msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
-msgstr ""
+msgstr "Neplatný smer zoradenia \"%1$s\", musí byť \"%2$s\" alebo \"%3$s\"."
 
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
