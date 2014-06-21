@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-17 16:29+0300\n"
+"POT-Creation-Date: 2014-06-21 12:06+0300\n"
 "PO-Revision-Date: 2013-11-05 18:31+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -39,7 +39,7 @@ msgstr[1] "%1$d день"
 msgstr[2] "%1$d дні"
 msgstr[3] "%1$d днів"
 
-#: include/blocks.inc.php:1125
+#: include/blocks.inc.php:1124
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -53,7 +53,7 @@ msgstr[3] "відображено %1$d з %2$d проблем"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (рік %2$s)"
 
-#: latest.php:553 latest.php:725
+#: latest.php:555 latest.php:727
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -159,7 +159,7 @@ msgstr "(без проксі)"
 msgid "(with warnings)"
 msgstr ""
 
-#: include/blocks.inc.php:1326
+#: include/blocks.inc.php:1325
 msgid "-"
 msgstr "-"
 
@@ -167,11 +167,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ВВЕДЕНО ЯК МАСОВЕ ПІДТВЕРДЖЕННЯ]----"
 
-#: include/triggers.inc.php:2124 include/triggers.inc.php:2125
-#: include/triggers.inc.php:2126 include/triggers.inc.php:2128
-#: include/triggers.inc.php:2130 include/triggers.inc.php:2133
-#: include/triggers.inc.php:2136 include/triggers.inc.php:2137
-#: include/triggers.inc.php:2149
+#: include/triggers.inc.php:2100 include/triggers.inc.php:2101
+#: include/triggers.inc.php:2102 include/triggers.inc.php:2104
+#: include/triggers.inc.php:2106 include/triggers.inc.php:2109
+#: include/triggers.inc.php:2112 include/triggers.inc.php:2113
+#: include/triggers.inc.php:2125
 msgid "0 or 1"
 msgstr "0 або 1"
 
@@ -271,13 +271,13 @@ msgstr "Доступ заборонено."
 msgid "Account is blocked for %s seconds"
 msgstr "Обліковий запис заблоковано на %s секунд"
 
-#: events.php:480 include/actions.inc.php:232 include/blocks.inc.php:1004
-#: include/blocks.inc.php:1299 include/events.inc.php:197
+#: events.php:481 include/actions.inc.php:232 include/blocks.inc.php:1004
+#: include/blocks.inc.php:1298 include/events.inc.php:197
 #: include/events.inc.php:272 include/views/configuration.action.edit.php:1020
 msgid "Ack"
 msgstr "Підтверджено"
 
-#: acknow.php:234 jsLoader.php:180 tr_status.php:776
+#: acknow.php:234 jsLoader.php:180 tr_status.php:684
 msgid "Acknowledge"
 msgstr "Підтвердити"
 
@@ -293,11 +293,11 @@ msgstr "Підтвердження тривоги від імені"
 msgid "Acknowledge and return"
 msgstr "Підтвердити та повернутись"
 
-#: tr_status.php:268
+#: include/views/common.filter.trigger.php:45
 msgid "Acknowledge status"
 msgstr "Статус підтвердження"
 
-#: include/events.inc.php:182 tr_status.php:392 tr_status.php:787
+#: include/events.inc.php:182 tr_status.php:300 tr_status.php:695
 msgid "Acknowledged"
 msgstr "Підтверджено"
 
@@ -402,7 +402,7 @@ msgstr "Операції дії"
 msgid "Action updated"
 msgstr "Дію оновлено"
 
-#: events.php:481 include/blocks.inc.php:1005 include/blocks.inc.php:1300
+#: events.php:482 include/blocks.inc.php:1005 include/blocks.inc.php:1299
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -432,8 +432,8 @@ msgstr "Активно із"
 msgid "Active till"
 msgstr "Активно до"
 
-#: include/reports.inc.php:118 include/reports.inc.php:208
-#: include/reports.inc.php:250
+#: include/reports.inc.php:119 include/reports.inc.php:210
+#: include/reports.inc.php:252
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
 #: include/views/administration.general.regularexpressions.edit.php:47
@@ -443,7 +443,8 @@ msgstr "Активно до"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:70
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:219
+#: include/views/common.filter.trigger.php:132
 #: include/views/common.macros.php:69
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:535
@@ -481,9 +482,9 @@ msgstr "Активно до"
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.sysmaps.js.php:192
 #: include/views/js/configuration.sysmaps.js.php:405
-#: include/views/monitoring.history.php:100 jsLoader.php:181
+#: include/views/monitoring.history.php:101 jsLoader.php:181
 #: popup_bitem.php:166 popup_media.php:137 popup_period.php:135
-#: tr_logform.php:266 tr_status.php:338 tr_status.php:831
+#: tr_logform.php:266 tr_status.php:739
 msgid "Add"
 msgstr "Додати"
 
@@ -556,17 +557,17 @@ msgstr "Адміністрування"
 msgid "Advanced labels"
 msgstr "Розширені ярлики"
 
-#: include/blocks.inc.php:1002 include/blocks.inc.php:1297
+#: include/blocks.inc.php:1002 include/blocks.inc.php:1296
 #: include/events.inc.php:196 include/events.inc.php:272
-#: include/events.inc.php:275 tr_status.php:390
+#: include/events.inc.php:275 tr_status.php:298
 msgid "Age"
 msgstr "Вік"
 
-#: tr_status.php:301
+#: include/views/common.filter.trigger.php:92
 msgid "Age less than"
 msgstr "З віком менше ніж"
 
-#: include/views/monitoring.overview.php:64
+#: include/views/monitoring.overview.triggers.php:58
 #, c-format
 msgid "Age less than %s"
 msgstr "З віком менше ніж %s"
@@ -605,7 +606,7 @@ msgstr "Аліас"
 msgid "Align icons"
 msgstr "Вирівняти іконки"
 
-#: include/reports.inc.php:326
+#: include/reports.inc.php:329
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
 #: include/views/administration.general.gui.edit.php:28
@@ -643,7 +644,7 @@ msgstr "Дозволені вузли мережі"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr ""
 
-#: include/triggers.inc.php:1577
+#: include/triggers.inc.php:1553
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:967
 #: include/views/configuration.host.discovery.edit.php:278
@@ -657,7 +658,8 @@ msgstr ""
 msgid "And/Or"
 msgstr ""
 
-#: tr_status.php:258 tr_status.php:265
+#: include/views/common.filter.trigger.php:38
+#: include/views/common.filter.trigger.php:46
 msgid "Any"
 msgstr "Будь-який"
 
@@ -675,7 +677,6 @@ msgstr "Містить будь-який рядок символів"
 #: include/views/configuration.screen.constructor.edit.php:400
 #: include/views/inventory.host.view.php:226
 #: include/views/js/configuration.sysmaps.js.php:118
-#: include/views/monitoring.overview.php:32
 msgid "Application"
 msgstr "Група елементів даних"
 
@@ -899,11 +900,11 @@ msgstr "Протокол аутентифікації"
 msgid "Auto registration"
 msgstr "Автоматична реєстрація"
 
-#: include/views/administration.users.edit.php:164
+#: include/views/administration.users.edit.php:165
 msgid "Auto-login"
 msgstr "Авто-вхід"
 
-#: include/views/administration.users.edit.php:165 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:166 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Авто-вихід (мін. 90 секунд)"
 
@@ -952,7 +953,7 @@ msgstr "Доступний"
 msgid "Average"
 msgstr "Середня"
 
-#: include/reports.inc.php:395
+#: include/reports.inc.php:398
 msgid "Average by"
 msgstr "Середнє по"
 
@@ -1049,7 +1050,7 @@ msgstr "Булеан"
 msgid "Bottom"
 msgstr "По нижньому краю"
 
-#: include/reports.inc.php:433
+#: include/reports.inc.php:436
 msgid "Brighten"
 msgstr "Світліше"
 
@@ -1057,7 +1058,7 @@ msgstr "Світліше"
 msgid "Bulgarian (bg_BG)"
 msgstr "Болгарська (bg_BG)"
 
-#: tr_status.php:916
+#: tr_status.php:824
 msgid "Bulk acknowledge"
 msgstr "Масове підтвердження"
 
@@ -1319,7 +1320,7 @@ msgstr "Не вдалося додати не числовий елемент д
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Не вдалося додати не числовий елемент даних \"%1$s\" до прототипу графіка \"%2$s\"."
 
-#: include/reports.inc.php:489
+#: include/reports.inc.php:492
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr "Не вдалося додати не числовий елемент даних \"%1$s\"."
@@ -2657,7 +2658,7 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:179 users.php:240
+#: profile.php:180 users.php:240
 msgid "Cannot update user"
 msgstr "Не вдалося оновити дані користувача"
 
@@ -2709,7 +2710,7 @@ msgstr "По центру"
 msgid "Change"
 msgstr "Змінити"
 
-#: latest.php:340 latest.php:341
+#: latest.php:342 latest.php:343
 msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Зміна"
@@ -2721,7 +2722,7 @@ msgid "Change password"
 msgstr "Змінити пароль"
 
 #: include/forms.inc.php:403 include/items.inc.php:125
-#: include/triggers.inc.php:2101 include/views/configuration.item.edit.php:213
+#: include/triggers.inc.php:2077 include/views/configuration.item.edit.php:213
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Символ"
@@ -3601,7 +3602,7 @@ msgstr "ДЕЗАКТИВОВАНО"
 msgid "DISCOVERED"
 msgstr "ВИЯВЛЕНО"
 
-#: events.php:460 hosts.php:806 include/views/administration.proxy.edit.php:62
+#: events.php:461 hosts.php:806 include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3626,8 +3627,8 @@ msgid "DOWN"
 msgstr "НЕДОСТУПНИЙ"
 
 #: include/forms.inc.php:1634 include/maintenances.inc.php:33
-#: include/reports.inc.php:61 include/reports.inc.php:383
-#: include/reports.inc.php:391 report3.php:58 report4.php:104
+#: include/reports.inc.php:62 include/reports.inc.php:386
+#: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
 msgstr "Щодня"
 
@@ -3635,7 +3636,7 @@ msgstr "Щодня"
 msgid "Dark orange"
 msgstr "Помаранчева ніч"
 
-#: include/reports.inc.php:432
+#: include/reports.inc.php:435
 msgid "Darken"
 msgstr "Темніше"
 
@@ -3656,7 +3657,8 @@ msgstr "Фільтрування ПАНЕЛІ"
 msgid "Dashed line"
 msgstr "Пунктирна лінія"
 
-#: include/views/monitoring.overview.php:28
+#: include/views/monitoring.overview.items.php:26
+#: include/views/monitoring.overview.triggers.php:28
 msgid "Data"
 msgstr "Дані"
 
@@ -3748,7 +3750,6 @@ msgid "Date HW purchased"
 msgstr "Дата придбання HW"
 
 #: include/forms.inc.php:1703 report3.php:124 report4.php:159 report5.php:44
-#: tr_status.php:273 tr_status.php:275
 msgid "Day"
 msgstr "День"
 
@@ -3793,7 +3794,7 @@ msgstr "День тижня > N"
 msgid "Day of week is NOT N"
 msgstr "День тижня НЕ є N"
 
-#: include/forms.inc.php:1779 tr_status.php:273 tr_status.php:275
+#: include/forms.inc.php:1779
 msgid "Days"
 msgstr "Днів"
 
@@ -3982,8 +3983,8 @@ msgstr "Видалити комплексний екран?"
 msgid "Delete script?"
 msgstr "Видалити скрипт?"
 
-#: hosts.php:1060 include/reports.inc.php:110 include/reports.inc.php:199
-#: include/reports.inc.php:242
+#: hosts.php:1060 include/reports.inc.php:111 include/reports.inc.php:201
+#: include/reports.inc.php:244
 #: include/views/administration.general.regularexpressions.list.php:65
 #: include/views/administration.mediatypes.list.php:119
 #: include/views/administration.proxy.list.php:109
@@ -3993,7 +3994,7 @@ msgstr "Видалити скрипт?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:148
 #: include/views/administration.users.edit.php:74
-#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:222
 #: include/views/administration.users.list.php:153
 #: include/views/configuration.action.list.php:103
 #: include/views/configuration.application.list.php:118
@@ -4131,7 +4132,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr "Видалити вибрані тригери?"
 
-#: include/views/administration.users.edit.php:387
+#: include/views/administration.users.edit.php:390
 msgid "Delete selected user?"
 msgstr "Видалити обраного користувача?"
 
@@ -4266,14 +4267,14 @@ msgstr "Заборонено"
 msgid "Dependencies"
 msgstr "Залежності"
 
-#: include/triggers.inc.php:1272 tr_status.php:675
+#: include/triggers.inc.php:1248 tr_status.php:583
 msgid "Dependent"
 msgstr "Залежність"
 
-#: include/triggers.inc.php:1252
+#: include/triggers.inc.php:1228
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.triggers.list.php:173 popup.php:1021
-#: tr_status.php:659
+#: tr_status.php:567
 msgid "Depends on"
 msgstr "Залежить від"
 
@@ -4281,7 +4282,7 @@ msgstr "Залежить від"
 msgid "Deployment status"
 msgstr "Статус розгортання"
 
-#: events.php:461 events.php:476 include/classes/screens/CScreenEvents.php:41
+#: events.php:462 events.php:477 include/classes/screens/CScreenEvents.php:41
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.proxy.edit.php:89
 #: include/views/administration.script.edit.php:70
@@ -4296,7 +4297,7 @@ msgstr "Статус розгортання"
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:189
 #: include/views/monitoring.triggerComment.php:39 popup.php:1358
-#: tr_logform.php:227 tr_status.php:395
+#: tr_logform.php:227 tr_status.php:303
 msgid "Description"
 msgstr "Опис"
 
@@ -4496,13 +4497,13 @@ msgstr "Дезактивувати вибрані тригери?"
 #: auditlogs.php:146 dashboard.php:295 hosts.php:975
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1521
-#: include/triggers.inc.php:2358 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1497
+#: include/triggers.inc.php:2334 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:87
-#: include/views/administration.users.edit.php:185
+#: include/views/administration.users.edit.php:188
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.list.php:72
@@ -4571,7 +4572,7 @@ msgid "Discovery object"
 msgstr "Об'єкт виявлення"
 
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/blocks.inc.php:1256 include/forms.inc.php:1090
+#: include/blocks.inc.php:1255 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4682,7 +4683,7 @@ msgstr "Готово"
 msgid "Dot"
 msgstr "Лінія з крапок"
 
-#: include/blocks.inc.php:1258
+#: include/blocks.inc.php:1257
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Недоступно"
@@ -4778,8 +4779,8 @@ msgstr "Дублікат назви важливості \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дублікат імені користувача \"%s\"."
 
-#: events.php:479 include/events.inc.php:195 include/events.inc.php:272
-#: include/events.inc.php:275 tr_status.php:391
+#: events.php:480 include/events.inc.php:195 include/events.inc.php:272
+#: include/events.inc.php:275 tr_status.php:299
 msgid "Duration"
 msgstr "Тривалість"
 
@@ -4812,7 +4813,7 @@ msgstr "ПОДІЇ"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Кожнен URL-запит повинен мати унікальне ім'я. Будь ласка переконайтесь що це тільки один URL-запит з таким іменем"
 
-#: include/views/administration.users.edit.php:211
+#: include/views/administration.users.edit.php:214
 #: include/views/configuration.action.edit.php:397
 #: include/views/configuration.action.edit.php:410
 #: include/views/configuration.maintenance.edit.php:112
@@ -5082,7 +5083,7 @@ msgstr "Активувати вибрані тригери?"
 #: auditlogs.php:143 dashboard.php:295 hosts.php:966
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2355
+#: include/items.inc.php:206 include/triggers.inc.php:2331
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:95
 #: include/views/administration.usergroups.edit.php:65
@@ -5090,7 +5091,7 @@ msgstr "Активувати вибрані тригери?"
 #: include/views/administration.usergroups.list.php:57
 #: include/views/administration.usergroups.list.php:82
 #: include/views/administration.usergroups.list.php:87
-#: include/views/administration.users.edit.php:181
+#: include/views/administration.users.edit.php:184
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.edit.php:61
@@ -5120,7 +5121,7 @@ msgstr "Англійська (en_US)"
 msgid "Error"
 msgstr "Помилка"
 
-#: include/db.inc.php:738
+#: include/db.inc.php:749
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Помилка в запиті пошуку в таблиці \"%1$s\"."
@@ -5163,7 +5164,7 @@ msgstr "Підтвердження подій дезактивовано"
 msgid "Event details"
 msgstr "Подробиці події"
 
-#: include/triggers.inc.php:1519
+#: include/triggers.inc.php:1495
 msgid "Event generation"
 msgstr "Генерація події"
 
@@ -5184,8 +5185,9 @@ msgid "Event type"
 msgstr ""
 
 #: events.php:342 include/menu.inc.php:56
+#: include/views/common.filter.trigger.php:63
 #: include/views/inventory.host.view.php:202 jsLoader.php:190 search.php:136
-#: search.php:222 search.php:276 search.php:329 tr_status.php:277
+#: search.php:222 search.php:276 search.php:329
 msgid "Events"
 msgstr "Події"
 
@@ -5271,7 +5273,7 @@ msgstr "Експортувати вибране"
 msgid "Export to CSV"
 msgstr "Експортувати в CSV"
 
-#: include/triggers.inc.php:1516
+#: include/triggers.inc.php:1492
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5329,11 +5331,6 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "Пт"
 
-#: report3.php:114 report4.php:145
-msgctxt "Month long name"
-msgid "F"
-msgstr ""
-
 #: include/views/js/adm.regexprs.edit.js.php:360
 #: include/views/js/adm.regexprs.edit.js.php:369
 msgid "FALSE"
@@ -5345,11 +5342,11 @@ msgid "FTP"
 msgstr "FTP"
 
 #: include/setup.inc.php:209 include/setup.inc.php:352
-#: include/setup.inc.php:516
+#: include/setup.inc.php:517
 msgid "Fail"
 msgstr "Помилка"
 
-#: include/actions.inc.php:1079 include/blocks.inc.php:1170
+#: include/actions.inc.php:1079 include/blocks.inc.php:1169
 msgid "Failed"
 msgstr "Помилковий"
 
@@ -5473,29 +5470,32 @@ msgstr ""
 msgid "Filled region"
 msgstr "Заповнений регіон"
 
-#: events.php:399 hosts.php:811 include/forms.inc.php:616
+#: events.php:400 hosts.php:811 include/forms.inc.php:616
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
+#: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:131 latest.php:309 report2.php:383
-#: tr_status.php:345
+#: include/views/monitoring.history.php:132
+#: include/views/monitoring.overview.items.php:82 latest.php:311
+#: report2.php:384
 msgid "Filter"
 msgstr "Фільтрувати"
 
-#: tr_status.php:304
+#: include/views/common.filter.trigger.php:98
+#: include/views/monitoring.overview.items.php:72
 msgid "Filter by application"
 msgstr ""
 
-#: report2.php:322
+#: report2.php:323
 msgid "Filter by host group"
 msgstr "Фільтр по групі вузлів мережі"
 
-#: tr_status.php:340
+#: include/views/common.filter.trigger.php:134
 msgid "Filter by host inventory"
 msgstr ""
 
-#: tr_status.php:303
+#: include/views/common.filter.trigger.php:95
 msgid "Filter by name"
 msgstr "Фільтр по імені"
 
@@ -5583,12 +5583,12 @@ msgstr "П'ят"
 msgid "Friday"
 msgstr "П'ятниця"
 
-#: include/reports.inc.php:70 include/reports.inc.php:372
+#: include/reports.inc.php:71 include/reports.inc.php:375
 #: include/views/configuration.action.edit.php:458
 #: include/views/configuration.services.edit.php:228
 #: include/views/configuration.services.edit.php:254
 #: include/views/js/configuration.sysmaps.js.php:337 popup_period.php:120
-#: report2.php:372 report3.php:143 report4.php:175 services.php:187
+#: report2.php:373 report3.php:143 report4.php:175 services.php:187
 #: services.php:193
 msgid "From"
 msgstr "З"
@@ -5604,7 +5604,7 @@ msgstr "Доступ до веб-інтерфейсу"
 msgid "Frontend access updated"
 msgstr "Доступ до веб-інтерфейсу оновлено"
 
-#: include/views/administration.users.edit.php:230
+#: include/views/administration.users.edit.php:233
 msgid "Frontend messaging"
 msgstr "Повідомлення у веб-інтерфейсі"
 
@@ -5650,7 +5650,7 @@ msgstr "GSM модем"
 msgid "GUI"
 msgstr "Веб інтерфейс"
 
-#: include/classes/class.cwebuser.php:41
+#: include/classes/class.cwebuser.php:51
 msgid "GUI access disabled."
 msgstr "Доступ до GUI відключено."
 
@@ -5696,7 +5696,7 @@ msgstr ""
 msgid "Giga"
 msgstr "Гіга"
 
-#: include/triggers.inc.php:1652 tr_testexpr.php:35
+#: include/triggers.inc.php:1628 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Наданий вираз це не макрос"
 
@@ -5734,7 +5734,7 @@ msgstr "Глобальні скрипти"
 #: include/views/configuration.slideconf.list.php:59
 #: include/views/configuration.sysmap.list.php:65
 #: include/views/configuration.triggers.list.php:310 templates.php:663
-#: tr_status.php:918
+#: tr_status.php:826
 msgid "Go"
 msgstr "Виконати"
 
@@ -5757,8 +5757,8 @@ msgstr "Градієнтна лінія"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:294
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:61 latest.php:443 latest.php:621
-#: report2.php:397
+#: include/views/monitoring.history.php:61 latest.php:445 latest.php:623
+#: report2.php:398
 msgid "Graph"
 msgstr "Графік"
 
@@ -5942,7 +5942,7 @@ msgstr "Сітка"
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
 #: include/classes/screens/CScreenHostgroupTriggers.php:125
 #: include/classes/screens/CScreenHostTriggers.php:126
-#: include/reports.inc.php:331 include/screens.inc.php:346
+#: include/reports.inc.php:334 include/screens.inc.php:346
 #: include/views/configuration.application.list.php:44
 #: include/views/configuration.copy.elements.php:60
 #: include/views/configuration.graph.list.php:53
@@ -5955,10 +5955,11 @@ msgstr "Сітка"
 #: include/views/inventory.host.list.php:25
 #: include/views/inventory.host.list.php:75
 #: include/views/monitoring.charts.php:25
-#: include/views/monitoring.overview.php:31
+#: include/views/monitoring.overview.items.php:29
+#: include/views/monitoring.overview.triggers.php:31
 #: include/views/monitoring.screen.php:96
-#: include/views/monitoring.slides.php:82 latest.php:298 popup.php:474
-#: templates.php:484 tr_status.php:236
+#: include/views/monitoring.slides.php:82 latest.php:299 popup.php:474
+#: templates.php:484 tr_status.php:223
 msgid "Group"
 msgstr "Група"
 
@@ -6025,7 +6026,7 @@ msgstr "Групу оновлено"
 msgid "Grouping by"
 msgstr "Згруповано по"
 
-#: include/reports.inc.php:322 include/views/administration.users.edit.php:67
+#: include/reports.inc.php:325 include/views/administration.users.edit.php:67
 #: include/views/administration.users.list.php:58
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.host.edit.php:232
@@ -6134,7 +6135,7 @@ msgstr "Прихована"
 msgid "Hide"
 msgstr "Приховати"
 
-#: tr_status.php:272
+#: include/views/common.filter.trigger.php:55
 msgid "Hide all"
 msgstr "Приховати все"
 
@@ -6154,7 +6155,7 @@ msgstr "Приховати дезактивовані тригери"
 msgid "Hide filter"
 msgstr ""
 
-#: include/views/monitoring.history.php:115
+#: include/views/monitoring.history.php:116
 msgid "Hide selected"
 msgstr "Не відображувати тільки відібрані"
 
@@ -6172,8 +6173,8 @@ msgstr "Висока"
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.prototype.list.php:50 items.php:157
-#: jsLoader.php:202 latest.php:347 latest.php:348 latest.php:448
-#: latest.php:626
+#: jsLoader.php:202 latest.php:349 latest.php:350 latest.php:450
+#: latest.php:628
 msgid "History"
 msgstr "Історія"
 
@@ -6217,17 +6218,17 @@ msgstr "Горизонтальний"
 msgid "Horizontal align"
 msgstr "Вирівнювання по горизонталі"
 
-#: events.php:330 events.php:475 events.php:575 httpmon.php:71 httpmon.php:84
+#: events.php:330 events.php:476 events.php:576 httpmon.php:71 httpmon.php:84
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:671 include/blocks.inc.php:720
 #: include/blocks.inc.php:989 include/blocks.inc.php:999
-#: include/blocks.inc.php:1295 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1294 include/classes/screens/CScreenEvents.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:537 include/html.inc.php:343 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1141
-#: include/triggers.inc.php:1507
+#: include/setup.inc.php:365 include/triggers.inc.php:1117
+#: include/triggers.inc.php:1483
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:60
 #: include/views/configuration.graph.list.php:54
@@ -6251,10 +6252,10 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
 #: include/views/monitoring.slides.php:83 items.php:501 items.php:738
-#: items.php:765 jsLoader.php:140 latest.php:299 latest.php:323 latest.php:325
-#: popup.php:469 popup.php:486 popup.php:1078 queue.php:203 report2.php:359
-#: report2.php:393 report5.php:58 search.php:131 tr_status.php:237
-#: tr_status.php:393
+#: items.php:765 jsLoader.php:140 latest.php:300 latest.php:325 latest.php:327
+#: popup.php:469 popup.php:486 popup.php:1078 queue.php:203 report2.php:360
+#: report2.php:394 report5.php:58 search.php:131 tr_status.php:224
+#: tr_status.php:301
 #, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
@@ -6325,7 +6326,7 @@ msgstr[3] ""
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:276 include/blocks.inc.php:466
-#: include/blocks.inc.php:1168 include/forms.inc.php:493
+#: include/blocks.inc.php:1167 include/forms.inc.php:493
 #: include/maps.inc.php:25 include/views/administration.script.edit.php:84
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
@@ -6334,7 +6335,7 @@ msgstr[3] ""
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:143
-#: report2.php:341 search.php:273
+#: report2.php:342 search.php:273
 msgid "Host group"
 msgstr "Група вузлів мережі"
 
@@ -6562,7 +6563,7 @@ msgstr "Вузел мережі з цим самим видимим іменем
 #: hostinventoriesoverview.php:85 hosts.php:798 include/forms.inc.php:199
 #: include/forms.inc.php:884 include/items.inc.php:723
 #: include/menu.inc.php:109 include/menu.inc.php:162
-#: include/reports.inc.php:364 include/views/administration.proxy.edit.php:88
+#: include/reports.inc.php:367 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:46
 #: include/views/configuration.copy.elements.php:46
 #: include/views/configuration.graph.list.php:76
@@ -6600,7 +6601,8 @@ msgid "Hosts info"
 msgstr "Інформація по вузлах мережі"
 
 #: include/views/configuration.screen.constructor.edit.php:552
-#: include/views/monitoring.overview.php:90
+#: include/views/monitoring.overview.items.php:58
+#: include/views/monitoring.overview.triggers.php:80
 msgid "Hosts location"
 msgstr "Розміщення вузлів"
 
@@ -6608,8 +6610,8 @@ msgstr "Розміщення вузлів"
 msgid "Hosts updated"
 msgstr "Вузли мережі оновлено"
 
-#: include/reports.inc.php:60 include/reports.inc.php:382
-#: include/reports.inc.php:390
+#: include/reports.inc.php:61 include/reports.inc.php:385
+#: include/reports.inc.php:393
 msgid "Hourly"
 msgstr "Щогодини"
 
@@ -6643,7 +6645,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:459 hosts.php:807
+#: events.php:460 hosts.php:807
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:61
 #: include/views/inventory.host.view.php:57
@@ -7321,7 +7323,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr ""
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1653 tr_testexpr.php:36
+#: include/triggers.inc.php:1629 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Використано некоректну функцію"
 
@@ -7716,7 +7718,7 @@ msgstr "Значення \"%1$s\" є некоректним для поля ці
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Значення \"%1$s\" є некоректним для поля числа без знаку \"%2$s\"."
 
-#: include/reports.inc.php:524 include/reports.inc.php:528
+#: include/reports.inc.php:527 include/reports.inc.php:531
 #, c-format
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
@@ -7759,15 +7761,15 @@ msgid "Indonesian (id_ID)"
 msgstr "Індонезійська (id_ID)"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:1003
-#: include/blocks.inc.php:1298 include/classes/class.cformlist.php:72
+#: include/blocks.inc.php:1297 include/classes/class.cformlist.php:72
 #: include/classes/screens/CScreenActions.php:134
 #: include/views/administration.auditacts.list.php:75
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.hostgroups.list.php:53
 #: include/views/configuration.httpconf.list.php:70
 #: include/views/configuration.item.list.php:72
-#: include/views/configuration.triggers.list.php:112 latest.php:356
-#: latest.php:357 tr_status.php:388
+#: include/views/configuration.triggers.list.php:112 latest.php:358
+#: latest.php:359 tr_status.php:296
 msgid "Info"
 msgstr "Інфо"
 
@@ -7868,8 +7870,8 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.prototype.list.php:49
-#: include/views/configuration.services.edit.php:131 latest.php:344
-#: latest.php:345
+#: include/views/configuration.services.edit.php:131 latest.php:346
+#: latest.php:347
 msgid "Interval"
 msgstr "Інтервал"
 
@@ -7947,7 +7949,7 @@ msgstr ""
 msgid "Invalid params."
 msgstr "Помилкові параметри."
 
-#: include/reports.inc.php:574 include/reports.inc.php:578
+#: include/reports.inc.php:577 include/reports.inc.php:581
 #, c-format
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
@@ -7996,7 +7998,7 @@ msgid "Is online?"
 msgstr "В системі?"
 
 #: include/blocks.inc.php:991 include/blocks.inc.php:1000
-#: include/blocks.inc.php:1296
+#: include/blocks.inc.php:1295
 msgid "Issue"
 msgstr "Проблема"
 
@@ -8018,7 +8020,7 @@ msgstr "Італійська (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:164
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
-#: include/reports.inc.php:422 include/views/configuration.graph.edit.php:109
+#: include/reports.inc.php:425 include/views/configuration.graph.edit.php:109
 #: include/views/configuration.graph.edit.php:167
 #: include/views/configuration.triggers.expression.php:57 items.php:500
 #: items.php:738 items.php:765 tr_logform.php:254
@@ -8222,7 +8224,7 @@ msgstr ""
 
 #: hosts.php:838 hosts.php:931 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
-#: include/reports.inc.php:116 include/reports.inc.php:248
+#: include/reports.inc.php:117 include/reports.inc.php:250
 #: include/views/configuration.application.list.php:97
 #: include/views/configuration.graph.edit.php:285
 #: include/views/configuration.host.discovery.list.php:47
@@ -8230,7 +8232,7 @@ msgstr ""
 #: include/views/configuration.item.list.php:42
 #: include/views/configuration.template.edit.php:222
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:217
-#: include/views/inventory.host.view.php:227 latest.php:301 popup.php:71
+#: include/views/inventory.host.view.php:227 latest.php:302 popup.php:71
 #: queue.php:101 report6.php:44 search.php:141 search.php:173 search.php:198
 #: search.php:395 search.php:426 search.php:455 templates.php:497
 #: templates.php:559
@@ -8249,7 +8251,7 @@ msgstr "Елементи даних скопійовано"
 msgid "Items deleted"
 msgstr "Елементи даних видалено"
 
-#: include/views/monitoring.history.php:108
+#: include/views/monitoring.history.php:109
 msgid "Items list"
 msgstr "Список елементів"
 
@@ -8372,7 +8374,7 @@ msgstr "Кіло"
 msgid "Korean (ko_KR)"
 msgstr "Корейська (ko_KR)"
 
-#: latest.php:313
+#: latest.php:315
 msgid "LATEST DATA"
 msgstr "ОСТАННІ ДАНІ"
 
@@ -8479,7 +8481,7 @@ msgstr "Останні 365 днів"
 msgid "Last 7 days"
 msgstr "Останні 7 днів"
 
-#: include/blocks.inc.php:1001 tr_status.php:389
+#: include/blocks.inc.php:1001 tr_status.php:297
 msgid "Last change"
 msgstr "Остання зміна"
 
@@ -8487,7 +8489,7 @@ msgstr "Остання зміна"
 msgid "Last change (descending)"
 msgstr "Остання зміна (в порядку спадання)"
 
-#: httpmon.php:87 latest.php:333 latest.php:335
+#: httpmon.php:87 latest.php:335 latest.php:337
 msgid "Last check"
 msgstr "Остання перевірка"
 
@@ -8508,7 +8510,7 @@ msgstr "За останні"
 msgid "Last seen (age)"
 msgstr "Востаннє помітний (вік)"
 
-#: latest.php:337 latest.php:338
+#: latest.php:339 latest.php:340
 msgid "Last value"
 msgstr "Останнє значення"
 
@@ -8534,19 +8536,20 @@ msgstr ""
 msgid "Latvian (lv_LV)"
 msgstr "Латвійська (lv_LV)"
 
-#: include/reports.inc.php:99
+#: include/reports.inc.php:100
 #: include/views/configuration.screen.constructor.edit.php:548
 #: include/views/configuration.screen.constructor.edit.php:577
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
 #: include/views/js/configuration.sysmaps.js.php:249
-#: include/views/monitoring.overview.php:86 popup_bitem.php:153
+#: include/views/monitoring.overview.items.php:54
+#: include/views/monitoring.overview.triggers.php:76 popup_bitem.php:153
 msgid "Left"
 msgstr "З лівого боку"
 
-#: include/reports.inc.php:57 include/reports.inc.php:163
-#: include/reports.inc.php:306
+#: include/reports.inc.php:58 include/reports.inc.php:165
+#: include/reports.inc.php:309
 msgid "Legend"
 msgstr "Легенда"
 
@@ -8669,7 +8672,7 @@ msgid "Location longitude"
 msgstr "Розміщення (довгота)"
 
 #: include/forms.inc.php:404 include/items.inc.php:127
-#: include/triggers.inc.php:2102 include/views/configuration.item.edit.php:214
+#: include/triggers.inc.php:2078 include/views/configuration.item.edit.php:214
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Лог (багато полів)"
@@ -8910,11 +8913,11 @@ msgstr "Тип сервісу"
 msgid "Maintenance updated"
 msgstr "Сервіс оновлено"
 
-#: include/blocks.inc.php:1032 tr_status.php:725
+#: include/blocks.inc.php:1032 tr_status.php:633
 msgid "Maintenance with data collection"
 msgstr "Сервіс зі збором даних"
 
-#: include/blocks.inc.php:1031 tr_status.php:724
+#: include/blocks.inc.php:1031 tr_status.php:632
 msgid "Maintenance without data collection"
 msgstr "Сервіс без збору даних"
 
@@ -9011,11 +9014,11 @@ msgstr "Березень"
 msgid "Mark elements on trigger status change"
 msgstr "Відмічати елементи при зміні стану тригера"
 
-#: include/views/monitoring.history.php:117
+#: include/views/monitoring.history.php:118
 msgid "Mark others"
 msgstr "Не помічати тільки відібрані"
 
-#: include/views/monitoring.history.php:116
+#: include/views/monitoring.history.php:117
 msgid "Mark selected"
 msgstr "Помітити тільки відібрані"
 
@@ -9138,8 +9141,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "Травень"
 
-#: include/views/administration.users.edit.php:215
-#: include/views/administration.users.edit.php:343 popup_media.php:27
+#: include/views/administration.users.edit.php:218
+#: include/views/administration.users.edit.php:346 popup_media.php:27
 msgid "Media"
 msgstr "Метод повідомлення"
 
@@ -9237,11 +9240,11 @@ msgstr "Повідомлення дій"
 msgid "Message text limit"
 msgstr "Обреження тексту повідомлення"
 
-#: include/views/administration.users.edit.php:236
+#: include/views/administration.users.edit.php:239
 msgid "Message timeout"
 msgstr "Таймаут повідомлення"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:234
 msgid "Message timeout (seconds)"
 msgstr "Таймаут повідомлення (секунди)"
 
@@ -9249,7 +9252,7 @@ msgstr "Таймаут повідомлення (секунди)"
 msgid "Messages"
 msgstr "Повідомлення"
 
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:375
 msgid "Messaging"
 msgstr "Повідомлення"
 
@@ -9257,7 +9260,7 @@ msgstr "Повідомлення"
 msgid "Method not found."
 msgstr "Метод не знайдено."
 
-#: include/reports.inc.php:431
+#: include/reports.inc.php:434
 #: include/views/configuration.screen.constructor.edit.php:593
 msgid "Middle"
 msgstr "Посередині"
@@ -9310,7 +9313,8 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: include/views/configuration.sysmap.edit.php:132 tr_status.php:288
+#: include/views/common.filter.trigger.php:67
+#: include/views/configuration.sysmap.edit.php:132
 msgid "Minimum trigger severity"
 msgstr ""
 
@@ -9339,12 +9343,12 @@ msgstr "Хвилин"
 msgid "Missing \"%1$s\" field for action condition."
 msgstr ""
 
-#: include/reports.inc.php:467
+#: include/reports.inc.php:470
 #, c-format
 msgid "Missing \"%1$s\" field for item."
 msgstr ""
 
-#: include/reports.inc.php:564
+#: include/reports.inc.php:567
 #, c-format
 msgid "Missing \"%1$s\" field for period."
 msgstr ""
@@ -9438,8 +9442,8 @@ msgid "Month"
 msgstr "Місяць"
 
 #: include/forms.inc.php:1636 include/maintenances.inc.php:37
-#: include/reports.inc.php:63 include/reports.inc.php:385
-#: include/reports.inc.php:393 report3.php:60 report4.php:106
+#: include/reports.inc.php:64 include/reports.inc.php:388
+#: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
 msgstr "Щомісяця"
 
@@ -9464,7 +9468,7 @@ msgstr "100 найбільш активних тригерів"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1520
+#: include/triggers.inc.php:1496
 msgid "Multiple PROBLEM events"
 msgstr "Багатократні події ПРОБЛЕМА"
 
@@ -9497,7 +9501,7 @@ msgstr ""
 #: adm.regexps.php:171 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:49 hosts.php:805 hosts.php:836
 #: httpconf.php:44 httpmon.php:85 include/forms.inc.php:591
-#: include/hosts.inc.php:115 include/reports.inc.php:167
+#: include/hosts.inc.php:115 include/reports.inc.php:169
 #: include/setup.inc.php:384
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:24
@@ -9556,16 +9560,16 @@ msgstr ""
 #: include/views/configuration.triggers.massupdate.php:88
 #: include/views/inventory.host.list.php:76
 #: include/views/js/configuration.sysmaps.js.php:184 items.php:44
-#: latest.php:330 latest.php:331 maintenance.php:44 maintenance.php:204
+#: latest.php:332 latest.php:333 maintenance.php:44 maintenance.php:204
 #: maintenance.php:232 popup_httpstep.php:36 popup.php:522 popup.php:580
 #: popup.php:647 popup.php:722 popup.php:797 popup.php:873 popup.php:939
 #: popup.php:962 popup.php:1080 popup.php:1189 popup.php:1198 popup.php:1285
 #: popup.php:1364 popup.php:1457 popup.php:1460 popup.php:1527 popup.php:1530
 #: popup.php:1591 popup.php:1595 popup.php:1645 popup.php:1672 popup.php:1693
 #: popup.php:1719 popup.php:1748 popup.php:1755 popup_right.php:53
-#: popup_usrgrp.php:89 queue.php:204 report2.php:394 screenconf.php:50
+#: popup_usrgrp.php:89 queue.php:204 report2.php:395 screenconf.php:50
 #: services.php:41 slideconf.php:36 sysmaps.php:48 trigger_prototypes.php:41
-#: triggers.php:41 tr_status.php:394 users.php:45
+#: triggers.php:41 tr_status.php:302 users.php:45
 msgid "Name"
 msgstr "Ім'я"
 
@@ -9683,8 +9687,8 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Наступна"
 
-#: events.php:816 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2110 include/triggers.inc.php:1522
+#: events.php:817 include/events.inc.php:355 include/events.inc.php:373
+#: include/func.inc.php:2110 include/triggers.inc.php:1498
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -9898,11 +9902,11 @@ msgstr ""
 msgid "No errors found."
 msgstr "Помилок не знайдено."
 
-#: include/blocks.inc.php:1077 include/blocks.inc.php:1317 tr_status.php:797
+#: include/blocks.inc.php:1077 include/blocks.inc.php:1316 tr_status.php:705
 msgid "No events"
 msgstr "Подій немає"
 
-#: events.php:409 include/blocks.inc.php:997
+#: events.php:410 include/blocks.inc.php:997
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr ""
@@ -10077,7 +10081,7 @@ msgid "No items defined."
 msgstr "Елементів даних не визначено."
 
 #: include/items.inc.php:697 include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:114 popup.php:1075
+#: include/views/monitoring.overview.items.php:95 popup.php:1075
 msgid "No items found."
 msgstr ""
 
@@ -10110,7 +10114,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:177
+#: include/views/administration.users.edit.php:180
 msgid "No media found."
 msgstr ""
 
@@ -10317,7 +10321,7 @@ msgstr ""
 msgid "No times defined. Work 24x7."
 msgstr "Інтервалів не визначено. Робота 24х7."
 
-#: include/views/monitoring.overview.php:67
+#: include/views/monitoring.overview.triggers.php:61
 msgid "No trigger"
 msgstr "Немає тригера"
 
@@ -10330,9 +10334,10 @@ msgstr "Немає тригера з triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
-#: include/triggers.inc.php:1104
-#: include/views/configuration.triggers.list.php:104 popup.php:958
-#: report2.php:391 report5.php:56 tr_status.php:382
+#: include/triggers.inc.php:1080
+#: include/views/configuration.triggers.list.php:104
+#: include/views/monitoring.overview.triggers.php:116 popup.php:958
+#: report2.php:392 report5.php:56 tr_status.php:290
 msgid "No triggers found."
 msgstr "Тригери не знайдено."
 
@@ -10352,11 +10357,11 @@ msgstr ""
 #: include/classes/screens/CScreenHistory.php:160
 #: include/classes/screens/CScreenHistory.php:270
 #: include/classes/screens/CScreenPlainText.php:41
-#: include/classes/screens/CScreenPlainText.php:63 latest.php:316
+#: include/classes/screens/CScreenPlainText.php:63 latest.php:318
 msgid "No values found."
 msgstr "Значень не знайдено."
 
-#: httpmon.php:82 include/blocks.inc.php:1166
+#: httpmon.php:82 include/blocks.inc.php:1165
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr ""
@@ -10371,7 +10376,7 @@ msgid "None"
 msgstr "Нічого"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1519 popup.php:1425
+#: include/triggers.inc.php:1495 popup.php:1425
 msgid "Normal"
 msgstr "Звичайний"
 
@@ -10607,14 +10612,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr ""
 
 #: include/forms.inc.php:402 include/items.inc.php:123
-#: include/triggers.inc.php:2100 include/views/configuration.item.edit.php:212
+#: include/triggers.inc.php:2076 include/views/configuration.item.edit.php:212
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Числовий (дробове)"
 
-#: include/triggers.inc.php:2099 include/triggers.inc.php:2115
-#: include/triggers.inc.php:2119 include/triggers.inc.php:2129
-#: include/triggers.inc.php:2134 include/triggers.inc.php:2138
+#: include/triggers.inc.php:2075 include/triggers.inc.php:2091
+#: include/triggers.inc.php:2095 include/triggers.inc.php:2105
+#: include/triggers.inc.php:2110 include/triggers.inc.php:2114
 msgid "Numeric (integer 64bit)"
 msgstr "Числовий (64 біти)"
 
@@ -10633,12 +10638,12 @@ msgstr "OEM"
 #: include/maps.inc.php:470 include/maps.inc.php:552 include/maps.inc.php:642
 #: include/maps.inc.php:732 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
-#: include/setup.inc.php:515 include/triggers.inc.php:166
-#: include/views/monitoring.overview.php:41
+#: include/setup.inc.php:516 include/triggers.inc.php:166
+#: include/views/monitoring.overview.triggers.php:38
 msgid "OK"
 msgstr "OK"
 
-#: include/views/monitoring.overview.php:70
+#: include/views/monitoring.overview.items.php:39
 msgid "OK or no trigger"
 msgstr ""
 
@@ -10674,7 +10679,8 @@ msgstr "ОС (Короткий опис)"
 msgid "OTHER CONFIGURATION PARAMETERS"
 msgstr "ІНШІ ПАРАМЕТРИ НАЛАШТУВАНЬ"
 
-#: include/views/monitoring.overview.php:77
+#: include/views/monitoring.overview.items.php:45
+#: include/views/monitoring.overview.triggers.php:67
 msgid "OVERVIEW"
 msgstr "ОГЛЯД"
 
@@ -10696,9 +10702,9 @@ msgstr "Жовтень"
 msgid "Off"
 msgstr "Вимкн"
 
-#: include/actions.inc.php:1076 include/blocks.inc.php:1169
+#: include/actions.inc.php:1076 include/blocks.inc.php:1168
 #: include/classes/class.ctriggersinfo.php:126
-#: include/views/administration.users.list.php:85 report2.php:396
+#: include/views/administration.users.list.php:85 report2.php:397
 #: report3.php:83
 msgid "Ok"
 msgstr "Ок"
@@ -10712,7 +10718,7 @@ msgstr "Увімк"
 msgid "On status change triggers blink for"
 msgstr "Мигання тригерів при зміні стану протягом"
 
-#: include/views/administration.users.edit.php:234
+#: include/views/administration.users.edit.php:237
 msgid "Once"
 msgstr "Один раз"
 
@@ -10855,7 +10861,7 @@ msgstr "Операції"
 msgid "Operator"
 msgstr "Оператор"
 
-#: include/triggers.inc.php:1577
+#: include/triggers.inc.php:1553
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:968
 #: include/views/configuration.host.discovery.edit.php:279
@@ -10930,7 +10936,7 @@ msgstr "Інші"
 msgid "Other configuration parameters"
 msgstr "Інші параметри налаштувань"
 
-#: include/reports.inc.php:322
+#: include/reports.inc.php:325
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.maintenance.edit.php:176
@@ -10942,7 +10948,7 @@ msgstr "Інші групи"
 msgid "Other hosts"
 msgstr "Інші вузли мережі"
 
-#: include/reports.inc.php:366
+#: include/reports.inc.php:369
 #: include/views/configuration.hostgroups.edit.php:63
 #: include/views/configuration.maintenance.edit.php:168
 msgid "Other hosts | Group"
@@ -10986,7 +10992,9 @@ msgstr ""
 
 #: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
-#: include/views/monitoring.overview.php:35 overview.php:27 queue.php:69
+#: include/views/monitoring.overview.items.php:32
+#: include/views/monitoring.overview.triggers.php:34 overview.php:27
+#: queue.php:69
 msgid "Overview"
 msgstr "Огляд"
 
@@ -11161,7 +11169,8 @@ msgid "POP"
 msgstr "POP"
 
 #: chart5.php:196 include/maps.inc.php:454 include/triggers.inc.php:167
-#: include/views/monitoring.overview.php:45
+#: include/views/monitoring.overview.items.php:37
+#: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
 
@@ -11169,12 +11178,12 @@ msgstr "ПРОБЛЕМА"
 msgid "Page received incorrect data"
 msgstr "Сторінка отримала некоректні дані"
 
-#: include/reports.inc.php:435
+#: include/reports.inc.php:438
 msgid "Palette"
 msgstr "Палітра"
 
-#: include/reports.inc.php:425 include/reports.inc.php:426
-#: include/reports.inc.php:427 include/reports.inc.php:428
+#: include/reports.inc.php:428 include/reports.inc.php:429
+#: include/reports.inc.php:430 include/reports.inc.php:431
 #, c-format
 msgid "Palette #%1$s"
 msgstr "Палітра #%1$s"
@@ -11285,8 +11294,8 @@ msgstr "Процентна лінія (справа)"
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
-#: include/reports.inc.php:77 include/reports.inc.php:206
-#: include/reports.inc.php:379
+#: include/reports.inc.php:78 include/reports.inc.php:208
+#: include/reports.inc.php:382
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.discovery.edit.php:233
 #: include/views/configuration.item.edit.php:265
@@ -11294,7 +11303,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.massupdate.php:362
 #: include/views/configuration.maintenance.edit.php:102 popup_period.php:25
-#: popup_period.php:89 popup_period.php:127 report2.php:380 report3.php:62
+#: popup_period.php:89 popup_period.php:127 report2.php:381 report3.php:62
 #: report4.php:102 report6.php:56 srv_status.php:159
 msgid "Period"
 msgstr "Період"
@@ -11310,11 +11319,11 @@ msgid "Periods"
 msgstr "Періоди"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:369
+#: include/views/administration.users.edit.php:372
 msgid "Permissions"
 msgstr "Права доступу"
 
-#: include/views/administration.users.edit.php:367
+#: include/views/administration.users.edit.php:370
 msgid "Permissions can be assigned for user groups only."
 msgstr "Права доступу можуть бути призначені тільки групам користувачів."
 
@@ -11338,12 +11347,12 @@ msgstr "Алгоритм розміщення"
 msgid "Plain text"
 msgstr "Текст"
 
-#: include/views/administration.users.edit.php:249
-#: include/views/administration.users.edit.php:286
+#: include/views/administration.users.edit.php:252
+#: include/views/administration.users.edit.php:289
 msgid "Play"
 msgstr "Грати"
 
-#: include/views/administration.users.edit.php:237
+#: include/views/administration.users.edit.php:240
 msgid "Play sound"
 msgstr "Програвати звуковий сигнал"
 
@@ -11505,7 +11514,8 @@ msgid "Probably php-ldap module is missing."
 msgstr "Можливо відсутній модуль php-ldap."
 
 #: include/maps.inc.php:508 include/maps.inc.php:591 include/maps.inc.php:682
-#: include/views/js/configuration.sysmaps.js.php:144 tr_status.php:260
+#: include/views/common.filter.trigger.php:40
+#: include/views/js/configuration.sysmaps.js.php:144
 msgid "Problem"
 msgstr "Проблема"
 
@@ -11531,7 +11541,7 @@ msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, якщо хоча б у одного із підлеглих наявна проблема"
 
 #: chart4.php:163 include/maps.inc.php:502 include/maps.inc.php:585
-#: include/maps.inc.php:676 report2.php:395 report3.php:83
+#: include/maps.inc.php:676 report2.php:396 report3.php:83
 msgid "Problems"
 msgstr "Проблеми"
 
@@ -11649,7 +11659,7 @@ msgstr "Причина"
 msgid "Received value"
 msgstr "Отримане значення"
 
-#: tr_status.php:259
+#: include/views/common.filter.trigger.php:39
 msgid "Recent problem"
 msgstr ""
 
@@ -11672,7 +11682,7 @@ msgstr "Отримувач (в порядку спадання)"
 msgid "Recipient(s)"
 msgstr "Отримувачі"
 
-#: include/views/administration.users.edit.php:246
+#: include/views/administration.users.edit.php:249
 msgid "Recovery"
 msgstr "Відновлення"
 
@@ -11685,7 +11695,7 @@ msgstr "Повідомлення про відновлення"
 msgid "Recovery subject"
 msgstr "Тема про відновлення"
 
-#: include/views/administration.users.edit.php:166 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:169 profile.php:53 users.php:64
 msgid "Refresh (in seconds)"
 msgstr "Оновлювати екран (секунди)"
 
@@ -11770,6 +11780,7 @@ msgstr "Віддалена команда"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
+#: include/views/common.filter.trigger.php:126
 #: include/views/common.macros.php:53
 #: include/views/configuration.action.edit.php:99
 #: include/views/configuration.action.edit.php:400
@@ -11790,6 +11801,7 @@ msgstr "Віддалена команда"
 #: include/views/configuration.triggers.massupdate.php:113
 #: include/views/js/administration.general.valuemapping.edit.js.php:11
 #: include/views/js/adm.regexprs.edit.js.php:8
+#: include/views/js/common.filter.trigger.js.php:16
 #: include/views/js/common.macros.js.php:15
 #: include/views/js/configuration.action.edit.js.php:9
 #: include/views/js/configuration.action.edit.js.php:21
@@ -11808,9 +11820,7 @@ msgstr "Віддалена команда"
 #: include/views/js/configuration.sysmaps.js.php:303
 #: include/views/js/configuration.sysmaps.js.php:416
 #: include/views/js/configuration.sysmaps.js.php:461
-#: include/views/js/configuration.sysmaps.js.php:470
-#: include/views/js/monitoring.triggers.js.php:16 jsLoader.php:213
-#: tr_status.php:332
+#: include/views/js/configuration.sysmaps.js.php:470 jsLoader.php:213
 msgid "Remove"
 msgstr "Видалити"
 
@@ -11847,7 +11857,7 @@ msgstr "Видалити вузел мережі"
 msgid "Remove link"
 msgstr "Видалити лінк"
 
-#: include/views/monitoring.history.php:105
+#: include/views/monitoring.history.php:106
 msgid "Remove selected"
 msgstr "Прибрати вибране"
 
@@ -11876,11 +11886,11 @@ msgstr "Звіт"
 msgid "Report 1"
 msgstr "Звіт 1"
 
-#: include/reports.inc.php:142
+#: include/reports.inc.php:143
 msgid "Report 2"
 msgstr "Звіт 2"
 
-#: include/reports.inc.php:271
+#: include/reports.inc.php:273
 msgid "Report 3"
 msgstr "Звіт 3"
 
@@ -11928,13 +11938,15 @@ msgstr "Необхідні коди статусу"
 msgid "Required string"
 msgstr "Необхідна строка"
 
-#: events.php:400 hosts.php:814 include/forms.inc.php:619
-#: include/html.inc.php:209 include/reports.inc.php:126
-#: include/reports.inc.php:258 include/reports.inc.php:438
+#: events.php:401 hosts.php:814 include/forms.inc.php:619
+#: include/html.inc.php:209 include/reports.inc.php:127
+#: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
 #: include/views/administration.auditlogs.list.php:67
-#: include/views/inventory.host.list.php:55 latest.php:310 report2.php:384
-#: tr_status.php:346
+#: include/views/common.filter.trigger.php:148
+#: include/views/inventory.host.list.php:55
+#: include/views/monitoring.overview.items.php:83 latest.php:312
+#: report2.php:385
 msgid "Reset"
 msgstr "Скинути"
 
@@ -12017,7 +12029,7 @@ msgstr "Залишилось повторних спроб"
 msgid "Retrieve only headers"
 msgstr ""
 
-#: include/setup.inc.php:233 include/setup.inc.php:521
+#: include/setup.inc.php:233 include/setup.inc.php:522
 #: include/views/general.warning.php:40
 msgid "Retry"
 msgstr "Повторити"
@@ -12048,7 +12060,7 @@ msgstr ""
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr ""
 
-#: include/reports.inc.php:99
+#: include/reports.inc.php:100
 #: include/views/configuration.screen.constructor.edit.php:581
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:73
@@ -12078,7 +12090,7 @@ msgstr "Об'єднати рядки"
 msgid "Rows"
 msgstr "Рядків"
 
-#: include/views/administration.users.edit.php:167 profile.php:54 users.php:65
+#: include/views/administration.users.edit.php:170 profile.php:54 users.php:65
 msgid "Rows per page"
 msgstr "Рядків на сторінку"
 
@@ -12310,7 +12322,7 @@ msgstr ""
 msgid "STATUS OF DISCOVERY"
 msgstr "СТАН ВИЯВЛЕННЯ"
 
-#: tr_status.php:241
+#: tr_status.php:228
 msgid "STATUS OF TRIGGERS"
 msgstr "СТАН ТРИГЕРІВ"
 
@@ -12356,9 +12368,9 @@ msgstr "Субота"
 #: include/views/administration.script.edit.php:124
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:380
-#: include/views/administration.users.edit.php:384
-#: include/views/administration.users.edit.php:394
+#: include/views/administration.users.edit.php:383
+#: include/views/administration.users.edit.php:387
+#: include/views/administration.users.edit.php:397
 #: include/views/configuration.action.edit.php:1060
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -12395,7 +12407,7 @@ msgstr "Зберегти"
 msgid "Save and return"
 msgstr "Зберегти і повернутися"
 
-#: include/reports.inc.php:65 include/reports.inc.php:387
+#: include/reports.inc.php:66 include/reports.inc.php:390
 msgid "Scale"
 msgstr "Період"
 
@@ -12621,7 +12633,7 @@ msgstr "Другорядний телефон B для контакту"
 msgid "Secondary POC screen name"
 msgstr "Другорядне нік-ім'я для контакту"
 
-#: include/views/administration.users.edit.php:235
+#: include/views/administration.users.edit.php:238
 msgid "Seconds"
 msgstr "Секунд"
 
@@ -12640,11 +12652,12 @@ msgstr ""
 msgid "Security name"
 msgstr ""
 
-#: events.php:381 include/classes/class.cmultiselect.php:54
+#: events.php:382 include/classes/class.cmultiselect.php:54
 #: include/classes/html/CButtonPopup.php:52 include/forms.inc.php:569
-#: include/reports.inc.php:411
+#: include/reports.inc.php:414
 #: include/views/administration.auditacts.list.php:44
 #: include/views/administration.auditlogs.list.php:59
+#: include/views/common.filter.trigger.php:100
 #: include/views/configuration.action.edit.php:232
 #: include/views/configuration.action.edit.php:245
 #: include/views/configuration.action.edit.php:258
@@ -12667,12 +12680,12 @@ msgstr ""
 #: include/views/configuration.triggers.expression.php:43
 #: include/views/js/configuration.sysmaps.js.php:107
 #: include/views/js/configuration.sysmaps.js.php:114
-#: include/views/js/configuration.sysmaps.js.php:121 jsLoader.php:177
+#: include/views/js/configuration.sysmaps.js.php:121
+#: include/views/monitoring.overview.items.php:74 jsLoader.php:177
 #: popup_bitem.php:128 popup.php:558 popup.php:626 popup.php:699 popup.php:774
 #: popup.php:850 popup.php:921 popup.php:1056 popup.php:1167 popup.php:1262
 #: popup.php:1333 popup.php:1436 popup.php:1504 popup.php:1567 popup.php:1628
 #: popup.php:1815 popup_right.php:71 popup_usrgrp.php:106 tr_logform.php:252
-#: tr_status.php:306
 msgid "Select"
 msgstr "Вибрати"
 
@@ -12682,13 +12695,13 @@ msgstr "Вибрати"
 msgid "Select prototype"
 msgstr "Обрати прототип"
 
-#: include/views/monitoring.history.php:109
+#: include/views/monitoring.history.php:110
 msgid "Select rows with value like"
 msgstr "Відібрати рядки, які В ЗНАЧЕННІ містять"
 
 #: include/views/administration.script.edit.php:83
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:131
 msgid "Selected"
 msgstr "Відібрані"
 
@@ -12700,11 +12713,11 @@ msgstr "Вибрані дії видалено"
 msgid "Selected elements"
 msgstr "Вибрані елементи"
 
-#: include/reports.inc.php:322
+#: include/reports.inc.php:325
 msgid "Selected groups"
 msgstr "Вибрані групи"
 
-#: include/reports.inc.php:365
+#: include/reports.inc.php:368
 msgid "Selected hosts"
 msgstr "Вибрані вузли мережі"
 
@@ -12776,7 +12789,7 @@ msgstr "Інформація про сервер"
 msgid "Server time"
 msgstr "Час на сервері"
 
-#: events.php:589 include/actions.inc.php:103
+#: events.php:590 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:280
 #: include/views/configuration.services.parent.list.php:36 services.php:467
@@ -12853,13 +12866,13 @@ msgstr "Послуги утворюють кільцеву залежність.
 msgid "Session terminated, re-login, please."
 msgstr "Сесія завершилась, будь-ласка повторно увійдіть в систему."
 
-#: events.php:478 include/classes/screens/CScreenEvents.php:43
+#: events.php:479 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:167
-#: include/triggers.inc.php:1514 include/views/configuration.item.list.php:144
+#: include/triggers.inc.php:1490 include/views/configuration.item.list.php:144
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
-#: report5.php:60 tr_logform.php:331 tr_status.php:386
+#: report5.php:60 tr_logform.php:331 tr_status.php:294
 msgid "Severity"
 msgstr "Важливість"
 
@@ -12872,19 +12885,24 @@ msgid "Severity name cannot be empty."
 msgstr "Ім'я важливості не може бути пустим."
 
 #: include/classes/class.ccollapsibleuiwidget.php:48
-#: include/reports.inc.php:125 include/reports.inc.php:257
-#: include/reports.inc.php:437
+#: include/reports.inc.php:126 include/reports.inc.php:259
+#: include/reports.inc.php:440
 #: include/views/configuration.application.list.php:62
-#: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:831 tr_status.php:836
+#: include/views/js/configuration.sysmaps.js.php:26 report2.php:420
+#: tr_status.php:739 tr_status.php:744
 msgid "Show"
 msgstr "Відобразити"
 
-#: tr_status.php:273
-msgid "Show all"
-msgstr "Відображувати все"
+#: include/views/common.filter.trigger.php:56
+#, c-format
+msgid "Show all (%1$s day)"
+msgid_plural "Show all (%1$s days)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: latest.php:308 tr_status.php:302
+#: include/views/common.filter.trigger.php:143 latest.php:310
 msgid "Show details"
 msgstr "Відображувати деталі"
 
@@ -12918,15 +12936,16 @@ msgstr "Відображувати події не старше ніж (в дн�
 msgid "Show filter"
 msgstr ""
 
-#: include/views/monitoring.dashconf.php:87 tr_status.php:343
+#: include/views/common.filter.trigger.php:137
+#: include/views/monitoring.dashconf.php:87
 msgid "Show hosts in maintenance"
 msgstr "Відображувати вузли мережі в періодах сервісу"
 
-#: latest.php:306
+#: latest.php:308
 msgid "Show items with name like"
 msgstr "Відображувати елементи даних, які в імені містять"
 
-#: latest.php:307
+#: latest.php:309
 msgid "Show items without data"
 msgstr "Відображувати елементи даних без історії"
 
@@ -12942,7 +12961,7 @@ msgstr "Відображувати легенду"
 msgid "Show lines"
 msgstr "Відображувати лінії"
 
-#: include/views/monitoring.history.php:114
+#: include/views/monitoring.history.php:115
 msgid "Show selected"
 msgstr "Відобразити тільки відібрані"
 
@@ -12958,9 +12977,14 @@ msgstr "Відобразити текст у вигляді HTML"
 msgid "Show triggers"
 msgstr "Відображувати тригери"
 
-#: tr_status.php:275
-msgid "Show unacknowledged"
-msgstr "Відображувати тільки не підтверджені"
+#: include/views/common.filter.trigger.php:60
+#, c-format
+msgid "Show unacknowledged (%1$s day)"
+msgid_plural "Show unacknowledged (%1$s days)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: include/views/configuration.item.edit.php:392
 #: include/views/configuration.item.massupdate.php:447
@@ -13141,7 +13165,7 @@ msgstr ""
 msgid "Software package list - lists all packages for all supported package managers by default"
 msgstr ""
 
-#: include/reports.inc.php:170
+#: include/reports.inc.php:172
 msgid "Sort by"
 msgstr "Сортування за"
 
@@ -13204,7 +13228,7 @@ msgstr "Стан"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:462 events.php:477 hosts.php:845 httpdetails.php:134
+#: events.php:463 events.php:478 hosts.php:845 httpdetails.php:134
 #: httpmon.php:88 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13227,7 +13251,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:111 popup_media.php:134
 #: popup.php:964 popup.php:1084 popup.php:1193 popup.php:1202
-#: srv_status.php:140 tr_status.php:387
+#: srv_status.php:140 tr_status.php:295
 msgid "Status"
 msgstr "Стан"
 
@@ -13302,8 +13326,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Кроки"
 
-#: include/views/administration.users.edit.php:250
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:253
+#: include/views/administration.users.edit.php:290
 msgid "Stop"
 msgstr "Стоп"
 
@@ -13500,7 +13524,7 @@ msgstr "Telnet"
 #: include/forms.inc.php:597 include/forms.inc.php:914
 #: include/html.inc.php:323 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:378
-#: include/views/configuration.triggers.list.php:128 report2.php:267
+#: include/views/configuration.triggers.list.php:128 report2.php:268
 #: search.php:393
 msgid "Template"
 msgstr "Шаблон"
@@ -13532,7 +13556,7 @@ msgstr "Шаблон не може бути приєднано до іншого
 msgid "Template deleted"
 msgstr "Шаблон видалено"
 
-#: report2.php:248
+#: report2.php:249
 msgid "Template group"
 msgstr "Група шаблону"
 
@@ -13557,7 +13581,7 @@ msgstr ""
 msgid "Template screens"
 msgstr "Комплексні екрани з шаблону"
 
-#: report2.php:300
+#: report2.php:301
 msgid "Template trigger"
 msgstr "Тригер з шаблону"
 
@@ -13640,7 +13664,7 @@ msgid "Test string"
 msgstr "Тестовий рядок"
 
 #: include/forms.inc.php:405 include/items.inc.php:129
-#: include/triggers.inc.php:2103 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2079 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Текст (одне поле)"
@@ -13663,7 +13687,7 @@ msgstr ""
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
-#: include/classes/db/PostgresqlDbBackend.php:41
+#: include/classes/db/PostgresqlDbBackend.php:44
 #: include/classes/db/SqliteDbBackend.php:34
 msgid "The frontend does not match Zabbix database."
 msgstr ""
@@ -13773,15 +13797,15 @@ msgstr "Чет"
 msgid "Thursday"
 msgstr "Четвер"
 
-#: include/reports.inc.php:74 include/reports.inc.php:376
+#: include/reports.inc.php:75 include/reports.inc.php:379
 #: include/views/configuration.services.edit.php:229
 #: include/views/configuration.services.edit.php:255 popup_period.php:124
-#: report2.php:374 report3.php:143 report4.php:175 services.php:201
+#: report2.php:375 report3.php:143 report4.php:175 services.php:201
 #: services.php:207
 msgid "Till"
 msgstr "До"
 
-#: events.php:458 events.php:474 include/acknow.inc.php:49
+#: events.php:459 events.php:475 include/acknow.inc.php:49
 #: include/actions.inc.php:819 include/actions.inc.php:842
 #: include/actions.inc.php:915 include/actions.inc.php:933
 #: include/blocks.inc.php:993 include/classes/screens/CScreenActions.php:32
@@ -13859,8 +13883,8 @@ msgstr "Штамп часу не відрізняється від часу на
 msgid "Timestamp of system boot."
 msgstr ""
 
-#: include/reports.inc.php:54 include/reports.inc.php:159
-#: include/reports.inc.php:302
+#: include/reports.inc.php:55 include/reports.inc.php:161
+#: include/reports.inc.php:305
 msgid "Title"
 msgstr "Заголовок"
 
@@ -13882,7 +13906,8 @@ msgstr "Сьогодні"
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/js/configuration.sysmaps.js.php:251
-#: include/views/monitoring.overview.php:85
+#: include/views/monitoring.overview.items.php:53
+#: include/views/monitoring.overview.triggers.php:75
 msgid "Top"
 msgstr "По верхньому краю"
 
@@ -13931,13 +13956,13 @@ msgstr ""
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.prototype.list.php:51 items.php:158
-#: latest.php:350 latest.php:351
+#: latest.php:352 latest.php:353
 msgid "Trends"
 msgstr "Динаміка"
 
-#: events.php:337 events.php:378 include/actions.inc.php:56
+#: events.php:337 events.php:379 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1511
+#: include/maps.inc.php:26 include/triggers.inc.php:1487
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -14136,7 +14161,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "Важливість тригера"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:294
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:297
 msgid "Trigger severity"
 msgstr "Важливість тригера"
 
@@ -14158,7 +14183,7 @@ msgstr "Значення тригера"
 
 #: hosts.php:839 hosts.php:933 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
-#: include/triggers.inc.php:1116
+#: include/triggers.inc.php:1092
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:498
@@ -14170,10 +14195,11 @@ msgstr "Значення тригера"
 #: include/views/inventory.host.view.php:218
 #: include/views/inventory.host.view.php:228
 #: include/views/js/configuration.sysmaps.js.php:395
-#: include/views/monitoring.overview.php:27 jsLoader.php:219 popup.php:59
-#: search.php:135 search.php:142 search.php:177 search.php:199 search.php:221
-#: search.php:275 search.php:328 search.php:396 search.php:430 search.php:456
-#: templates.php:498 templates.php:561 tr_status.php:244
+#: include/views/monitoring.overview.items.php:25
+#: include/views/monitoring.overview.triggers.php:27 jsLoader.php:219
+#: popup.php:59 search.php:135 search.php:142 search.php:177 search.php:199
+#: search.php:221 search.php:275 search.php:328 search.php:396 search.php:430
+#: search.php:456 templates.php:498 templates.php:561 tr_status.php:231
 msgid "Triggers"
 msgstr "Тригери"
 
@@ -14197,7 +14223,7 @@ msgstr "Масове оновлення"
 msgid "Triggers overview"
 msgstr "Огляд тригерів"
 
-#: tr_status.php:261
+#: include/views/common.filter.trigger.php:37
 msgid "Triggers status"
 msgstr "Статус тригерів"
 
@@ -14265,9 +14291,10 @@ msgstr "Два елементи даних (\"%1$s\" та \"%2$s\") не мож�
 #: include/views/inventory.host.list.php:77
 #: include/views/js/configuration.sysmaps.js.php:13
 #: include/views/js/configuration.sysmaps.js.php:396
-#: include/views/monitoring.overview.php:33 latest.php:353 latest.php:354
-#: popup_media.php:117 popup.php:483 popup.php:1082 popup.php:1191
-#: popup.php:1200 tr_logform.php:276 tr_logform.php:280
+#: include/views/monitoring.overview.items.php:30
+#: include/views/monitoring.overview.triggers.php:32 latest.php:355
+#: latest.php:356 popup_media.php:117 popup.php:483 popup.php:1082
+#: popup.php:1191 popup.php:1200 tr_logform.php:276 tr_logform.php:280
 msgid "Type"
 msgstr "Тип"
 
@@ -14332,7 +14359,7 @@ msgstr "ДОСТУПНИЙ"
 msgid "URL"
 msgstr "URL-запит"
 
-#: include/views/administration.users.edit.php:168
+#: include/views/administration.users.edit.php:171
 msgid "URL (after login)"
 msgstr "URL (після входу в систему)"
 
@@ -14426,15 +14453,15 @@ msgstr "Розблокувати вибраних користувачів?"
 msgid "Units"
 msgstr "Одиниця виміру"
 
-#: events.php:572 events.php:573 events.php:583 events.php:584 events.php:585
-#: events.php:586 hosts.php:982 httpdetails.php:165 httpmon.php:167
+#: events.php:573 events.php:574 events.php:584 events.php:585 events.php:586
+#: events.php:587 hosts.php:982 httpdetails.php:165 httpmon.php:167
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
 #: include/actions.inc.php:185 include/actions.inc.php:199
 #: include/actions.inc.php:210 include/actions.inc.php:241
 #: include/actions.inc.php:625 include/actions.inc.php:1171
-#: include/blocks.inc.php:1171 include/classes/class.chostsinfo.php:120
+#: include/blocks.inc.php:1170 include/classes/class.chostsinfo.php:120
 #: include/discovery.inc.php:131 include/discovery.inc.php:168
 #: include/events.inc.php:47 include/events.inc.php:78
 #: include/graphs.inc.php:37 include/graphs.inc.php:67
@@ -14448,7 +14475,7 @@ msgstr "Одиниця виміру"
 #: include/perm.inc.php:53 include/regexp.inc.php:199
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2355 include/triggers.inc.php:2361
+#: include/triggers.inc.php:2331 include/triggers.inc.php:2337
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14471,11 +14498,11 @@ msgstr ""
 msgid "Unknown function."
 msgstr "Невідома функція."
 
-#: include/triggers.inc.php:1651 popup_trexpr.php:616 tr_testexpr.php:34
+#: include/triggers.inc.php:1627 popup_trexpr.php:616 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Невідомий елемент даних вузла мережі, немає цього елемента в обраному вузлі"
 
-#: include/triggers.inc.php:1650 tr_testexpr.php:33
+#: include/triggers.inc.php:1626 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Невідомий вузел мережі, його не представлено в системі"
 
@@ -14604,7 +14631,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1257
+#: include/blocks.inc.php:1256
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Доступно"
@@ -14651,8 +14678,8 @@ msgid "Updated status of host"
 msgstr "Оновлено статус вузла мережі"
 
 #: include/blocks.inc.php:457 include/blocks.inc.php:792
-#: include/blocks.inc.php:864 include/blocks.inc.php:1122
-#: include/blocks.inc.php:1223 include/blocks.inc.php:1273
+#: include/blocks.inc.php:864 include/blocks.inc.php:1121
+#: include/blocks.inc.php:1222 include/blocks.inc.php:1272
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14737,7 +14764,7 @@ msgstr "Використовується в діях"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:344
 #: include/views/configuration.action.edit.php:540
 #: include/views/configuration.httpconf.edit.php:158
 msgid "User"
@@ -14752,7 +14779,7 @@ msgstr "Користувач \"%s\" не може існувати без гру
 msgid "User added"
 msgstr "Користувача додано"
 
-#: include/views/administration.users.edit.php:359
+#: include/views/administration.users.edit.php:362
 msgid "User can't change type for himself"
 msgstr "Користувач не може змінювати тип сам собі"
 
@@ -14863,7 +14890,7 @@ msgstr "Користувач не може модифікувати систем
 msgid "User name"
 msgstr "Ім'я користувача"
 
-#: index.php:100
+#: index.php:102
 msgid "User name does not match with DB"
 msgstr "Ім'я користувача не співпадає з БД"
 
@@ -14889,13 +14916,13 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:359
-#: include/views/administration.users.edit.php:363
+#: include/views/administration.users.edit.php:362
+#: include/views/administration.users.edit.php:366
 #: include/views/administration.users.list.php:57
 msgid "User type"
 msgstr "Тип користувача"
 
-#: profile.php:179 users.php:239
+#: profile.php:180 users.php:239
 msgid "User updated"
 msgstr "Дані користувача оновлено"
 
@@ -15108,7 +15135,7 @@ msgstr ""
 #: include/blocks.inc.php:804 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:169
-#: include/classes/screens/CScreenHistory.php:271 include/reports.inc.php:168
+#: include/classes/screens/CScreenHistory.php:271 include/reports.inc.php:170
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:38 tr_testexpr.php:50
 #, c-format
@@ -15402,8 +15429,8 @@ msgid "Week"
 msgstr "Тиждень"
 
 #: include/forms.inc.php:1635 include/maintenances.inc.php:35
-#: include/reports.inc.php:62 include/reports.inc.php:384
-#: include/reports.inc.php:392 report3.php:59 report4.php:105
+#: include/reports.inc.php:63 include/reports.inc.php:387
+#: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
 msgstr "Щотижня"
 
@@ -15426,7 +15453,7 @@ msgstr "Ширина"
 msgid "With data collection"
 msgstr "Зі збором даних"
 
-#: tr_status.php:267
+#: include/views/common.filter.trigger.php:48
 msgid "With last event unacknowledged"
 msgstr "З останньою непідтвердженою подією"
 
@@ -15439,7 +15466,7 @@ msgstr "З проблемами"
 msgid "With triggers"
 msgstr "З тригерами"
 
-#: tr_status.php:266
+#: include/views/common.filter.trigger.php:47
 msgid "With unacknowledged events"
 msgstr "З непідтвердженими подіями"
 
@@ -15556,8 +15583,8 @@ msgstr "Помилковий макрос \"%1$s\"."
 msgid "X"
 msgstr "X"
 
-#: include/reports.inc.php:55 include/reports.inc.php:160
-#: include/reports.inc.php:303
+#: include/reports.inc.php:56 include/reports.inc.php:162
+#: include/reports.inc.php:306
 msgid "X label"
 msgstr "Підпис вісі X"
 
@@ -15608,8 +15635,8 @@ msgstr "Мінімальне значення вісі Y"
 msgid "Y axis side"
 msgstr "Розміщення вісі Y"
 
-#: include/reports.inc.php:56 include/reports.inc.php:161
-#: include/reports.inc.php:304
+#: include/reports.inc.php:57 include/reports.inc.php:163
+#: include/reports.inc.php:307
 msgid "Y label"
 msgstr "Підпис вісі Y"
 
@@ -15630,15 +15657,15 @@ msgstr "d.m.Y H:i:s"
 msgid "Year"
 msgstr "Рік"
 
-#: include/reports.inc.php:64 include/reports.inc.php:386
-#: include/reports.inc.php:394 report3.php:61 report4.php:107
+#: include/reports.inc.php:65 include/reports.inc.php:389
+#: include/reports.inc.php:397 report3.php:61 report4.php:107
 msgid "Yearly"
 msgstr "Щороку"
 
-#: events.php:816 include/blocks.inc.php:813
+#: events.php:817 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2110
-#: include/triggers.inc.php:1522
+#: include/triggers.inc.php:1498
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -15857,7 +15884,7 @@ msgstr "[Неправильне значення місяця: \"%s\" ]"
 msgid "agent"
 msgstr "агент"
 
-#: include/classes/class.cpagefilter.php:804
+#: include/classes/class.cpagefilter.php:729
 #: include/classes/graphdraw/CLineGraphDraw.php:1850
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15867,9 +15894,9 @@ msgstr "агент"
 #: include/forms.inc.php:415 include/forms.inc.php:422
 #: include/forms.inc.php:439 include/forms.inc.php:584
 #: include/forms.inc.php:599 include/graphs.inc.php:76
-#: include/views/js/configuration.graph.edit.js.php:46 report2.php:236
-#: report2.php:252 report2.php:271 report2.php:304 report2.php:329
-#: report2.php:345 report4.php:90 report4.php:261
+#: include/views/js/configuration.graph.edit.js.php:46 report2.php:237
+#: report2.php:253 report2.php:272 report2.php:305 report2.php:330
+#: report2.php:346 report4.php:90 report4.php:261
 msgid "all"
 msgstr "всі"
 
@@ -15877,15 +15904,15 @@ msgstr "всі"
 msgid "all media"
 msgstr ""
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:125
 msgid "as Blue"
 msgstr "синім"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:124
 msgid "as Green"
 msgstr "зеленим"
 
-#: include/views/monitoring.history.php:122
+#: include/views/monitoring.history.php:123
 msgid "as Red"
 msgstr "червоним"
 
@@ -15930,7 +15957,7 @@ msgstr "d.m"
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
-#: tr_status.php:299
+#: include/views/common.filter.trigger.php:90
 msgid "days"
 msgstr "днів"
 
@@ -15938,7 +15965,7 @@ msgstr "днів"
 msgid "dd"
 msgstr "дд"
 
-#: include/classes/class.cpagefilter.php:686 include/setup.inc.php:420
+#: include/classes/class.cpagefilter.php:627 include/setup.inc.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
 msgid "default"
@@ -16157,8 +16184,8 @@ msgstr "не містить"
 msgid "not running"
 msgstr "не запущено"
 
-#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:726
-#: include/classes/class.cpagefilter.php:804 include/forms.inc.php:1108
+#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:667
+#: include/classes/class.cpagefilter.php:729 include/forms.inc.php:1108
 #: include/views/monitoring.screen.php:88 slides.php:225
 msgid "not selected"
 msgstr "не обрано"
