@@ -60,6 +60,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...);
 void zabbix_close_log();
 void zabbix_set_log_level(int level);
 
+int zabbix_check_log_level(int level);
+
 char *zbx_strerror(int errnum);
 char *strerror_from_system(unsigned long error);
 #ifdef _WINDOWS

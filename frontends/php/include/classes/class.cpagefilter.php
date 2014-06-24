@@ -734,7 +734,7 @@ class CPageFilter {
 	 */
 	private function _initSeveritiesMin($severityMin, array $options = array()) {
 		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		$mapId = isset($options['mapId']) ? $options['mapId'] : null;
+		$mapId = isset($options['mapId']) ? $options['mapId'] : 0;
 		$severityMinProfile = isset($this->_profileIds['severityMin']) ? $this->_profileIds['severityMin'] : null;
 
 		if ($severityMin === null && $severityMinProfile !== null) {

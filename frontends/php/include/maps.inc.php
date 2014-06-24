@@ -161,7 +161,8 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$gotos['events'] = array(
 					'triggerid' => $elem['elementid'],
-					'nav_time' => time() - SEC_PER_WEEK
+					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
+					'period' => SEC_PER_WEEK
 				);
 				break;
 
@@ -351,7 +352,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 		foreach ($hostsByNr as $i => $host) {
 			$replace = array(
 				'{HOST.NAME'.$i.'}' => $host['name'],
-				'{HOSTNAME'.$i.'}' => $host['name'],
+				'{HOSTNAME'.$i.'}' => $host['host'],
 				'{HOST.HOST'.$i.'}' => $host['host'],
 				'{HOST.DNS'.$i.'}' => $host['dns'],
 				'{HOST.IP'.$i.'}' => $host['ip'],

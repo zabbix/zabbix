@@ -232,6 +232,14 @@ elseif (isset($_REQUEST['rmv_row'])) {
 		DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 		DBexecute('DELETE FROM screens_items WHERE screenid='.zbx_dbstr($screen['screenid']).' AND y='.zbx_dbstr($rmv_row));
 		DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND y>'.zbx_dbstr($rmv_row));
+		// reduce the rowspan of the items that are displayed in the removed row
+		DBexecute(
+			'UPDATE screens_items'.
+				' SET rowspan=(rowspan-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND y+rowspan>'.zbx_dbstr($rmv_row).
+				' AND y<'.zbx_dbstr($rmv_row)
+		);
 
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Row deleted');
 	}
@@ -247,6 +255,14 @@ elseif (isset($_REQUEST['rmv_col'])) {
 		DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 		DBexecute('DELETE FROM screens_items WHERE screenid='.zbx_dbstr($screen['screenid']).' AND x='.zbx_dbstr($rmv_col));
 		DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.zbx_dbstr($screen['screenid']).' AND x>'.zbx_dbstr($rmv_col));
+		// reduce the colspan of the items that are displayed in the removed column
+		DBexecute(
+			'UPDATE screens_items'.
+				' SET colspan=(colspan-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND x+colspan>'.zbx_dbstr($rmv_col).
+				' AND x<'.zbx_dbstr($rmv_col)
+		);
 
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Column deleted');
 	}

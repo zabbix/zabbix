@@ -76,7 +76,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
 	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [listener #%d]", thread_num, thread_num2);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", thread_num, thread_num2);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 

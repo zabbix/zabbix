@@ -120,7 +120,7 @@ switch ($data['method']) {
 					}
 
 					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
-					$url_events = 'events.php?triggerid='.$event['objectid'];
+					$url_events = 'events.php?triggerid='.$event['objectid'].'&source='.EVENT_SOURCE_TRIGGERS;
 					$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
 
 					$result[$number] = array(

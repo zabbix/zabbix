@@ -587,20 +587,38 @@ class CTemplateScreen extends CScreen {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
-	 * @throws APIException if the input is invalid
+	 * Update template screens.
 	 *
 	 * @param array $screens
+	 *
+	 * @return array
 	 */
-	protected function validateUpdate(array $screens) {
+	public function update(array $screens) {
+		$screens = zbx_toArray($screens);
+
+		// check hostids before doing anything
+		$this->checkObjectIds($screens, 'screenid',
+			_('No "%1$s" given for template screen.'),
+			_('Empty screen ID for template screen.'),
+			_('Incorrect template screen ID.')
+		);
+
 		$dbScreens = $this->get(array(
+			'output' => array('screenid', 'hsize', 'vsize', 'templateid'),
+			'selectScreenItems' => array('screenitemid', 'x', 'y', 'colspan', 'rowspan'),
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => array('screenid', 'templateid'),
 			'preservekeys' => true
 		));
 
+		$this->validateUpdate($screens, $dbScreens);
+		$this->updateReal($screens);
+		$this->truncateScreenItems($screens, $dbScreens);
+
+		return array('screenids' => zbx_objectValues($screens, 'screenid'));
+	}
+
+	protected function validateUpdate(array $screens, array $dbScreens) {
 		foreach ($screens as $screen) {
 			if (!isset($dbScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

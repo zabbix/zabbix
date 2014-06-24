@@ -99,7 +99,7 @@ if ($isExportData) {
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
-	if (!no_errors()) {
+	if (hasErrorMesssages()) {
 		show_messages();
 	}
 	else {
@@ -189,6 +189,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 		'editable' => true
 	));
 
+	DBstart();
+
 	if (!empty($screens)) {
 		$goResult = API::Screen()->delete($screenids);
 
@@ -213,6 +215,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 			}
 		}
 	}
+
+	$goResult = DBend($goResult);
 
 	if ($goResult) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);

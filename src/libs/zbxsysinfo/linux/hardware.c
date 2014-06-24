@@ -119,7 +119,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 			if (MAP_FAILED == (mmp = mmap(0, len + SMBIOS_ENTRY_POINT_SIZE, PROT_READ, MAP_SHARED, fd, fp - len)))
 				goto close;
 
-			memcpy(membuf, mmp + len, sizeof(membuf));
+			memcpy(membuf, (char *)mmp + len, sizeof(membuf));
 			munmap(mmp, len + SMBIOS_ENTRY_POINT_SIZE);
 
 			if (0 == strncmp((char *)membuf, "_DMI_", 5))	/* entry point found */
@@ -144,7 +144,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	if (MAP_FAILED == (mmp = mmap(0, len + smbios_len, PROT_READ, MAP_SHARED, fd, smbios - len)))
 		goto clean;
 
-	memcpy(smbuf, mmp + len, smbios_len);
+	memcpy(smbuf, (char *)mmp + len, smbios_len);
 	munmap(mmp, len + smbios_len);
 
 	data = smbuf;

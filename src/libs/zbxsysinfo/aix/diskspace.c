@@ -171,25 +171,25 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
-	struct vmount	*vm = NULL;
+	struct vmount	*vms = NULL, *vm;
 	struct zbx_json	j;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
 		return ret;
 
-	vm = zbx_malloc(vm, (size_t)sz);
+	vms = zbx_malloc(vms, (size_t)sz);
 
 	/* get the list of mounted filesystems */
 	/* return code is number of filesystems returned */
-	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vm)))
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
 		goto error;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < rc; i++)
+	for (i = 0, vm = vms; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#FSNAME}", (char *)vm + vm->vmt_data[VMT_STUB].vmt_off, ZBX_JSON_TYPE_STRING);
@@ -208,7 +208,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 error:
-	zbx_free(vm);
+	zbx_free(vms);
 
 	return ret;
 }

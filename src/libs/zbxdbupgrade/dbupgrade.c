@@ -107,6 +107,7 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
+#ifndef HAVE_SQLITE3
 /*********************************************************************************
  *                                                                               *
  * Function: parse_db_monitor_item_params                                        *
@@ -197,7 +198,6 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 		*sql = zbx_strdup(NULL, "");
 }
 
-#ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
 	switch (field->type)
@@ -2396,6 +2396,15 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020001(void)
+{
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2439,7 +2448,7 @@ int	DBcheck_version(void)
 	int		db_mandatory, db_optional, required, ret = FAIL;
 
 #ifndef HAVE_SQLITE3
-	int		i, total = 0, current = 0, completed, last_completed = -1;
+	int		i, total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
 #endif
 
 	DBPATCH_START()
@@ -2643,7 +2652,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
+	DBPATCH_ADD(2020001, 0, 0)
 
 	DBPATCH_END()
 
@@ -2683,7 +2692,12 @@ int	DBcheck_version(void)
 	for (i = 0; NULL != patches[i].function; i++)
 	{
 		if (0 != patches[i].mandatory)
+		{
 			required = patches[i].version;
+			optional_num = 0;
+		}
+		else
+			optional_num++;
 
 		if (db_optional < patches[i].version)
 			total++;
@@ -2711,6 +2725,9 @@ int	DBcheck_version(void)
 #ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
+
+	if (0 != optional_num)
+		zabbix_log(LOG_LEVEL_INFORMATION, "optional patches were found");
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 

@@ -116,7 +116,7 @@ class CTriggersInfo extends CTable {
 				}
 			}
 
-			if (remove_nodes_from_id($this->groupid) > 0) {
+			if ($this->groupid != 0) {
 				$group = get_hostgroup_by_groupid($this->groupid);
 				$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 			}

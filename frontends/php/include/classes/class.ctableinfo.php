@@ -50,7 +50,7 @@ class CTableInfo extends CTable {
 							var cell = $(this);
 
 							var text = $("<span>", {
-								text: cell.text()
+								text: $.escapeHtml(cell.text())
 							});
 
 							if (IE) {

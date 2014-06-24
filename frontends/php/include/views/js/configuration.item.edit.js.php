@@ -140,6 +140,7 @@
 	}
 
 	jQuery(document).ready(function() {
+		// field switchers
 		<?php if (!empty($this->data['dataTypeVisibility'])) { ?>
 		var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
 			<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
@@ -163,11 +164,14 @@
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
 
+		// multiplier
 		var multpStat = document.getElementById('multiplier');
+
 		if (multpStat && multpStat.onclick) {
 			multpStat.onclick();
 		}
 
+		// type
 		jQuery('#type')
 			.change(function() {
 				// update the interface select with each item type change
@@ -176,6 +180,7 @@
 				setAuthTypeLabel();
 			})
 			.trigger('change');
+
 		jQuery('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!jQuery('#visible_type').is(':checked')) {
@@ -184,9 +189,11 @@
 			else {
 				jQuery('#type').trigger('change');
 			}
+
 			displayKeyButton();
 		});
 
+		// authentication type
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
@@ -210,10 +217,23 @@
 			jQuery('#privprotocol_div').buttonset();
 		});
 
+		// flexible interval max reached
 		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
+
 		if (maxReached) {
 			jQuery('#row-new-delay-flex-fields').hide();
 			jQuery('#row-new-delay-flex-max-reached').show();
 		}
+
+		// add flexible interval
+		jQuery('#add_delay_flex').click(function() {
+			var addDelayFlex = jQuery('<input>', {
+				type: 'hidden',
+				name: 'add_delay_flex',
+				value: 'add'
+			});
+
+			jQuery('form[name="itemForm"]').append(addDelayFlex).submit();
+		});
 	});
 </script>
