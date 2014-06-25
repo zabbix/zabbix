@@ -2213,14 +2213,14 @@ function get_item_function_info($expr) {
 
 	$type_of_value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
 		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 	);
 
 	$function_info = array(
-		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'band' =>		array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2285,7 +2285,7 @@ function get_item_function_info($expr) {
 				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
-					'key_' => array($exprPart['item']),
+					'key_' => array($exprPart['item'])
 				),
 				'webitems' => true
 			));
@@ -2295,7 +2295,7 @@ function get_item_function_info($expr) {
 					'output' => array('value_type'),
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
 					'filter' => array(
-						'key_' => array($exprPart['item']),
+						'key_' => array($exprPart['item'])
 					)
 				));
 
@@ -2311,7 +2311,7 @@ function get_item_function_info($expr) {
 				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
 				$result['type'] = $result['type'][$itemFound['value_type']];
 
-				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
+				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
@@ -2486,4 +2486,40 @@ function triggerIndicatorStyle($status, $state = null) {
 	}
 
 	return 'unknown';
+}
+
+/**
+ * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ *
+ * Keep in sync with orderItemsByStatus().
+ *
+ * @param array  $triggers
+ * @param string $sortorder
+ */
+function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($triggers as $key => $trigger) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+		}
+		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedTriggers = array();
+	foreach ($sort as $key => $val) {
+		$sortedTriggers[$key] = $triggers[$key];
+	}
+	$triggers = $sortedTriggers;
 }

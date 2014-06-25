@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageOverview extends CWebTest {
 	public function testPageOverview_CheckLayout() {
 		$this->zbxTestLogin('overview.php');
-		$this->zbxTestCheckTitle('Overview \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('Overview \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('OVERVIEW');
 		$this->zbxTestTextPresent('Hosts location');
 		$this->zbxTestTextPresent('Group');
@@ -33,7 +33,7 @@ class testPageOverview extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageOverview_NoHostNames() {
 		$this->zbxTestLogin('overview.php');
-		$this->zbxTestCheckTitle('Overview \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('Overview \[refreshed every 30 sec.\]');
 		$this->checkNoRealHostnames();
 	}
 }

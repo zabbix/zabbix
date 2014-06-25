@@ -49,3 +49,8 @@ void	zbx_vector_ptr_clean(zbx_vector_ptr_t *vector, zbx_mem_free_func_t free_fun
 	memset(vector->values, 0, sizeof(*vector->values) * vector->values_num);
 	vector->values_num = 0;
 }
+
+void	zbx_ptr_free(void *ptr)
+{
+	zbx_free(ptr);
+}

@@ -112,7 +112,9 @@ foreach ($this->data['graphs'] as $graph) {
 				'&hostid='.$this->data['hostid']
 		);
 
-		$isCheckboxEnabled = false;
+		if ($graph['discoveryRule']) {
+			$isCheckboxEnabled = false;
+		}
 	}
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
 		$name[] = new CLink(

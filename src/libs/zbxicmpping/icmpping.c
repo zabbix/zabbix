@@ -341,8 +341,15 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			}
 			while (++index < count && NULL != (c = strchr(c + 1, ' ')));
 
-			host->cnt = count;
-
+			host->cnt += count;
+#ifdef HAVE_IPV6
+			if (host->cnt == count && NULL == CONFIG_SOURCE_IP &&
+					0 != (fping_existence & FPING_EXISTS) &&
+					0 != (fping_existence & FPING6_EXISTS))
+			{
+				memset(host->status, 0, count);	/* reset response statuses for IPv6 */
+			}
+#endif
 			ret = SUCCEED;
 		}
 		while (NULL != fgets(tmp, sizeof(tmp), f));

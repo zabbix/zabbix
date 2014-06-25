@@ -42,12 +42,12 @@ ZBX_MEM_FUNC_DECL(__strpool);
 
 static zbx_hash_t	__strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	__strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 ZBX_MEM_FUNC_IMPL(__strpool, strpool.mem_info);
@@ -106,7 +106,7 @@ const char	*zbx_strpool_intern(const char *str)
 	refcount = (uint32_t *)record;
 	(*refcount)++;
 
-	return record + REFCOUNT_FIELD_SIZE;
+	return (char *)record + REFCOUNT_FIELD_SIZE;
 }
 
 const char	*zbx_strpool_acquire(const char *str)

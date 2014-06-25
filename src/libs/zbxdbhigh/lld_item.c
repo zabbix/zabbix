@@ -798,7 +798,7 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	int		i, j, new_items = 0, upd_items = 0, new_applications = 0;
 	zbx_lld_item_t	*item;
 	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0, flags = ZBX_FLAG_LLD_ITEM_UNSET;
-	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
+	char		*sql = NULL,
 			*key_proto_esc = NULL, *delay_flex_esc = NULL, *trapper_hosts_esc = NULL, *units_esc = NULL,
 			*formula_esc = NULL, *logtimefmt_esc = NULL, *ipmi_sensor_esc = NULL,
 			*snmp_community_esc = NULL, *port_esc = NULL, *snmpv3_securityname_esc = NULL,
@@ -806,23 +806,8 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 			*password_esc = NULL, *publickey_esc = NULL, *privatekey_esc = NULL,
 			*snmpv3_contextname_esc = NULL,
 			*name_esc, *key_esc, *params_esc, *snmp_oid_esc, *description_esc;
-	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
-			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
-			sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
-			sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0;
-	const char	*ins_items_sql =
-			"insert into items"
-			" (itemid,name,key_,hostid,type,value_type,data_type,delay,delay_flex,history,trends,status,"
-				"trapper_hosts,units,multiplier,delta,formula,logtimefmt,valuemapid,params,ipmi_sensor,"
-				"snmp_community,snmp_oid,port,snmpv3_securityname,snmpv3_securitylevel,"
-				"snmpv3_authprotocol,snmpv3_authpassphrase,snmpv3_privprotocol,snmpv3_privpassphrase,"
-				"authtype,username,password,publickey,privatekey,description,interfaceid,flags,"
-				"snmpv3_contextname)"
-			" values ";
-	const char	*ins_item_discovery_sql =
-			"insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values ";
-	const char	*ins_items_applications_sql =
-			"insert into items_applications (itemappid,itemid,applicationid) values ";
+	size_t		sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_db_insert_t	db_insert, db_insert_idiscovery, db_insert_iapps;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -856,32 +841,31 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		itemid = DBget_maxid_num("items", new_items);
 		itemdiscoveryid = DBget_maxid_num("item_discovery", new_items);
 
-		sql1 = zbx_malloc(sql1, sql1_alloc);
-		sql2 = zbx_malloc(sql2, sql2_alloc);
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
-#endif
-		flags |= ZBX_FLAG_LLD_ITEM_UPDATE;
+		zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
+				"data_type", "delay", "delay_flex", "history", "trends", "status", "trapper_hosts",
+				"units", "multiplier", "delta", "formula", "logtimefmt", "valuemapid", "params",
+				"ipmi_sensor", "snmp_community", "snmp_oid", "port", "snmpv3_securityname",
+				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
+				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
+				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
+				NULL);
+
+		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
+				"parent_itemid", "key_", NULL);
 	}
 
 	if (0 != new_applications)
 	{
 		itemappid = DBget_maxid_num("items_applications", new_applications);
 
-		sql3 = zbx_malloc(sql3, sql3_alloc);
-		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_items_applications_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert_iapps, "items_applications", "itemappid", "itemid", "applicationid",
+				NULL);
 	}
 
 	if (0 != upd_items || 0 != del_itemappids->values_num)
 	{
-		sql4 = zbx_malloc(sql4, sql4_alloc);
-		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		sql = zbx_malloc(sql, sql_alloc);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
@@ -929,41 +913,19 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		if (0 == item->itemid)
 		{
 			item->itemid = itemid++;
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
-#endif
-			name_esc = DBdyn_escape_string(item->name);
-			key_esc = DBdyn_escape_string(item->key);
-			params_esc = DBdyn_escape_string(item->params);
-			snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-			description_esc = DBdyn_escape_string(item->description);
 
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
-						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s','%s',%d,%d,'%s',%d,"
-						"'%s',%d,'%s','%s','%s','%s','%s',%s,%d,'%s')" ZBX_ROW_DL,
-					item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
-					(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
-					trapper_hosts_esc, units_esc, (int)multiplier, (int)delta, formula_esc,
-					logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc, ipmi_sensor_esc,
-					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
-					(int)snmpv3_securitylevel, (int)snmpv3_authprotocol, snmpv3_authpassphrase_esc,
-					(int)snmpv3_privprotocol, snmpv3_privpassphrase_esc, (int)authtype,
-					username_esc, password_esc, publickey_esc, privatekey_esc, description_esc,
-					DBsql_id_ins(interfaceid), ZBX_FLAG_DISCOVERY_CREATED, snmpv3_contextname_esc);
+			zbx_db_insert_add_values(&db_insert, item->itemid, item->name, item->key, hostid, (int)type,
+					(int)value_type, (int)data_type, delay, delay_flex, history, trends,
+					(int)status, trapper_hosts, units, (int)multiplier, (int)delta, formula,
+					logtimefmt, valuemapid, item->params, ipmi_sensor, snmp_community,
+					item->snmp_oid, port, snmpv3_securityname, (int)snmpv3_securitylevel,
+					(int)snmpv3_authprotocol, snmpv3_authpassphrase, (int)snmpv3_privprotocol,
+					snmpv3_privpassphrase, (int)authtype, username, password, publickey, privatekey,
+					item->description, interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
+					snmpv3_contextname);
 
-			zbx_free(description_esc);
-			zbx_free(snmp_oid_esc);
-			zbx_free(params_esc);
-			zbx_free(key_esc);
-			zbx_free(name_esc);
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
-#endif
-			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-					itemdiscoveryid++, item->itemid, parent_itemid, key_proto_esc);
+			zbx_db_insert_add_values(&db_insert_idiscovery, itemdiscoveryid++, item->itemid, parent_itemid,
+					key_proto);
 		}
 		else
 		{
@@ -971,206 +933,206 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update items set ");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
 				{
 					name_esc = DBdyn_escape_string(item->name);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "name='%s'", name_esc);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
 					zbx_free(name_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 				{
 					key_esc = DBdyn_escape_string(item->key);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%skey_='%s'", d, key_esc);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%skey_='%s'", d, key_esc);
 					zbx_free(key_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%stype=%d", d, (int)type);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, (int)type);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%svalue_type=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue_type=%d",
 							d, (int)value_type);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdata_type=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdata_type=%d",
 							d, (int)data_type);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelay=%d", d, delay);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdelay=%d", d, delay);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelay_flex='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdelay_flex='%s'",
 							d, delay_flex_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%shistory=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%shistory=%d",
 							d, history);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%strends=%d", d, trends);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%strends=%d", d, trends);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%strapper_hosts='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%strapper_hosts='%s'",
 							d, trapper_hosts_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sunits='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sunits='%s'",
 							d, units_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%smultiplier=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smultiplier=%d",
 							d, (int)multiplier);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELTA))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelta=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdelta=%d",
 							d, (int)delta);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sformula='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sformula='%s'",
 							d, formula_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%slogtimefmt='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%slogtimefmt='%s'",
 							d, logtimefmt_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%svaluemapid=%s",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svaluemapid=%s",
 							d, DBsql_id_ins(valuemapid));
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS))
 				{
 					params_esc = DBdyn_escape_string(item->params);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sparams='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sparams='%s'",
 							d, params_esc);
 					zbx_free(params_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sipmi_sensor='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sipmi_sensor='%s'",
 							d, ipmi_sensor_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%ssnmp_community='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ssnmp_community='%s'",
 							d, snmp_community_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID))
 				{
 					snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%ssnmp_oid='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ssnmp_oid='%s'",
 							d, snmp_oid_esc);
 					zbx_free(snmp_oid_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PORT))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sport='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sport='%s'",
 							d, port_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_securityname='%s'", d, snmpv3_securityname_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_securitylevel=%d", d, (int)snmpv3_securitylevel);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPROTOCOL))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_authprotocol=%d", d, (int)snmpv3_authprotocol);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_authpassphrase='%s'", d, snmpv3_authpassphrase_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPROTOCOL))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_privprotocol=%d", d, (int)snmpv3_privprotocol);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_privpassphrase='%s'", d, snmpv3_privpassphrase_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sauthtype=%d",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sauthtype=%d",
 							d, (int)authtype);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%susername='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%susername='%s'",
 							d, username_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spassword='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spassword='%s'",
 							d, password_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spublickey='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spublickey='%s'",
 							d, publickey_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sprivatekey='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sprivatekey='%s'",
 							d, privatekey_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION))
 				{
 					description_esc = DBdyn_escape_string(item->description);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdescription='%s'",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdescription='%s'",
 							d, description_esc);
 					zbx_free(description_esc);
 					d = ",";
@@ -1178,23 +1140,23 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sinterfaceid=%s",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sinterfaceid=%s",
 							d, DBsql_id_ins(interfaceid));
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"%ssnmpv3_contextname='%s'", d, snmpv3_contextname_esc);
 				}
 
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where itemid=" ZBX_FS_UI64 ";\n",
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
 						item->itemid);
 			}
 
 			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update item_discovery"
 						" set key_='%s'"
 						" where itemid=" ZBX_FS_UI64 ";\n",
@@ -1204,12 +1166,8 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 		for (j = 0; j < item->new_applicationids.values_num; j++)
 		{
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_items_applications_sql);
-#endif
-			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					itemappid++, item->itemid, item->new_applicationids.values[j]);
+			zbx_db_insert_add_values(&db_insert_iapps, itemappid++, item->itemid,
+					item->new_applicationids.values[j]);
 		}
 	}
 
@@ -1231,46 +1189,34 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	zbx_free(delay_flex_esc);
 	zbx_free(key_proto_esc);
 
-	if (0 != new_items)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql1_offset--;
-		sql2_offset--;
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-		DBexecute("%s", sql1);
-		DBexecute("%s", sql2);
-		zbx_free(sql1);
-		zbx_free(sql2);
-	}
-
-	if (0 != new_applications)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql3_offset--;
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBexecute("%s", sql3);
-		zbx_free(sql3);
-	}
-
 	if (0 != upd_items || 0 != del_itemappids->values_num)
 	{
 		if (0 != del_itemappids->values_num)
 		{
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "delete from items_applications where");
-			DBadd_condition_alloc(&sql4, &sql4_alloc, &sql4_offset, "itemappid",
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items_applications where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemappid",
 					del_itemappids->values, del_itemappids->values_num);
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
-		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
-		DBexecute("%s", sql4);
-		zbx_free(sql4);
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+
+	if (0 != new_items)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		zbx_db_insert_execute(&db_insert_idiscovery);
+		zbx_db_insert_clean(&db_insert_idiscovery);
+	}
+
+	if (0 != new_applications)
+	{
+		zbx_db_insert_execute(&db_insert_iapps);
+		zbx_db_insert_clean(&db_insert_iapps);
 	}
 
 	DBcommit();

@@ -128,7 +128,7 @@ $schema = DB::getSchema('config');
 						jQuery(this).dialog("destroy");
 					}}
 				],
-				draggable: false,
+				draggable: true,
 				modal: true,
 				width: (w > 600 ? 600 : 'inherit'),
 				resizable: false,

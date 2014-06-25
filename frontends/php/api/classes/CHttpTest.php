@@ -344,10 +344,11 @@ class CHttpTest extends CZBXAPI {
 			if (!isset($test['name']) || zbx_empty($test['name']) || !empty($dbTest['templateid'])) {
 				$test['name'] = $dbTest['name'];
 			}
-			if (!empty($test['steps'])) {
+
+			if (array_key_exists('steps', $test) && is_array($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
 					if (isset($step['httpstepid'])
-							&& (!empty($dbTest['templateid']) || !isset($step['name']) || zbx_empty($step['name']))) {
+							&& (!empty($dbTest['templateid']) || !array_key_exists('name', $step))) {
 						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
 					}
 					if (!empty($dbTest['templateid'])) {
@@ -358,7 +359,7 @@ class CHttpTest extends CZBXAPI {
 			unset($test);
 		}
 
-		$this->validateUpdate($httpTests);
+		$this->validateUpdate($httpTests, $dbHttpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
@@ -479,9 +480,6 @@ class CHttpTest extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 			}
 
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-			}
 			$this->checkSteps($httpTest);
 			$this->checkDuplicateSteps($httpTest);
 		}
@@ -497,7 +495,7 @@ class CHttpTest extends CZBXAPI {
 	 *
 	 * @param array $httpTests
 	 */
-	protected function validateUpdate(array $httpTests) {
+	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
 		if (!$this->isWritable($httpTestIds)) {
@@ -536,8 +534,10 @@ class CHttpTest extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if (isset($httpTest['steps'])) {
-				$this->checkSteps($httpTest);
+			if (array_key_exists('steps', $httpTest)) {
+				$dbHttpTest = isset($httpTest['httptestid']) ? $dbHttpTests[$httpTest['httptestid']] : null;
+
+				$this->checkSteps($httpTest, $dbHttpTest);
 				$this->checkDuplicateSteps($httpTest);
 			}
 		}
@@ -581,19 +581,52 @@ class CHttpTest extends CZBXAPI {
 	 * Check web scenario steps.
 	 *  - check status_codes field
 	 *  - check name characters
+	 *  - check if httpstepid values are from current web scenario
+	 *  - check if name is valid
+	 *  - check if url is valid
 	 *
 	 * @param array $httpTest
+	 * @param array|null $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
+
+		if (array_key_exists('steps', $httpTest)
+				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
+		}
+
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
+		if ($dbHttpTest) {
+			$httpTestStepIds = zbx_objectValues($httpTest['steps'], 'httpstepid');
+
+			if ($httpTestStepIds) {
+				$dbHttpTestStepIds = zbx_objectValues($dbHttpTest['steps'], 'httpstepid');
+
+				if (array_diff($httpTestStepIds, $dbHttpTestStepIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+			}
+		}
+
 		foreach ($httpTest['steps'] as $step) {
+			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
+			}
+
+			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && zbx_empty($step['url']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
+			}
+
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
+
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
 			}
@@ -612,30 +645,35 @@ class CHttpTest extends CZBXAPI {
 	}
 
 	/**
-	 * Validate http response code reange.
-	 * Range can contain ',' and '-'
-	 * Range can be empty string.
+	 * Validate http response code range.
+	 * Range can be empty string, can be set as user macro or be numeric and contain ',' and '-'.
 	 *
-	 * Examples: '100-199, 301, 404, 500-550'
+	 * Examples: '100-199, 301, 404, 500-550' or '{$USER_MACRO123}'
+	 *
+	 * @throws APIException if the status code range is invalid.
 	 *
 	 * @param string $statusCodeRange
 	 *
 	 * @return bool
 	 */
 	protected  function checkStatusCode($statusCodeRange) {
-		if ($statusCodeRange == '') {
+		if ($statusCodeRange === '' || preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $statusCodeRange)) {
 			return true;
 		}
+		else {
+			$ranges = explode(',', $statusCodeRange);
+			foreach ($ranges as $range) {
+				$range = explode('-', $range);
+				if (count($range) > 2) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
+				}
 
-		foreach (explode(',', $statusCodeRange) as $range) {
-			$range = explode('-', $range);
-			if (count($range) > 2) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
-			}
-
-			foreach ($range as $value) {
-				if (!is_numeric($value)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				foreach ($range as $value) {
+					if (!is_numeric($value)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid response code "%1$s".', $statusCodeRange)
+						);
+					}
 				}
 			}
 		}

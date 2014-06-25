@@ -49,33 +49,34 @@ function getLocales() {
 	return array(
 		'en_GB' => array('name' => _('English (en_GB)'),	'display' => true),
 		'en_US' => array('name' => _('English (en_US)'),	'display' => true),
-		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => true),
-		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => true),
-		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => true),
+		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => false),
+		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => false),
+		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => false),
 		'cs_CZ' => array('name' => _('Czech (cs_CZ)'),		'display' => false),
 		'nl_NL' => array('name' => _('Dutch (nl_NL)'),		'display' => false),
 		'fi_FI' => array('name' => _('Finnish (fi_FI)'),	'display' => false),
 		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => true),
-		'de_DE' => array('name' => _('German (de_DE)'),		'display' => true),
+		'de_DE' => array('name' => _('German (de_DE)'),		'display' => false),
 		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => false),
 		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
-		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => true),
+		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => false),
 		'it_IT' => array('name' => _('Italian (it_IT)'),	'display' => true),
 		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => false),
 		'ja_JP' => array('name' => _('Japanese (ja_JP)'),	'display' => true),
 		'lv_LV' => array('name' => _('Latvian (lv_LV)'),	'display' => false),
 		'lt_LT' => array('name' => _('Lithuanian (lt_LT)'),	'display' => false),
 		'fa_IR' => array('name' => _('Persian (fa_IR)'),	'display' => false),
-		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => false),
+		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => true),
 		'pt_BR' => array('name' => _('Portuguese (pt_BR)'),	'display' => true),
-		'pt_PT' => array('name' => _('Portuguese (pt_PT)'),	'display' => true),
+		'pt_PT' => array('name' => _('Portuguese (pt_PT)'),	'display' => false),
 		'ro_RO' => array('name' => _('Romanian (ro_RO)'),	'display' => false),
 		'ru_RU' => array('name' => _('Russian (ru_RU)'),	'display' => true),
 		'sk_SK' => array('name' => _('Slovak (sk_SK)'),		'display' => true),
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
-		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => true),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true)
+		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
+		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => false),
+		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
 	);
 }
 
@@ -172,7 +173,8 @@ function zbx_locale_variants_win($language) {
 		'es_es' => array('Spanish_Spain.1252', 'spanish'),
 		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
 		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian')
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
+		'vi_vn' => array('Vietnamese_Viet Nam.1258', 'vietnamese')
 	);
 	return $winLanguageName[strtolower($language)];
 }

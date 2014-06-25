@@ -27,28 +27,46 @@
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
 	char		*c = NULL;
-	regex_t		re;
+	static char	*old_pattern = NULL;
+	static int	old_flags;
+	static regex_t	re;
 	regmatch_t	match;
 
 	if (NULL != len)
 		*len = 0;
 
-	if (NULL != string)
+	if (NULL == string)
+		goto out;
+
+	/* performance optimization: if possible then reuse the last compiled regexp */
+
+	if (NULL == old_pattern)
+		goto compile;
+
+	if (0 != strcmp(old_pattern, pattern) || old_flags != flags)
+		regfree(&re);
+	else
+		goto execute;
+compile:
+	if (0 == regcomp(&re, pattern, flags))
 	{
-		if (0 == regcomp(&re, pattern, flags))
-		{
-			if (0 == regexec(&re, string, (size_t)1, &match, 0))	/* matched */
-			{
-				c = (char *)string + match.rm_so;
-
-				if (NULL != len)
-					*len = match.rm_eo - match.rm_so;
-			}
-
-			regfree(&re);
-		}
+		old_pattern = zbx_strdup(old_pattern, pattern);
+		old_flags = flags;
 	}
+	else
+	{
+		zbx_free(old_pattern);
+		goto out;
+	}
+execute:
+	if (0 == regexec(&re, string, (size_t)1, &match, 0))	/* matched */
+	{
+		c = (char *)string + match.rm_so;
 
+		if (NULL != len)
+			*len = match.rm_eo - match.rm_so;
+	}
+out:
 	return c;
 }
 
@@ -174,9 +192,11 @@ out:
  *********************************************************************************/
 static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
 {
-	regex_t		re;
-	regmatch_t	match[10];
+	static regex_t	re;
+	regmatch_t	match[10];	/* up to 10 capture groups in regexp */
 	char		*ptr = NULL;
+	static char	*old_pattern = NULL;
+	static int	old_flags;
 
 	if (NULL == string)
 		return NULL;
@@ -184,13 +204,29 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 	if (NULL == output_template || '\0' == *output_template)
 		flags |= REG_NOSUB;
 
-	if (0 != regcomp(&re, pattern, flags))
-		return NULL;
+	/* performance optimization: if possible then reuse the last compiled regexp */
 
+	if (NULL == old_pattern)
+		goto compile;
+
+	if (0 != strcmp(old_pattern, pattern) || old_flags != flags)
+		regfree(&re);
+	else
+		goto execute;
+compile:
+	if (0 == regcomp(&re, pattern, flags))
+	{
+		old_pattern = zbx_strdup(old_pattern, pattern);
+		old_flags = flags;
+	}
+	else
+	{
+		zbx_free(old_pattern);
+		return NULL;
+	}
+execute:
 	if (0 == regexec(&re, string, ARRSIZE(match), match, 0))
 		ptr = regexp_sub_replace(string, output_template, match, ARRSIZE(match));
-
-	regfree(&re);
 
 	return ptr;
 }
