@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-21 12:06+0300\n"
+"POT-Creation-Date: 2014-06-25 13:35+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -149,11 +149,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ОБЩО ПОТВЪРЖДАВАНЕ]----"
 
-#: include/triggers.inc.php:2100 include/triggers.inc.php:2101
-#: include/triggers.inc.php:2102 include/triggers.inc.php:2104
-#: include/triggers.inc.php:2106 include/triggers.inc.php:2109
-#: include/triggers.inc.php:2112 include/triggers.inc.php:2113
-#: include/triggers.inc.php:2125
+#: include/triggers.inc.php:2101 include/triggers.inc.php:2102
+#: include/triggers.inc.php:2103 include/triggers.inc.php:2105
+#: include/triggers.inc.php:2107 include/triggers.inc.php:2110
+#: include/triggers.inc.php:2113 include/triggers.inc.php:2114
+#: include/triggers.inc.php:2126
 msgid "0 or 1"
 msgstr "0 или 1"
 
@@ -622,7 +622,7 @@ msgstr "Позволени хостове"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr ""
 
-#: include/triggers.inc.php:1553
+#: include/triggers.inc.php:1554
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:967
 #: include/views/configuration.host.discovery.edit.php:278
@@ -1352,7 +1352,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Не може да се добави изображение"
 
-#: include/classes/import/CXmlImport18.php:642
+#: include/classes/import/CXmlImport18.php:643
 msgid "Cannot add image."
 msgstr "Не може да се добави изображение."
 
@@ -1548,7 +1548,7 @@ msgstr "Не може да се създаде съответствие на и�
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не може да се създаде съответствие на икона с идентично име \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:828
+#: include/classes/import/CXmlImport18.php:829
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не може да се създаде карта  \"%s\"."
@@ -1561,7 +1561,7 @@ msgstr "Не може да се създаде ново приложение, в
 msgid "Cannot create new element"
 msgstr "Не може да се създаде нов елемент"
 
-#: include/classes/import/CXmlImport18.php:1747
+#: include/classes/import/CXmlImport18.php:1748
 msgid "Cannot create screen."
 msgstr "Не може да се създаде екран."
 
@@ -1967,38 +1967,38 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/import/CXmlImport18.php:691
+#: include/classes/import/CXmlImport18.php:692
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери фоновото изображение \"%1$s\" използвано в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:510
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:511
+#: include/classes/import/CXmlImport18.php:1705
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери графиката \"%1$s\" използвана в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:736
+#: include/classes/import/CXmlImport18.php:737
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:476
+#: include/classes/import/CXmlImport18.php:477
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:747
+#: include/classes/import/CXmlImport18.php:748
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери хоста \"%1$s\" използван в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:493
+#: include/classes/import/CXmlImport18.php:494
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -2022,7 +2022,7 @@ msgstr "Не може да се намери хост интефейса в \"%1
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:780
+#: include/classes/import/CXmlImport18.php:781
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2053,14 +2053,14 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:530
-#: include/classes/import/CXmlImport18.php:1717
+#: include/classes/import/CXmlImport18.php:531
+#: include/classes/import/CXmlImport18.php:1718
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери елемент на данните \"%1$s\" използван в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:725
+#: include/classes/import/CXmlImport18.php:726
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в изнесената карта \"%2$s\"."
@@ -2070,7 +2070,7 @@ msgstr "Не може да се намери картата \"%1$s\" изпол�
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:546
+#: include/classes/import/CXmlImport18.php:547
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2080,7 +2080,7 @@ msgstr "Не може да се намери картата \"%1$s\" изпол�
 msgid "Cannot find objects with name"
 msgstr "Не може да се намерят обектите с име"
 
-#: include/classes/import/CXmlImport18.php:562
+#: include/classes/import/CXmlImport18.php:563
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2091,8 +2091,8 @@ msgstr "Не може да се намери екрана \"%1$s\" използ�
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:758
-#: include/classes/import/CXmlImport18.php:800
+#: include/classes/import/CXmlImport18.php:759
+#: include/classes/import/CXmlImport18.php:801
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2473,7 +2473,7 @@ msgstr "Не може да се актуализира съответствие 
 msgid "Cannot update image"
 msgstr "Не може да се актуализира изображението"
 
-#: include/classes/import/CXmlImport18.php:649
+#: include/classes/import/CXmlImport18.php:650
 msgid "Cannot update image."
 msgstr "Не може да се актуализира изображението."
 
@@ -2506,7 +2506,7 @@ msgstr "Не може да се актуализират макросите"
 msgid "Cannot update maintenance"
 msgstr "Не може да се актуализира поддръжката"
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не може да се актуализира карта на мрежата \"%s\"."
@@ -2536,7 +2536,7 @@ msgstr "Не може да се актуализират регуларните 
 msgid "Cannot update screen"
 msgstr "Не може да се актуализира екрана"
 
-#: include/classes/import/CXmlImport18.php:1739
+#: include/classes/import/CXmlImport18.php:1740
 msgid "Cannot update screen."
 msgstr "Не може да се актуализира екрана."
 
@@ -2641,7 +2641,7 @@ msgid "Change password"
 msgstr "Промени парола"
 
 #: include/forms.inc.php:403 include/items.inc.php:125
-#: include/triggers.inc.php:2077 include/views/configuration.item.edit.php:213
+#: include/triggers.inc.php:2078 include/views/configuration.item.edit.php:213
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Символ"
@@ -4186,11 +4186,11 @@ msgstr "Отказ"
 msgid "Dependencies"
 msgstr "Зависимости"
 
-#: include/triggers.inc.php:1248 tr_status.php:583
+#: include/triggers.inc.php:1249 tr_status.php:583
 msgid "Dependent"
 msgstr "Зависим"
 
-#: include/triggers.inc.php:1228
+#: include/triggers.inc.php:1229
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.triggers.list.php:173 popup.php:1021
 #: tr_status.php:567
@@ -4416,8 +4416,8 @@ msgstr "Изключване на избраните тригери?"
 #: auditlogs.php:146 dashboard.php:295 hosts.php:975
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1497
-#: include/triggers.inc.php:2334 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1498
+#: include/triggers.inc.php:2335 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
@@ -4998,7 +4998,7 @@ msgstr "Активиране на избраните тригери?"
 #: auditlogs.php:143 dashboard.php:295 hosts.php:966
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2331
+#: include/items.inc.php:206 include/triggers.inc.php:2332
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:95
 #: include/views/administration.usergroups.edit.php:65
@@ -5079,7 +5079,7 @@ msgstr "Потвърждаване на събитие изключено"
 msgid "Event details"
 msgstr "Детайли за събитието"
 
-#: include/triggers.inc.php:1495
+#: include/triggers.inc.php:1496
 msgid "Event generation"
 msgstr "Генериране на събитие"
 
@@ -5188,7 +5188,7 @@ msgstr "Експортиране на избраните"
 msgid "Export to CSV"
 msgstr "Експортиране в CSV"
 
-#: include/triggers.inc.php:1492
+#: include/triggers.inc.php:1493
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5611,7 +5611,7 @@ msgstr ""
 msgid "Giga"
 msgstr "Гига"
 
-#: include/triggers.inc.php:1628 tr_testexpr.php:35
+#: include/triggers.inc.php:1629 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Като се има предвид, израза не е макро"
 
@@ -5714,8 +5714,8 @@ msgstr "Графика \"%1$s\" не може да бъде наследена. 
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Графика \"%1$s\" не съществува в шаблон \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1599
-#: include/classes/import/CXmlImport18.php:1603
+#: include/classes/import/CXmlImport18.php:1600
+#: include/classes/import/CXmlImport18.php:1604
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Графика \"%1$s\" пропуснато - потребителско правило."
@@ -6140,8 +6140,8 @@ msgstr "Хоризонтално подравняване"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:537 include/html.inc.php:343 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1117
-#: include/triggers.inc.php:1483
+#: include/setup.inc.php:365 include/triggers.inc.php:1118
+#: include/triggers.inc.php:1484
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:60
 #: include/views/configuration.graph.list.php:54
@@ -6184,7 +6184,7 @@ msgstr "Хост \"%1$s\" вече съществува."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Хост \"%1$s\" се наблюдава с прокси \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:956
+#: include/classes/import/CXmlImport18.php:957
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "В хост \"%s\" е избран параметър \"useipmi\", но не е зададен параметър\"ipmi_ip\"! Използване IP адреса на хоста като адрес за интерфейс IPMI."
@@ -7232,7 +7232,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr ""
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1629 tr_testexpr.php:36
+#: include/triggers.inc.php:1630 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Използва се неправилна функция"
 
@@ -7315,7 +7315,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "Неправилен елемент на данните за стойност ос."
 
-#: api/classes/CTrigger.php:689 include/triggers.inc.php:895
+#: api/classes/CTrigger.php:689 include/triggers.inc.php:896
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "В тригер израза \"%2$s\" е зададен неправилен ключ за елемента на данните \"%1$s\"."
@@ -7567,7 +7567,7 @@ msgstr "Неправилен израз в тригер"
 msgid "Incorrect trigger expression."
 msgstr "Неправилен израз в тригер."
 
-#: include/triggers.inc.php:997
+#: include/triggers.inc.php:998
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Неправилен израз в тригер. Хост \"%1$s\" не съществува или нямате права за достъп до него."
@@ -7655,12 +7655,12 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "Неправилно работно време."
 
-#: include/classes/import/CXmlImport18.php:1631
+#: include/classes/import/CXmlImport18.php:1632
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Неправилен елемент на данните за макс. Y в графика \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1618
+#: include/classes/import/CXmlImport18.php:1619
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Неправилен елемент на данните за мин. Y в графика \"%1$s\"."
@@ -7961,7 +7961,7 @@ msgstr "Елемент на данните \"%1$s\" не може да попъ�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Елемент на данните \"%1$s\" не съществува в шаблон \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1561
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" не съществува."
@@ -7971,8 +7971,8 @@ msgstr "Елемент на данните \"%1$s\" не съществува."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложение \"%3$s\" не съществува."
 
-#: include/classes/import/CXmlImport18.php:1302
-#: include/classes/import/CXmlImport18.php:1306
+#: include/classes/import/CXmlImport18.php:1303
+#: include/classes/import/CXmlImport18.php:1307
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
@@ -8571,7 +8571,7 @@ msgid "Location longitude"
 msgstr "Местонахождение (дължина)"
 
 #: include/forms.inc.php:404 include/items.inc.php:127
-#: include/triggers.inc.php:2078 include/views/configuration.item.edit.php:214
+#: include/triggers.inc.php:2079 include/views/configuration.item.edit.php:214
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Дневник (лог)"
@@ -8842,7 +8842,7 @@ msgstr "Принудителен изход"
 msgid "Map"
 msgstr "Карта на мрежата"
 
-#: include/classes/import/CXmlImport18.php:682
+#: include/classes/import/CXmlImport18.php:683
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Карта на мрежата \"%1$s\" пропусната - правило от потребителя."
@@ -8852,12 +8852,12 @@ msgstr "Карта на мрежата \"%1$s\" пропусната - прав
 msgid "Map \"%s\""
 msgstr "Карта на мрежата \"%s\""
 
-#: include/classes/import/CXmlImport18.php:831
+#: include/classes/import/CXmlImport18.php:832
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Карта на мрежата \"%s\" създадена."
 
-#: include/classes/import/CXmlImport18.php:822
+#: include/classes/import/CXmlImport18.php:823
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Карта на мрежата \"%s\" актуализирана."
@@ -9254,8 +9254,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "Липсващо поле \"name\" за графика."
 
-#: include/classes/import/CXmlImport18.php:1622
-#: include/classes/import/CXmlImport18.php:1635
+#: include/classes/import/CXmlImport18.php:1623
+#: include/classes/import/CXmlImport18.php:1636
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Липсващ елемент на данните \"%1$s\" за хост \"%2$s\"."
@@ -9353,7 +9353,7 @@ msgstr "Топ 100 на най-ативните тригери"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1496
+#: include/triggers.inc.php:1497
 msgid "Multiple PROBLEM events"
 msgstr "Множество събития с ПРОБЛЕМ"
 
@@ -9573,7 +9573,7 @@ msgid "Next"
 msgstr "Следващо"
 
 #: events.php:817 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2110 include/triggers.inc.php:1498
+#: include/func.inc.php:2110 include/triggers.inc.php:1499
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -9626,12 +9626,12 @@ msgstr ""
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1612
+#: include/classes/import/CXmlImport18.php:1613
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Не полето \"ymax_type\" за графика \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1608
+#: include/classes/import/CXmlImport18.php:1609
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Не полето \"ymin_type\" за графика \"%s\"."
@@ -10017,27 +10017,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:999
 #: include/classes/import/CConfigurationImport.php:1116
-#: include/classes/import/CXmlImport18.php:1593
+#: include/classes/import/CXmlImport18.php:1594
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Нямате право на достъп до графика \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:991
+#: include/classes/import/CXmlImport18.php:992
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Нямате право на достъп до хост \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Нямате право на достъп до елемент на данните \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1173
+#: include/classes/import/CXmlImport18.php:1174
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Нямате право на достъп до шаблон \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1460
+#: include/classes/import/CXmlImport18.php:1461
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr ""
@@ -10046,17 +10046,17 @@ msgstr ""
 msgid "No permissions"
 msgstr "Нямате право на достъп"
 
-#: include/classes/import/CXmlImport18.php:1066
+#: include/classes/import/CXmlImport18.php:1067
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Нямате право на достъп до карта на мрежата \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:440
+#: include/classes/import/CXmlImport18.php:441
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
@@ -10219,7 +10219,7 @@ msgstr "Няма тригер с triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Не са дефинирани тригери."
 
-#: include/triggers.inc.php:1080
+#: include/triggers.inc.php:1081
 #: include/views/configuration.triggers.list.php:104
 #: include/views/monitoring.overview.triggers.php:116 popup.php:958
 #: report2.php:392 report5.php:56 tr_status.php:290
@@ -10261,7 +10261,7 @@ msgid "None"
 msgstr "Нищо"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1495 popup.php:1425
+#: include/triggers.inc.php:1496 popup.php:1425
 msgid "Normal"
 msgstr "Нормално"
 
@@ -10497,14 +10497,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr ""
 
 #: include/forms.inc.php:402 include/items.inc.php:123
-#: include/triggers.inc.php:2076 include/views/configuration.item.edit.php:212
+#: include/triggers.inc.php:2077 include/views/configuration.item.edit.php:212
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Числен (с плаваща точка)"
 
-#: include/triggers.inc.php:2075 include/triggers.inc.php:2091
-#: include/triggers.inc.php:2095 include/triggers.inc.php:2105
-#: include/triggers.inc.php:2110 include/triggers.inc.php:2114
+#: include/triggers.inc.php:2076 include/triggers.inc.php:2092
+#: include/triggers.inc.php:2096 include/triggers.inc.php:2106
+#: include/triggers.inc.php:2111 include/triggers.inc.php:2115
 msgid "Numeric (integer 64bit)"
 msgstr "Числен (цяло число 64бит)"
 
@@ -10748,7 +10748,7 @@ msgstr "Операции"
 msgid "Operator"
 msgstr "Оператор"
 
-#: include/triggers.inc.php:1553
+#: include/triggers.inc.php:1554
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:968
 #: include/views/configuration.host.discovery.edit.php:279
@@ -12331,8 +12331,8 @@ msgstr ""
 msgid "Screen"
 msgstr "Екран"
 
-#: include/classes/import/CXmlImport18.php:596
-#: include/classes/import/CXmlImport18.php:1750
+#: include/classes/import/CXmlImport18.php:597
+#: include/classes/import/CXmlImport18.php:1751
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Екран \"%1$s\" добавен."
@@ -12371,15 +12371,15 @@ msgstr ""
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:448
-#: include/classes/import/CXmlImport18.php:1684
-#: include/classes/import/CXmlImport18.php:1688
+#: include/classes/import/CXmlImport18.php:449
+#: include/classes/import/CXmlImport18.php:1685
+#: include/classes/import/CXmlImport18.php:1689
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Екран \"%1$s\" пропуснато - потребителско правило."
 
-#: include/classes/import/CXmlImport18.php:593
-#: include/classes/import/CXmlImport18.php:1742
+#: include/classes/import/CXmlImport18.php:594
+#: include/classes/import/CXmlImport18.php:1743
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Екран \"%1$s\" актуализиран."
@@ -12757,7 +12757,7 @@ msgstr "Сесията е прекратена, моля влезте повто
 
 #: events.php:479 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:167
-#: include/triggers.inc.php:1490 include/views/configuration.item.list.php:144
+#: include/triggers.inc.php:1491 include/views/configuration.item.list.php:144
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
@@ -13549,7 +13549,7 @@ msgid "Test string"
 msgstr "Тест на низ"
 
 #: include/forms.inc.php:405 include/items.inc.php:129
-#: include/triggers.inc.php:2079 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2080 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Текст"
@@ -13842,7 +13842,7 @@ msgstr "Динамика на промените"
 
 #: events.php:337 events.php:379 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1487
+#: include/maps.inc.php:26 include/triggers.inc.php:1488
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13866,8 +13866,8 @@ msgstr "Тригер \"%1$s\" вече съществува в \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", който не съществува."
 
-#: include/classes/import/CXmlImport18.php:1469
-#: include/classes/import/CXmlImport18.php:1473
+#: include/classes/import/CXmlImport18.php:1470
+#: include/classes/import/CXmlImport18.php:1474
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропуснат - потребителско правило."
@@ -14055,7 +14055,7 @@ msgstr "Стойност на тригер"
 
 #: hosts.php:839 hosts.php:933 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
-#: include/triggers.inc.php:1092
+#: include/triggers.inc.php:1093
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:498
@@ -14347,7 +14347,7 @@ msgstr "Единици за измерване"
 #: include/perm.inc.php:53 include/regexp.inc.php:199
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2331 include/triggers.inc.php:2337
+#: include/triggers.inc.php:2332 include/triggers.inc.php:2338
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14370,11 +14370,11 @@ msgstr ""
 msgid "Unknown function."
 msgstr "Неизвестна функция."
 
-#: include/triggers.inc.php:1627 popup_trexpr.php:616 tr_testexpr.php:34
+#: include/triggers.inc.php:1628 popup_trexpr.php:616 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестен елемент на данните за хост, няма такъв елемент на данните в избрания хост"
 
-#: include/triggers.inc.php:1626 tr_testexpr.php:33
+#: include/triggers.inc.php:1627 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Неизвестен хост, няма такъв хост в системата"
 
@@ -15456,23 +15456,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Етикет на X ос"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "XML файла съдържа грешка %1$s:"
 
-#: include/classes/import/CXmlImport18.php:392
-#: include/classes/import/CXmlImport18.php:395
-#: include/classes/import/CXmlImport18.php:398
+#: include/classes/import/CXmlImport18.php:393
+#: include/classes/import/CXmlImport18.php:396
+#: include/classes/import/CXmlImport18.php:399
 msgid "XML file contains errors"
 msgstr "XML файла съдържа грешки"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML файла съдържа фатална грешка %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML файла съдържа предупреждение %1$s:"
@@ -15533,7 +15533,7 @@ msgstr "Ежегодно"
 #: events.php:817 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2110
-#: include/triggers.inc.php:1498
+#: include/triggers.inc.php:1499
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
 #: include/views/js/adm.regexprs.edit.js.php:139

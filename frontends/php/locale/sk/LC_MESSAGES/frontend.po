@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-21 12:08+0300\n"
+"POT-Creation-Date: 2014-06-25 13:35+0300\n"
 "PO-Revision-Date: 2014-06-18 21:35+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -158,11 +158,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[HROMADNÉ POTVRDENIE]----"
 
-#: include/triggers.inc.php:2100 include/triggers.inc.php:2101
-#: include/triggers.inc.php:2102 include/triggers.inc.php:2104
-#: include/triggers.inc.php:2106 include/triggers.inc.php:2109
-#: include/triggers.inc.php:2112 include/triggers.inc.php:2113
-#: include/triggers.inc.php:2125
+#: include/triggers.inc.php:2101 include/triggers.inc.php:2102
+#: include/triggers.inc.php:2103 include/triggers.inc.php:2105
+#: include/triggers.inc.php:2107 include/triggers.inc.php:2110
+#: include/triggers.inc.php:2113 include/triggers.inc.php:2114
+#: include/triggers.inc.php:2126
 msgid "0 or 1"
 msgstr "0 alebo 1"
 
@@ -633,7 +633,7 @@ msgstr "Povolené hosty"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr "Veľkosť pamäte v bytoch. Ak mode chýba, je použitý total."
 
-#: include/triggers.inc.php:1553
+#: include/triggers.inc.php:1554
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:967
 #: include/views/configuration.host.discovery.edit.php:278
@@ -1363,7 +1363,7 @@ msgstr "Nie je možné pridať prototyp hosta"
 msgid "Cannot add image"
 msgstr "Nie je možné pridať obrázok"
 
-#: include/classes/import/CXmlImport18.php:642
+#: include/classes/import/CXmlImport18.php:643
 msgid "Cannot add image."
 msgstr "Nie je možné pridať obrázok."
 
@@ -1558,7 +1558,7 @@ msgstr "Nie je možné vytvoriť mapu ikon"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Nie je možné vytvoriť mapu ikon s rovnakým menom \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:828
+#: include/classes/import/CXmlImport18.php:829
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Nie je možné vytvoriť mapu \"%s\"."
@@ -1571,7 +1571,7 @@ msgstr "Nie je možné vytvoriť novú aplikáciu, web scenár je už priradený
 msgid "Cannot create new element"
 msgstr "Nie je možné vytvoriť nový prvok"
 
-#: include/classes/import/CXmlImport18.php:1747
+#: include/classes/import/CXmlImport18.php:1748
 msgid "Cannot create screen."
 msgstr "Nie možné vytvoriť obrazovku."
 
@@ -1999,38 +1999,38 @@ msgstr[0] "Nie je možné povoliť scenár"
 msgstr[1] "Nie je možné povoliť scenáre"
 msgstr[2] "Nie je možné povoliť scenáre"
 
-#: include/classes/import/CXmlImport18.php:691
+#: include/classes/import/CXmlImport18.php:692
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Obrázok pozadia \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 
-#: include/classes/import/CXmlImport18.php:510
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:511
+#: include/classes/import/CXmlImport18.php:1705
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Graf \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 
-#: include/classes/import/CXmlImport18.php:736
+#: include/classes/import/CXmlImport18.php:737
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Skupina \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
-#: include/classes/import/CXmlImport18.php:476
+#: include/classes/import/CXmlImport18.php:477
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Skupina \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
-#: include/classes/import/CXmlImport18.php:747
+#: include/classes/import/CXmlImport18.php:748
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 
-#: include/classes/import/CXmlImport18.php:493
+#: include/classes/import/CXmlImport18.php:494
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -2054,7 +2054,7 @@ msgstr "Nemôžem nájsť hostiteľské rozhranie na \"%1$s\" pre kľúč polož
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Nemôžem nájsť hosta alebo šablónu \"%1$s\" použitú v grafe \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:780
+#: include/classes/import/CXmlImport18.php:781
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2085,14 +2085,14 @@ msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú ako minimálna
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú ako minimálna hodnota Y osi prototypu grafu \"%3$s\" zisťovacieho pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CXmlImport18.php:530
-#: include/classes/import/CXmlImport18.php:1717
+#: include/classes/import/CXmlImport18.php:531
+#: include/classes/import/CXmlImport18.php:1718
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Položka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
-#: include/classes/import/CXmlImport18.php:725
+#: include/classes/import/CXmlImport18.php:726
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Položka \"%1$s\" použitá v exportovanej mape \"%2$s\" nebola nájdená."
@@ -2102,7 +2102,7 @@ msgstr "Položka \"%1$s\" použitá v exportovanej mape \"%2$s\" nebola nájden�
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
-#: include/classes/import/CXmlImport18.php:546
+#: include/classes/import/CXmlImport18.php:547
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2112,7 +2112,7 @@ msgstr "Mapa \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 msgid "Cannot find objects with name"
 msgstr "Nemôžem nájsť objekt s menom"
 
-#: include/classes/import/CXmlImport18.php:562
+#: include/classes/import/CXmlImport18.php:563
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2123,8 +2123,8 @@ msgstr "Obrazovka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nemôžem nájsť šablónu \"%1$s\" pre prototyp hosta \"%2$s\" zisťovacieho pravidla \"%3$s\" na \"%4$s\"."
 
-#: include/classes/import/CXmlImport18.php:758
-#: include/classes/import/CXmlImport18.php:800
+#: include/classes/import/CXmlImport18.php:759
+#: include/classes/import/CXmlImport18.php:801
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2506,7 +2506,7 @@ msgstr "Nie je možné aktualizovať mapu ikon"
 msgid "Cannot update image"
 msgstr "Nie je možné aktualizovať obrázok"
 
-#: include/classes/import/CXmlImport18.php:649
+#: include/classes/import/CXmlImport18.php:650
 msgid "Cannot update image."
 msgstr "Nie je možné aktualizovať obrázok."
 
@@ -2539,7 +2539,7 @@ msgstr "Nie je možné aktualizovať makrá"
 msgid "Cannot update maintenance"
 msgstr "Nie je možné aktualizovať údržbu"
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Nie je možné aktualizovať mapu \"%s\"."
@@ -2569,7 +2569,7 @@ msgstr "Nie je možné aktualizovať regulárny výraz"
 msgid "Cannot update screen"
 msgstr "Nie je možné aktualizovať obrazovku"
 
-#: include/classes/import/CXmlImport18.php:1739
+#: include/classes/import/CXmlImport18.php:1740
 msgid "Cannot update screen."
 msgstr "Nie je možné aktualizovať obrazovku."
 
@@ -2674,7 +2674,7 @@ msgid "Change password"
 msgstr "Zmeniť heslo"
 
 #: include/forms.inc.php:403 include/items.inc.php:125
-#: include/triggers.inc.php:2077 include/views/configuration.item.edit.php:213
+#: include/triggers.inc.php:2078 include/views/configuration.item.edit.php:213
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Znak"
@@ -4217,11 +4217,11 @@ msgstr "Zakázať"
 msgid "Dependencies"
 msgstr "Závislosti"
 
-#: include/triggers.inc.php:1248 tr_status.php:583
+#: include/triggers.inc.php:1249 tr_status.php:583
 msgid "Dependent"
 msgstr "Podradená závislosť (tento ovplyvňuje)"
 
-#: include/triggers.inc.php:1228
+#: include/triggers.inc.php:1229
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.triggers.list.php:173 popup.php:1021
 #: tr_status.php:567
@@ -4447,8 +4447,8 @@ msgstr "Zakázať označené spúšťače?"
 #: auditlogs.php:146 dashboard.php:295 hosts.php:975
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1497
-#: include/triggers.inc.php:2334 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1498
+#: include/triggers.inc.php:2335 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
@@ -5031,7 +5031,7 @@ msgstr "Povoliť označené spúšťače?"
 #: auditlogs.php:143 dashboard.php:295 hosts.php:966
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2331
+#: include/items.inc.php:206 include/triggers.inc.php:2332
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:95
 #: include/views/administration.usergroups.edit.php:65
@@ -5112,7 +5112,7 @@ msgstr "Potvrdzovanie udalostí je vypnuté"
 msgid "Event details"
 msgstr "Podrobnosti udalosti"
 
-#: include/triggers.inc.php:1495
+#: include/triggers.inc.php:1496
 msgid "Event generation"
 msgstr "Generovanie udalosti"
 
@@ -5221,7 +5221,7 @@ msgstr "Export označených"
 msgid "Export to CSV"
 msgstr "Export do CSV súboru"
 
-#: include/triggers.inc.php:1492
+#: include/triggers.inc.php:1493
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5644,7 +5644,7 @@ msgstr "Získať čas načítania úplnej web stránky. Predvolená cesta je /"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1628 tr_testexpr.php:35
+#: include/triggers.inc.php:1629 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Zadaný výraz nie je makro"
 
@@ -5747,8 +5747,8 @@ msgstr "Graf \"%1$s\" nemôže dediť. Na \"%2$s\" nie sú požadované položky
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Graf \"%1$s\" neexistuje v šablóne \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1599
-#: include/classes/import/CXmlImport18.php:1603
+#: include/classes/import/CXmlImport18.php:1600
+#: include/classes/import/CXmlImport18.php:1604
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Graf \"%1$s\" preskočený - používateľovo pravidlo."
@@ -6173,8 +6173,8 @@ msgstr "Vodorovné zarovnanie"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:537 include/html.inc.php:343 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1117
-#: include/triggers.inc.php:1483
+#: include/setup.inc.php:365 include/triggers.inc.php:1118
+#: include/triggers.inc.php:1484
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:60
 #: include/views/configuration.graph.list.php:54
@@ -6218,7 +6218,7 @@ msgstr "Host \"%1$s\" už existuje."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" je monitorovaný s proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:956
+#: include/classes/import/CXmlImport18.php:957
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Host \"%s\" má nastavený parameter \"useipmi\", ale nemá parameter \"ipmi_ip\". Použijem IP adresu hosta ako adresu pre IPMI rozhranie."
@@ -7263,7 +7263,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr "Nesprávna hodnota Nasledovania presmerovaní pre krok \"%1$s\" scenára \"%2$s\"."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1629 tr_testexpr.php:36
+#: include/triggers.inc.php:1630 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Nie je použitá platná funkcia"
 
@@ -7346,7 +7346,7 @@ msgstr "Neplatné ID položky \"%1$s\" v prvku obrazovky."
 msgid "Incorrect item for axis value."
 msgstr "Neplatná položka pre hodnotu osi."
 
-#: api/classes/CTrigger.php:689 include/triggers.inc.php:895
+#: api/classes/CTrigger.php:689 include/triggers.inc.php:896
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Neplatný kľúč položky \"%1$s\" pre spúšťač na \"%2$s\"."
@@ -7598,7 +7598,7 @@ msgstr "Neplatný výraz spúšťača"
 msgid "Incorrect trigger expression."
 msgstr "Neplatný výraz spúšťača."
 
-#: include/triggers.inc.php:997
+#: include/triggers.inc.php:998
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Neplatný výraz spúšťača. Host \"%1$s\" neexistuje alebo nemáte prístup k tomuto hostu."
@@ -7686,12 +7686,12 @@ msgstr "Neplatné ID web scenára."
 msgid "Incorrect working time."
 msgstr "Neplatný pracovný čas."
 
-#: include/classes/import/CXmlImport18.php:1631
+#: include/classes/import/CXmlImport18.php:1632
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Neplatná položka y max pre graf \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1618
+#: include/classes/import/CXmlImport18.php:1619
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Neplatná položka y min pre graf \"%1$s\"."
@@ -7992,7 +7992,7 @@ msgstr "Položka \"%1$s\" nemôže byť naplnená chýbajúcim inventárnym polo
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Položka \"%1$s\" neexistuje v šablóne \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1561
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Položka \"%1$s\" neexistuje."
@@ -8002,8 +8002,8 @@ msgstr "Položka \"%1$s\" neexistuje."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Položka \"%1$s\" na \"%2$s\": aplikácia \"%3$s\" neexistuje."
 
-#: include/classes/import/CXmlImport18.php:1302
-#: include/classes/import/CXmlImport18.php:1306
+#: include/classes/import/CXmlImport18.php:1303
+#: include/classes/import/CXmlImport18.php:1307
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Položka \"%1$s\" preskočená - používateľské pravidlo."
@@ -8607,7 +8607,7 @@ msgid "Location longitude"
 msgstr "Zemepisná dĺžka umiestnenia"
 
 #: include/forms.inc.php:404 include/items.inc.php:127
-#: include/triggers.inc.php:2078 include/views/configuration.item.edit.php:214
+#: include/triggers.inc.php:2079 include/views/configuration.item.edit.php:214
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -8878,7 +8878,7 @@ msgstr "Manuálne odhlásenie"
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/import/CXmlImport18.php:682
+#: include/classes/import/CXmlImport18.php:683
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Mapa \"%1$s\" preskočená - používateľské pravidlo."
@@ -8888,12 +8888,12 @@ msgstr "Mapa \"%1$s\" preskočená - používateľské pravidlo."
 msgid "Map \"%s\""
 msgstr "Mapa \"%s\""
 
-#: include/classes/import/CXmlImport18.php:831
+#: include/classes/import/CXmlImport18.php:832
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Mapa \"%s\" vytvorená."
 
-#: include/classes/import/CXmlImport18.php:822
+#: include/classes/import/CXmlImport18.php:823
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Mapa \"%s\" aktualizovaná."
@@ -9294,8 +9294,8 @@ msgstr "Chýbajúce pole \"name\" pre prototyp grafu."
 msgid "Missing \"name\" field for graph."
 msgstr "Chýbajúce pole \"name\" pre graf."
 
-#: include/classes/import/CXmlImport18.php:1622
-#: include/classes/import/CXmlImport18.php:1635
+#: include/classes/import/CXmlImport18.php:1623
+#: include/classes/import/CXmlImport18.php:1636
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Chýbajúca položka \"%1$s\" pre host \"%2$s\"."
@@ -9393,7 +9393,7 @@ msgstr "100 najaktívnejších spúšťačov"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1496
+#: include/triggers.inc.php:1497
 msgid "Multiple PROBLEM events"
 msgstr "Viacnásobné PROBLÉMOVÉ udalosti"
 
@@ -9613,7 +9613,7 @@ msgid "Next"
 msgstr "Nasledujúce"
 
 #: events.php:817 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2110 include/triggers.inc.php:1498
+#: include/func.inc.php:2110 include/triggers.inc.php:1499
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:120
@@ -9666,12 +9666,12 @@ msgstr "Žiadne \"%2$s\" dané pre prototyp hosta \"%1$s\"."
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Žiadne \"%2$s\" dané pre filter zisťovacieho pravidla \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1612
+#: include/classes/import/CXmlImport18.php:1613
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Žiadne pole \"ymax_type\" pre graf \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1608
+#: include/classes/import/CXmlImport18.php:1609
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Žiadne pole \"ymin_type\" pre graf \"%s\"."
@@ -10057,27 +10057,27 @@ msgstr "Nedefinované žiadne operácie."
 
 #: include/classes/import/CConfigurationImport.php:999
 #: include/classes/import/CConfigurationImport.php:1116
-#: include/classes/import/CXmlImport18.php:1593
+#: include/classes/import/CXmlImport18.php:1594
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Nemáte oprávnenie pre graf \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:991
+#: include/classes/import/CXmlImport18.php:992
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Nemáte oprávnenie pre host \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Nemáte oprávnenie pre položku \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1173
+#: include/classes/import/CXmlImport18.php:1174
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Nemáte oprávnenie pre šablónu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1460
+#: include/classes/import/CXmlImport18.php:1461
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr "Žiadne práva pre spúšťač \"%1$s\"."
@@ -10086,17 +10086,17 @@ msgstr "Žiadne práva pre spúšťač \"%1$s\"."
 msgid "No permissions"
 msgstr "Nemáte oprávnenia"
 
-#: include/classes/import/CXmlImport18.php:1066
+#: include/classes/import/CXmlImport18.php:1067
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr "Žiadne práva pre skupinu hostov \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Žiadne oprávnenia pre mapu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:440
+#: include/classes/import/CXmlImport18.php:441
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Žiadne oprávnenia pre obrazovku \"%1$s\"."
@@ -10259,7 +10259,7 @@ msgstr "Žiaden spúšťač s triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Žiadne definované spúšťače."
 
-#: include/triggers.inc.php:1080
+#: include/triggers.inc.php:1081
 #: include/views/configuration.triggers.list.php:104
 #: include/views/monitoring.overview.triggers.php:116 popup.php:958
 #: report2.php:392 report5.php:56 tr_status.php:290
@@ -10301,7 +10301,7 @@ msgid "None"
 msgstr "Žiadna"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1495 popup.php:1425
+#: include/triggers.inc.php:1496 popup.php:1425
 msgid "Normal"
 msgstr "Normálny"
 
@@ -10537,14 +10537,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "Počet virtuálnych serverov na VMware hypervízorovi, <url> - URL VMware služby , <uuid> - VMware hypervízor host meno"
 
 #: include/forms.inc.php:402 include/items.inc.php:123
-#: include/triggers.inc.php:2076 include/views/configuration.item.edit.php:212
+#: include/triggers.inc.php:2077 include/views/configuration.item.edit.php:212
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Číslo (float)"
 
-#: include/triggers.inc.php:2075 include/triggers.inc.php:2091
-#: include/triggers.inc.php:2095 include/triggers.inc.php:2105
-#: include/triggers.inc.php:2110 include/triggers.inc.php:2114
+#: include/triggers.inc.php:2076 include/triggers.inc.php:2092
+#: include/triggers.inc.php:2096 include/triggers.inc.php:2106
+#: include/triggers.inc.php:2111 include/triggers.inc.php:2115
 msgid "Numeric (integer 64bit)"
 msgstr "Číslo (integer 64bit)"
 
@@ -10786,7 +10786,7 @@ msgstr "Operácie"
 msgid "Operator"
 msgstr "Operátor"
 
-#: include/triggers.inc.php:1553
+#: include/triggers.inc.php:1554
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:968
 #: include/views/configuration.host.discovery.edit.php:279
@@ -12366,8 +12366,8 @@ msgstr "Naplánovaná kontrola"
 msgid "Screen"
 msgstr "Obrazovka"
 
-#: include/classes/import/CXmlImport18.php:596
-#: include/classes/import/CXmlImport18.php:1750
+#: include/classes/import/CXmlImport18.php:597
+#: include/classes/import/CXmlImport18.php:1751
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Obrazovka \"%1$s\" pridaná."
@@ -12406,15 +12406,15 @@ msgstr "Obrazovka \"%1$s\" rozsah riadku v bunke X - %2$s Y - %3$s je neplatný.
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr "Obrazovka \"%1$s\" rozsah riadku v bunke X - %2$s Y - %3$s je príliš veľký."
 
-#: include/classes/import/CXmlImport18.php:448
-#: include/classes/import/CXmlImport18.php:1684
-#: include/classes/import/CXmlImport18.php:1688
+#: include/classes/import/CXmlImport18.php:449
+#: include/classes/import/CXmlImport18.php:1685
+#: include/classes/import/CXmlImport18.php:1689
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Obrazovka \"%1$s\" preskočená - používateľské pravidlo."
 
-#: include/classes/import/CXmlImport18.php:593
-#: include/classes/import/CXmlImport18.php:1742
+#: include/classes/import/CXmlImport18.php:594
+#: include/classes/import/CXmlImport18.php:1743
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Obrazovka \"%1$s\" aktualizovaná."
@@ -12792,7 +12792,7 @@ msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
 #: events.php:479 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:167
-#: include/triggers.inc.php:1490 include/views/configuration.item.list.php:144
+#: include/triggers.inc.php:1491 include/views/configuration.item.list.php:144
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
@@ -13586,7 +13586,7 @@ msgid "Test string"
 msgstr "Testovací reťazec"
 
 #: include/forms.inc.php:405 include/items.inc.php:129
-#: include/triggers.inc.php:2079 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2080 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Text"
@@ -13881,7 +13881,7 @@ msgstr "Trendy"
 
 #: events.php:337 events.php:379 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1487
+#: include/maps.inc.php:26 include/triggers.inc.php:1488
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13905,8 +13905,8 @@ msgstr "Spúšťač \"%1$s\" už existuje na \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Spúšťač \"%1$s\" závisí na inom spúšťači \"%2$s\", ktorý neexistuje."
 
-#: include/classes/import/CXmlImport18.php:1469
-#: include/classes/import/CXmlImport18.php:1473
+#: include/classes/import/CXmlImport18.php:1470
+#: include/classes/import/CXmlImport18.php:1474
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Spúšťač \"%1$s\" preskočený - používateľské pravidlo."
@@ -14098,7 +14098,7 @@ msgstr "Hodnota spúšťača"
 
 #: hosts.php:839 hosts.php:933 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
-#: include/triggers.inc.php:1092
+#: include/triggers.inc.php:1093
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:498
@@ -14390,7 +14390,7 @@ msgstr "Jednotky"
 #: include/perm.inc.php:53 include/regexp.inc.php:199
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2331 include/triggers.inc.php:2337
+#: include/triggers.inc.php:2332 include/triggers.inc.php:2338
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14413,11 +14413,11 @@ msgstr "Neznáma chyba"
 msgid "Unknown function."
 msgstr "Neznáma funkcia."
 
-#: include/triggers.inc.php:1627 popup_trexpr.php:616 tr_testexpr.php:34
+#: include/triggers.inc.php:1628 popup_trexpr.php:616 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Neznáme položky hosta, nenájdené položky na vybranom hostovi"
 
-#: include/triggers.inc.php:1626 tr_testexpr.php:33
+#: include/triggers.inc.php:1627 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Neznámy host, nie je prítomný v systéme"
 
@@ -15499,23 +15499,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Označenie osi X"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "XML súbor obsahuje chybu %1$s:"
 
-#: include/classes/import/CXmlImport18.php:392
-#: include/classes/import/CXmlImport18.php:395
-#: include/classes/import/CXmlImport18.php:398
+#: include/classes/import/CXmlImport18.php:393
+#: include/classes/import/CXmlImport18.php:396
+#: include/classes/import/CXmlImport18.php:399
 msgid "XML file contains errors"
 msgstr "XML súbor obsahuje chyby"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML súbor obsahuje fatálnu chybu %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML súbor obsahuje varovania %1$s:"
@@ -15576,7 +15576,7 @@ msgstr "Ročne"
 #: events.php:817 include/blocks.inc.php:813
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2110
-#: include/triggers.inc.php:1498
+#: include/triggers.inc.php:1499
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:120
 #: include/views/js/adm.regexprs.edit.js.php:139
