@@ -80,7 +80,7 @@ switch ($_REQUEST['period']) {
 }
 
 $triggersEventCount = array();
-// get 100 triggerids with max even count
+// get 100 triggerids with max event count
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' FROM triggers t,events e'.
 		' WHERE t.triggerid=e.objectid'.
