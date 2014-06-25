@@ -116,7 +116,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 	else {
 		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], '', 'on');
+		$info->setHint($alert['error'], 'on');
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])

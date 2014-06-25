@@ -767,17 +767,15 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 {
 	const char		*__function_name = "lld_graphs_validate";
 
-	char			*names = NULL, *name_esc;
-	size_t			names_alloc = 256, names_offset = 0;
 	int			i, j;
 	zbx_lld_graph_t		*graph, *graph_b;
 	zbx_vector_uint64_t	graphids;
+	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&graphids);
-
-	names = zbx_malloc(names, names_alloc);	/* list of graph names */
+	zbx_vector_str_create(&names);		/* list of graph names */
 
 	/* checking a validity of the fields */
 
@@ -822,6 +820,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 			}
 			else
 				graph->flags &= ~ZBX_FLAG_LLD_GRAPH_DISCOVERED;
+
 			break;
 		}
 	}
@@ -843,18 +842,10 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 				continue;
 		}
 
-		name_esc = DBdyn_escape_string(graph->name);
-
-		if (0 != names_offset)
-			zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, ',');
-		zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-		zbx_strcpy_alloc(&names, &names_alloc, &names_offset, name_esc);
-		zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-
-		zbx_free(name_esc);
+		zbx_vector_str_append(&names, graph->name);
 	}
 
-	if (0 != names_offset)
+	if (0 != names.values_num)
 	{
 		DB_RESULT	result;
 		DB_ROW		row;
@@ -869,8 +860,11 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 				" where g.graphid=gi.graphid"
 					" and gi.itemid=i.itemid"
 					" and i.hostid=" ZBX_FS_UI64
-					" and g.name in (%s)",
-				hostid, names);
+					" and",
+				hostid);
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
+				(const char **)names.values, names.values_num);
+
 		if (0 != graphids.values_num)
 		{
 			zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -913,8 +907,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 		zbx_free(sql);
 	}
 
-	zbx_free(names);
-
+	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&graphids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

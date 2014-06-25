@@ -1,16 +1,19 @@
 Changes for 2.3.2
 
 New features:
-..F....... [ZBX-8339] there are no more auto login/logout controls while editing guest user (Andrejs)
+..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
+..F....... [ZBX-8339] removed auto login/logout controls while editing guest user (Andrejs)
 ...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris,asaveljevs)
 ..F....... [ZBXNEXT-2254] added support for custom PostgreSQL schema to frontend and updated setup wizard (Krists)
 ..F....... [ZBX-8329] added styling for disabled buttons and inputs (Andrejs)
 ..F....... [ZBXNEXT-2344] added links on group names in "Web monitoring" widget (Ivo)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBX-7399] improved multiselect by adding popup select window (Oleg)
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+.......PS. [ZBX-8092] fixed items being polled at the same time after host becoming enabled (asaveljevs)
+.......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
 ..F....... [ZBX-8355] changed confusing context for date format translations (Andrejs)
 ..F.I..... [ZBX-7921] fixed default values for screen item colspan/rowspan to 1 in frontend and database (Krists, wiper)
 ..F....... [ZBX-8288] fixed problems with vertical table headers sometimes being offset (Krists)
@@ -205,7 +208,25 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.5rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-8092] fixed items being polled at the same time after host becoming enabled (asaveljevs)
+.......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
+...G...... [ZBX-8373] fixed the argument to system.cpu.num[] being ignored on HP-UX (asaveljevs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4
+
+2.2.4rc4 was released as 2.2.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.4rc4
+
+New features:
+A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...... [ZBX-8213] fixed possible crash when processing eventlog on Windows 2000,2003,XP (wiper)
