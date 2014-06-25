@@ -1839,7 +1839,7 @@ out:
  *             timestamp - [IN] the requested period end timestamp            *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
  *           updates cache from database if necessary.                        *
@@ -1920,7 +1920,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  *             timestamp - [IN] the target timestamp                          *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested number of values is cached *
  *           and updates cache from database if necessary.                    *
@@ -2006,7 +2006,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  *             ts        - [IN] the timestamp                                 *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
  *           updates cache from database if necessary.                        *
