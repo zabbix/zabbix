@@ -13,7 +13,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 
 Bug fixes:
 ..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
-.......PS. [ZBX-8092] fixed items being polled at the same time after host becoming enabled (asaveljevs)
+.......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
 .......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
 ..F....... [ZBX-8355] changed confusing context for date format translations (Andrejs)
 ..F.I..... [ZBX-7921] fixed default values for screen item colspan/rowspan to 1 in frontend and database (Krists, wiper)
