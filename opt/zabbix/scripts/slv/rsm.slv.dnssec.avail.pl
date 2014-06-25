@@ -40,8 +40,7 @@ foreach (@$tlds_ref)
 
     if ($online_probes < $cfg_minonline)
     {
-	info("Up (not enough probes online, $online_probes while $cfg_minonline required)");
-	push_value($tld, $cfg_key_out, $value_ts, UP);
+	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $online_probes while $cfg_minonline required)");
 	next;
     }
 
@@ -71,8 +70,7 @@ foreach (@$tlds_ref)
     my $probes_with_values = get_probes_count($items_ref, $values_ref);
     if ($probes_with_values < $cfg_minonline)
     {
-	info("Up (not enough probes with reults, $probes_with_values while $cfg_minonline required)");
-	push_value($tld, $cfg_key_out, $value_ts, UP);
+	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_values while $cfg_minonline required)");
 	next;
     }
 
@@ -87,8 +85,7 @@ foreach (@$tlds_ref)
     my $perc = $success_values * 100 / $total_values;
     $test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
 
-    info(avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
-    push_value($tld, $cfg_key_out, $value_ts, $test_result);
+    push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 }
 
 # unset TLD (for the logs)

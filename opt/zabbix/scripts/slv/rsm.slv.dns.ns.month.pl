@@ -46,8 +46,7 @@ foreach (@$tlds_ref)
 
 	my $perc = sprintf("%.3f", $up_count * 100 / $total_values);
 
-	info("$key_out: up:$up_count perc:$perc");
-	push_value($tld, $key_out, $value_ts, $perc);
+	push_value($tld, $key_out, $value_ts, $perc, "$key_out: up:$up_count perc:$perc");
     }
 }
 

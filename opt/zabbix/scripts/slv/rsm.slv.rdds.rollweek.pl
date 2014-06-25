@@ -35,9 +35,7 @@ foreach (@$tlds_ref)
     my $downtime = get_downtime($itemid_in, $from, $till);
     my $perc = sprintf("%.3f", $downtime * 100 / $cfg_sla);
 
-    info("result: $perc% (down: $downtime minutes, sla: $cfg_sla, ", ts_str($value_ts), ")");
-
-    push_value($tld, $cfg_key_out, $value_ts, $perc);
+    push_value($tld, $cfg_key_out, $value_ts, $perc, "result: $perc% (down: $downtime minutes, sla: $cfg_sla, ", ts_str($value_ts), ")");
 }
 
 # unset TLD (for the logs)

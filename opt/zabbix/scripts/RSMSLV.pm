@@ -818,11 +818,19 @@ sub push_value
     my $timestamp = shift;
     my $value = shift;
 
-    push(@_sender_values, {'host' => $hostname, 'key' => $key,  'value' => "$value", 'clock' => $timestamp});
+    my $info = join('', @_);
+
+    push(@_sender_values, {
+	'data' => {
+	    'host' => $hostname,
+	    'key' => $key,
+	    'value' => "$value",
+	    'clock' => $timestamp},
+	'info' => $info});
 }
 
 #
-# accepts array reference of values:
+# send previously collected values:
 #
 # [
 #   {'host' => 'host1', 'key' => 'item1', 'value' => '5', 'clock' => 1391790685},
@@ -847,31 +855,44 @@ sub send_values
 
     fail("cannot connect to Zabbix server") unless (defined($sender));
 
-    my @suba;
     my $total_values = scalar(@_sender_values);
 
     while (scalar(@_sender_values) > 0)
     {
-	@suba = splice(@_sender_values, 0, SENDER_BATCH_COUNT);
+	my @suba = splice(@_sender_values, 0, SENDER_BATCH_COUNT);
 
 	dbg("sending ", scalar(@suba), "/$total_values values");
 
-	unless (defined($sender->send_arrref(\@suba)))
-	{
-	    my $msg = "Cannot send data to Zabbix server: " . $sender->sender_err() . ". The query was:\n";
+	my @hashes;
 
-	    foreach my $entry (@suba)
+	foreach my $hash_ref (@suba)
+	{
+	    push(@hashes, $hash_ref->{'data'});
+	}
+
+	unless (defined($sender->send_arrref(\@hashes)))
+	{
+	    my $msg = "Cannot send data to Zabbix server: " . $sender->sender_err() . ". The query was:";
+
+	    foreach my $hash_ref (@suba)
 	    {
+		my $data_ref = $hash_ref->{'data'};
+
 		my $line = '{';
 
-		$line .= ($line ne '{' ? ', ' : '') . $_ . ' => ' . $entry->{$_} foreach (keys(%$entry));
+		$line .= ($line ne '{' ? ', ' : '') . $_ . ' => ' . $data_ref->{$_} foreach (keys(%$data_ref));
 
 		$line .= '}';
 
-		$msg .= "  $line\n";
+		$msg .= "\n  $line";
 	    }
 
 	    fail($msg);
+	}
+
+	foreach my $hash_ref (@suba)
+        {
+	    info($hash_ref->{'info'});
 	}
     }
 }
@@ -991,8 +1012,7 @@ sub process_slv_ns_monthly
 	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $total_values{$ns});
 	my $key_out = $cfg_key_out . $ns . ']';
 
-	info("$ns: $perc% successful values (", $successful_values{$ns}, "/", $total_values{$ns});
-	push_value($tld, $key_out, $value_ts, $perc);
+	push_value($tld, $key_out, $value_ts, $perc, "$ns: $perc% successful values (", $successful_values{$ns}, "/", $total_values{$ns});
     }
 }
 
@@ -1057,8 +1077,7 @@ sub process_slv_monthly
 
     my $perc = sprintf("%.3f", $successful_values * 100 / $total_values);
 
-    info("$perc% successful values ($successful_values/$total_values)");
-    push_value($tld, $cfg_key_out, $value_ts, $perc);
+    push_value($tld, $cfg_key_out, $value_ts, $perc, "$perc% successful values ($successful_values/$total_values)");
 }
 
 sub process_slv_ns_avail
@@ -1083,8 +1102,7 @@ sub process_slv_ns_avail
     my $count = scalar(@$online_probes_ref);
     if ($count < $cfg_minonline)
     {
-	info("Up (not enough probes online, $count while $cfg_minonline required)");
-	push_value($tld, $_, $value_ts, UP) foreach (@out_keys);
+	push_value($tld, $_, $value_ts, UP, "Up (not enough probes online, $count while $cfg_minonline required)") foreach (@out_keys);
 	return;
     }
 
@@ -1106,8 +1124,7 @@ sub process_slv_ns_avail
 
 	if ($total_values < $cfg_minonline)
 	{
-	    info("$ns Up (not enough probes with reults, $total_values while $cfg_minonline required)");
-	    push_value($tld, $out_key, $value_ts, UP);
+	    push_value($tld, $out_key, $value_ts, UP, "$ns Up (not enough probes with reults, $total_values while $cfg_minonline required)");
 	    next;
 	}
 
@@ -1121,8 +1138,7 @@ sub process_slv_ns_avail
 	my $perc = $success_values * 100 / $total_values;
 	my $test_result = $perc > $unavail_limit ? UP : DOWN;
 
-	info($ns, ": ", avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
-	push_value($tld, $out_key, $value_ts, $test_result);
+	push_value($tld, $out_key, $value_ts, $test_result, "$ns: ", avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
     }
 }
 
