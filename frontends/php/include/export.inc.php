@@ -347,10 +347,13 @@ class zbxXML{
 
 	public static function import($file){
 
+		$contents = file_get_contents($file);
+
 		libxml_use_internal_errors(true);
+		libxml_disable_entity_loader(true);
 
 		$xml = new DOMDocument();
-		if(!$xml->load($file)){
+		if(!$xml->loadXML($contents, LIBXML_IMPORT_FLAGS)){
 			foreach(libxml_get_errors() as $error){
 				$text = '';
 
