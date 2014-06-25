@@ -532,11 +532,12 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 }
 
 /********************************************************************************
- *																				*
- * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10	*
- *																				*
- * Comments: !!! Don't forget sync code with C !!!								*
- *																				*
+ *                                                                              *
+ * Purpose: Translate {10}>10 to something like                                 *
+ * localhost:system.cpu.load.last(0)>10                                         *
+ *                                                                              *
+ * Comments: !!! Don't forget sync code with C !!!                              *
+ *                                                                              *
  *******************************************************************************/
 function explode_exp($expressionCompressed, $html = false, $resolveMacro = false, $sourceHost = null, $destinationHost = null) {
 	$expressionExpanded = $html ? array() : '';
@@ -849,7 +850,7 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs.
  *
- * Fro example: localhost:procload.last(0)>10 will translated to {12}>10 and created database representation.
+ * For example: localhost:system.cpu.load.last(0)>10 will be translated to {12}>10 and created database representation.
  *
  * @throws Exception if error occureed
  *
