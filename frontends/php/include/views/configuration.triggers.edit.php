@@ -189,7 +189,7 @@ if ($this->data['input_method'] == IM_TREE) {
 							array_push($errorTexts, $expVal, ':', $errTxt);
 						}
 					}
-					$errorImg->setHint($errorTexts, '', 'left');
+					$errorImg->setHint($errorTexts, 'left');
 				}
 				$errorColumn = new CCol($errorImg, 'center');
 			}

@@ -176,7 +176,7 @@ if (isset($_REQUEST['save_trigger'])) {
 
 if(isset($_REQUEST['sform'])){
 	$frmTRLog = new CFormTable(_('Trigger'),'tr_logform.php','POST',null,'sform');
-	$frmTRLog->setHelp('web.triggerlog.service.php');
+	$frmTRLog->addHelpIcon();
 	$frmTRLog->setTableClass('formlongtable formtable');
 	$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 

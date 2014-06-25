@@ -123,26 +123,13 @@ if (hasRequest('filter_set')) {
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
-
-	if (hasRequest('show_events')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			if (!str_in_array($showEvents, array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
-				$showEvents = EVENTS_OPTION_NOEVENT;
-			}
-		}
-
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED || $showEvents != EVENTS_OPTION_NOT_ACK) {
 		CProfile::update('web.tr_status.filter.show_events', $showEvents, PROFILE_TYPE_INT);
 	}
 
 	// ack status
-	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
-
-	if (hasRequest('ack_status')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			$ackStatus = ZBX_ACK_STS_ANY;
-		}
-
-		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
+		CProfile::update('web.tr_status.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
 	}
 
 	// update host inventory filter
@@ -230,7 +217,7 @@ validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN, array('priority', 'last
 /*
  * Display
  */
-$triggerWidget = new CWidget(null, 'trigger-mon');
+$triggerWidget = new CWidget();
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
@@ -244,106 +231,27 @@ $triggerWidget->addPageHeader(
 $triggerWidget->addHeader(_('Triggers'), $rightForm);
 $triggerWidget->addHeaderRowNumber();
 
-/*
- * Filter
- */
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
-$filterForm->addVar('groupid', $_REQUEST['groupid']);
-$filterForm->addVar('hostid', $_REQUEST['hostid']);
-
-$statusComboBox = new CComboBox('show_triggers', $showTriggers);
-$statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_RECENT_PROBLEM, _('Recent problem'));
-$statusComboBox->additem(TRIGGERS_OPTION_IN_PROBLEM, _('Problem'));
-$filterForm->addRow(_('Triggers status'), $statusComboBox);
-
-if ($config['event_ack_enable']) {
-	$ackStatusComboBox = new CComboBox('ack_status', $ackStatus);
-	$ackStatusComboBox->addItem(ZBX_ACK_STS_ANY, _('Any'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_UNACK, _('With unacknowledged events'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_LAST_UNACK, _('With last event unacknowledged'));
-	$filterForm->addRow(_('Acknowledge status'), $ackStatusComboBox);
-}
-
-$eventsComboBox = new CComboBox('show_events', $showEvents);
-$eventsComboBox->addItem(EVENTS_OPTION_NOEVENT, _('Hide all'));
-$eventsComboBox->addItem(EVENTS_OPTION_ALL, _('Show all').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-if ($config['event_ack_enable']) {
-	$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-}
-$filterForm->addRow(_('Events'), $eventsComboBox);
-
-$severityComboBox = new CComboBox('show_severity', $showSeverity);
-$severityComboBox->addItems(array(
-	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
-));
-$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
-
-$statusChangeDays = new CNumericBox('status_change_days', $statusChangeBydays, 3, false, false, false);
-if (!$showChange) {
-	$statusChangeDays->setAttribute('disabled', 'disabled');
-}
-$statusChangeDays->addStyle('vertical-align: middle;');
-
-$statusChangeCheckBox = new CCheckBox('status_change', $showChange, 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1);
-$statusChangeCheckBox->addStyle('vertical-align: middle;');
-
-$daysSpan = new CSpan(_('days'));
-$daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $showDetails, null, 1));
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $txtSelect, 40));
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $filter['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-			'&dstfrm='.$filterForm->getName().'");',
-		'filter-button'
+// filter
+$filterFormView = new CView('common.filter.trigger', array(
+	'overview' => false,
+	'filter' => array(
+		'showTriggers' => $showTriggers,
+		'ackStatus' => $ackStatus,
+		'showEvents' => $showEvents,
+		'showSeverity' => $showSeverity,
+		'statusChange' => $showChange,
+		'statusChangeDays' => $statusChangeBydays,
+		'showDetails' => $showDetails,
+		'txtSelect' => $txtSelect,
+		'application' => $filter['application'],
+		'inventory' => $filter['inventory'],
+		'showMaintenance' => $showMaintenance,
+		'hostId' => getRequest('hostid'),
+		'groupId' => getRequest('groupid'),
+		'fullScreen' => getRequest('fullscreen')
 	)
 ));
-
-// inventory filter
-$inventoryFilters = $filter['inventory'];
-if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
-	);
-}
-$inventoryFields = array();
-foreach (getHostInventories() as $inventory) {
-	$inventoryFields[$inventory['db_field']] = $inventory['title'];
-}
-
-$inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
-$i = 0;
-foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
-
-	$i++;
-}
-$inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
-);
-$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
-
-// maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $showMaintenance, null, 1));
-
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm = $filterFormView->render();
 
 $triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 
@@ -823,7 +731,7 @@ foreach ($triggers as $trigger) {
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], '', 'on');
+		$unknown->setHint($trigger['error'], 'on');
 	}
 
 	// comments
@@ -931,7 +839,5 @@ $triggerWidget->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
-
-require_once dirname(__FILE__).'/include/views/js/monitoring.triggers.js.php';
 
 require_once dirname(__FILE__).'/include/page_footer.php';
