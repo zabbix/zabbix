@@ -899,8 +899,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 	if (0 != descriptions.values_num)
 	{
-		char			*sql = NULL, *condition = NULL, *description_esc;
-		size_t			sql_alloc = 256, sql_offset = 0, condition_alloc = 256, condition_offset = 0;
+		char			*sql = NULL;
+		size_t			sql_alloc = 256, sql_offset = 0;
 		DB_RESULT		result;
 		DB_ROW			row;
 		zbx_vector_ptr_t	db_triggers;
@@ -911,21 +911,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_str_sort(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 		zbx_vector_str_uniq(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-		condition = zbx_malloc(condition, condition_alloc);	/* list of trigger descriptions */
-
-		for (i = 0; i < descriptions.values_num; i++)
-		{
-			description_esc = DBdyn_escape_string(descriptions.values[i]);
-
-			if (0 != condition_offset)
-				zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, ',');
-			zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, '\'');
-			zbx_strcpy_alloc(&condition, &condition_alloc, &condition_offset, description_esc);
-			zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, '\'');
-
-			zbx_free(description_esc);
-		}
-
 		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -934,8 +919,11 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				" where t.triggerid=f.triggerid"
 					" and f.itemid=i.itemid"
 					" and i.hostid=" ZBX_FS_UI64
-					" and t.description in (%s)",
-				hostid, condition);
+					" and",
+				hostid);
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.description",
+				(const char **)descriptions.values, descriptions.values_num);
+
 		if (0 != triggerids.values_num)
 		{
 			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1034,7 +1022,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_ptr_destroy(&db_triggers);
 
 		zbx_free(sql);
-		zbx_free(condition);
 	}
 
 	zbx_vector_str_destroy(&descriptions);
