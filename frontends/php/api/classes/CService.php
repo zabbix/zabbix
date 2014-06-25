@@ -1222,7 +1222,7 @@ class CService extends CApiService {
 			$arr[$dbDep['serviceupid']][$dbDep['servicedownid']] = $dbDep['servicedownid'];
 		}
 
-		// chech for circularity and add dependencies to the graph
+		// check for circularity and add dependencies to the graph
 		foreach ($depsToValid as $dep) {
 			$this->DFCircularitySearch($dep['serviceid'], $dep['dependsOnServiceid'], $arr);
 			$arr[$dep['serviceid']][$dep['dependsOnServiceid']] = $dep['dependsOnServiceid'];
