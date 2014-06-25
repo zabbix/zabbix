@@ -1395,12 +1395,12 @@ sub info
 
 sub wrn
 {
-    __err('WRN', join('', (defined($tld) ? "$tld: " : ''), @_));
+    __err('WRN', join('', @_));
 }
 
 sub fail
 {
-    __err('ERR', join('', (defined($tld) ? "$tld: " : ''), @_));
+    __err('ERR', join('', @_));
 
     exit(FAIL);
 }
@@ -1493,24 +1493,35 @@ sub __write_log
     close $OUTFILE or die("cannot close $file: $!");
 }
 
+sub __log_stdout
+{
+    my $msg_prefix = shift;
+    my $msg = shift;
+
+    if (defined($OPTS{'debug'}))
+    {
+	print(ts_str() . " [$msg_prefix] " . (defined($tld) ? "$tld: " : '') . "$msg\n");
+	return;
+    }
+
+    print(ts_str() . " [$msg_prefix] " . (defined($tld) ? "$tld: " : '') . $msg . " (" . __script() . ")\n");
+}
+
 sub __log
 {
     my $msg_prefix = shift;
     my $msg = shift;
-    my $file = shift;
 
     if (defined($OPTS{'debug'}) or
 	not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
     {
-	my $line = ts_str() . " [$msg_prefix] " . (defined($tld) ? "$tld: " : '') . $msg . "\n";
-	print($line);
+	__log_stdout($msg_prefix, $msg);
 	return;
     }
 
-    $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log' unless (defined($file));
-
+    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log';
     my $line = ts_str() . " [$msg_prefix] " . $msg . "\n";
 
     __write_log($file, $line);
@@ -1521,9 +1532,19 @@ sub __err
     my $msg_prefix = shift;
     my $msg = shift;
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . __script() . '.err';
+    if (defined($OPTS{'debug'}) or
+	not defined($config) or
+	not defined($config->{'slv'}) or
+	not defined($config->{'slv'}->{'logdir'}))
+    {
+	__log_stdout($msg_prefix, $msg);
+	return;
+    }
 
-    __log($msg_prefix, $msg, $file);
+    my $file = $config->{'slv'}->{'logdir'} . '/' . __script() . '.err';
+    my $line = ts_str() . " [$msg_prefix] " . (defined($tld) ? "$tld: " : '') . $msg . "\n";
+
+    __write_log($file, $line);
 }
 
 sub __get_macro
