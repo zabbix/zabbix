@@ -2798,6 +2798,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+..F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
