@@ -1204,7 +1204,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException if at least one cycle is possible
 	 *
-	 * @param array $depsToValid	dpendency list to be validated
+	 * @param array $depsToValid	dependency list to be validated
 	 *
 	 * @return void
 	 */
