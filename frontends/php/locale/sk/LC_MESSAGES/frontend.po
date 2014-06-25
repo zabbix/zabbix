@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:35+0300\n"
-"PO-Revision-Date: 2014-06-18 21:35+0300\n"
+"POT-Creation-Date: 2014-06-25 13:38+0300\n"
+"PO-Revision-Date: 2014-06-23 19:22+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1403120123.0\n"
+"X-POOTLE-MTIME: 1403544176.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -12821,9 +12821,9 @@ msgstr "Zobraziť"
 #, c-format
 msgid "Show all (%1$s day)"
 msgid_plural "Show all (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Zobraziť všetky (%1$s deň)"
+msgstr[1] "Zobraziť všetky (%1$s dni)"
+msgstr[2] "Zobraziť všetky (%1$s dní)"
 
 #: include/views/common.filter.trigger.php:143 latest.php:310
 msgid "Show details"
@@ -12904,9 +12904,9 @@ msgstr "Zobraziť spúšťače"
 #, c-format
 msgid "Show unacknowledged (%1$s day)"
 msgid_plural "Show unacknowledged (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Zobraziť nepotvrdené (%1$s deň)"
+msgstr[1] "Zobraziť nepotvrdené (%1$s dni)"
+msgstr[2] "Zobraziť nepotvrdené (%1$s dní)"
 
 #: include/views/configuration.item.edit.php:392
 #: include/views/configuration.item.massupdate.php:447
