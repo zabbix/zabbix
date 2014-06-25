@@ -115,6 +115,14 @@ jQuery(function($) {
 
 	/*
 	 * add.popup event
+	 *
+	 * Call multiselect method 'addData' if parent was multiselect, execute addPopupValues function
+	 * or just update input field value
+	 *
+	 * @param object data
+	 * @param string data.object   object name
+	 * @param array  data.values   values
+	 * @param string data.parentId parent id
 	 */
 	$(document).on('add.popup', function(e, data) {
 		// multiselect check
