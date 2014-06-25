@@ -8,8 +8,8 @@
 	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
-			Use bulk requests
+			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
+			<label for="interfaces[#{iface.interfaceid}][bulk]">Use bulk requests</label>
 		</div>
 	</td>
 	<td class="interface-dns">
