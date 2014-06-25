@@ -84,6 +84,8 @@
 	border-radius: 2px; -moz-border-radius: 2px; -webkit-border-radius: 2px;
 }
 
+table.tableinfo-overview-hint { width: 200px; }
+
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
@@ -104,10 +106,6 @@
 .latest-mon .tableinfo td span,
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
-
-/* trigger monitoring */
-.trigger-mon #inventory-filter td { padding-left: 0; padding-right: 3px; }
-.trigger-mon .filter-button { height: 16px; }
 
 /* trigger list */
 .trigger-list .dependencies { padding-left: 8px; }
@@ -132,6 +130,7 @@
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
 .item-list .menuPopup { width: 200px; }
+.item-list .filter .multiselect .selected ul { margin: 0;}
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -163,6 +162,8 @@
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
+#selementForm .multiselect .selected ul { margin: 0;}
+#map-window #application-select-row .link_menu { margin-left: 3px; }
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

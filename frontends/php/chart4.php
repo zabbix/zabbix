@@ -86,7 +86,7 @@ $y = imagesy($im);
 imagefilledrectangle($im, 0, 0, $x, $y, $white);
 imagerectangle($im, 0, 0, $x - 1, $y - 1, $black);
 
-$str = _s('%1$s (year %2$s)', $dbTrigger['description'], zbx_date2str('Y'));
+$str = _s('%1$s (year %2$s)', $dbTrigger['description'], zbx_date2str(_x('Y', DATE_FORMAT_CONTEXT)));
 $x = imagesx($im) / 2 - imagefontwidth(4) * mb_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 

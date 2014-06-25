@@ -41,21 +41,17 @@ $discoveryForm->addVar('hostid', $this->data['hostid']);
 // create table
 $discoveryTable = new CTableInfo(_('No discovery rules found.'));
 
-$sortLink = new CUrl();
-$sortLink->setArgument('hostid', $this->data['hostid']);
-$sortLink = $sortLink->getUrl();
-
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
-	make_sorting_header(_('Name'), 'name', $sortLink),
+	make_sorting_header(_('Name'), 'name'),
 	_('Items'),
 	_('Triggers'),
 	_('Graphs'),
 	($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
-	make_sorting_header(_('Key'), 'key_', $sortLink),
-	make_sorting_header(_('Interval'), 'delay', $sortLink),
-	make_sorting_header(_('Type'), 'type', $sortLink),
-	make_sorting_header(_('Status'), 'status', $sortLink),
+	make_sorting_header(_('Key'), 'key_'),
+	make_sorting_header(_('Interval'), 'delay'),
+	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Status'), 'status'),
 	$data['showInfoColumn'] ? _('Info') : null
 ));
 
@@ -83,7 +79,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], '', 'on');
+			$info->setHint($discovery['error'], 'on');
 		}
 		else {
 			$info = '';

@@ -632,7 +632,7 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, width, className, isStatic) {
+	createBox: function(e, target, hintText, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (typeof hintText === 'string') {
@@ -644,10 +644,6 @@ var hintBox = {
 		}
 		else {
 			box.html(hintText);
-		}
-
-		if (!empty(width)) {
-			box.css('width', width + 'px');
 		}
 
 		if (isStatic) {
@@ -667,14 +663,14 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, width, className) {
+	HintWraper: function(e, target, hintText, className) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
 				e = d;
 			}
-			hintBox.showHint(e, target, hintText, width, className, false);
+			hintBox.showHint(e, target, hintText, className, false);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
@@ -687,13 +683,13 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, className, resizeAfterLoad) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, width, className, true);
+			hintBox.showHint(e, target, hint, className, true);
 
 			if (resizeAfterLoad) {
 				hint.one('load', function(e) {
@@ -703,12 +699,12 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, width, className, isStatic) {
+	showHint: function(e, target, hintText, className, isStatic) {
 		if (target.hintBoxItem) {
 			return;
 		}
 
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
 	},
@@ -905,13 +901,11 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 		}
 	});
 
-	// resize multiselect
+	// resize multiselects in the flicker
 	if (typeof flickerResizeMultiselect === 'undefined' && state == 1) {
 		flickerResizeMultiselect = true;
 
-		if (jQuery('.multiselect').length > 0) {
-			jQuery('#' + id).multiSelect.resize();
-		}
+		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
 	}
 }
 
@@ -1191,3 +1185,120 @@ function getConditionFormula(conditions, evalType) {
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));
+
+jQuery(function ($) {
+	var verticalHeaderTables = {};
+
+	var tablesWidthChangeChecker = function() {
+		for (var tableId in verticalHeaderTables) {
+			if (verticalHeaderTables.hasOwnProperty(tableId)) {
+				var table = verticalHeaderTables[tableId];
+
+				if (table && table.width() != table.data('last-width')) {
+					centerVerticalCellContents(table);
+				}
+			}
+		}
+		setTimeout(tablesWidthChangeChecker, 100);
+	};
+
+	var centerVerticalCellContents = function(table) {
+		var verticalCells = $('.vertical_rotation', table);
+
+		verticalCells.each(function() {
+			var cell = $(this),
+				cellWidth = cell.width();
+
+			if (cellWidth > 30) {
+				cell.children().css({
+					position: 'relative',
+					left: (cellWidth / 2 - 12) + 'px'
+				});
+			}
+		});
+
+		table.data('last-width', table.width());
+	};
+
+	tablesWidthChangeChecker();
+
+	$.fn.makeVerticalRotation = function() {
+		this.each(function(i) {
+			var table = $(this);
+
+			if (table.data('rotated') == 1) {
+				return;
+			}
+			table.data('rotated', 1);
+
+			var cellsToRotate = $('.vertical_rotation', table),
+				betterCells = [];
+
+			// insert spans
+			cellsToRotate.each(function() {
+				var cell = $(this);
+
+				var text = $('<span>', {
+					text: cell.html()
+				});
+
+				if (IE) {
+					text.css({'font-family': 'monospace'});
+				}
+
+				cell.text('').append(text);
+			});
+
+			// rotate cells
+			cellsToRotate.each(function() {
+				var cell = $(this),
+					span = cell.children(),
+					height = cell.height(),
+					width = span.width(),
+					transform = (width / 2) + 'px ' + (width / 2) + 'px';
+
+				var css = {
+					"transform-origin": transform,
+					"-webkit-transform-origin": transform,
+					"-moz-transform-origin": transform,
+					"-o-transform-origin": transform
+				};
+
+				if (IE) {
+					css['font-family'] = 'monospace';
+					css['-ms-transform-origin'] = '50% 50%';
+				}
+
+				if (IE9) {
+					css['-ms-transform-origin'] = transform;
+				}
+
+				var divInner = $('<div>', {
+					'class': 'vertical_rotation_inner'
+				})
+					.css(css)
+					.append(span.text());
+
+				var div = $('<div>', {
+					height: width,
+					width: height
+				})
+					.append(divInner);
+
+				betterCells.push(div);
+			});
+
+			cellsToRotate.each(function(i) {
+				$(this).html(betterCells[i]);
+			});
+
+			centerVerticalCellContents(table);
+
+			table.on('remove', function() {
+				delete verticalHeaderTables[table.attr('id')];
+			});
+
+			verticalHeaderTables[table.attr('id')] = table;
+		});
+	};
+});

@@ -95,9 +95,13 @@ out:
  *                                                                            *
  * Function: split_filename                                                   *
  *                                                                            *
- * Purpose: separates filename to directory and to file format (regexp)       *
+ * Purpose: separates filename to directory and to file name pattern (regexp) *
  *                                                                            *
- * Parameters: filename - first parameter of log[] item                       *
+ * Parameters: filename  - [IN] first parameter of logrt[] item               *
+ *             directory - [IN/OUT] directory part of the 'filename'          *
+ *             format    - [IN/OUT] file name pattern part                    *
+ *             err_msg   - [IN/OUT] error message why an item became          *
+ *                         NOTSUPPORTED                                       *
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
@@ -109,7 +113,7 @@ out:
  *           is freed.                                                        *
  *                                                                            *
  ******************************************************************************/
-static int	split_filename(const char *filename, char **directory, char **format)
+static int	split_filename(const char *filename, char **directory, char **format, char **err_msg)
 {
 	const char	*__function_name = "split_filename";
 	const char	*separator = NULL;
@@ -118,15 +122,11 @@ static int	split_filename(const char *filename, char **directory, char **format)
 #ifdef _WINDOWS
 	size_t		sz;
 #endif
-
-	assert(NULL != directory && '\0' == *directory);
-	assert(NULL != format && '\0' == *format);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __function_name, filename ? filename : "NULL");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __function_name, ZBX_NULL2STR(filename));
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot split empty path");
+		*err_msg = zbx_strdup(*err_msg, "Cannot split empty path.");
 		goto out;
 	}
 
@@ -143,7 +143,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, format))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot split '%s'", filename);
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
 			goto out;
 		}
 
@@ -152,7 +152,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		/* Windows world verification */
 		if (sz + 1 > MAX_PATH)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot proceed: directory path is too long");
+			*err_msg = zbx_strdup(*err_msg, "Directory path is too long.");
 			zbx_free(*directory);
 			zbx_free(*format);
 			goto out;
@@ -180,24 +180,26 @@ static int	split_filename(const char *filename, char **directory, char **format)
 	}
 
 	if (separator < filename)
-		goto out;
-
-#else	/* not _WINDOWS */
-	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain any path separator '%c'", filename,
-				PATH_SEPARATOR);
+		*err_msg = zbx_strdup(*err_msg, "Non-existing disk or directory.");
 		goto out;
 	}
+#else	/* not _WINDOWS */
+	if (NULL == (separator = strrchr(filename, PATH_SEPARATOR)))
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot find separator \"%c\" in path.", PATH_SEPARATOR);
+		goto out;
+	}
+
 	if (SUCCEED != split_string(filename, separator, directory, format))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot split filename '%s' by '%c'", filename, PATH_SEPARATOR);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
 		goto out;
 	}
 
 	if (-1 == zbx_stat(*directory, &buf))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot find directory '%s' on the file system", *directory);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain directory information: %s", zbx_strerror(errno));
 		zbx_free(*directory);
 		zbx_free(*format);
 		goto out;
@@ -205,7 +207,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 
 	if (0 == S_ISDIR(buf.st_mode))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot proceed: directory '%s' is a file", *directory);
+		*err_msg = zbx_dsprintf(*err_msg, "Base path \"%s\" is not a directory.", *directory);
 		zbx_free(*directory);
 		zbx_free(*format);
 		goto out;
@@ -232,29 +234,44 @@ out:
  *     md5buf   - [OUT] output buffer, MD5_DIGEST_SIZE-bytes long, where the  *
  *                calculated MD5 sum is placed                                *
  *     filename - [IN] file name, used in error logging                       *
+ *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *filename)
+static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *filename, char **err_msg)
 {
 	md5_state_t	state;
 	char		buf[MAX_LEN_MD5];
+	int		rc;
 
 	if (MAX_LEN_MD5 < length)
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Length %d exceeds maximum MD5 fragment length of %d.", length,
+				MAX_LEN_MD5);
 		return FAIL;
+	}
 
 	if ((zbx_offset_t)-1 == zbx_lseek(f, 0, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to 0 for file \"%s\": %s", filename,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to 0 for file \"%s\": %s", filename,
 				zbx_strerror(errno));
 		return FAIL;
 	}
 
-	if (length != (int)read(f, buf, (size_t)length))
+	if (length != (rc = (int)read(f, buf, (size_t)length)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
-				(zbx_fs_size_t)length, filename, zbx_strerror(errno));
+		if (-1 == rc)
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read %d bytes from file \"%s\": %s", length, filename,
+					zbx_strerror(errno));
+		}
+		else
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read %d bytes from file \"%s\". Read %d bytes only.",
+					length, filename, rc);
+		}
+
 		return FAIL;
 	}
 
@@ -280,12 +297,13 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
  *     ino_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
  *     ino_hi   - [OUT] higher 64-bits of FileId                              *
  *     filename - [IN] file name, used in error logging                       *
+ *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
 static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, zbx_uint64_t *ino_hi,
-		const char *filename)
+		const char *filename, char **err_msg)
 {
 	int				ret = FAIL;
 	intptr_t			h;	/* file HANDLE */
@@ -294,7 +312,8 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 	if (-1 == (h = _get_osfhandle(f)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get file handle from file descriptor for '%s'", filename);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain handle from descriptor of file \"%s\": %s",
+				filename, zbx_strerror(errno));
 		return ret;
 	}
 
@@ -310,7 +329,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\": %s",
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
 					filename, strerror_from_system(GetLastError()));
 			return ret;
 		}
@@ -327,8 +346,8 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
-						"\"%s\": %s", filename, strerror_from_system(GetLastError()));
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended information for file"
+						" \"%s\": %s", filename, strerror_from_system(GetLastError()));
 				return ret;
 			}
 		}
@@ -353,11 +372,12 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
  * Parameters:                                                                *
  *     path     - [IN] directory or file name                                 *
  *     use_ino  - [IN] how to use file IDs                                    *
+ *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
+static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg)
 {
 	char	*utf8;
 	wchar_t	*path_uni, mount_point[MAX_PATH + 1], fs_type[MAX_PATH + 1];
@@ -368,7 +388,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 	if (0 == GetVolumePathName(path_uni, mount_point,
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": %s", path,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for file \"%s\": %s", path,
 				strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
@@ -381,7 +401,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 			sizeof(fs_type) / sizeof(wchar_t)))
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume information for \"%s\": %s", utf8,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for directory \"%s\": %s", utf8,
 				strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
@@ -448,6 +468,8 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *          use_ino - [IN] 0 - do not use inodes in comparison,               *
  *                         1 - use up to 64-bit inodes in comparison,         *
  *                         2 - use 128-bit inodes in comparison.              *
+ *          err_msg - [IN/OUT] error message why an item became               *
+ *                    NOTSUPPORTED                                            *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
@@ -458,7 +480,7 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
-static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
+static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino, char **err_msg)
 {
 	int	ret = ZBX_SAME_FILE_NO;
 
@@ -527,13 +549,13 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", new->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 				goto out;
 			}
 
-			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename))
+			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename, err_msg))
 			{
 				ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
 						ZBX_SAME_FILE_NO;
@@ -543,9 +565,12 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (0 != close(f))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", new->filename,
-						zbx_strerror(errno));
-				ret = ZBX_SAME_FILE_ERROR;
+				if (ZBX_SAME_FILE_ERROR != ret)
+				{
+					*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new->filename,
+							zbx_strerror(errno));
+					ret = ZBX_SAME_FILE_ERROR;
+				}
 			}
 
 			goto out;
@@ -571,6 +596,7 @@ out:
  *          new     - [IN] new file list                                      *
  *          num_new - [IN] number of elements in the new file list            *
  *          use_ino - [IN] how to use inodes in is_same_file()                *
+ *          err_msg - [IN/OUT] error message why an item became NOTSUPPORTED  *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -581,7 +607,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
-		const struct st_logfile *new, int num_new, int use_ino)
+		const struct st_logfile *new, int num_new, int use_ino, char **err_msg)
 {
 	int	i, j, rc;
 	char	*p = old2new;
@@ -590,7 +616,7 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 	{
 		for (j = 0; j < num_new; j++)
 		{
-			rc = is_same_file(old + i, new + j, use_ino);
+			rc = is_same_file(old + i, new + j, use_ino, err_msg);
 
 			if (ZBX_SAME_FILE_NO == rc)
 				p[j] = '0';
@@ -605,8 +631,10 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 						old[i].filename, new[j].filename, p[j]);
 			}
 		}
+
 		p += (size_t)num_new;
 	}
+
 	return SUCCEED;
 }
 
@@ -739,6 +767,7 @@ static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
 
 			ret = i;
 		}
+
 		p += n_cols;
 	}
 
@@ -975,7 +1004,7 @@ static int	find_old2new(char *old2new, int num_new, int i_old)
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
+static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)
 {
 	const char	*__function_name = "add_logfile";
@@ -1146,6 +1175,8 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
+ *     err_msg        - [IN/OUT] error message why an item became             *
+ *                      NOTSUPPORTED                                          *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -1153,7 +1184,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  *                                                                            *
  ******************************************************************************/
 static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, int *use_ino,
-		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
 #ifdef _WINDOWS
 	int			ret = FAIL;
@@ -1168,14 +1199,14 @@ static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, in
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
 		zbx_free(find_wpath);
 		zbx_free(find_path);
 		return FAIL;
 	}
 
-	if (SUCCEED != set_use_ino_by_fs_type(find_path, use_ino))
+	if (SUCCEED != set_use_ino_by_fs_type(find_path, use_ino, err_msg))
 		goto clean;
 
 	do
@@ -1190,8 +1221,7 @@ static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, in
 clean:
 	if (-1 == _findclose(find_handle))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
-				zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close directory \"%s\": %s", directory, zbx_strerror(errno));
 		ret = FAIL;
 	}
 
@@ -1205,7 +1235,7 @@ clean:
 
 	if (NULL == (dir = opendir(directory)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
 		return FAIL;
 	}
@@ -1220,7 +1250,7 @@ clean:
 
 	if (-1 == closedir(dir))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close directory \"%s\": %s", directory, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -1243,12 +1273,14 @@ clean:
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     use_ino        - [IN/OUT] how to use inode numbers                     *
+ *     err_msg        - [IN/OUT] error message why an item became             *
+ *                      NOTSUPPORTED                                          *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
 static int	make_logfile_list(int is_logrt, const char *filename, const int *mtime, struct st_logfile **logfiles,
-		int *logfiles_alloc, int *logfiles_num, int *use_ino)
+		int *logfiles_alloc, int *logfiles_num, int *use_ino, char **err_msg)
 {
 	int		ret = SUCCEED, i;
 	zbx_stat_t	file_buf;
@@ -1257,22 +1289,22 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 	{
 		if (0 != zbx_stat(filename, &file_buf))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s", filename,
+					zbx_strerror(errno));
 			ret = FAIL;
 			goto clean;
 		}
 
 		if (!S_ISREG(file_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] item",
-					filename);
+			*err_msg = zbx_dsprintf(*err_msg, "\"%s\" is not a regular file.", filename);
 			ret = FAIL;
 			goto clean;
 		}
 
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #ifdef _WINDOWS
-		if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino))
+		if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino, err_msg))
 		{
 			ret = FAIL;
 			goto clean;
@@ -1289,10 +1321,8 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		regex_t			re;
 
 		/* split a filename into directory and file mask (regular expression) parts */
-		if (SUCCEED != split_filename(filename, &directory, &format))
+		if (SUCCEED != split_filename(filename, &directory, &format, err_msg))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
-					filename);
 			ret = FAIL;
 			goto clean;
 		}
@@ -1302,13 +1332,14 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			char	err_buf[MAX_STRING_LEN];
 
 			regerror(reg_error, &re, err_buf, sizeof(err_buf));
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
-					"a logrt[] item. Error: %s", format, err_buf);
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename"
+					" pattern: %s", err_buf);
 			ret = FAIL;
 			goto clean1;
 		}
 
-		if (SUCCEED != pick_logfiles(directory, *mtime, &re, use_ino, logfiles, logfiles_alloc, logfiles_num))
+		if (SUCCEED != pick_logfiles(directory, *mtime, &re, use_ino, logfiles, logfiles_alloc, logfiles_num,
+				err_msg))
 		{
 			ret = FAIL;
 			goto clean2;
@@ -1341,26 +1372,28 @@ clean1:
 
 		if (-1 == (f = zbx_open(p->filename, O_RDONLY)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", p->filename, zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", p->filename,
+					zbx_strerror(errno));
 			ret = FAIL;
 			break;
 		}
 
 		p->md5size = (zbx_uint64_t)MAX_LEN_MD5 > p->size ? (int)p->size : MAX_LEN_MD5;
 
-		if (SUCCEED != file_start_md5(f, p->md5size, p->md5buf, p->filename))
+		if (SUCCEED != file_start_md5(f, p->md5size, p->md5buf, p->filename, err_msg))
 		{
 			ret = FAIL;
 			goto clean3;
 		}
 #ifdef _WINDOWS
-		if (SUCCEED != file_id(f, *use_ino, &p->dev, &p->ino_lo, &p->ino_hi, p->filename))
+		if (SUCCEED != file_id(f, *use_ino, &p->dev, &p->ino_lo, &p->ino_hi, p->filename, err_msg))
 			ret = FAIL;
 #endif	/*_WINDOWS*/
 clean3:
 		if (0 != close(f))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", p->filename, zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", p->filename,
+					zbx_strerror(errno));
 			ret = FAIL;
 			break;
 		}
@@ -1389,6 +1422,8 @@ clean:
  *                        record is being processed                           *
  *     use_ino          - [IN/OUT] how to use inode numbers                   *
  *     error_count      - [IN/OUT] number of errors (for limiting retries)    *
+ *     err_msg          - [IN/OUT] error message why an item became           *
+ *                        NOTSUPPORTED                                        *
  *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
  *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
  *     encoding         - [IN] text string describing encoding.               *
@@ -1423,10 +1458,10 @@ clean:
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, int *use_ino, int *error_count, struct st_logfile **logfiles_old, int *logfiles_num_old,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		int *big_rec, int *use_ino, int *error_count, char **err_msg, struct st_logfile **logfiles_old,
+		int *logfiles_num_old, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -1451,7 +1486,8 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				"seconds back.", (int)(old_mtime - now));
 	}
 
-	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino))
+	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
+			err_msg))
 	{
 		/* an error occured or a file was not accessible for a log[] item */
 		(*error_count)++;
@@ -1481,7 +1517,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
 
 		if (SUCCEED != setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num,
-				*use_ino))
+				*use_ino, err_msg))
 		{
 			destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
 			zbx_free(old2new);
@@ -1589,8 +1625,9 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				*lastlogsize = logfiles[i].processed_size;
 
 			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
-					skip_old_data, big_rec, &logfiles[i].incomplete, encoding, regexps, pattern,
-					output_template, p_count, s_count, process_value, server, port, hostname, key);
+					skip_old_data, big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps,
+					pattern, output_template, p_count, s_count, process_value, server, port,
+					hostname, key);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -1699,7 +1736,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete,
+static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, char **err_msg,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
 		unsigned short port, const char *hostname, const char *key)
@@ -1735,6 +1772,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		{
 			*big_rec = 0;
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to 0 in file: %s", zbx_strerror(errno));
 			ret = FAIL;
 			goto out;
 		}
@@ -1745,6 +1783,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 		{
 			/* error on read */
 			*big_rec = 0;
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read from file: %s", zbx_strerror(errno));
 			ret = FAIL;
 			goto out;
 		}
@@ -1900,6 +1939,8 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
+						*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64
+								" in file: %s", *lastlogsize, zbx_strerror(errno));
 						ret = FAIL;
 						goto out;
 					}
@@ -1935,6 +1976,8 @@ out:
  *     incomplete      - [OUT] 0 - the last record ended with a newline,      *
  *                       1 - there was no newline at the end of the last      *
  *                       record.                                              *
+ *     err_msg         - [IN/OUT] error message why an item became            *
+ *                       NOTSUPPORTED                                         *
  *     encoding        - [IN] text string describing encoding.                *
  *                         The following encodings are recognized:            *
  *                           "UNICODE"                                        *
@@ -1970,7 +2013,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		const char *server, unsigned short port, const char *hostname, const char *key)
 {
@@ -1985,7 +2028,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s", filename,
+				zbx_strerror(errno));
 		goto out;
 	}
 
@@ -2002,7 +2046,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", filename, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -2023,18 +2067,18 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
 
-		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, pattern, output_template,
-				p_count, s_count, process_value, server, port, hostname, key);
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
+				output_template, p_count, s_count, process_value, server, port, hostname, key);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for '%s': %s",
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
 				l_size, filename, zbx_strerror(errno));
 	}
 
 	if (0 != close(f))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", filename, zbx_strerror(errno));
 		ret = FAIL;
 	}
 out:
