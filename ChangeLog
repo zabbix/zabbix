@@ -3,6 +3,7 @@ Changes for 2.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
 .......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
 .......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
 ...G...... [ZBX-8373] fixed the argument to system.cpu.num[] being ignored on HP-UX (asaveljevs)
