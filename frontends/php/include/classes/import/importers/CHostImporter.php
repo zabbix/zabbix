@@ -164,39 +164,74 @@ class CHostImporter extends CImporter {
 	/**
 	 * For existing hosts we need to set an interfaceid for existing interfaces or they will be added.
 	 *
-	 * @param array $hosts
+	 * @param array $xmlHosts
 	 *
 	 * @return array
 	 */
-	protected function addInterfaceIds(array $hosts) {
-
+	protected function addInterfaceIds(array $xmlHosts) {
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'hostids' => zbx_objectValues($xmlHosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($dbInterfaces as $dbInterface) {
-			foreach ($hosts as $hnum => $host) {
-				if (!empty($host['interfaces']) && idcmp($host['hostid'], $dbInterface['hostid'])) {
-					foreach ($host['interfaces'] as $inum => $interface) {
-						if ($dbInterface['ip'] == $interface['ip']
-								&& $dbInterface['dns'] == $interface['dns']
-								&& $dbInterface['useip'] == $interface['useip']
-								&& $dbInterface['port'] == $interface['port']
-								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']) {
-							$hosts[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
+
+		// build lookup maps for:
+		// - interfaces per host
+		// - default (primary) interface ids per host per interface type
+		$dbHostInterfaces = array();
+		$dbHostMainInterfaceIds = array();
+		foreach($dbInterfaces as $dbInterface) {
+			$dbHostId = $dbInterface['hostid'];
+
+			$dbHostInterfaces[$dbHostId][] = $dbInterface;
+			if ($dbInterface['main'] == INTERFACE_PRIMARY) {
+				$dbHostMainInterfaceIds[$dbHostId][$dbInterface['type']] = $dbInterface['interfaceid'];
+			}
+		}
+
+		foreach ($xmlHosts as &$xmlHost) {
+			// if interfaces in XML are empty then do not touch existing interfaces
+			if (!$xmlHost['interfaces']) {
+				unset($xmlHost['interfaces']);
+				continue;
+			}
+
+			$xmlHostId = $xmlHost['hostid'];
+
+			$currentDbHostMainInterfaceIds = isset($dbHostMainInterfaceIds[$xmlHostId])
+				? $dbHostMainInterfaceIds[$xmlHostId]
+				: array();
+
+			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
+				$xmlHostInterfaceType = $xmlHostInterface['type'];
+
+				// check if an existing interfaceid from current host can be reused
+				// in case there is default (primary) interface in current host with same type
+				if ($xmlHostInterface['main'] == INTERFACE_PRIMARY
+						&& isset($currentDbHostMainInterfaceIds[$xmlHostInterfaceType])) {
+					$xmlHostInterface['interfaceid'] = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
+				}
+				else {
+					// otherwise loop through all interfaces of current host and take interfaceids from
+					// ones that match completely
+					foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
+						if ($dbHostInterface['ip'] == $xmlHostInterface['ip']
+								&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
+								&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
+								&& $dbHostInterface['port'] == $xmlHostInterface['port']
+								&& $dbHostInterface['type'] == $xmlHostInterface['type']
+								&& $dbHostInterface['main'] == $xmlHostInterface['main']) {
+							$xmlHostInterface['interfaceid'] = $dbHostInterface['interfaceid'];
 							break;
 						}
 					}
 				}
-				if (empty($hosts[$hnum]['interfaces'])) {
-					unset($hosts[$hnum]['interfaces']);
-				}
 			}
+			unset($xmlHostInterface);
 		}
+		unset($xmlHost);
 
-		return $hosts;
+		return $xmlHosts;
 	}
 
 }
