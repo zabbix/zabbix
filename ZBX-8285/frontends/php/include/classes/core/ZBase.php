@@ -226,6 +226,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/include/classes/parsers/results',
+			$this->rootDir.'/include/classes/routing',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/classes/managers',
 			$this->rootDir.'/api/rpc'
@@ -368,12 +369,14 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
+		$sessionId = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+
+		if (!$sessionId) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = get_cookie('zbx_sessionid');
+		API::getWrapper()->auth = $sessionId;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();

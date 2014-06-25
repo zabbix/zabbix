@@ -359,7 +359,7 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
-					$ackLink->setHint($ackLinkHints, '', '', false);
+					$ackLink->setHint($ackLinkHints, '', false);
 				}
 				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}

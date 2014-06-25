@@ -47,7 +47,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 /*
  * Form actions
@@ -345,7 +345,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['paging'] = getPagingLine($groups, array('groupid'));
+	$data['paging'] = getPagingLine($groups);
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count

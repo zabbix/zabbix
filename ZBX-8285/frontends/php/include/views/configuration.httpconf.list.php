@@ -99,7 +99,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
 			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, '', 'on');
+			$infoIcon->setHint($errorMessage, 'on');
 		}
 		else {
 			$infoIcon = '';

@@ -104,7 +104,7 @@ $fields = array(
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 
@@ -249,7 +249,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$templateIds = array();
-		if (isset($visible['template_table'])) {
+		if (isset($visible['templates'])) {
 			$templateIds = $_REQUEST['templates'];
 		}
 
@@ -332,7 +332,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if ($templateIds && isset($visible['template_table'])) {
+		if ($templateIds && isset($visible['templates'])) {
 			$add['templates'] = $templateIds;
 		}
 
@@ -876,7 +876,7 @@ else {
 
 	// sorting && paging
 	order_result($hosts, $sortfield, $sortorder);
-	$paging = getPagingLine($hosts, array('hostid'));
+	$paging = getPagingLine($hosts);
 
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
