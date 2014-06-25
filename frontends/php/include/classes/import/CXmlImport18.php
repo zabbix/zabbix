@@ -903,10 +903,11 @@ class CXmlImport18 {
 				 * @todo when new XML format will be introduced, this check should be changed to XML version check
 				 */
 				$old_version_input = $host_db['status'] != HOST_STATUS_TEMPLATE;
-				$interfaces = array();
-				if ($old_version_input) {
-					// rearranging host structure, so it would look more like 2.0 host
 
+				$interfaces = array();
+
+				// rearranging host structure, so it would look more like 2.0 host
+				if ($old_version_input) {
 					// the main interface is always "agent" type
 					if (!is_null($host_db['ip'])) {
 						$interfaces[] = array(
@@ -996,28 +997,31 @@ class CXmlImport18 {
 
 					$currentMainInterfaces = array();
 					$currentInterfacesByType = array();
+
 					foreach ($current_host['interfaces'] as $currentInterface) {
 						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
 							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
 						}
+
 						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
 					}
 
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
-						// Loop through all interfaces we got from XML
+						// loop through all interfaces we got from XML
 						foreach ($interfaces as &$interfaceXml) {
 							$interfaceXmlType = $interfaceXml['type'];
 
-							// If this is primary interface of some type and we have default
-							// interface of same type in current (target) host, re-use interfaceid of
-							// the matching default interface in current host.
-							if($interfaceXml['main'] == INTERFACE_PRIMARY && isset($currentMainInterfaces[$interfaceXmlType])) {
+							// if this is the primary interface of some type and we have default interface of same type
+							// in current (target) host, re-use "interfaceid" of the matching default interface
+							// in current host
+							if ($interfaceXml['main'] == INTERFACE_PRIMARY
+									&& isset($currentMainInterfaces[$interfaceXmlType])) {
 								$interfaceXml['interfaceid'] = $currentMainInterfaces[$interfaceXmlType]['interfaceid'];
 							}
 							else {
-								// Otherwise, loop through all current (target) host interfaces with type of current
-								// imported interface and re-use interfaceid in case if all interface parameters match.
+								// otherwise, loop through all current (target) host interfaces with type of current
+								// imported interface and re-use "interfaceid" in case if all interface parameters match
 								if (isset($currentInterfacesByType[$interfaceXmlType])) {
 									foreach ($currentInterfacesByType[$interfaceXmlType] as $currentInterface) {
 										if ($currentInterface['ip'] == $interfaceXml['ip']
