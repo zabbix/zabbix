@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:58+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
 "PO-Revision-Date: 2014-06-09 18:29+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1526,7 +1526,7 @@ msgstr "Nie je možné vytvoriť zacyklené závislosti."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie je možné vytvoriť závislosť spúšťača na sebe samom."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Nie je možné vytvoriť pravidlo zisťovania"
 
@@ -1577,12 +1577,12 @@ msgstr "Nie je možné zmazať aplikáciu"
 msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Nie je možné zmazať zisťovacie pravidlo"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Nie je možné zmazať zisťovacie pravidlá"
 
@@ -1809,7 +1809,7 @@ msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nie je možné vypnúť zisťovacie pravidlo"
@@ -1901,7 +1901,7 @@ msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nie je možné povoliť zisťovacie pravidlo"
@@ -2413,7 +2413,7 @@ msgstr "Nie je možné aktualizovať nastavenia"
 msgid "Cannot update debug mode"
 msgstr "Nie je možné aktualizovať nastavenia ladiaceho módu"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Nie je možné aktualizovať zisťovacie pravidlo"
 
@@ -4505,29 +4505,29 @@ msgstr "Zisťovacie pravidlo \"%1$s:%2$s\" ma nesprávny lifetime: \"%3$s\". (mi
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Zisťovacie pravidlo \"%s\" už existuje."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Zisťovacie pravidlo vytvorené"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Zisťovacie pravidlo vymazané"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Zisťovacie pravidlo vypnuté"
 msgstr[1] "Zisťovacie pravidlá vypnuté"
 msgstr[2] "Zisťovacie pravidlá vypnuté"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Zisťovacie pravidlo povolené"
 msgstr[1] "Zisťovacie pravidlá povolené"
 msgstr[2] "Zisťovacie pravidlá povolené"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Zisťovacie pravidlo aktualizované"
 
@@ -4540,7 +4540,7 @@ msgstr "Zisťovacie pravidlo aktualizované"
 msgid "Discovery rules"
 msgstr "Zisťovacie pravidlá"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Zisťovacie pravidlá vymazané"
 
@@ -7341,7 +7341,7 @@ msgstr "Neplatný nadriadený pre službu \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Neplatná nadriadená služba."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Neplatný rozsah portov."
 
@@ -7709,7 +7709,7 @@ msgstr "Neplatný kľúč \"%1$s\" pre položku \"%2$s\" na \"%3$s\": %4$s."
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Neplatný kľúč \"%1$s\" pre prototyp \"%2$s\" na \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Neplatný kľúč \"%1$s\": %2$s."

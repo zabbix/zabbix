@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:58+0300\n"
-"PO-Revision-Date: 2014-06-09 04:19+0300\n"
+"POT-Creation-Date: 2014-06-12 23:09+0300\n"
+"PO-Revision-Date: 2014-06-20 05:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402280356.0\n"
+"X-POOTLE-MTIME: 1403235215.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1506,7 +1506,7 @@ msgstr "循環する依存関係は作成できません。"
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "ディスカバリルールを作成できません"
 
@@ -1557,12 +1557,12 @@ msgstr "アプリケーションを削除できません"
 msgid "Cannot delete dependency"
 msgstr "依存関係を削除できません"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "ディスカバリルールを削除できません"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "ディスカバリルールを削除できません"
 
@@ -1784,7 +1784,7 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "ディスカバリルールを無効にできません"
@@ -1852,7 +1852,7 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "ディスカバリルールを有効にできません"
@@ -2338,7 +2338,7 @@ msgstr "設定を更新できません"
 msgid "Cannot update debug mode"
 msgstr "デバッグモードを更新できません"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "ディスカバリルールを更新できません"
 
@@ -4427,25 +4427,25 @@ msgstr "ディスカバリルール\"%1$s:%2$s\"の生存期間が正しくあ�
 msgid "Discovery rule \"%s\" already exists."
 msgstr "ディスカバリルール\"%s\"はすでに存在します。"
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "ディスカバリルールを作成しました"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "ディスカバリルールを削除しました"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "ディスカバリルールを無効にしました"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "ディスカバリルールを有効にしました"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "ディスカバリルールを更新しました"
 
@@ -4458,7 +4458,7 @@ msgstr "ディスカバリルールを更新しました"
 msgid "Discovery rules"
 msgstr "ディスカバリルール"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "ディスカバリルールを削除しました"
 
@@ -7251,7 +7251,7 @@ msgstr "サービス\"%1$s\"の親が正しくありません。"
 msgid "Incorrect parent service."
 msgstr "親サービスが正しくありません。"
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "ポートの範囲が正しくありません。"
 
@@ -7619,7 +7619,7 @@ msgstr "\"%3$s\": %4$sのアイテム\"%2$s\"のキー\"%1$s\"が正しくあり
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "キー\"%1$s\": %2$sが正しくありません。"
@@ -11830,7 +11830,7 @@ msgstr "コマンドを実行"
 
 #: include/actions.inc.php:503
 msgid "Run custom commands on Zabbix agent"
-msgstr "Zabbixエージェント城でカスタムコマンドを実行"
+msgstr "Zabbixエージェント上でカスタムコマンドを実行"
 
 #: include/actions.inc.php:506
 msgid "Run custom commands on Zabbix server"

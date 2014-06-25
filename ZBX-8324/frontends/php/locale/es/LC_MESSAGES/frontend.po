@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
-"PO-Revision-Date: 2014-06-07 17:03+0300\n"
+"POT-Creation-Date: 2014-06-12 23:10+0300\n"
+"PO-Revision-Date: 2014-06-11 18:21+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402153408.0\n"
+"X-POOTLE-MTIME: 1402503683.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1524,7 +1524,7 @@ msgstr "No se pudo crear las dependencias de circular."
 msgid "Cannot create dependency on trigger itself."
 msgstr "No se puede crear una dependencia sobre el mismo disparador."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "No se pudo crear la regla de descubrimiento"
 
@@ -1575,12 +1575,12 @@ msgstr "No es posible eliminar la aplicación"
 msgid "Cannot delete dependency"
 msgstr "No es posible eliminar la dependecia"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "No es posible eliminar la regla"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "No se pudo eliminar las reglas de descubrimiento"
 
@@ -1805,7 +1805,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "No se pudo desactivar la acción"
 msgstr[1] "No se pudo desactivar las acciones"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "No se pudo desactivar la regla de descubrimiento"
@@ -1886,7 +1886,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "No se pudo habilitar la acción"
 msgstr[1] "No se pudo habilitar las acciones"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "No se pudo habilitar la regla de descubrimiento"
@@ -2386,7 +2386,7 @@ msgstr "No se pudo actualizar la configuración"
 msgid "Cannot update debug mode"
 msgstr "No se puede poner en modo debug"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "No es posible actualizar la regla"
 
@@ -2558,7 +2558,7 @@ msgstr "No es posible actualizar al usuario. Ambas contraseñas deben ser iguale
 
 #: adm.valuemapping.php:66
 msgid "Cannot update value map"
-msgstr "No es posible actualizar la asignación"
+msgstr "No se pudo actualizar el mapa de valores"
 
 #: httpconf.php:141
 msgid "Cannot update web scenario"
@@ -3473,8 +3473,9 @@ msgstr "CONFIGURACIÓN DEL PANEL DE CONTROL"
 #: include/views/configuration.item.edit.php:158
 #: include/views/configuration.item.massupdate.php:170
 #: include/views/js/configuration.discovery.edit.js.php:95
+#, fuzzy
 msgid "DES"
-msgstr ""
+msgstr "DES"
 
 #: httpdetails.php:118
 msgid "DETAILS OF SCENARIO"
@@ -4040,7 +4041,7 @@ msgstr "¿Desea eliminar los usuarios seccionados?"
 
 #: adm.valuemapping.php:181
 msgid "Delete selected value mapping?"
-msgstr ""
+msgstr "¿Desea eliminar el mapa de valores seleccionado?"
 
 #: adm.valuemapping.php:179
 #, c-format
@@ -4059,23 +4060,23 @@ msgstr "Eliminar el servicio"
 
 #: include/views/configuration.slideconf.edit.php:117
 msgid "Delete slide show?"
-msgstr ""
+msgstr "¿Desea eliminar la diapositiva?"
 
 #: include/views/configuration.template.edit.php:457
 msgid "Delete template?"
-msgstr ""
+msgstr "¿Desea eliminar la plantilla?"
 
 #: jsLoader.php:189
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "¿Desea eliminar el servicio seleccionado?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger prototype?"
-msgstr ""
+msgstr "¿Desea eliminar el prototipo de disparador?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger?"
-msgstr ""
+msgstr "¿Desea eliminar el disparador?"
 
 #: auditlogs.php:140
 msgid "Deleted"
@@ -4084,47 +4085,47 @@ msgstr "Eliminado"
 #: api/classes/CApplication.php:479
 #, c-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado la aplicación \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:423
 #, c-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado la regla de descubrimiento \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CGraph.php:595
 #, c-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado la gráfica \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CHost.php:1583
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr ""
+msgstr "Se ha eliminado el equipo \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:971
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el prototipo de equipo \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CItem.php:784
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el ítem \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CItemPrototype.php:595
 #, c-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el prototipo de ítem \"%1$s\" en \"%2$s\"."
 
 #: api/classes/CProxy.php:470
 #, c-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "Se ha eliminado el proxy \"%1$s\"."
 
 #: api/classes/CTemplate.php:763
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr ""
+msgstr "Se ha eliminado la plantilla \"%1$s\"."
 
 #: api/classes/CTrigger.php:850
 #, c-format
@@ -4215,12 +4216,12 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:415
 msgid "Device interrupts."
-msgstr ""
+msgstr "Interrupciones del dispositivo."
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:447
 msgid "Device list - lists PCI devices by default"
-msgstr ""
+msgstr "Lista de dispositivos - Lista los dispositivos PCI de manera predeterminada"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:503
@@ -4481,27 +4482,27 @@ msgstr ""
 msgid "Discovery rule \"%s\" already exists."
 msgstr ""
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr ""
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Regla de descubrimiento eliminada"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Regla de descubrimiento actualizada"
 
@@ -4514,7 +4515,7 @@ msgstr "Regla de descubrimiento actualizada"
 msgid "Discovery rules"
 msgstr ""
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Reglas de descubrimiento eliminadas"
 
@@ -7311,7 +7312,7 @@ msgstr ""
 msgid "Incorrect parent service."
 msgstr ""
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr ""
 
@@ -7679,7 +7680,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
