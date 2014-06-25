@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.2');
 define('ZABBIX_API_VERSION', '2.3.2');
-define('ZABBIX_DB_VERSION',	 2030106);
+define('ZABBIX_DB_VERSION',	 2030111);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -849,6 +849,14 @@ define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
+// XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
+
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
@@ -914,6 +922,9 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
 define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
+
+// date format context, usable for translators
+define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
 // actions
 define('LONG_DESCRIPTION',	0);
