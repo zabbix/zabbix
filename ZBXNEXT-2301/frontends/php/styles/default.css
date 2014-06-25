@@ -341,7 +341,7 @@ table.tableinfo tr.header td.hover_grey {
 	white-space: nowrap; word-spacing: 0; font-weight: bold; border-width: 0; cursor: pointer;
 }
 table.tableinfo tr.vertical_header td {
-	padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center;
+	padding: 5px 0 5px 0px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center;
 }
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
@@ -462,6 +462,11 @@ table.filter tr.item-list-row { height: 26px; }
 
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
+
+/* old-style filter */
+.old-filter .form_row_l { text-align: right; }
+.old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
+.old-filter .filter-button { height: 16px; }
 
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }
