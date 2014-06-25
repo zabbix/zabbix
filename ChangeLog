@@ -3,6 +3,7 @@ Changes for 2.2.5rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
 ...G...... [ZBX-8373] fixed the argument to system.cpu.num[] being ignored on HP-UX (asaveljevs)
 
 --------------------------------------------------------------------------------
