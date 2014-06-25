@@ -12,6 +12,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions (Andrejs)
 ..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
 .......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
 .......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
@@ -214,6 +215,7 @@ Changes for 2.2.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions (Andrejs)
 ..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
 .......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
 .......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
@@ -1231,6 +1233,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions (Andrejs)
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
