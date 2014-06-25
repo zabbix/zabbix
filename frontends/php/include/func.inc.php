@@ -617,7 +617,7 @@ function convert_units($options = array()) {
 	}
 
 	// any other unit
-	// black list wich do not require units metrics..
+	// black list of units that should have no multiplier prefix (K, M, G etc) applied
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
