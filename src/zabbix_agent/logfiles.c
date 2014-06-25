@@ -1453,7 +1453,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino))
 	{
-		/* an error occured or a file was not accessible for a log[] item */
+		/* an error occurred or a file was not accessible for a log[] item */
 		(*error_count)++;
 		ret = SUCCEED;
 		goto out;

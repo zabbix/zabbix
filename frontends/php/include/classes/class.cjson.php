@@ -384,7 +384,7 @@ class CJSON {
 				 *
 				 * As per the ECMA and JSON specification an object may
 				 * have any string as a property. Unfortunately due to
-				 * a hole in the ECMA specification ifthe key is a
+				 * a hole in the ECMA specification if the key is an
 				 * ECMA reserved word or starts with a digit the
 				 * parameter is only accessible using ECMAScript's
 				 * bracket notation.
@@ -668,7 +668,7 @@ class CJSON {
 						elseif ($chrs{$c} == $top['delim'] && $top['what'] == self::IN_STR
 								&& ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
 							// found a quote, we're in a string, and it's not escaped
-							// we know that it's not escaped becase there is _not_ an
+							// we know that it's not escaped because there is _not_ an
 							// odd number of backslashes at the end of the string so far
 							array_pop($stk);
 						}

@@ -430,7 +430,7 @@ class CPageFilter {
 			$this->data['groups'][$group['groupid']] = $group;
 		}
 
-		// select remebered selection
+		// select remembered selection
 		if (is_null($groupid) && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
 			if ($hostid) {
@@ -503,7 +503,7 @@ class CPageFilter {
 				}
 			}
 
-			// select remebered selection
+			// select remembered selection
 			if (is_null($hostId) && $this->_profileIds['hostid']) {
 				$hostId = $this->_profileIds['hostid'];
 			}
@@ -679,7 +679,7 @@ class CPageFilter {
 	/**
 	 * Set applications related variables.
 	 *  - applications: all applications available for dropdown on page
-	 *  - application: application curently selected, can be '' for 'all' or 'not selected'
+	 *  - application: application currently selected, can be '' for 'all' or 'not selected'
 	 *  - applicationsSelected: if an application selected, i.e. not 'not selected'
 	 * Applications are dependent on groups.
 	 *

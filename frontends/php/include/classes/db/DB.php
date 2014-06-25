@@ -167,7 +167,7 @@ class DB {
 
 	/**
 	 * Refresh id record for given table.
-	 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
+	 * Record is deleted and then created again with value of maximum id from table or minimum allowed.
 	 *
 	 * @throw APIException
 	 * @static
