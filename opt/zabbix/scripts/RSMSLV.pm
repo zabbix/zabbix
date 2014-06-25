@@ -826,7 +826,8 @@ sub push_value
 	    'key' => $key,
 	    'value' => "$value",
 	    'clock' => $timestamp},
-	'info' => $info});
+	'info' => $info,
+	'tld' => $hostname});
 }
 
 #
@@ -890,10 +891,14 @@ sub send_values
 	    fail($msg);
 	}
 
+	# $tld is a global variable which is used in info()
+	my $saved_tld = $tld;
 	foreach my $hash_ref (@suba)
         {
+	    $tld = $hash_ref->{'tld'};
 	    info($hash_ref->{'info'});
 	}
+	$tld = $saved_tld;
     }
 }
 
