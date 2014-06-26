@@ -732,7 +732,7 @@ class CConfigurationImport {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
-				// if rule was not processed we should not create/upadate any of it's prototypes
+				// if rule was not processed we should not create/update any of its prototypes
 				if (!isset($processedRules[$hostid][$item['key_']])) {
 					continue;
 				}
@@ -905,7 +905,7 @@ class CConfigurationImport {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
-				// if rule was not processed we should not create/upadate any of it's prototypes
+				// if rule was not processed we should not create/update any of its prototypes
 				if (!isset($processedRules[$hostid][$item['key_']])) {
 					continue;
 				}
