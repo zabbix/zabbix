@@ -55,13 +55,18 @@ $fields = array(
 check_fields($fields);
 
 $_REQUEST['caption'] = get_request('caption', '');
+$autoCaption = '';
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-if (zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
+if (isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
 	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($_REQUEST['itemid'])));
 	$item = reset($items);
 
-	$_REQUEST['caption'] = $item['name_expanded'];
+	$autoCaption = $item['name_expanded'];
+
+	if (zbx_empty($_REQUEST['caption'])) {
+		$_REQUEST['caption'] = $item['name_expanded'];
+	}
 }
 
 insert_js_function('add_bitem');
@@ -112,8 +117,9 @@ else {
 	$frmGItem->addVar('config', $config);
 	$frmGItem->addVar('list_name', $list_name);
 	$frmGItem->addVar('itemid', $itemid);
-
-	$frmGItem->addRow(array(new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
+	$frmGItem->addRow(array(new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption,
+			'caption', _('Default')
+		),
 		_('Caption')), new CTextBox('caption', $caption, 50)
 	);
 
