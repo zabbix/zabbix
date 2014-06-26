@@ -844,7 +844,7 @@ A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln 
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 ...GI..PS. [ZBX-6955] fixed library order in linking, fixed compiler warnings, improved performance of zbx_snprintf_alloc() function (Andris)
 ........S. [ZBX-6981] fixed SQL error during lld trigger creation (wiper)
-A......... [ZBX-6866] fixed beeing able to add graph items from other hosts for templated graphs (Ivo)
+A......... [ZBX-6866] fixed being able to add graph items from other hosts for templated graphs (Ivo)
 ..F....... [ZBX-6854] fixed javascript error on pages with checkboxes, but without main checkbox (Vitalij)
 ..F....... [ZBX-6873] fixed errors in page switching after executing an action (Ivo)
 
@@ -877,7 +877,7 @@ A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknow
 Bug fixes:
 ...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
 ..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
-..F....... [ZBX-6878] fixed history screen log bug for two items, parametr itemid renamed to itemids (Vitalij)
+..F....... [ZBX-6878] fixed history screen log bug for two items, parameter itemid renamed to itemids (Vitalij)
 ..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)
 A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vitalij)
 ..F....... [ZBX-6893] fixed prototype name error ($1 -> {#FSNAME}) on adding new prototype in the graph prototype form in the item prototype selection template (Vitalij)
