@@ -915,7 +915,7 @@ class CXmlImport18 {
 					unset($snmp_interface_ports_created); // it was a temporary variable
 
 
-					// we ned to add ipmi interface if at least one ipmi item exists
+					// we need to add ipmi interface if at least one ipmi item exists
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						if ($item_db['type'] == ITEM_TYPE_IPMI) {

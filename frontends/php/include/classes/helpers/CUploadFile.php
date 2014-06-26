@@ -131,7 +131,7 @@ class CUploadFile {
 	}
 
 	/**
-	 * Return true if file wos uploaded, maybe with errors.
+	 * Return true if file was uploaded, maybe with errors.
 	 *
 	 * @return bool
 	 */
