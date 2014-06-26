@@ -1,6 +1,7 @@
 Changes for 2.3.2
 
 New features:
+..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 ..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
 ..F....... [ZBX-8339] removed auto login/logout controls while editing guest user (Andrejs)
 ...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris,asaveljevs)
@@ -215,6 +216,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.5rc1
 
 New features:
+..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
 ..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
