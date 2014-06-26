@@ -164,7 +164,7 @@ class CHostImporter extends CImporter {
 	/**
 	 * For existing hosts we need to set an interfaceid for existing interfaces or they will be added.
 	 *
-	 * @param array $xmlHosts
+	 * @param array $xmlHosts    hosts from XML for which interfaces will be added
 	 *
 	 * @return array
 	 */
@@ -180,7 +180,8 @@ class CHostImporter extends CImporter {
 		// - default (primary) interface ids per host per interface type
 		$dbHostInterfaces = array();
 		$dbHostMainInterfaceIds = array();
-		foreach($dbInterfaces as $dbInterface) {
+
+		foreach ($dbInterfaces as $dbInterface) {
 			$dbHostId = $dbInterface['hostid'];
 
 			$dbHostInterfaces[$dbHostId][] = $dbInterface;
@@ -202,6 +203,8 @@ class CHostImporter extends CImporter {
 				? $dbHostMainInterfaceIds[$xmlHostId]
 				: array();
 
+			$reusedInterfaceIds = array();
+
 			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
 				$xmlHostInterfaceType = $xmlHostInterface['type'];
 
@@ -209,21 +212,29 @@ class CHostImporter extends CImporter {
 				// in case there is default (primary) interface in current host with same type
 				if ($xmlHostInterface['main'] == INTERFACE_PRIMARY
 						&& isset($currentDbHostMainInterfaceIds[$xmlHostInterfaceType])) {
-					$xmlHostInterface['interfaceid'] = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
+					$interfaceId = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
+
+					$xmlHostInterface['interfaceid'] = $interfaceId;
+					$reusedInterfaceIds[$interfaceId] = true;
 				}
-				else {
-					// otherwise loop through all interfaces of current host and take interfaceids from
-					// ones that match completely
-					foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
-						if ($dbHostInterface['ip'] == $xmlHostInterface['ip']
-								&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
-								&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
-								&& $dbHostInterface['port'] == $xmlHostInterface['port']
-								&& $dbHostInterface['type'] == $xmlHostInterface['type']
-								&& $dbHostInterface['main'] == $xmlHostInterface['main']) {
-							$xmlHostInterface['interfaceid'] = $dbHostInterface['interfaceid'];
-							break;
-						}
+			}
+			unset($xmlHostInterface);
+
+			// loop through all interfaces of current host and take interfaceids from ones that
+			// match completely, ignoring ones with reused intefaceids
+			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
+				foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
+					if (!isset($reusedInterfaceIds[$dbHostInterface['hostid']])
+							&& $dbHostInterface['ip'] == $xmlHostInterface['ip']
+							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
+							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
+							&& $dbHostInterface['port'] == $xmlHostInterface['port']
+							&& $dbHostInterface['type'] == $xmlHostInterface['type']) {
+						$interfaceId = $dbHostInterface['interfaceid'];
+
+						$xmlHostInterface['interfaceid'] = $interfaceId;
+						$reusedInterfaceIds[$interfaceId] = true;
+						break;
 					}
 				}
 			}
@@ -233,5 +244,4 @@ class CHostImporter extends CImporter {
 
 		return $xmlHosts;
 	}
-
 }
