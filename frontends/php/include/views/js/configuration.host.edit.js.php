@@ -58,6 +58,10 @@
 			domRow = jQuery('#hostInterfaceRow_' + hostInterface.interfaceid);
 			jQuery('.jqueryinputset', domRow).buttonset();
 
+			if (hostInterface.type != <?php echo INTERFACE_TYPE_SNMP; ?>) {
+				jQuery('.interface-bulk', domRow).remove();
+			}
+
 			if (hostInterface.locked) {
 				addNotDraggableIcon(domRow);
 			}
@@ -152,8 +156,7 @@
 				disabled: '',
 				checked_dns: '',
 				checked_ip: '',
-				checked_main: '',
-				checked_bulk: ''
+				checked_main: ''
 			};
 
 			if (hostInterface.items) {
@@ -171,8 +174,13 @@
 				attrs.checked_main = 'checked="checked"';
 			}
 
-			if (hostInterface.bulk == 1) {
-				attrs.checked_bulk = 'checked="checked"';
+			if (hostInterface.type == <?php echo INTERFACE_TYPE_SNMP; ?>) {
+				if (hostInterface.bulk == 1) {
+					attrs.checked_bulk = 'checked="checked"';
+				}
+				else {
+					attrs.checked_bulk = '';
+				}
 			}
 
 			return attrs;
@@ -228,9 +236,12 @@
 				useip: 1,
 				type: getHostInterfaceNumericType(hostInterfaceType),
 				port: ports[hostInterfaceType],
-				ip: '127.0.0.1',
-				bulk: 1
+				ip: '127.0.0.1'
 			};
+
+			if (hostInterfaceType === 'snmp') {
+				newInterface.bulk = 1;
+			}
 
 			newInterface.interfaceid = 1;
 			while (allHostInterfaces[newInterface.interfaceid] !== void(0)) {
@@ -353,6 +364,35 @@
 					hostInterfaceId = ui.draggable.data('interfaceid');
 
 				ui.helper.remove();
+
+				if (hostInterfaceTypeName === 'snmp') {
+					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
+						var bulkDiv = jQuery('<div>', {
+							'class': 'interface-bulk'
+						});
+
+						// append checkbox
+						bulkDiv.append(jQuery('<input>', {
+							id: 'interfaces[' + hostInterfaceId + '][bulk]',
+							'class': 'input checkbox pointer',
+							type: 'checkbox',
+							name: 'interfaces[' + hostInterfaceId + '][bulk]',
+							value: 1,
+							checked: true
+						}));
+
+						// append label
+						bulkDiv.append(jQuery('<label>', {
+							'for': 'interfaces[' + hostInterfaceId + '][bulk]',
+							text: 'Use bulk requests'
+						}));
+
+						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkDiv);
+					}
+				}
+				else {
+					jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).remove();
+				}
 
 				hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
 				hostInterfacesManager.resetMainInterfaces();
