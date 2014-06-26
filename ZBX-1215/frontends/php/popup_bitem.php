@@ -117,10 +117,14 @@ else {
 	$frmGItem->addVar('config', $config);
 	$frmGItem->addVar('list_name', $list_name);
 	$frmGItem->addVar('itemid', $itemid);
-	$frmGItem->addRow(array(new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption,
-			'caption', _('Default')
+	$frmGItem->addRow(
+		array(
+			new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
+				_('Default')
+			),
+			_('Caption')
 		),
-		_('Caption')), new CTextBox('caption', $caption, 50)
+		new CTextBox('caption', $caption, 50)
 	);
 
 	$host = get_request('host');

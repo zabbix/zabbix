@@ -115,7 +115,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$frmPd->addRow(
 			array(
 				new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
-					_('Auto')),
+					_('Auto')
+				),
 				_('Custom caption')
 			),
 			new CTextBox('caption', $caption, 42)
