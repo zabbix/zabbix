@@ -203,6 +203,9 @@
 		}
 	}
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		// templates
 		var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
