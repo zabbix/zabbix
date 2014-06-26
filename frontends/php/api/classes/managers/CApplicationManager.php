@@ -471,7 +471,7 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Get hosts applications for each passed hosts.
+	 * Get host applications for each passed host.
 	 * Each host has two hashes with applications, one with name keys other with templateid keys.
 	 *
 	 * Resulting structure is:
