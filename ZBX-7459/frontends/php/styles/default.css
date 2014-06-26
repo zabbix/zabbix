@@ -37,6 +37,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
+.pre-wrap { white-space: pre-wrap; }
+.break-lines { word-break: break-all; }
 .placeholder { color: #aaa; }
 .maxwidth { width: 100%; }
 .paddingless { padding: 0; }
@@ -356,7 +358,6 @@ table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; paddi
 table.tableinfo > tbody > tr > td:first-child { width: 1px; }
 table.tableinfo tr td.wraptext { white-space: normal; }
 table.tableinfo tr td.message { text-align: center; }
-table.tableinfo tr td.pre { white-space: pre; }
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
 table.tableinfo caption {
 	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
