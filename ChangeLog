@@ -5,7 +5,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
-..F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions (Andrejs)
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
 .......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
 .......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
