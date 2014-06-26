@@ -557,7 +557,7 @@ define('VALIGN_TOP',		1);
 define('VALIGN_BOTTOM',		2);
 
 // info module style
-define('STYLE_HORISONTAL',	0);
+define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
 // view style [Overview]
