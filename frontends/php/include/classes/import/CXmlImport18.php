@@ -890,7 +890,7 @@ class CXmlImport18 {
 						);
 					}
 
-					// now we need to check if host had SNMP items. If it had, we need and SNMP interface for every different port.
+					// now we need to check if host had SNMP items. If it had, we need an SNMP interface for every different port.
 					$items = $xpath->query('items/item', $host);
 					$snmp_interface_ports_created = array();
 					foreach ($items as $item) {
