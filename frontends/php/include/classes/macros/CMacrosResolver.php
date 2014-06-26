@@ -1137,7 +1137,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				foreach ($replaceHosts as $i => $host) {
 					$macroTmp = $macro;
 
-					// repalce only macro in first position
+					// replace only macro in first position
 					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 
 					// only one simple macro possible inside functional macro
