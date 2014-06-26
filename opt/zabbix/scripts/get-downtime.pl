@@ -75,7 +75,6 @@ foreach (@$tlds_ref)
 	foreach my $ns (keys(%$itemids_ref))
 	{
 	    my $itemid = $itemids_ref->{$ns};
-
 	    my $downtime = get_downtime($itemid, $from, $till, 1); # no incidents check
 
 	    curmon_log_downtime($from, $till, $OPTS{'service'} . "-downtime", $downtime, $ns);
