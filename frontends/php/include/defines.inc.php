@@ -543,7 +543,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
-// alignes
+// alignments
 define('HALIGN_DEFAULT',	0);
 define('HALIGN_CENTER',		0);
 define('HALIGN_LEFT',		1);
