@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',     '2.2.4');
 define('ZABBIX_API_VERSION', '2.2.4');
-define('ZABBIX_DB_VERSION',	 2020000);
+define('ZABBIX_DB_VERSION',	 2020009);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -455,6 +455,7 @@ define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_JABBER',		3);
 define('MEDIA_TYPE_EZ_TEXTING',	100);
+define('MEDIA_TYPE_REMEDY',		101);
 
 define('EZ_TEXTING_LIMIT_USA',		0);
 define('EZ_TEXTING_LIMIT_CANADA',	1);
@@ -829,6 +830,7 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', 1);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
+define('ZBX_SOCKET_REMEDY_TIMEOUT',	25);
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
 
 // value is also used in servercheck.js file
@@ -845,6 +847,14 @@ define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
 define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
+
+// XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);

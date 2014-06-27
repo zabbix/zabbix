@@ -42,8 +42,7 @@ class CSetValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
+	public function validate($value) {
 		$values = array_flip($this->values);
 
 		if (!isset($values[$value])) {

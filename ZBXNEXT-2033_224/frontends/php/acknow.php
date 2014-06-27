@@ -43,6 +43,7 @@ $fields = array(
 	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
+	'ticket_status' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -111,6 +112,9 @@ $eventTrigger = null;
 $eventAcknowledged = null;
 $eventTriggerName = null;
 
+$ticket = null;
+$event = null;
+
 $bulk = !isset($_REQUEST['eventid']);
 
 if (!$bulk) {
@@ -125,6 +129,13 @@ if (!$bulk) {
 
 		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
+
+		CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
+
+		// if trigger severity is valid, media type is set up as Remedy Service, but server is offline, show error
+		if (!CRemedyService::$enabled && hasErrorMesssages()) {
+			show_messages();
+		}
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
@@ -148,20 +159,43 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		));
 	}
 
-	$acknowledgeEvent = API::Event()->acknowledge(array(
-		'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
-		'message' => $_REQUEST['message']
-	));
+	$result = true;
 
-	show_messages($acknowledgeEvent, _('Event acknowledged'), _('Cannot acknowledge event'));
+	if (!$bulk && $event && CRemedyService::$enabled) {
+		// create or update existing remedy ticket
+		if (hasRequest('ticket_status')) {
+			$ticket = CRemedyService::mediaAcknowledge(array(
+				'eventid' => getRequest('eventid'),
+				'message' => getRequest('message'),
+				'subject' => $eventTriggerName
+			));
 
-	if ($acknowledgeEvent) {
+			$result = (bool) $ticket;
+		}
+		// read remedy ticket
+		else {
+			$ticket = CRemedyService::mediaQuery(getRequest('eventid'));
+		}
+	}
+
+	if ($result) {
+		DBstart();
+
+		$result = API::Event()->acknowledge(array(
+			'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
+			'message' => $_REQUEST['message']
+		));
+
 		$eventAcknowledged = true;
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, _('Acknowledge added').
 			' ['.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName).']'.
 			' ['.$_REQUEST['message'].']');
+
+		$result = DBend($result);
 	}
+
+	show_messages($result, _('Event acknowledged'), _('Cannot acknowledge event'));
 
 	if (isset($_REQUEST['saveandreturn'])) {
 		ob_end_clean();
@@ -182,15 +216,30 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		}
 	}
 }
+elseif (!$bulk && CRemedyService::$enabled && $event) {
+	$ticket = CRemedyService::mediaQuery($event['eventid']);
+
+	if (hasErrorMesssages()) {
+		show_messages();
+	}
+}
 
 ob_end_flush();
 
 /*
  * Display
  */
-show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
 
-echo SBR;
+$ackWidget = new CWidget();
+if ($ticket) {
+	$ackWidget->addHeader(array(_('Ticket').NAME_DELIMITER.' ', $ticket['link']));
+	if ($ticket['assignee']) {
+		$ackWidget->addHeader(array(_('Assignee').NAME_DELIMITER.' ', $ticket['assignee']));
+	}
+	$ackWidget->addHeader(array(_('Status').NAME_DELIMITER.' ', $ticket['status']));
+	$ackWidget->addHeader(array(_('Created').NAME_DELIMITER.' ', $ticket['created']));
+}
+$ackWidget->addPageHeader(_('ALARM ACKNOWLEDGES').NAME_DELIMITER.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName));
 
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
@@ -204,6 +253,7 @@ else {
 		' WHERE a.eventid='.zbx_dbstr($_REQUEST['eventid'])
 	);
 
+	$acknowledgesFound = false;
 	if ($acknowledges) {
 		$acknowledgesTable = new CTable(null, 'ack_msgs');
 		$acknowledgesTable->setAlign('center');
@@ -215,9 +265,8 @@ else {
 				'title'
 			);
 			$acknowledgesTable->addRow(new CCol(zbx_nl2br($acknowledge['message']), null, 2), 'msg');
+			$acknowledgesFound = true;
 		}
-
-		$acknowledgesTable->show();
 	}
 
 	if ($eventAcknowledged) {
@@ -266,6 +315,17 @@ $message = new CTextArea('message', '', array(
 $message->attr('autofocus', 'autofocus');
 
 $messageTable->addRow(_('Message'), $message);
+
+if (CRemedyService::$enabled && ((!$ticket && $event['value'] == TRIGGER_VALUE_TRUE) || $ticket)) {
+	$ticketStatusMessage = (!$ticket || $ticket['status'] === 'Closed' || $ticket['status'] === 'Cancelled')
+		? _('Create ticket')
+		: array(_('Update ticket').' ', $ticket['link']);
+
+	$messageTable->addRow($ticketStatusMessage,
+		new CCheckBox('ticket_status'), hasErrorMesssages() ? getRequest('ticket_status') : 'no'
+	);
+}
+
 $messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));
 
 if (!$bulk) {
@@ -273,6 +333,12 @@ if (!$bulk) {
 }
 
 $messageTable->addItemToBottomRow(new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid'))));
-$messageTable->show(false);
+
+if (isset($acknowledgesFound) && $acknowledgesFound) {
+	$ackWidget->addItem($acknowledgesTable);
+}
+$ackWidget->addItem($messageTable);
+
+$ackWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

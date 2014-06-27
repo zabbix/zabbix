@@ -113,6 +113,28 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
+CRemedyService::init(array('triggerSeverity' => $trigger['priority']));
+
+if (CRemedyService::$enabled) {
+	$ticket = CRemedyService::mediaQuery($event['eventid']);
+
+	if ($ticket) {
+		$ticketTable = new CTableInfo();
+
+		$ticketTable->addRow(array(_('Ticket'), $ticket['link']));
+		if ($ticket['assignee']) {
+			$ticketTable->addRow(array(_('Assignee'), $ticket['assignee']));
+		}
+		$ticketTable->addRow(array(_('Status'), $ticket['status']));
+		$ticketTable->addRow(array(_('Created'), $ticket['created']));
+
+		$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
+		$ticketDetails->setHeader(_('Ticket details'));
+
+		$left_col[] = $ticketDetails;
+	}
+}
+
 $right_col = array();
 
 // if acknowledges are not disabled in configuration, let's show them

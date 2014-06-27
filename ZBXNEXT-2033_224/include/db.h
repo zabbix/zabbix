@@ -310,7 +310,7 @@ typedef struct
 }
 DB_ITEM;
 
-typedef struct
+typedef struct DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
@@ -346,17 +346,19 @@ typedef struct
 }
 DB_CONDITION;
 
-typedef struct
+typedef struct DB_ALERT
 {
 	zbx_uint64_t	alertid;
 	zbx_uint64_t 	actionid;
-	int		clock;
+	zbx_uint64_t	eventid;
 	zbx_uint64_t	mediatypeid;
+	zbx_uint64_t	userid;
 	char		*sendto;
 	char		*subject;
 	char		*message;
 	zbx_alert_status_t	status;
 	int		retries;
+	int		clock;
 }
 DB_ALERT;
 
