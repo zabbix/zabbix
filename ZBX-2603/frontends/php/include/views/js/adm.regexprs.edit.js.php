@@ -346,30 +346,46 @@
 			 * @param {Object} response ajax response
 			 */
 			showTestResults: function(response) {
-				var tplData, expr, exprResult;
+				var tplData, expr, exprResult, hasErrors;
 
 				$('#testResultTable tr:not(.header)').remove();
+
+				hasErrors = false;
 
 				for (var id in this.expressions) {
 					expr = this.expressions[id];
 					exprResult = response.data.expressions[id];
-					error = response.data.errors[id];
+
+					if (response.data.errors[id]) {
+						hasErrors = true;
+						result = response.data.errors[id];
+					}
+					else {
+						result = exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>;
+					}
 
 					tplData = {
 						expression: expr.data.expression,
 						type: expr.type2str(),
-						result: error ? error:
-							exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>,
+						result: result,
 						resultClass: exprResult ? 'green' : 'red'
 					};
 
 					$('#testResultTable').append(this.testTableRowTpl.evaluate(tplData));
 				}
 
-				tplData = {
-					resultClass: response.data.final ? 'green' : 'red',
-					result: response.data.final ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>
-				};
+				if (hasErrors) {
+					tplData = {
+						resultClass: 'red',
+						result: <?php echo CJs::encodeJson(_('UNKNOWN')); ?>
+					};
+				}
+				else {
+					tplData = {
+						resultClass: response.data.final ? 'green' : 'red',
+						result: response.data.final ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>
+					};
+				}
 
 				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
 				$('#testResultTable').css({opacity: 1});
