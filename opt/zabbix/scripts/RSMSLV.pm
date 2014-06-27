@@ -65,9 +65,8 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_results get_item_values check_lastclock get_downtime avail_result_msg
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str curmon_log_values curmon_log_downtime
-		usage);
+		get_ns_results get_item_values check_lastclock get_downtime avail_result_msg
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -462,6 +461,10 @@ sub handle_db_error
 
 sub db_connect
 {
+    fail("no database configuration defined") if (not defined($config) or
+						  not defined($config->{'db'}) or
+						  not defined($config->{'db'}->{'name'}));
+
     $dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
 			$config->{'db'}->{'user'},
 			$config->{'db'}->{'password'},
@@ -1162,7 +1165,7 @@ sub process_slv_ns_avail
 # get total and successful number of results of a service within given period of time for
 # a specified TLD
 #
-sub get_results
+sub get_ns_results
 {
     my $tld = shift;
     my $key = shift;             # part of input key, e. g. 'rsm.dns.udp.upd[{$RSM.TLD},'
@@ -1171,21 +1174,19 @@ sub get_results
     my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
-    my $nss_ref = __get_nss($tld, "Template $tld");
+    my $nss_ref = __get_nss("Template $tld", $key);
 
-    # %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
+    # %result is a hash of name server as key and its number of successful results as a value. Name server is
     # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
     # certain period. An example of Name Server strings:
     #
     # 'g.ns.se,2001:6b0:e:3::1'
     # 'b.ns.se,192.36.133.107'
     #
-    my %total_values;
-    my %successful_values;
+    my %result;
     foreach my $ns (@$nss_ref)
     {
-	$total_values{$ns} = 0;
-	$successful_values{$ns} = 0;
+	$result{$ns} = {'total' => 0, 'successful' => 0};
     }
 
     my $all_ns_items_ref = __get_all_ns_items($nss_ref, $key, $tld);
@@ -1194,9 +1195,7 @@ sub get_results
     {
 	my $times_ref = $probe_times_ref->{$probe};
 
-	my @online_probes = ($probe);
-
-	my $hostids_ref = probes2tldhostids($tld, \@online_probes);
+	my $hostids_ref = probes2tldhostids($tld, [$probe]);
 
 	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
 
@@ -1211,12 +1210,12 @@ sub get_results
 
 	    foreach (@$item_values_ref)
 	    {
-		$total_values{$ns}++;
+		$result{$ns}->{'total'}++;
 		$probe_total++;
 
 		if ($check_value_ref->($_) == SUCCESS)
 		{
-		    $successful_values{$ns}++;
+		    $result{$ns}->{'successful'}++;
 		    $probe_successful++;
 		}
 	    }
@@ -1225,18 +1224,7 @@ sub get_results
 	}
     }
 
-    foreach my $ns (keys(%total_values))
-    {
-	if ($total_values{$ns} == 0)
-	{
-	    info("$ns: no values found in the database for current month");
-	    next;
-	}
-
-	info("$ns: ", $successful_values{$ns}, "/", $total_values{$ns}, " successful values");
-
-	curmon_log_values("CURMON-UDP-DNS-RTT", $ns, $successful_values{$ns}, $total_values{$ns});
-    }
+    return \%result;
 }
 
 # organize values from all hosts grouped by itemid and return itemid->values hash
@@ -1466,43 +1454,6 @@ sub ts_str
     return sprintf("%4.2d/%2.2d/%2.2d-%2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
 }
 
-sub curmon_log_values
-{
-    my $prefix = shift;
-    my $target = shift;
-    my $successful = shift;
-    my $total = shift;
-
-    if (defined($OPTS{'debug'}))
-    {
-	print(ts_str(), " $prefix $tld $target: $successful/$total successful results\n");
-	return;
-    }
-
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '.log';
-    __write_log($file, ts_str() . " [$target] [$successful] [$total]\n");
-}
-
-sub curmon_log_downtime
-{
-    my $from = shift;
-    my $till = shift;
-    my $prefix = shift;
-    my $downtime = shift;
-    my $target = shift;
-
-    $target = (defined($target) ? " [$target]" : "");
-
-    if (defined($OPTS{'debug'}))
-    {
-	print(ts_str(), " $prefix $tld$target: $downtime minutes from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)\n");
-	return;
-    }
-
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '.log';
-    __write_log($file, ts_str() . "$target [$downtime]\n");
-}
-
 sub usage
 {
     pod2usage(shift);
@@ -1533,7 +1484,8 @@ sub __log_stdout
 
     if (defined($OPTS{'debug'}))
     {
-	print(ts_str(), " [$msg_prefix] ", __func(), " ", (defined($tld) ? "$tld: " : ''), "$msg\n");
+	my $func = __func();
+	print(ts_str(), " [$msg_prefix] ", (defined($func) ? "$func " : ''), (defined($tld) ? "$tld: " : ''), "$msg\n");
 	return;
     }
 
@@ -1609,8 +1561,6 @@ sub __get_ns_values
     my $all_ns_items = shift;
 
     my %result;
-
-    dbg("getting NS values of items:\n", Dumper($itemids_ref));
 
     if (scalar(@$itemids_ref) != 0)
     {
@@ -1827,7 +1777,11 @@ sub __func
 {
     my $func = (caller(4))[3];
 
-    $func =~ s/.*::(.*)$/$1()/;
+    if (defined($func))
+    {
+	$func =~ s/^[^:]*::(.*)$/$1/;
+	$func .= "()";
+    }
 
     return $func;
 }

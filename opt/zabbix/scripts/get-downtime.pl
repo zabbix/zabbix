@@ -77,7 +77,7 @@ foreach (@$tlds_ref)
 	    my $itemid = $itemids_ref->{$ns};
 	    my $downtime = get_downtime($itemid, $from, $till, 1); # no incidents check
 
-	    curmon_log_downtime($from, $till, $OPTS{'service'} . "-downtime", $downtime, $ns);
+	    info("$ns: $downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
 	}
     }
     else
@@ -85,7 +85,7 @@ foreach (@$tlds_ref)
 	my $itemid = get_itemid($tld, $key);
 	my $downtime = get_downtime($itemid, $from, $till);
 
-	curmon_log_downtime($from, $till, $OPTS{'service'} . "-downtime", $downtime);
+	info("$downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
     }
 }
 
