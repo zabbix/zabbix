@@ -114,6 +114,13 @@
 					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}", 450, 450)'><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
+			<tr id="application-select-row">
+				<td><?php echo _('Application'); ?></td>
+				<td>
+					<input size="50" id="application" name="application" style="width: 312px;">
+					<input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
+				</td>
+			</tr>
 
 			<tr>
 				<td colspan="2">
@@ -478,5 +485,14 @@ jQuery(document).ready(function() {
 
 		return false;
 	});
-})
+});
+
+function addPopupValues(data) {
+	if (data.object === 'name') {
+		jQuery('#application').val(data.values[0].name);
+	}
+	else if (data.object === 'linktrigger') {
+		ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
+	}
+}
 </script>
