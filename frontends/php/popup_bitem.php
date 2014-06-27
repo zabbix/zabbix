@@ -54,18 +54,18 @@ $fields = array(
 );
 check_fields($fields);
 
-$_REQUEST['caption'] = get_request('caption', '');
+$caption = getRequest('caption', '');
 $autoCaption = '';
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-if (isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
-	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($_REQUEST['itemid'])));
+if (hasRequest('itemid') && getRequest('itemid') > 0) {
+	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid(getRequest('itemid'))));
 	$item = reset($items);
 
 	$autoCaption = $item['name_expanded'];
 
-	if (zbx_empty($_REQUEST['caption'])) {
-		$_REQUEST['caption'] = $item['name_expanded'];
+	if (!hasRequest('caption')) {
+		$caption = $item['name_expanded'];
 	}
 }
 
@@ -75,7 +75,7 @@ insert_js_function('update_bitem');
 if (isset($_REQUEST['save']) && !isset($_REQUEST['gid'])) {
 	insert_js("add_bitem(".
 		zbx_jsvalue($_REQUEST['dstfrm']).",".
-		zbx_jsvalue($_REQUEST['caption']).",'".
+		zbx_jsvalue($caption).",'".
 		$_REQUEST['itemid']."','".
 		$_REQUEST['color']."',".
 		$_REQUEST['calc_fnc'].",".
@@ -88,7 +88,7 @@ if (isset($_REQUEST['save']) && isset($_REQUEST['gid'])) {
 		zbx_jsvalue($_REQUEST['dstfrm']).",".
 		zbx_jsvalue($_REQUEST['list_name']).",'".
 		$_REQUEST['gid']."',".
-		zbx_jsvalue($_REQUEST['caption']).",'".
+		zbx_jsvalue($caption).",'".
 		$_REQUEST['itemid']."','".
 		$_REQUEST['color']."',".
 		$_REQUEST['calc_fnc'].",".
@@ -126,12 +126,6 @@ else {
 		),
 		new CTextBox('caption', $caption, 50)
 	);
-
-	$host = get_request('host');
-	$itemName = get_request('name');
-	if ($host && $itemName) {
-		$caption = $host['name'].NAME_DELIMITER.$itemName;
-	}
 
 	$txtCondVal = new CTextBox('name', $caption, 50, 'yes');
 

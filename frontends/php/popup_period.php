@@ -115,9 +115,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$frmPd->addRow(
 			array(
 				new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
-					_('Auto')
+					_('Default')
 				),
-				_('Custom caption')
+				_('Caption')
 			),
 			new CTextBox('caption', $caption, 42)
 		);
@@ -133,7 +133,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$reporttimetab->addRow($timeTillRow);
 
 		$frmPd->addRow(_('Period'), $reporttimetab);
-//*/
+
 		if($config != 1)
 			$frmPd->addRow(_('Colour'), new CColor('color',$color));
 		else
