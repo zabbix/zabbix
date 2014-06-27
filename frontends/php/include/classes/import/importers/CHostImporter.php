@@ -104,7 +104,9 @@ class CHostImporter extends CImporter {
 								&& $dbInterface['useip'] == $interface['useip']
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']) {
+								&& $dbInterface['main'] == $interface['main']
+								&& ((isset($interface['bulk']) && $dbInterface['bulk'] == $interface['bulk'])
+									|| !isset($interface['bulk']))) {
 
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
@@ -184,7 +186,9 @@ class CHostImporter extends CImporter {
 								&& $dbInterface['useip'] == $interface['useip']
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']) {
+								&& $dbInterface['main'] == $interface['main']
+								&& ((isset($interface['bulk']) && $dbInterface['bulk'] == $interface['bulk'])
+									|| !isset($interface['bulk']))) {
 							$hosts[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
 							break;
 						}
