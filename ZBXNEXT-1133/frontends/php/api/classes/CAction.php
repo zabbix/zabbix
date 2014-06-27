@@ -474,13 +474,8 @@ class CAction extends CApiService {
 						array('conditions', 'formula', 'evaltype'),
 						$options['selectFilter']
 					);
-					$filter = reset($filter);
 
-					if (isset($filter['conditions'])) {
-						$filter['conditions'] = array_values($filter['conditions']);
-					}
-
-					$rule['filter'] = $filter;
+					$rule['filter'] = reset($filter);
 				}
 			}
 			unset($rule);
@@ -1758,8 +1753,6 @@ class CAction extends CApiService {
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
 
 				foreach ($filters as &$filter) {
-					$filter['conditions'] = zbx_toHash($filter['conditions'], 'conditionid');
-
 					// in case of a custom expression - use the given formula
 					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$formula = $filter['formula'];
