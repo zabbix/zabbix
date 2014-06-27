@@ -21,19 +21,29 @@
 class CRegexValidator extends CValidator
 {
 	/**
+	 * Error message if the argument is not a string.
+	 *
+	 * @var string
+	 */
+	public $messageType;
+
+	/**
+	 * Error message if the value is invalid.
+	 *
+	 * @var string
+	 */
+	public $messageInvalid;
+
+	/**
 	 * Check if regular expression is valid
 	 *
-	 * @param $value
+	 * @param string $value
 	 *
 	 * @return bool
 	 */
 	public function validate($value) {
-		// validate for modifiers
-		if (preg_match('/^\//', $value) ||
-			// yes, four backslashes represent one backslash in PHP regex, no error here
-			preg_match('/[^\\\\]\/[a-z]*/i', $value)
-		) {
-			$this->setError(_('Regular expression should not contain delimiters of modifiers (you should escape "/" with "\/").'));
+		if (!is_string($value)) {
+			$this->error($this->messageType);
 			return false;
 		}
 
@@ -51,7 +61,11 @@ class CRegexValidator extends CValidator
 		restore_error_handler();
 
 		if ($error) {
-			$this->setError(_s('Incorrect regular expression: "%1$s".', str_replace('preg_match(): ', '', $error)));
+			$this->error(
+				$this->messageInvalid,
+				$value,
+				str_replace('preg_match(): ', '', $error)
+			);
 			return false;
 		}
 
