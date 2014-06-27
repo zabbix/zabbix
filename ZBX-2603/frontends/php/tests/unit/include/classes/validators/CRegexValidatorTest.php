@@ -22,7 +22,12 @@ class CRegexValidatorTest extends CValidatorTest
 {
 	public function validParamProvider()
 	{
-		return array(array(array()));
+		return array(array(
+			array(
+				'messageType' => 'Not a string',
+				'messageInvalid' => 'Invalid regular expression'
+			)
+		));
 	}
 
 	public function validValuesProvider()
@@ -38,40 +43,52 @@ class CRegexValidatorTest extends CValidatorTest
 			array(array(), '[A-Z]+[0-9]{123}foo.*(bar|buz)[^A-K]{4}'),
 			array(array(), 'asd\('),
 			array(array(), '^Timestamp \[[0-9]{4}-[A-Za-z]{3}-[0-9]{1,2}\]: ERROR.*$'),
+			array(array(), '\/[a-z]+'),
+			array(array(), '[a-z]+\ \[\/'),
+			array(array(), '[a-f0-9]{32}\/iu'),
+			array(array(), '[a-f0-9]{32}\/i'),
 		);
 	}
 
 	public function invalidValuesProvider()
 	{
 		return array(
-			array(array(), '[[', $this->pcreMessage('Compilation failed: missing terminating ] for character class at offset 2')),
-			array(array(), 'asd(', $this->pcreMessage('Compilation failed: missing ) at offset 4')),
-			array(array(), '/[a-z]+', $this->delimiterMessage()),
-			array(array(), '[a-z]+\ \[/', $this->delimiterMessage()),
-			array(array(), '[a-f0-9]{32}/iu', $this->delimiterMessage()),
-			array(array(), '[a-f0-9]{32}/i', $this->delimiterMessage()),
+			array(
+				array('messageType' => 'Not a string'),
+				array(),
+				'Not a string'
+			),
+			array(
+				array('messageType' => 'Not a string'),
+				null,
+				'Not a string'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect regular expression "%1$s": "%2$s"'),
+				'[[',
+				'Incorrect regular expression "[[": "Compilation failed: missing terminating ] for character class at offset 2"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect regular expression "%1$s": "%2$s".'),
+				'asd(',
+				'Incorrect regular expression "asd(": "Compilation failed: missing ) at offset 4".'
+			)
 		);
 	}
 
 	public function invalidValuesWithObjectsProvider()
 	{
 		return array(
-			array(array(), 'test[', $this->pcreMessage('Compilation failed: missing terminating ] for character class at offset 5'))
+			array(
+				array('messageInvalid' => 'Incorrect regular expression "%2$s" for object "%1$s": "%3$s"'),
+				'test[',
+				'Incorrect regular expression "test[" for object "object": "Compilation failed: missing terminating ] for character class at offset 5"'
+			)
 		);
 	}
 
 	protected function createValidator(array $params = array())
 	{
 		return new CRegexValidator($params);
-	}
-
-	protected function delimiterMessage()
-	{
-		return 'Regular expression should not contain delimiters of modifiers (you should escape "/" with "\/").';
-	}
-
-	protected function pcreMessage($message)
-	{
-		return sprintf('Incorrect regular expression: "%s".', $message);
 	}
 }
