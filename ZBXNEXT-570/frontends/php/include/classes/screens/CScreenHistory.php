@@ -307,10 +307,15 @@ class CScreenHistory extends CScreenBase {
 			}
 		}
 
-		if ($this->action == 'showgraph' && !isset($iv_string[$this->item['value_type']])) {
+		if ($this->action == 'showgraph') {
 			$this->dataId = 'historyGraph';
 			$containerId = 'graph_cont1';
-			$src = 'chart.php?itemid='.$this->item['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'].$this->getProfileUrlParams();
+			$query = http_build_query(array(
+				'itemids' => $this->itemids,
+				'period' => $this->timeline['period'],
+				'stime' => $this->timeline['stime']
+			));
+			$src = 'chart.php?'.$query.'&'.$this->getProfileUrlParams();
 
 			$output[] = new CDiv(null, 'center', $containerId);
 		}
