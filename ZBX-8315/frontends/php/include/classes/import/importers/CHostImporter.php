@@ -212,28 +212,29 @@ class CHostImporter extends CImporter {
 				// in case there is default (primary) interface in current host with same type
 				if ($xmlHostInterface['main'] == INTERFACE_PRIMARY
 						&& isset($currentDbHostMainInterfaceIds[$xmlHostInterfaceType])) {
-					$interfaceId = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
+					$dbHostInterfaceId = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
 
-					$xmlHostInterface['interfaceid'] = $interfaceId;
-					$reusedInterfaceIds[$interfaceId] = true;
+					$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
+					$reusedInterfaceIds[$dbHostInterfaceId] = true;
 				}
 			}
 			unset($xmlHostInterface);
 
 			// loop through all interfaces of current host and take interfaceids from ones that
-			// match completely, ignoring ones with reused intefaceids
+			// match completely, ignoring hosts from XML with set interfaceids and ignoring hosts
+			// from DB with reused intefaceids
 			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
 				foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
-					if (!isset($reusedInterfaceIds[$dbHostInterface['hostid']])
+					$dbHostInterfaceId = $dbHostInterface['interfaceid'];
+
+					if (!isset($xmlHostInterface['interfaceid']) && !isset($reusedInterfaceIds[$dbHostInterfaceId])
 							&& $dbHostInterface['ip'] == $xmlHostInterface['ip']
 							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
 							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
 							&& $dbHostInterface['port'] == $xmlHostInterface['port']
 							&& $dbHostInterface['type'] == $xmlHostInterface['type']) {
-						$interfaceId = $dbHostInterface['interfaceid'];
-
-						$xmlHostInterface['interfaceid'] = $interfaceId;
-						$reusedInterfaceIds[$interfaceId] = true;
+						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
+						$reusedInterfaceIds[$dbHostInterfaceId] = true;
 						break;
 					}
 				}
