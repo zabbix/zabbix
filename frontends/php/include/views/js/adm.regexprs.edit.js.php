@@ -353,6 +353,7 @@
 				hasErrors = false;
 
 				for (var id in this.expressions) {
+					var result;
 					expr = this.expressions[id];
 					exprResult = response.data.expressions[id];
 

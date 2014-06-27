@@ -193,6 +193,8 @@ class GlobalRegExp {
 	 * @return string
 	 */
 	private static function buildRegularExpression(array $expression) {
+		$expression['expression'] = str_replace('/', '\/', $expression['expression']);
+
 		$pattern = '/'.$expression['expression'].'/';
 		if (!$expression['case_sensitive']) {
 			$pattern .= 'i';

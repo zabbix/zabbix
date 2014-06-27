@@ -89,6 +89,12 @@ class GlobalRegexpTest extends PHPUnit_Framework_TestCase
 				'expression' => $this->expr(EXPRESSION_TYPE_FALSE, 'server state (fail|outage)', 0),
 				'success' => array('server state 3', 'server state NOT OK - power failure'),
 				'fail' => array('Server state FAIL', 'server state outage of cooling liquid')
+			),
+			// extra tests, should verify both escaped and non-escaped slashes
+			array(
+				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, 'http://example.com/', 0),
+				'success' => array('referrer: http://example.com/', 'request to http://example.com/test'),
+				'fail' => array('example.com')
 			)
 		);
 	}
