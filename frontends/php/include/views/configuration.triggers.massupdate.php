@@ -113,7 +113,7 @@ if (empty($this->data['parent_discoveryid'])) {
 					'dstfrm=massupdate'.
 					'&dstact=add_dependency'.
 					'&reference=deptrigger'.
-					'&dstfld1=new_dependency'.
+					'&dstfld1=new_dependency[]'.
 					'&srctbl=triggers'.
 					'&objname=triggers'.
 					'&srcfld1=triggerid'.
