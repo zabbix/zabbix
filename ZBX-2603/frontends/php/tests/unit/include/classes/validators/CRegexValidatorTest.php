@@ -34,19 +34,20 @@ class CRegexValidatorTest extends CValidatorTest
 	{
 		return array(
 			array(array(), 'foobar'),
-			array(array(), '\/foobar'),
-			array(array(), 'foobar\/'),
-			array(array(), 'foobar\/i'),
-			array(array(), '\/'),
+			array(array(), '/foobar'),
+			array(array(), 'foobar/'),
+			array(array(), 'foobar/i'),
+			array(array(), '/'),
 			array(array(), ' '),
 			array(array(), '\\\\'),
 			array(array(), '[A-Z]+[0-9]{123}foo.*(bar|buz)[^A-K]{4}'),
 			array(array(), 'asd\('),
 			array(array(), '^Timestamp \[[0-9]{4}-[A-Za-z]{3}-[0-9]{1,2}\]: ERROR.*$'),
-			array(array(), '\/[a-z]+'),
-			array(array(), '[a-z]+\ \[\/'),
-			array(array(), '[a-f0-9]{32}\/iu'),
-			array(array(), '[a-f0-9]{32}\/i'),
+			array(array(), '/[a-z]+'),
+			array(array(), '[a-z]+\ \[/'),
+			array(array(), '[a-f0-9]{32}/iu'),
+			array(array(), '[a-f0-9]{32}/i'),
+			array(array(), '/foo bar// me!/')
 		);
 	}
 
