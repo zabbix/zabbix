@@ -618,19 +618,19 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param array  $hostIds
- * @param string $application name of application to filter
- * @param int    $viewMode
+ * @param array  		$hostIds
+ * @param array|null	$applicationIds		IDs of applications to filter items by
+ * @param int    		$viewMode
  *
  * @return CTableInfo
  */
-function getItemsDataOverview($hostIds, $application, $viewMode) {
+function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
 
-	if ($application !== '') {
-		$sqlFrom = 'applications a,items_applications ia,';
-		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
+	if ($applicationIds !== null) {
+		$sqlFrom = 'items_applications ia,';
+		$sqlWhere = ' AND i.itemid=ia.itemid AND '.dbConditionInt('ia.applicationid', $applicationIds);
 	}
 
 	$dbItems = DBfetchArray(DBselect(
@@ -912,7 +912,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
  *
  * @param array		$item
  * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
@@ -1202,7 +1202,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay, can be overriden
+ * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *

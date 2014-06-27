@@ -180,7 +180,7 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }
 
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occurred
 function dowHrMinToSec($dow, $hr, $min) {
 	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
 		return false;
@@ -205,7 +205,7 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Retun 'Never' if 0.
+// Convert timestamp to string representation. Return 'Never' if 0.
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
@@ -617,7 +617,7 @@ function convert_units($options = array()) {
 	}
 
 	// any other unit
-	// black list wich do not require units metrics..
+	// black list of units that should have no multiplier prefix (K, M, G etc) applied
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
@@ -686,7 +686,7 @@ function convert_units($options = array()) {
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip mili & micro for values without units
+			// skip milli & micro for values without units
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -813,7 +813,7 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parametr as integer either
+// accepts parameter as integer either
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1411,25 +1411,32 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @param string $sort
  * @param string $sortorder
+ * @param array $allowedColumns
  *
- * @retur void
+ * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
 	$_REQUEST['sort'] = getPageSortField($sort);
 	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
-		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
+		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
+			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
+			invalid_url();
+		}
+
+		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
+			));
+			invalid_url();
+		}
+
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
-
-	if (!str_in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		$_REQUEST['sortorder'] = ZBX_SORT_UP;
-	}
-
-	CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 }
 
 // creates header col for sorting in table header

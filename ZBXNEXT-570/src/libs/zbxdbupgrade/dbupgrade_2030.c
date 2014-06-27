@@ -1115,6 +1115,45 @@ static int	DBpatch_2030105(void)
 
 	return DBadd_field("httpstep", &field);
 }
+
+static int	DBpatch_2030106(void)
+{
+	const ZBX_FIELD field = {"colspan", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("screens_items", &field);
+}
+
+static int	DBpatch_2030107(void)
+{
+	const ZBX_FIELD field = {"rowspan", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("screens_items", &field);
+}
+
+static int	DBpatch_2030108(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update screens_items set colspan=1 where colspan=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2030109(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update screens_items set rowspan=1 where rowspan=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2030110(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.view.application'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -1226,5 +1265,10 @@ DBPATCH_ADD(2030102, 0, 1)
 DBPATCH_ADD(2030103, 0, 1)
 DBPATCH_ADD(2030104, 0, 1)
 DBPATCH_ADD(2030105, 0, 1)
+DBPATCH_ADD(2030106, 0, 1)
+DBPATCH_ADD(2030107, 0, 1)
+DBPATCH_ADD(2030108, 0, 1)
+DBPATCH_ADD(2030109, 0, 1)
+DBPATCH_ADD(2030110, 0, 0)
 
 DBPATCH_END()
