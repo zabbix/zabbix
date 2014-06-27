@@ -64,7 +64,12 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 			'final' => true
 		);
 
-		$validator = new CRegexValidator();
+		$validator = new CRegexValidator(
+			array(
+				'messageType' => _('Regular expression must be a string'),
+				'messageInvalid' => _('Incorrect regular expression "%1$s": "%2$s"')
+			)
+		);
 
 		foreach ($ajaxData['expressions'] as $id => $expression) {
 			if (!in_array($expression['expression_type'], array(EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE)) ||
