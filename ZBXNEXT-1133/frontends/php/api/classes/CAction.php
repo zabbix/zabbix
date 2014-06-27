@@ -685,7 +685,7 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter'], $action['evaltype']);
+			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter']);
 
 				if (!empty($action)) {
 				$actionUpdates[] = array(
