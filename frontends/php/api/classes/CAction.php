@@ -2111,11 +2111,7 @@ class CAction extends CApiService {
 		}
 		$formula = CConditionHelper::replaceLetterIds($formulaWithLetters, $formulaIdToConditionId);
 
-		DB::updateByPk(
-			'actions',
-			$actionId,
-			array('formula' => $formula)
-		);
+		DB::updateByPk('actions', $actionId, array('formula' => $formula));
 	}
 
 	/**
@@ -2283,20 +2279,14 @@ class CAction extends CApiService {
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		$filterConditionValidator->setValidator(
-			'actionid',
-			new CIdValidator(array(
-				'empty'        => true,
-				'messageRegex' => _('Incorrect action ID for action "%1$s".')
-			))
-		);
-		$filterConditionValidator->setValidator(
-			'conditionid',
-			new CIdValidator(array(
-				'empty'        => true,
-				'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
-			))
-		);
+		$filterConditionValidator->setValidator('actionid', new CIdValidator(array(
+			'empty' => true,
+			'messageRegex' => _('Incorrect action ID for action "%1$s".')
+		)));
+		$filterConditionValidator->setValidator('conditionid', new CIdValidator(array(
+			'empty' => true,
+			'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
+		)));
 
 		$conditionsToValidateForCreate = array();
 		$conditionsToValidateForUpdate = array();
@@ -2306,17 +2296,15 @@ class CAction extends CApiService {
 			if (isset($action['name'])) {
 				$actionName = $action['name'];
 
-				$actionExists = $this->get(
-					array(
-						'filter'        => array('name' => $actionName),
-						'output'        => array('actionid'),
-						'editable'      => true,
-						'nopermissions' => true,
-						'preservekeys'  => true
-					)
-				);
-				if (($actionExist = reset($actionExists))
-					&& (bccomp($actionExist['actionid'], $actionId) != 0)
+				$actionExists = $this->get(array(
+					'filter' => array('name' => $actionName),
+					'output' => array('actionid'),
+					'editable' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				if (($actionExists = reset($actionExists))
+					&& (bccomp($actionExists['actionid'], $actionId) != 0)
 				) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $actionName));
 				}
