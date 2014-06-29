@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 15:56+0200\n"
+"POT-Creation-Date: 2014-06-30 02:40+0300\n"
 "PO-Revision-Date: 2013-11-08 11:48+0300\n"
 "Last-Translator: David.perez <david.perez@securitasdirect.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1160,7 +1160,7 @@ msgstr "No es posible añadir el equipo"
 msgid "Cannot add image"
 msgstr "No es posible añadir la imágen"
 
-#: include/classes/import/CXmlImport18.php:632
+#: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
 msgstr "No es posible añadir la imagen."
 
@@ -1332,7 +1332,7 @@ msgstr "No se puede crear un mapa de iconos"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "No se puede crear un mapa de iconos con el mismo nombre \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:816
+#: include/classes/import/CXmlImport18.php:817
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "No se pudo crear el mapa \"%s\"."
@@ -1341,7 +1341,7 @@ msgstr "No se pudo crear el mapa \"%s\"."
 msgid "Cannot create new element"
 msgstr "No se pudo crear el nuevo elemento"
 
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1710
 msgid "Cannot create screen."
 msgstr "No se pudo crear la pantalla."
 
@@ -1556,38 +1556,38 @@ msgstr "No es posible eliminar el tipo de media"
 msgid "Cannot enable media type"
 msgstr "No se puede habilitar el tipo de medio"
 
-#: include/classes/import/CXmlImport18.php:676
+#: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "No se pudo encontrar la imagen de fondo \"%1$s\" utilizada en el mapa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:506
-#: include/classes/import/CXmlImport18.php:1666
+#: include/classes/import/CXmlImport18.php:507
+#: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "No se puede encontrar el gráfico \"%1$s\" usado en la pantalla \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:723
+#: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "No se pudo encontrar el grupo \"%1$s\" utilizado en el mapa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:483
+#: include/classes/import/CXmlImport18.php:484
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "No se pudo encontrar el grupo \"%1$s\" utilizado en la pantalla \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:734
+#: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "No se pudo encontrar el servidor \"%1$s\" utilizado en el mapa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:495
+#: include/classes/import/CXmlImport18.php:496
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1606,7 +1606,7 @@ msgstr "No se pudo encontrar la interfaz del equipo en \"%1$s\" para el ítem \"
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "No se ha encontrado servidor o plantilla \"%1$s\" usado en el gráfico \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:767
+#: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1617,14 +1617,14 @@ msgstr "No se pudo encontrar el icono \"%1$s\" utilizado en el mapa \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "No se pudo encontrar el mapa de icono \"%1$s\" utilizado en el mapa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:519
-#: include/classes/import/CXmlImport18.php:1679
+#: include/classes/import/CXmlImport18.php:520
+#: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "No se pudo encontrar el ítem \"%1$s\" utilizado en la pantalla \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:712
+#: include/classes/import/CXmlImport18.php:713
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en el mapa exportado \"%2$s\"."
@@ -1634,7 +1634,7 @@ msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en el mapa exportado \"%
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en el mapa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:530
+#: include/classes/import/CXmlImport18.php:531
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -1644,14 +1644,14 @@ msgstr "No se pudo encontrar el mapa \"%1$s\" utilizado en la pantalla \"%2$s\".
 msgid "Cannot find objects with name"
 msgstr "No se puede encontrar objetos con nombre"
 
-#: include/classes/import/CXmlImport18.php:541
+#: include/classes/import/CXmlImport18.php:542
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "No se puede encontrar pantalla \"%1$s\" usada en pantalla \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:745
-#: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/CXmlImport18.php:746
+#: include/classes/import/CXmlImport18.php:789
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, php-format
@@ -1927,7 +1927,7 @@ msgstr "No se pudo actualizar el mapa de íconos"
 msgid "Cannot update image"
 msgstr "No se pudo actualizar la imagen"
 
-#: include/classes/import/CXmlImport18.php:639
+#: include/classes/import/CXmlImport18.php:640
 msgid "Cannot update image."
 msgstr "No se pudo actualizar la imagen."
 
@@ -1951,7 +1951,7 @@ msgstr "No se pudo actualizar las macros"
 msgid "Cannot update maintenance"
 msgstr "No se pudo actualizar el periodo de mantenimiento"
 
-#: include/classes/import/CXmlImport18.php:807
+#: include/classes/import/CXmlImport18.php:808
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "No se pudo actualizar el mapa \"%s\"."
@@ -1984,7 +1984,7 @@ msgstr "No se pudo actualizar el escenario"
 msgid "Cannot update screen"
 msgstr "No se pudo actualizar la pantalla"
 
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1702
 msgid "Cannot update screen."
 msgstr "No se pudo actualizar la pantalla."
 
@@ -4800,8 +4800,8 @@ msgstr "El gráfico \"%1$s\" no puede heredar. Sin items requeridos en \"%2$s\".
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "El gráfico \"%1$s\" no existe en la plantilla \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1558
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1563
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Gráfico \"%1$s\" omitido: regla de usuario."
@@ -5205,7 +5205,7 @@ msgstr "Servidor \"%1$s\" esta monitorizado mediante el proxy \"%2$s\"."
 msgid "Host \"%s\" already exists."
 msgstr "El servidor \"%s\" ya existe."
 
-#: include/classes/import/CXmlImport18.php:927
+#: include/classes/import/CXmlImport18.php:928
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Servidor \"%s\" tiene el parametro \"useipmi\" activado, pero no tiene el parametro \"ipmi_ip\" ! Usando la dirección IP del servidor o la IP del dispositivo IPMI."
@@ -6363,12 +6363,12 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1590
+#: include/classes/import/CXmlImport18.php:1591
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1578
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr ""
@@ -6577,7 +6577,7 @@ msgstr ""
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1525
+#: include/classes/import/CXmlImport18.php:1526
 #, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr ""
@@ -6587,8 +6587,8 @@ msgstr ""
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1274
+#: include/classes/import/CXmlImport18.php:1278
 #, php-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr ""
@@ -7402,7 +7402,7 @@ msgstr ""
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/import/CXmlImport18.php:667
+#: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr ""
@@ -7412,12 +7412,12 @@ msgstr ""
 msgid "Map \"%s\""
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, php-format
 msgid "Map \"%s\" created."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:810
+#: include/classes/import/CXmlImport18.php:811
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr ""
@@ -7755,8 +7755,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1581
-#: include/classes/import/CXmlImport18.php:1594
+#: include/classes/import/CXmlImport18.php:1582
+#: include/classes/import/CXmlImport18.php:1595
 #, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr ""
@@ -8044,12 +8044,12 @@ msgstr "Próxima comprobación"
 msgid "No"
 msgstr "No"
 
-#: include/classes/import/CXmlImport18.php:1571
+#: include/classes/import/CXmlImport18.php:1572
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1567
+#: include/classes/import/CXmlImport18.php:1568
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr ""
@@ -8394,27 +8394,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:823
 #: include/classes/import/CConfigurationImport.php:903
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, php-format
 msgid "No permission for graph \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:962
+#: include/classes/import/CXmlImport18.php:963
 #, php-format
 msgid "No permission for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1516
+#: include/classes/import/CXmlImport18.php:1517
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1145
+#: include/classes/import/CXmlImport18.php:1146
 #, php-format
 msgid "No permission for template \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1427
+#: include/classes/import/CXmlImport18.php:1428
 #, php-format
 msgid "No permission for trigger \"%s\"."
 msgstr ""
@@ -8427,17 +8427,17 @@ msgstr ""
 msgid "No permissions defined."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1023
+#: include/classes/import/CXmlImport18.php:1024
 #, php-format
 msgid "No permissions for group \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:660
+#: include/classes/import/CXmlImport18.php:661
 #, php-format
 msgid "No permissions for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:450
+#: include/classes/import/CXmlImport18.php:451
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
@@ -10543,8 +10543,8 @@ msgstr ""
 msgid "Screen"
 msgstr "Pantalla"
 
-#: include/classes/import/CXmlImport18.php:575
-#: include/classes/import/CXmlImport18.php:1712
+#: include/classes/import/CXmlImport18.php:576
+#: include/classes/import/CXmlImport18.php:1713
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr ""
@@ -10559,15 +10559,15 @@ msgstr ""
 msgid "Screen \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:458
-#: include/classes/import/CXmlImport18.php:1643
-#: include/classes/import/CXmlImport18.php:1647
+#: include/classes/import/CXmlImport18.php:459
+#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1648
 #, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:572
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:573
+#: include/classes/import/CXmlImport18.php:1705
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr ""
@@ -11923,8 +11923,8 @@ msgstr ""
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1434
-#: include/classes/import/CXmlImport18.php:1438
+#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1439
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr ""
@@ -13133,23 +13133,23 @@ msgstr "X"
 msgid "X label"
 msgstr ""
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, php-format
 msgid "XML file contains error %1$s:"
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:403
-#: include/classes/import/CXmlImport18.php:406
-#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:404
+#: include/classes/import/CXmlImport18.php:407
+#: include/classes/import/CXmlImport18.php:410
 msgid "XML file contains errors"
 msgstr ""
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, php-format
 msgid "XML file contains fatal error %1$s:"
 msgstr ""
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, php-format
 msgid "XML file contains warning %1$s:"
 msgstr ""

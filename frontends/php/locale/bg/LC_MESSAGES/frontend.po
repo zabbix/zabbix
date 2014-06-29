@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 15:56+0200\n"
+"POT-Creation-Date: 2014-06-30 02:40+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1161,7 +1161,7 @@ msgstr "Не може да се добави потребител"
 msgid "Cannot add image"
 msgstr "Не може да се добави изображение"
 
-#: include/classes/import/CXmlImport18.php:632
+#: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
 msgstr "Не може да се добави изображение."
 
@@ -1334,7 +1334,7 @@ msgstr "Не може да се създаде съответствие на и�
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не може да се създаде съответствие на икона с идентично име \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:816
+#: include/classes/import/CXmlImport18.php:817
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не може да се създаде карта  \"%s\"."
@@ -1343,7 +1343,7 @@ msgstr "Не може да се създаде карта  \"%s\"."
 msgid "Cannot create new element"
 msgstr "Не може да се създаде нов елемент"
 
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1710
 msgid "Cannot create screen."
 msgstr "Не може да се създаде екран."
 
@@ -1559,38 +1559,38 @@ msgstr "Не може да се изключи метод на уведомле�
 msgid "Cannot enable media type"
 msgstr "Не може да се активира метод на уведомление"
 
-#: include/classes/import/CXmlImport18.php:676
+#: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери фоновото изображение \"%1$s\" използвано в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:506
-#: include/classes/import/CXmlImport18.php:1666
+#: include/classes/import/CXmlImport18.php:507
+#: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери графиката \"%1$s\" използвана в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:723
+#: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:483
+#: include/classes/import/CXmlImport18.php:484
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:734
+#: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери хоста \"%1$s\" използван в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:495
+#: include/classes/import/CXmlImport18.php:496
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1609,7 +1609,7 @@ msgstr "Не може да се намери хост интефейса в \"%1
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:767
+#: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1620,14 +1620,14 @@ msgstr "Не може да се намери иконата  \"%1$s\" изпол
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери съответствие на икона \"%1$s\" използвана в карта на мрежата \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:519
-#: include/classes/import/CXmlImport18.php:1679
+#: include/classes/import/CXmlImport18.php:520
+#: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери елемент на данните \"%1$s\" използван в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:712
+#: include/classes/import/CXmlImport18.php:713
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в изнесената карта \"%2$s\"."
@@ -1637,7 +1637,7 @@ msgstr "Не може да се намери картата \"%1$s\" изпол�
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в карта \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:530
+#: include/classes/import/CXmlImport18.php:531
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -1647,14 +1647,14 @@ msgstr "Не може да се намери картата \"%1$s\" изпол�
 msgid "Cannot find objects with name"
 msgstr "Не може да се намерят обектите с име"
 
-#: include/classes/import/CXmlImport18.php:541
+#: include/classes/import/CXmlImport18.php:542
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери екрана \"%1$s\" използван в екран \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:745
-#: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/CXmlImport18.php:746
+#: include/classes/import/CXmlImport18.php:789
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, php-format
@@ -1931,7 +1931,7 @@ msgstr "Не може да се актуализира съответствие 
 msgid "Cannot update image"
 msgstr "Не може да се актуализира изображението"
 
-#: include/classes/import/CXmlImport18.php:639
+#: include/classes/import/CXmlImport18.php:640
 msgid "Cannot update image."
 msgstr "Не може да се актуализира изображението."
 
@@ -1955,7 +1955,7 @@ msgstr "Не може да се актуализират макросите"
 msgid "Cannot update maintenance"
 msgstr "Не може да се актуализира поддръжката"
 
-#: include/classes/import/CXmlImport18.php:807
+#: include/classes/import/CXmlImport18.php:808
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не може да се актуализира карта на мрежата \"%s\"."
@@ -1988,7 +1988,7 @@ msgstr "Не може да се актуализира сценария"
 msgid "Cannot update screen"
 msgstr "Не може да се актуализира екрана"
 
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1702
 msgid "Cannot update screen."
 msgstr "Не може да се актуализира екрана."
 
@@ -4798,8 +4798,8 @@ msgstr "Графика \"%1$s\" не може да бъде наследена. 
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Графика \"%1$s\" не съществува в шаблон \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1558
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1563
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Графика \"%1$s\" пропуснато - потребителско правило."
@@ -5202,7 +5202,7 @@ msgstr "Хост \"%1$s\" се наблюдава с прокси \"%2$s\"."
 msgid "Host \"%s\" already exists."
 msgstr "Хост \"%s\" вече съществува."
 
-#: include/classes/import/CXmlImport18.php:927
+#: include/classes/import/CXmlImport18.php:928
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "В хост \"%s\" е избран параметър \"useipmi\", но не е зададен параметър\"ipmi_ip\"! Използване IP адреса на хоста като адрес за интерфейс IPMI."
@@ -6366,12 +6366,12 @@ msgstr "Неправилна стойност за setMessage(): \"%s\"."
 msgid "Incorrect working time."
 msgstr "Неправилно работно време."
 
-#: include/classes/import/CXmlImport18.php:1590
+#: include/classes/import/CXmlImport18.php:1591
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Неправилен елемент на данните за макс. Y в графика \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1578
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Неправилен елемент на данните за мин. Y в графика \"%1$s\"."
@@ -6580,7 +6580,7 @@ msgstr "Елемент на данните \"%1$s\" не може да попъ�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Елемент на данните \"%1$s\" не съществува в шаблон \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1525
+#: include/classes/import/CXmlImport18.php:1526
 #, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" не съществува."
@@ -6590,8 +6590,8 @@ msgstr "Елемент на данните \"%1$s\" не съществува."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложение \"%3$s\" не съществува."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1274
+#: include/classes/import/CXmlImport18.php:1278
 #, php-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
@@ -7405,7 +7405,7 @@ msgstr "Принудителен изход"
 msgid "Map"
 msgstr "Карта на мрежата"
 
-#: include/classes/import/CXmlImport18.php:667
+#: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Карта на мрежата \"%1$s\" пропусната - правило от потребителя."
@@ -7415,12 +7415,12 @@ msgstr "Карта на мрежата \"%1$s\" пропусната - прав
 msgid "Map \"%s\""
 msgstr "Карта на мрежата \"%s\""
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, php-format
 msgid "Map \"%s\" created."
 msgstr "Карта на мрежата \"%s\" създадена."
 
-#: include/classes/import/CXmlImport18.php:810
+#: include/classes/import/CXmlImport18.php:811
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr "Карта на мрежата \"%s\" актуализирана."
@@ -7760,8 +7760,8 @@ msgstr "Липсващо поле \"itemid\" за елемент на данни
 msgid "Missing \"name\" field for graph."
 msgstr "Липсващо поле \"name\" за графика."
 
-#: include/classes/import/CXmlImport18.php:1581
-#: include/classes/import/CXmlImport18.php:1594
+#: include/classes/import/CXmlImport18.php:1582
+#: include/classes/import/CXmlImport18.php:1595
 #, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Липсващ елемент на данните \"%1$s\" за хост \"%2$s\"."
@@ -8049,12 +8049,12 @@ msgstr "Следваща проверка"
 msgid "No"
 msgstr "Не"
 
-#: include/classes/import/CXmlImport18.php:1571
+#: include/classes/import/CXmlImport18.php:1572
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Не полето \"ymax_type\" за графика \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1567
+#: include/classes/import/CXmlImport18.php:1568
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Не полето \"ymin_type\" за графика \"%s\"."
@@ -8400,27 +8400,27 @@ msgstr "Не са дефинирани операции."
 
 #: include/classes/import/CConfigurationImport.php:823
 #: include/classes/import/CConfigurationImport.php:903
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, php-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Нямате право на достъп до графика \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:962
+#: include/classes/import/CXmlImport18.php:963
 #, php-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Нямате право на достъп до хост \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1516
+#: include/classes/import/CXmlImport18.php:1517
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Нямате право на достъп до елемент на данните \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1145
+#: include/classes/import/CXmlImport18.php:1146
 #, php-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Нямате право на достъп до шаблон \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1427
+#: include/classes/import/CXmlImport18.php:1428
 #, php-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Нямате право на достъп до тригер \"%s\"."
@@ -8433,17 +8433,17 @@ msgstr "Нямате право на достъп"
 msgid "No permissions defined."
 msgstr "Не е дефинирано право на достъп."
 
-#: include/classes/import/CXmlImport18.php:1023
+#: include/classes/import/CXmlImport18.php:1024
 #, php-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Нямате право на достъп до група \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:660
+#: include/classes/import/CXmlImport18.php:661
 #, php-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Нямате право на достъп до карта на мрежата \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:450
+#: include/classes/import/CXmlImport18.php:451
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
@@ -10554,8 +10554,8 @@ msgstr "Планирано"
 msgid "Screen"
 msgstr "Екран"
 
-#: include/classes/import/CXmlImport18.php:575
-#: include/classes/import/CXmlImport18.php:1712
+#: include/classes/import/CXmlImport18.php:576
+#: include/classes/import/CXmlImport18.php:1713
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr "Екран \"%1$s\" добавен."
@@ -10570,15 +10570,15 @@ msgstr "Екран \"%1$s\" вече съществува в шаблон \"%2$2
 msgid "Screen \"%1$s\" already exists."
 msgstr "Екран \"%1$s\" вече съществува."
 
-#: include/classes/import/CXmlImport18.php:458
-#: include/classes/import/CXmlImport18.php:1643
-#: include/classes/import/CXmlImport18.php:1647
+#: include/classes/import/CXmlImport18.php:459
+#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1648
 #, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Екран \"%1$s\" пропуснато - потребителско правило."
 
-#: include/classes/import/CXmlImport18.php:572
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:573
+#: include/classes/import/CXmlImport18.php:1705
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Екран \"%1$s\" актуализиран."
@@ -11934,8 +11934,8 @@ msgstr "Тригер \"%1$s\" вече съществува в \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", който не съществува."
 
-#: include/classes/import/CXmlImport18.php:1434
-#: include/classes/import/CXmlImport18.php:1438
+#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1439
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропуснат - потребителско правило."
@@ -13145,23 +13145,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Етикет на X ос"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, php-format
 msgid "XML file contains error %1$s:"
 msgstr "XML файла съдържа грешка %1$s:"
 
-#: include/classes/import/CXmlImport18.php:403
-#: include/classes/import/CXmlImport18.php:406
-#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:404
+#: include/classes/import/CXmlImport18.php:407
+#: include/classes/import/CXmlImport18.php:410
 msgid "XML file contains errors"
 msgstr "XML файла съдържа грешки"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, php-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML файла съдържа фатална грешка %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, php-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML файла съдържа предупреждение %1$s:"
