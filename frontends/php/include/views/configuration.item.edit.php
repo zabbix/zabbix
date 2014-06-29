@@ -326,7 +326,7 @@ if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['
 		$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
 	}
 	else {
-		$keepHistory[] = new CSpan(_('Overriden by global housekeeping settings').
+		$keepHistory[] = new CSpan(_('Overridden by global housekeeping settings').
 			'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
 		);
 	}
@@ -347,7 +347,7 @@ if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['i
 		$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
 	}
 	else {
-		$keepTrend[] = new CSpan(_('Overriden by global housekeeping settings').
+		$keepTrend[] = new CSpan(_('Overridden by global housekeeping settings').
 			'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
 		);
 	}
