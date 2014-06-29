@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:29+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2014-01-20 10:54+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -997,7 +997,7 @@ msgstr "Κάτω"
 msgid "Brighten"
 msgstr "Φωτεινό"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "Βουλγάρικα (bg_BG)"
 
@@ -2702,11 +2702,11 @@ msgstr "Οι έλεγχοι να είναι μοναδικοί."
 msgid "Child"
 msgstr "Θυγατρικό"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Κινέζικα (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Κινέζικα (zh_TW)"
 
@@ -3443,7 +3443,7 @@ msgstr "Προσαρμοσμένο μέγεθος"
 msgid "Custom slides"
 msgstr "Προσαρμοσμένες διαφάνειες"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Τσέχικα (cs_CZ)"
 
@@ -4654,7 +4654,7 @@ msgstr "Διάρκεια"
 msgid "Duration (sec)"
 msgstr "Διάρκεια (δευτ)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Ολλανδικά (nl_NL)"
 
@@ -4948,11 +4948,11 @@ msgstr "Ενεργοποίηση επιλεγμένων εναυσμάτων;"
 msgid "Enabled"
 msgstr "Ενεργοποιημένο"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "Αγγλικά (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "Αγγλικά (en_US)"
 
@@ -5343,7 +5343,7 @@ msgstr "Εύρεση συμβολοσειράς σε αρχείο. Ταίρια�
 msgid "Finish"
 msgstr "Τέλος"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Φινλανδικά (fi_FI)"
 
@@ -5382,7 +5382,7 @@ msgstr "Τύπος"
 msgid "Fourth"
 msgstr "Τέταρτος"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Γαλλικά (fr_FR)"
 
@@ -5476,7 +5476,7 @@ msgstr "Γενικά"
 msgid "Generated in %s sec"
 msgstr "Παραγόμενο σε %s δευτ"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Γερμανικά (de_DE)"
 
@@ -5740,7 +5740,7 @@ msgstr "Γραφήματα αντιγράφηκαν"
 msgid "Graphs deleted"
 msgstr "Γραφήματα διεγράφησαν"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Ελληνικά (el_GR)"
 
@@ -6432,7 +6432,7 @@ msgstr "Ώρες"
 msgid "Housekeeping"
 msgstr "Τακτοποίηση"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Ουγγρικά (hu_HU)"
 
@@ -7512,7 +7512,7 @@ msgstr "Λανθασμένη y max συλλέκτη γραφήματος \"%1$s\
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Λανθασμένη y min συλλέκτη γραφήματος \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Ινδονησιακά (id_ID)"
 
@@ -7762,7 +7762,7 @@ msgstr "Αδύνατη η αποσύνδεση από HTTP ταυτοποίησ�
 msgid "It is not possible to search by user password."
 msgstr "Αδύνατη η αναζήτηση με κωδικό χρήστη."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Ιταλικά (it_IT)"
 
@@ -8045,7 +8045,7 @@ msgstr "Ιαν"
 msgid "January"
 msgstr "Ιανουάριος"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Ιαπωνικά (ja_JP)"
 
@@ -8104,7 +8104,7 @@ msgstr "Λέξη-κλειδί"
 msgid "Kilo"
 msgstr "Κιλο"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Κορεάτικα (ko_KR)"
 
@@ -8263,7 +8263,7 @@ msgstr "Τελευταία συμβάντα"
 msgid "Latest values"
 msgstr "Τελευταίες τιμές"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Λετονικά (lv_LV)"
 
@@ -8385,7 +8385,7 @@ msgstr "Κενός κατάλογος"
 msgid "List of network interfaces. Text value."
 msgstr "Κατάλογος διεπαφών δικτύου. Τιμή κειμένου."
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "Λιθουανικά (lt_LT)"
 
@@ -11118,7 +11118,7 @@ msgstr "Δικαιώματα"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Τα δικαιώματα εκχωρούνται μόνο σε ομάδες χρηστών."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Περσικά (fa_IR)"
 
@@ -11163,7 +11163,7 @@ msgstr "Εισάγετε κείμενο επιβεβαίωσης."
 msgid "Please select two elements"
 msgstr "Επιλέξτε δύο στοιχεία"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Πολωνικά (pl_PL)"
 
@@ -11199,11 +11199,11 @@ msgstr "Η θύρα δεν μπορεί να είναι κενή για διεπ
 msgid "Port range"
 msgstr "Περιοχή θύρας"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Πορτογαλικά (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "Πορτογαλικά (pt_PT)"
 
@@ -11857,7 +11857,7 @@ msgstr "Επιστρέφει ποσοστό χαμένων πακέτων ICMP p
 msgid "Right"
 msgstr "Δεξιά"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr "Ρουμανικά (ro_RO)"
 
@@ -11923,7 +11923,7 @@ msgstr "Εκτέλεση απομακρυσμένων εντολών σε ξεν
 msgid "Run specified command on the host."
 msgstr "Εκτέλεση καθορισμένης εντολής στον ξενιστή."
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
@@ -12855,7 +12855,7 @@ msgstr "Προβολές διαφάνειας"
 msgid "Slides"
 msgstr "Διαφάνειες"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
@@ -12927,7 +12927,7 @@ msgstr "Ταξινόμηση με πεδίο \"%1$s\" δεν επιτρέπετ�
 msgid "Source"
 msgstr "Προέλευση"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Ισπανικά (es_ES)"
 
@@ -13159,7 +13159,7 @@ msgstr "Swap out. Εάν ο τύπος είναι απαρίθμηση - επι�
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Swap space. Αριθμός bytes. Αν το swap λείπει χρήση όλων. Εάν λείπει ο τρόπος χρήση free."
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
@@ -13971,7 +13971,7 @@ msgstr "Τρι"
 msgid "Tuesday"
 msgstr "Τρίτη"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "Τουρκικά (tr_TR)"
 
@@ -14115,7 +14115,7 @@ msgstr "ΠΡΟΦΙΛ ΧΡΗΣΤΗ"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 
@@ -14988,7 +14988,7 @@ msgstr "Κατακόρυφο"
 msgid "Vertical align"
 msgstr "Κατακόρυφη ευθυγράμμιση"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:29+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1003,7 +1003,7 @@ msgstr "Jos"
 msgid "Brighten"
 msgstr "Luminozitate"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulgară (bg_BG)"
 
@@ -2735,11 +2735,11 @@ msgstr "Verificările trebuie să fie unice."
 msgid "Child"
 msgstr "Copil"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Chineză (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Chineză (zh_TW)"
 
@@ -3476,7 +3476,7 @@ msgstr "Dimensiune personalizată"
 msgid "Custom slides"
 msgstr "Slide-uri personalizate"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Cehă (cs_CZ)"
 
@@ -4689,7 +4689,7 @@ msgstr "Durată"
 msgid "Duration (sec)"
 msgstr "Durată (secunde)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Olandeză (nl_NL)"
 
@@ -4983,11 +4983,11 @@ msgstr "Activare triggeri selectați?"
 msgid "Enabled"
 msgstr "Activat"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "Engleză (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "Engleză (en_US)"
 
@@ -5377,7 +5377,7 @@ msgstr "Găsește rândul într-un fișier. Fișier care se potrivește"
 msgid "Finish"
 msgstr "Sfârșit"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Finlandeză (fi_FI)"
 
@@ -5416,7 +5416,7 @@ msgstr "Formulă"
 msgid "Fourth"
 msgstr "al patrulea"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Franceză (fr_FR)"
 
@@ -5510,7 +5510,7 @@ msgstr "General"
 msgid "Generated in %s sec"
 msgstr "Generat în %s secunde"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Germană (de_DE)"
 
@@ -5774,7 +5774,7 @@ msgstr "Grafice copiate"
 msgid "Graphs deleted"
 msgstr "Grafice șterse"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Greacă (el_GR)"
 
@@ -6470,7 +6470,7 @@ msgstr "Ore"
 msgid "Housekeeping"
 msgstr "Housekeeping"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Maghiară (hu_HU)"
 
@@ -7550,7 +7550,7 @@ msgstr "Item y max incorect pentru graficul \"%1$s\"."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Item y min incorect pentru graficul \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Indoneză (id_ID)"
 
@@ -7800,7 +7800,7 @@ msgstr "Nu este posibila deconectarea de la autentificarea HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Nu este posibilă căutarea după parola utilizatorului."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Italiană (it)"
 
@@ -8087,7 +8087,7 @@ msgstr "Ian"
 msgid "January"
 msgstr "Ianuarie"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Japoneză (ja_JP)"
 
@@ -8146,7 +8146,7 @@ msgstr "Cuvânt cheie"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Coreeană (ko_KR)"
 
@@ -8306,7 +8306,7 @@ msgstr "Cele mai recente evenimente"
 msgid "Latest values"
 msgstr "Cele mai recente valori"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Letonă (lv_LV)"
 
@@ -8428,7 +8428,7 @@ msgstr "Lista este goală"
 msgid "List of network interfaces. Text value."
 msgstr "Listă a interfețelor rețelei. Valoare text."
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituaniană (lt_LT)"
 
@@ -11168,7 +11168,7 @@ msgstr "Permisiuni"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Persmisiunea poate fi atribuită doar grupurilor de utilizatori."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
@@ -11213,7 +11213,7 @@ msgstr "Va rog introduceți textul de confirmare."
 msgid "Please select two elements"
 msgstr "Va rog selectați două elemente"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Poloneză (pl_PL)"
 
@@ -11249,11 +11249,11 @@ msgstr "Portul nu pot fi nul pentru interfața serverului."
 msgid "Port range"
 msgstr "Interval port"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Portugheză (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "Portugheză (pt_BR)"
 
@@ -11907,7 +11907,7 @@ msgstr "Redă un procent din pachetele pierdute la ping ICMP."
 msgid "Right"
 msgstr "Dreapta"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr "Română (ro_RO)"
 
@@ -11973,7 +11973,7 @@ msgstr "Execută comenzile de la distanță pe servere"
 msgid "Run specified command on the host."
 msgstr "Execută comanda dată pe server."
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Rusă (ru_RU)"
 
@@ -12905,7 +12905,7 @@ msgstr "Prezentări"
 msgid "Slides"
 msgstr "Slides"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Slovacă (sk_SK)"
 
@@ -12977,7 +12977,7 @@ msgstr "Sortarea după câmpul \"%1$s\" nu este permisă."
 msgid "Source"
 msgstr "Sursă"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Spaniolă (es_ES)"
 
@@ -13209,7 +13209,7 @@ msgstr "Extrage din memoria swap. Dacă tipul este contor - redă memoria extras
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Spațiu swap. Număr de bytes. Dacă memoria swap lipsește totul este folosit. Dacă mod lipsește se folosește liber."
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Suedeză (sv_SE)"
 
@@ -14028,7 +14028,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Marți"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "Turcă (tr_TR)"
 
@@ -14172,7 +14172,7 @@ msgstr "PROFILUL UTILIZATORULUI"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraineană (uk_UA)"
 
@@ -15046,7 +15046,7 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Aliniere verticală"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnameză (vi_VN)"
 

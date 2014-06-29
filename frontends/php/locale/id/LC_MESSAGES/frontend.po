@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:29+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -982,7 +982,7 @@ msgstr "Bawah"
 msgid "Brighten"
 msgstr "Lebih terang"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
@@ -2662,11 +2662,11 @@ msgstr "Pemeriksaan harus unik."
 msgid "Child"
 msgstr "Anak"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Chinese (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Chinese (zh_TW)"
 
@@ -3402,7 +3402,7 @@ msgstr "Custom ukuran"
 msgid "Custom slides"
 msgstr "Custom slides"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Czech (cs_CZ)"
 
@@ -4609,7 +4609,7 @@ msgstr "Durasi"
 msgid "Duration (sec)"
 msgstr "Durasi (dtk)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Dutch (nl_NL)"
 
@@ -4903,11 +4903,11 @@ msgstr "Aktifkan trigger yang dipilih?"
 msgid "Enabled"
 msgstr "Aktif"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "English (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "English (en_US)"
 
@@ -5297,7 +5297,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Selesai"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Finnish (fi_FI)"
 
@@ -5336,7 +5336,7 @@ msgstr "Rumus"
 msgid "Fourth"
 msgstr "Keempat"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "French (fr_FR)"
 
@@ -5430,7 +5430,7 @@ msgstr "Umum"
 msgid "Generated in %s sec"
 msgstr "Pembuatan dalam %s det"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
@@ -5694,7 +5694,7 @@ msgstr "Grafik telah disalin"
 msgid "Graphs deleted"
 msgstr "Grafik telah dihapus"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Greek (el_GR)"
 
@@ -6382,7 +6382,7 @@ msgstr "Jam"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Hungarian (hu_HU)"
 
@@ -7462,7 +7462,7 @@ msgstr "Kesalahan item y max untuk grafik \"%1$s\"."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Kesalahan item y min untuk grafik \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Indonesian (id_ID)"
 
@@ -7712,7 +7712,7 @@ msgstr "Tidak memungkinkan untuk logout melalui otentikasi HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Tidak memungkinkan untuk mencari dengan password user."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
@@ -7991,7 +7991,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Januari"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
@@ -8050,7 +8050,7 @@ msgstr "Kata kunci"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Korean (ko_KR)"
 
@@ -8208,7 +8208,7 @@ msgstr "Event terakhir"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Latvian (lv_LV)"
 
@@ -8330,7 +8330,7 @@ msgstr "Daftar kosong"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -11056,7 +11056,7 @@ msgstr "Izin"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Perizinan dapat diberikan hanya untuk grup user."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
@@ -11101,7 +11101,7 @@ msgstr "Silahkan masukkan teks konfirmasi."
 msgid "Please select two elements"
 msgstr "Silahkan pilih dua elemen"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Polish (pl_PL)"
 
@@ -11137,11 +11137,11 @@ msgstr "Port tidak boleh kosong untuk interface host."
 msgid "Port range"
 msgstr "Range port"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Portuguese (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -11793,7 +11793,7 @@ msgstr ""
 msgid "Right"
 msgstr "Kanan"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -11859,7 +11859,7 @@ msgstr "Jalankan perintah jarak jauh pada host"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -12791,7 +12791,7 @@ msgstr "Slide show"
 msgid "Slides"
 msgstr "Slide"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -12863,7 +12863,7 @@ msgstr "Urut berdasarkan field \"%1$s\" tidak boleh."
 msgid "Source"
 msgstr "Sumber"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -13095,7 +13095,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -13900,7 +13900,7 @@ msgstr "Sel"
 msgid "Tuesday"
 msgstr "Selasa"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14044,7 +14044,7 @@ msgstr "PROFIL USER"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
@@ -14914,7 +14914,7 @@ msgstr "Vertikal"
 msgid "Vertical align"
 msgstr "Meluruskan vertikal"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:29+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -985,7 +985,7 @@ msgstr "底部"
 msgid "Brighten"
 msgstr "转亮"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "保加利亚语 (bg_BG)"
 
@@ -2666,11 +2666,11 @@ msgstr "检查必需是唯一的"
 msgid "Child"
 msgstr "子"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "中文 (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "中文 (zh_TW)"
 
@@ -3407,7 +3407,7 @@ msgstr "自定义大小"
 msgid "Custom slides"
 msgstr "自定义幻灯片"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
@@ -4614,7 +4614,7 @@ msgstr "持续时间"
 msgid "Duration (sec)"
 msgstr "持续时间(秒)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "荷兰(nl_NL)"
 
@@ -4908,11 +4908,11 @@ msgstr "启用所选的触发器?"
 msgid "Enabled"
 msgstr "已启用"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "英语 (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "英语(en_US)"
 
@@ -5302,7 +5302,7 @@ msgstr ""
 msgid "Finish"
 msgstr "完成"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "芬兰语 (fi_FI)"
 
@@ -5341,7 +5341,7 @@ msgstr "公式"
 msgid "Fourth"
 msgstr "第四"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "法语 (fr_FR)"
 
@@ -5435,7 +5435,7 @@ msgstr "一般"
 msgid "Generated in %s sec"
 msgstr "产生于%s秒"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "德语 (de_DE)"
 
@@ -5699,7 +5699,7 @@ msgstr "图形已複製"
 msgid "Graphs deleted"
 msgstr "图形已删除"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "希腊(el_GR)"
 
@@ -6388,7 +6388,7 @@ msgstr "时"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
@@ -7468,7 +7468,7 @@ msgstr "图形\"%1$s\"的不正确y max项目."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "图形\"%1$s\"的不正确y min项目."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "印度尼西亚 (id_ID)"
 
@@ -7718,7 +7718,7 @@ msgstr "不可能于HTTP认证中登出."
 msgid "It is not possible to search by user password."
 msgstr "以用户密码寻找是不可能的."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "意大利语 (it_IT)"
 
@@ -7997,7 +7997,7 @@ msgstr "一月"
 msgid "January"
 msgstr "一月"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "日语 (ja_JP)"
 
@@ -8056,7 +8056,7 @@ msgstr "关键字"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "韩语 (ko_KR)"
 
@@ -8214,7 +8214,7 @@ msgstr "最新报警"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "拉脱维亚语(lv_LV)"
 
@@ -8336,7 +8336,7 @@ msgstr "清单是空的"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "立陶宛 (lt_LT)"
 
@@ -11062,7 +11062,7 @@ msgstr "许可权"
 msgid "Permissions can be assigned for user groups only."
 msgstr "许可权只能被指派予用户群组"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "波斯语 (fa_IR)"
 
@@ -11107,7 +11107,7 @@ msgstr "请输入确认文字."
 msgid "Please select two elements"
 msgstr "请选择两组件"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "波兰(pl_PL)"
 
@@ -11143,11 +11143,11 @@ msgstr "主机介面的埠不能是空白."
 msgid "Port range"
 msgstr "埠范围"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "波兰语 (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "葡萄牙语 (pt_PT)"
 
@@ -11799,7 +11799,7 @@ msgstr ""
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -11865,7 +11865,7 @@ msgstr "于主机上执行远程命令"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "俄语 (ru_RU)"
 
@@ -12797,7 +12797,7 @@ msgstr "简报片展示"
 msgid "Slides"
 msgstr "简报片"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -12869,7 +12869,7 @@ msgstr "依栏位\"%1$s\"排序是不允许的."
 msgid "Source"
 msgstr "来源 "
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "西班牙语 (es_ES)"
 
@@ -13101,7 +13101,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -13906,7 +13906,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "土耳其语 (tr_TR)"
 
@@ -14050,7 +14050,7 @@ msgstr "用户基本资料"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "乌克兰语 (uk_UA)"
 
@@ -14920,7 +14920,7 @@ msgstr "垂直的"
 msgid "Vertical align"
 msgstr "纵向对齐"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 

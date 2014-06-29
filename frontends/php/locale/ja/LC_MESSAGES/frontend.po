@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:29+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2014-06-20 05:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -983,7 +983,7 @@ msgstr "下"
 msgid "Brighten"
 msgstr "明るく"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "ブルガリア語 (bg_BG)"
 
@@ -2661,11 +2661,11 @@ msgstr "チェックは重複できません"
 msgid "Child"
 msgstr "子"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "中国語 (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "中国語 (zh_TW)"
 
@@ -3402,7 +3402,7 @@ msgstr "カスタムサイズ"
 msgid "Custom slides"
 msgstr "カスタムスライド"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "チェコ語 (cs_CZ)"
 
@@ -4609,7 +4609,7 @@ msgstr "継続期間"
 msgid "Duration (sec)"
 msgstr "期間 (秒)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "オランダ語 (nl_NL)"
 
@@ -4903,11 +4903,11 @@ msgstr "選択したトリガーを有効にしますか？"
 msgid "Enabled"
 msgstr "有効"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "英語 (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "英語 (en_US)"
 
@@ -5297,7 +5297,7 @@ msgstr "ファイル内の文字列検索。文字列のマッチング"
 msgid "Finish"
 msgstr "終了"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "フィンランド語 (fi_FI)"
 
@@ -5336,7 +5336,7 @@ msgstr "式"
 msgid "Fourth"
 msgstr "第4週"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "フランス語 (fr_FR)"
 
@@ -5430,7 +5430,7 @@ msgstr "一般設定"
 msgid "Generated in %s sec"
 msgstr "Generated in %s sec"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "ドイツ語 (de_DE)"
 
@@ -5694,7 +5694,7 @@ msgstr "グラフをコピーしました"
 msgid "Graphs deleted"
 msgstr "グラフを削除しました"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "ギリシャ語 (el_GR)"
 
@@ -6382,7 +6382,7 @@ msgstr "時間"
 msgid "Housekeeping"
 msgstr "データの保存期間"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "ハンガリー語 (hu_HU)"
 
@@ -7462,7 +7462,7 @@ msgstr "グラフ\"%1$s\"のY軸の最大値のアイテムが正しくありま
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のY軸の最小値のアイテムが正しくありません。"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "インドネシア語 (id_ID)"
 
@@ -7712,7 +7712,7 @@ msgstr "HTTP認証からはログアウトできません。"
 msgid "It is not possible to search by user password."
 msgstr "ユーザーのパスワードによる検索は行えません。"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "イタリア語 (it_IT)"
 
@@ -7991,7 +7991,7 @@ msgstr "1月"
 msgid "January"
 msgstr "1月"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "日本語 (ja_JP)"
 
@@ -8050,7 +8050,7 @@ msgstr "キーワード"
 msgid "Kilo"
 msgstr "キロ"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "韓国語 (ko_KR)"
 
@@ -8208,7 +8208,7 @@ msgstr "最新のイベント"
 msgid "Latest values"
 msgstr "最新の値"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "ラトビア語 (lv_LV)"
 
@@ -8330,7 +8330,7 @@ msgstr "リストがありません"
 msgid "List of network interfaces. Text value."
 msgstr "ネットワークインターフェースのリスト。テキスト値。"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "リトアニア語 (lt_LT)"
 
@@ -11054,7 +11054,7 @@ msgstr "権限"
 msgid "Permissions can be assigned for user groups only."
 msgstr "権限はユーザーグループにのみ割り当てることができます。"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "ペルシャ語 (fa_IR)"
 
@@ -11099,7 +11099,7 @@ msgstr "確認のテキストを入力してください。"
 msgid "Please select two elements"
 msgstr "2つの要素を選択してください"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "ポーランド語 (pl_PL)"
 
@@ -11135,11 +11135,11 @@ msgstr "ホストインターフェースのポートは必須項目です。"
 msgid "Port range"
 msgstr "ポートの範囲"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "ポルトガル語 (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "ポルトガル語 (pt_PT)"
 
@@ -11791,7 +11791,7 @@ msgstr "ICMP pingパケットのロスト率を返却。"
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr "ルーマニア語 (ro_RO)"
 
@@ -11857,7 +11857,7 @@ msgstr "ホストでリモートコマンドを実行"
 msgid "Run specified command on the host."
 msgstr "ホスト上で指定したコマンドを実行。"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "ロシア語 (ru_RU)"
 
@@ -12789,7 +12789,7 @@ msgstr "スライドショー"
 msgid "Slides"
 msgstr "スライド"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "スロバキア語 (sk_SK)"
 
@@ -12861,7 +12861,7 @@ msgstr "フィールド\"%1$s\"による並べ替えは許可されていませ�
 msgid "Source"
 msgstr "ソース"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "スペイン語(es_ES)"
 
@@ -13093,7 +13093,7 @@ msgstr "スワップアウト。typeにcountを指定 - swapoutsを返却。type
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "スワップ領域。バイト数もしくはパーセンテージ。"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
@@ -13898,7 +13898,7 @@ msgstr "火"
 msgid "Tuesday"
 msgstr "火曜"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "トルコ語 (tr_TR)"
 
@@ -14042,7 +14042,7 @@ msgstr "ユーザープロファイル"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 
@@ -14912,7 +14912,7 @@ msgstr "縦"
 msgid "Vertical align"
 msgstr "縦位置"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr "ベトナム語 (vi_VN)"
 
