@@ -29,7 +29,6 @@ class CActionConditionValueValidator extends CValidator implements CPartialValid
 	 * @return bool
 	 */
 	public function validate($condition) {
-
 		// build validators
 		$timePeriodValidator = new CTimePeriodValidator();
 		$discoveryCheckTypeValidator = new CSetValidator(array(
@@ -195,7 +194,8 @@ class CActionConditionValueValidator extends CValidator implements CPartialValid
 				$this->setError(_('Incorrect action condition type.'));
 		}
 
-		return true;
+		// If no error is not set, return true.
+		return !(bool) $this->getError();
 	}
 
 	/**
