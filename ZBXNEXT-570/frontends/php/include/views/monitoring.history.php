@@ -139,9 +139,9 @@ $screen = CScreenBuilder::getScreen(array(
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
 	'item' => $this->data['item'],
-	'itemids' => $this->data['itemids'],
+	'itemids' => $itemIds,
 	'profileIdx' => 'web.item.graph',
-	'profileIdx2' => reset($this->data['itemids']),
+	'profileIdx2' => reset($itemIds),
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => get_request('filter'),
@@ -186,7 +186,122 @@ else {
 	$historyWidget->addItem($historyTable);
 
 	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
-		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
+		function wildcardKeyParameter($itemKey, $param) {
+			list($key, $params) = explode('[', rtrim($itemKey, ']'));
+
+			$paramTokens = explode(',', $params);
+			$paramTokens[$param] = '*';
+
+			$newKey = $key.'['.implode(',', $paramTokens).']';
+
+			return $newKey;
+		}
+
+		$subfilter = $this->data['subfilter'];
+
+		$baseItem = $this->data['item'];
+		$baseItemHostId = $baseItem['hosts'][0]['hostid'];
+		$baseItemHostGroups = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name'),
+			'hostids' => $baseItemHostId,
+		));
+
+		$sameKeyItems = API::Item()->get(array(
+			'output' => array('itemid', 'hostid'),
+			'groupids' => zbx_objectValues($baseItemHostGroups, 'groupid'),
+			'templated' => false,
+			'webitems' => true,
+			'filter' => array(
+				'key_' => $baseItem['key_']
+			),
+			'preservekeys' => true
+		));
+		unset($sameKeyItems[$baseItem['itemid']]);
+
+		$sameKeyItemHosts = API::Host()->get(array(
+			'output' => array('hostid'),
+			'selectGroups' => array('groupid'),
+			'hostids' => zbx_objectValues($sameKeyItems, 'hostid'),
+		));
+		$hostIdToGroupId = array();
+		foreach ($sameKeyItemHosts as $host) {
+			$hostIdToGroupId[$host['hostid']] = zbx_objectValues($host['groups'], 'groupid');
+		}
+
+		$hostGroupFilterData = array();
+		foreach ($baseItemHostGroups as $hostGroup) {
+			$hostGroupFilterData[$hostGroup['groupid']] = array(
+				'name' => $hostGroup['name'],
+				'count' => 0
+			);
+		}
+		foreach ($sameKeyItems as $item) {
+			foreach ($hostIdToGroupId[$item['hostid']] as $hostGroupId) {
+				$hostGroupFilterData[$hostGroupId]['count']++;
+			}
+		}
+
+		// key filter
+		$itemKeyParser = new CItemKey($baseItem['key_']);
+		$variationFilterData = array();
+		foreach ($itemKeyParser->getParameters() as $i => $param) {
+			$variationKey = wildcardKeyParameter($baseItem['key_'], $i);
+
+			$variationItemCount = API::Item()->get(array(
+				'countOutput' => true,
+				'hostids' => $baseItem['hostid'],
+				'templated' => false,
+				'webitems' => true,
+				'search' => array(
+					'key_' => $variationKey
+				),
+				'searchWildcardsEnabled' => true
+			));
+
+			$variationFilterData[$variationKey] = array(
+				'name' => $variationKey,
+				'count' => $variationItemCount
+			);
+		}
+
+		$filterForm = new CForm('get');
+		$filterForm->setName('zbx_filter');
+		$filterForm->addVar('action', getRequest('showgraph'));
+		$filterForm->addVar('itemid', getRequest('itemid'));
+		$filterForm->addVar('subfilter_hostgroupids', $subfilter['hostgroupids']);
+
+		$filterForm->addItem(new CDiv(null, null, 'scrollbar_cntr'));
+
+		$table_subfilter = new CTable(null, 'filter sub-filter');
+
+		// base item subfilter
+		$itemIdFilter = prepareSubfilterOutput(array(
+				$baseItem['itemid'] => array(
+					'name' => $baseItem['name_expanded'],
+					'count' => 1,
+				)
+			),
+			$this->data['subfilter']['itemids'], 'subfilter_itemids'
+		);
+		$table_subfilter->addRow(array(_('Base item'), $itemIdFilter));
+
+		// host group subfilter
+		$hostGroupFilter = prepareSubfilterOutput($hostGroupFilterData, $this->data['subfilter']['hostgroupids'],
+			'subfilter_hostgroupids'
+		);
+		$table_subfilter->addRow(array(_('Host groups'), $hostGroupFilter));
+
+		// key variation subfilter
+		if ($variationFilterData) {
+			$variationFilter = prepareSubfilterOutput($variationFilterData, $this->data['subfilter']['variations'],
+				'subfilter_variations'
+			);
+			$table_subfilter->addRow(array(_('Key variations'), $variationFilter));
+		}
+
+		$filterForm->addItem($table_subfilter);
+
+		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 
 		CScreenBuilder::insertScreenStandardJs(array(
 			'timeline' => $screen->timeline,

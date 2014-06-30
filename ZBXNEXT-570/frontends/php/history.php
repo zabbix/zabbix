@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
@@ -50,6 +51,10 @@ $fields = array(
 	'mark_color' =>		array(T_ZBX_STR, O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
 	'cmbitemlist' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'plaintext' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
+	'subfilter_toggled' =>          array(T_ZBX_STR, O_OPT, null,	null,	null),
+	'subfilter_itemids' =>          array(T_ZBX_STR, O_OPT, null,	null,	null),
+	'subfilter_hostgroupids' =>     array(T_ZBX_STR, O_OPT, null,	null,	null),
+	'subfilter_variations' =>       array(T_ZBX_STR, O_OPT, null,	null,	null),
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 	// ajax
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
@@ -139,6 +144,59 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 	}
 }
 
+// graph subfilters
+$subfilter = array(
+	'itemids' => array(),
+	'hostgroupids' => array(),
+	'variations' => array()
+);
+if (getRequest('action') === 'showgraph') {
+	$baseItem = reset($items);
+
+	switch (getRequest('subfilter_toggled')) {
+		case 'subfilter_itemids':
+			$subfilter['itemids'] = getRequest('subfilter_itemids');
+
+			break;
+		case 'subfilter_hostgroupids':
+			$subfilter['hostgroupids'] = getRequest('subfilter_hostgroupids');
+
+			$items = zbx_array_merge($items, API::Item()->get(array(
+				'output' => array('itemid', 'name', 'key_', 'value_type', 'hostid', 'valuemapid'),
+				'selectHosts' => array('hostid', 'name'),
+				'groupids' => $subfilter['hostgroupids'],
+				'webitems' => true,
+				'templated' => false,
+				'filter' => array(
+					'key_' => $baseItem['key_']
+				),
+				'limit' => 40,
+				'preservekeys' => true,
+			)));
+
+			break;
+		case 'subfilter_variations':
+			$subfilter['variations'] = getRequest('subfilter_variations');
+			$variation = reset($subfilter['variations']);
+
+			$items = zbx_array_merge($items, API::Item()->get(array(
+				'output' => array('itemid', 'name', 'key_', 'value_type', 'hostid', 'valuemapid'),
+				'selectHosts' => array('hostid', 'name'),
+				'hostids' => $baseItem['hostid'],
+				'webitems' => true,
+				'templated' => false,
+				'search' => array(
+					'key_' => $variation
+				),
+				'searchWildcardsEnabled' => true,
+				'limit' => 40,
+				'preservekeys' => true,
+			)));
+
+			break;
+	}
+}
+
 $items = CMacrosResolverHelper::resolveItemNames($items);
 
 $item = reset($items);
@@ -146,7 +204,6 @@ $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
 
 $data = array(
-	'itemids' => get_request('itemid'),
 	'items' => $items,
 	'item' => $item,
 	'action' => get_request('action'),
@@ -155,7 +212,8 @@ $data = array(
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),
-	'fullscreen' => $_REQUEST['fullscreen']
+	'fullscreen' => $_REQUEST['fullscreen'],
+	'subfilter' => $subfilter
 );
 
 // render view

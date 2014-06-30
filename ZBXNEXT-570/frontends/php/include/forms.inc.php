@@ -262,6 +262,7 @@ function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
 			$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
 			$span->onClick(CHtml::encode(
 				'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+				'javascript: create_var("zbx_filter", "subfilter_toggled", "'.$subfilterName.'", false);'.
 				'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
 			));
 			$output[] = $span;
@@ -283,6 +284,7 @@ function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
 				$span = new CSpan($element['name'], 'subfilter_disabled');
 				$span->onClick(CHtml::encode(
 					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'javascript: create_var("zbx_filter", "subfilter_toggled", "'.$subfilterName.'", false);'.
 					'create_var("zbx_filter", '.
 						CJs::encodeJson($subfilterName.'['.$id.']').', '.
 						CJs::encodeJson($id).', '.

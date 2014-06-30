@@ -81,7 +81,12 @@ if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
 foreach (getRequest('itemids') as $itemId) {
-	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
+	$color = '';
+	foreach (get_next_color(1) as $rgb) {
+		$color .= str_pad(dechex($rgb), 2, 0);
+	}
+
+	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL, $color);
 }
 $graph->draw();
 
