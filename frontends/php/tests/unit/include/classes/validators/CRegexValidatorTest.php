@@ -47,7 +47,9 @@ class CRegexValidatorTest extends CValidatorTest
 			array(array(), '[a-z]+\ \[/'),
 			array(array(), '[a-f0-9]{32}/iu'),
 			array(array(), '[a-f0-9]{32}/i'),
-			array(array(), '/foo bar// me!/')
+			array(array(), '/foo bar// me!/'),
+			array(array(), 1),
+			array(array(), 1.2)
 		);
 	}
 
@@ -62,6 +64,11 @@ class CRegexValidatorTest extends CValidatorTest
 			array(
 				array('messageType' => 'Not a string'),
 				null,
+				'Not a string'
+			),
+			array(
+				array('messageType' => 'Not a string'),
+				true,
 				'Not a string'
 			),
 			array(
