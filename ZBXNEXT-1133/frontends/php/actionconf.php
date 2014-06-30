@@ -39,7 +39,10 @@ $fields = array(
 		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)),
 		null
 	),
-	'filter' =>				array(null,		O_OPT,	null,	null,		null),
+	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
+		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION)),
+		'isset({save})'),
+	'formula' =>			array(T_ZBX_STR, O_OPT, null,   null,		'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -107,16 +110,20 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 }
 elseif (hasRequest('save')) {
 	$action = array(
-		'name'			=> get_request('name'),
-		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
-		'esc_period'	=> get_request('esc_period', 0),
-		'def_shortdata'	=> get_request('def_shortdata', ''),
-		'def_longdata'	=> get_request('def_longdata', ''),
-		'recovery_msg'	=> get_request('recovery_msg', 0),
-		'r_shortdata'	=> get_request('r_shortdata', ''),
-		'r_longdata'	=> get_request('r_longdata', ''),
-		'filter'		=> getRequest('filter'),
-		'operations'	=> get_request('operations', array())
+		'name' => get_request('name'),
+		'status' => get_request('status', ACTION_STATUS_DISABLED),
+		'esc_period' => get_request('esc_period', 0),
+		'def_shortdata' => get_request('def_shortdata', ''),
+		'def_longdata' => get_request('def_longdata', ''),
+		'recovery_msg' => get_request('recovery_msg', 0),
+		'r_shortdata' => get_request('r_shortdata', ''),
+		'r_longdata' => get_request('r_longdata', ''),
+		'operations' => get_request('operations', array()),
+		'filter' => array(
+			'conditions' => getRequest('conditions', array()),
+			'evaltype' => getRequest('evaltype'),
+			'formula' => getRequest('formula')
+		)
 	);
 
 	foreach ($action['operations'] as $num => $operation) {
@@ -172,8 +179,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		$newCondition = getRequest('new_condition');
 
 		if ($newCondition) {
-			$actionFilter = getRequest('filter');
-			$conditions = $actionFilter['conditions'];
+			$conditions = getRequest('conditions');
 
 			// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
 			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
@@ -210,10 +216,10 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			}
 
 			if ($validateConditions) {
-				CAction::validateConditionsIntegrity($validateConditions);
+				API::Action()->validateConditionsIntegrity($validateConditions);
 			}
 
-			$_REQUEST['filter']['conditions'] = $validateConditions;
+			$_REQUEST['conditions'] = $validateConditions;
 		}
 	}
 	catch (APIException $e) {
@@ -363,11 +369,15 @@ if (hasRequest('form')) {
 		$data['action'] = API::Action()->get(array(
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectFilter' => array('formula', 'conditions', 'conditiontype', 'operator', 'value', 'evaltype'),
+			'selectFilter' => array('formula', 'conditions', 'evaltype'),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$data['action'] = reset($data['action']);
+
+		$data['action']['evaltype'] = $data['action']['filter']['evaltype'];
+		$data['action']['formula'] = $data['action']['filter']['formula'];
+		$data['action']['conditions'] = $data['action']['filter']['conditions'];
 
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
@@ -375,8 +385,6 @@ if (hasRequest('form')) {
 		$data['eventsource'] = getRequest('eventsource',
 			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 		);
-		$data['evaltype'] = getRequest('evaltype');
-		$data['formula'] = getRequest('formula');
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
@@ -390,7 +398,9 @@ if (hasRequest('form')) {
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['operations'] = get_request('operations', array());
 
-		$data['action']['filter'] = getRequest('filter');
+		$data['action']['evaltype'] = getRequest('evaltype');
+		$data['action']['formula'] = getRequest('formula');
+		$data['action']['conditions'] = getRequest('conditions');
 
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
@@ -423,7 +433,7 @@ if (hasRequest('form')) {
 	}
 
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['filter']['conditions'] = array(
+		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 				'operator' => CONDITION_OPERATOR_EQUAL,
@@ -447,7 +457,7 @@ if (hasRequest('form')) {
 		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
 	);
-	CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
+	CArrayHelper::sort($data['action']['conditions'], $sortFields);
 
 	// new condition
 	$data['new_condition'] = array(

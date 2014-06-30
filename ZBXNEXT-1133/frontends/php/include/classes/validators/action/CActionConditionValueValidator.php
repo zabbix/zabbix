@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CActionConditionValueValidator extends CValidator {
+class CActionConditionValueValidator extends CValidator implements CPartialValidatorInterface {
 
 	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
@@ -196,5 +196,20 @@ class CActionConditionValueValidator extends CValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validates a partial array. Some data may be missing from the given $array, then it will be taken from the
+	 * full array.
+	 *
+	 *
+	 * @param array $array
+	 * @param array $fullArray
+	 *
+	 * @return bool
+	 */
+	public function validatePartial(array $array, array $fullArray)
+	{
+		return $this->validate($array);
 	}
 }
