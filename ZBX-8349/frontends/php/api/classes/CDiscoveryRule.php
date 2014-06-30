@@ -849,7 +849,7 @@ class CDiscoveryRule extends CItemGeneral {
 				)),
 				'conditions' => new CCollectionValidator(array(
 					'empty' => true,
-					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".')
+					'messageType' => _('Incorrect conditions for discovery rule "%1$s".')
 				))
 			),
 			'postValidators' => array(

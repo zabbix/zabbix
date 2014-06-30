@@ -64,52 +64,6 @@ class CCollectionValidator extends CValidator {
 	public $messageDuplicate;
 
 	/**
-	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
-	 *
-	 * @param array $options
-	 */
-	public function __construct(array $options = array()) {
-		if (isset($options['messageInvalid'])) {
-			$options['messageType'] = $options['messageInvalid'];
-			unset($options['messageInvalid']);
-		}
-
-		parent::__construct($options);
-	}
-
-	/**
-	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
-	 *
-	 * @param $name
-	 * @param $value
-	 *
-	 * @throws \Exception
-	 */
-	public function __set($name, $value) {
-		if ($name === 'messageInvalid') {
-			$this->messageType = $value;
-
-			return;
-		}
-
-		parent::__set($name, $value);
-	}
-
-	/**
-	 * @todo: This exists only because messageInvalid -> messageType change. We should refactor it later.
-	 *
-	 * @param $name
-	 * @return string
-	 */
-	public function __get($name) {
-		if ($name === 'messageInvalid') {
-			return $this->messageType;
-		}
-
-		return null;
-	}
-
-	/**
 	 * Checks if the given array of objects is valid.
 	 *
 	 * @param array $value
