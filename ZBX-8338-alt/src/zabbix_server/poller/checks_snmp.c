@@ -690,7 +690,7 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 	/*                                                                                                            */
 	/* Apparently, this is different than the original.                                                           */
 	/*                                                                                                            */
-	/* The second problem is indices of type OCTET STRING, which might contains unprintable characters:           */
+	/* The second problem are indices of type OCTET STRING, which might contain unprintable characters:           */
 	/*                                                                                                            */
 	/*   1.3.6.1.2.1.17.4.3.1.1.0.0.240.122.113.21                                                                */
 	/*                                                                                                            */
