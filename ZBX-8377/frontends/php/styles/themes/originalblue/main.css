@@ -37,3 +37,33 @@ table.ack_msgs tr.msg { background-color: #F8F8F8; }
 div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
+
+.input[readonly]:hover, .input[disabled]:hover {
+	border-color: #d0d0d0;
+	background: #eeeeee;
+	/* ignored by IE for <select> */
+	color: #aca899;
+}
+
+/* disabled <select> font color for IE 9+ */
+select[disabled="disabled"]::-ms-value {
+	color: #aca899;
+}
+
+.link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
+	background-color: #ffffff;
+	color: #aca899;
+}
+
+/* disabled form buttons */
+.input.button[disabled]:hover {
+	background-color: #fafbfc;
+	border-color: #ced8e6;
+	color: #a8bfd4;
+}
+
+/* disabled save button */
+.jqueryinput.input.button[disabled]:hover {
+	border-color: #ffaa33;
+	color: #a8bfd4;
+}
