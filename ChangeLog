@@ -13,6 +13,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
 ..F....... [ZBX-7459] fixed saving and editing of regular expression having trailing, leading, or repeating spaces (Andrejs)
 ..F....... [ZBX-1268] fixed log trigger expression editor to show only usable sorting arrows (Andrejs)
 ..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
@@ -220,6 +221,7 @@ New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
 ..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
