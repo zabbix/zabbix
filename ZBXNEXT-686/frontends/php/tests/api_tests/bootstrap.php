@@ -119,8 +119,15 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function getApiEntryPoint()
 	{
-		// TODO: remove hardcode
-		return realpath(__DIR__.'/../frontends/php/api_jsonrpc.php');
+		$path = realpath(__DIR__);
+
+		if (strpos($path, 'frontends/php') === false) {
+			throw new \Exception('Oops. Don\'t know where I am, is Zabbix file structure changed?');
+		}
+
+		$base = substr($path, 0, strpos($path, 'frontends/php') + strlen('frontends/php'));
+
+		return realpath($base . '/api_jsonrpc.php');
 	}
 
 	/**
@@ -170,8 +177,11 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		));
 
 		if (!is_array($result) || !isset($result['result']) || !preg_match('/^[a-z0-9]{32}$/', $result['result'])) {
-			// TODO: check for API exception here
-			throw new RuntimeException('Api returned garbaged result');
+			if (is_array($result) && isset($result['error'])) {
+				throw new RuntimeException(sprintf('API error code %d: %s' ,$result['error']['code'], $result['error']['message']));
+			}
+
+			throw new RuntimeException('API returned garbaged result: '.json_encode($result));
 		} else {
 			$this->authKey = $result['result'];
 

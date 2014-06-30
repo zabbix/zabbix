@@ -2,6 +2,9 @@
 
 class ZBX8301DruleCreateTest extends ZbxApiTestBase
 {
+	/**
+	 * @group regression
+	 */
 	public function testCreateValidateUnique()
 	{
 		$this->expectApiException(
