@@ -13,6 +13,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+A......... [ZBX-8315] fixed host interface import (from 1.8 and up) to correctly create new or reuse existing interfaces (Krists)
 ...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
 ..F....... [ZBX-7459] fixed saving and editing of regular expression having trailing, leading, or repeating spaces (Andrejs)
 ..F....... [ZBX-1268] fixed log trigger expression editor to show only usable sorting arrows (Andrejs)
