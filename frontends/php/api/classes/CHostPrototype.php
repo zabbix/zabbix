@@ -187,13 +187,13 @@ class CHostPrototype extends CHostBase {
 				'groupLinks' => new CCollectionValidator(array(
 					'uniqueField' => 'groupid',
 					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageInvalid' => _('Incorrect host groups for host prototype "%1$s".'),
+					'messageType' => _('Incorrect host groups for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
 				)),
 				'groupPrototypes' => new CCollectionValidator(array(
 					'empty' => true,
 					'uniqueField' => 'name',
-					'messageInvalid' => _('Incorrect group prototypes for host prototype "%1$s".'),
+					'messageType' => _('Incorrect group prototypes for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".')
 				)),
 				'inventory' => new CSchemaValidator(array(
