@@ -392,12 +392,13 @@ class CXmlImport18 {
 		return $array;
 	}
 
-	public static function import($file) {
+	public static function import($source) {
 
 		libxml_use_internal_errors(true);
+		libxml_disable_entity_loader(true);
 
 		$xml = new DOMDocument();
-		if (!$xml->loadXML($file)) {
+		if (!$xml->loadXML($source, LIBXML_IMPORT_FLAGS)) {
 			$text = '';
 			foreach (libxml_get_errors() as $error) {
 				switch ($error->level) {
@@ -889,7 +890,7 @@ class CXmlImport18 {
 						);
 					}
 
-					// now we need to check if host had SNMP items. If it had, we need and SNMP interface for every different port.
+					// now we need to check if host had SNMP items. If it had, we need an SNMP interface for every different port.
 					$items = $xpath->query('items/item', $host);
 					$snmp_interface_ports_created = array();
 					foreach ($items as $item) {
@@ -914,7 +915,7 @@ class CXmlImport18 {
 					unset($snmp_interface_ports_created); // it was a temporary variable
 
 
-					// we ned to add ipmi interface if at least one ipmi item exists
+					// we need to add ipmi interface if at least one ipmi item exists
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						if ($item_db['type'] == ITEM_TYPE_IPMI) {

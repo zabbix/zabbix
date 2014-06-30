@@ -395,7 +395,7 @@ function getLastEvents($options) {
 	$triggerOptions = array(
 		'filter' => array(),
 		'skipDependent' => 1,
-		'selectHosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'name'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,

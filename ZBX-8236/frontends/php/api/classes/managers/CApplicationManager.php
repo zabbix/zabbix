@@ -103,12 +103,12 @@ class CApplicationManager {
 
 		// replace existing application templates
 		if ($applicationTemplates) {
-			$dbAplicationTemplates = DBfetchArray(DBselect(
+			$dbApplicationTemplates = DBfetchArray(DBselect(
 				'SELECT * '.
 				' FROM application_template at'.
 				' WHERE '.dbConditionInt('at.applicationid', zbx_objectValues($applications, 'applicationid'))
 			));
-			DB::replace('application_template', $dbAplicationTemplates, $applicationTemplates);
+			DB::replace('application_template', $dbApplicationTemplates, $applicationTemplates);
 		}
 
 		// TODO: REMOVE info
@@ -340,7 +340,7 @@ class CApplicationManager {
 			'where' => array('applicationid' => $applicationIds)
 		));
 
-		// remove Monitoring > Latest data toggle profile values related to given aplications
+		// remove Monitoring > Latest data toggle profile values related to given applications
 		CProfile::delete('web.latest.toggle', $applicationIds);
 
 		DB::delete('applications', array('applicationid' => $applicationIds));
@@ -471,7 +471,7 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Get hosts applications for each passed hosts.
+	 * Get host applications for each passed host.
 	 * Each host has two hashes with applications, one with name keys other with templateid keys.
 	 *
 	 * Resulting structure is:

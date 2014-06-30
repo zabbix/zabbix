@@ -323,7 +323,7 @@ class ZBase {
 	}
 
 	/**
-	 * Initilaize translations.
+	 * Initialize translations.
 	 */
 	protected function initLocales() {
 		init_mbstrings();

@@ -77,7 +77,7 @@ CDate.prototype = {
 		}
 
 		/**
-		 * Append date suffix according to english rules e.g., 3 becomes 3rd
+		 * Append date suffix according to English rules e.g., 3 becomes 3rd
 		 * @param int date
 		 * @return string
 		 */

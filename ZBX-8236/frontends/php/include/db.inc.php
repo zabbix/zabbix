@@ -424,7 +424,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 			break;
 	}
 
-	// $result is false only if an error occured
+	// $result is false only if an error occurred
 	if ($DB['TRANSACTION_NO_FAILED_SQLS'] && !$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}

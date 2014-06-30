@@ -570,8 +570,8 @@ else {
  */
 if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_HORISONTAL, null, 'style_'.STYLE_HORISONTAL, $style == STYLE_HORISONTAL),
-		new CLabel(_('Horizontal'), 'style_'.STYLE_HORISONTAL),
+		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style == STYLE_HORIZONTAL),
+		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
 		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
 		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
 	);

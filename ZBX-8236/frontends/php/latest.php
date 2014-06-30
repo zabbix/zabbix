@@ -211,7 +211,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2);
+		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
 		if (!$filterShowWithoutData) {
@@ -330,7 +330,7 @@ if (getRequest('hostid')) {
 }
 else {
 	$hostHeader = make_sorting_header(_('Host'), 'host');
-	$hostHeader->addClass('latest-host');
+	$hostHeader->addClass('latest-host '.($filterShowDetails ? 'with-details' : 'no-details'));
 	$hostHeader->setAttribute('title', _('Host'));
 
 	$hostColumn = SPACE;

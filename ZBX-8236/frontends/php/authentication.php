@@ -161,7 +161,7 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	if (isset($_REQUEST['save'])) {
-		// get groups wich use this authentication method
+		// get groups that use this authentication method
 		$result = DBfetch(DBselect(
 			'SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL
 		));

@@ -166,7 +166,7 @@ static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, con
 
 	for (i = 0; i < clusters->values_num; i++)
 	{
-		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
 
 		if (0 == strcmp(cluster->name, name))
 			goto out;
@@ -352,7 +352,7 @@ out:
  *             ret       - [OUT] the operation result code                    *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
- *               found, did not have data or any error occured. In the last   *
+ *               found, did not have data or any error occurred. In the last  *
  *               case the error message will be stored in agent result.       *
  *                                                                            *
  * Comments: There are three possible cases:                                  *
