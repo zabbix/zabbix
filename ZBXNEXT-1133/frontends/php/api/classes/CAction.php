@@ -1536,13 +1536,6 @@ class CAction extends CApiService {
 					}
 					unset($condition);
 
-					$sortFields = array(
-						array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-						array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-						array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-					);
-					CArrayHelper::sort($filter['conditions'], $sortFields);
-
 					// generated a letter based formula only for actions with custom expressions
 					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
