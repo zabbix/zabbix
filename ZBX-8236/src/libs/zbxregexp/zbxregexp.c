@@ -56,6 +56,11 @@ compile:
 	}
 	else
 	{
+#ifdef _WINDOWS
+		/* the Windows gnuregex implementation does not correctly clean up */
+		/* allocated memory after regcomp() failure                        */
+		regfree(&re);
+#endif
 		zbx_free(old_pattern);
 		goto out;
 	}
@@ -223,6 +228,11 @@ compile:
 	}
 	else
 	{
+#ifdef _WINDOWS
+		/* the Windows gnuregex implementation does not correctly clean up */
+		/* allocated memory after regcomp() failure                        */
+		regfree(&re);
+#endif
 		zbx_free(old_pattern);
 		return NULL;
 	}
