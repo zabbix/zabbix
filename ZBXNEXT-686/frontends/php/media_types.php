@@ -59,7 +59,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
+validate_sort_and_sortorder('description', ZBX_SORT_UP, array('description', 'type'));
 
 $mediaTypeId = get_request('mediatypeid');
 

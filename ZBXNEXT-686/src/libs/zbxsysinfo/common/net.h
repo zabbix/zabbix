@@ -88,8 +88,13 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
+#define ZBX_TCP_EXPECT_FAIL	-1
+#define ZBX_TCP_EXPECT_OK	0
+#define ZBX_TCP_EXPECT_IGNORE	1
+
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int);
+		int(*validate_func)(const char *), const char *sendtoclose, int *value_int);
+
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);

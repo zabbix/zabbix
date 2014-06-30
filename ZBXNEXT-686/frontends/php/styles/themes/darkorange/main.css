@@ -417,10 +417,11 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover, input.formlist[type="button"],
-div.calendar input[type="button"] {
-	border: 1px solid #DFDFDF;
-	background-color: #2F2F2F;
-	color: #DFDFDF;
+div.calendar input[type="button"], input[type="button"].input[disabled].formlist,
+input[type="submit"].input[disabled].formlist {
+	border: 1px solid #dfdfdf;
+	background-color: #2fdfdf;
+	color: #dfdfdf;
 }
 .input option { background: #2F2F2F; color: #FF5500; }
 .input:focus, input.formlist[type="button"]:focus, div.calendar input[type="button"]:focus
@@ -428,7 +429,7 @@ div.calendar input[type="button"] {
 	border-color: #FF5500; color: #FF5500;
 }
 
-.input[readonly], .input[readonly]:hover{
+.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover {
 /* NOTE: Ignored by IE */
 	border-color: #DFDFDF;
 	background-color: #777777;
@@ -458,9 +459,10 @@ ul.formlist li.new { background: #2F2F2F; }
 }
 
 .link_menu[disabled], .link_menu[disabled]:hover{
-	color: #DFDFDF;
+	color: #dfdfdf;
 	border: 0;
 	cursor: default;
+	background-color: #1a1a1a;
 }
 
 .column .widget .header{ border: 0;}

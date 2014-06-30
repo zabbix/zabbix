@@ -79,7 +79,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], '', 'on');
+			$info->setHint($discovery['error'], 'on');
 		}
 		else {
 			$info = '';

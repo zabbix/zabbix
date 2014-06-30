@@ -256,21 +256,18 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
 	const char		*__function_name = "lld_hosts_validate";
 
-	char			*tnames = NULL, *vnames = NULL, *host_esc, *name_esc;
-	size_t			tnames_alloc = 256, tnames_offset = 0,
-				vnames_alloc = 256, vnames_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
 	zbx_lld_host_t		*host, *host_b;
 	zbx_vector_uint64_t	hostids;
+	zbx_vector_str_t	tnames, vnames;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&hostids);
-
-	tnames = zbx_malloc(tnames, tnames_alloc);	/* list of technical host names */
-	vnames = zbx_malloc(vnames, vnames_alloc);	/* list of visible host names */
+	zbx_vector_str_create(&tnames);		/* list of technical host names */
+	zbx_vector_str_create(&vnames);		/* list of visible host names */
 
 	/* checking a host name validity */
 	for (i = 0; i < hosts->values_num; i++)
@@ -429,33 +426,13 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			zbx_vector_uint64_append(&hostids, host->hostid);
 
 		if (0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
-		{
-			host_esc = DBdyn_escape_string(host->host);
-
-			if (0 != tnames_offset)
-				zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, ',');
-			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
-			zbx_strcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, host_esc);
-			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
-
-			zbx_free(host_esc);
-		}
+			zbx_vector_str_append(&tnames, host->host);
 
 		if (0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
-		{
-			name_esc = DBdyn_escape_string(host->name);
-
-			if (0 != vnames_offset)
-				zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, ',');
-			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
-			zbx_strcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, name_esc);
-			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
-
-			zbx_free(name_esc);
-		}
+			zbx_vector_str_append(&vnames, host->name);
 	}
 
-	if (0 != tnames_offset || 0 != vnames_offset)
+	if (0 != tnames.values_num || 0 != vnames.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
@@ -465,19 +442,31 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				" from hosts"
 				" where status in (%d,%d,%d)"
 					" and flags<>%d"
-					" and ",
+					" and",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);
-		if (0 != tnames_offset && 0 != vnames_offset)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
-		if (0 != tnames_offset)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "host in (%s)", tnames);
-		if (0 != tnames_offset && 0 != vnames_offset)
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
-		if (0 != vnames_offset)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name in (%s)", vnames);
-		if (0 != tnames_offset && 0 != vnames_offset)
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (");
+
+		if (0 != tnames.values_num)
+		{
+			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+					(const char **)tnames.values, tnames.values_num);
+		}
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or");
+
+		if (0 != vnames.values_num)
+		{
+			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
+					(const char **)vnames.values, vnames.values_num);
+		}
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
 			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
 		if (0 != hostids.values_num)
 		{
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -539,9 +528,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		zbx_free(sql);
 	}
 
-	zbx_free(vnames);
-	zbx_free(tnames);
-
+	zbx_vector_str_destroy(&vnames);
+	zbx_vector_str_destroy(&tnames);
 	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1013,19 +1001,17 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 {
 	const char		*__function_name = "lld_groups_validate";
 
-	char			*names = NULL, *name_esc;
-	size_t			names_alloc = 256, names_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
 	zbx_lld_group_t		*group, *group_b;
 	zbx_vector_uint64_t	groupids;
+	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&groupids);
-
-	names = zbx_malloc(names, names_alloc);	/* list of group names */
+	zbx_vector_str_create(&names);		/* list of group names */
 
 	/* checking a group name validity */
 	for (i = 0; i < groups->values_num; i++)
@@ -1114,25 +1100,18 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 			zbx_vector_uint64_append(&groupids, group->groupid);
 
 		if (0 == group->groupid || 0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-		{
-			name_esc = DBdyn_escape_string(group->name);
-
-			if (0 != names_offset)
-				zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, ',');
-			zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-			zbx_strcpy_alloc(&names, &names_alloc, &names_offset, name_esc);
-			zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-
-			zbx_free(name_esc);
-		}
+			zbx_vector_str_append(&names, group->name);
 	}
 
-	if (0 != names_offset)
+	if (0 != names.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where name in (%s)", names);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where");
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
+				(const char **)names.values, names.values_num);
+
 		if (0 != groupids.values_num)
 		{
 			zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1176,8 +1155,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		zbx_free(sql);
 	}
 
-	zbx_free(names);
-
+	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

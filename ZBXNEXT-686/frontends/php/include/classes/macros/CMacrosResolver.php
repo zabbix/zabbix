@@ -1133,11 +1133,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro = $expr;
 
 			if ($replaceHosts !== null) {
-				// search for macros with all possible indecies
+				// search for macros with all possible indices
 				foreach ($replaceHosts as $i => $host) {
 					$macroTmp = $macro;
 
-					// repalce only macro in first position
+					// replace only macro in first position
 					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 
 					// only one simple macro possible inside functional macro
@@ -1154,7 +1154,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				continue;
 			}
 
-			// look in DB for coressponding item
+			// look in DB for corresponding item
 			$itemHost = $expressionData->expressions[0]['host'];
 			$key = $expressionData->expressions[0]['item'];
 			$function = $expressionData->expressions[0]['functionName'];

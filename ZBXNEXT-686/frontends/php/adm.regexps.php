@@ -35,8 +35,8 @@ $fields = array(
 	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})', _('Test string')),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})', _('Test string')),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})'),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,	null),
@@ -46,7 +46,7 @@ $fields = array(
 	// ajax
 	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
 	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null)
+	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null)
 );
 check_fields($fields);
 

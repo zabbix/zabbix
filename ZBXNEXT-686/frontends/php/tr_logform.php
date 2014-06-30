@@ -176,7 +176,7 @@ if (isset($_REQUEST['save_trigger'])) {
 
 if(isset($_REQUEST['sform'])){
 	$frmTRLog = new CFormTable(_('Trigger'),'tr_logform.php','POST',null,'sform');
-	$frmTRLog->setHelp('web.triggerlog.service.php');
+	$frmTRLog->addHelpIcon();
 	$frmTRLog->setTableClass('formlongtable formtable');
 	$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
@@ -285,10 +285,12 @@ if(isset($_REQUEST['sform'])){
 		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
 		$imgup->setAttribute('onclick','javascript:  element_up("logtr'.$id.'");');
 		$imgup->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
+		$imgup->addClass('updown');
 
 		$imgdn = new CImg('images/general/arrow_down.png','down',12,14);
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
+		$imgdn->addClass('updown');
 
 		$del_url = new CSpan(_('Delete'),'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
@@ -296,7 +298,7 @@ if(isset($_REQUEST['sform'])){
 		$row = new CRow(array(
 			htmlspecialchars($expr['value']),
 			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
-			array($imgup, SPACE, $imgdn),
+			array($imgup, ' ', $imgdn),
 			$del_url
 		));
 		$row->setAttribute('id','logtr'.$id);
@@ -308,6 +310,7 @@ if(isset($_REQUEST['sform'])){
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}
 	zbx_add_post_js('logexpr_count='.($maxid+1).';');
+	zbx_add_post_js('processExpressionList();');
 
 	$maxid=0;
 	foreach($keys as $id => $val){

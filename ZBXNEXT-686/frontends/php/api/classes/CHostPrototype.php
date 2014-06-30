@@ -373,7 +373,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypes
-	 * @param arary $dbHostPrototypes	array of existing host prototypes with hostids as keys
+	 * @param array $dbHostPrototypes	array of existing host prototypes with hostids as keys
 	 *
 	 * @return void
 	 */
@@ -1064,7 +1064,7 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the given host prototypes are not inherited from a template.
 	 *
-	 * @throws APIException 	if at least one host prototype is iherited
+	 * @throws APIException 	if at least one host prototype is inherited
 	 *
 	 * @param array $hostPrototypeIds
 	 */
@@ -1221,7 +1221,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 					' FROM group_prototype hg'.
 					' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.groupid!=0'
+					' AND hg.groupid IS NOT NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(
@@ -1242,7 +1242,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 				' FROM group_prototype hg'.
 				' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.name NOT LIKE '.zbx_dbstr('')
+					' AND hg.groupid IS NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(
