@@ -216,7 +216,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			}
 
 			if ($validateConditions) {
-				API::Action()->validateConditionsIntegrity($validateConditions);
+				CAction::validateConditionsIntegrity($validateConditions);
 			}
 
 			$_REQUEST['conditions'] = $validateConditions;
@@ -494,20 +494,20 @@ else {
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
 	);
 
-	$sortfield = getPageSortField('name');
+	$sortField = getPageSortField('name');
 
 	$data['actions'] = API::Action()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array('eventsource' => array($data['eventsource'])),
-		'selectFilter' => array('formula', 'conditions', 'conditiontype', 'operator', 'value', 'evaltype'),
+		'selectFilter' => array('formula', 'conditions', 'evaltype'),
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	// sorting && paging
-	order_result($data['actions'], $sortfield, getPageSortOrder());
+	order_result($data['actions'], $sortField, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions']);
 
 	// render view

@@ -2238,19 +2238,15 @@ class CAction extends CApiService {
 	/**
 	 * @param array $conditions      conditions to validate
 	 */
-	public function validateConditionsIntegrity($conditions) {
-		$filterConditionValidator = new CPartialSchemaValidator($this->getFilterConditionSchema());
-		$filterConditionValidator->setValidator('actionid', new CIdValidator(array(
-				'empty' => true,
-				'messageRegex' => _('Incorrect action ID for action "%1$s".')
-			)));
-		$filterConditionValidator->setValidator('conditionid', new CIdValidator(array(
-				'empty' => true,
-				'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
-			)));
+	public static function validateConditionsIntegrity($conditions) {
+		$filterConditionValidator = new CActionConditionValueValidator();
 
 		foreach($conditions as $condition) {
-			$this->checkPartialValidator($condition, $filterConditionValidator);
+			if(!$filterConditionValidator->validate($condition)) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $filterConditionValidator->getError());
+			}
 		}
+
+		self::validateConditionsPermissions($conditions);
 	}
 }
