@@ -50,7 +50,8 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT,	 P_SYS,	null,	null),
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null),
 	'host' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
-	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null)
+	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
+	'name_expanded' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null)
 );
 check_fields($fields);
 
@@ -64,7 +65,7 @@ if (hasRequest('itemid') && getRequest('itemid') > 0) {
 
 	$autoCaption = $item['name_expanded'];
 
-	if (!hasRequest('caption')) {
+	if (!hasRequest('caption') || getRequest('caption') == $item['name']) {
 		$caption = $item['name_expanded'];
 	}
 }
@@ -107,7 +108,6 @@ else {
 	$config	= get_request('config', 1);
 	$gid = get_request('gid', null);
 	$list_name = get_request('list_name', null);
-	$caption = get_request('caption', '');
 	$itemid = get_request('itemid', 0);
 	$color = get_request('color', '009900');
 	$calc_fnc = get_request('calc_fnc', 2);
@@ -126,6 +126,12 @@ else {
 		),
 		new CTextBox('caption', $caption, 50)
 	);
+
+	$host = getRequest('host');
+	$itemName = getRequest('name_expanded');
+	if ($host && $itemName) {
+		$caption = $host['name'].NAME_DELIMITER.$itemName;
+	}
 
 	$txtCondVal = new CTextBox('name', $caption, 50, 'yes');
 
