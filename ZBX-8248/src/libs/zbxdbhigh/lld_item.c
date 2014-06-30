@@ -372,19 +372,17 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 {
 	const char		*__function_name = "lld_items_validate";
 
-	char			*keys = NULL, *key_esc;
-	size_t			keys_alloc = 256, keys_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
 	zbx_lld_item_t		*item, *item_b;
 	zbx_vector_uint64_t	itemids;
+	zbx_vector_str_t	keys;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&itemids);
-
-	keys = zbx_malloc(keys, keys_alloc);	/* list of item keys */
+	zbx_vector_str_create(&keys);		/* list of item keys */
 
 	/* check an item name validity */
 	for (i = 0; i < items->values_num; i++)
@@ -436,6 +434,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 			}
 			else
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+
 			break;
 		}
 	}
@@ -455,18 +454,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			continue;
 
-		key_esc = DBdyn_escape_string(item->key);
-
-		if (0 != keys_offset)
-			zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, ',');
-		zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, '\'');
-		zbx_strcpy_alloc(&keys, &keys_alloc, &keys_offset, key_esc);
-		zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, '\'');
-
-		zbx_free(key_esc);
+		zbx_vector_str_append(&keys, item->key);
 	}
 
-	if (0 != keys_offset)
+	if (0 != keys.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 256, sql_offset = 0;
@@ -477,8 +468,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				"select key_"
 				" from items"
 				" where hostid=" ZBX_FS_UI64
-					" and key_ in (%s)",
-				hostid, keys);
+					" and",
+				hostid);
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "key_",
+				(const char **)keys.values, keys.values_num);
+
 		if (0 != itemids.values_num)
 		{
 			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -521,8 +515,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		zbx_free(sql);
 	}
 
-	zbx_free(keys);
-
+	zbx_vector_str_destroy(&keys);
 	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

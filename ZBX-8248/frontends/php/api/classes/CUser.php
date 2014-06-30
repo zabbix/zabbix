@@ -303,7 +303,7 @@ class CUser extends CZBXAPI {
 				$dbUser = $dbUsers[$user['userid']];
 			}
 
-			// check if user alais
+			// check if user alias
 			if (isset($user['alias'])) {
 				// check if we change guest user
 				if ($dbUser['alias'] === ZBX_GUEST_USER && $user['alias'] !== ZBX_GUEST_USER) {

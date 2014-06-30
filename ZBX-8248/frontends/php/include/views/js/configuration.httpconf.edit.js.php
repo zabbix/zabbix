@@ -133,7 +133,7 @@
 				return ui;
 			},
 			start: function(e, ui) {
-				// fix placeholder not to change height while object is beeing dragged
+				// fix placeholder not to change height while object is being dragged
 				$(ui.placeholder).height($(ui.helper).height());
 
 				if (IE8) {

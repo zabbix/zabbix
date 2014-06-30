@@ -373,7 +373,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
       int needexact = 0;
 
 #if ON
-      /* allow `--zbx_option#value' because you cannout assign a '='
+      /* allow `--zbx_option#value' because you cannot assign a '='
          to an environment variable under DOS command.com */
       while (*s && *s != '=' && * s != '#')
         s++;

@@ -832,7 +832,7 @@ var hintBox = {
 			target.clientY = e.clientY;
 		}
 
-		// doesn't fit in the screen horizontaly
+		// doesn't fit in the screen horizontally
 		if (target.hintBoxItem.width() + 10 > wWidth) {
 			left = scrollLeft + 2;
 		}
@@ -858,7 +858,7 @@ var hintBox = {
 			top = scrollTop + target.clientY + 10;
 		}
 
-		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
+		// fallback if doesn't fit verticaly but could fit if aligned to right or left
 		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
 				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
 

@@ -1196,7 +1196,7 @@ class CTrigger extends CTriggerGeneral {
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression();
 				$oldExpressionData->parse($oldExpression);
-				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
+				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($expressionData->getHosts());
 				$proceed = true;
@@ -1437,7 +1437,7 @@ class CTrigger extends CTriggerGeneral {
 					' WHERE '.dbConditionInt('td.triggerid_down', $downTriggerIds)
 				);
 
-				// combine db dependencies with thouse to be added
+				// combine db dependencies with those to be added
 				$upTriggersIds = array();
 				while ($row = DBfetch($res)) {
 					$upTriggersIds[] = $row['triggerid_up'];

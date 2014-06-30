@@ -828,7 +828,7 @@ char	*get_param_dyn(const char *param, int num);
  *                       for their parameters - 1 or higher (for arrays)      *
  *      num       - [IN] parameter number; for item keys and OIDs the level   *
  *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
  *                                                                            *
  * Return value: NULL if parameter doesn't change; a new string - otherwise   *

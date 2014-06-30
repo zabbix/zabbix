@@ -623,7 +623,7 @@ abstract class CItemGeneral extends CZBXAPI {
 	 * @abstract
 	 *
 	 * @param array $items          an array of items to inherit
-	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, teh children will be updated on all
+	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, the children will be updated on all
 	 *                              child hosts
 	 *
 	 * @return bool

@@ -543,9 +543,9 @@ class CMap extends CMapElement {
 	 * @param string $maps['highlight']
 	 * @param array  $maps['label_type']
 	 * @param int    $maps['label_location']
-	 * @param int    $maps['grid_size']			size of a one grid cell. 100 refers to 100x100 and so on.
+	 * @param int    $maps['grid_size']			size of one grid cell. 100 refers to 100x100 and so on.
 	 * @param int    $maps['grid_show']			does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
-	 * @param int    $maps['grid_align']		does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
+	 * @param int    $maps['grid_align']		do elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
 	 *
 	 * @return array
 	 */
@@ -632,9 +632,9 @@ class CMap extends CMapElement {
 	 * @param string $maps['backgroundid']
 	 * @param array  $maps['label_type']
 	 * @param int    $maps['label_location']
-	 * @param int    $maps['grid_size']			size of a one grid cell. 100 refers to 100x100 and so on.
+	 * @param int    $maps['grid_size']			size of one grid cell. 100 refers to 100x100 and so on.
 	 * @param int    $maps['grid_show']			does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
-	 * @param int    $maps['grid_align']		does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
+	 * @param int    $maps['grid_align']		do elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
 	 *
 	 * @return array
 	 */

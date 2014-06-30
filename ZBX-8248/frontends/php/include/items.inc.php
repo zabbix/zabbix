@@ -917,7 +917,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
  *
  * @param array		$item
  * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
@@ -1207,7 +1207,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay, can be overriden
+ * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *

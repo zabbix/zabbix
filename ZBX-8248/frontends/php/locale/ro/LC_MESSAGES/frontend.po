@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
+"POT-Creation-Date: 2014-06-30 02:42+0300\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -133,11 +133,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[CONFIRMARE MULTIPLĂ]----"
 
-#: include/triggers.inc.php:2261 include/triggers.inc.php:2262
-#: include/triggers.inc.php:2263 include/triggers.inc.php:2265
-#: include/triggers.inc.php:2267 include/triggers.inc.php:2270
-#: include/triggers.inc.php:2273 include/triggers.inc.php:2274
-#: include/triggers.inc.php:2285
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
+#: include/triggers.inc.php:2264 include/triggers.inc.php:2266
+#: include/triggers.inc.php:2268 include/triggers.inc.php:2271
+#: include/triggers.inc.php:2274 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2286
 msgid "0 or 1"
 msgstr "0 sau 1"
 
@@ -187,7 +187,7 @@ msgstr "AES"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "CONFIRMĂRI ALARME"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -1003,7 +1003,7 @@ msgstr "Jos"
 msgid "Brighten"
 msgstr "Luminozitate"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulgară (bg_BG)"
 
@@ -1344,7 +1344,7 @@ msgstr "Nu se poate adăuga prototipul serverului"
 msgid "Cannot add image"
 msgstr "Nu se poate adăuga imaginea"
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
 msgstr "Nu se poate adăuga imaginea."
 
@@ -1526,7 +1526,7 @@ msgstr "Nu se pot crea dependințe circulare."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nu se poate crea dependință cu trigger-ul însuși."
 
-#: discoveryconf.php:141
+#: discoveryconf.php:145
 msgid "Cannot create discovery rule"
 msgstr "Nu se poate crea regula de detecție"
 
@@ -1543,7 +1543,7 @@ msgstr "Nu se poate crea icon hartă"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Nu se pot crea mapări de icon-uri cu nume identice \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:815
+#: include/classes/import/CXmlImport18.php:816
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Nu se poate crea harta \"%s\"."
@@ -1556,7 +1556,7 @@ msgstr "Nu se poate crea o aplicație nouă, scenariul web este deja asignat une
 msgid "Cannot create new element"
 msgstr "Nu se poate crea un element nou"
 
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:1705
 msgid "Cannot create screen."
 msgstr "Nu se poate crea ecranul."
 
@@ -1577,12 +1577,12 @@ msgstr "Nu se poate șterge aplicația"
 msgid "Cannot delete dependency"
 msgstr "Nu se poate șterge dependința"
 
-#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Nu se poate șterge regula de detecție"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Nu se pot șterge regulile de detecție"
 
@@ -1808,7 +1808,7 @@ msgstr[0] "Nu se poate dezactiva acţiunea"
 msgstr[1] "Nu se pot dezactiva acţiunile"
 msgstr[2] "Nu se pot dezactiva acţiunile"
 
-#: discoveryconf.php:190
+#: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nu se poate dezactiva regula de detecție"
@@ -1900,7 +1900,7 @@ msgstr[0] "Nu se poate activa acțiunea"
 msgstr[1] "Nu se pot activa acțiunile"
 msgstr[2] "Nu se pot activa acțiunile"
 
-#: discoveryconf.php:189
+#: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nu se poate activa regula de detecție"
@@ -1977,38 +1977,38 @@ msgstr[0] "Nu se poate activa scenariul web"
 msgstr[1] "Nu se pot activa scenariile web"
 msgstr[2] "Nu se pot activa scenariile web"
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Nu se poate găsi imaginea de fundal \"%1$s\" folosită în harta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1661
+#: include/classes/import/CXmlImport18.php:509
+#: include/classes/import/CXmlImport18.php:1662
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nu se poate găsi graficul \"%1$s\" folosit în ecranul \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:722
+#: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Nu se poate găsi grupul \"%1$s\" folosit în harta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:485
+#: include/classes/import/CXmlImport18.php:486
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nu se poate găsi grupul \"%1$s\" folosit în ecranul \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:733
+#: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Nu se poate găsi serverul \"%1$s\" folosit în harta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:497
+#: include/classes/import/CXmlImport18.php:498
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -2032,7 +2032,7 @@ msgstr "Nu se poate găsi interfața serverului în \"%1$s\" pentru elementul \"
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Nu se poate serverul sau șablonul \"%1$s\" folosit în elementul grafic \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2063,14 +2063,14 @@ msgstr "Nu se poate găsi elementul \"%1$s\" pe \"%2$s\" folosit ca și axă Y v
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nu se poate găsi elementul  \"%1$s\" pe \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 
-#: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1674
+#: include/classes/import/CXmlImport18.php:522
+#: include/classes/import/CXmlImport18.php:1675
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nu se poate găsi elementul \"%1$s\" folosit în ecranul \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:711
+#: include/classes/import/CXmlImport18.php:712
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Nu se poate găsi harta \"%1$s\" folosită în harta exportată \"%2$s\"."
@@ -2080,7 +2080,7 @@ msgstr "Nu se poate găsi harta \"%1$s\" folosită în harta exportată \"%2$s\"
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Nu se poate găsi harta \"%1$s\" folosită în harta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:532
+#: include/classes/import/CXmlImport18.php:533
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2090,7 +2090,7 @@ msgstr "Nu se poate găsi harta \"%1$s\" folosită în ecranul \"%2$s\"."
 msgid "Cannot find objects with name"
 msgstr "Nu se pot găsi obiectele cu numele"
 
-#: include/classes/import/CXmlImport18.php:543
+#: include/classes/import/CXmlImport18.php:544
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2101,8 +2101,8 @@ msgstr "Nu se poate găsi ecranul \"%1$s\" folosit în ecranul \"%2$s\"."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nu se poate gasi șablonul \"%1$s\" pentru serverul prototip \"%2$s\" a regulii de detecție \"%3$s\" pe \"%4$s\"."
 
-#: include/classes/import/CXmlImport18.php:744
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:745
+#: include/classes/import/CXmlImport18.php:788
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2412,7 +2412,7 @@ msgstr "Nu se poate actualiza configurația"
 msgid "Cannot update debug mode"
 msgstr "Nu se poate actualiza modul de depanare"
 
-#: discoveryconf.php:135 host_discovery.php:259
+#: discoveryconf.php:139 host_discovery.php:259
 msgid "Cannot update discovery rule"
 msgstr "Nu se poate actualiza regula de detecție"
 
@@ -2462,7 +2462,7 @@ msgstr "Nu se poate actualiza maparea icon-ului"
 msgid "Cannot update image"
 msgstr "Nu se poate actualiza imaginea"
 
-#: include/classes/import/CXmlImport18.php:638
+#: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
 msgstr "Nu se poate actualiza imaginea."
 
@@ -2495,7 +2495,7 @@ msgstr "Nu se pot actualiza macro-urile"
 msgid "Cannot update maintenance"
 msgstr "Nu se poate actualiza mentenanța"
 
-#: include/classes/import/CXmlImport18.php:806
+#: include/classes/import/CXmlImport18.php:807
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Nu se poate actualiza harta \"%s\"."
@@ -2529,7 +2529,7 @@ msgstr "Nu se poate actualiza expresia regulată"
 msgid "Cannot update screen"
 msgstr "Nu se poate actualiza ecranul"
 
-#: include/classes/import/CXmlImport18.php:1696
+#: include/classes/import/CXmlImport18.php:1697
 msgid "Cannot update screen."
 msgstr "Nu se poate actualiza ecranul."
 
@@ -2634,7 +2634,7 @@ msgid "Change password"
 msgstr "Modifică parola"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Caracter"
@@ -2735,11 +2735,11 @@ msgstr "Verificările trebuie să fie unice."
 msgid "Child"
 msgstr "Copil"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Chineză (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Chineză (zh_TW)"
 
@@ -3476,7 +3476,7 @@ msgstr "Dimensiune personalizată"
 msgid "Custom slides"
 msgstr "Slide-uri personalizate"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Cehă (cs_CZ)"
 
@@ -4188,11 +4188,11 @@ msgstr "Negare"
 msgid "Dependencies"
 msgstr "Dependențe"
 
-#: include/triggers.inc.php:1418 tr_status.php:612
+#: include/triggers.inc.php:1419 tr_status.php:612
 msgid "Dependent"
 msgstr "Dependenţă"
 
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1399
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:596
@@ -4402,8 +4402,8 @@ msgstr "Dezactivare triggeri selectați?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1645
-#: include/triggers.inc.php:2494 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1646
+#: include/triggers.inc.php:2495 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4503,29 +4503,29 @@ msgstr "Regulă de detecție \"%1$s:%2$s\" are perioadă de viață incorectă: 
 msgid "Discovery rule \"%s\" already exists."
 msgstr "Regula de detecție \"%s\" există deja."
 
-#: discoveryconf.php:140 host_discovery.php:263
+#: discoveryconf.php:144 host_discovery.php:263
 msgid "Discovery rule created"
 msgstr "Regulă de detecție creată"
 
-#: discoveryconf.php:159 host_discovery.php:185
+#: discoveryconf.php:163 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Regulă de detecție ștearsă"
 
-#: discoveryconf.php:187 host_discovery.php:283
+#: discoveryconf.php:191 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regulă de detecție dezactivată"
 msgstr[1] "Reguli de detecție dezactivate"
 msgstr[2] "Reguli de detecție dezactivate"
 
-#: discoveryconf.php:186 host_discovery.php:282
+#: discoveryconf.php:190 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regulă de detecție activată"
 msgstr[1] "Reguli de detecție activate"
 msgstr[2] "Reguli de detecție activate"
 
-#: discoveryconf.php:134 host_discovery.php:259
+#: discoveryconf.php:138 host_discovery.php:259
 msgid "Discovery rule updated"
 msgstr "Regulă de detecție actualizată"
 
@@ -4538,7 +4538,7 @@ msgstr "Regulă de detecție actualizată"
 msgid "Discovery rules"
 msgstr "Reguli de detecție"
 
-#: discoveryconf.php:200 host_discovery.php:294
+#: discoveryconf.php:204 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Reguli de detecție șterse"
 
@@ -4689,7 +4689,7 @@ msgstr "Durată"
 msgid "Duration (sec)"
 msgstr "Durată (secunde)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Olandeză (nl_NL)"
 
@@ -4962,7 +4962,7 @@ msgstr "Activare triggeri selectați?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2491
+#: include/items.inc.php:206 include/triggers.inc.php:2492
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4983,11 +4983,11 @@ msgstr "Activare triggeri selectați?"
 msgid "Enabled"
 msgstr "Activat"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "Engleză (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "Engleză (en_US)"
 
@@ -5044,7 +5044,7 @@ msgstr "Dezactivare confirmare eveniment "
 msgid "Event details"
 msgstr "Detalii eveniment"
 
-#: include/triggers.inc.php:1643
+#: include/triggers.inc.php:1644
 msgid "Event generation"
 msgstr "Generare eveniment"
 
@@ -5147,7 +5147,7 @@ msgstr "Export selectat"
 msgid "Export to CSV"
 msgstr "Export în CSV"
 
-#: include/triggers.inc.php:1642
+#: include/triggers.inc.php:1643
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5377,7 +5377,7 @@ msgstr "Găsește rândul într-un fișier. Fișier care se potrivește"
 msgid "Finish"
 msgstr "Sfârșit"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Finlandeză (fi_FI)"
 
@@ -5416,7 +5416,7 @@ msgstr "Formulă"
 msgid "Fourth"
 msgstr "al patrulea"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Franceză (fr_FR)"
 
@@ -5510,7 +5510,7 @@ msgstr "General"
 msgid "Generated in %s sec"
 msgstr "Generat în %s secunde"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Germană (de_DE)"
 
@@ -5542,7 +5542,7 @@ msgstr "Sincronizare la încărcarea paginii WEB. calea implicită este /"
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1775 tr_testexpr.php:35
+#: include/triggers.inc.php:1776 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Expresia dată nu este macro"
 
@@ -5645,8 +5645,8 @@ msgstr "Graficul \"%1$s\" nu poate moșteni. Nu se cer itemi pe \"%2$s\"."
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Graficul \"%1$s\" nu există pe șablonul \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1553
-#: include/classes/import/CXmlImport18.php:1557
+#: include/classes/import/CXmlImport18.php:1554
+#: include/classes/import/CXmlImport18.php:1558
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Graficul \"%1$s\" sărit - regula utilizatorului."
@@ -5774,7 +5774,7 @@ msgstr "Grafice copiate"
 msgid "Graphs deleted"
 msgstr "Grafice șterse"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Greacă (el_GR)"
 
@@ -6075,8 +6075,8 @@ msgstr "Aliniere orizontală"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1287
-#: include/triggers.inc.php:1639
+#: include/setup.inc.php:365 include/triggers.inc.php:1288
+#: include/triggers.inc.php:1640
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6117,7 +6117,7 @@ msgstr "Serverul \"%1$s\" există deja."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Serverul \"%1$s\" este monitorizat cu proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:926
+#: include/classes/import/CXmlImport18.php:927
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Serverul \"%s\" are verificat parametrul \"useipmi\", dar nu are parametrul \"ipmi_ip\"! Utilizarea adresei IP a serverului ca o adresă pentru interfața IPMI."
@@ -6470,7 +6470,7 @@ msgstr "Ore"
 msgid "Housekeeping"
 msgstr "Housekeeping"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Maghiară (hu_HU)"
 
@@ -7133,7 +7133,7 @@ msgstr "Interval flexibil \"%1$s\" incorect."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Interval flexibil incorect în itemul \"%1$s\". Intervalul flexibil trebuie să fie un șir."
 
-#: include/triggers.inc.php:629 include/triggers.inc.php:1776
+#: include/triggers.inc.php:629 include/triggers.inc.php:1777
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Funcție incorectă utilizată"
@@ -7216,7 +7216,7 @@ msgstr "ID item \"%1$s\" incorect prevăzut pentru elementul ecran. "
 msgid "Incorrect item for axis value."
 msgstr "Item incorect pentru valoare axă."
 
-#: api/classes/CTrigger.php:725 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:725 include/triggers.inc.php:1041
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Cheie item \"%1$s\" incorect prevăzut pentru expresia triggerului pe \"%2$s\"."
@@ -7339,7 +7339,7 @@ msgstr "Părinte incorect pentru serviciul \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Serviciu părinte incorect."
 
-#: api/classes/CDRule.php:300 discoveryconf.php:90
+#: api/classes/CDRule.php:300 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Gamă port incorectă."
 
@@ -7453,7 +7453,7 @@ msgstr "Expresie trigger incorectă"
 msgid "Incorrect trigger expression."
 msgstr "Expresii trigger incorecte."
 
-#: include/triggers.inc.php:1143
+#: include/triggers.inc.php:1144
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Expresie trigger incorectă. Serverul \"%1$s\" nu există sau nu ai acces la acest server."
@@ -7540,17 +7540,17 @@ msgstr "Valoare incorectă folosită pentru stare proxy \"%1$s\"."
 msgid "Incorrect working time."
 msgstr "Timp de lucru incorect."
 
-#: include/classes/import/CXmlImport18.php:1585
+#: include/classes/import/CXmlImport18.php:1586
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Item y max incorect pentru graficul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1572
+#: include/classes/import/CXmlImport18.php:1573
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Item y min incorect pentru graficul \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Indoneză (id_ID)"
 
@@ -7707,7 +7707,7 @@ msgstr "Cheie invalidă \"%1$s\" pentru itemul \"%2$s\" pe \"%3$s\": %4$s."
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Cheie invalidă \"%1$s\" pentru prototipul item \"%2$s\" pe \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:311 discoveryconf.php:97
+#: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Cheie invalidă \"%1$s\": %2$s."
@@ -7800,7 +7800,7 @@ msgstr "Nu este posibila deconectarea de la autentificarea HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Nu este posibilă căutarea după parola utilizatorului."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Italiană (it)"
 
@@ -7833,7 +7833,7 @@ msgstr "Itemul \"%1$s\" nu poate popula un server lipsă cu număr câmp inventa
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Itemul \"%1$s\" nu există pe șablonul \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1520
+#: include/classes/import/CXmlImport18.php:1521
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Itemul \"%1$s\" nu există."
@@ -7843,8 +7843,8 @@ msgstr "Itemul \"%1$s\" nu există."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Itemul \"%1$s\" pe \"%2$s\": aplicația \"%3$s\" nu există."
 
-#: include/classes/import/CXmlImport18.php:1271
-#: include/classes/import/CXmlImport18.php:1275
+#: include/classes/import/CXmlImport18.php:1272
+#: include/classes/import/CXmlImport18.php:1276
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Itemul \"%1$s\" sărit - regula utilizatorului."
@@ -8087,7 +8087,7 @@ msgstr "Ian"
 msgid "January"
 msgstr "Ianuarie"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Japoneză (ja_JP)"
 
@@ -8146,7 +8146,7 @@ msgstr "Cuvânt cheie"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Coreeană (ko_KR)"
 
@@ -8306,7 +8306,7 @@ msgstr "Cele mai recente evenimente"
 msgid "Latest values"
 msgstr "Cele mai recente valori"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Letonă (lv_LV)"
 
@@ -8428,7 +8428,7 @@ msgstr "Lista este goală"
 msgid "List of network interfaces. Text value."
 msgstr "Listă a interfețelor rețelei. Valoare text."
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituaniană (lt_LT)"
 
@@ -8459,7 +8459,7 @@ msgid "Location longitude"
 msgstr "Longitudine locație"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Înregistrare"
@@ -8738,7 +8738,7 @@ msgstr "Deconectare manuală"
 msgid "Map"
 msgstr "Hartă"
 
-#: include/classes/import/CXmlImport18.php:666
+#: include/classes/import/CXmlImport18.php:667
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Harta \"%1$s\" sărită - regula utilizatorului."
@@ -8748,12 +8748,12 @@ msgstr "Harta \"%1$s\" sărită - regula utilizatorului."
 msgid "Map \"%s\""
 msgstr "Harta \"%s\""
 
-#: include/classes/import/CXmlImport18.php:818
+#: include/classes/import/CXmlImport18.php:819
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Harta \"%s\" creată."
 
-#: include/classes/import/CXmlImport18.php:809
+#: include/classes/import/CXmlImport18.php:810
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Harta \"%s\" actualizată."
@@ -9166,8 +9166,8 @@ msgstr "Câmp lipsă \"nume\" pentru prototip grafic."
 msgid "Missing \"name\" field for graph."
 msgstr "Câmp lipsă \"nume\" pentru element grafic."
 
-#: include/classes/import/CXmlImport18.php:1576
-#: include/classes/import/CXmlImport18.php:1589
+#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1590
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Item lipsă \"%1$s\" pentru server \"%2$s\"."
@@ -9276,7 +9276,7 @@ msgstr "Mutare"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1644
+#: include/triggers.inc.php:1645
 msgid "Multiple PROBLEM events"
 msgstr "Evenimente PROBLEME multiple"
 
@@ -9496,7 +9496,7 @@ msgid "Next"
 msgstr "Următorul"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2436 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9533,12 +9533,12 @@ msgstr "Niciun \"%1$s\" dat pentru șablon ecran."
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "Niciun \"%2$s\" dat pentru prototipul server \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1566
+#: include/classes/import/CXmlImport18.php:1567
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Niciun câmp \"ymax_type\" pentru graficul \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1563
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Niciun câmp \"ymin_type\" pentru graficul \"%s\"."
@@ -9924,27 +9924,27 @@ msgstr "Nicio operație definită."
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1547
+#: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Nicio permisiune pentru graficul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:961
+#: include/classes/import/CXmlImport18.php:962
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Nicio permisiune pentru serverul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1511
+#: include/classes/import/CXmlImport18.php:1512
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Nicio permisiune pentru itemul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1142
+#: include/classes/import/CXmlImport18.php:1143
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Nicio permisiune pentru șablonul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1422
+#: include/classes/import/CXmlImport18.php:1423
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Nicio permisiune pentru triggerul \"%1$s\"."
@@ -9953,17 +9953,17 @@ msgstr "Nicio permisiune pentru triggerul \"%1$s\"."
 msgid "No permissions"
 msgstr "Nu aveţi permisiune"
 
-#: include/classes/import/CXmlImport18.php:1022
+#: include/classes/import/CXmlImport18.php:1023
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Nicio permisiune pentru grupul \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:659
+#: include/classes/import/CXmlImport18.php:660
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Nicio permisiune pentru harta \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:452
+#: include/classes/import/CXmlImport18.php:453
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Nicio permisiune pentru ecranul \"%1$s\"."
@@ -10132,7 +10132,7 @@ msgstr "Niciun trigger cu triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Niciun trigger definit."
 
-#: include/triggers.inc.php:1250
+#: include/triggers.inc.php:1251
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10172,7 +10172,7 @@ msgstr "Niciun scenariu web găsit."
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
 #: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1636
+#: include/page_header.php:324 include/triggers.inc.php:1637
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10238,7 +10238,7 @@ msgid "None"
 msgstr "Niciunul"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1643 popup.php:1509
+#: include/triggers.inc.php:1644 popup.php:1509
 msgid "Normal"
 msgstr "Normal"
 
@@ -10476,14 +10476,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "Numărul mașinilor virtuale pe VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor nume server"
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numeric (float)"
 
-#: include/triggers.inc.php:2236 include/triggers.inc.php:2252
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2266
-#: include/triggers.inc.php:2271 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2237 include/triggers.inc.php:2253
+#: include/triggers.inc.php:2257 include/triggers.inc.php:2267
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2276
 msgid "Numeric (integer 64bit)"
 msgstr "Numeric (întreg 64bit)"
 
@@ -10523,7 +10523,7 @@ msgstr "router OOB"
 msgid "OOB subnet mask"
 msgstr "Mască subnet OOB"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -11168,7 +11168,7 @@ msgstr "Permisiuni"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Persmisiunea poate fi atribuită doar grupurilor de utilizatori."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
@@ -11213,7 +11213,7 @@ msgstr "Va rog introduceți textul de confirmare."
 msgid "Please select two elements"
 msgstr "Va rog selectați două elemente"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Poloneză (pl_PL)"
 
@@ -11249,11 +11249,11 @@ msgstr "Portul nu pot fi nul pentru interfața serverului."
 msgid "Port range"
 msgstr "Interval port"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Portugheză (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "Portugheză (pt_BR)"
 
@@ -11907,7 +11907,7 @@ msgstr "Redă un procent din pachetele pierdute la ping ICMP."
 msgid "Right"
 msgstr "Dreapta"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr "Română (ro_RO)"
 
@@ -11973,7 +11973,7 @@ msgstr "Execută comenzile de la distanță pe servere"
 msgid "Run specified command on the host."
 msgstr "Execută comanda dată pe server."
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Rusă (ru_RU)"
 
@@ -12247,8 +12247,8 @@ msgstr "Verificare programare"
 msgid "Screen"
 msgstr "Ecran"
 
-#: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1707
+#: include/classes/import/CXmlImport18.php:578
+#: include/classes/import/CXmlImport18.php:1708
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Ecran \"%1$s\" adăugat."
@@ -12287,15 +12287,15 @@ msgstr "Ecranul \"%1$s\" deschidere rând în celula X - %2$s Y - %3$s este inco
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr "Ecranul \"%1$s\" deschidere rând în celula X - %2$s Y - %3$s este prea mare."
 
-#: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1638
-#: include/classes/import/CXmlImport18.php:1642
+#: include/classes/import/CXmlImport18.php:461
+#: include/classes/import/CXmlImport18.php:1639
+#: include/classes/import/CXmlImport18.php:1643
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Ecran \"%1$s\" sărit - regula utilizatorului."
 
-#: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1699
+#: include/classes/import/CXmlImport18.php:575
+#: include/classes/import/CXmlImport18.php:1700
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Ecran \"%1$s\" actualizat."
@@ -12666,7 +12666,7 @@ msgstr "Sesiune terminată, relogare, va rog."
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1642 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -12905,7 +12905,7 @@ msgstr "Prezentări"
 msgid "Slides"
 msgstr "Slides"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Slovacă (sk_SK)"
 
@@ -12977,7 +12977,7 @@ msgstr "Sortarea după câmpul \"%1$s\" nu este permisă."
 msgid "Source"
 msgstr "Sursă"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Spaniolă (es_ES)"
 
@@ -13209,7 +13209,7 @@ msgstr "Extrage din memoria swap. Dacă tipul este contor - redă memoria extras
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Spațiu swap. Număr de bytes. Dacă memoria swap lipsește totul este folosit. Dacă mod lipsește se folosește liber."
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Suedeză (sv_SE)"
 
@@ -13460,7 +13460,7 @@ msgid "Test string"
 msgstr "Rând test"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2241 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Text"
@@ -13750,7 +13750,7 @@ msgstr "Tendințe"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1640
+#: include/maps.inc.php:26 include/triggers.inc.php:1641
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13774,8 +13774,8 @@ msgstr "Trigger \"%1$s\" există deja pe \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Triggerul \"%1$s\" depinde de trigger \"%2$s\", care nu există."
 
-#: include/classes/import/CXmlImport18.php:1429
-#: include/classes/import/CXmlImport18.php:1433
+#: include/classes/import/CXmlImport18.php:1430
+#: include/classes/import/CXmlImport18.php:1434
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Triggerul \"%1$s\" sărit - regula utilizatorului."
@@ -13959,7 +13959,7 @@ msgstr "Valoare trigger"
 
 #: hosts.php:810 hosts.php:902 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1262
+#: include/triggers.inc.php:1263
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:483
@@ -14028,7 +14028,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Marți"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "Turcă (tr_TR)"
 
@@ -14172,7 +14172,7 @@ msgstr "PROFILUL UTILIZATORULUI"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraineană (uk_UA)"
 
@@ -14246,7 +14246,7 @@ msgstr "Unități"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/triggers.inc.php:2492 include/triggers.inc.php:2498
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14268,11 +14268,11 @@ msgstr "Eroare necunoscută"
 msgid "Unknown function."
 msgstr "Funcție necunoscută."
 
-#: include/triggers.inc.php:1774 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1775 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item server necunoscut, nu există asemenea item în serverul selectat"
 
-#: include/triggers.inc.php:1773 tr_testexpr.php:33
+#: include/triggers.inc.php:1774 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Server necunoscut, nu există asemenea server prezent în sistem"
 
@@ -15046,7 +15046,7 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Aliniere verticală"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnameză (vi_VN)"
 
@@ -15344,23 +15344,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Etichetă X"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "Fișierul XML conține eroarea %1$s:"
 
-#: include/classes/import/CXmlImport18.php:405
-#: include/classes/import/CXmlImport18.php:408
-#: include/classes/import/CXmlImport18.php:411
+#: include/classes/import/CXmlImport18.php:406
+#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:412
 msgid "XML file contains errors"
 msgstr "Fișierul XML conține erori"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "Fișierul XML conține eroarea fatală %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "Fișierul XML conține avertizarea %1$s:"
@@ -15437,7 +15437,7 @@ msgstr "Anual"
 #: events.php:839 include/blocks.inc.php:750
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2436
-#: include/triggers.inc.php:1646
+#: include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
