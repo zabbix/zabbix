@@ -1204,7 +1204,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException if at least one cycle is possible
 	 *
-	 * @param array $depsToValid	dpendency list to be validated
+	 * @param array $depsToValid	dependency list to be validated
 	 *
 	 * @return void
 	 */
@@ -1222,7 +1222,7 @@ class CService extends CApiService {
 			$arr[$dbDep['serviceupid']][$dbDep['servicedownid']] = $dbDep['servicedownid'];
 		}
 
-		// chech for circularity and add dependencies to the graph
+		// check for circularity and add dependencies to the graph
 		foreach ($depsToValid as $dep) {
 			$this->DFCircularitySearch($dep['serviceid'], $dep['dependsOnServiceid'], $arr);
 			$arr[$dep['serviceid']][$dep['dependsOnServiceid']] = $dep['dependsOnServiceid'];

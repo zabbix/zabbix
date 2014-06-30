@@ -93,7 +93,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return zbx_date2str('Y', $t);
+			return zbx_date2str(_x('Y', DATE_FORMAT_CONTEXT), $t);
 		}
 
 		function format_time2($t) {
@@ -111,7 +111,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return _(zbx_date2str(_x('F', 'Month long name'), $t));
+			return zbx_date2str(_x('F', DATE_FORMAT_CONTEXT), $t);
 		}
 
 		function format_time2($t) {

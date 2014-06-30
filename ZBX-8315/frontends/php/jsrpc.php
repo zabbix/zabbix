@@ -130,7 +130,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'color' => getSeverityColor($trigger['priority'], $event['value']),
-						'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
+						'title' => $title.' [url='.$url_tr_status.']'.$host['name'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 							_('Date').': [b][url='.$url_tr_events.']'.
