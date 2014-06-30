@@ -79,7 +79,7 @@ CDate.prototype = {
 		}
 
 		/**
-		 * Append date suffix according to english rules e.g., 3 becomes 3rd
+		 * Append date suffix according to English rules e.g., 3 becomes 3rd
 		 * @param int date
 		 * @return string
 		 */
@@ -105,9 +105,6 @@ CDate.prototype = {
 				return yr + '/' + appZr(mnth + 1) + '/' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'Y-m-d H:i':
 				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
-			case 'Y-m-d H:i:s':
-				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
-					':' + appZr(sec);
 			case 'Y-m-d':
 				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt);
 			case 'H:i:s':
@@ -122,9 +119,13 @@ CDate.prototype = {
 				return  yr + ' ' + shortMn[mnth] + ' ' +appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'd.m.Y H:i':
 				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'd. m. Y H:i':
+				return appZr(dt) + '. ' + appZr(mnth + 1) + '. ' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			default:
+				// defaults to Y-m-d H:i:s
+				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
+					':' + appZr(sec);
 		}
-
-		return false;
 	},
 
 	getZBXDate: function() {
