@@ -42,7 +42,7 @@ class CRegexValidator extends CValidator
 	 * @return bool
 	 */
 	public function validate($value) {
-		if (!is_string($value)) {
+		if (!is_string($value) && !is_numeric($value)) {
 			$this->error($this->messageType);
 			return false;
 		}
