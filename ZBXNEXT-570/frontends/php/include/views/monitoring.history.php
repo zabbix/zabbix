@@ -134,6 +134,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 }
 
 // create history screen
+$itemIds = zbx_objectValues($this->data['items'], 'itemid');
 $screen = CScreenBuilder::getScreen(array(
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
