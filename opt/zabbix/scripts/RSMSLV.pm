@@ -457,8 +457,8 @@ sub get_items_by_hostids
     foreach my $row_ref (@$rows_ref)
     {
 	my %hash;
-	$hash{'itemid'} = $rows_ref->[0];
-	$hash{'hostid'} = $rows_ref->[1];
+	$hash{'itemid'} = $row_ref->[0];
+	$hash{'hostid'} = $row_ref->[1];
 	push(@items, \%hash);
     }
 
