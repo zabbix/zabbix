@@ -48,13 +48,6 @@ zbx_httpstat_t;
 
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
-int	HTTP_DEBUG_STATE = HTTP_DEBUG_DISABLED;
-
-void set_http_debug(int value)
-{
-	HTTP_DEBUG_STATE = value;
-}
-
 #ifdef HAVE_LIBCURL
 
 static zbx_httppage_t	page;
@@ -462,13 +455,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			{
 				err_str = zbx_strdup(err_str, "status code did not match");
 
-				if (HTTP_DEBUG_ENABLED == HTTP_DEBUG_STATE)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
-							" Status code \"%s\" did not match with response code \"%d\" ",
-							__function_name, httptest->httptest.httptestid,
-							httptest->httptest.name, httpstep.status_codes, stat.rspcode);
-				}
+				zabbix_log(LOG_LEVEL_TRACE, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
+						" Status code \"%s\" did not match with response code \"%d\" ",
+						__function_name, httptest->httptest.httptestid,
+						httptest->httptest.name, httpstep.status_codes, stat.rspcode);
 			}
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)) &&
@@ -494,14 +484,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			{
 				err_str = zbx_strdup(err_str, "required pattern not found");
 
-				if (HTTP_DEBUG_ENABLED == HTTP_DEBUG_STATE)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
-							" Required pattern \"%s\" not found on %s",
-							__function_name, httptest->httptest.httptestid,
-							httptest->httptest.name, httpstep.required, httpstep.url);
-					zabbix_log(LOG_LEVEL_INFORMATION, "page data: %s", page.data);
-				}
+				zabbix_log(LOG_LEVEL_TRACE, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
+						" Required pattern \"%s\" not found on %s",
+						__function_name, httptest->httptest.httptestid,
+						httptest->httptest.name, httpstep.required, httpstep.url);
+				zabbix_log(LOG_LEVEL_TRACE, "page data: %s", page.data);
 			}
 
 			/* variables defined in scenario */
@@ -514,14 +501,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
 						variables, var_err_str);
 
-				if (HTTP_DEBUG_ENABLED == HTTP_DEBUG_STATE)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
-							" Error in scenario variables \"%s\": %s",
-							__function_name, httptest->httptest.httptestid,
-							httptest->httptest.name, variables, var_err_str);
-					zabbix_log(LOG_LEVEL_INFORMATION, "page data: %s", page.data);
-				}
+				zabbix_log(LOG_LEVEL_TRACE, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
+						" Error in scenario variables \"%s\": %s",
+						__function_name, httptest->httptest.httptestid,
+						httptest->httptest.name, variables, var_err_str);
+				zabbix_log(LOG_LEVEL_TRACE, "page data: %s", page.data);
 
 				zbx_free(variables);
 			}
@@ -536,14 +520,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
 						variables, var_err_str);
 
-				if (HTTP_DEBUG_ENABLED == HTTP_DEBUG_STATE)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
-							" Error in step variables \"%s\": %s",
-							__function_name, httptest->httptest.httptestid,
-							httptest->httptest.name, variables, var_err_str);
-					zabbix_log(LOG_LEVEL_INFORMATION, "page data: %s", page.data);
-				}
+				zabbix_log(LOG_LEVEL_TRACE, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
+						" Error in step variables \"%s\": %s",
+						__function_name, httptest->httptest.httptestid,
+						httptest->httptest.name, variables, var_err_str);
+				zabbix_log(LOG_LEVEL_TRACE, "page data: %s", page.data);
 
 				zbx_free(variables);
 			}

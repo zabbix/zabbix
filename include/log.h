@@ -25,6 +25,7 @@
 #define LOG_LEVEL_ERR		2
 #define LOG_LEVEL_WARNING	3
 #define LOG_LEVEL_DEBUG		4
+#define LOG_LEVEL_TRACE		5
 
 #define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
 
@@ -59,7 +60,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...);
 
 void zabbix_close_log();
 void zabbix_set_log_level(int level);
-
+void set_debug_level(int value, unsigned char process_type);
 int zabbix_check_log_level(int level);
 
 char *zbx_strerror(int errnum);

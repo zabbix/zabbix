@@ -759,6 +759,19 @@ unsigned char get_process_type_by_server_num(int server_num)
 	/* nothing to do */
 }
 
+unsigned int get_process_num_by_server_num(int server_num)
+{
+	/* nothing to do */
+}
+
+int	get_process_type_forks(unsigned char process_type)
+{
+}
+
+const char	*get_process_type_string(unsigned char process_type)
+{
+}
+
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;

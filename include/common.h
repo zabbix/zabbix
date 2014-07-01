@@ -71,6 +71,9 @@
 #define ON	1
 #define OFF	0
 
+#define	UP	1
+#define	DOWN	-1
+
 #if defined(_WINDOWS)
 #	define	ZBX_SERVICE_NAME_LEN	64
 extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
@@ -375,8 +378,8 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
-#define ZBX_START_HTTP_DEBUG	"start_http_debug"
-#define ZBX_STOP_HTTP_DEBUG	"stop_http_debug"
+#define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
+#define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -714,6 +717,8 @@ typedef enum
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
 	ZBX_TASK_CONFIG_CACHE_RELOAD,
+	ZBX_TASK_LOG_LEVEL_INCREASE,
+	ZBX_TASK_LOG_LEVEL_DECREASE,
 	ZBX_TASK_START_HTTP_DEBUG,
 	ZBX_TASK_STOP_HTTP_DEBUG
 }

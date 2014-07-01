@@ -50,6 +50,8 @@
 #define ZBX_PROCESS_TYPE_SELFMON	19
 #define ZBX_PROCESS_TYPE_VMWARE		20
 #define ZBX_PROCESS_TYPE_COUNT		21	/* number of process types */
+#define ZBX_PROCESS_TYPE_ALL		22
+#define ZBX_PROCESS_TYPE_PID		23
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 
 #define ZBX_AGGR_FUNC_ONE		0
@@ -59,6 +61,7 @@
 
 int	get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
+int	compare_process_type_string(char *proc_type_str);
 void	init_selfmon_collector(void);
 void	free_selfmon_collector(void);
 void	update_selfmon_counter(unsigned char state);

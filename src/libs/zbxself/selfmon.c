@@ -204,6 +204,54 @@ const char	*get_process_type_string(unsigned char proc_type)
 	assert(0);
 }
 
+int	compare_process_type_string(char *proc_type_str)
+{
+	if( 0 == strcmp(proc_type_str, "poller"))
+		return ZBX_PROCESS_TYPE_POLLER;
+	if( 0 == strcmp(proc_type_str, "unreachable poller"))
+		return ZBX_PROCESS_TYPE_UNREACHABLE;
+	if( 0 == strcmp(proc_type_str, "ipmi poller"))
+		return ZBX_PROCESS_TYPE_IPMIPOLLER;
+	if( 0 == strcmp(proc_type_str, "icmp pinger"))
+		return ZBX_PROCESS_TYPE_PINGER;
+	if( 0 == strcmp(proc_type_str, "java poller"))
+		return ZBX_PROCESS_TYPE_JAVAPOLLER;
+	if( 0 == strcmp(proc_type_str, "http poller"))
+		return ZBX_PROCESS_TYPE_HTTPPOLLER;
+	if( 0 == strcmp(proc_type_str, "trapper"))
+		return ZBX_PROCESS_TYPE_TRAPPER;
+	if( 0 == strcmp(proc_type_str, "snmp trapper"))
+		return ZBX_PROCESS_TYPE_SNMPTRAPPER;
+	if( 0 == strcmp(proc_type_str, "proxy poller"))
+		return ZBX_PROCESS_TYPE_PROXYPOLLER;
+	if( 0 == strcmp(proc_type_str, "escalator"))
+		return ZBX_PROCESS_TYPE_ESCALATOR;
+	if( 0 == strcmp(proc_type_str, "history syncer"))
+		return ZBX_PROCESS_TYPE_HISTSYNCER;
+	if( 0 == strcmp(proc_type_str, "discoverer"))
+		return ZBX_PROCESS_TYPE_DISCOVERER;
+	if( 0 == strcmp(proc_type_str, "alerter"))
+		return ZBX_PROCESS_TYPE_ALERTER;
+	if( 0 == strcmp(proc_type_str, "timer"))
+		return ZBX_PROCESS_TYPE_TIMER;
+	if( 0 == strcmp(proc_type_str, "housekeeper"))
+		return ZBX_PROCESS_TYPE_HOUSEKEEPER;
+	if( 0 == strcmp(proc_type_str, "db watchdog"))
+		return ZBX_PROCESS_TYPE_WATCHDOG;
+	if( 0 == strcmp(proc_type_str, "data sender"))
+		return ZBX_PROCESS_TYPE_DATASENDER;
+	if( 0 == strcmp(proc_type_str, "configuration syncer"))
+		return ZBX_PROCESS_TYPE_CONFSYNCER;
+	if( 0 == strcmp(proc_type_str, "heartbeat sender"))
+		return ZBX_PROCESS_TYPE_HEARTBEAT;
+	if( 0 == strcmp(proc_type_str, "self-monitoring"))
+		return ZBX_PROCESS_TYPE_SELFMON;
+	if( 0 == strcmp(proc_type_str, "vmware collector"))
+		return ZBX_PROCESS_TYPE_VMWARE;
+	else
+		return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: init_selfmon_collector                                           *
