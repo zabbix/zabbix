@@ -38,16 +38,17 @@ div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
 
-.input[readonly]:hover, .input[disabled]:hover {
+.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
+input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #d0d0d0;
 	background: #eeeeee;
 	/* ignored by IE for <select> */
-	color: #aca899;
+	color: #505050;
 }
 
 /* disabled <select> font color for IE 9+ */
 select[disabled="disabled"]::-ms-value {
-	color: #aca899;
+	color: #505050;
 }
 
 .link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
