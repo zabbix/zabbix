@@ -673,7 +673,12 @@ void	main_trapper_loop(zbx_sock_t *s)
 
 			zbx_tcp_unaccept(s);
 		}
+		else if (EINTR == zbx_sock_last_error())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Trapper caught signal. Repeating connection");
+		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
+
 	}
 }
