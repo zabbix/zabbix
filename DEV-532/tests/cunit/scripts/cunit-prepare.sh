@@ -63,7 +63,7 @@ prepare_sources()
 		if [ -n "$module" ]; then
 			echo "	if (CUE_SUCCESS != zbx_cu_init_$module()) return CU_get_error();" >> "src/$target/${target}_cu.c"
 			
-			file=${file#*/tests/$target/}
+			file=${file#$OPT_TEST_PATH/$target/}
 			echo -e "\tadd test suit to $file"
 			echo "#include \"$OPT_TEST_PATH/$target/$file\" //$TEST_COMMENT" >> "src/${file}"
 		fi

@@ -271,7 +271,7 @@ static void	cuvc_check_records_str(const zbx_vector_history_record_t *records, .
 
 /******************************************************************************
  *                                                                            *
- * Function: cuvc_check_records_str                                           *
+ * Function: cuvc_check_cache_str                                             *
  *                                                                            *
  * Purpose: compare cached string values with arguments                       *
  *                                                                            *
