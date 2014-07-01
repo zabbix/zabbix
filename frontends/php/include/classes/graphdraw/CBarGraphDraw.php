@@ -495,11 +495,11 @@ class CBarGraphDraw extends CGraphDraw {
 			$i = 0;
 			foreach ($this->series as $key => $serie) {
 				$caption = $this->periodCaption[$key];
-				$dims = imageTextSize(7, 90, $caption);
+				$dims = imageTextSize(8, 90, $caption);
 
 				imageText(
 					$this->im,
-					7,
+					8,
 					90,
 					$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)+$dims['width']*2,
 					$this->sizeY+$this->shiftY + $dims['height'] +6,
