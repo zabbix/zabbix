@@ -379,12 +379,13 @@ class CXmlImport18 {
 		return $array;
 	}
 
-	public static function import($file) {
+	public static function import($source) {
 
 		libxml_use_internal_errors(true);
+		libxml_disable_entity_loader(true);
 
 		$xml = new DOMDocument();
-		if (!$xml->loadXML($file)) {
+		if (!$xml->loadXML($source, LIBXML_IMPORT_FLAGS)) {
 			$text = '';
 			foreach (libxml_get_errors() as $error) {
 				switch ($error->level) {
@@ -915,10 +916,11 @@ class CXmlImport18 {
 				 * @todo when new XML format will be introduced, this check should be changed to XML version check
 				 */
 				$old_version_input = $host_db['status'] != HOST_STATUS_TEMPLATE;
-				if ($old_version_input) {
-					// rearranging host structure, so it would look more like 2.0 host
-					$interfaces = array();
 
+				$interfaces = array();
+
+				// rearranging host structure, so it would look more like 2.0 host
+				if ($old_version_input) {
 					// the main interface is always "agent" type
 					if (!is_null($host_db['ip'])) {
 						$interfaces[] = array(
@@ -931,7 +933,7 @@ class CXmlImport18 {
 						);
 					}
 
-					// now we need to check if host had SNMP items. If it had, we need and SNMP interface for every different port.
+					// now we need to check if host had SNMP items. If it had, we need an SNMP interface for every different port.
 					$items = $xpath->query('items/item', $host);
 					$snmp_interface_ports_created = array();
 					foreach ($items as $item) {
@@ -943,7 +945,7 @@ class CXmlImport18 {
 						) {
 
 							$interfaces[] = array(
-								'main' => INTERFACE_PRIMARY,
+								'main' => $snmp_interface_ports_created ? INTERFACE_SECONDARY : INTERFACE_PRIMARY,
 								'type' => INTERFACE_TYPE_SNMP,
 								'useip' => $host_db['useip'],
 								'ip' => $host_db['ip'],
@@ -956,7 +958,7 @@ class CXmlImport18 {
 					unset($snmp_interface_ports_created); // it was a temporary variable
 
 
-					// we ned to add ipmi interface if at least one ipmi item exists
+					// we need to add ipmi interface if at least one ipmi item exists
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						if ($item_db['type'] == ITEM_TYPE_IPMI) {
@@ -973,9 +975,9 @@ class CXmlImport18 {
 							$interfaces[] = array(
 								'main' => INTERFACE_PRIMARY,
 								'type' => INTERFACE_TYPE_IPMI,
-								'useip' => INTERFACE_USE_DNS,
-								'ip' => '',
-								'dns' => $ipmi_ip,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => $ipmi_ip,
+								'dns' => '',
 								'port' => $host_db['ipmi_port']
 							);
 
@@ -1006,34 +1008,58 @@ class CXmlImport18 {
 						$current_host = reset($current_host);
 					}
 
+					$currentMainInterfaces = array();
+					$currentInterfacesByType = array();
+
+					foreach ($current_host['interfaces'] as $currentInterface) {
+						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
+							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
+						}
+
+						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
+					}
 
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
-						// for every interface we got based on XML
-						foreach ($interfaces as $i => $interface_db) {
-							// checking every interface of current host
-							foreach ($current_host['interfaces'] as $interface) {
-								// if all parameters of interface are identical
-								if (
-									$interface['type'] == $interface_db['type']
-									&& $interface['ip'] == $interface_db['ip']
-									&& $interface['dns'] == $interface_db['dns']
-									&& $interface['port'] == $interface_db['port']
-									&& $interface['useip'] == $interface_db['useip']
-								) {
-									// this interface is the same as existing one!
-									$interfaces[$i]['interfaceid'] = $interface['interfaceid'];
-									break;
+						// loop through all interfaces we got from XML
+						foreach ($interfaces as &$interfaceXml) {
+							$interfaceXmlType = $interfaceXml['type'];
+
+							// if this is the primary interface of some type and we have default interface of same type
+							// in current (target) host, re-use "interfaceid" of the matching default interface
+							// in current host
+							if ($interfaceXml['main'] == INTERFACE_PRIMARY
+									&& isset($currentMainInterfaces[$interfaceXmlType])) {
+								$interfaceXml['interfaceid'] = $currentMainInterfaces[$interfaceXmlType]['interfaceid'];
+							}
+							else {
+								// otherwise, loop through all current (target) host interfaces with type of current
+								// imported interface and re-use "interfaceid" in case if all interface parameters match
+								if (isset($currentInterfacesByType[$interfaceXmlType])) {
+									foreach ($currentInterfacesByType[$interfaceXmlType] as $currentInterface) {
+										if ($currentInterface['ip'] == $interfaceXml['ip']
+												&& $currentInterface['dns'] == $interfaceXml['dns']
+												&& $currentInterface['port'] == $interfaceXml['port']
+												&& $currentInterface['useip'] == $interfaceXml['useip']) {
+											$interfaceXml['interfaceid'] = $currentInterface['interfaceid'];
+											break;
+										}
+									}
 								}
 							}
 						}
-					}
+						unset($interfaceXml);
 
-					$interfaces_created_with_host = false;
+						$host_db['interfaces'] = $interfaces;
+					}
+					$interfaces_created_with_host = true;
 				}
 				elseif ($host_db['status'] != HOST_STATUS_TEMPLATE) {
 					$host_db['interfaces'] = $interfaces;
 					$interfaces_created_with_host = true;
+				}
+				else {
+					$interfaces_created_with_host = false;
 				}
 
 // HOST GROUPS {{{
@@ -1164,10 +1190,54 @@ class CXmlImport18 {
 						$current_hostid = reset($result['hostids']);
 					}
 				}
+
 				$current_hostname = $host_db['host'];
 
 				// store parsed host IDs
 				$hostIdsXML[$current_hostid] = $current_hostid;
+				if ($old_version_input) {
+					if (!$interfaces_created_with_host) {
+						// if host had another interfaces, we are not touching them: they remain as is
+						foreach ($interfaces as $i => $interface) {
+							// interface was not already created
+							if (!isset($interface['interfaceid'])) {
+								// creating interface
+								$interface['hostid'] = $current_hostid;
+								$ids = API::HostInterface()->create($interface);
+								if ($ids === false) {
+									throw new Exception();
+								}
+								$interfaces[$i]['interfaceid'] = reset($ids['interfaceids']);
+							}
+						}
+					}
+					else {
+						$options = array(
+							'hostids' => $current_hostid,
+							'output' => API_OUTPUT_EXTEND
+						);
+						$interfaces = API::HostInterface()->get($options);
+					}
+
+					// we must know interface ids to assign them to items
+					$agent_interface_id = null;
+					$ipmi_interface_id = null;
+					$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+
+					foreach ($interfaces as $interface) {
+						switch ($interface['type']) {
+							case INTERFACE_TYPE_AGENT:
+								$agent_interface_id = $interface['interfaceid'];
+								break;
+							case INTERFACE_TYPE_IPMI:
+								$ipmi_interface_id = $interface['interfaceid'];
+								break;
+							case INTERFACE_TYPE_SNMP:
+								$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
+								break;
+						}
+					}
+				}
 
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
@@ -1209,51 +1279,6 @@ class CXmlImport18 {
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
-					if ($old_version_input) {
-						if (!$interfaces_created_with_host) {
-							// if host had another interfaces, we are not touching them: they remain as is
-							foreach ($interfaces as $i => $interface) {
-								// interface was not already created
-								if (!isset($interface['interfaceid'])) {
-									// creating interface
-									$interface['hostid'] = $current_hostid;
-									$ids = API::HostInterface()->create($interface);
-									if ($ids === false) {
-										throw new Exception();
-									}
-									$interfaces[$i]['interfaceid'] = reset($ids['interfaceids']);
-								}
-							}
-						}
-						else {
-							$options = array(
-								'hostids' => $current_hostid,
-								'output' => API_OUTPUT_EXTEND
-							);
-							$interfaces = API::HostInterface()->get($options);
-						}
-
-
-						// we must know interface ids to assign them to items
-						$agent_interface_id = null;
-						$ipmi_interface_id = null;
-						$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
-
-						foreach ($interfaces as $interface) {
-							switch ($interface['type']) {
-								case INTERFACE_TYPE_AGENT:
-									$agent_interface_id = $interface['interfaceid'];
-									break;
-								case INTERFACE_TYPE_IPMI:
-									$ipmi_interface_id = $interface['interfaceid'];
-									break;
-								case INTERFACE_TYPE_SNMP:
-									$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
-									break;
-							}
-						}
-					}
-
 					// cycle each XML item
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);

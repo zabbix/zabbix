@@ -282,7 +282,6 @@ static int	validate_imap(const char *line)
 	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
 }
 
-
 int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;

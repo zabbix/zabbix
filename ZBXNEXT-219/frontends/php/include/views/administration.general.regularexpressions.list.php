@@ -47,10 +47,10 @@ foreach($this->data['db_exps'] as $exp) {
 	}
 
 	$expressions[$exp['regexpid']]->addRow(array(
-		$values[$exp['regexpid']],
-		' &raquo; ',
-		$exp['expression'],
-		' ['.expression_type2str($exp['expression_type']).']'
+		new CCol($values[$exp['regexpid']], 'top'),
+		new CCol(' &raquo; ', 'top'),
+		new CCol($exp['expression'], 'pre-wrap  break-lines'),
+		new CCol(' ['.expression_type2str($exp['expression_type']).']', 'top')
 	));
 }
 foreach($this->data['regexps'] as $regexpid => $regexp) {
