@@ -316,7 +316,7 @@ static void	vc_try_unlock(void)
  * Purpose: reads item history data from database                                *
  *                                                                               *
  * Parameters:  itemid        - [IN] the itemid                                  *
- * 		value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
+ *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
  *              values        - [OUT] the item history data values               *
  *              seconds       - [IN] the time period to read                     *
  *              end_timestamp - [IN] the value timestamp to start reading with   *
@@ -465,8 +465,8 @@ out:
  *          target timestamp from DB                                             *
  *                                                                               *
  * Parameters:  itemid        - [IN] the itemid                                  *
- * 		value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
- * 		ts            - [IN] the target timestamp                        *
+ *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
+ *              ts            - [IN] the target timestamp                        *
  *              value         - [OUT] the read value                             *
  *                                                                               *
  * Return value: SUCCEED - the history data were read successfully               *
@@ -1299,7 +1299,7 @@ static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *i
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_chunk_find_last_value_before                                  *
+ * Function: vch_chunk_find_last_value_before                                 *
  *                                                                            *
  * Purpose: find the index of the last value in chunk with timestamp less or  *
  *          equal to the specified timestamp.                                 *
@@ -1449,7 +1449,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_copy_values_at_beginning                                *
+ * Function: vch_item_copy_values_at_tail                                     *
  *                                                                            *
  * Purpose: copies values at the beginning of item tail chunk                 *
  *                                                                            *
@@ -1564,7 +1564,7 @@ static void	vch_item_remove_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_clean_cache                                              *
+ * Function: vch_item_clean_cache                                             *
  *                                                                            *
  * Purpose: removes item history data that are outside (older) the maximum    *
  *          request range                                                     *
@@ -2063,7 +2063,8 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 			ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds,
 					update_end);
 
-			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
 		}
 
 		/* the target second does not contain the required value, read first value before it */
@@ -2459,7 +2460,8 @@ void	zbx_vc_init(void)
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func,
+			__vc_mem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -2896,3 +2898,4 @@ void	zbx_vc_unlock(void)
 	vc_locked = 0;
 	zbx_mutex_unlock(&vc_lock);
 }
+
