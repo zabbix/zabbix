@@ -347,6 +347,25 @@ AC_DEFINE(HAVE_SYS_STATVFS64, 1, [Define to 1 if struct 'statvfs64' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for struct statfs64 in sys/statfs.h)
+AC_TRY_COMPILE(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STATFS_H
+#	include <sys/statfs.h>
+#endif
+],
+[
+	struct statfs64	s;
+	s.f_bsize = s.f_blocks = s.f_bfree = s.f_bavail = 0;
+	statfs64("/", &s);
+],
+AC_DEFINE(HAVE_SYS_STATFS64, 1, [Define to 1 if struct 'statfs64' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 AC_MSG_CHECKING(for field ss_family in struct sockaddr_storage)
 AC_TRY_COMPILE([#include <sys/socket.h>],
 [struct sockaddr_storage ss;
