@@ -996,7 +996,9 @@ jQuery(function($) {
 	}
 
 	function removePlaceholder(obj) {
-		$('input[type="text"]', obj).removeAttr('placeholder');
+		$('input[type="text"]', obj)
+			.removeAttr('placeholder')
+			.removeClass('placeholder');
 	}
 
 	function getLimit(values, options) {
