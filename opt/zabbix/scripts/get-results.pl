@@ -25,22 +25,33 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $cfg_max_value, $service_type);
+my ($key, $cfg_max_value, $service_type, $delay);
+
+my $from = $OPTS{'from'};
+my $till = $OPTS{'till'};
+my $value_ts = $till;
+
+# calculate estimated total number of tests this month unless at least one time bound specified
+my $calculate_month_total = 0;
+$calculate_month_total = 1 unless (defined($from) or defined($till));
 
 if ($OPTS{'service'} eq 'tcp-dns-rtt')
 {
     $key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
     $cfg_max_value = get_macro_dns_tcp_rtt_low();
+    $delay = get_macro_dns_tcp_delay() if ($calculate_month_total == 1);
 }
 elsif ($OPTS{'service'} eq 'udp-dns-rtt')
 {
     $key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
     $cfg_max_value = get_macro_dns_udp_rtt_low();
+    $delay = get_macro_dns_udp_delay() if ($calculate_month_total == 1);
 }
 elsif ($OPTS{'service'} eq 'dns-upd')
 {
     $key = 'rsm.dns.udp.upd[{$RSM.TLD},';
     $cfg_max_value = get_macro_dns_update_time();
+    $delay = get_macro_dns_udp_delay() if ($calculate_month_total == 1);
     $service_type = 'rdds';
 }
 else
@@ -49,23 +60,20 @@ else
     usage(2);
 }
 
-my $from = $OPTS{'from'};
-my $till = $OPTS{'till'};
-my $value_ts = $till;
-
 unless (defined($from) and defined($till))
 {
-    dbg("getting current month bounds");
     my @bounds = get_curmon_bounds();
 
     $from = $bounds[0] unless (defined($from));
     $till = $bounds[1] unless (defined($till));
-    $value_ts = $value_ts;
+    $value_ts = $till;
 }
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit);
+my $probes_ref = get_probes($service_type);
+
+my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $probes_ref);
 
 my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds($service_type);
 
@@ -75,7 +83,7 @@ foreach (@$tlds_ref)
 
     if ("," eq substr($key, -1))
     {
-	my $result = get_ns_results($tld, $key, $value_ts, $probe_times_ref, \&check_item_value);
+	my $result = get_ns_results($tld, $service_type, $key, $value_ts, $probe_times_ref, \&check_item_value);
 
 	foreach my $ns (keys(%$result))
 	{

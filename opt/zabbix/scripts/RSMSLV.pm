@@ -60,7 +60,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_itemids get_lastclock
-		get_tlds
+		get_tlds get_probes
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
@@ -396,6 +396,44 @@ sub get_tlds
     return \@tlds;
 }
 
+# Returns a reference to hash of all probes (host name => hostid).
+sub get_probes
+{
+    my $service = shift;
+
+    $service = uc($service) if (defined($service));
+
+    my $rows_ref = db_select(
+	"select h.host,h.hostid".
+	" from hosts h, hosts_groups hg, groups g".
+	" where h.hostid=hg.hostid".
+		" and hg.groupid=g.groupid".
+		" and g.name='".PROBE_GROUP_NAME."'");
+
+    my %result;
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $host = $row_ref->[0];
+	my $hostid = $row_ref->[1];
+
+	if (defined($service))
+	{
+	    $rows_ref = db_select(
+		"select hm.value".
+		" from hosts h,hostmacro hm".
+		" where h.hostid=hm.hostid".
+			" and h.host='Template $host'".
+			" and hm.macro='{\$RSM.$service.ENABLED}'");
+
+	    next if (scalar(@$rows_ref) != 0 and $rows_ref->[0]->[0] == 0);
+	}
+
+	$result{$host} = $hostid;
+    }
+
+    return \%result;
+}
+
 sub get_items_by_hostids
 {
     my $hostids_ref = shift;
@@ -555,7 +593,7 @@ sub get_curmon_bounds
     $dt->truncate(to => 'month');
     my $from = $dt->epoch;
 
-    return ($from, $till, $till);
+    return ($from, $till);
 }
 
 sub minutes_last_month
@@ -735,10 +773,11 @@ sub get_probe_times
     my $from = shift;
     my $till = shift;
     my $probe_avail_limit = shift;
+    my $probes_ref = shift; # { host => hostid, ... }
 
     dbg("from:$from till:$till probe_avail_limit:$probe_avail_limit");
 
-    my $probes_ref = __get_probes(); # host => hostid
+    $probes_ref = get_probes() unless (defined($probes_ref));
 
     my %result;
 
@@ -978,7 +1017,7 @@ sub process_slv_ns_monthly
 	$successful_values{$ns} = 0;
     }
 
-    my $probes_ref = __get_probes();
+    my $probes_ref = get_probes();
 
     my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
 
@@ -1045,7 +1084,7 @@ sub process_slv_monthly
     my $min_error = shift;         # optional: min error that relates to this item
     my $max_error = shift;         # optional: max error that relates to this item
 
-    my $probes_ref = __get_probes();
+    my $probes_ref = get_probes();
 
     my $all_items_ref = __get_all_items($cfg_key_in);
 
@@ -1888,25 +1927,6 @@ sub __get_eventtimes
     dbg("eventtimes: ", join(',', @eventtimes));
 
     return \@eventtimes;
-}
-
-# Returns a reference to hash of all probes (host name => hostid).
-sub __get_probes
-{
-    my $rows_ref = db_select(
-	"select h.host,h.hostid".
-	" from hosts h, hosts_groups hg, groups g".
-	" where h.hostid=hg.hostid".
-		" and hg.groupid=g.groupid".
-		" and g.name='".PROBE_GROUP_NAME."'");
-
-    my %result;
-    foreach my $row_ref (@$rows_ref)
-    {
-	$result{$row_ref->[0]} = $row_ref->[1];
-    }
-
-    return \%result;
 }
 
 # Times when probe "lastaccess" under limit.
