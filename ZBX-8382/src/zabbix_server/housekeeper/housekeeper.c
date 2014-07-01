@@ -183,7 +183,7 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  * Purpose: add item to the delete queue if necessary                         *
  *                                                                            *
  * Parameters: rule        - [IN/OUT] the history housekeeping rule           *
- *             now         - [IN] the current timestmap                       *
+ *             now         - [IN] the current timestamp                       *
  *             item_record - [IN/OUT] the record from item cache containing   *
  *                           item to process and its oldest record timestamp  *
  *             history     - [IN] a number of days the history data for       *
@@ -222,7 +222,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
  * Purpose: prepares history housekeeping rule                                *
  *                                                                            *
  * Parameters: rule        - [IN/OUT] the history housekeeping rule           *
- *             now         - [IN] the current timestmap                       *
+ *             now         - [IN] the current timestamp                       *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *

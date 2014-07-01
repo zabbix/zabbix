@@ -1202,7 +1202,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay, can be overriden
+ * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *

@@ -487,9 +487,15 @@ jQuery(document).ready(function() {
 	});
 })
 
+/**
+ * @see init.js add.popup event
+ */
 function addPopupValues(data) {
-	if (data.object == 'name') {
+	if (data.object === 'name') {
 		jQuery('#application').val(data.values[0].name);
+	}
+	else if (data.object === 'linktrigger') {
+		ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
 	}
 }
 </script>

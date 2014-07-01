@@ -260,7 +260,7 @@ static void	row2value_ui64(history_value_t *value, DB_ROW row)
 	ZBX_STR2UINT64(value->ui64, row[0]);
 }
 
-/* timestmap, logeventid, severity, source, value */
+/* timestamp, logeventid, severity, source, value */
 static void	row2value_log(history_value_t *value, DB_ROW row)
 {
 	value->log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
@@ -2503,7 +2503,7 @@ void	zbx_vc_destroy(void)
  *                                                                            *
  * Parameters: itemid     - [IN] the item id                                  *
  *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
- *             timestamp  - [IN] the value timestmap                          *
+ *             timestamp  - [IN] the value timestamp                          *
  *             value      - [IN] the value to add                             *
  *                                                                            *
  * Return value:  SUCCEED - the item value was added successfully             *

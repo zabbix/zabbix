@@ -534,6 +534,9 @@ zbx_add_post_js('jqBlink.blink();');
 
 ?>
 <script type="text/javascript">
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		var favourites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
 
