@@ -38,7 +38,14 @@ class CActionConditionValueValidator extends CValidator implements CPartialValid
 			'values' => array_keys(discovery_object_status2str())
 		));
 		$triggerSeverityValidator = new CSetValidator(array(
-			'values' => array_keys(getSeverityCaption())
+			'values' => array(
+				TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				TRIGGER_SEVERITY_INFORMATION,
+				TRIGGER_SEVERITY_WARNING,
+				TRIGGER_SEVERITY_AVERAGE,
+				TRIGGER_SEVERITY_HIGH,
+				TRIGGER_SEVERITY_DISASTER
+			)
 		));
 		$discoveryObjectValidator = new CSetValidator(array(
 			'values' => array_keys(discovery_object2str())
@@ -100,7 +107,7 @@ class CActionConditionValueValidator extends CValidator implements CPartialValid
 					$this->setError(_('Empty action condition.'));
 				}
 				elseif (!$discoveryObjectValidator->validate($conditionValue)) {
-					$this->setError(('Incorrect action condition discovery object.'));
+					$this->setError(_('Incorrect action condition discovery object.'));
 				}
 				break;
 
