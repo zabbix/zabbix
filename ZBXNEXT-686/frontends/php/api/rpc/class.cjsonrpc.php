@@ -152,7 +152,6 @@ class CJSONrpc {
 			$error['debug'] = $debug;
 		}
 
-
 		$formed_error = array(
 			'jsonrpc' => self::VERSION,
 			'error' => $error,

@@ -15,5 +15,9 @@
         <testsuite name="Zabbix API regression test suite">
             <directory>./tests/regression/api/*/</directory>
         </testsuite>
+        <testsuite name="Zabbix API integration">
+            <directory>./tests/integration/api/*/*</directory>
+            <directory>./tests/integration/api/</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
