@@ -60,14 +60,27 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
 		$result = array(
 			'expressions' => array(),
+			'errors' => array(),
 			'final' => true
 		);
-		$testString = $ajaxData['testString'];
+
+		$validator = new CRegexValidator(array(
+			'messageType' => _('Regular expression must be a string'),
+			'messageInvalid' => _('Incorrect regular expression "%1$s": "%2$s"')
+		));
 
 		foreach ($ajaxData['expressions'] as $id => $expression) {
-			$match = GlobalRegExp::matchExpression($expression, $testString);
+			if (!in_array($expression['expression_type'], array(EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE)) ||
+				$validator->validate($expression['expression'])
+			) {
+				$match = GlobalRegExp::matchExpression($expression, $ajaxData['testString']);
 
-			$result['expressions'][$id] = $match;
+				$result['expressions'][$id] = $match;
+			} else {
+				$match = false;
+				$result['errors'][$id] = $validator->getError();
+			}
+
 			$result['final'] = $result['final'] && $match;
 		}
 
