@@ -638,6 +638,13 @@ if (!isset($graph_data['legend'])) {
 	$graph_data['legend'] = '';
 }
 
+$maxCaptionLength = 0;
+foreach($graph_data['captions'] as $caption) {
+	if(strlen($caption) > $maxCaptionLength) {
+		$maxCaptionLength = strlen($caption);
+	}
+}
+
 $graph->setSeriesLegend($graph_data['legend']);
 $graph->setPeriodCaption($graph_data['captions']);
 
@@ -651,8 +658,8 @@ $graph->setSeriesColor($graph_data['colors']);
 $graph->showLegend($showlegend);
 
 $graph->setWidth(1024);
-$graph->setHeight(400);
+$graph->setMinChartHeight(250);
 
-$graph->Draw();
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
