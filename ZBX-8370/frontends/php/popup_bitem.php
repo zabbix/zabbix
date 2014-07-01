@@ -36,7 +36,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
 	'config' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1,2,3'),		null),
-	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	BETWEEN(0,65535),	null),
+	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({}!=0)',	null),
 	'list_name' =>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT,	 null,	null,				null),
 	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),

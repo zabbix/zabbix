@@ -179,7 +179,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$color = new CColorCell(null, $period['color']);
 
 			$edit_link = 'popup_period.php?period_id='.$pid.'&config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
-				'&dstfrm='.$reportForm->getName().'&caption='.$period['caption'].'&report_timesince='.
+				'&dstfrm='.$reportForm->getName().url_param($period['caption'], false, 'caption').'&report_timesince='.
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
