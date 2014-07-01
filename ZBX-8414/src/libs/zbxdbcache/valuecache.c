@@ -408,7 +408,11 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 
 	while (-1 != periods[step] && 0 < count)
 	{
-		clock_from = clock_to - periods[step];
+		if (0 > (clock_from = clock_to - periods[step]))
+		{
+			clock_from = clock_to;
+			step = 4;
+		}
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1961,7 +1965,10 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 		zbx_vector_history_record_t	records;
 
 		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
-			cache_records -= vch_item_drop_first_second(item);
+		{
+			if (0 > (cache_records -= vch_item_drop_first_second(item)))
+				cache_records = 0;
+		}
 
 		zbx_vector_history_record_create(&records);
 
@@ -2039,7 +2046,7 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 	}
 
 	/* update cache if necessary */
-	if (0 < update_seconds && ZBX_ITEM_STATUS_CACHED_ALL != item->status)
+	if (ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
 		zbx_vector_history_record_t	records;
 
@@ -2050,10 +2057,14 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 
 		vc_try_unlock();
 
-		/* first try to find the requested value in target second interval */
-		ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds, update_end);
+		if (0 < update_seconds)
+		{
+			/* first try to find the requested value in target second interval */
+			ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds,
+					update_end);
 
-		zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
+			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
+		}
 
 		/* the target second does not contain the required value, read first value before it */
 		if (0 == records.values_num || 0 > zbx_timespec_compare(ts, &records.values[0].timestamp))
@@ -2275,8 +2286,8 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item, zbx_vector_history_reco
 		if (FAIL == (ret = vch_item_get_values_by_count(item, values, count, timestamp)))
 			goto out;
 
-		if (records_read > count)
-			records_read = count;
+		if (records_read > values->values_num)
+			records_read = values->values_num;
 	}
 
 	hits = values->values_num - records_read;
@@ -2731,6 +2742,8 @@ out:
 			vc_update_statistics(NULL, 0, 1);
 			*found = 1;
 		}
+		else
+			ret = SUCCEED;
 	}
 
 	if (NULL != item)
