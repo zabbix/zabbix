@@ -35,7 +35,6 @@ $userForm = new CForm();
 $userForm->setName('userForm');
 $userForm->addVar('config', get_request('config', 0));
 $userForm->addVar('form', $this->data['form']);
-$userForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
 if (isset($_REQUEST['userid'])) {
 	$userForm->addVar('userid', $this->data['userid']);
