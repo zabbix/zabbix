@@ -150,12 +150,12 @@ input.input.formlist[type="button"][disabled], input.input.formlist[type="submit
 	border-color: #aca899;
 	background: #ffffff;
 	/* ignored by IE for <select> */
-	color: #aca899;
+	color: #505050;
 }
 
 /* disabled <select> font color for IE 9+ */
 select[disabled="disabled"]::-ms-value {
-	color: #aca899;
+	color: #505050;
 }
 
 .link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
