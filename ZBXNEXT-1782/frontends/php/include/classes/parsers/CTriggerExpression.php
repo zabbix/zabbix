@@ -317,7 +317,7 @@ class CTriggerExpression {
 								break 3;
 							}
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								'(', $this->pos, 1
+								')', $this->pos, 1
 							);
 							$level--;
 							break;
