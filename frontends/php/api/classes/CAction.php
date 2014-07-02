@@ -1753,21 +1753,21 @@ class CAction extends CApiService {
 		return array(
 			'validators' => array(
 				'evaltype' => new CSetValidator(array(
-						'values' => array(
-							CONDITION_EVAL_TYPE_OR,
-							CONDITION_EVAL_TYPE_AND,
-							CONDITION_EVAL_TYPE_AND_OR,
-							CONDITION_EVAL_TYPE_EXPRESSION
-						),
-						'messageInvalid' => _('Incorrect type of calculation for action "%1$s".')
-					)),
+					'values' => array(
+						CONDITION_EVAL_TYPE_OR,
+						CONDITION_EVAL_TYPE_AND,
+						CONDITION_EVAL_TYPE_AND_OR,
+						CONDITION_EVAL_TYPE_EXPRESSION
+					),
+					'messageInvalid' => _('Incorrect type of calculation for action "%1$s".')
+				)),
 				'formula' => new CStringValidator(array(
-						'empty' => true
-					)),
+					'empty' => true
+				)),
 				'conditions' => new CCollectionValidator(array(
-						'empty' => true,
-						'messageInvalid' => _('Incorrect conditions for action "%1$s".')
-					))
+					'empty' => true,
+					'messageInvalid' => _('Incorrect conditions for action "%1$s".')
+				))
 			),
 			'postValidators' => array(
 				new CConditionValidator(array(
@@ -1807,21 +1807,21 @@ class CAction extends CApiService {
 		return array(
 			'validators' => array(
 				'conditiontype' => new CSetValidator(array(
-						'values' => $conditionTypes,
-						'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
-					)) ,
+					'values' => $conditionTypes,
+					'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
+				)) ,
 				'value' => new CStringValidator(array(
-						'empty' => true
-					)),
+					'empty' => true
+				)),
 				'formulaid' => new CStringValidator(array(
-						'regex' => '/[A-Z]+/',
-						'messageEmpty' => _('Empty filter condition formula ID for action "%1$s".'),
-						'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
-					)),
+					'regex' => '/[A-Z]+/',
+					'messageEmpty' => _('Empty filter condition formula ID for action "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
+				)),
 				'operator' => new CSetValidator(array(
-						'values' => $operators,
-						'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
-					))
+					'values' => $operators,
+					'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
+				))
 			),
 			'postValidators' => array(
 				new CActionConditionValueValidator()
