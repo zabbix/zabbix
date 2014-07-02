@@ -823,7 +823,7 @@ static char	*remedy_get_ticketid_by_eventid(zbx_uint64_t eventid)
 	/* first check if the event is linked to an incident */
 	result = DBselect("select externalid from ticket"
 			" where eventid=" ZBX_FS_UI64
-			" order by clock,ticketid desc", eventid);
+			" order by clock desc,ticketid desc", eventid);
 
 	if (NULL != (row = DBfetch(result)))
 		ticketid = zbx_strdup(NULL, row[0]);
@@ -863,7 +863,7 @@ static char	*remedy_get_ticketid_by_triggerid(zbx_uint64_t triggerid)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select externalid,clock from ticket"
 				" where triggerid=" ZBX_FS_UI64
-				" order by clock,ticketid desc",
+				" order by clock desc,ticketid desc",
 				triggerid);
 
 	result = DBselectN(sql, 1);
@@ -1514,9 +1514,12 @@ out:
 			if (NULL != incident_number)
 				ticket->ticketid = zbx_strdup(NULL, incident_number);
 
-			assignee = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_ASSIGNEE);
-			if (NULL != assignee)
-				ticket->assignee = zbx_strdup(NULL, assignee);
+			if (1 != is_new)
+			{
+				assignee = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_ASSIGNEE);
+				if (NULL != assignee)
+					ticket->assignee = zbx_strdup(NULL, assignee);
+			}
 		}
 	}
 
