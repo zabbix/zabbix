@@ -21,6 +21,68 @@
 #include "sysinfo.h"
 #include "stats.h"
 #include "log.h"
+#include "zbxjson.h"
+
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		line[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *cpuids;
+	FILE		*fp;
+	int		ret = SYSINFO_RET_FAIL;
+	long		ncpu, i;
+	struct zbx_json	json;
+
+	do {
+		if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror(errno)));
+			break;
+		}
+
+		if (NULL == (fp = fopen("/proc/stat", "r")))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));
+			break;
+		}
+
+		cpuids = zbx_calloc(NULL, ncpu, sizeof(char));
+
+		while (NULL != fgets(line, sizeof(line), fp))
+		{
+			if (1 == sscanf(line, "cpu%[0-9]", tmp))
+				cpuids[strtol(tmp, NULL, 10)] = 1;
+		}
+
+		fclose(fp);
+
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+		for (i = 0; i < ncpu; i++)
+		{
+			zbx_json_addobject(&json, NULL);
+
+			/* We start indexing CPUs/CPU cores at 1 to provide consistency for	*/
+			/* items that take CPU ids as parameters (such as system.hw.cpu) for	*/
+			/* item creation on discovery.						*/
+
+			zbx_json_adduint64(&json, "{#CPUID}", i + 1);
+			zbx_json_addstring(&json, "{#STATUS}", (1 == cpuids[i] ? "online" : "offline"),
+					ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(&json);
+		}
+
+		zbx_json_close(&json);
+		SET_STR_RESULT(result, zbx_strdup(result->str, json.buffer));
+
+		zbx_json_free(&json);
+		zbx_free(cpuids);
+
+		ret = SYSINFO_RET_OK;
+	} while(0);
+
+	return ret;
+}
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

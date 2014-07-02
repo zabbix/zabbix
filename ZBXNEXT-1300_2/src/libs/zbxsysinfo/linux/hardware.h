@@ -46,4 +46,6 @@
 #define HW_CPU_SHOW_MODEL	4
 #define HW_CPU_SHOW_CURFREQ	5
 
+#define	HW_STAT_FILE		"/proc/stat"
+
 #endif	/* ZABBIX_HARDWARE_H */
