@@ -1208,61 +1208,50 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *
  * @return array
  */
-function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
-	// special processing of active items to see better view in queue
-	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
-		if ($delay != 0) {
-			$nextcheck = $now + $delay;
+function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
+	// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+	// if it is not possible to check the item within a year, fail
+
+	$arrOfFlexIntervals = explode(';', $flexIntervals);
+	$t = $now;
+	$tMax = $now + SEC_PER_YEAR;
+	$try = 0;
+
+	while ($t < $tMax) {
+		// calculate 'nextcheck' value for the current interval
+		$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
+
+		if ($currentDelay != 0) {
+			$nextCheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
+
+			if ($try == 0) {
+				while ($nextCheck <= $t) {
+					$nextCheck += $currentDelay;
+				}
+			}
+			else {
+				while ($nextCheck < $t) {
+					$nextCheck += $currentDelay;
+				}
+			}
 		}
 		else {
-			$nextcheck = ZBX_JAN_2038;
+			$nextCheck = ZBX_JAN_2038;
 		}
-	}
-	else {
-		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
-		// if it is not possible to check the item within a year, fail
 
-		$arrOfFlexIntervals = explode(';', $flexIntervals);
-		$t = $now;
-		$tmax = $now + SEC_PER_YEAR;
-		$try = 0;
-
-		while ($t < $tmax) {
-			// calculate 'nextcheck' value for the current interval
-			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
-
-			if ($currentDelay != 0) {
-				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
-
-				if ($try == 0) {
-					while ($nextcheck <= $t) {
-						$nextcheck += $currentDelay;
-					}
-				}
-				else {
-					while ($nextcheck < $t) {
-						$nextcheck += $currentDelay;
-					}
-				}
-			}
-			else {
-				$nextcheck = ZBX_JAN_2038;
-			}
-
-			// 'nextcheck' < end of the current interval ?
-			// the end of the current interval is the beginning of the next interval - 1
-			if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextcheck >= $nextInterval) {
-				// 'nextcheck' is beyond the current interval
-				$t = $nextInterval;
-				$try++;
-			}
-			else {
-				break;
-			}
+		// 'nextcheck' < end of the current interval ?
+		// the end of the current interval is the beginning of the next interval - 1
+		if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextCheck >= $nextInterval) {
+			// 'nextcheck' is beyond the current interval
+			$t = $nextInterval;
+			$try++;
+		}
+		else {
+			break;
 		}
 	}
 
-	return $nextcheck;
+	return $nextCheck;
 }
 
 /**
