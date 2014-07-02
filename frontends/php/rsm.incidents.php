@@ -922,42 +922,8 @@ if ($host || $data['filter_search']) {
 				}
 
 				foreach ($services as $key => $service) {
-					foreach ($data[$key]['events'] as &$event) {
-						if ($event['false_positive'] || $event['startTime'] > $weekTimeTill) {
-							$event['incidentSecDown'] = 0;
-						}
-						else {
-							$endTime = isset($event['endTime']) ? $event['endTime'] : $weekTimeTill;
-
-							// get failed tests time interval
-							if ($event['startTime'] >= $weekTimeFrom && $endTime <= $weekTimeTill) {
-								$getFailedFrom = $event['startTime'];
-								$getFailedTill = $endTime;
-							}
-							elseif ($event['startTime'] < $weekTimeFrom && $endTime <= $weekTimeTill) {
-								$getFailedFrom = $weekTimeFrom;
-								$getFailedTill = $endTime;
-							}
-							elseif ($event['startTime'] >= $weekTimeFrom && $endTime > $weekTimeTill) {
-								$getFailedFrom = $event['startTime'];
-								$getFailedTill = $weekTimeTill;
-							}
-
-							// get failed tests count
-							$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom,
-								$getFailedTill
-							);
-
-							// get percent
-
-							$event['incidentSecDown'] = $failedTests * $service['delay'];
-						}
-					}
-
 					$data[$key]['slaValue'] = $service['slaValue'] * 60;
 					$data[$key]['delay'] = $service['delay'];
-
-					unset($event);
 				}
 			}
 		}
