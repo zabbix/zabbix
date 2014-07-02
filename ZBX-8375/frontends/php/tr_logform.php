@@ -77,88 +77,85 @@ $constructor = new CTextTriggerConstructor(new CTriggerExpression());
 /**
  * Save a trigger
  */
-if (isset($_REQUEST['save_trigger'])) {
+if (hasRequest('save_trigger')) {
 	show_messages();
 
-	$exprs = get_request('expressions', false);
+	$exprs = getRequest('expressions', false);
 	if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
-		if (!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
+		if (!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) {
+			access_deny();
+		}
 
 		$now = time();
 		$status = hasRequest('status') ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED;
 		$type = TRIGGER_MULT_EVENT_ENABLED;
 
-		if (isset($_REQUEST['triggerid'])) {
+		if (hasRequest('triggerid')) {
+			$triggerId = getRequest('triggerid');
+			$description = getRequest('description', '');
+
 			$triggersData = API::Trigger()->get(array(
-				'triggerids' => $_REQUEST['triggerid'],
+				'triggerids' => array($triggerId),
 				'output' => API_OUTPUT_EXTEND
 			));
 			$triggerData = reset($triggersData);
 
 			if ($triggerData['templateid']) {
-				$_REQUEST['description'] = $triggerData['description'];
+				$description = $triggerData['description'];
 				$expression = explode_exp($triggerData['expression']);
 			}
 
 			$trigger = array();
-			$trigger['triggerid'] = $_REQUEST['triggerid'];
+			$trigger['triggerid'] = $triggerId;
 			$trigger['expression'] = $expression;
-			$trigger['description'] = $_REQUEST['description'];
+			$trigger['description'] = $description;
 			$trigger['type'] = $type;
-			$trigger['priority'] = $_REQUEST['priority'];
+			$trigger['priority'] = getRequest('priority', 0);
 			$trigger['status'] = $status;
-			$trigger['comments'] = $_REQUEST['comments'];
-			$trigger['url'] = $_REQUEST['url'];
+			$trigger['comments'] = getRequest('comments', '');
+			$trigger['url'] = getRequest('url', '');
 
-			DBstart();
-			$result = API::Trigger()->update($trigger);
-//REVERT
-			$result = DBend($result);
+			$result = (bool) API::Trigger()->update($trigger);
 
-			$triggerid = $_REQUEST['triggerid'];
-			$audit_action = AUDIT_ACTION_UPDATE;
+			$auditAction = AUDIT_ACTION_UPDATE;
 
 			show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 		}
 		else {
 			$trigger = array();
 			$trigger['expression'] = $expression;
-			$trigger['description'] = $_REQUEST['description'];
+			$trigger['description'] = getRequest('description');
 			$trigger['type'] = $type;
-			$trigger['priority'] = $_REQUEST['priority'];
+			$trigger['priority'] = getRequest('priority', 0);
 			$trigger['status'] = $status;
-			$trigger['comments'] = $_REQUEST['comments'];
-			$trigger['url'] = $_REQUEST['url'];
+			$trigger['comments'] = getRequest('comments', '');
+			$trigger['url'] = getRequest('url', '');
 
-			DBstart();
-			if ($result = API::Trigger()->create($trigger)) {
-				if ($result !== false) {
-					$options = array(
-						'triggerids' => $result['triggerids'],
-						'output' => API_OUTPUT_EXTEND
-					);
-					$db_triggers = API::Trigger()->get($options);
+			$result = (bool) API::Trigger()->create($trigger);
+			if ($result) {
+				$dbTriggers = API::Trigger()->get(array(
+					'triggerids' => $result['triggerids'],
+					'output' => array('triggerid')
+				));
 
-					$result = true;
-					$db_triggers = reset($db_triggers);
-					$triggerid = $db_triggers['triggerid'];
-				}
-				else {
-					$result = false;
-				}
+				$dbTrigger = reset($dbTriggers);
+				$triggerId = $dbTrigger['triggerid'];
 			}
 
-			$result = DBend($result);
-
-			$audit_action = AUDIT_ACTION_ADD;
+			$auditAction = AUDIT_ACTION_ADD;
 
 			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 
-		if ($result){
+		if ($result) {
 			DBstart();
-			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, _('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']');
+
+			add_audit($auditAction, AUDIT_RESOURCE_TRIGGER,
+				_('Trigger').' ['.$triggerId.'] ['.$trigger['description'].']'
+			);
+
 			DBend(true);
+
 			unset($_REQUEST['sform']);
 
 			zbx_add_post_js('closeForm("items.php");');
@@ -169,19 +166,21 @@ if (isset($_REQUEST['save_trigger'])) {
 
 //------------------------ <FORM> ---------------------------
 
-if (isset($_REQUEST['sform'])) {
+if (hasRequest('sform')) {
 	$frmTRLog = new CFormTable(_('Trigger'));
 	$frmTRLog->setName('sform');
 	$frmTRLog->addHelpIcon();
 	$frmTRLog->setTableClass('formlongtable formtable');
 
-	if(isset($_REQUEST['triggerid'])) $frmTRLog->addVar('triggerid',$_REQUEST['triggerid']);
+	if (hasRequest('triggerid')) {
+		$frmTRLog->addVar('triggerid', getRequest('triggerid'));
+	}
 
-	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])) {
+	if (hasRequest('triggerid') && !hasRequest('form_refresh')) {
 		$result = DBselect(
 			'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
 			' FROM triggers t'.
-			' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
+			' WHERE t.triggerid='.zbx_dbstr(getRequest('triggerid')).
 				' AND EXISTS ('.
 					'SELECT NULL'.
 					' FROM functions f,items i'.
@@ -207,16 +206,16 @@ if (isset($_REQUEST['sform'])) {
 		$expressions = $constructor->getPartsFromExpression($expression);
 	}
 	else {
-		$description = get_request('description', '');
-		$expressions = get_request('expressions', array());
-		$type = get_request('type', 0);
-		$priority = get_request('priority', 0);
-		$comments = get_request('comments', '');
-		$url = get_request('url', '');
-		$status = get_request('status', 0);
+		$description = getRequest('description', '');
+		$expressions = getRequest('expressions', array());
+		$type = getRequest('type', 0);
+		$priority = getRequest('priority', 0);
+		$comments = getRequest('comments', '');
+		$url = getRequest('url', '');
+		$status = getRequest('status', 0);
 	}
 
-	$keys = get_request('keys',array());
+	$keys = getRequest('keys', array());
 
 	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
@@ -240,14 +239,15 @@ if (isset($_REQUEST['sform'])) {
 	}
 
 	$ctb = new CTextBox('item', $itemName, 80);
-	$ctb->setAttribute('id','item');
-	$ctb->setAttribute('disabled','disabled');
+	$ctb->setAttribute('id', 'item');
+	$ctb->setAttribute('disabled', 'disabled');
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
-	$cbtn = new CSubmit('select_item',_('Select'),$script);
+	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
+		"&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
+	$cbtn = new CSubmit('select_item', _('Select'), $script);
 
 	$frmTRLog->addRow(_('Item'), array($ctb, $cbtn));
-	$frmTRLog->addVar('itemid',$itemid);
+	$frmTRLog->addVar('itemid', $itemid);
 
 
 	$exp_select = new CComboBox('expr_type');
@@ -255,39 +255,42 @@ if (isset($_REQUEST['sform'])) {
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
-	$ctb = new CTextBox('expression','',80);
-	$ctb->setAttribute('id','logexpr');
+	$ctb = new CTextBox('expression', '', 80);
+	$ctb->setAttribute('id', 'logexpr');
 
-	$cb = new CButton('add_exp',_('Add'),'javascript: add_logexpr();');
+	$cb = new CButton('add_exp', _('Add'), 'javascript: add_logexpr();');
 	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
 	$cbOr = new CButton('add_key_or', _('OR'), 'javascript: add_keyword_or();');
-	$cbIregexp = new CCheckBox('iregexp', 'no', null,1);
+	$cbIregexp = new CCheckBox('iregexp', 'no', null, 1);
 
-	$frmTRLog->addRow(_('Expression'), array($ctb,BR(),$cbIregexp,'iregexp',SPACE,$cbAdd,SPACE,$cbOr,SPACE,$exp_select,SPACE, $cb));
+	$frmTRLog->addRow(_('Expression'),
+		array($ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb)
+	);
 
 	$keyTable = new CTableInfo(null);
-	$keyTable->setAttribute('id','key_list');
+	$keyTable->setAttribute('id', 'key_list');
 	$keyTable->setHeader(array(_('Keyword'), _('Type'), _('Action')));
 
 	$table = new CTableInfo(null);
-	$table->setAttribute('id','exp_list');
+	$table->setAttribute('id', 'exp_list');
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 
 	$maxid = 0;
 	foreach ($expressions as $id => $expr) {
-
-		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
-		$imgup->setAttribute('onclick','javascript:  element_up("logtr'.$id.'");');
-		$imgup->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
+		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
+		$imgup->setAttribute('onclick', 'javascript: element_up("logtr'.$id.'");');
+		$imgup->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
 		$imgup->addClass('updown');
 
-		$imgdn = new CImg('images/general/arrow_down.png','down',12,14);
-		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
-		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
+		$imgdn = new CImg('images/general/arrow_down.png', 'down', 12, 14);
+		$imgdn->setAttribute('onclick', 'javascript: element_down("logtr'.$id.'");');
+		$imgdn->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
 		$imgdn->addClass('updown');
 
-		$del_url = new CSpan(_('Delete'),'link');
-		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
+		$del_url = new CSpan(_('Delete'), 'link');
+		$del_url->setAttribute('onclick',
+			'javascript: if (confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;'
+		);
 
 		$row = new CRow(array(
 			htmlspecialchars($expr['value']),
@@ -295,29 +298,33 @@ if (isset($_REQUEST['sform'])) {
 			array($imgup, ' ', $imgdn),
 			$del_url
 		));
-		$row->setAttribute('id','logtr'.$id);
+		$row->setAttribute('id', 'logtr'.$id);
 		$table->addRow($row);
 
-		$frmTRLog->addVar('expressions['.$id.'][value]',$expr['value']);
-		$frmTRLog->addVar('expressions['.$id.'][type]',$expr['type']);
+		$frmTRLog->addVar('expressions['.$id.'][value]', $expr['value']);
+		$frmTRLog->addVar('expressions['.$id.'][type]', $expr['type']);
 
 		$maxid = ($maxid < $id) ? $id : $maxid;
 	}
-	zbx_add_post_js('logexpr_count='.($maxid+1).';');
+
+	zbx_add_post_js('logexpr_count='.($maxid + 1).';');
 	zbx_add_post_js('processExpressionList();');
 
 	$maxid = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = new CLink(_('Delete'),'#','action','javascript: if(confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;');
-		$row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
-		$row->setAttribute('id','keytr'.$id);
+		$del_url = new CLink(_('Delete'), '#', 'action',
+			'javascript: if (confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;'
+		);
+		$row = new CRow(array(htmlspecialchars($val['value']), $val['type'], $del_url));
+		$row->setAttribute('id', 'keytr'.$id);
 		$keyTable->addRow($row);
 
-		$frmTRLog->addVar('keys['.$id.'][value]',$val['value']);
-		$frmTRLog->addVar('keys['.$id.'][type]',$val['type']);
+		$frmTRLog->addVar('keys['.$id.'][value]', $val['value']);
+		$frmTRLog->addVar('keys['.$id.'][type]', $val['type']);
 
 		$maxid = ($maxid < $id) ? $id : $maxid;
 	}
+
 	zbx_add_post_js('key_count='.($maxid + 1).';');
 
 	$frmTRLog->addRow(SPACE, $keyTable);
@@ -325,11 +332,16 @@ if (isset($_REQUEST['sform'])) {
 
 	$sev_select = new CComboBox('priority', $priority);
 	$sev_select->addItems(getSeverityCaption());
+
 	$frmTRLog->addRow(_('Severity'), $sev_select);
 	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
 	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));
-	$frmTRLog->addRow(_('Disabled'), new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1));
-	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'));
+	$frmTRLog->addRow(_('Disabled'),
+		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
+	);
+	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save'),
+		'javascript: document.forms[0].action += \'?saction=1\';')
+	);
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 
