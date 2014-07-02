@@ -211,7 +211,7 @@ if ($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) {
 		$validItems = CMacrosResolverHelper::resolveItemNames($validItems);
 
 		foreach ($validItems as &$item) {
-			if ($item['caption'] == $item['name']) {
+			if ($item['caption'] === $item['name']) {
 				$item['caption'] = $item['name_expanded'];
 			}
 		}
