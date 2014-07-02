@@ -52,7 +52,7 @@ elsif ($OPTS{'service'} eq 'dns-upd')
     $key = 'rsm.dns.udp.upd[{$RSM.TLD},';
     $cfg_max_value = get_macro_dns_update_time();
     $delay = get_macro_dns_udp_delay() if ($calculate_month_total == 1);
-    $service_type = 'rdds';
+    $service_type = 'epp';
 }
 else
 {
@@ -81,9 +81,16 @@ foreach (@$tlds_ref)
 {
     $tld = $_;
 
+    if (SUCCESS != tld_service_enabled($tld, $service_type))
+    {
+	$service_type = 'DNS' unless (defined($service_type));
+	dbg("'$service_type' is disabled on TLD '$tld'");
+	next;
+    }
+
     if ("," eq substr($key, -1))
     {
-	my $result = get_ns_results($tld, $service_type, $key, $value_ts, $probe_times_ref, \&check_item_value);
+	my $result = get_ns_results($tld, $key, $value_ts, $probe_times_ref, \&check_item_value);
 
 	foreach my $ns (keys(%$result))
 	{

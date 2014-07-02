@@ -60,7 +60,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_itemids get_lastclock
-		get_tlds get_probes
+		get_tlds get_probes tld_service_enabled
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
@@ -488,6 +488,30 @@ sub get_tld_items
     fail("cannot find items ($cfg_key*) at host ($tld)") if (scalar(@items) == 0);
 
     return \@items;
+}
+
+sub tld_service_enabled
+{
+    my $tld = shift;
+    my $service_type = shift;
+
+    $service_type = uc($service_type) if (defined($service_type));
+
+    return SUCCESS if (not defined($service_type) or $service_type eq 'DNS');
+
+    my $host = "Template $tld";
+    my $macro = "{\$RSM.TLD.$service_type.ENABLED}";
+
+    my $rows_ref = db_select(
+	"select hm.value".
+	" from hosts h,hostmacro hm".
+	" where h.hostid=hm.hostid".
+		" and h.host='$host'".
+		" and hm.macro='$macro'");
+
+    fail("host '$host' macro '$macro' not found") if (scalar(@$rows_ref) == 0);
+
+    return ($rows_ref->[0]->[0] == 0 ? FAIL : SUCCESS);
 }
 
 sub handle_db_error
