@@ -393,7 +393,7 @@ class CPageFilter {
 			$this->data['groups'][$group['groupid']] = $group;
 		}
 
-		// select remebered selection
+		// select remembered selection
 		if (is_null($groupid) && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
 			if ($hostid) {
@@ -464,7 +464,7 @@ class CPageFilter {
 				}
 			}
 
-			// select remebered selection
+			// select remembered selection
 			if (is_null($hostId) && $this->_profileIds['hostid']) {
 				$hostId = $this->_profileIds['hostid'];
 			}

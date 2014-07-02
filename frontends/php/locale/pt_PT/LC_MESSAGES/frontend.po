@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:35+0300\n"
+"POT-Creation-Date: 2014-06-30 02:44+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -455,7 +455,7 @@ msgstr "Activo até"
 #: include/views/configuration.triggers.edit.php:318
 #: include/views/configuration.triggers.massupdate.php:125
 #: include/views/js/adm.regexprs.edit.js.php:249
-#: include/views/js/configuration.action.edit.js.php:289
+#: include/views/js/configuration.action.edit.js.php:292
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.sysmaps.js.php:192
 #: include/views/js/configuration.sysmaps.js.php:405
@@ -1025,7 +1025,7 @@ msgstr "Abaixo"
 msgid "Brighten"
 msgstr "Aclarar"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:56
 msgid "Bulgarian (bg_BG)"
 msgstr "Búlgaro (bg_BG)"
 
@@ -1272,7 +1272,7 @@ msgstr "Canadá (136 caracteres)"
 #: include/views/js/administration.general.triggerSeverity.js.php:38
 #: include/views/js/configuration.action.edit.js.php:102
 #: include/views/js/configuration.discovery.edit.js.php:114 jsLoader.php:104
-#: tr_logform.php:337
+#: tr_logform.php:340
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -2209,7 +2209,7 @@ msgstr ""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/views/js/monitoring.history.js.php:35
+#: include/views/js/monitoring.history.js.php:38
 msgid "Cannot remove all items, at least one item should remain."
 msgstr ""
 
@@ -2590,7 +2590,7 @@ msgstr "Não foi possível actualizar o mapeamento de valores"
 msgid "Cannot update web scenario"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:603
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr ""
 
@@ -2656,7 +2656,7 @@ msgstr "Chassis"
 msgid "Chassis info - returns full info by default"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:536
+#: include/views/js/configuration.discovery.edit.js.php:539
 msgid "Check already exists."
 msgstr "Verificação já existe."
 
@@ -2731,11 +2731,11 @@ msgstr ""
 msgid "Checks should be unique."
 msgstr "As verificações devem ser únicas."
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:57
 msgid "Chinese (zh_CN)"
 msgstr "Chinês (zh_CN)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:58
 msgid "Chinese (zh_TW)"
 msgstr "Chinês (zh_TW)"
 
@@ -2812,9 +2812,9 @@ msgstr "Relógio"
 msgid "Clone"
 msgstr "Clonar"
 
-#: include/views/js/configuration.discovery.edit.js.php:537
-#: include/views/js/configuration.discovery.edit.js.php:601
-#: include/views/js/configuration.discovery.edit.js.php:618
+#: include/views/js/configuration.discovery.edit.js.php:540
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:621
 #: include/views/js/configuration.sysmaps.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:304
 #: include/views/js/configuration.sysmaps.js.php:417 jsLoader.php:146
@@ -2888,7 +2888,7 @@ msgstr "O comando não pode estar vazio."
 msgid "Commands"
 msgstr "Comandos"
 
-#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:332
+#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:335
 msgid "Comments"
 msgstr "Comentários"
 
@@ -3410,7 +3410,7 @@ msgid "Current date is NOT N"
 msgstr "A data actual é != N"
 
 #: include/views/js/configuration.action.edit.js.php:87
-#: include/views/js/configuration.action.edit.js.php:212
+#: include/views/js/configuration.action.edit.js.php:215
 msgid "Current host"
 msgstr "Host actual"
 
@@ -3480,7 +3480,7 @@ msgstr "Tamanho personalizado"
 msgid "Custom slides"
 msgstr "Slides personalizados"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:59
 msgid "Czech (cs_CZ)"
 msgstr "Checo (cs_CZ)"
 
@@ -3795,7 +3795,7 @@ msgstr "Atrasado em"
 #: include/classes/class.cbuttondelete.php:25
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:162 jsLoader.php:107
-#: jsLoader.php:185 tr_logform.php:293 tr_logform.php:314
+#: jsLoader.php:185 tr_logform.php:295 tr_logform.php:317
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -3825,7 +3825,7 @@ msgid "Delete discovery rule?"
 msgstr "Eliminar regra de descoberta?"
 
 #: include/views/configuration.triggers.edit.php:164 jsLoader.php:109
-#: tr_logform.php:294
+#: tr_logform.php:296
 msgid "Delete expression?"
 msgstr "Eliminar expressão?"
 
@@ -3857,7 +3857,7 @@ msgstr ""
 msgid "Delete item?"
 msgstr "Eliminar item?"
 
-#: jsLoader.php:108 tr_logform.php:314
+#: jsLoader.php:108 tr_logform.php:317
 msgid "Delete keyword?"
 msgstr "Eliminar palavra chave?"
 
@@ -4422,7 +4422,7 @@ msgstr "Desactivar triggers seleccionados?"
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:156
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
-#: tr_logform.php:334
+#: tr_logform.php:337
 msgid "Disabled"
 msgstr "Desactivado"
 
@@ -4461,9 +4461,9 @@ msgstr "Descoberta por proxy"
 msgid "Discovery check"
 msgstr "Verificação de descoberta"
 
-#: include/views/js/configuration.discovery.edit.js.php:535
-#: include/views/js/configuration.discovery.edit.js.php:599
-#: include/views/js/configuration.discovery.edit.js.php:616
+#: include/views/js/configuration.discovery.edit.js.php:538
+#: include/views/js/configuration.discovery.edit.js.php:602
+#: include/views/js/configuration.discovery.edit.js.php:619
 msgid "Discovery check error"
 msgstr ""
 
@@ -4692,7 +4692,7 @@ msgstr "Duração"
 msgid "Duration (sec)"
 msgstr "Duração (seg)"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Dutch (nl_NL)"
 msgstr "Holandês (nl_NL)"
 
@@ -5012,11 +5012,11 @@ msgstr "Activar triggers seleccionados?"
 msgid "Enabled"
 msgstr "Activado"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:54
 msgid "English (en_GB)"
 msgstr "Inglês (en_GB)"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:55
 msgid "English (en_US)"
 msgstr "Inglês (en_US)"
 
@@ -5111,7 +5111,7 @@ msgstr "Semanalmente"
 msgid "Exa"
 msgstr "Exa"
 
-#: tr_logform.php:261 tr_logform.php:298
+#: tr_logform.php:261 tr_logform.php:300
 msgid "Exclude"
 msgstr "Excluir"
 
@@ -5430,7 +5430,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Terminar"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Finnish (fi_FI)"
 msgstr "Finlandês (fi_FI)"
 
@@ -5474,7 +5474,7 @@ msgstr "Fórmula"
 msgid "Fourth"
 msgstr "Quarto"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "French (fr_FR)"
 msgstr "Francês (fr_FR)"
 
@@ -5568,13 +5568,13 @@ msgstr "Geral"
 msgid "Generated in %s sec"
 msgstr "Gerado em %s seg"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "German (de_DE)"
 msgstr "Alemão (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:555
-msgid "Get content of WEB page. Default path is /"
+msgid "Get content of web page. Default path is /"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:257
@@ -5584,7 +5584,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:563
-msgid "Get first occurence of regexp in WEB page. Default path is /"
+msgid "Get first occurrence of regexp in web page. Default path is /"
 msgstr ""
 
 #: include/page_header.php:194
@@ -5593,7 +5593,7 @@ msgstr "Suporte"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:559
-msgid "Get timing of loading full WEB page. Default path is /"
+msgid "Get timing of loading full web page. Default path is /"
 msgstr ""
 
 #: include/func.inc.php:680
@@ -5831,7 +5831,7 @@ msgstr "Gráficos copiados"
 msgid "Graphs deleted"
 msgstr "Gráficos eliminados"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Greek (el_GR)"
 msgstr "Grego (el_GR)"
 
@@ -6148,7 +6148,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:225
 #: include/views/js/configuration.action.edit.js.php:88
-#: include/views/js/configuration.action.edit.js.php:209
+#: include/views/js/configuration.action.edit.js.php:212
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
@@ -6226,7 +6226,7 @@ msgstr[1] ""
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
-#: include/views/js/configuration.action.edit.js.php:197
+#: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:143
@@ -6518,7 +6518,7 @@ msgstr "Horas"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "Húngaro (hu_HU)"
 
@@ -6902,7 +6902,7 @@ msgstr "Em manutenção"
 msgid "In progress"
 msgstr "Em progresso"
 
-#: tr_logform.php:260 tr_logform.php:298
+#: tr_logform.php:260 tr_logform.php:300
 msgid "Include"
 msgstr "Incluir"
 
@@ -6928,12 +6928,12 @@ msgid "Incorrect IP range \"%s\"."
 msgstr "Gama de IPs \"%s\" inválida."
 
 #: api/classes/CDRule.php:286
-#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:571
 msgid "Incorrect SNMP OID."
 msgstr "OID SNMP inválido."
 
 #: api/classes/CDRule.php:282
-#: include/views/js/configuration.discovery.edit.js.php:564
+#: include/views/js/configuration.discovery.edit.js.php:567
 msgid "Incorrect SNMP community."
 msgstr "Community SNMP incorrecta."
 
@@ -7647,7 +7647,7 @@ msgstr "Ponto máximo Y inválido para o gráfico \"%1$s\"."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Ponto mínimo Y inválido para o gráfico \"%1$s\"."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:66
 msgid "Indonesian (id_ID)"
 msgstr "Indonésio (id_ID)"
 
@@ -7905,7 +7905,7 @@ msgstr "Não é possível terminar sessão quando autenticado por HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Não é possível pesquisar pela palavra-passe do utilizador."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Italian (it_IT)"
 msgstr "Italiano (it_IT)"
 
@@ -8193,7 +8193,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Janeiro"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:69
 msgid "Japanese (ja_JP)"
 msgstr "Japonês (ja_JP)"
 
@@ -8230,7 +8230,7 @@ msgstr "Período de retenção de recursos perdidos (em dias)"
 #: include/views/configuration.item.edit.php:68
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.list.php:48
-#: include/views/js/configuration.discovery.edit.js.php:426 items.php:46
+#: include/views/js/configuration.discovery.edit.js.php:429 items.php:46
 #: popup.php:939 popup.php:1081 popup.php:1190 popup.php:1199
 msgid "Key"
 msgstr "Chave"
@@ -8253,7 +8253,7 @@ msgstr "Palavra-chave"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:68
 msgid "Korean (ko_KR)"
 msgstr "Coreano (ko_KR)"
 
@@ -8413,7 +8413,7 @@ msgstr "Últimos eventos"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:70
 msgid "Latvian (lv_LV)"
 msgstr "Lituâno (lv_LV)"
 
@@ -8526,7 +8526,7 @@ msgstr "A lista está vazia"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:71
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -10842,17 +10842,17 @@ msgctxt "item_form"
 msgid "Overridden by"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:350
+msgid "Overridden by global housekeeping settings"
+msgstr ""
+
 #: include/views/administration.general.housekeeper.edit.php:133
 msgid "Override item history period"
 msgstr ""
 
 #: include/views/administration.general.housekeeper.edit.php:154
 msgid "Override item trend period"
-msgstr ""
-
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.edit.php:350
-msgid "Overriden by global housekeeping settings"
 msgstr ""
 
 #: include/menu.inc.php:37 include/menu.inc.php:105
@@ -11192,7 +11192,7 @@ msgstr "Permissões"
 msgid "Permissions can be assigned for user groups only."
 msgstr "As permissões apenas podem ser atribuídas a grupos de utilizadores."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:72
 msgid "Persian (fa_IR)"
 msgstr "Persa (fa_IR)"
 
@@ -11233,7 +11233,7 @@ msgstr "Por favor introduza o texto de confirmação."
 msgid "Please select two elements"
 msgstr "Por favor seleccione dois elementos"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:73
 msgid "Polish (pl_PL)"
 msgstr "Polaco (pl_PL)"
 
@@ -11268,11 +11268,11 @@ msgstr "O porto não pode ser vazio para o interface do host."
 msgid "Port range"
 msgstr "Gama de portos"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_BR)"
 msgstr "Português (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_PT)"
 msgstr "Português (pt_PT)"
 
@@ -11932,7 +11932,7 @@ msgstr ""
 msgid "Right"
 msgstr "Direita"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:76
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12006,7 +12006,7 @@ msgstr "Executar comandos remotos nos hosts"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:77
 msgid "Russian (ru_RU)"
 msgstr "Russo (ru_RU)"
 
@@ -12087,7 +12087,7 @@ msgstr "Chave SNMP"
 #: disc_prototypes.php:79 host_discovery.php:82 include/forms.inc.php:463
 #: include/views/configuration.host.discovery.edit.php:103
 #: include/views/configuration.item.edit.php:109
-#: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
+#: include/views/js/configuration.discovery.edit.js.php:430 items.php:87
 msgid "SNMP OID"
 msgstr "OID SNMP"
 
@@ -12262,7 +12262,7 @@ msgstr "Sábado"
 #: include/views/configuration.triggers.massupdate.php:165
 #: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
-#: popup_media.php:137 tr_logform.php:335
+#: popup_media.php:137 tr_logform.php:338
 msgid "Save"
 msgstr "Guardar"
 
@@ -12735,7 +12735,7 @@ msgstr "A sessão foi terminada, por favor, inicie a sessão novamente."
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
-#: report5.php:60 tr_logform.php:331 tr_status.php:294
+#: report5.php:60 tr_logform.php:334 tr_status.php:294
 msgid "Severity"
 msgstr "Severidade"
 
@@ -12974,7 +12974,7 @@ msgstr "Slideshows"
 msgid "Slides"
 msgstr "Slides"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:78
 msgid "Slovak (sk_SK)"
 msgstr "Eslovaco (sk_SK)"
 
@@ -13049,7 +13049,7 @@ msgstr "Não é permitido ordenar pelo campo \"%1$s\"."
 msgid "Source"
 msgstr "Origem"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:79
 msgid "Spanish (es_ES)"
 msgstr "Espanhol (es_ES)"
 
@@ -13277,7 +13277,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:80
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
@@ -14098,7 +14098,7 @@ msgstr "Ter"
 msgid "Tuesday"
 msgstr "Terça-feira"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:81
 msgid "Turkish (tr_TR)"
 msgstr "Turco (tr_TR)"
 
@@ -14200,7 +14200,7 @@ msgstr "SUBIR"
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:185 jsLoader.php:220
-#: popup_httpstep.php:37 tr_logform.php:333
+#: popup_httpstep.php:37 tr_logform.php:336
 msgid "URL"
 msgstr "URL"
 
@@ -14251,7 +14251,7 @@ msgstr "USA (160 caracteres)"
 msgid "USER PROFILE"
 msgstr "PERFIL DO UTILIZADOR"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:82
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraniano (uk_UA)"
 
@@ -14492,7 +14492,7 @@ msgstr "Em cima"
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
 #: include/views/js/adm.regexprs.edit.js.php:255
-#: include/views/js/configuration.discovery.edit.js.php:348
+#: include/views/js/configuration.discovery.edit.js.php:351
 #: popup_period.php:135
 msgid "Update"
 msgstr "Actualizar"
@@ -15128,7 +15128,7 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Alinhamento vertical"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:83
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15530,11 +15530,11 @@ msgstr "Sem sessão iniciada."
 msgid "You can not switch hosts for current selection."
 msgstr "Não é possível alterar entre hosts para a selecção actual."
 
-#: include/views/js/configuration.action.edit.js.php:351
+#: include/views/js/configuration.action.edit.js.php:354
 msgid "You did not specify host for operation."
 msgstr "Não foi especificado nenhum host para esta operação."
 
-#: include/views/js/configuration.action.edit.js.php:317
+#: include/views/js/configuration.action.edit.js.php:320
 msgid "You did not specify host group for operation."
 msgstr "Não foi especificado nenhum grupo de hosts para esta operação."
 

@@ -527,14 +527,14 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
 			}
 
-			// where condition proccess
+			// where condition processing
 			$sqlWhere = array();
 			foreach ($row['where'] as $field => $values) {
 				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
 					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 				}
 				$values = zbx_toArray($values);
-				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
+				sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
 
 				$sqlWhere[] = dbConditionString($field, $values);
 			}
