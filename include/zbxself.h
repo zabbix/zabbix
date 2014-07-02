@@ -62,6 +62,8 @@
 int	get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
 int	compare_process_type_string(char *proc_type_str);
+unsigned char get_process_type_by_server_num(int server_num);
+int 	get_process_num_by_server_num(int server_num);
 void	init_selfmon_collector(void);
 void	free_selfmon_collector(void);
 void	update_selfmon_counter(unsigned char state);

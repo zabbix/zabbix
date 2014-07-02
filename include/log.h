@@ -60,7 +60,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...);
 
 void zabbix_close_log();
 void zabbix_set_log_level(int level);
-void set_debug_level(int value, unsigned char process_type);
+void set_debug_level(int value, const char *process_type);
 int zabbix_check_log_level(int level);
 
 char *zbx_strerror(int errnum);

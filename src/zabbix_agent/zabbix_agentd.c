@@ -754,22 +754,24 @@ void	zbx_sigusr_handler(zbx_task_t task)
 }
 #endif
 
-unsigned char get_process_type_by_server_num(int server_num)
+unsigned char	get_process_type_by_server_num(int server_num)
 {
 	/* nothing to do */
 }
 
-unsigned int get_process_num_by_server_num(int server_num)
+unsigned int	get_process_num_by_server_num(int server_num)
 {
 	/* nothing to do */
 }
 
 int	get_process_type_forks(unsigned char process_type)
 {
+	/* nothing to do */
 }
 
 const char	*get_process_type_string(unsigned char process_type)
 {
+	/* nothing to do */
 }
 
 int	main(int argc, char **argv)
