@@ -215,6 +215,8 @@ if ($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) {
 				$item['caption'] = $item['name_expanded'];
 			}
 		}
+
+		unset($item);
 	}
 
 	if ($config == BR_DISTRIBUTION_MULTIPLE_ITEMS) {
