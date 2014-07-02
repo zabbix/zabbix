@@ -275,7 +275,7 @@ if (hasRequest('sform')) {
 	$table->setAttribute('id', 'exp_list');
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 
-	$maxid = 0;
+	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
 		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
 		$imgup->setAttribute('onclick', 'javascript: element_up("logtr'.$id.'");');
@@ -304,13 +304,13 @@ if (hasRequest('sform')) {
 		$frmTRLog->addVar('expressions['.$id.'][value]', $expr['value']);
 		$frmTRLog->addVar('expressions['.$id.'][type]', $expr['type']);
 
-		$maxid = ($maxid < $id) ? $id : $maxid;
+		$maxId = max($maxId, $id);
 	}
 
-	zbx_add_post_js('logexpr_count='.($maxid + 1).';');
+	zbx_add_post_js('logexpr_count='.($maxId + 1).';');
 	zbx_add_post_js('processExpressionList();');
 
-	$maxid = 0;
+	$maxId = 0;
 	foreach ($keys as $id => $val) {
 		$del_url = new CLink(_('Delete'), '#', 'action',
 			'javascript: if (confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;'
@@ -322,10 +322,10 @@ if (hasRequest('sform')) {
 		$frmTRLog->addVar('keys['.$id.'][value]', $val['value']);
 		$frmTRLog->addVar('keys['.$id.'][type]', $val['type']);
 
-		$maxid = ($maxid < $id) ? $id : $maxid;
+		$maxId = max($maxId, $id);
 	}
 
-	zbx_add_post_js('key_count='.($maxid + 1).';');
+	zbx_add_post_js('key_count='.($maxId + 1).';');
 
 	$frmTRLog->addRow(SPACE, $keyTable);
 	$frmTRLog->addRow(SPACE, $table);
