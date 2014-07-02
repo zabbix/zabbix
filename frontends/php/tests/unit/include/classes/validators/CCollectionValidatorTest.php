@@ -61,13 +61,12 @@ class CCollectionValidatorTest extends CValidatorTest {
 					array('type' => 2, 'subtype' => 2),
 				)
 			),
-			// this is a regression test
-			// todo: rewrite messageInvalid to messageType
 			array(
-				array('messageType' => 'Not an array'),
+				array('uniqueField' => 'type', 'uniqueField2' => null),
 				array(
-					'string',
-					100
+					array('type' => 1),
+					array('type' => 2),
+					array('type' => 3)
 				)
 			)
 		);
