@@ -88,14 +88,14 @@ class CCollectionValidator extends CValidator {
 		// check for objects with duplicate values
 		if ($this->uniqueField) {
 			if ($duplicate = CArrayHelper::findDuplicate($value, $this->uniqueField, $this->uniqueField2)) {
-				// since second unique parameter can be absent, we call it in ugly way
-				$params = array($this->messageDuplicate, $duplicate[$this->uniqueField]);
-
-				if ($this->uniqueField2) {
-					$params[] = $duplicate[$this->uniqueField2];
+				if ($this->uniqueField2 === null) {
+					$this->error($this->messageDuplicate, $duplicate[$this->uniqueField]);
 				}
-
-				call_user_func_array(array($this, 'error'), $params);
+				else {
+					$this->error($this->messageDuplicate,
+						$duplicate[$this->uniqueField], $duplicate[$this->uniqueField2]
+					);
+				}
 
 				return false;
 			}
