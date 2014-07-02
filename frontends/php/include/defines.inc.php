@@ -139,6 +139,7 @@ define('P_SYS',				1);
 define('P_UNSET_EMPTY',		2);
 define('P_ACT',				16);
 define('P_NZERO',			32);
+define('P_NO_TRIM',			64);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -542,7 +543,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
-// alignes
+// alignments
 define('HALIGN_DEFAULT',	0);
 define('HALIGN_CENTER',		0);
 define('HALIGN_LEFT',		1);
@@ -554,7 +555,7 @@ define('VALIGN_TOP',		1);
 define('VALIGN_BOTTOM',		2);
 
 // info module style
-define('STYLE_HORISONTAL',	0);
+define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
 // view style [Overview]
@@ -905,7 +906,6 @@ define('WIDGET_ZABBIX_STATUS',		'stszbx');
 define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
 define('NOT_ZERO',	"({}!=0)&&");
-define('NO_TRIM',	'NO_TRIM');
 
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);

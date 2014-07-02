@@ -28,7 +28,7 @@ class CTriggersInfo extends CTable {
 	private $groupid;
 	private $hostid;
 
-	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORISONTAL) {
+	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
 		$this->style = null;
 
 		parent::__construct(null, 'triggers_info');
@@ -39,7 +39,7 @@ class CTriggersInfo extends CTable {
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL) {
+		if ($value != STYLE_HORIZONTAL && $value != STYLE_VERTICAL) {
 			return $this->error('Incorrect value for SetOrientation ['.$value.']');
 		}
 		$this->style = $value;
@@ -117,7 +117,7 @@ class CTriggersInfo extends CTable {
 			}
 
 			$header = new CCol($header_str, 'header');
-			if ($this->style == STYLE_HORISONTAL) {
+			if ($this->style == STYLE_HORIZONTAL) {
 				$header->setColspan(8);
 			}
 			$this->addRow($header);
@@ -131,7 +131,7 @@ class CTriggersInfo extends CTable {
 		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
 		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
-		if (STYLE_HORISONTAL == $this->style) {
+		if (STYLE_HORIZONTAL == $this->style) {
 			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
 		}
 		else {

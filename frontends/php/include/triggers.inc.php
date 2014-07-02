@@ -459,7 +459,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		$dependencies = array();
 		foreach ($dbSrcTriggers as $srcTrigger) {
 			if ($srcTrigger['dependencies']) {
-				// get coresponding created trigger id
+				// get corresponding created trigger id
 				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
 
 
@@ -852,7 +852,7 @@ function triggerExpression($trigger, $html = false) {
  *
  * For example: localhost:system.cpu.load.last(0)>10 will be translated to {12}>10 and created database representation.
  *
- * @throws Exception if error occureed
+ * @throws Exception if error occurred
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid

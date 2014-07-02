@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:35+0300\n"
+"POT-Creation-Date: 2014-06-30 02:44+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -456,7 +456,7 @@ msgstr "Активно до"
 #: include/views/configuration.triggers.edit.php:318
 #: include/views/configuration.triggers.massupdate.php:125
 #: include/views/js/adm.regexprs.edit.js.php:249
-#: include/views/js/configuration.action.edit.js.php:289
+#: include/views/js/configuration.action.edit.js.php:292
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.sysmaps.js.php:192
 #: include/views/js/configuration.sysmaps.js.php:405
@@ -1027,7 +1027,7 @@ msgstr "Долен"
 msgid "Brighten"
 msgstr "Ярък"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:56
 msgid "Bulgarian (bg_BG)"
 msgstr "Български (bg_BG)"
 
@@ -1275,7 +1275,7 @@ msgstr "Канада (136 символа)"
 #: include/views/js/administration.general.triggerSeverity.js.php:38
 #: include/views/js/configuration.action.edit.js.php:102
 #: include/views/js/configuration.discovery.edit.js.php:114 jsLoader.php:104
-#: tr_logform.php:337
+#: tr_logform.php:340
 msgid "Cancel"
 msgstr "Отказ"
 
@@ -2215,7 +2215,7 @@ msgstr ""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/views/js/monitoring.history.js.php:35
+#: include/views/js/monitoring.history.js.php:38
 msgid "Cannot remove all items, at least one item should remain."
 msgstr "Не може да се премахнат всички елементи на данните, трябва да остане поне един елемент на данните."
 
@@ -2597,7 +2597,7 @@ msgstr "Не може да се актуализира стойност на р�
 msgid "Cannot update web scenario"
 msgstr " Не може да се актуализира уеб сценарий"
 
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:603
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr ""
 
@@ -2663,7 +2663,7 @@ msgstr "Шаси"
 msgid "Chassis info - returns full info by default"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:536
+#: include/views/js/configuration.discovery.edit.js.php:539
 msgid "Check already exists."
 msgstr "Проверката вече съществува."
 
@@ -2738,11 +2738,11 @@ msgstr ""
 msgid "Checks should be unique."
 msgstr "Проверките трябва да са уникални."
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:57
 msgid "Chinese (zh_CN)"
 msgstr "Китайски (zh_CN)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:58
 msgid "Chinese (zh_TW)"
 msgstr "Китайски (zh_TW)"
 
@@ -2819,9 +2819,9 @@ msgstr "Часовник"
 msgid "Clone"
 msgstr "Клониране"
 
-#: include/views/js/configuration.discovery.edit.js.php:537
-#: include/views/js/configuration.discovery.edit.js.php:601
-#: include/views/js/configuration.discovery.edit.js.php:618
+#: include/views/js/configuration.discovery.edit.js.php:540
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:621
 #: include/views/js/configuration.sysmaps.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:304
 #: include/views/js/configuration.sysmaps.js.php:417 jsLoader.php:146
@@ -2896,7 +2896,7 @@ msgstr "Комапдата не може да бъде празна."
 msgid "Commands"
 msgstr "Команди"
 
-#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:332
+#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:335
 msgid "Comments"
 msgstr "Коментари"
 
@@ -3420,7 +3420,7 @@ msgid "Current date is NOT N"
 msgstr "Текущата дата НЕ е N"
 
 #: include/views/js/configuration.action.edit.js.php:87
-#: include/views/js/configuration.action.edit.js.php:212
+#: include/views/js/configuration.action.edit.js.php:215
 msgid "Current host"
 msgstr "Текущ хост"
 
@@ -3490,7 +3490,7 @@ msgstr "Персонализиран размер"
 msgid "Custom slides"
 msgstr "Персонализирани слайдове"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:59
 msgid "Czech (cs_CZ)"
 msgstr "Чешки (cs_CZ)"
 
@@ -3805,7 +3805,7 @@ msgstr "Закъснение с"
 #: include/classes/class.cbuttondelete.php:25
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:162 jsLoader.php:107
-#: jsLoader.php:185 tr_logform.php:293 tr_logform.php:314
+#: jsLoader.php:185 tr_logform.php:295 tr_logform.php:317
 msgid "Delete"
 msgstr "Изтриване"
 
@@ -3835,7 +3835,7 @@ msgid "Delete discovery rule?"
 msgstr "Изтриване на правилото за откриване?"
 
 #: include/views/configuration.triggers.edit.php:164 jsLoader.php:109
-#: tr_logform.php:294
+#: tr_logform.php:296
 msgid "Delete expression?"
 msgstr "Изтриване на израза?"
 
@@ -3868,7 +3868,7 @@ msgstr ""
 msgid "Delete item?"
 msgstr "Изтриване на елемент на данните?"
 
-#: jsLoader.php:108 tr_logform.php:314
+#: jsLoader.php:108 tr_logform.php:317
 msgid "Delete keyword?"
 msgstr "Изтриване на ключова дума?"
 
@@ -4433,7 +4433,7 @@ msgstr "Изключване на избраните тригери?"
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:156
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
-#: tr_logform.php:334
+#: tr_logform.php:337
 msgid "Disabled"
 msgstr "Изключено"
 
@@ -4472,9 +4472,9 @@ msgstr "Откриване чрез прокси"
 msgid "Discovery check"
 msgstr "Проверка за откриване"
 
-#: include/views/js/configuration.discovery.edit.js.php:535
-#: include/views/js/configuration.discovery.edit.js.php:599
-#: include/views/js/configuration.discovery.edit.js.php:616
+#: include/views/js/configuration.discovery.edit.js.php:538
+#: include/views/js/configuration.discovery.edit.js.php:602
+#: include/views/js/configuration.discovery.edit.js.php:619
 msgid "Discovery check error"
 msgstr ""
 
@@ -4703,7 +4703,7 @@ msgstr "Продължителност"
 msgid "Duration (sec)"
 msgstr "Продължителност (сек)"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Dutch (nl_NL)"
 msgstr "Холандски (nl_NL)"
 
@@ -5023,11 +5023,11 @@ msgstr "Активиране на избраните тригери?"
 msgid "Enabled"
 msgstr "Активно"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:54
 msgid "English (en_GB)"
 msgstr "Английски (en_GB)"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:55
 msgid "English (en_US)"
 msgstr "Английски (US)"
 
@@ -5122,7 +5122,7 @@ msgstr "Всяка седмица"
 msgid "Exa"
 msgstr "Екса"
 
-#: tr_logform.php:261 tr_logform.php:298
+#: tr_logform.php:261 tr_logform.php:300
 msgid "Exclude"
 msgstr "Изключване"
 
@@ -5441,7 +5441,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Завърши"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Finnish (fi_FI)"
 msgstr "Финландски (fi_FI)"
 
@@ -5485,7 +5485,7 @@ msgstr "Формула"
 msgid "Fourth"
 msgstr "Четвърти"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "French (fr_FR)"
 msgstr "Френски (fr_FR)"
 
@@ -5579,13 +5579,13 @@ msgstr "Общ"
 msgid "Generated in %s sec"
 msgstr "Генерирано за %s сек"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "German (de_DE)"
 msgstr "Немски (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:555
-msgid "Get content of WEB page. Default path is /"
+msgid "Get content of web page. Default path is /"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:257
@@ -5595,7 +5595,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:563
-msgid "Get first occurence of regexp in WEB page. Default path is /"
+msgid "Get first occurrence of regexp in web page. Default path is /"
 msgstr ""
 
 #: include/page_header.php:194
@@ -5604,7 +5604,7 @@ msgstr "Получаване на поддръжка"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:559
-msgid "Get timing of loading full WEB page. Default path is /"
+msgid "Get timing of loading full web page. Default path is /"
 msgstr ""
 
 #: include/func.inc.php:680
@@ -5842,7 +5842,7 @@ msgstr "Графики копирани"
 msgid "Graphs deleted"
 msgstr "Графики изтрити"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Greek (el_GR)"
 msgstr "Гръцки (el_GR)"
 
@@ -6159,7 +6159,7 @@ msgstr "Хоризонтално подравняване"
 #: include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:225
 #: include/views/js/configuration.action.edit.js.php:88
-#: include/views/js/configuration.action.edit.js.php:209
+#: include/views/js/configuration.action.edit.js.php:212
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
@@ -6237,7 +6237,7 @@ msgstr[1] ""
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
-#: include/views/js/configuration.action.edit.js.php:197
+#: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:143
@@ -6529,7 +6529,7 @@ msgstr "Часа"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "Унгарски (hu_HU)"
 
@@ -6920,7 +6920,7 @@ msgstr "В поддръжка"
 msgid "In progress"
 msgstr "В процес на изпълнение"
 
-#: tr_logform.php:260 tr_logform.php:298
+#: tr_logform.php:260 tr_logform.php:300
 msgid "Include"
 msgstr "Включва"
 
@@ -6946,12 +6946,12 @@ msgid "Incorrect IP range \"%s\"."
 msgstr "Неправилен IP диапазон \"%s\"."
 
 #: api/classes/CDRule.php:286
-#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:571
 msgid "Incorrect SNMP OID."
 msgstr "Неправилен SNMP OID."
 
 #: api/classes/CDRule.php:282
-#: include/views/js/configuration.discovery.edit.js.php:564
+#: include/views/js/configuration.discovery.edit.js.php:567
 msgid "Incorrect SNMP community."
 msgstr "Неправилно SNMP community."
 
@@ -7665,7 +7665,7 @@ msgstr "Неправилен елемент на данните за макс. Y
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Неправилен елемент на данните за мин. Y в графика \"%1$s\"."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:66
 msgid "Indonesian (id_ID)"
 msgstr "Индонезийски (id_ID)"
 
@@ -7923,7 +7923,7 @@ msgstr "Не е възможно да се излезе от HTTP автенти
 msgid "It is not possible to search by user password."
 msgstr "Не е възможно да се търси по парола на потребителя."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Italian (it_IT)"
 msgstr "Италиански (it_IT)"
 
@@ -8211,7 +8211,7 @@ msgstr "Яну"
 msgid "January"
 msgstr "Януари"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:69
 msgid "Japanese (ja_JP)"
 msgstr "Японски (ja_JP)"
 
@@ -8248,7 +8248,7 @@ msgstr "Период на пазене на загубените ресурси 
 #: include/views/configuration.item.edit.php:68
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.list.php:48
-#: include/views/js/configuration.discovery.edit.js.php:426 items.php:46
+#: include/views/js/configuration.discovery.edit.js.php:429 items.php:46
 #: popup.php:939 popup.php:1081 popup.php:1190 popup.php:1199
 msgid "Key"
 msgstr "Ключ"
@@ -8271,7 +8271,7 @@ msgstr "Ключова дума"
 msgid "Kilo"
 msgstr "Кило"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:68
 msgid "Korean (ko_KR)"
 msgstr "Корейски (ko_KR)"
 
@@ -8431,7 +8431,7 @@ msgstr "Последни събития"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:70
 msgid "Latvian (lv_LV)"
 msgstr "Латвийски (lv_LV)"
 
@@ -8544,7 +8544,7 @@ msgstr "Списъкът е празен"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:71
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -10864,17 +10864,17 @@ msgctxt "item_form"
 msgid "Overridden by"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:350
+msgid "Overridden by global housekeeping settings"
+msgstr ""
+
 #: include/views/administration.general.housekeeper.edit.php:133
 msgid "Override item history period"
 msgstr ""
 
 #: include/views/administration.general.housekeeper.edit.php:154
 msgid "Override item trend period"
-msgstr ""
-
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.edit.php:350
-msgid "Overriden by global housekeeping settings"
 msgstr ""
 
 #: include/menu.inc.php:37 include/menu.inc.php:105
@@ -11214,7 +11214,7 @@ msgstr "Права за достъп"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Права за достъп може да бъдат назначен само за потребителски групи."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:72
 msgid "Persian (fa_IR)"
 msgstr "Персийски (fa_IR)"
 
@@ -11255,7 +11255,7 @@ msgstr "Моля, въведете текста за потвърждение."
 msgid "Please select two elements"
 msgstr "Моля, изберете два елемента"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:73
 msgid "Polish (pl_PL)"
 msgstr "Полски (pl_PL)"
 
@@ -11290,11 +11290,11 @@ msgstr "Порта не може да бъде празен за хост инт
 msgid "Port range"
 msgstr "Диапазон на порт"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_BR)"
 msgstr "Португалски (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_PT)"
 msgstr "Португалски (pt_PT)"
 
@@ -11958,7 +11958,7 @@ msgstr ""
 msgid "Right"
 msgstr "Отдясно"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:76
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12032,7 +12032,7 @@ msgstr "Изпълни отдалечени команди на хост"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:77
 msgid "Russian (ru_RU)"
 msgstr "Руски (ru_RU)"
 
@@ -12113,7 +12113,7 @@ msgstr "SNMP Ключ"
 #: disc_prototypes.php:79 host_discovery.php:82 include/forms.inc.php:463
 #: include/views/configuration.host.discovery.edit.php:103
 #: include/views/configuration.item.edit.php:109
-#: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
+#: include/views/js/configuration.discovery.edit.js.php:430 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -12288,7 +12288,7 @@ msgstr "Събота"
 #: include/views/configuration.triggers.massupdate.php:165
 #: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
-#: popup_media.php:137 tr_logform.php:335
+#: popup_media.php:137 tr_logform.php:338
 msgid "Save"
 msgstr "Запиши"
 
@@ -12761,7 +12761,7 @@ msgstr "Сесията е прекратена, моля влезте повто
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
-#: report5.php:60 tr_logform.php:331 tr_status.php:294
+#: report5.php:60 tr_logform.php:334 tr_status.php:294
 msgid "Severity"
 msgstr "Важност"
 
@@ -13000,7 +13000,7 @@ msgstr "Слайдшоу"
 msgid "Slides"
 msgstr "Слайдове"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:78
 msgid "Slovak (sk_SK)"
 msgstr "Словашки (sk_SK)"
 
@@ -13075,7 +13075,7 @@ msgstr "Сортиране по поле \"%1$s\" не е разрешено."
 msgid "Source"
 msgstr "Източник"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:79
 msgid "Spanish (es_ES)"
 msgstr "Испански (es_ES)"
 
@@ -13303,7 +13303,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:80
 msgid "Swedish (sv_SE)"
 msgstr "Шведски (sv_SE)"
 
@@ -14125,7 +14125,7 @@ msgstr "Вто"
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:81
 msgid "Turkish (tr_TR)"
 msgstr "Турски (tr_TR)"
 
@@ -14227,7 +14227,7 @@ msgstr "ДОСТЪПЕН"
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:185 jsLoader.php:220
-#: popup_httpstep.php:37 tr_logform.php:333
+#: popup_httpstep.php:37 tr_logform.php:336
 msgid "URL"
 msgstr "URL"
 
@@ -14278,7 +14278,7 @@ msgstr "USA (160 символа)"
 msgid "USER PROFILE"
 msgstr "ПОТРЕБИТЕЛСКИ ПРОФИЛ"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:82
 msgid "Ukrainian (uk_UA)"
 msgstr "Украински (uk_UA)"
 
@@ -14519,7 +14519,7 @@ msgstr "Достъпен"
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
 #: include/views/js/adm.regexprs.edit.js.php:255
-#: include/views/js/configuration.discovery.edit.js.php:348
+#: include/views/js/configuration.discovery.edit.js.php:351
 #: popup_period.php:135
 msgid "Update"
 msgstr "Актуализиране"
@@ -15156,7 +15156,7 @@ msgstr "Вертикален"
 msgid "Vertical align"
 msgstr "Вертикално подравняване"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:83
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15562,11 +15562,11 @@ msgstr "Вие не сте влезли в системата."
 msgid "You can not switch hosts for current selection."
 msgstr "Не може да превключвате хостове за текущата селекция."
 
-#: include/views/js/configuration.action.edit.js.php:351
+#: include/views/js/configuration.action.edit.js.php:354
 msgid "You did not specify host for operation."
 msgstr "Вие не сте уточнили хост за операцията."
 
-#: include/views/js/configuration.action.edit.js.php:317
+#: include/views/js/configuration.action.edit.js.php:320
 msgid "You did not specify host group for operation."
 msgstr "Вие не сте уточнили хост група за операцията."
 
