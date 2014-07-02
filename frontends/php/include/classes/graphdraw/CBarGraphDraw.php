@@ -502,7 +502,7 @@ class CBarGraphDraw extends CGraphDraw {
 					8,
 					90,
 					$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)+$dims['width']*2,
-					$this->sizeY+$this->shiftY + $dims['height'] +6,
+					$this->sizeY+$this->shiftY + $dims['height'] + 10,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption
 				);
@@ -695,7 +695,7 @@ class CBarGraphDraw extends CGraphDraw {
 
 			if ($this->sizeY - $shiftsY < $this->minChartHeight) {
 				$this->sizeY = $this->minChartHeight;
-				$this->fullSizeY = $this->sizeY + $shiftsY;
+				$this->fullSizeY = $this->sizeY + $shiftsY + 10;
 			}
 		}
 		else {

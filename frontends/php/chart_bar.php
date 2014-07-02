@@ -638,13 +638,6 @@ if (!isset($graph_data['legend'])) {
 	$graph_data['legend'] = '';
 }
 
-$maxCaptionLength = 0;
-foreach($graph_data['captions'] as $caption) {
-	if(strlen($caption) > $maxCaptionLength) {
-		$maxCaptionLength = strlen($caption);
-	}
-}
-
 $graph->setSeriesLegend($graph_data['legend']);
 $graph->setPeriodCaption($graph_data['captions']);
 
