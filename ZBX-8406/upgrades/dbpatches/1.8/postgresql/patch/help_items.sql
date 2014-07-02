@@ -98,7 +98,7 @@ insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk 
 insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
 insert into help_items values(0,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
 insert into help_items values(0,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
-insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurence of regexp in WEB page. Default path is /');
+insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in WEB page. Default path is /');
 insert into help_items values(0,'perf_counter[counter, interval]','Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.');
 insert into help_items values(0,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(0,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
@@ -150,7 +150,7 @@ insert into help_items values(7,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk 
 insert into help_items values(7,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
 insert into help_items values(7,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
 insert into help_items values(7,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
-insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurence of regexp in WEB page. Default path is /');
+insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in WEB page. Default path is /');
 insert into help_items values(7,'perf_counter[counter]','Value of any performance counter, where parameter is the counter path.');
 insert into help_items values(7,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(7,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
