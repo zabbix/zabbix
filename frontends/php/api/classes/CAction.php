@@ -687,7 +687,7 @@ class CAction extends CApiService {
 
 			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter']);
 
-				if (!empty($action)) {
+			if (!empty($action)) {
 				$actionUpdates[] = array(
 					'values' => $action,
 					'where' => array('actionid' => $actionId)
