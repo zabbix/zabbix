@@ -35,21 +35,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'description' =>	array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,			'isset({save_trigger})'),
+	'description' =>	array(T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({save_trigger})'),
 	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({save_trigger})'),
-	'sform' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
-	'sitems' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'sform' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
+	'sitems' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'triggerid' =>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null),
-	'type' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
-	'priority' =>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
-	'expressions' =>	array(T_ZBX_STR, O_OPT,	 NULL,			NOT_EMPTY,			'isset({save_trigger})'),
-	'expr_type' =>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'type' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
+	'priority' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
+	'expressions' =>	array(T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({save_trigger})'),
+	'expr_type' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'comments' =>		array(T_ZBX_STR, O_OPT,  null,			null,				null),
 	'url' =>			array(T_ZBX_STR, O_OPT,  null,			null,				null),
-	'status' =>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),			null),
+	'status' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 null,			null,				null),
-	'save_trigger' =>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,				null),
-	'keys '=> 			array(T_ZBX_STR, O_OPT,  NULL,			NULL,				NULL),
+	'save_trigger' =>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
+	'keys' => 			array(T_ZBX_STR, O_OPT,  null,			null,				null),
 );
 check_fields($fields);
 
@@ -167,7 +167,7 @@ if (hasRequest('save_trigger')) {
 //------------------------ <FORM> ---------------------------
 
 if (hasRequest('sform')) {
-	$frmTRLog = new CFormTable(_('Trigger'));
+	$frmTRLog = new CFormTable(_('Trigger'), null, null, null, 'sform');
 	$frmTRLog->setName('sform');
 	$frmTRLog->addHelpIcon();
 	$frmTRLog->setTableClass('formlongtable formtable');
@@ -339,9 +339,7 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(_('Disabled'),
 		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
 	);
-	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save'),
-		'javascript: document.forms[0].action += \'?saction=1\';')
-	);
+	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save')));
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 
