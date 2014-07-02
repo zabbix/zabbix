@@ -50,7 +50,7 @@ class CProfiler {
 	protected $apiLog = array();
 
 	/**
-	 * Contains sql queryes info.
+	 * Contains SQL queries info.
 	 *
 	 * @var array
 	 */

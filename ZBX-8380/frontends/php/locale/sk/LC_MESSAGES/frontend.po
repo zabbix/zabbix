@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:38+0300\n"
+"POT-Creation-Date: 2014-06-30 02:44+0300\n"
 "PO-Revision-Date: 2014-06-23 19:22+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -467,7 +467,7 @@ msgstr "Aktívny do"
 #: include/views/configuration.triggers.edit.php:318
 #: include/views/configuration.triggers.massupdate.php:125
 #: include/views/js/adm.regexprs.edit.js.php:249
-#: include/views/js/configuration.action.edit.js.php:289
+#: include/views/js/configuration.action.edit.js.php:292
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.sysmaps.js.php:192
 #: include/views/js/configuration.sysmaps.js.php:405
@@ -1039,7 +1039,7 @@ msgstr "Dole"
 msgid "Brighten"
 msgstr "Zosvetliť"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:56
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulharsky (bg_BG)"
 
@@ -1286,7 +1286,7 @@ msgstr "Kanada (136 znakov)"
 #: include/views/js/administration.general.triggerSeverity.js.php:38
 #: include/views/js/configuration.action.edit.js.php:102
 #: include/views/js/configuration.discovery.edit.js.php:114 jsLoader.php:104
-#: tr_logform.php:337
+#: tr_logform.php:340
 msgid "Cancel"
 msgstr "Zrušiť"
 
@@ -2249,7 +2249,7 @@ msgstr "Nie je možné spracovať aplikácie z rôznych hostov alebo šablón."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Nie je možné čítať odpoveď, skontrolujte spojenie so Zabbix serverom \"%1$s\"."
 
-#: include/views/js/monitoring.history.js.php:35
+#: include/views/js/monitoring.history.js.php:38
 msgid "Cannot remove all items, at least one item should remain."
 msgstr "Nie je možné zmazať všetky položky, najmenej jedna musí ostať."
 
@@ -2630,7 +2630,7 @@ msgstr "Nie je možné aktualizovať mapu hodnôt"
 msgid "Cannot update web scenario"
 msgstr "Nie je možné aktualizovať web scenár"
 
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:603
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru."
 
@@ -2696,7 +2696,7 @@ msgstr "Šasi"
 msgid "Chassis info - returns full info by default"
 msgstr "Šasi informácie - vráti všetky informácie"
 
-#: include/views/js/configuration.discovery.edit.js.php:536
+#: include/views/js/configuration.discovery.edit.js.php:539
 msgid "Check already exists."
 msgstr "Kontrola už existuje."
 
@@ -2771,11 +2771,11 @@ msgstr "Kontrola, či port je v LISTEN stave. 0 - nie je, 1 - je v LISTEN stave.
 msgid "Checks should be unique."
 msgstr "Kontroly musia byť jedinečné."
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:57
 msgid "Chinese (zh_CN)"
 msgstr "Čínsky (zh_CN)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:58
 msgid "Chinese (zh_TW)"
 msgstr "Čínsky (zh_TW)"
 
@@ -2852,9 +2852,9 @@ msgstr "Hodiny"
 msgid "Clone"
 msgstr "Klonovať"
 
-#: include/views/js/configuration.discovery.edit.js.php:537
-#: include/views/js/configuration.discovery.edit.js.php:601
-#: include/views/js/configuration.discovery.edit.js.php:618
+#: include/views/js/configuration.discovery.edit.js.php:540
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:621
 #: include/views/js/configuration.sysmaps.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:304
 #: include/views/js/configuration.sysmaps.js.php:417 jsLoader.php:146
@@ -2928,7 +2928,7 @@ msgstr "Príkaz nemôže byť prázdny."
 msgid "Commands"
 msgstr "Príkazy"
 
-#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:332
+#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:335
 msgid "Comments"
 msgstr "Komentáre"
 
@@ -3451,7 +3451,7 @@ msgid "Current date is NOT N"
 msgstr "Aktuálny dátum NIE JE N"
 
 #: include/views/js/configuration.action.edit.js.php:87
-#: include/views/js/configuration.action.edit.js.php:212
+#: include/views/js/configuration.action.edit.js.php:215
 msgid "Current host"
 msgstr "Aktuálny host"
 
@@ -3521,7 +3521,7 @@ msgstr "Vlastná veľkosť"
 msgid "Custom slides"
 msgstr "Vlastné prezentácie"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:59
 msgid "Czech (cs_CZ)"
 msgstr "Česky (cs_CZ)"
 
@@ -3836,7 +3836,7 @@ msgstr "Oneskorené o"
 #: include/classes/class.cbuttondelete.php:25
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:162 jsLoader.php:107
-#: jsLoader.php:185 tr_logform.php:293 tr_logform.php:314
+#: jsLoader.php:185 tr_logform.php:295 tr_logform.php:317
 msgid "Delete"
 msgstr "Zmazať"
 
@@ -3866,7 +3866,7 @@ msgid "Delete discovery rule?"
 msgstr "Zmazať zisťovacie pravidlo?"
 
 #: include/views/configuration.triggers.edit.php:164 jsLoader.php:109
-#: tr_logform.php:294
+#: tr_logform.php:296
 msgid "Delete expression?"
 msgstr "Zmazať výraz?"
 
@@ -3898,7 +3898,7 @@ msgstr "Zmazať prototyp položky?"
 msgid "Delete item?"
 msgstr "Zmazať položku?"
 
-#: jsLoader.php:108 tr_logform.php:314
+#: jsLoader.php:108 tr_logform.php:317
 msgid "Delete keyword?"
 msgstr "Zmazať kľúčové slovo?"
 
@@ -4464,7 +4464,7 @@ msgstr "Zakázať označené spúšťače?"
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:156
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
-#: tr_logform.php:334
+#: tr_logform.php:337
 msgid "Disabled"
 msgstr "Vypnuté"
 
@@ -4503,9 +4503,9 @@ msgstr "Zisťovanie cez proxy"
 msgid "Discovery check"
 msgstr "Kontrola zisťovania"
 
-#: include/views/js/configuration.discovery.edit.js.php:535
-#: include/views/js/configuration.discovery.edit.js.php:599
-#: include/views/js/configuration.discovery.edit.js.php:616
+#: include/views/js/configuration.discovery.edit.js.php:538
+#: include/views/js/configuration.discovery.edit.js.php:602
+#: include/views/js/configuration.discovery.edit.js.php:619
 msgid "Discovery check error"
 msgstr "Chyba zisťovacej kontroly"
 
@@ -4736,7 +4736,7 @@ msgstr "Trvanie"
 msgid "Duration (sec)"
 msgstr "Trvanie (sekundy)"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Dutch (nl_NL)"
 msgstr "Holandsky (nl_NL)"
 
@@ -5056,11 +5056,11 @@ msgstr "Povoliť označené spúšťače?"
 msgid "Enabled"
 msgstr "Povolené"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:54
 msgid "English (en_GB)"
 msgstr "Anglicky (en_GB)"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:55
 msgid "English (en_US)"
 msgstr "Anglicky (en_US)"
 
@@ -5155,7 +5155,7 @@ msgstr "Každý týždeň(e)"
 msgid "Exa"
 msgstr "Exa"
 
-#: tr_logform.php:261 tr_logform.php:298
+#: tr_logform.php:261 tr_logform.php:300
 msgid "Exclude"
 msgstr "Vylúčiť"
 
@@ -5474,7 +5474,7 @@ msgstr "Nájdi reťazec v súbore. Vybraný reťazec"
 msgid "Finish"
 msgstr "Ukončiť"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Finnish (fi_FI)"
 msgstr "Fínsky (fi_FI)"
 
@@ -5518,7 +5518,7 @@ msgstr "Vzorec"
 msgid "Fourth"
 msgstr "Štvrtý"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "French (fr_FR)"
 msgstr "Francúzsky (fr_FR)"
 
@@ -5612,14 +5612,14 @@ msgstr "Všeobecne"
 msgid "Generated in %s sec"
 msgstr "Vygenerované za %s sekúnd"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "German (de_DE)"
 msgstr "Nemecky (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:555
-msgid "Get content of WEB page. Default path is /"
-msgstr "Získať obsah web stránky. Predvolená cesta je /"
+msgid "Get content of web page. Default path is /"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:515
@@ -5628,8 +5628,8 @@ msgstr "Získať obsah daného súboru."
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:563
-msgid "Get first occurence of regexp in WEB page. Default path is /"
-msgstr "Získať prvý výber regulárnym výrazom na web stránke. Predvolená cesta je /"
+msgid "Get first occurrence of regexp in web page. Default path is /"
+msgstr ""
 
 #: include/page_header.php:194
 msgid "Get support"
@@ -5637,8 +5637,8 @@ msgstr "Získať podporu"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:559
-msgid "Get timing of loading full WEB page. Default path is /"
-msgstr "Získať čas načítania úplnej web stránky. Predvolená cesta je /"
+msgid "Get timing of loading full web page. Default path is /"
+msgstr ""
 
 #: include/func.inc.php:680
 msgid "Giga"
@@ -5875,7 +5875,7 @@ msgstr "Grafy skopírované"
 msgid "Graphs deleted"
 msgstr "Grafy zmazané"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Greek (el_GR)"
 msgstr "Grécky (el_GR)"
 
@@ -6192,7 +6192,7 @@ msgstr "Vodorovné zarovnanie"
 #: include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:225
 #: include/views/js/configuration.action.edit.js.php:88
-#: include/views/js/configuration.action.edit.js.php:209
+#: include/views/js/configuration.action.edit.js.php:212
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
@@ -6273,7 +6273,7 @@ msgstr[2] "Hosty povolené"
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
-#: include/views/js/configuration.action.edit.js.php:197
+#: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:143
@@ -6567,7 +6567,7 @@ msgstr "hodín"
 msgid "Housekeeping"
 msgstr "Údržba"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "Maďarsky (hu_HU)"
 
@@ -6951,7 +6951,7 @@ msgstr "Plánovaná odstávka"
 msgid "In progress"
 msgstr "V priebehu"
 
-#: tr_logform.php:260 tr_logform.php:298
+#: tr_logform.php:260 tr_logform.php:300
 msgid "Include"
 msgstr "Vrátane"
 
@@ -6977,12 +6977,12 @@ msgid "Incorrect IP range \"%s\"."
 msgstr "Neplatný IP rozsah \"%s\"."
 
 #: api/classes/CDRule.php:286
-#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:571
 msgid "Incorrect SNMP OID."
 msgstr "Nesprávna hodnota SNMP OID."
 
 #: api/classes/CDRule.php:282
-#: include/views/js/configuration.discovery.edit.js.php:564
+#: include/views/js/configuration.discovery.edit.js.php:567
 msgid "Incorrect SNMP community."
 msgstr "Nesprávna SNMP komunita."
 
@@ -7696,7 +7696,7 @@ msgstr "Neplatná položka y max pre graf \"%1$s\"."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Neplatná položka y min pre graf \"%1$s\"."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:66
 msgid "Indonesian (id_ID)"
 msgstr "Indonézsky (id_ID)"
 
@@ -7954,7 +7954,7 @@ msgstr "Nie je možné sa odhlásiť od HTTP autentifikácie."
 msgid "It is not possible to search by user password."
 msgstr "Nie je možné nájsť používateľské heslo."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Italian (it_IT)"
 msgstr "Taliansky (it_IT)"
 
@@ -8246,7 +8246,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Január"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:69
 msgid "Japanese (ja_JP)"
 msgstr "Japonsky (ja_JP)"
 
@@ -8283,7 +8283,7 @@ msgstr "Ponechať stratené zdroje (v dňoch)"
 #: include/views/configuration.item.edit.php:68
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.list.php:48
-#: include/views/js/configuration.discovery.edit.js.php:426 items.php:46
+#: include/views/js/configuration.discovery.edit.js.php:429 items.php:46
 #: popup.php:939 popup.php:1081 popup.php:1190 popup.php:1199
 msgid "Key"
 msgstr "Kľúč"
@@ -8306,7 +8306,7 @@ msgstr "Kľúčové slovo"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:68
 msgid "Korean (ko_KR)"
 msgstr "Kórejsky (ko_KR)"
 
@@ -8467,7 +8467,7 @@ msgstr "Posledné udalosti"
 msgid "Latest values"
 msgstr "Posledné hodnoty"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:70
 msgid "Latvian (lv_LV)"
 msgstr "Litovsky (lv_LV)"
 
@@ -8580,7 +8580,7 @@ msgstr "Zoznam je prázdny"
 msgid "List of network interfaces. Text value."
 msgstr "Zoznam sieťových rozhraní. Textová hodnota."
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:71
 msgid "Lithuanian (lt_LT)"
 msgstr "Litovsky (lt_LT)"
 
@@ -10902,6 +10902,11 @@ msgctxt "item_form"
 msgid "Overridden by"
 msgstr "Prepísané"
 
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:350
+msgid "Overridden by global housekeeping settings"
+msgstr ""
+
 #: include/views/administration.general.housekeeper.edit.php:133
 msgid "Override item history period"
 msgstr "Prepísaná položka historickej periódy"
@@ -10909,11 +10914,6 @@ msgstr "Prepísaná položka historickej periódy"
 #: include/views/administration.general.housekeeper.edit.php:154
 msgid "Override item trend period"
 msgstr "Prepísaná položka trendovej periódy"
-
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.edit.php:350
-msgid "Overriden by global housekeeping settings"
-msgstr "Prepísané globálnymi nastaveniami údržby"
 
 #: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
@@ -11252,7 +11252,7 @@ msgstr "Oprávnenia"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k používateľovi."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:72
 msgid "Persian (fa_IR)"
 msgstr "Persky (fa_IR)"
 
@@ -11293,7 +11293,7 @@ msgstr "Prosím zadajte potvrdzovací text."
 msgid "Please select two elements"
 msgstr "Označte prosím dva elementy"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:73
 msgid "Polish (pl_PL)"
 msgstr "Polsky (pl_PL)"
 
@@ -11328,11 +11328,11 @@ msgstr "Port nemôže byť prázdny pre rozhranie hosta."
 msgid "Port range"
 msgstr "Rozsah portov"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_BR)"
 msgstr "Portugalsky (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_PT)"
 msgstr "Portugalsky (pt_PT)"
 
@@ -11993,7 +11993,7 @@ msgstr "Vrátí percento stratených ICMP ping paketov."
 msgid "Right"
 msgstr "Vpravo"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:76
 msgid "Romanian (ro_RO)"
 msgstr "Rumunsky (ro_RO)"
 
@@ -12067,7 +12067,7 @@ msgstr "Spusti vzdialené príkazy na hostoch"
 msgid "Run specified command on the host."
 msgstr "Spustí zadaný príkaz na hostovi."
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:77
 msgid "Russian (ru_RU)"
 msgstr "Rusky (ru_RU)"
 
@@ -12148,7 +12148,7 @@ msgstr "SNMP kľúč"
 #: disc_prototypes.php:79 host_discovery.php:82 include/forms.inc.php:463
 #: include/views/configuration.host.discovery.edit.php:103
 #: include/views/configuration.item.edit.php:109
-#: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
+#: include/views/js/configuration.discovery.edit.js.php:430 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -12323,7 +12323,7 @@ msgstr "Sobota"
 #: include/views/configuration.triggers.massupdate.php:165
 #: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
-#: popup_media.php:137 tr_logform.php:335
+#: popup_media.php:137 tr_logform.php:338
 msgid "Save"
 msgstr "Uložiť"
 
@@ -12796,7 +12796,7 @@ msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
-#: report5.php:60 tr_logform.php:331 tr_status.php:294
+#: report5.php:60 tr_logform.php:334 tr_status.php:294
 msgid "Severity"
 msgstr "Závažnosť"
 
@@ -13037,7 +13037,7 @@ msgstr "Prezentácie"
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:78
 msgid "Slovak (sk_SK)"
 msgstr "Slovensky (sk_SK)"
 
@@ -13112,7 +13112,7 @@ msgstr "Zoradenie podľa pola \"%1$s\" nie je dovolené."
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:79
 msgid "Spanish (es_ES)"
 msgstr "Španielsky (es_ES)"
 
@@ -13340,7 +13340,7 @@ msgstr "Swap out. Ak type je count - počet swapov je vrátený. Ak type je page
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Swapovací priestor. Hodnota v bytoch. Ak swap chýba, je použitý all. Ak mode chýba, je použitý used."
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:80
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
@@ -14168,7 +14168,7 @@ msgstr "Ut"
 msgid "Tuesday"
 msgstr "Utorok"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:81
 msgid "Turkish (tr_TR)"
 msgstr "Turecky (tr_TR)"
 
@@ -14270,7 +14270,7 @@ msgstr "UP"
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:185 jsLoader.php:220
-#: popup_httpstep.php:37 tr_logform.php:333
+#: popup_httpstep.php:37 tr_logform.php:336
 msgid "URL"
 msgstr "URL"
 
@@ -14321,7 +14321,7 @@ msgstr "USA (160 znakov)"
 msgid "USER PROFILE"
 msgstr "POUŽÍVATEĽSKÝ PROFIL"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:82
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
@@ -14562,7 +14562,7 @@ msgstr "Dostupný"
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
 #: include/views/js/adm.regexprs.edit.js.php:255
-#: include/views/js/configuration.discovery.edit.js.php:348
+#: include/views/js/configuration.discovery.edit.js.php:351
 #: popup_period.php:135
 msgid "Update"
 msgstr "Aktualizovať"
@@ -15200,7 +15200,7 @@ msgstr "Vertikálny"
 msgid "Vertical align"
 msgstr "Vertikálne zarovnanie"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:83
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnamsky (vi_VN)"
 
@@ -15604,11 +15604,11 @@ msgstr "Nie ste prihlásený."
 msgid "You can not switch hosts for current selection."
 msgstr "Nemôžete zmeniť hostov pre aktuálne označenie."
 
-#: include/views/js/configuration.action.edit.js.php:351
+#: include/views/js/configuration.action.edit.js.php:354
 msgid "You did not specify host for operation."
 msgstr "Nešpecifikovali ste hosta pre operáciu."
 
-#: include/views/js/configuration.action.edit.js.php:317
+#: include/views/js/configuration.action.edit.js.php:320
 msgid "You did not specify host group for operation."
 msgstr "Nešpecifikovali ste skupinu pre operáciu."
 

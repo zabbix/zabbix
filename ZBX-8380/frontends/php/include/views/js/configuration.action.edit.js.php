@@ -135,6 +135,9 @@
 		userscript: <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>
 	};
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		var i,
 			value,
