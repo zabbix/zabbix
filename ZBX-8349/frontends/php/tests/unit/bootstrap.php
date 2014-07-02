@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+error_reporting(E_ALL | E_STRICT); // because in some PHP versions E_ALL does not include E_STRICT
+
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
 require_once __DIR__.'/../../include/gettextwrapper.inc.php';
