@@ -203,98 +203,6 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
-unsigned char get_process_type_by_server_num(int server_num)
-{
-	int	server_count = 0;
-
-	if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
-		return ZBX_PROCESS_TYPE_CONFSYNCER;
-	else if (server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
-		return ZBX_PROCESS_TYPE_WATCHDOG;
-	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
-		return ZBX_PROCESS_TYPE_POLLER;
-	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-		return ZBX_PROCESS_TYPE_UNREACHABLE;
-	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
-		return ZBX_PROCESS_TYPE_TRAPPER;
-	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
-		return ZBX_PROCESS_TYPE_PINGER;
-	else if (server_num <= (server_count += CONFIG_ALERTER_FORKS))
-		return ZBX_PROCESS_TYPE_ALERTER;
-	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
-		return ZBX_PROCESS_TYPE_HOUSEKEEPER;
-	else if (server_num <= (server_count += CONFIG_TIMER_FORKS))
-		return ZBX_PROCESS_TYPE_TIMER;
-	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
-		return ZBX_PROCESS_TYPE_HTTPPOLLER;
-	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
-		return ZBX_PROCESS_TYPE_DISCOVERER;
-	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
-		return ZBX_PROCESS_TYPE_HISTSYNCER;
-	else if (server_num <= (server_count += CONFIG_ESCALATOR_FORKS))
-		return ZBX_PROCESS_TYPE_ESCALATOR;
-	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
-		return ZBX_PROCESS_TYPE_SNMPTRAPPER;
-	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
-		return ZBX_PROCESS_TYPE_JAVAPOLLER;
-	else if (server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
-		return ZBX_PROCESS_TYPE_SNMPTRAPPER;
-	else if (server_num <= (server_count += CONFIG_PROXYPOLLER_FORKS))
-		return ZBX_PROCESS_TYPE_PROXYPOLLER;
-	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
-		return ZBX_PROCESS_TYPE_SELFMON;
-	else if (server_num <= (server_count += CONFIG_VMWARE_FORKS))
-		return ZBX_PROCESS_TYPE_VMWARE;
-
-	assert(0);
-}
-
-int get_process_num_by_server_num(int server_num)
-{
-	int	server_count = 0;
-
-	if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
-		return (server_num - server_count + CONFIG_CONFSYNCER_FORKS);
-	else if (server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
-		return (server_num - server_count + CONFIG_WATCHDOG_FORKS);
-	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
-		return (server_num - server_count + CONFIG_POLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-		return (server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
-		return (server_num - server_count + CONFIG_TRAPPER_FORKS);
-	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
-		return (server_num - server_count + CONFIG_PINGER_FORKS);
-	else if (server_num <= (server_count += CONFIG_ALERTER_FORKS))
-		return (server_num - server_count + CONFIG_ALERTER_FORKS);
-	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
-		return (server_num - server_count + CONFIG_HOUSEKEEPER_FORKS);
-	else if (server_num <= (server_count += CONFIG_TIMER_FORKS))
-		return (server_num - server_count + CONFIG_TIMER_FORKS);
-	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
-		return (server_num - server_count + CONFIG_HTTPPOLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
-		return (server_num - server_count + CONFIG_DISCOVERER_FORKS);
-	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
-		return (server_num - server_count + CONFIG_HISTSYNCER_FORKS);
-	else if (server_num <= (server_count += CONFIG_ESCALATOR_FORKS))
-		return (server_num - server_count + CONFIG_ESCALATOR_FORKS);
-	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
-		return (server_num - server_count + CONFIG_IPMIPOLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
-		return (server_num - server_count + CONFIG_JAVAPOLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
-		return (server_num - server_count + CONFIG_SNMPTRAPPER_FORKS);
-	else if (server_num <= (server_count += CONFIG_PROXYPOLLER_FORKS))
-		return (server_num - server_count + CONFIG_PROXYPOLLER_FORKS);
-	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
-		return (server_num - server_count + CONFIG_SELFMON_FORKS);
-	else if (server_num <= (server_count += CONFIG_VMWARE_FORKS))
-		return (server_num - server_count + CONFIG_VMWARE_FORKS);
-
-	assert(0);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_defaults                                                 *
@@ -552,7 +460,8 @@ void	zbx_sigusr_handler(zbx_task_t task)
 				ZBX_PROCESS_TYPE_PID == ((unsigned char *)&task)[1] ||
 				process_type == ((unsigned char *)&task)[1])
 			{
-				set_debug_level(UP, process_type);
+				set_debug_level(UP, get_process_type_string(process_type));
+
 			}
 			break;
 		case ZBX_TASK_LOG_LEVEL_DECREASE:
@@ -560,7 +469,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 				ZBX_PROCESS_TYPE_PID == ((unsigned char *)&task)[1] ||
 				process_type == ((unsigned char *)&task)[1])
 			{
-				set_debug_level(DOWN, process_type);
+				set_debug_level(DOWN, get_process_type_string(process_type));
 			}
 			break;
 		default:

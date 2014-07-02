@@ -41,21 +41,20 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
-
-void set_debug_level(int value, unsigned char process_type)
+void set_debug_level(int value, const char *process_type)
 {
 	if (log_level + value > LOG_LEVEL_TRACE)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "highest log level was previously set for process: %d", process_type);
+		zabbix_log(LOG_LEVEL_INFORMATION, "highest log level was previously set for \"%s\" process", process_type);
 	}
 	else if (log_level + value < LOG_LEVEL_EMPTY)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "lowest log level was previously set for process: %d", process_type);
+		zabbix_log(LOG_LEVEL_INFORMATION, "lowest log level was previously set for \"%s\" process", process_type);
 	}
 	else
 	{
 		log_level = log_level + value;
-		zabbix_log(LOG_LEVEL_INFORMATION, "log level is set to level \"%d\" for process: %d", log_level, process_type);
+		zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%d\" is set for \"%s\" process", log_level, process_type);
 	}
 }
 
