@@ -59,13 +59,13 @@ $caption = getRequest('caption', '');
 $autoCaption = '';
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-if (hasRequest('itemid') && getRequest('itemid') > 0) {
+if (getRequest('itemid') > 0) {
 	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid(getRequest('itemid'))));
 	$item = reset($items);
 
 	$autoCaption = $item['name_expanded'];
 
-	if (!hasRequest('caption') || getRequest('caption') == $item['name']) {
+	if (!hasRequest('caption') || getRequest('caption') === $item['name']) {
 		$caption = $item['name_expanded'];
 	}
 }
