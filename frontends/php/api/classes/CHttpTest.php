@@ -882,7 +882,8 @@ class CHttpTest extends CApiService {
 		$verifyPeerValidator = new CSetValidator(
 			array(
 				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
-				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
+				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".'),
+				'messageType' => _('Incorrect SSL verify peer type for web scenario "%1$s".')
 			)
 		);
 		$verifyPeerValidator->setObjectName($httpTest['name']);
@@ -891,9 +892,11 @@ class CHttpTest extends CApiService {
 		$verifyHostValidator = new CSetValidator(
 			array(
 				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
-				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
+				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".'),
+				'messageType' => _('Incorrect SSL verify host type for web scenario "%1$s".')
 			)
 		);
+
 		$verifyHostValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
 
