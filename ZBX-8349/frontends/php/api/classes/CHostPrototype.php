@@ -182,7 +182,8 @@ class CHostPrototype extends CHostBase {
 				)),
 				'status' => new CSetValidator(array(
 					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
-					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
+					'messageInvalid' => _('Incorrect status for host prototype "%1$s".'),
+					'messageType' => _('Incorrect status type for host prototype "%1$s".')
 				)),
 				'groupLinks' => new CCollectionValidator(array(
 					'uniqueField' => 'groupid',
