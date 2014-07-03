@@ -68,3 +68,6 @@ select[disabled="disabled"]::-ms-value {
 	border-color: #ffaa33;
 	color: #a8bfd4;
 }
+
+/* show non-gray background for disabled multiselect inputs on hover */
+.multiselect input[type="text"][disabled]:hover { background-color: transparent; }

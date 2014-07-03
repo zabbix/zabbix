@@ -174,3 +174,6 @@ select[disabled="disabled"]::-ms-value {
 .jqueryinput.input.button[disabled]:hover {
 	border-color: #ffaa33;
 }
+
+/* show non-gray background for disabled multiselect inputs on hover */
+.multiselect input[type="text"][disabled]:hover { background-color: transparent; }
