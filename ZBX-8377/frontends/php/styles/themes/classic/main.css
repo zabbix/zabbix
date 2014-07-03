@@ -148,7 +148,7 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 .input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #aca899;
-	background: #ffffff;
+	background-color: #fbfbfb;
 	/* ignored by IE for <select> */
 	color: #505050;
 }
@@ -156,6 +156,7 @@ input.input.formlist[type="button"][disabled], input.input.formlist[type="submit
 /* disabled <select> font color for IE 9+ */
 select[disabled="disabled"]::-ms-value {
 	color: #505050;
+	background-color: #fbfbfb;
 }
 
 .link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
