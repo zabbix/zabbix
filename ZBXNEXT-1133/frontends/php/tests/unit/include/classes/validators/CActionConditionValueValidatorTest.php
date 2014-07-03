@@ -355,6 +355,14 @@ class CActionConditionValueValidatorTest extends CValidatorTest {
 					'value' => '',
 				),
 				'Empty action condition.'
+			),
+			// invalid condition type
+			array(array(),
+				array(
+					'conditiontype' => 9999,
+					'value' => '',
+				),
+				'Incorrect action condition type.'
 			)
 		);
 
