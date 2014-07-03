@@ -60,12 +60,12 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_itemids get_lastclock
-		get_tlds get_probes get_nss tld_service_enabled
+		get_tlds get_probes get_targets get_all_items get_all_ns_items tld_service_enabled
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_ns_results get_item_values check_lastclock get_downtime avail_result_msg
+		get_results get_item_values check_lastclock get_downtime avail_result_msg
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -347,14 +347,7 @@ sub get_tlds
 {
     my $service = shift;
 
-    if (defined($service))
-    {
-	$service = uc($service);
-    }
-    else
-    {
-	$service = 'DNS';
-    }
+    $service = defined($service) ? uc($service) : 'DNS';
 
     my $sql;
 
@@ -401,7 +394,7 @@ sub get_probes
 {
     my $service = shift;
 
-    $service = uc($service) if (defined($service));
+    $service = defined($service) ? uc($service) : 'DNS';
 
     my $rows_ref = db_select(
 	"select h.host,h.hostid".
@@ -416,7 +409,7 @@ sub get_probes
 	my $host = $row_ref->[0];
 	my $hostid = $row_ref->[1];
 
-	if (defined($service))
+	if ($service ne 'DNS')
 	{
 	    $rows_ref = db_select(
 		"select hm.value".
@@ -435,7 +428,7 @@ sub get_probes
 }
 
 # get array of key nameservers ('i.ns.se,130.239.5.114', ...)
-sub get_nss
+sub get_targets
 {
     my $host = shift;
     my $cfg_key_out = shift;
@@ -451,6 +444,89 @@ sub get_nss
     fail("cannot find items ($cfg_key_out*) at host ($host)") if (scalar(@nss) == 0);
 
     return \@nss;
+}
+
+#
+# return itemids grouped by hosts:
+#
+# {
+#   hostid1 => { itemid1 => '' },
+#   hostid2 => { itemid2 => '' },
+#   ...
+# }
+#
+sub get_all_items
+{
+    my $key = shift;
+    my $tld = shift;
+
+    my $sql =
+	"select h.hostid,i.itemid".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+		" and i.templateid is not null".
+		" and i.key_='$key'";
+    $sql .=	" and h.host like '$tld %'" if (defined($tld));
+
+    my $rows_ref = db_select($sql);
+
+    my %result;
+
+    foreach my $row_ref (@$rows_ref)
+    {
+	$result{$row_ref->[0]}{$row_ref->[1]} = '';
+    }
+
+    if (scalar(keys(%result)) == 0)
+    {
+	if (defined($tld))
+	{
+	    fail("no items matching '$key' found at host '$tld %'");
+	}
+	else
+	{
+	    fail("no items matching '$key' found in the database");
+	}
+    }
+
+    return \%result;
+}
+
+# return itemids grouped by hosts:
+#
+# {
+#   hostid1 => {itemid1 => 'i.ns.se.,2001:67c:1010:5::53', itemid2 => 'g.ns.se.,130.239.5.114', ... },
+#   hostid2 => {itemid2 => 'i2.ns.se.,2001:67c:1010:5::54', itemid4 => 'g2.ns.se.,130.239.5.115', ... },
+#   ...
+# }
+sub get_all_ns_items
+{
+    my $targets_ref = shift; # array reference of name servers ("name,IP")
+    my $cfg_key_in = shift;
+    my $tld = shift;
+
+    my @keys;
+    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$targets_ref);
+
+    my $keys_str = join(',', @keys);
+
+    my $rows_ref = db_select(
+	"select h.hostid,i.itemid,i.key_ ".
+	"from items i,hosts h ".
+	"where i.hostid=h.hostid".
+		" and h.host like '$tld %'".
+		" and i.templateid is not null".
+		" and i.key_ in ($keys_str)");
+
+    my %result;
+    foreach my $row_ref (@$rows_ref)
+    {
+	$result{$row_ref->[0]}{$row_ref->[1]} = get_ns_from_key($row_ref->[2]);
+    }
+
+    fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+    return \%result;
 }
 
 sub get_items_by_hostids
@@ -559,6 +635,8 @@ sub db_select
 {
     my $query = shift;
 
+    dbg("[$query]");
+
     my $res = $dbh->prepare($query)
 	or fail("cannot prepare [$query]: ", $dbh->errstr);
 
@@ -569,7 +647,7 @@ sub db_select
 
     my $rows = scalar(@$rows_ref);
 
-    dbg("[$query] returned $rows row", ($rows != 1 ? "s" : ""));
+    dbg("$rows row", ($rows != 1 ? "s" : ""));
 
     return $rows_ref;
 }
@@ -1045,9 +1123,9 @@ sub process_slv_ns_monthly
     my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
-    my $nss_ref = get_nss($tld, $cfg_key_out);
+    my $targets_ref = get_targets($tld, $cfg_key_out);
 
-    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nss_ref));
+    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
 
     # %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
     # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
@@ -1058,7 +1136,7 @@ sub process_slv_ns_monthly
     # ...
     my %total_values;
     my %successful_values;
-    foreach my $ns (@$nss_ref)
+    foreach my $ns (@$targets_ref)
     {
 	$total_values{$ns} = 0;
 	$successful_values{$ns} = 0;
@@ -1066,7 +1144,7 @@ sub process_slv_ns_monthly
 
     my $probes_ref = get_probes();
 
-    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
+    my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
 
     dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($all_ns_items_ref));
 
@@ -1086,7 +1164,7 @@ sub process_slv_ns_monthly
 
 	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
 
-	my $values_ref = __get_ns_values($itemids_ref, [$cur_from, $cur_till], $all_ns_items_ref);
+	my $values_ref = __get_values($itemids_ref, [$cur_from, $cur_till], $all_ns_items_ref);
 
 	foreach my $ns (keys(%$values_ref))
 	{
@@ -1133,7 +1211,7 @@ sub process_slv_monthly
 
     my $probes_ref = get_probes();
 
-    my $all_items_ref = __get_all_items($cfg_key_in);
+    my $all_items_ref = get_all_items($cfg_key_in);
 
     dbg("using filter '$cfg_key_in' found next items:\n", Dumper($all_items_ref));
 
@@ -1196,12 +1274,12 @@ sub process_slv_ns_avail
     my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;
 
-    my $nss_ref = get_nss($tld, $cfg_key_out);
+    my $targets_ref = get_targets($tld, $cfg_key_out);
 
-    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nss_ref));
+    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
 
     my @out_keys;
-    push(@out_keys, $cfg_key_out . $_ . ']') foreach (@$nss_ref);
+    push(@out_keys, $cfg_key_out . $_ . ']') foreach (@$targets_ref);
 
     my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
     my $count = scalar(@$online_probes_ref);
@@ -1211,13 +1289,13 @@ sub process_slv_ns_avail
 	return;
     }
 
-    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
+    my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
 
     my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
     my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
 
-    my $values_ref = __get_ns_values($itemids_ref, [$from, $till], $all_ns_items_ref);
+    my $values_ref = __get_values($itemids_ref, [$from, $till], $all_ns_items_ref);
 
     wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
@@ -1251,60 +1329,52 @@ sub process_slv_ns_avail
 # get total and successful number of results of a service within given period of time for
 # a specified TLD
 #
-sub get_ns_results
+sub get_results
 {
     my $tld = shift;
-    my $key = shift;             # part of input key, e. g. 'rsm.dns.udp.upd[{$RSM.TLD},'
     my $value_ts = shift;        # value timestamp
     my $probe_times_ref = shift; # probe online times (for history data)
-    my $nss_ref = shift;         # the list of name servers
+    my $items_ref = shift;       # list of items to get results
     my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
 
-    # %result is a hash of name server as key and its number of successful results as a value. Name server is
-    # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
-    # certain period. An example of Name Server strings:
-    #
-    # 'g.ns.se,2001:6b0:e:3::1'
-    # 'b.ns.se,192.36.133.107'
-    #
     my %result;
-    foreach my $ns (@$nss_ref)
+    foreach my $hostid (keys(%$items_ref))
     {
-	$result{$ns} = {'total' => 0, 'successful' => 0};
+	my $hostitems = $items_ref->{$hostid};
+	foreach my $itemid (keys(%$hostitems))
+	{
+	    my $target = $items_ref->{$hostid}->{$itemid};
+	    $result{$target} = {'total' => 0, 'successful' => 0} unless (exists($result{$target}));
+	}
     }
-
-    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $key, $tld);
 
     foreach my $probe (keys(%$probe_times_ref))
     {
 	my $times_ref = $probe_times_ref->{$probe};
-
 	my $hostids_ref = probes2tldhostids($tld, [$probe]);
+	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $items_ref);
+	my $values_ref = __get_values($itemids_ref, $times_ref, $items_ref);
 
-	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
-
-	my $values_ref = __get_ns_values($itemids_ref, $times_ref, $all_ns_items_ref);
-
-	foreach my $ns (keys(%$values_ref))
+	foreach my $target (keys(%$values_ref))
 	{
-	    my $item_values_ref = $values_ref->{$ns};
+	    my $item_values_ref = $values_ref->{$target};
 
 	    my $probe_total = 0;
 	    my $probe_successful = 0;
 
 	    foreach (@$item_values_ref)
 	    {
-		$result{$ns}->{'total'}++;
+		$result{$target}->{'total'}++;
 		$probe_total++;
 
 		if ($check_value_ref->($_) == SUCCESS)
 		{
-		    $result{$ns}->{'successful'}++;
+		    $result{$target}->{'successful'}++;
 		    $probe_successful++;
 		}
 	    }
 
-	    dbg("  [$probe] $ns: $probe_successful/$probe_total");
+	    dbg("  [$probe] $target: $probe_successful/$probe_total");
 	}
     }
 
@@ -1627,22 +1697,22 @@ sub __get_macro
     return $rows_ref->[0]->[0];
 }
 
-# organize values from all hosts grouped by name server and return "name server"->values hash
+# organize values from all hosts grouped by target and return "target"->values hash
 #
 # E. g.:
 #
-# 'g.ns.se.,2001:6b0:e:3::1' => [
-#          205
-#    ];
-# 'b.ns.se.,192.36.133.107' => [
-#          -102
-#          304
-#    ];
-sub __get_ns_values
+# 'g.ns.se.,2001:6b0:e:3::1' => [205],
+# 'b.ns.se.,192.36.133.107' => [-202, 304],
+# ...
+#
+# or
+#
+# '' => [503, -203, ...],
+sub __get_values
 {
     my $itemids_ref = shift;
     my $times_ref = shift; # from, till, ...
-    my $all_ns_items = shift;
+    my $items_ref = shift;
 
     my %result;
 
@@ -1669,15 +1739,15 @@ sub __get_ns_values
 		my $itemid = $row_ref->[0];
 		my $value = $row_ref->[1];
 
-		my $ns = '';
+		my $target;
 		my $last = 0;
-		foreach my $hostid (keys(%$all_ns_items))
+		foreach my $hostid (keys(%$items_ref))
 		{
-		    foreach my $i (keys(%{$all_ns_items->{$hostid}}))
+		    foreach my $i (keys(%{$items_ref->{$hostid}}))
 		    {
 			if ($i == $itemid)
 			{
-			    $ns = $all_ns_items->{$hostid}{$i};
+			    $target = $items_ref->{$hostid}{$i};
 			    $last = 1;
 			    last;
 			}
@@ -1685,15 +1755,15 @@ sub __get_ns_values
 		    last if ($last == 1);
 		}
 
-		fail("internal error: name server of item $itemid not found") if ($ns eq "");
+		fail("internal error: name server of item $itemid not found") unless (defined($target));
 
-		if (exists($result{$ns}))
+		if (exists($result{$target}))
 		{
-		    $result{$ns} = [@{$result{$ns}}, $value];
+		    $result{$target} = [@{$result{$target}}, $value];
 		}
 		else
 		{
-		    $result{$ns} = [$value];
+		    $result{$target} = [$value];
 		}
 	    }
 	}
@@ -1756,77 +1826,6 @@ sub __get_itemids_by_hostids
     }
 
     return \@result;
-}
-
-# return items hash from all hosts grouped by hostid (hostid => hash of its items (itemid => ns)):
-#
-# hostid1
-#   32389 => 'i.ns.se.,2001:67c:1010:5::53',
-#   32386 => 'g.ns.se.,130.239.5.114',
-#   ...
-# hostid2
-#   ...
-# ...
-sub __get_all_ns_items
-{
-    my $nss_ref = shift; # array reference of name servers ("name,IP")
-    my $cfg_key_in = shift;
-    my $tld = shift;
-
-    my @keys;
-    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$nss_ref);
-
-    my $keys_str = join(',', @keys);
-
-    my $rows_ref = db_select(
-	"select h.hostid,i.itemid,i.key_ ".
-	"from items i,hosts h ".
-	"where i.hostid=h.hostid".
-		" and h.host like '$tld %'".
-		" and i.templateid is not null".
-		" and i.key_ in ($keys_str)");
-
-    my %result;
-    foreach my $row_ref (@$rows_ref)
-    {
-	$result{$row_ref->[0]}{$row_ref->[1]} = get_ns_from_key($row_ref->[2]);
-    }
-
-    fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
-
-    return \%result;
-}
-
-#
-# return itemids of all hosts:
-#
-# {
-#   hostid1 => { itemid1 => '' },
-#   hostid2 => { itemid2 => '' },
-#   ...
-# }
-#
-sub __get_all_items
-{
-    my $key = shift;
-
-    my $rows_ref = db_select(
-	"select h.hostid,i.itemid".
-	" from items i,hosts h".
-	" where i.hostid=h.hostid".
-		" and i.templateid is not null".
-		" and i.key_='$key'");
-
-    my %result;
-
-    foreach my $row_ref (@$rows_ref)
-    {
-	$result{$row_ref->[0]}{$row_ref->[1]} = '';
-    }
-
-    fail("no items matching '$key' found in the database") if (scalar(keys(%result)) == 0);
-
-    return \%result;
 }
 
 sub __script
