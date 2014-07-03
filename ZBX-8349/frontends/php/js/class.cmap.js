@@ -2051,17 +2051,3 @@ ZABBIX.apps.map = (function($) {
 		}
 	};
 }(jQuery));
-
-/**
- * Function that is executed by popup.php to ass selected values to destination.
- * It uses a sysmap global variable that created in sysmap.php file via 'var sysmap = ZABBIX.apps.map.run();'
- *
- * @param list link triggers selected in popup
- * @param {String} list.object name of objects which we returned
- * @param {Array} list.values list of link triggers
- */
-function addPopupValues(list) {
-	if (list.object === 'linktrigger') {
-		ZABBIX.apps.map.object.linkForm.addNewTriggers(list.values);
-	}
-}

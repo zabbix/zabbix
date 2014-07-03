@@ -1172,7 +1172,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		}
 	}
 
-	// aplications
+	// applications
 	if (count($data['applications']) == 0) {
 		array_push($data['applications'], 0);
 	}
