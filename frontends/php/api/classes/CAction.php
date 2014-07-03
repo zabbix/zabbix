@@ -686,7 +686,7 @@ class CAction extends CApiService {
 			}
 
 			$evalType = isset($action['filter'])
-				? $action['formula']['evaltype']
+				? $action['filter']['evaltype']
 				: null;
 
 			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter'], $action['evaltype']);
