@@ -418,10 +418,10 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 /*////////////////	FORMS	////////////////////*/
 .input, input.formlist[type="button"], div.calendar input[type="button"] {
 	border: 1px solid #dfdfdf;
-	background-color: #000;
+	background-color: #2f2f2f;
 	color: #fff;
 }
-.input option { background: #000; color: #FF5500; }
+.input option { background: #2f2f2f; color: #FF5500; }
 .input:focus, input.formlist[type="button"]:focus, div.calendar input[type="button"]:focus
 .input:hover, input.formlist[type="button"]:hover, div.calendar input[type="button"]:hover {
 	border-color: #FF5500; color: #FF5500;
@@ -429,18 +429,20 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 .input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
-	border-color: #dfdfdf;
-	background-color: #444444;
+	border-color: #444;
+	background-color: #2f2f2f;
 	/* ignored by IE for <select> */
-	color: #bfbfbf;
+	color: #dfdfdf;
 }
 
 /* disabled <select> font color for IE 9+ */
 select[disabled="disabled"]::-ms-value {
-	color: #bfbfbf;
+	background-color: #2f2f2f;
+	color: #dfdfdf;
+	border-color: #333;
 }
 
-select[disabled="disabled"] option { background-color: #444444; }
+select[disabled="disabled"] option { background-color: #2f2f2f; }
 
 .input.link_menu[disabled], .input.link_menu[disabled]:focus, .input.link_menu[disabled]:hover {
 	background-color: transparent;
