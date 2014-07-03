@@ -72,7 +72,7 @@ $conditionTable->attr('style', 'min-width: 350px;');
 $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
-foreach ($this->data['action']['conditions'] as $condition) {
+foreach ($this->data['action']['filter']['conditions'] as $condition) {
 	if (!isset($condition['conditiontype'])) {
 		$condition['conditiontype'] = 0;
 	}
@@ -107,14 +107,14 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$i++;
 }
 
-$formula = new CTextBox('formula', $this->data['action']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
+$formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
 $formula->attr('id', 'formula');
 $formula->attr('placeholder', 'A or (B and C) &hellip;');
-if ($this->data['action']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
+if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
 }
 
-$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'processTypeOfCalculation()');
+$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filter']['evaltype'], 'processTypeOfCalculation()');
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
@@ -125,7 +125,7 @@ $conditionFormList->addRow(
 	_('Type of calculation'),
 	array(
 		$calculationTypeComboBox,
-		new CSpan('', ($this->data['action']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'conditionLabel'),
+		new CSpan('', ($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'conditionLabel'),
 		$formula
 	),
 	false,
