@@ -422,9 +422,9 @@ const char	*__DBnode(const char *field_name, int nodeid, int op);
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
-void	DBinit();
+void	DBinit(void);
 
-void	DBclose();
+void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);

@@ -501,7 +501,7 @@ out:
 }
 
 #if defined(HAVE_SQLITE3)
-void	zbx_create_sqlite3_mutex(const char *dbname)
+void	zbx_create_sqlite3_mutex(void)
 {
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sqlite_access, ZBX_MUTEX_SQLITE3))
 	{
@@ -510,7 +510,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 	}
 }
 
-void	zbx_remove_sqlite3_mutex()
+void	zbx_remove_sqlite3_mutex(void)
 {
 	zbx_mutex_destroy(&sqlite_access);
 }
@@ -532,17 +532,17 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 			exit(EXIT_FAILURE);
 		}
 
-		zbx_create_sqlite3_mutex(dbname);
+		zbx_create_sqlite3_mutex();
 
 		zbx_db_execute("%s", db_schema);
 		zbx_db_close();
 	}
 	else
-		zbx_create_sqlite3_mutex(dbname);
+		zbx_create_sqlite3_mutex();
 #endif	/* HAVE_SQLITE3 */
 }
 
-void	zbx_db_close()
+void	zbx_db_close(void)
 {
 #if defined(HAVE_IBM_DB2)
 	if (ibm_db2.hdbc)
@@ -616,7 +616,7 @@ void	zbx_db_close()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_begin()
+int	zbx_db_begin(void)
 {
 	int	rc = ZBX_DB_OK;
 
@@ -659,7 +659,7 @@ int	zbx_db_begin()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_commit()
+int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
 
@@ -711,7 +711,7 @@ int	zbx_db_commit()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_rollback()
+int	zbx_db_rollback(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
 
@@ -755,12 +755,12 @@ int	zbx_db_rollback()
 	return rc;
 }
 
-int	zbx_db_txn_level()
+int	zbx_db_txn_level(void)
 {
 	return txn_level;
 }
 
-int	zbx_db_txn_error()
+int	zbx_db_txn_error(void)
 {
 	return txn_error;
 }
