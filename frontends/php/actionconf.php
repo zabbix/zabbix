@@ -375,10 +375,6 @@ if (hasRequest('form')) {
 		));
 		$data['action'] = reset($data['action']);
 
-		$data['action']['evaltype'] = $data['action']['filter']['evaltype'];
-		$data['action']['formula'] = $data['action']['filter']['formula'];
-		$data['action']['conditions'] = $data['action']['filter']['conditions'];
-
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
@@ -398,9 +394,9 @@ if (hasRequest('form')) {
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['operations'] = get_request('operations', array());
 
-		$data['action']['evaltype'] = getRequest('evaltype');
-		$data['action']['formula'] = getRequest('formula');
-		$data['action']['conditions'] = getRequest('conditions');
+		$data['action']['filter']['evaltype'] = getRequest('evaltype');
+		$data['action']['filter']['formula'] = getRequest('formula');
+		$data['action']['filter']['conditions'] = getRequest('conditions');
 
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
@@ -433,7 +429,7 @@ if (hasRequest('form')) {
 	}
 
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['conditions'] = array(
+		$data['action']['filter']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 				'operator' => CONDITION_OPERATOR_EQUAL,
@@ -457,7 +453,7 @@ if (hasRequest('form')) {
 		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
 	);
-	CArrayHelper::sort($data['action']['conditions'], $sortFields);
+	CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
 
 	// new condition
 	$data['new_condition'] = array(
