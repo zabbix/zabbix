@@ -685,7 +685,15 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter']);
+			$evalType = isset($action['filter'])
+				? $action['formula']['evaltype']
+				: null;
+
+			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter'], $action['evaltype']);
+
+			if ($evalType) {
+				$action['evaltype'] = $evalType;
+			}
 
 			if (!empty($action)) {
 				$actionUpdates[] = array(
