@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
@@ -25,40 +27,11 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $cfg_max_value, $service_type, $delay);
+my ($key, $cfg_max_value, $service_type, $delay, $eomonth);
 
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
 my $value_ts = $till;
-
-# calculate estimated total number of tests this month unless at least one time bound specified
-my $calculate_month_total = 0;
-$calculate_month_total = 1 unless (defined($from) or defined($till));
-
-if ($OPTS{'service'} eq 'tcp-dns-rtt')
-{
-    $key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
-    $cfg_max_value = get_macro_dns_tcp_rtt_low();
-    $delay = get_macro_dns_tcp_delay() if ($calculate_month_total == 1);
-}
-elsif ($OPTS{'service'} eq 'udp-dns-rtt')
-{
-    $key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
-    $cfg_max_value = get_macro_dns_udp_rtt_low();
-    $delay = get_macro_dns_udp_delay() if ($calculate_month_total == 1);
-}
-elsif ($OPTS{'service'} eq 'dns-upd')
-{
-    $key = 'rsm.dns.udp.upd[{$RSM.TLD},';
-    $cfg_max_value = get_macro_dns_update_time();
-    $delay = get_macro_dns_udp_delay() if ($calculate_month_total == 1);
-    $service_type = 'epp';
-}
-else
-{
-    print("Invalid name of service specified \"", $OPTS{'service'}, "\"\n");
-    usage(2);
-}
 
 unless (defined($from) and defined($till))
 {
@@ -67,6 +40,35 @@ unless (defined($from) and defined($till))
     $from = $bounds[0] unless (defined($from));
     $till = $bounds[1] unless (defined($till));
     $value_ts = $till;
+    $eomonth = $bounds[2];
+}
+
+# calculate estimated total number of tests this month unless at least one time bound specified
+my $calculate_month_total = (defined($from) or defined($till) ? 0 : 1);
+
+if ($OPTS{'service'} eq 'tcp-dns-rtt')
+{
+    $key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
+    $cfg_max_value = get_macro_dns_tcp_rtt_low();
+    $delay = get_macro_dns_tcp_delay() if ($calculate_month_total != 0);
+}
+elsif ($OPTS{'service'} eq 'udp-dns-rtt')
+{
+    $key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+    $cfg_max_value = get_macro_dns_udp_rtt_low();
+    $delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
+}
+elsif ($OPTS{'service'} eq 'dns-upd')
+{
+    $key = 'rsm.dns.udp.upd[{$RSM.TLD},';
+    $cfg_max_value = get_macro_dns_update_time();
+    $delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
+    $service_type = 'epp';
+}
+else
+{
+    print("Invalid name of service specified \"", $OPTS{'service'}, "\"\n");
+    usage(2);
 }
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
@@ -90,7 +92,9 @@ foreach (@$tlds_ref)
 
     if ("," eq substr($key, -1))
     {
-	my $result = get_ns_results($tld, $key, $value_ts, $probe_times_ref, \&check_item_value);
+	my $nss_ref = get_nss("Template $tld", $key);
+
+	my $result = get_ns_results($tld, $key, $value_ts, $probe_times_ref, $nss_ref, \&check_item_value);
 
 	foreach my $ns (keys(%$result))
 	{
@@ -104,6 +108,12 @@ foreach (@$tlds_ref)
 	    }
 
 	    info("$ns: $successful/$total successful results from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
+
+	    if ($calculate_month_total != 0)
+	    {
+		my $month_total = $total + int(($eomonth - $value_ts) / $delay);
+		info("$ns: month total $month_total tests");
+	    }
 	}
     }
 }

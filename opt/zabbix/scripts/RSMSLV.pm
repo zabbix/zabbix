@@ -60,7 +60,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_itemids get_lastclock
-		get_tlds get_probes tld_service_enabled
+		get_tlds get_probes get_nss tld_service_enabled
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
@@ -434,6 +434,25 @@ sub get_probes
     return \%result;
 }
 
+# get array of key nameservers ('i.ns.se,130.239.5.114', ...)
+sub get_nss
+{
+    my $host = shift;
+    my $cfg_key_out = shift;
+
+    my $rows_ref = db_select("select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_ like '$cfg_key_out%'");
+
+    my @nss;
+    foreach my $row_ref (@$rows_ref)
+    {
+	push(@nss, get_ns_from_key($row_ref->[0]));
+    }
+
+    fail("cannot find items ($cfg_key_out*) at host ($host)") if (scalar(@nss) == 0);
+
+    return \@nss;
+}
+
 sub get_items_by_hostids
 {
     my $hostids_ref = shift;
@@ -617,7 +636,11 @@ sub get_curmon_bounds
     $dt->truncate(to => 'month');
     my $from = $dt->epoch;
 
-    return ($from, $till);
+    $dt->add(months => 1);
+    $dt->subtract(seconds => 1);
+    my $eomonth = $dt->epoch; # end of month
+
+    return ($from, $till, $eomonth);
 }
 
 sub minutes_last_month
@@ -1022,7 +1045,7 @@ sub process_slv_ns_monthly
     my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
-    my $nss_ref = __get_nss($tld, $cfg_key_out);
+    my $nss_ref = get_nss($tld, $cfg_key_out);
 
     dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nss_ref));
 
@@ -1173,7 +1196,7 @@ sub process_slv_ns_avail
     my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;
 
-    my $nss_ref = __get_nss($tld, $cfg_key_out);
+    my $nss_ref = get_nss($tld, $cfg_key_out);
 
     dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nss_ref));
 
@@ -1234,10 +1257,8 @@ sub get_ns_results
     my $key = shift;             # part of input key, e. g. 'rsm.dns.udp.upd[{$RSM.TLD},'
     my $value_ts = shift;        # value timestamp
     my $probe_times_ref = shift; # probe online times (for history data)
+    my $nss_ref = shift;         # the list of name servers
     my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
-
-    # first we need to get the list of name servers
-    my $nss_ref = __get_nss("Template $tld", $key);
 
     # %result is a hash of name server as key and its number of successful results as a value. Name server is
     # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
@@ -1806,25 +1827,6 @@ sub __get_all_items
     fail("no items matching '$key' found in the database") if (scalar(keys(%result)) == 0);
 
     return \%result;
-}
-
-# get array of key nameservers ('i.ns.se,130.239.5.114', ...)
-sub __get_nss
-{
-    my $host = shift;
-    my $cfg_key_out = shift;
-
-    my $rows_ref = db_select("select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_ like '$cfg_key_out%'");
-
-    my @nss;
-    foreach my $row_ref (@$rows_ref)
-    {
-	push(@nss, get_ns_from_key($row_ref->[0]));
-    }
-
-    fail("cannot find items ($cfg_key_out*) at host ($host)") if (scalar(@nss) == 0);
-
-    return \@nss;
 }
 
 sub __script
