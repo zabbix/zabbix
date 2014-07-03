@@ -1,0 +1,5 @@
+base_users:
+    cleanup:  [ users ]
+    rows:
+        users:
+            admin: { userid: 1, alias: Admin, passwd: 5fce1b3e34b520afeffb37ce08c7cd66, type: 3 }

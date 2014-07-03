@@ -4,6 +4,7 @@ class ZBX8301DruleCreateTest extends ZbxApiTestBase
 {
 	/**
 	 * @group regression
+	 * @fixtures base_users
 	 */
 	public function testCreateValidateUnique()
 	{
