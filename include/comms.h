@@ -79,11 +79,12 @@ typedef struct
 	char		*buffer;
 	unsigned char	accepted;
 	char		*error;
+	char		*next_line;
 	int		timeout;
 }
 zbx_sock_t;
 
-const char	*zbx_tcp_strerror();
+const char	*zbx_tcp_strerror(void);
 
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
@@ -120,6 +121,7 @@ void    zbx_tcp_free(zbx_sock_t *s);
 #define	zbx_tcp_recv_to(s, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, timeout))
 
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout);
+const char	*zbx_tcp_recv_line(zbx_sock_t *s);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);

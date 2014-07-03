@@ -161,8 +161,11 @@ else {
 	$autologoutTextBox->setAttribute('disabled', 'disabled');
 }
 
-$userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
-$userFormList->addRow(_('Auto-logout (min 90 seconds)'), array($autologoutCheckBox, $autologoutTextBox));
+if ($this->data['alias'] != ZBX_GUEST_USER) {
+	$userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
+	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), array($autologoutCheckBox, $autologoutTextBox));
+}
+
 $userFormList->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4));
 $userFormList->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6));
 $userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -247,7 +250,7 @@ if ($this->data['is_profile']) {
 		SPACE,
 		$soundList,
 		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'formlist'),
-		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 	);
 
 	$triggersTable = new CTable('', 'invisible');
@@ -284,7 +287,7 @@ if ($this->data['is_profile']) {
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
-			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+			new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 		));
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');

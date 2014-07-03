@@ -78,10 +78,21 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database.';
 					$result = false;
 				}
-				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-					if ((int) $pgsql_version >= 9) {
-						// change the output format for values of type bytea from hex (the default) to escape
-						DBexecute('SET bytea_output = escape');
+				else {
+					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
+
+					if(!$schemaSet) {
+						clear_messages();
+						$error = pg_last_error();
+						$result = false;
+					}
+					else {
+						if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
+							if ((int) $pgsql_version >= 9) {
+								// change the output format for values of type bytea from hex (the default) to escape
+								DBexecute('SET bytea_output = escape');
+							}
+						}
 					}
 				}
 
@@ -424,7 +435,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 			break;
 	}
 
-	// $result is false only if an error occured
+	// $result is false only if an error occurred
 	if ($DB['TRANSACTION_NO_FAILED_SQLS'] && !$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}

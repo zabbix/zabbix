@@ -217,7 +217,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && !zbx_empty($trigger['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($trigger['error'], '', 'on');
+			$info->setHint($trigger['error'], 'on');
 		}
 		else {
 			$info = '';

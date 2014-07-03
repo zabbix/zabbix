@@ -21,7 +21,7 @@
 
 /**
  * In case gettext functions do not exist, just replacing them with our own,
- * so user can see at least english translation.
+ * so user can see at least English translation.
  */
 if (!function_exists('_')) {
 	/**
@@ -180,7 +180,7 @@ function _xn($message, $messagePlural, $num, $context) {
 /**
  * Returns a formatted string.
  *
- * @param string $format		recieves already stranlated string with format
+ * @param string $format		receives already stranlated string with format
  * @param array  $arguments		arguments to replace according to given format
  *
  * @return string

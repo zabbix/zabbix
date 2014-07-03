@@ -650,12 +650,16 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
-		$followRedirectsValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		$followRedirectsValidator = new CSetValidator(array(
+				'values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON),
+				'messageType' => _('Incorrect value type for "Follow redirects" flag.')
+			)
 		);
 
-		$retrieveModeValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+		$retrieveModeValidator = new CSetValidator(array(
+				'values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS),
+				'messageType' => _('Incorrect value type for "Retrieve only headers" flag.')
+			)
 		);
 
 		foreach ($httpTest['steps'] as $step) {
