@@ -211,11 +211,12 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		return $fixtures;
 	}
 
-	protected function request($method, $data = array(), $version = '2.0') {
+	protected function request($method, $params = array(), $data = array(), $version = '2.0') {
 		$data = array_merge(
 			array(
 				'method' => $method,
-				'jsonrpc' => $version
+				'jsonrpc' => $version,
+				'params' => $params
 			),
 			$data
 		);
@@ -249,10 +250,6 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		$this->setStreamWrapper(json_encode($data));
 
 		$_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
-
-		if (function_exists('zbx_err_handler')) {
-			rename_function('zbx_err_handler', 'zbx_err_handler_'.rand(1, 10));
-		}
 
 		ob_start();
 		require $this->getApiEntryPoint();
@@ -319,11 +316,10 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		}
 
 		$result = $this->request('user.login', array(
-			'params' => array(
 				'user' => $this->username,
 				'password' => $this->password
 			)
-		));
+		);
 
 		if (!preg_match('/^[a-z0-9]{32}$/', $result['result'])) {
 			throw new \RuntimeException('API auth token does not much expected format');

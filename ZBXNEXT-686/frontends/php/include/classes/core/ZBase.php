@@ -264,14 +264,16 @@ class ZBase {
 	 * Set custom error handler for PHP errors.
 	 */
 	protected function setErrorHandler() {
-		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-			// necessary to surpress errors when calling with error control operator like @function_name()
-			if (error_reporting() === 0) {
-				return true;
-			}
+		if (!function_exists('zbx_err_handler')) {
+			function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+				// necessary to surpress errors when calling with error control operator like @function_name()
+				if (error_reporting() === 0) {
+					return true;
+				}
 
-			// don't show the call to this handler function
-			error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+				// don't show the call to this handler function
+				error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+			}
 		}
 
 		set_error_handler('zbx_err_handler');
