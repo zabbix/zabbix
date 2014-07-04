@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
 .......PS. [ZBX-8422] removed php mutex locking from server code because of not being used and incompatible licensing issues (wiper)
 A......... [ZBX-8394] corrected misspelled "template" variables in API (Ivo)
 ...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
