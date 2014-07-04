@@ -184,9 +184,6 @@ class CHostImporter extends CImporter {
 		$dbHostMainInterfaceIds = array();
 
 		foreach ($dbInterfaces as $dbInterface) {
-								&& $dbInterface['main'] == $interface['main']
-								&& ((isset($interface['bulk']) && $dbInterface['bulk'] == $interface['bulk'])
-									|| !isset($interface['bulk']))) {
 			$dbHostId = $dbInterface['hostid'];
 
 			$dbHostInterfaces[$dbHostId][] = $dbInterface;
@@ -237,7 +234,10 @@ class CHostImporter extends CImporter {
 							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
 							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
 							&& $dbHostInterface['port'] == $xmlHostInterface['port']
-							&& $dbHostInterface['type'] == $xmlHostInterface['type']) {
+							&& $dbHostInterface['type'] == $xmlHostInterface['type']
+							&& ((isset($xmlHostInterface['bulk'])
+									&& $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])
+								|| !isset($xmlHostInterface['bulk']))) {
 						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
 						$reusedInterfaceIds[$dbHostInterfaceId] = true;
 						break;
