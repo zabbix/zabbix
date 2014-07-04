@@ -661,7 +661,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_itservices_lock();
 
 #ifdef	HAVE_SQLITE3
-	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
+	zbx_create_sqlite3_mutex();
 #endif
 
 	if (SUCCEED != DBcheck_version())

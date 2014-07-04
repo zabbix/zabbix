@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+.......PS. [ZBX-8422] removed php mutex locking from server code because of not being used and incompatible licensing issues (wiper)
 A......... [ZBX-8394] corrected misspelled "template" variables in API (Ivo)
 ...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
 ..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
