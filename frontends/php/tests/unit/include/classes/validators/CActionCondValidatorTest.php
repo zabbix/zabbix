@@ -19,7 +19,7 @@
 **/
 
 
-class CActionConditionValueValidatorTest extends CValidatorTest {
+class CActionCondValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
 		return array(
@@ -403,6 +403,6 @@ class CActionConditionValueValidatorTest extends CValidatorTest {
 	 * @return CValidator
 	 */
 	protected function createValidator(array $params = array()) {
-		return new CActionConditionValueValidator($params);
+		return new CActionCondValidator($params);
 	}
 }
