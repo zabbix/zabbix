@@ -150,16 +150,35 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 	/**
 	 * Executes api request and checks if it throws exception with the expected message/data.
 	 *
-	 * @param string|array $fixtures fixtures to load, can be JSON string, array or fixture file path
-	 * @param string $message
-	 * @param string $messageData
+	 * @param $callable callable to wrap your code
+	 * @param string $message expected exception message
+	 * @param string $messageData expected exception data
 	 * @throws PHPUnit_Framework_ExpectationFailedException
+	 * @internal param array|string $fixtures fixtures to load, can be JSON string, array or fixture file path
 	 */
-	protected function expectApiException($fixtures, $message, $messageData) {
-		$data = $this->loadFixtures($fixtures);
+	protected function expectApiException($callable, $message, $messageData) {
+		// if the callable returns an exception
+		try {
+			$response = $callable();
+		} catch (ZabbixApiException $e) {
+			if ($e->getOriginalMessage() != $message || $e->getOriginalData() != $messageData) {
+				throw new PHPUnit_Framework_ExpectationFailedException(
+					sprintf(
+						'API returned wrong exception ("%s/%s" expected, "%s/%s" actual)',
+						$message,
+						$messageData,
+						$e->getOriginalMessage(),
+						$e->getOriginalData()
+					)
+				);
+			} else {
+				$this->addToAssertionCount(1);
 
-		$response = $this->apiRequest($data);
+				return;
+			}
+		}
 
+		// if the callable just returns parsed json
 		if (!isset($response['error'])) {
 			throw new PHPUnit_Framework_ExpectationFailedException(
 				'API response does not look like exception (and it should be)'
@@ -181,6 +200,14 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		$this->addToAssertionCount(1);
 	}
 
+	protected function processJsonFixtures($file) {
+		$fixtures = $this->loadJsonFixtures($file);
+
+		$response = $this->apiRequest($fixtures);
+
+		return $response;
+	}
+
 	/**
 	 * Detects fixture type and loads them into array
 	 * (so they can be modified on request with auth variables, id and so on)
@@ -190,7 +217,7 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 	 *
 	 * @return array
 	 */
-	protected function loadFixtures($fixtures) {
+	protected function loadJsonFixtures($fixtures) {
 		if (is_string($fixtures)) {
 			// TODO: make more sane check
 			if (strpos($fixtures, '/') !== false && is_readable($this->getTestRoot().'/'.$fixtures)) {
