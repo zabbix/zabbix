@@ -459,6 +459,12 @@ class CXmlImport18 {
 				if (!isset($screenitem['resourceid'])) {
 					$screenitem['resourceid'] = 0;
 				}
+				if ($screenitem['rowspan'] == 0) {
+					$screenitem['rowspan'] = 1;
+				}
+				if ($screenitem['colspan'] == 0) {
+					$screenitem['colspan'] = 1;
+				}
 				if (is_array($screenitem['resourceid'])) {
 					switch ($screenitem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
