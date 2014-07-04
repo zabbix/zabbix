@@ -175,83 +175,62 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
-	try {
-		$newCondition = getRequest('new_condition');
+	$newCondition = getRequest('new_condition');
 
-		if ($newCondition) {
-			$conditions = getRequest('conditions');
+	if ($newCondition) {
+		$conditions = getRequest('conditions');
 
-			// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
-			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
-				$newCondition['value'] = '';
-			}
+		// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
+		if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+			$newCondition['value'] = '';
+		}
 
-			// check existing conditions and remove duplicate condition values
-			foreach ($conditions as $condition) {
-				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-					if (is_array($newCondition['value'])) {
-						foreach ($newCondition['value'] as $key => $newValue) {
-							if ($condition['value'] == $newValue) {
-								unset($newCondition['value'][$key]);
-							}
-						}
-					}
-					else {
-						if ($newCondition['value'] == $condition['value']) {
-							$newCondition['value'] = null;
+		// check existing conditions and remove duplicate condition values
+		foreach ($conditions as $condition) {
+			if ($newCondition['conditiontype'] == $condition['conditiontype']) {
+				if (is_array($newCondition['value'])) {
+					foreach ($newCondition['value'] as $key => $newValue) {
+						if ($condition['value'] == $newValue) {
+							unset($newCondition['value'][$key]);
 						}
 					}
 				}
-			}
-
-			$validateConditions = $conditions;
-
-			if (isset($newCondition['value'])) {
-				$newConditionValues = zbx_toArray($newCondition['value']);
-				foreach ($newConditionValues as $newValue) {
-					$condition = $newCondition;
-					$condition['value'] = $newValue;
-					$validateConditions[] = $condition;
-				}
-			}
-
-			if ($validateConditions) {
-				$filterConditionValidator = new CActionCondValidator();
-				foreach($validateConditions as $condition) {
-					if(!$filterConditionValidator->validate($condition)) {
-						throw new APIException(ZBX_API_ERROR_INTERNAL, $filterConditionValidator->getError());
+				else {
+					if ($newCondition['value'] == $condition['value']) {
+						$newCondition['value'] = null;
 					}
 				}
 			}
+		}
 
+		$validateConditions = $conditions;
+
+		if (isset($newCondition['value'])) {
+			$newConditionValues = zbx_toArray($newCondition['value']);
+			foreach ($newConditionValues as $newValue) {
+				$condition = $newCondition;
+				$condition['value'] = $newValue;
+				$validateConditions[] = $condition;
+			}
+		}
+
+		$conditionError = null;
+		if ($validateConditions) {
+			$filterConditionValidator = new CActionCondValidator();
+			foreach ($validateConditions as $condition) {
+				if (!$filterConditionValidator->validate($condition)) {
+					$conditionError = $filterConditionValidator->getError();
+				}
+			}
+		}
+
+		if (!$conditionError) {
 			$_REQUEST['conditions'] = $validateConditions;
 		}
-	}
-	catch (APIException $e) {
-		show_error_message(_('Cannot add action condition'));
-		error($e->getMessage());
-	}
-}
-elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
-	$new_opcondition = $_REQUEST['new_opcondition'];
-
-	try {
-		CAction::validateOperationConditions($new_opcondition);
-		$new_operation = get_request('new_operation', array());
-
-		if (!isset($new_operation['opconditions'])) {
-			$new_operation['opconditions'] = array();
+		else {
+			show_error_message(_('Cannot add action condition'));
+			error($filterConditionValidator->getError());
 		}
-		if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
-			array_push($new_operation['opconditions'], $new_opcondition);
-		}
-
-		$_REQUEST['new_operation'] = $new_operation;
-
-		unset($_REQUEST['new_opcondition']);
-	}
-	catch (APIException $e) {
-		error($e->getMessage());
 	}
 }
 elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
