@@ -36,7 +36,7 @@ foreach (@$tlds_ref)
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
-			 SLV_UNAVAILABILITY_LIMIT, $probe_avail_limit, \&check_item_value);
+			 $probe_avail_limit, \&check_item_value);
 }
 
 # unset TLD (for the logs)

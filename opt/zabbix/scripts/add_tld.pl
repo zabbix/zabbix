@@ -49,6 +49,7 @@ use constant LINUX_TEMPLATEID => 10001;
 
 use constant VALUE_TYPE_AVAIL => 0;
 use constant VALUE_TYPE_PERC => 1;
+use constant VALUE_TYPE_NUMBER => 2;
 
 use constant ZBX_EC_INTERNAL          => -1;   # internal error (general)
 use constant ZBX_EC_DNS_NS_NOREPLY    => -200; # no reply from Name Server
@@ -665,6 +666,13 @@ sub create_slv_item {
                                               'type' => 2, 'value_type' => 0,
                                               'applications' => $applicationids,
 					      'units' => '%'};
+    }
+    elsif ($value_type == VALUE_TYPE_NUMBER) {
+	$options = {'name' => $name,
+                                              'key_'=> $key,
+                                              'hostid' => $hostid,
+                                              'type' => 2, 'value_type' => 3,
+                                              'applications' => $applicationids};
     }
     else {
 	pfail("Unknown value type $value_type.");
@@ -1412,6 +1420,9 @@ sub create_all_slv_ns_items {
     create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'rsm.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
     create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('DNS NS probes with results: $1 ($2)', 'rsm.slv.dns.ns.results['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('DNS NS probes with positive results: $1 ($2)', 'rsm.slv.dns.ns.positive['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('DNS NS required probes with positive results: $1 ($2)', 'rsm.slv.dns.ns.required['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
     create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
 

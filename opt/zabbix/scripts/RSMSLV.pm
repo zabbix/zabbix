@@ -64,8 +64,8 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
-		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_results get_item_values check_lastclock get_downtime avail_result_msg
+		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
+		process_slv_monthly get_results get_item_values check_lastclock get_downtime avail_result_msg
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -759,7 +759,7 @@ sub get_online_probes
     my $probe_avail_limit = shift; # max "last seen" of proxy
     my $all_probes_ref = shift;
 
-    $all_probes_ref = __get_probes() unless ($all_probes_ref);
+    $all_probes_ref = get_probes() unless ($all_probes_ref);
     my %reachable_probes = %$all_probes_ref; # we should work on a copy
 
     my (@result, @row, $sql, $host, $hostid, $rows_ref, $probe_down, $no_values);
@@ -813,7 +813,7 @@ sub get_online_probes
 	    if ($row_ref->[0] == DOWN)
 	    {
 		$probe_down = 1;
-		dbg("  $host ($hostid) down (manual: between $from and $till)");
+		dbg("$host ($hostid) down (manual: between $from and $till)");
 		last;
 	    }
 	}
@@ -831,13 +831,13 @@ sub get_online_probes
 		my $lastvalue = $rows_ref->[0]->[0];
 		if (defined($lastvalue) and $lastvalue == DOWN)
 		{
-		    dbg("  $host ($hostid) down (manual: latest)");
+		    dbg("$host ($hostid) down (manual: latest)");
 		    next;
 		}
 	    }
 	}
 
-	dbg("  $host ($hostid) up (manual)");
+	dbg("$host ($hostid) up (manual)");
 
 	# Probe is considered manually up, check automatic status.
 
@@ -858,7 +858,7 @@ sub get_online_probes
 
             if ($row_ref->[0] == DOWN)
             {
-		dbg("  $host ($hostid) down (automatic: between $from and $till)");
+		dbg("$host ($hostid) down (automatic: between $from and $till)");
                 $probe_down = 1;
                 last;
             }
@@ -877,7 +877,7 @@ sub get_online_probes
 		my $lastvalue = $rows_ref->[0]->[0];
 		if (defined($lastvalue) and $lastvalue == DOWN)
 		{
-		    dbg("  $host ($hostid) down (automatic: latest)");
+		    dbg("$host ($hostid) down (automatic: latest)");
 		    next;
 		}
 	    }
@@ -1011,7 +1011,19 @@ sub push_value
 #
 sub send_values
 {
-    return if (defined($OPTS{'debug'}));
+    if (defined($OPTS{'debug'}))
+    {
+	# $tld is a global variable which is used in info()
+	my $saved_tld = $tld;
+	foreach my $hash_ref (@_sender_values)
+        {
+	    $tld = $hash_ref->{'tld'};
+	    info($hash_ref->{'data'}->{'key'}, '=', $hash_ref->{'data'}->{'value'}, " ", $hash_ref->{'info'});
+	}
+	$tld = $saved_tld;
+
+	return;
+    }
 
     if (scalar(@_sender_values) == 0)
     {
@@ -1066,7 +1078,7 @@ sub send_values
 	foreach my $hash_ref (@suba)
         {
 	    $tld = $hash_ref->{'tld'};
-	    info($hash_ref->{'info'});
+	    info($hash_ref->{'data'}->{'key'}, '=', $hash_ref->{'data'}->{'value'}, " ", $hash_ref->{'info'});
 	}
 	$tld = $saved_tld;
     }
@@ -1261,6 +1273,77 @@ sub process_slv_monthly
     push_value($tld, $cfg_key_out, $value_ts, $perc, "$perc% successful values ($successful_values/$total_values)");
 }
 
+sub process_slv_avail
+{
+    my $tld = shift;
+    my $cfg_key_in = shift;
+    my $cfg_key_out = shift;
+    my $from = shift;
+    my $till = shift;
+    my $value_ts = shift;
+    my $cfg_minonline = shift;
+    my $probe_avail_limit = shift; # max "last seen" of proxy
+    my $probes_ref = shift;
+    my $check_value_ref = shift;
+
+    my $probes_count = scalar(@$probes_ref);
+
+    if ($probes_count < $cfg_minonline)
+    {
+	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
+	return;
+    }
+
+    my $hostids_ref = probes2tldhostids($tld, $probes_ref);
+    if (scalar(@$hostids_ref) == 0)
+    {
+        wrn("no probe hosts found");
+        return;
+    }
+
+    my $complete_key = ("]" eq substr($cfg_key_in, -1)) ? 1 : 0;
+    my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, $complete_key);
+    if (scalar(@$items_ref) == 0)
+    {
+	wrn("no items ($cfg_key_in) found");
+	return;
+    }
+
+    my $values_ref = get_item_values($items_ref, $from, $till);
+    my $probes_with_results = scalar(keys(%$values_ref));
+    if ($probes_with_results < $cfg_minonline)
+    {
+	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+	return;
+    }
+
+    my $probes_with_positive = 0;
+    foreach my $itemid (keys(%$values_ref))
+    {
+	my $result = check_item_values($values_ref->{$itemid});
+
+	$probes_with_positive++ if (SUCCESS == $result);
+
+	my $hostid = -1;
+	foreach my $item (@$items_ref)
+	{
+	    if ($item->{'itemid'} == $itemid)
+	    {
+		$hostid = $item->{'hostid'};
+		last;
+	    }
+	}
+
+	info("  i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(', ', @{$values_ref->{$itemid}}), ")");
+    }
+
+    my $result = DOWN;
+    my $perc = $probes_with_positive * 100 / $probes_with_results;
+    $result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
+
+    push_value($tld, $cfg_key_out, $value_ts, $result, avail_result_msg($result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
+}
+
 sub process_slv_ns_avail
 {
     my $tld = shift;
@@ -1270,7 +1353,6 @@ sub process_slv_ns_avail
     my $till = shift;
     my $value_ts = shift;
     my $cfg_minonline = shift;
-    my $unavail_limit = shift;
     my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;
 
@@ -1278,50 +1360,56 @@ sub process_slv_ns_avail
 
     dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
 
-    my @out_keys;
-    push(@out_keys, $cfg_key_out . $_ . ']') foreach (@$targets_ref);
-
     my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
     my $count = scalar(@$online_probes_ref);
     if ($count < $cfg_minonline)
     {
-	push_value($tld, $_, $value_ts, UP, "Up (not enough probes online, $count while $cfg_minonline required)") foreach (@out_keys);
-	return;
+	foreach my $target (@$targets_ref)
+	{
+	    push_value($tld, $cfg_key_out . $target . ']', $value_ts, UP, "Up (not enough probes online, $count while $cfg_minonline required)");
+	    push_value($tld, 'rsm.slv.dns.ns.results[' . $target . ']', $value_ts, 0, "");
+	    push_value($tld, 'rsm.slv.dns.ns.positive[' . $target . ']', $value_ts, 0, "");
+	    push_value($tld, 'rsm.slv.dns.ns.required[' . $target . ']', $value_ts, 0, "");
+	    return;
+	}
     }
 
     my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
-
     my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
-
     my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
-
     my $values_ref = __get_values($itemids_ref, [$from, $till], $all_ns_items_ref);
 
     wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
-    foreach my $ns (keys(%$values_ref))
+    foreach my $target (keys(%$values_ref))
     {
-	my $item_values_ref = $values_ref->{$ns};
-	my $total_values = scalar(@$item_values_ref);
-	my $out_key = $cfg_key_out . $ns . ']';
+	my $item_values_ref = $values_ref->{$target};
+	my $probes_with_results = scalar(@$item_values_ref);
+	my $out_key = $cfg_key_out . $target . ']';
 
-	if ($total_values < $cfg_minonline)
-	{
-	    push_value($tld, $out_key, $value_ts, UP, "$ns Up (not enough probes with reults, $total_values while $cfg_minonline required)");
-	    next;
-	}
-
-	my $success_values = 0;
+	my $probes_with_positive = 0;
 	foreach (@$item_values_ref)
 	{
 	    info("  ", $_);
-	    $success_values++ if ($check_value_ref->($_) == SUCCESS);
+	    $probes_with_positive++ if ($check_value_ref->($_) == SUCCESS);
 	}
 
-	my $perc = $success_values * 100 / $total_values;
-	my $test_result = $perc > $unavail_limit ? UP : DOWN;
+	my $positive_required = floor($probes_with_results * SLV_UNAVAILABILITY_LIMIT / 100);
+	my $perc = $probes_with_positive * 100 / $probes_with_results;
+	my $test_result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
 
-	push_value($tld, $out_key, $value_ts, $test_result, "$ns: ", avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
+	if ($probes_with_results < $cfg_minonline)
+	{
+	    push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+	}
+	else
+	{
+	    push_value($tld, $out_key, $value_ts, $test_result, avail_result_msg($test_result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
+	}
+
+	push_value($tld, 'rsm.slv.dns.ns.results[' . $target . ']', $value_ts, $probes_with_results, "");
+	push_value($tld, 'rsm.slv.dns.ns.positive[' . $target . ']', $value_ts, $probes_with_positive, "");
+	push_value($tld, 'rsm.slv.dns.ns.required[' . $target . ']', $value_ts, $positive_required, "");
     }
 }
 
@@ -1374,7 +1462,7 @@ sub get_results
 		}
 	    }
 
-	    dbg("  [$probe] $target: $probe_successful/$probe_total");
+	    dbg("[$probe] $target: $probe_successful/$probe_total");
 	}
     }
 
@@ -1385,13 +1473,9 @@ sub get_results
 #
 # E. g.:
 #
-# '10010' => [
-#          205
-#    ];
-# '10011' => [
-#          -102
-#          304
-#    ];
+# '10010' => [205],
+# '10011' => [-102, 304]
+# ...
 sub get_item_values
 {
     my $items_ref = shift;
@@ -1983,7 +2067,7 @@ sub __get_reachable_times
 	my $clock = $rows_ref->[0]->[0];
 	my $value = $rows_ref->[0]->[1];
 
-	dbg("  clock:$clock value:$value");
+	dbg("clock:$clock value:$value");
 
 	$last_status = DOWN if ($clock - $value > $probe_avail_limit);
     }
@@ -2012,7 +2096,7 @@ sub __get_reachable_times
 	{
 	    push(@times, $clock);
 
-	    dbg("  clock:$clock diff:", ($clock - $value));
+	    dbg("clock:$clock diff:", ($clock - $value));
 
 	    $last_status = $status;
 	}
@@ -2085,7 +2169,7 @@ sub __get_probestatus_times
 	    {
 		push(@times, $clock);
 
-		dbg("  clock:$clock value:$value");
+		dbg("clock:$clock value:$value");
 
 		$last_status = $status;
 	    }
