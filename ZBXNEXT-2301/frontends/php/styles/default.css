@@ -37,6 +37,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
+.pre-wrap { white-space: pre-wrap; }
+.break-lines { word-break: break-all; }
 .placeholder { color: #aaa; }
 .maxwidth { width: 100%; }
 .paddingless { padding: 0; }

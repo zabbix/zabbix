@@ -36,7 +36,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
 	'config' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1,2,3'),		null),
-	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	BETWEEN(0,65535),	null),
+	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({}!=0)',	null),
 	'list_name' =>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT,	 null,	null,				null),
 	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),
@@ -50,18 +50,24 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT,	 P_SYS,	null,	null),
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null),
 	'host' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
-	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null)
+	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
+	'name_expanded' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null)
 );
 check_fields($fields);
 
-$_REQUEST['caption'] = get_request('caption', '');
+$caption = getRequest('caption', '');
+$autoCaption = '';
 $_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-if (zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
-	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($_REQUEST['itemid'])));
+if (getRequest('itemid') > 0) {
+	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid(getRequest('itemid'))));
 	$item = reset($items);
 
-	$_REQUEST['caption'] = $item['name_expanded'];
+	$autoCaption = $item['name_expanded'];
+
+	if (!hasRequest('caption') || getRequest('caption') === $item['name']) {
+		$caption = $item['name_expanded'];
+	}
 }
 
 insert_js_function('add_bitem');
@@ -70,7 +76,7 @@ insert_js_function('update_bitem');
 if (isset($_REQUEST['save']) && !isset($_REQUEST['gid'])) {
 	insert_js("add_bitem(".
 		zbx_jsvalue($_REQUEST['dstfrm']).",".
-		zbx_jsvalue($_REQUEST['caption']).",'".
+		zbx_jsvalue($caption).",'".
 		$_REQUEST['itemid']."','".
 		$_REQUEST['color']."',".
 		$_REQUEST['calc_fnc'].",".
@@ -83,7 +89,7 @@ if (isset($_REQUEST['save']) && isset($_REQUEST['gid'])) {
 		zbx_jsvalue($_REQUEST['dstfrm']).",".
 		zbx_jsvalue($_REQUEST['list_name']).",'".
 		$_REQUEST['gid']."',".
-		zbx_jsvalue($_REQUEST['caption']).",'".
+		zbx_jsvalue($caption).",'".
 		$_REQUEST['itemid']."','".
 		$_REQUEST['color']."',".
 		$_REQUEST['calc_fnc'].",".
@@ -102,7 +108,6 @@ else {
 	$config	= get_request('config', 1);
 	$gid = get_request('gid', null);
 	$list_name = get_request('list_name', null);
-	$caption = get_request('caption', '');
 	$itemid = get_request('itemid', 0);
 	$color = get_request('color', '009900');
 	$calc_fnc = get_request('calc_fnc', 2);
@@ -112,13 +117,18 @@ else {
 	$frmGItem->addVar('config', $config);
 	$frmGItem->addVar('list_name', $list_name);
 	$frmGItem->addVar('itemid', $itemid);
-
-	$frmGItem->addRow(array(new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
-		_('Caption')), new CTextBox('caption', $caption, 50)
+	$frmGItem->addRow(
+		array(
+			new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
+				_('Default')
+			),
+			_('Caption')
+		),
+		new CTextBox('caption', $caption, 50)
 	);
 
-	$host = get_request('host');
-	$itemName = get_request('name');
+	$host = getRequest('host');
+	$itemName = getRequest('name_expanded');
 	if ($host && $itemName) {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
