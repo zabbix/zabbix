@@ -35,6 +35,9 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
+extern unsigned char	get_process_type_by_server_num(int server_num);
+extern int		get_process_num_by_server_num(int server_num);
+
 /******************************************************************************
  *                                                                            *
  * Function: user1_signal_handler                                             *
