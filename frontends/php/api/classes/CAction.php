@@ -1530,8 +1530,18 @@ class CAction extends CApiService {
 					}
 					// in other cases - generate the formula automatically
 					else {
+						$conditions = $filter['conditions'];
+
+						// sort conditions
+						$sortFields = array(
+							array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+							array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+							array('field' => 'value', 'order' => ZBX_SORT_DOWN)
+						);
+						CArrayHelper::sort($conditions, $sortFields);
+
 						$conditionsForFormula = array();
-						foreach ($filter['conditions'] as $condition) {
+						foreach ($conditions as $condition) {
 							$conditionsForFormula[$condition['conditionid']] = $condition['conditiontype'];
 						}
 						$formula = CConditionHelper::getFormula($conditionsForFormula, $filter['evaltype']);

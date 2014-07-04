@@ -453,7 +453,6 @@ if (hasRequest('form')) {
 
 	// sort conditions
 	$sortFields = array(
-		array('field' => 'conditionid', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
