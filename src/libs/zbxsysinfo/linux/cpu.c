@@ -21,43 +21,30 @@
 #include "sysinfo.h"
 #include "stats.h"
 #include "log.h"
+#include "zbxalgo.h"
 #include "zbxjson.h"
 
 int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		line[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *cpuids;
-	FILE		*fp;
-	int		ret = SYSINFO_RET_FAIL;
-	long		ncpu, i;
-	struct zbx_json	json;
+	int			ret = SYSINFO_RET_FAIL, i;
+	zbx_vector_uint64_t	cpus;
+	struct zbx_json		json;
 
-	do {
-		if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
+	do
+	{
+		zbx_vector_uint64_create(&cpus);
+
+		if (SYSINFO_RET_OK != get_cpu_statuses(&cpus))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror(errno)));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
+			zbx_vector_uint64_destroy(&cpus);
 			break;
 		}
-
-		if (NULL == (fp = fopen("/proc/stat", "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));
-			break;
-		}
-
-		cpuids = zbx_calloc(NULL, ncpu, sizeof(char));
-
-		while (NULL != fgets(line, sizeof(line), fp))
-		{
-			if (1 == sscanf(line, "cpu%[0-9]", tmp))
-				cpuids[strtol(tmp, NULL, 10)] = 1;
-		}
-
-		fclose(fp);
 
 		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-		for (i = 0; i < ncpu; i++)
+		for (i = 0; i < cpus.values_num; i++)
 		{
 			zbx_json_addobject(&json, NULL);
 
@@ -65,9 +52,9 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			/* items that take CPU ids as parameters (such as system.hw.cpu) for	*/
 			/* item creation on discovery.						*/
 
-			zbx_json_adduint64(&json, "{#CPUID}", i + 1);
-			zbx_json_addstring(&json, "{#STATUS}", (1 == cpuids[i] ? "online" : "offline"),
-					ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json, "{#CPUID}", i);
+			zbx_json_addstring(&json, "{#STATUS}", (SYSINFO_RET_OK == cpus.values[i] ?
+					"online" : "offline"), ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json);
 		}
@@ -76,7 +63,7 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_STR_RESULT(result, zbx_strdup(result->str, json.buffer));
 
 		zbx_json_free(&json);
-		zbx_free(cpuids);
+		zbx_vector_uint64_destroy(&cpus);
 
 		ret = SYSINFO_RET_OK;
 	} while(0);

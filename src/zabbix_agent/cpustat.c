@@ -687,4 +687,30 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	return SYSINFO_RET_OK;
 }
 
+int	get_cpu_statuses(zbx_vector_uint64_t *vector)
+{
+	int				index, i;
+	ZBX_CPUS_STAT_DATA		*pcpus;
+	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+
+	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
+		return SYSINFO_RET_FAIL;
+
+	LOCK_CPUSTATS;
+
+	for (i = 0; i < pcpus->count; i++)
+	{
+		cpu = get_cpustat_by_num(&collector->cpus, i + 1);
+
+		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
+			index -= MAX_COLLECTOR_HISTORY;
+
+		zbx_vector_uint64_append(vector, cpu->h_status[index]);
+	}
+
+	UNLOCK_CPUSTATS;
+
+	return SYSINFO_RET_OK;
+}
+
 #endif	/* not _WINDOWS */
