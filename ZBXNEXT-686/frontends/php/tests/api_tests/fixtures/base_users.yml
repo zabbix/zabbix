@@ -1,5 +1,12 @@
+base_groups:
+    cleanup: [ usrgrp, users_groups, users ]
+    require: []
+    rows:
+        usrgrp:
+            admins: { usrgrpid: 1, name: 'Zabbix administrators', gui_access: 0, users_status: 0, debug_mode: 0 }
 base_users:
-    cleanup:  [ users ]
+    cleanup: []
+    require: []
     rows:
         users:
             admin: { userid: 1, alias: Admin, passwd: 5fce1b3e34b520afeffb37ce08c7cd66, type: 3 }

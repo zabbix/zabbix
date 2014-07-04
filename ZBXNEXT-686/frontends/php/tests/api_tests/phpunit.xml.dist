@@ -18,6 +18,7 @@
         <testsuite name="Zabbix API integration">
             <directory>./tests/integration/api/*/*</directory>
             <directory>./tests/integration/api/</directory>
+            <directory>./tests/integration/*</directory>
         </testsuite>
     </testsuites>
 </phpunit>

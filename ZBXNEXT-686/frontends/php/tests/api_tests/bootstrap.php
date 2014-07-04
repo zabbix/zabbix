@@ -93,8 +93,12 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	protected function loadDatabaseFixtures($file)
+	protected function loadDatabaseFixtures($file, $loaded = array())
 	{
+		if (in_array($file, $loaded)) {
+			return;
+		}
+
 		$path = __DIR__ . '/fixtures/'.$file.'.yml';
 
 		if (!is_readable($path)) {
@@ -108,6 +112,10 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 		// todo: validate here
 
 		foreach ($fixtures as $suite => $data) {
+			foreach ($data['require'] as $fixture) {
+				$this->loadDatabaseFixtures($fixture, $loaded);
+			}
+
 			foreach ($data['cleanup'] as $table) {
 				// todo: pre-define truncate order
 				$pdo->query('DELETE FROM '.$table);
@@ -127,6 +135,8 @@ class ZbxApiTestBase extends PHPUnit_Framework_TestCase
 					$query->execute($fields);
 				}
 			}
+
+			$loaded[] = $file;
 		}
 
 	}
