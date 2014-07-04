@@ -216,7 +216,12 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			}
 
 			if ($validateConditions) {
-				CAction::validateConditionsIntegrity($validateConditions);
+				$filterConditionValidator = new CActionCondValidator();
+				foreach($validateConditions as $condition) {
+					if(!$filterConditionValidator->validate($condition)) {
+						throw new APIException(ZBX_API_ERROR_INTERNAL, $filterConditionValidator->getError());
+					}
+				}
 			}
 
 			$_REQUEST['conditions'] = $validateConditions;

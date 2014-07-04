@@ -1832,7 +1832,7 @@ class CAction extends CApiService {
 				))
 			),
 			'postValidators' => array(
-				new CActionConditionValueValidator()
+				new CActionCondValidator()
 			)
 		);
 	}
@@ -2148,7 +2148,7 @@ class CAction extends CApiService {
 	 * @param array $conditions   conditions for which permissions to referenced DB entities will be checked
 	 * @param bool  $update       true for false mode check, false for update mode check
 	 */
-	public static function validateConditionsPermissions(array $conditions, $update = false) {
+	public function validateConditionsPermissions(array $conditions, $update = false) {
 		$hostGroupIdsAll = array();
 		$templateIdsAll = array();
 		$triggerIdsAll = array();
@@ -2241,20 +2241,5 @@ class CAction extends CApiService {
 				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
 			);
 		}
-	}
-
-	/**
-	 * @param array $conditions      conditions to validate
-	 */
-	public static function validateConditionsIntegrity($conditions) {
-		$filterConditionValidator = new CActionConditionValueValidator();
-
-		foreach($conditions as $condition) {
-			if(!$filterConditionValidator->validate($condition)) {
-				self::exception(ZBX_API_ERROR_INTERNAL, $filterConditionValidator->getError());
-			}
-		}
-
-		self::validateConditionsPermissions($conditions);
 	}
 }

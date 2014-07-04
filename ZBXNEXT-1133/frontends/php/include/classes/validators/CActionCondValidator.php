@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CActionConditionValueValidator extends CValidator implements CPartialValidatorInterface {
+class CActionCondValidator extends CValidator implements CPartialValidatorInterface {
 
 	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
