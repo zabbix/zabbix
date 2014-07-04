@@ -205,7 +205,7 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Retun 'Never' if 0.
+// Convert timestamp to string representation. Return 'Never' if 0.
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
@@ -686,7 +686,7 @@ function convert_units($options = array()) {
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip mili & micro for values without units
+			// skip milli & micro for values without units
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -813,7 +813,7 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parametr as integer either
+// accepts parameter as integer either
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }

@@ -392,7 +392,7 @@ class CApplicationManager {
 	 * @return array
 	 */
 	protected function getChildHostsFromApplications(array $applications, array $hostIds = array()) {
-		$hostsTemapltesMap = array();
+		$hostsTemplatesMap = array();
 
 		$sqlWhere = empty($hostIds) ? '' : ' AND '.dbConditionInt('ht.hostid', $hostIds);
 		$dbCursor = DBselect(
@@ -402,10 +402,10 @@ class CApplicationManager {
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
-			$hostsTemapltesMap[$dbHost['hostid']] = $dbHost['templateid'];
+			$hostsTemplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
 		}
 
-		return $hostsTemapltesMap;
+		return $hostsTemplatesMap;
 	}
 
 	/**
@@ -471,7 +471,7 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Get hosts applications for each passed hosts.
+	 * Get host applications for each passed host.
 	 * Each host has two hashes with applications, one with name keys other with templateid keys.
 	 *
 	 * Resulting structure is:

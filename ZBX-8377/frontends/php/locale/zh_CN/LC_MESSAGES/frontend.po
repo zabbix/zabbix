@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-25 13:35+0300\n"
+"POT-Creation-Date: 2014-06-30 02:44+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -448,7 +448,7 @@ msgstr "作用中直到"
 #: include/views/configuration.triggers.edit.php:318
 #: include/views/configuration.triggers.massupdate.php:125
 #: include/views/js/adm.regexprs.edit.js.php:249
-#: include/views/js/configuration.action.edit.js.php:289
+#: include/views/js/configuration.action.edit.js.php:292
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.sysmaps.js.php:192
 #: include/views/js/configuration.sysmaps.js.php:405
@@ -1015,7 +1015,7 @@ msgstr "底部"
 msgid "Brighten"
 msgstr "转亮"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:56
 msgid "Bulgarian (bg_BG)"
 msgstr "保加利亚语 (bg_BG)"
 
@@ -1262,7 +1262,7 @@ msgstr "加拿大 (136 字元)"
 #: include/views/js/administration.general.triggerSeverity.js.php:38
 #: include/views/js/configuration.action.edit.js.php:102
 #: include/views/js/configuration.discovery.edit.js.php:114 jsLoader.php:104
-#: tr_logform.php:337
+#: tr_logform.php:340
 msgid "Cancel"
 msgstr "取消"
 
@@ -2171,7 +2171,7 @@ msgstr ""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "不能读取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
 
-#: include/views/js/monitoring.history.js.php:35
+#: include/views/js/monitoring.history.js.php:38
 msgid "Cannot remove all items, at least one item should remain."
 msgstr "无法删除所有的监控项，至少一个监控项应该保留."
 
@@ -2552,7 +2552,7 @@ msgstr "无法更新值对应"
 msgid "Cannot update web scenario"
 msgstr "无法更新 web 场景"
 
-#: include/views/js/configuration.discovery.edit.js.php:600
+#: include/views/js/configuration.discovery.edit.js.php:603
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr ""
 
@@ -2618,7 +2618,7 @@ msgstr "机壳"
 msgid "Chassis info - returns full info by default"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:536
+#: include/views/js/configuration.discovery.edit.js.php:539
 msgid "Check already exists."
 msgstr "检查已存在."
 
@@ -2693,11 +2693,11 @@ msgstr ""
 msgid "Checks should be unique."
 msgstr "检查必需是唯一的"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:57
 msgid "Chinese (zh_CN)"
 msgstr "中文 (zh_CN)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:58
 msgid "Chinese (zh_TW)"
 msgstr "中文 (zh_TW)"
 
@@ -2774,9 +2774,9 @@ msgstr "时钟"
 msgid "Clone"
 msgstr "克隆"
 
-#: include/views/js/configuration.discovery.edit.js.php:537
-#: include/views/js/configuration.discovery.edit.js.php:601
-#: include/views/js/configuration.discovery.edit.js.php:618
+#: include/views/js/configuration.discovery.edit.js.php:540
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:621
 #: include/views/js/configuration.sysmaps.js.php:203
 #: include/views/js/configuration.sysmaps.js.php:304
 #: include/views/js/configuration.sysmaps.js.php:417 jsLoader.php:146
@@ -2850,7 +2850,7 @@ msgstr "命令不能是空白."
 msgid "Commands"
 msgstr "命令"
 
-#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:332
+#: include/acknow.inc.php:49 tr_comments.php:77 tr_logform.php:335
 msgid "Comments"
 msgstr "评论"
 
@@ -3371,7 +3371,7 @@ msgid "Current date is NOT N"
 msgstr "当前日期不是 N"
 
 #: include/views/js/configuration.action.edit.js.php:87
-#: include/views/js/configuration.action.edit.js.php:212
+#: include/views/js/configuration.action.edit.js.php:215
 msgid "Current host"
 msgstr "当前主机"
 
@@ -3441,7 +3441,7 @@ msgstr "自定义大小"
 msgid "Custom slides"
 msgstr "自定义幻灯片"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:59
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
@@ -3756,7 +3756,7 @@ msgstr "被延迟由于"
 #: include/classes/class.cbuttondelete.php:25
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:162 jsLoader.php:107
-#: jsLoader.php:185 tr_logform.php:293 tr_logform.php:314
+#: jsLoader.php:185 tr_logform.php:295 tr_logform.php:317
 msgid "Delete"
 msgstr "删除"
 
@@ -3786,7 +3786,7 @@ msgid "Delete discovery rule?"
 msgstr "删除发现规则?"
 
 #: include/views/configuration.triggers.edit.php:164 jsLoader.php:109
-#: tr_logform.php:294
+#: tr_logform.php:296
 msgid "Delete expression?"
 msgstr "删除表示式?"
 
@@ -3818,7 +3818,7 @@ msgstr ""
 msgid "Delete item?"
 msgstr "删除监控项?"
 
-#: jsLoader.php:108 tr_logform.php:314
+#: jsLoader.php:108 tr_logform.php:317
 msgid "Delete keyword?"
 msgstr "删除关键字?"
 
@@ -4382,7 +4382,7 @@ msgstr "停用所选的触发器?"
 #: include/views/configuration.item.massupdate.php:300
 #: include/views/js/configuration.sysmaps.js.php:156
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
-#: tr_logform.php:334
+#: tr_logform.php:337
 msgid "Disabled"
 msgstr "停用的"
 
@@ -4421,9 +4421,9 @@ msgstr "由系统代理程式探索"
 msgid "Discovery check"
 msgstr "探索检查"
 
-#: include/views/js/configuration.discovery.edit.js.php:535
-#: include/views/js/configuration.discovery.edit.js.php:599
-#: include/views/js/configuration.discovery.edit.js.php:616
+#: include/views/js/configuration.discovery.edit.js.php:538
+#: include/views/js/configuration.discovery.edit.js.php:602
+#: include/views/js/configuration.discovery.edit.js.php:619
 msgid "Discovery check error"
 msgstr ""
 
@@ -4650,7 +4650,7 @@ msgstr "持续时间"
 msgid "Duration (sec)"
 msgstr "持续时间(秒)"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:60
 msgid "Dutch (nl_NL)"
 msgstr "荷兰(nl_NL)"
 
@@ -4970,11 +4970,11 @@ msgstr "启用所选的触发器?"
 msgid "Enabled"
 msgstr "已启用"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:54
 msgid "English (en_GB)"
 msgstr "英语 (en_GB)"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:55
 msgid "English (en_US)"
 msgstr "英语(en_US)"
 
@@ -5069,7 +5069,7 @@ msgstr "每週"
 msgid "Exa"
 msgstr "千兆兆"
 
-#: tr_logform.php:261 tr_logform.php:298
+#: tr_logform.php:261 tr_logform.php:300
 msgid "Exclude"
 msgstr "除外"
 
@@ -5388,7 +5388,7 @@ msgstr ""
 msgid "Finish"
 msgstr "完成"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:61
 msgid "Finnish (fi_FI)"
 msgstr "芬兰语 (fi_FI)"
 
@@ -5432,7 +5432,7 @@ msgstr "公式"
 msgid "Fourth"
 msgstr "第四"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:62
 msgid "French (fr_FR)"
 msgstr "法语 (fr_FR)"
 
@@ -5526,13 +5526,13 @@ msgstr "一般"
 msgid "Generated in %s sec"
 msgstr "产生于%s秒"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:63
 msgid "German (de_DE)"
 msgstr "德语 (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:555
-msgid "Get content of WEB page. Default path is /"
+msgid "Get content of web page. Default path is /"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:257
@@ -5542,7 +5542,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:563
-msgid "Get first occurence of regexp in WEB page. Default path is /"
+msgid "Get first occurrence of regexp in web page. Default path is /"
 msgstr ""
 
 #: include/page_header.php:194
@@ -5551,7 +5551,7 @@ msgstr "获取支援"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:559
-msgid "Get timing of loading full WEB page. Default path is /"
+msgid "Get timing of loading full web page. Default path is /"
 msgstr ""
 
 #: include/func.inc.php:680
@@ -5789,7 +5789,7 @@ msgstr "图形已複製"
 msgid "Graphs deleted"
 msgstr "图形已删除"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:64
 msgid "Greek (el_GR)"
 msgstr "希腊(el_GR)"
 
@@ -6106,7 +6106,7 @@ msgstr "横向对齐"
 #: include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:225
 #: include/views/js/configuration.action.edit.js.php:88
-#: include/views/js/configuration.action.edit.js.php:209
+#: include/views/js/configuration.action.edit.js.php:212
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
@@ -6181,7 +6181,7 @@ msgstr[0] ""
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
-#: include/views/js/configuration.action.edit.js.php:197
+#: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:143
@@ -6471,7 +6471,7 @@ msgstr "时"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
@@ -6855,7 +6855,7 @@ msgstr "维修中"
 msgid "In progress"
 msgstr "作业中"
 
-#: tr_logform.php:260 tr_logform.php:298
+#: tr_logform.php:260 tr_logform.php:300
 msgid "Include"
 msgstr "包含"
 
@@ -6881,12 +6881,12 @@ msgid "Incorrect IP range \"%s\"."
 msgstr "不正确的IP区域\"%s\"."
 
 #: api/classes/CDRule.php:286
-#: include/views/js/configuration.discovery.edit.js.php:568
+#: include/views/js/configuration.discovery.edit.js.php:571
 msgid "Incorrect SNMP OID."
 msgstr "不正确的SNMP OID"
 
 #: api/classes/CDRule.php:282
-#: include/views/js/configuration.discovery.edit.js.php:564
+#: include/views/js/configuration.discovery.edit.js.php:567
 msgid "Incorrect SNMP community."
 msgstr "不正确的SNMP community."
 
@@ -7600,7 +7600,7 @@ msgstr "图形\"%1$s\"的不正确y max项目."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "图形\"%1$s\"的不正确y min项目."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:66
 msgid "Indonesian (id_ID)"
 msgstr "印度尼西亚 (id_ID)"
 
@@ -7858,7 +7858,7 @@ msgstr "不可能于HTTP认证中登出."
 msgid "It is not possible to search by user password."
 msgstr "以用户密码寻找是不可能的."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:67
 msgid "Italian (it_IT)"
 msgstr "意大利语 (it_IT)"
 
@@ -8142,7 +8142,7 @@ msgstr "一月"
 msgid "January"
 msgstr "一月"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:69
 msgid "Japanese (ja_JP)"
 msgstr "日语 (ja_JP)"
 
@@ -8179,7 +8179,7 @@ msgstr "保留失去的资源期间(日记)"
 #: include/views/configuration.item.edit.php:68
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.list.php:48
-#: include/views/js/configuration.discovery.edit.js.php:426 items.php:46
+#: include/views/js/configuration.discovery.edit.js.php:429 items.php:46
 #: popup.php:939 popup.php:1081 popup.php:1190 popup.php:1199
 msgid "Key"
 msgstr "键值"
@@ -8202,7 +8202,7 @@ msgstr "关键字"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:68
 msgid "Korean (ko_KR)"
 msgstr "韩语 (ko_KR)"
 
@@ -8361,7 +8361,7 @@ msgstr "最新报警"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:70
 msgid "Latvian (lv_LV)"
 msgstr "拉脱维亚语(lv_LV)"
 
@@ -8474,7 +8474,7 @@ msgstr "清单是空的"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:71
 msgid "Lithuanian (lt_LT)"
 msgstr "立陶宛 (lt_LT)"
 
@@ -10782,6 +10782,11 @@ msgctxt "item_form"
 msgid "Overridden by"
 msgstr "覆盖被"
 
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:350
+msgid "Overridden by global housekeeping settings"
+msgstr ""
+
 #: include/views/administration.general.housekeeper.edit.php:133
 msgid "Override item history period"
 msgstr "覆盖监控项历史期间"
@@ -10789,11 +10794,6 @@ msgstr "覆盖监控项历史期间"
 #: include/views/administration.general.housekeeper.edit.php:154
 msgid "Override item trend period"
 msgstr "覆盖监控项趋势期间"
-
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.edit.php:350
-msgid "Overriden by global housekeeping settings"
-msgstr ""
 
 #: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
@@ -11132,7 +11132,7 @@ msgstr "许可权"
 msgid "Permissions can be assigned for user groups only."
 msgstr "许可权只能被指派予用户群组"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:72
 msgid "Persian (fa_IR)"
 msgstr "波斯语 (fa_IR)"
 
@@ -11173,7 +11173,7 @@ msgstr "请输入确认文字."
 msgid "Please select two elements"
 msgstr "请选择两组件"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:73
 msgid "Polish (pl_PL)"
 msgstr "波兰(pl_PL)"
 
@@ -11208,11 +11208,11 @@ msgstr "主机介面的埠不能是空白."
 msgid "Port range"
 msgstr "埠范围"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_BR)"
 msgstr "波兰语 (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_PT)"
 msgstr "葡萄牙语 (pt_PT)"
 
@@ -11871,7 +11871,7 @@ msgstr ""
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:76
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -11945,7 +11945,7 @@ msgstr "于主机上执行远程命令"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:77
 msgid "Russian (ru_RU)"
 msgstr "俄语 (ru_RU)"
 
@@ -12026,7 +12026,7 @@ msgstr "SNMP Key"
 #: disc_prototypes.php:79 host_discovery.php:82 include/forms.inc.php:463
 #: include/views/configuration.host.discovery.edit.php:103
 #: include/views/configuration.item.edit.php:109
-#: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
+#: include/views/js/configuration.discovery.edit.js.php:430 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -12201,7 +12201,7 @@ msgstr "週六"
 #: include/views/configuration.triggers.massupdate.php:165
 #: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
-#: popup_media.php:137 tr_logform.php:335
+#: popup_media.php:137 tr_logform.php:338
 msgid "Save"
 msgstr "存档"
 
@@ -12674,7 +12674,7 @@ msgstr "连线期已中断, 请重连."
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:107
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:963
-#: report5.php:60 tr_logform.php:331 tr_status.php:294
+#: report5.php:60 tr_logform.php:334 tr_status.php:294
 msgid "Severity"
 msgstr "严重性"
 
@@ -12911,7 +12911,7 @@ msgstr "简报片展示"
 msgid "Slides"
 msgstr "简报片"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:78
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -12986,7 +12986,7 @@ msgstr "依栏位\"%1$s\"排序是不允许的."
 msgid "Source"
 msgstr "来源 "
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:79
 msgid "Spanish (es_ES)"
 msgstr "西班牙语 (es_ES)"
 
@@ -13214,7 +13214,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:80
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -14028,7 +14028,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:81
 msgid "Turkish (tr_TR)"
 msgstr "土耳其语 (tr_TR)"
 
@@ -14130,7 +14130,7 @@ msgstr "上线"
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:185 jsLoader.php:220
-#: popup_httpstep.php:37 tr_logform.php:333
+#: popup_httpstep.php:37 tr_logform.php:336
 msgid "URL"
 msgstr "URL"
 
@@ -14181,7 +14181,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:82
 msgid "Ukrainian (uk_UA)"
 msgstr "乌克兰语 (uk_UA)"
 
@@ -14422,7 +14422,7 @@ msgstr "上"
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
 #: include/views/js/adm.regexprs.edit.js.php:255
-#: include/views/js/configuration.discovery.edit.js.php:348
+#: include/views/js/configuration.discovery.edit.js.php:351
 #: popup_period.php:135
 msgid "Update"
 msgstr "更新"
@@ -15056,7 +15056,7 @@ msgstr "垂直的"
 msgid "Vertical align"
 msgstr "纵向对齐"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:83
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15457,11 +15457,11 @@ msgstr "您尚未登入."
 msgid "You can not switch hosts for current selection."
 msgstr "您无法为目前的选择切换主机."
 
-#: include/views/js/configuration.action.edit.js.php:351
+#: include/views/js/configuration.action.edit.js.php:354
 msgid "You did not specify host for operation."
 msgstr "您没有指定主机来操作."
 
-#: include/views/js/configuration.action.edit.js.php:317
+#: include/views/js/configuration.action.edit.js.php:320
 msgid "You did not specify host group for operation."
 msgstr "您没有指定主机群组来操作."
 
