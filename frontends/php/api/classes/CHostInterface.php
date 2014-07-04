@@ -695,7 +695,7 @@ class CHostInterface extends CApiService {
 			}
 		}
 
-		// gathrer missing host ids
+		// gather missing host ids
 		$hostIds = array();
 		if ($interfaceidsWithoutHostIds) {
 			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));

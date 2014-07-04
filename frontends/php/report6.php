@@ -207,6 +207,17 @@ $config = $_REQUEST['config'] = get_request('config', BR_DISTRIBUTION_MULTIPLE_P
 if ($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) {
 	$items = get_request('items');
 	$validItems = validateBarReportItems($items);
+	if ($validItems) {
+		$validItems = CMacrosResolverHelper::resolveItemNames($validItems);
+
+		foreach ($validItems as &$item) {
+			if ($item['caption'] === $item['name']) {
+				$item['caption'] = $item['name_expanded'];
+			}
+		}
+
+		unset($item);
+	}
 
 	if ($config == BR_DISTRIBUTION_MULTIPLE_ITEMS) {
 		$validPeriods = validateBarReportPeriods(get_request('periods'));
@@ -256,7 +267,7 @@ $rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', BR_D
 if (hasRequest('report_show')) {
 	$items = ($config == BR_COMPARE_VALUE_MULTIPLE_PERIODS)
 		? array(array('itemid' => get_request('itemid')))
-		: get_request('items');
+		: $validItems;
 
 	if ($isValid && (($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) ? $validItems : true)
 			&& (($config == BR_DISTRIBUTION_MULTIPLE_ITEMS) ? $validPeriods : true)) {
