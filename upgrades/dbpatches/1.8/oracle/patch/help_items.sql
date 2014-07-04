@@ -11,7 +11,7 @@ insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval
 insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets.');
 insert into help_items values (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time in seconds. Example: 0.02');
 insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. 1 - FTP server is running.');
-insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. 1 - HTTP server is running.');
+insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (web) server is running and accepting connections. 0 - HTTP server is down. 1 - HTTP server is running.');
 insert into help_items values (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. 1 - IMAP server is running.');
 insert into help_items values (3,'ldap&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. 1 - LDAP server is running.');
 insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. 1 - NNTP server is running.');
@@ -21,7 +21,7 @@ insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is r
 insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. 1 - SSH server is running.');
 insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. 1 - the service is running.');
 insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. Otherwise, number of seconds spent connecting to FTP server.');
-insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. Otherwise, number of seconds spent connecting to HTTP server.');
+insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (web) server is running and accepting connections. 0 - HTTP server is down. Otherwise, number of seconds spent connecting to HTTP server.');
 insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. Otherwise, number of seconds spent connecting to IMAP server.');
 insert into help_items values (3,'ldap_perf&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. Otherwise, number of seconds spent connecting to LDAP server.');
 insert into help_items values (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. Otherwise, number of seconds spent connecting to NNTP server.');
@@ -96,9 +96,9 @@ insert into help_items values(0,'vfs.file.time[file &lt;,mode&gt;]','File time i
 insert into help_items values(0,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
 insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
-insert into help_items values(0,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
-insert into help_items values(0,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
-insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in WEB page. Default path is /');
+insert into help_items values(0,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of web page. Default path is /');
+insert into help_items values(0,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full web page. Default path is /');
+insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in web page. Default path is /');
 insert into help_items values(0,'perf_counter[counter, interval]','Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.');
 insert into help_items values(0,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(0,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
@@ -148,9 +148,9 @@ insert into help_items values(7,'vfs.file.time[file&lt;, mode&gt;]','File time i
 insert into help_items values(7,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 insert into help_items values(7,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
 insert into help_items values(7,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
-insert into help_items values(7,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
-insert into help_items values(7,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
-insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in WEB page. Default path is /');
+insert into help_items values(7,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of web page. Default path is /');
+insert into help_items values(7,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full web page. Default path is /');
+insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurrence of regexp in web page. Default path is /');
 insert into help_items values(7,'perf_counter[counter]','Value of any performance counter, where parameter is the counter path.');
 insert into help_items values(7,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(7,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
