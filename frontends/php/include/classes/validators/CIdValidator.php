@@ -19,21 +19,35 @@
 **/
 
 
-class CIdValidator extends CStringValidator {
+class CIdValidator extends CValidator {
 
 	/**
-	 * Numeric ID regex.
+	 * Value to determine whether to allow empty values
+	 *
+	 * @var bool
+	 */
+	public $empty = false;
+
+	/**
+	 * Error message if the id has wrong type
 	 *
 	 * @var string
 	 */
-	public $regex = '/^\d+$/';
+	public $messageType;
 
 	/**
-	 * Error message if the id is not in range 0..ZBX_DB_MAX_ID
+	 * Error message if the id is empty
 	 *
 	 * @var string
 	 */
-	public $messageRange;
+	public $messageEmpty;
+
+	/**
+	 * Error message if id is out of range or invalid
+	 *
+	 * @var string
+	 */
+	public $messageInvalid;
 
 	/**
 	 * Validates ID value
@@ -43,19 +57,29 @@ class CIdValidator extends CStringValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		// CStringValidator uses zbx_empty, which considers '0' as non-empty value. We do an additional check.
+		if (!is_string($value) && !is_int($value)) {
+			$this->error($this->messageType);
+
+			return false;
+		}
+
 		if (!$this->empty && empty($value)) {
 			$this->error($this->messageEmpty);
 
 			return false;
 		}
 
-		if (bccomp($value, 0)  == -1 || bccomp($value, ZBX_DB_MAX_ID) == 1) {
-			$this->error($this->messageRange, $value);
+		$regex = $this->empty ? '/^(0|(?!0)[0-9]+)$/' : '/^(?!0)\d+$/';
+
+		if (!preg_match($regex, $value) ||
+			bccomp($value, 0)  == -1 ||
+			bccomp($value, ZBX_DB_MAX_ID) == 1
+		) {
+			$this->error($this->messageInvalid, $value);
 
 			return false;
 		}
 
-		return parent::validate($value);
+		return true;
 	}
 }
