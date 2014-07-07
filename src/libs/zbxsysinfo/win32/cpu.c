@@ -31,6 +31,49 @@ static int	get_cpu_num()
 	return (int)sysInfo.dwNumberOfProcessors;
 }
 
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vector_uint64_t	cpus;
+	struct zbx_json		json;
+
+	do
+	{
+		zbx_vector_uint64_create(&cpus);
+
+		if (SYSINFO_RET_OK != get_cpu_statuses(&cpus))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector in not started."));
+			zbx_vector_uint64_destroy(&cpus);
+			break;
+		}
+
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+		for (i = 0; i < cpus.values_num; i++)
+		{
+			zbx_json_addobject(&json, NULL);
+
+			zbx_json_adduint64(&json, "{#CPUID}", i);
+			zbx_json_addstring(&json, "{#STATUS}", (PERF_COUNTER_ACTIVE == cpus.values[i]) ?
+					"online" : "offline", ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(&json);
+		}
+
+		zbx_json_close(&json);
+		SET_STR_RESULT(result, zbx_strdup(result->str, json.buffer));
+
+		zbx_json_free(&json);
+		zbx_vector_uint64_destroy(&cpus);
+
+		ret = SYSINFO_RET_OK;
+	} while(0);
+
+	return ret;
+}
+
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
