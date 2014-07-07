@@ -80,12 +80,14 @@ class CDecimalValidator extends CValidator {
 		$parts = explode('.', $value);
 
 		$beforeDot = trim($parts[0], '-');
-
 		$afterDot = isset($parts[1]) ? $parts[1] : '';
+
+		$beforeDotLength = strlen($beforeDot);
+		$afterDotLength = strlen($afterDot);
 
 		if ($this->maxPrecision > 0 && $this->maxScale > 0) {
 			// validate overall precision
-			if (strlen($beforeDot) + strlen($afterDot) > $this->maxPrecision) {
+			if ($beforeDotLength + $afterDotLength > $this->maxPrecision) {
 				$this->error($this->messagePrecision, $value, $this->maxPrecision - $this->maxScale, $this->maxScale);
 
 				return false;
@@ -93,14 +95,14 @@ class CDecimalValidator extends CValidator {
 		}
 
 		// digits before dot
-		if (strlen($beforeDot) > $this->maxPrecision - $this->maxScale) {
+		if ($beforeDotLength > $this->maxPrecision - $this->maxScale) {
 			$this->error($this->messageNatural, $value, $this->maxPrecision - $this->maxScale);
 
 			return false;
 		}
 
 		// digits after dot
-		if (strlen($afterDot) > $this->maxScale) {
+		if ($afterDotLength > $this->maxScale) {
 			$this->error($this->messageScale, $value, $this->maxScale);
 
 			return false;
