@@ -88,6 +88,18 @@ class CProfile {
 		self::$update = array();
 	}
 
+	public static function has($idx, $idx2 = 0) {
+		if (!CWebUser::$data) {
+			return false;
+		}
+
+		if (is_null(self::$profiles)) {
+			self::init();
+		}
+
+		return isset(self::$profiles[$idx][$idx2]);
+	}
+
 	public static function get($idx, $default_value = null, $idx2 = 0) {
 		// no user data available, just return the default value
 		if (!CWebUser::$data) {
