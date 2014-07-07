@@ -19,7 +19,7 @@
 
 
 /*
- * value cache test suite: misc #1
+ * value cache test suite: misc1
  *
  *
  */
@@ -96,7 +96,7 @@ static void	cuvc_suite_misc1_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_misc1_testN()
+static void	cuvc_suite_misc1_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -153,7 +153,7 @@ static void	cuvc_suite_misc2_test1()
 	vc_item_addref(item);
 	vc_release_space(item, 128);
 
-	/* the accessed 2 and reserved item must still be in cached */
+	/* the accessed 2 and reserved item must still be in cache */
 	for (i = 0; i < 3; i++)
 	{
 		itemid = CUVC_ITEMID_BASE + i;
@@ -253,7 +253,7 @@ static void	cuvc_suite_misc2_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_misc2_testN()
+static void	cuvc_suite_misc2_cleanup()
 {
 	vc_time = time;
 

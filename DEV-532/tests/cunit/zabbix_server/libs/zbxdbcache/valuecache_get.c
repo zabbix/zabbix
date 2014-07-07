@@ -43,7 +43,7 @@
 
 
 /*
- * value cache test suite: get #1
+ * value cache test suite: get1
  *
  * This test suite checks if all item value types are correctly cached and
  * retrieved.
@@ -106,11 +106,12 @@ static void	cuvc_suite_get1_test5()
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_TEXT);
 }
 
-static void	cuvc_suite_get1_testN()
+static void	cuvc_suite_get1_cleanup()
 {
 	zbx_vc_item_t	*item;
 	int		i;
 
+	/* remove all items from cache */
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
 		zbx_uint64_t	itemid = CUVC_ITEMID_BASE + i;
@@ -124,11 +125,12 @@ static void	cuvc_suite_get1_testN()
 		CU_ASSERT_PTR_NULL(item);
 	}
 
+	/* check for cache memory leaks */
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }
 
 /*
- * value cache test suite: get #2
+ * value cache test suite: get2
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by time based requests.
@@ -338,7 +340,7 @@ static void	cuvc_suite_get2_test6()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
-static void	cuvc_suite_get2_testN()
+static void	cuvc_suite_get2_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -355,7 +357,7 @@ static void	cuvc_suite_get2_testN()
 }
 
 /*
- * value cache test suite: get #3
+ * value cache test suite: get3
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by count based requests.
@@ -545,7 +547,7 @@ static void	cuvc_suite_get3_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get3_testN()
+static void	cuvc_suite_get3_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -562,7 +564,7 @@ static void	cuvc_suite_get3_testN()
 }
 
 /*
- * value cache test suite: get #4
+ * value cache test suite: get4
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by timestamp based requests.
@@ -978,7 +980,7 @@ static void	cuvc_suite_get4_test10()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get4_testN()
+static void	cuvc_suite_get4_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -1276,7 +1278,7 @@ static void	cuvc_suite_get5_test7()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get5_testN()
+static void	cuvc_suite_get5_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -1294,7 +1296,7 @@ static void	cuvc_suite_get5_testN()
 
 /*
  *
- * value cache test suite: get #6
+ * value cache test suite: get6
  *
  * This test suite checks if the data is being correctly retrieved
  * by all request types on empty history tables.
@@ -1409,7 +1411,7 @@ static void	cuvc_suite_get6_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get6_testN()
+static void	cuvc_suite_get6_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid1 = CUVC_ITEMID_STR, itemid2 = CUVC_ITEMID_FLOAT, itemid3 = CUVC_ITEMID_UINT64;
@@ -1436,7 +1438,7 @@ static void	cuvc_suite_get6_testN()
 }
 
 /*
- * value cache test suite: get #7
+ * value cache test suite: get7
  *
  * This test suite checks if the data is being correctly retrieved
  * by all request types when the requested value type differs from
@@ -1645,7 +1647,7 @@ static void	cuvc_suite_get7_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get7_testN()
+static void	cuvc_suite_get7_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -1667,7 +1669,7 @@ static void	cuvc_suite_get7_testN()
 }
 
 /*
- * value cache test suite_get #8
+ * value cache test suite_get8
  *
  * This test suite checks if the data is being correctly retrieved
  * (and not cached) by time based requests in low memory mode.
@@ -1813,13 +1815,13 @@ static void	cuvc_suite_get8_test5()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
-static void	cuvc_suite_get8_testN()
+static void	cuvc_suite_get8_cleanup()
 {
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }
 
 /*
- * value cache test suite: get #9
+ * value cache test suite: get9
  *
  * This test suite checks if the data is being correctly retrieved
  * (and not cached) by count based requests in low memory mode.
@@ -1918,13 +1920,13 @@ static void	cuvc_suite_get9_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get9_testN()
+static void	cuvc_suite_get9_cleanup()
 {
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }
 
 /*
- * value cache test suite_get #10
+ * value cache test suite_get10
  *
  * This test suite checks if the data is being correctly retrieved
  * (and not cached) by timestamp based requests in low memory mode.
@@ -2284,7 +2286,7 @@ static void	cuvc_suite_get10_test10()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_get10_testN()
+static void	cuvc_suite_get10_cleanup()
 {
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }

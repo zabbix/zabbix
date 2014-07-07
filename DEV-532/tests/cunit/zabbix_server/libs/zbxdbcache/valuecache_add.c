@@ -36,7 +36,7 @@
  */
 
 /*
- * value cache test suite: add #1
+ * value cache test suite: add1
  *
  * This test suite checks if all item value types are correctly added to cache.
  *
@@ -165,7 +165,7 @@ static void	cuvc_suite_add1_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_add1_testN()
+static void	cuvc_suite_add1_cleanup()
 {
 	zbx_vc_item_t	*item;
 	int		i;
@@ -187,7 +187,7 @@ static void	cuvc_suite_add1_testN()
 }
 
 /*
- * value cache test suite: add #2
+ * value cache test suite: add2
  *
  * This test suite checks if the value is added to cache in the right location -
  * after cached data, inside cached data, before cached data.
@@ -358,7 +358,7 @@ static void	cuvc_suite_add2_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_add2_testN()
+static void	cuvc_suite_add2_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -370,7 +370,7 @@ static void	cuvc_suite_add2_testN()
 }
 
 /*
- * value cache test suite: add #3
+ * value cache test suite: add3
  *
  * This test suite checks if the values are added in low memory situation.
  */
@@ -491,7 +491,7 @@ static void	cuvc_suite_add3_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_add3_testN()
+static void	cuvc_suite_add3_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -503,7 +503,7 @@ static void	cuvc_suite_add3_testN()
 }
 
 /*
- * value cache test suite: add #4
+ * value cache test suite: add4
  *
  * This test suite checks if the value type change is handled correctly.
  *
@@ -549,7 +549,7 @@ static void	cuvc_suite_add4_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_add4_testN()
+static void	cuvc_suite_add4_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
@@ -561,7 +561,7 @@ static void	cuvc_suite_add4_testN()
 }
 
 /*
- * value cache test suite: add #5
+ * value cache test suite: add5
  *
  * This test suite checks if the old data (outside request range) are correctly
  * dropped when current time is advanced and a new value added to cache.
@@ -618,7 +618,7 @@ static void	cuvc_suite_add5_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-static void	cuvc_suite_add5_testN()
+static void	cuvc_suite_add5_cleanup()
 {
 	zbx_vc_item_t	*item;
 	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
