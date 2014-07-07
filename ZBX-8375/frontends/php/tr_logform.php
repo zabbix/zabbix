@@ -289,7 +289,7 @@ if (hasRequest('sform')) {
 
 		$del_url = new CSpan(_('Delete'), 'link');
 		$del_url->setAttribute('onclick', 'javascript:'.
-			' if (confirm("'.CJs::encodeJson(_('Delete expression?')).'")) remove_expression("logtr'.$id.'");'.
+			' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
 			' return false;'
 		);
 
@@ -314,7 +314,7 @@ if (hasRequest('sform')) {
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
 		$del_url = new CLink(_('Delete'), '#', 'action', 'javascript:'.
-			' if (confirm("'.CJs::encodeJson(_('Delete keyword?')).'")) remove_keyword("keytr'.$id.'");'.
+			' if (confirm('.CJs::encodeJson(_('Delete keyword?')).')) remove_keyword("keytr'.$id.'");'.
 			' return false;'
 		);
 		$row = new CRow(array(htmlspecialchars($val['value']), $val['type'], $del_url));
