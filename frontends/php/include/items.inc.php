@@ -1201,7 +1201,6 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         mm      - minutes (0-59)
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
- * @param int $itemType
  * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
@@ -1211,7 +1210,6 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
 	// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
 	// if it is not possible to check the item within a year, fail
-
 	$arrOfFlexIntervals = explode(';', $flexIntervals);
 	$t = $now;
 	$tMax = $now + SEC_PER_YEAR;
