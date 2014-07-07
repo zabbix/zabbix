@@ -49,9 +49,8 @@ class CSetValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
-		if (!is_scalar($value)) {
+	public function validate($value) {
+		if (!is_string($value) && !is_int($value)) {
 			$this->error($this->messageType);
 
 			return false;
