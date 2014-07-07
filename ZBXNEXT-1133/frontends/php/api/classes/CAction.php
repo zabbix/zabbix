@@ -626,7 +626,6 @@ class CAction extends CApiService {
 		$conditionsForCustomExpressions = array();
 
 		$actionsUpdateData = array();
-		$actionsWithCustomExpressions = array();
 
 		foreach ($actions as $actionId => $action) {
 			$actionDb = $actionsDb[$actionId];
