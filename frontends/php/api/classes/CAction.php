@@ -615,8 +615,6 @@ class CAction extends CApiService {
 
 		$this->validateUpdate($actions, $actionsDb);
 
-		$actionUpdates = array();
-
 		$operationsToCreate = array();
 		$operationsToUpdate = array();
 		$operationIdsForDelete = array();
@@ -625,16 +623,31 @@ class CAction extends CApiService {
 		$conditionsToUpdate = array();
 		$conditionIdsForDelete = array();
 
-		$defaultConditionFields = array('conditiontype', 'operator', 'value');
+		$conditionsForCustomExpressions = array();
+
+		$actionsUpdateData = array();
+		$actionsWithCustomExpressions = array();
 
 		foreach ($actions as $actionId => $action) {
+			$actionDb = $actionsDb[$actionId];
+
+			$actionUpdateValues = $action;
+			unset(
+				$actionUpdateValues['actionid'],
+				$actionUpdateValues['filter'],
+				$actionUpdateValues['operations'],
+				$actionUpdateValues['conditions'],
+				$actionUpdateValues['formula'],
+				$actionUpdateValues['evaltype']
+			);
+
 			if (isset($action['filter'])) {
-				$conditionsDb = isset($actionsDb[$actionId]['filter']['conditions'])
-					? $actionsDb[$actionId]['filter']['conditions']
-					: array();
+				$actionFilter = $action['filter'];
+
+				$conditionsDb = isset($actionDb['filter']['conditions']) ? $actionDb['filter']['conditions'] : array();
 				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
 
-				foreach ($action['filter']['conditions'] as $condition) {
+				foreach ($actionFilter['conditions'] as $condition) {
 					if (!isset($condition['conditionid'])) {
 						$condition['actionid'] = $actionId;
 						$conditionsToCreate[] = $condition;
@@ -643,26 +656,27 @@ class CAction extends CApiService {
 						$conditionId = $condition['conditionid'];
 
 						if (isset($conditionsDb[$conditionId])) {
-							// value and operator validation depends on condition type
-							foreach ($defaultConditionFields as $field) {
-								$condition[$field] = isset($condition[$field])
-									? $condition[$field]
-									: $conditionsDb[$conditionId][$field];
-							}
-
 							$conditionsToUpdate[] = $condition;
 							unset($conditionsDb[$conditionId]);
+
+							// collect and group existing action conditions for formula calculation later
+							$conditionsForCustomExpressions[$actionId][] = $condition;
 						}
 					}
 				}
 
-				$action['evaltype'] = $action['filter']['evaltype'];
-
 				$conditionIdsForDelete = array_merge($conditionIdsForDelete, array_keys($conditionsDb));
+
+				// set formula to empty string of not custom expression
+				if ($actionFilter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					$actionUpdateValues['formula'] = '';
+				}
+
+				$actionUpdateValues['evaltype'] = $actionFilter['evaltype'];
 			}
 
 			if (isset($action['operations'])) {
-				$operationsDb = $actionsDb[$action['actionid']]['operations'];
+				$operationsDb = $actionDb['operations'];
 				$operationsDb = zbx_toHash($operationsDb, 'operationid');
 
 				foreach ($action['operations'] as $operation) {
@@ -677,71 +691,43 @@ class CAction extends CApiService {
 							$operationsToUpdate[] = $operation;
 							unset($operationsDb[$operationId]);
 						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
-						}
 					}
 				}
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$evalType = isset($action['filter'])
-				? $action['filter']['evaltype']
-				: null;
-
-			unset($action['actionid'], $action['conditions'], $action['operations'], $action['formula'], $action['filter'], $action['evaltype']);
-
-			if ($evalType) {
-				$action['evaltype'] = $evalType;
-			}
-
-			if (!empty($action)) {
-				$actionUpdates[] = array(
-					'values' => $action,
-					'where' => array('actionid' => $actionId)
-				);
-			}
+			$actionsUpdateData[] = array('values' => $actionUpdateValues, 'where' => array('actionid' => $actionId));
 		}
 
-		if($actionUpdates) {
-			DB::update('actions', $actionUpdates);
+		if ($actionsUpdateData) {
+			DB::update('actions', $actionsUpdateData);
 		}
 
-		// Add, update and delete operations.
+		// add, update and delete operations
 		$this->addOperations($operationsToCreate);
 		$this->updateOperations($operationsToUpdate, $actionsDb);
 		if (!empty($operationIdsForDelete)) {
 			$this->deleteOperations($operationIdsForDelete);
 		}
 
-		// Add, update and delete conditions. Group newly created conditions by actions.
+		// add, update and delete conditions
 		$newConditions = $this->addConditions($conditionsToCreate);
-		$newConditionsForActions = array();
-		foreach ($newConditions as $newCondition) {
-			$newConditionsForActions[$newCondition['actionid']][$newCondition['formulaid']] = $newCondition;
-		}
 		$this->updateConditions($conditionsToUpdate);
 		if (!empty($conditionIdsForDelete)) {
 			$this->deleteConditions($conditionIdsForDelete);
 		}
 
-		$conditionsForActions = array();
-		foreach ($actions as $actionId => $action) {
-			$conditionsForActions[$actionId] = zbx_toHash($action['filter']['conditions'], 'formulaid');
-		}
-		foreach ($newConditionsForActions as $actionId => $newConditionsForAction) {
-			foreach ($newConditionsForAction as $newCondition) {
-				$conditionsForActions[$actionId][$newCondition['formulaid']] = $newCondition;
+		foreach($newConditions as $newCondition) {
+			$action = $actions[$newCondition['actionid']];
+
+			if (isset($action['filter']) && $action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$conditionsForCustomExpressions[$newCondition['actionid']][] = $newCondition;
 			}
 		}
-		foreach ($conditionsForActions as $actionId => $conditionsForAction) {
+
+		foreach ($conditionsForCustomExpressions as $actionId => $conditionsForAction) {
 			$actionFilter = $actions[$actionId]['filter'];
-
-			$formula = $actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-				? $actionFilter['formula']
-				: '';
-
-			$this->updateFormula($actionId, $formula, $conditionsForAction);
+			$this->updateFormula($actionId, $actionFilter['formula'], $conditionsForAction);
 		}
 
 		return array('actionids' => $actionIds);
