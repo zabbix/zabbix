@@ -1418,24 +1418,43 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
-	$_REQUEST['sort'] = getPageSortField($sort);
-	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
+	$currentSortField = getPageSortField($sort);
+	$currentSortOrder = getPageSortOrder($sortorder);
 
-	if (!is_null($_REQUEST['sort'])) {
-		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
-			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
-			invalid_url();
+	$profileSortFieldIndex = 'web.'.$page['file'].'.sort';
+	$profileSortOrderIndex = 'web.'.$page['file'].'.sortorder';
+
+	if (!is_null($currentSortField)) {
+		if ($allowedColumns && !in_array($currentSortField, $allowedColumns)) {
+			if (CProfile::has($profileSortFieldIndex) && CProfile::get($profileSortFieldIndex)) {
+				CProfile::delete($profileSortFieldIndex);
+				$currentSortField = null;
+			}
+			else {
+				error(_s('Cannot sort by field "%1$s".', $currentSortField));
+				invalid_url();
+			}
 		}
 
-		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
-			));
-			invalid_url();
+		if (!in_array($currentSortOrder, array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+			if (CProfile::has($profileSortOrderIndex) && CProfile::get($profileSortOrderIndex)) {
+				CProfile::delete($profileSortOrderIndex);
+				$currentSortOrder = null;
+			}
+			else {
+				error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+					$currentSortOrder, ZBX_SORT_UP, ZBX_SORT_DOWN
+				));
+				invalid_url();
+			}
 		}
 
-		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
-		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
+		CProfile::update($profileSortOrderIndex, $currentSortOrder, PROFILE_TYPE_STR);
+		CProfile::update($profileSortFieldIndex, $currentSortField, PROFILE_TYPE_STR);
+
+		$_REQUEST['sort'] = $currentSortField;
+		$_REQUEST['sortorder'] = $currentSortOrder;
+
 	}
 }
 
@@ -1494,7 +1513,7 @@ function make_sorting_header($obj, $tabfield) {
  *
  * @return string
  */
-function getPageSortField($default = null) {
+function  getPageSortField($default = null) {
 	global $page;
 
 	$sort = get_request('sort', CProfile::get('web.'.$page['file'].'.sort'));
