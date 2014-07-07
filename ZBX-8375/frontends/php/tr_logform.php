@@ -288,8 +288,9 @@ if (hasRequest('sform')) {
 		$imgdn->addClass('updown');
 
 		$del_url = new CSpan(_('Delete'), 'link');
-		$del_url->setAttribute('onclick',
-			'javascript: if (confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;'
+		$del_url->setAttribute('onclick', 'javascript:'.
+			' if (confirm("'.CJs::encodeJson(_('Delete expression?')).'")) remove_expression("logtr'.$id.'");'.
+			' return false;'
 		);
 
 		$row = new CRow(array(
@@ -312,8 +313,9 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = new CLink(_('Delete'), '#', 'action',
-			'javascript: if (confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;'
+		$del_url = new CLink(_('Delete'), '#', 'action', 'javascript:'.
+			' if (confirm("'.CJs::encodeJson(_('Delete keyword?')).'")) remove_keyword("keytr'.$id.'");'.
+			' return false;'
 		);
 		$row = new CRow(array(htmlspecialchars($val['value']), $val['type'], $del_url));
 		$row->setAttribute('id', 'keytr'.$id);
