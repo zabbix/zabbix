@@ -2,7 +2,11 @@
 .SH NAME
 zabbix_get \- Zabbix get utility.
 .SH SYNOPSIS
-.B zabbix_get [-hV] [-s \fI<host name or IP>\fB] [-p \fI<port number>\fB] [-I \fI<IP address>\fB] [-k \fI<item key>\fB]
+.B zabbix_get -s \fI<host name or IP>\fB [-p \fI<port number>\fB] [-I \fI<IP address>\fB] -k \fI<item key>\fB
+.br
+.B zabbix_get -h
+.br
+.B zabbix_get -V
 .SH DESCRIPTION
 .B zabbix_get
 is a command line utility for getting data from a remote Zabbix agent.
