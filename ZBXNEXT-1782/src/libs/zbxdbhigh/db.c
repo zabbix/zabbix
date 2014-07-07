@@ -37,7 +37,7 @@ extern int	txn_error;
 
 static int	connection_failure;
 
-void	DBclose()
+void	DBclose(void)
 {
 	zbx_db_close();
 }
@@ -98,7 +98,7 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit()
+void	DBinit(void)
 {
 	zbx_db_init(CONFIG_DBNAME, db_schema);
 }

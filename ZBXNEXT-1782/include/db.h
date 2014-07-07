@@ -415,9 +415,9 @@ typedef struct
 DB_ESCALATION;
 
 int	DBconnect(int flag);
-void	DBinit();
+void	DBinit(void);
 
-void	DBclose();
+void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
