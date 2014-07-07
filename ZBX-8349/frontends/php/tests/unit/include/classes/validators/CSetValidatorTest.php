@@ -50,7 +50,17 @@ class CSetValidatorTest extends CValidatorTest {
 			),
 			array(
 				array('messageType' => 'Incorrect value type'),
+				true,
+				'Incorrect value type'
+			),
+			array(
+				array('messageType' => 'Incorrect value type'),
 				array(),
+				'Incorrect value type'
+			),
+			array(
+				array('messageType' => 'Incorrect value type'),
+				1.1,
 				'Incorrect value type'
 			),
 			array(
@@ -80,7 +90,17 @@ class CSetValidatorTest extends CValidatorTest {
 			),
 			array(
 				array('messageType' => 'Incorrect value type for "%1$s"'),
+				true,
+				'Incorrect value type for "object"'
+			),
+			array(
+				array('messageType' => 'Incorrect value type for "%1$s"'),
 				array(),
+				'Incorrect value type for "object"'
+			),
+			array(
+				array('messageType' => 'Incorrect value type for "%1$s"'),
+				1.1,
 				'Incorrect value type for "object"'
 			),
 			array(
