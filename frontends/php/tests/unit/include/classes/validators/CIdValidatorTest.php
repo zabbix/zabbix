@@ -45,9 +45,14 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageEmpty' => 'Invalid ID'),
-				'',
-				'Invalid ID'
+				array('messageType' => 'Invalid ID type'),
+				true,
+				'Invalid ID type'
+			),
+			array(
+				array('messageType' => 'Invalid ID type'),
+				null,
+				'Invalid ID type'
 			),
 			array(
 				array('messageType' => 'Invalid ID type'),
@@ -68,6 +73,21 @@ class CIdValidatorTest extends CValidatorTest {
 				array('messageEmpty' => 'Empty ID'),
 				'0',
 				'Empty ID'
+			),
+			array(
+				array('messageInvalid' => 'Invalid ID'),
+				'',
+				'Invalid ID'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+				'01',
+				'Incorrect ID "01"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+				'1.1',
+				'Incorrect ID "1.1"'
 			),
 			array(
 				array('messageInvalid' => 'Incorrect ID "%1$s"'),
@@ -95,8 +115,13 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageEmpty' => 'Invalid ID for "%1$s"'),
-				'',
+				array('messageType' => 'Invalid ID for "%1$s"'),
+				true,
+				'Invalid ID for "object"'
+			),
+			array(
+				array('messageType' => 'Invalid ID for "%1$s"'),
+				null,
 				'Invalid ID for "object"'
 			),
 			array(
@@ -115,9 +140,24 @@ class CIdValidatorTest extends CValidatorTest {
 				'Empty ID for "object"'
 			),
 			array(
+				array('messageInvalid' => 'Invalid ID for "%1$s"'),
+				'',
+				'Invalid ID for "object"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+				'01',
+				'Incorrect ID "01" for "object"'
+			),
+			array(
 				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
 				'-1',
 				'Incorrect ID "-1" for "object"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+				'1.1',
+				'Incorrect ID "1.1" for "object"'
 			),
 			array(
 				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),

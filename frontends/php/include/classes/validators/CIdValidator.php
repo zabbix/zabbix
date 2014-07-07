@@ -63,7 +63,7 @@ class CIdValidator extends CValidator {
 			return false;
 		}
 
-		if (!$this->empty && empty($value)) {
+		if (!$this->empty && (string) $value === '0') {
 			$this->error($this->messageEmpty);
 
 			return false;
