@@ -220,22 +220,23 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			}
 		}
 
-		$conditionError = null;
+		$conditionsValid = true;
 		if ($validateConditions) {
 			$filterConditionValidator = new CActionCondValidator();
 			foreach ($validateConditions as $condition) {
 				if (!$filterConditionValidator->validate($condition)) {
-					$conditionError = $filterConditionValidator->getError();
+					$conditionsValid = false;
+					break;
 				}
 			}
 		}
 
-		if (!$conditionError) {
+		if ($conditionsValid) {
 			$_REQUEST['conditions'] = $validateConditions;
 		}
 		else {
-			show_error_message(_('Cannot add action condition'));
 			error($filterConditionValidator->getError());
+			show_error_message(_('Cannot add action condition'));
 		}
 	}
 }

@@ -2145,7 +2145,7 @@ class CAction extends CApiService {
 	 * @param array $conditions   conditions for which permissions to referenced DB entities will be checked
 	 * @param bool  $update       true for false mode check, false for update mode check
 	 */
-	public function validateConditionsPermissions(array $conditions, $update = false) {
+	protected function validateConditionsPermissions(array $conditions, $update = false) {
 		$hostGroupIdsAll = array();
 		$templateIdsAll = array();
 		$triggerIdsAll = array();
