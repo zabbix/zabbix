@@ -430,13 +430,14 @@ if (hasRequest('form')) {
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	// sort conditions
-	$sortFields = array(
-		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-	);
-	CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
+	if($data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+		$sortFields = array(
+			array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'value', 'order' => ZBX_SORT_DOWN)
+		);
+		CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
+	}
 
 	// new condition
 	$data['new_condition'] = array(
