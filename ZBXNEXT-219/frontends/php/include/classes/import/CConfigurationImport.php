@@ -1308,11 +1308,10 @@ class CConfigurationImport {
 	 * Import template screens.
 	 */
 	protected function processTemplateScreens() {
-		if ($screens = $this->getFormattedTemplateScreens()) {
-			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer);
-			$screenImporter->import($screens);
-			$screenImporter->delete($screens);
-		}
+		$screens = $this->getFormattedTemplateScreens();
+		$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer, $this->formatter);
+		$screenImporter->import($screens);
+		$screenImporter->delete($screens);
 	}
 
 	/**
@@ -1325,34 +1324,29 @@ class CConfigurationImport {
 			return;
 		}
 
-		$allItems = $this->getFormattedItems();
-
-		if (!$allItems) {
-			return;
-		}
-
-		$hostIdsXML = array();
-
-		foreach ($allItems as $host => $items) {
-			if (!$this->referencer->isProcessedHost($host)) {
-				continue;
-			}
-
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$hostIdsXML[$hostId] = $hostId;
-
-			foreach ($items as $item) {
-				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
-
-				if ($itemId) {
-					$itemIdsXML[$itemId] = $itemId;
-				}
-			}
-		}
+		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
 
 		// no hosts have been processed
 		if (!$hostIdsXML) {
 			return;
+		}
+
+		$itemIdsXML = array();
+
+		$allItems = $this->getFormattedItems();
+
+		if ($allItems) {
+			foreach ($allItems as $host => $items) {
+				$hostId = $hostIdsXML[$host];
+
+				foreach ($items as $item) {
+					$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
+
+					if ($itemId) {
+						$itemIdsXML[$itemId] = $itemId;
+					}
+				}
+			}
 		}
 
 		$dbItemIds = API::Item()->get(array(
@@ -1384,44 +1378,25 @@ class CConfigurationImport {
 			return;
 		}
 
-		$allTriggers = $this->getFormattedTriggers();
-
-		if (!$allTriggers) {
-			return;
-		}
-
-		$hosts = $this->getFormattedHosts();
-		if ($hosts) {
-			$hosts = zbx_objectValues($hosts, 'host');
-		}
-		else {
-			$hosts = $this->getFormattedTemplates();
-			$hosts = zbx_objectValues($hosts, 'host');
-		}
-
-		$hostIdsXML = array();
-		$triggersXML = array();
-
-		foreach ($hosts as $host) {
-			if (!$this->referencer->isProcessedHost($host)) {
-				continue;
-			}
-
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$hostIdsXML[$hostId] = $hostId;
-		}
+		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
 
 		// no hosts have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
 
-		foreach ($allTriggers as $trigger) {
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+		$triggersXML = array();
 
-			if ($triggerId) {
-				$triggersXML[$triggerId]['triggerid'] = $triggerId;
-				$triggersXML[$triggerId]['hosts'] = $this->referencer->resolveTriggerHostsById($triggerId);
+		$allTriggers = $this->getFormattedTriggers();
+
+		if ($allTriggers) {
+			foreach ($allTriggers as $trigger) {
+				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+				if ($triggerId) {
+					$triggersXML[$triggerId]['triggerid'] = $triggerId;
+					$triggersXML[$triggerId]['hosts'] = $this->referencer->resolveTriggerHostsById($triggerId);
+				}
 			}
 		}
 
@@ -1435,10 +1410,11 @@ class CConfigurationImport {
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
-		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
-
 		// check that potentially deletable trigger belongs to same hosts that are in XML
 		// if some triggers belong to more hosts than current XML contains, don't delete them
+		$hostIdsXML = array_flip($hostIdsXML);
+		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+
 		foreach ($triggersToDelete as $triggerId => $trigger) {
 			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
@@ -1463,32 +1439,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$allGraphs = $this->getFormattedGraphs();
-
-		if (!$allGraphs) {
-			return;
-		}
-
-		$hosts = $this->getFormattedHosts();
-		if ($hosts) {
-			$hosts = zbx_objectValues($hosts, 'host');
-		}
-		else {
-			$hosts = $this->getFormattedTemplates();
-			$hosts = zbx_objectValues($hosts, 'host');
-		}
-
-
-		$hostIdsXML = array();
-
-		foreach ($hosts as $host) {
-			if (!$this->referencer->isProcessedHost($host)) {
-				continue;
-			}
-
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$hostIdsXML[$hostId] = $hostId;
-		}
+		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
 
 		// no hosts have been processed
 		if (!$hostIdsXML) {
@@ -1497,30 +1448,33 @@ class CConfigurationImport {
 
 		$graphNames = array();
 		$graphHostIds = array();
-
-		// gather host IDs for graphs that exist in XML
-		foreach ($allGraphs as $graph) {
-			$graphNames[] = $graph['name'];
-
-			if (isset($graph['gitems']) && $graph['gitems']) {
-				foreach ($graph['gitems'] as $gitem) {
-					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-					$graphHostIds[$gitemHostId] = $gitemHostId;
-				}
-			}
-		}
-
 		$graphsXML = array();
 
-		// gather graph IDs and hosts graphs belong to
-		$graphsXML = API::Graph()->get(array(
-			'output' => array('graphid'),
-			'hostids' => $graphHostIds,
-			'selectHosts' => array('hostid'),
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'filter' => array('name' => $graphNames)
-		));
+		// gather host IDs for graphs that exist in XML
+		$allGraphs = $this->getFormattedGraphs();
+
+		if ($allGraphs) {
+			foreach ($allGraphs as $graph) {
+				$graphNames[] = $graph['name'];
+
+				if (isset($graph['gitems']) && $graph['gitems']) {
+					foreach ($graph['gitems'] as $gitem) {
+						$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+						$graphHostIds[$gitemHostId] = $gitemHostId;
+					}
+				}
+			}
+
+			// gather graph IDs and hosts graphs belong to
+			$graphsXML = API::Graph()->get(array(
+				'output' => array('graphid'),
+				'hostids' => $graphHostIds,
+				'selectHosts' => array('hostid'),
+				'preservekeys' => true,
+				'nopermissions' => true,
+				'filter' => array('name' => $graphNames)
+			));
+		}
 
 		// check permissions only if there was no update or create. Else permissions are already checked.
 		if (!$this->options['graphs']['createMissing'] && !$this->options['graphs']['updateExisting']) {
@@ -1547,10 +1501,11 @@ class CConfigurationImport {
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
-		$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
-
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
+		$hostIdsXML = array_flip($hostIdsXML);
+		$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+
 		foreach ($graphsToDelete as $graphId => $graph) {
 			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
@@ -1570,35 +1525,28 @@ class CConfigurationImport {
 			return;
 		}
 
-		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
-
-		if (!$allDiscoveryRules) {
-			return;
-		}
-
-		$hostIdsXML = array();
-		$discoveryRuleIdsXML = array();
-
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			if (!$this->referencer->isProcessedHost($host)) {
-				continue;
-			}
-
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-
-			$hostIdsXML[$hostId] = $hostId;
-
-			foreach ($discoveryRules as $discoveryRule) {
-				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
-				if ($discoveryRuleId) {
-					$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
-				}
-			}
-		}
+		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
 
 		// no hosts have been processed
 		if (!$hostIdsXML) {
 			return;
+		}
+
+		$discoveryRuleIdsXML = array();
+
+		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
+
+		if ($allDiscoveryRules) {
+			foreach ($allDiscoveryRules as $host => $discoveryRules) {
+				$hostId = $hostIdsXML[$host];
+
+				foreach ($discoveryRules as $discoveryRule) {
+					$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+					if ($discoveryRuleId) {
+						$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
+					}
+				}
+			}
 		}
 
 		$dbDiscoveryRuleIds = API::DiscoveryRule()->get(array(
@@ -1625,7 +1573,7 @@ class CConfigurationImport {
 		$graphPrototypeNames = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$hostId = $hostIdsXML[$host];
 
 			foreach ($discoveryRules as $discoveryRule) {
 				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
@@ -1988,5 +1936,34 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['templateScreens'];
+	}
+
+	/**
+	 * Get array of processed host or template name and ID pairs.
+	 *
+	 * @return array
+	 */
+	protected function getProcessedHostOrTemplateIds() {
+		$hosts = $this->getFormattedHosts();
+		if ($hosts) {
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+		else {
+			$hosts = $this->getFormattedTemplates();
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+
+		$hostIdsXML = array();
+
+		foreach ($hosts as $host) {
+			if (!$this->referencer->isProcessedHost($host)) {
+				continue;
+			}
+
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$hostIdsXML[$host] = $hostId;
+		}
+
+		return $hostIdsXML;
 	}
 }

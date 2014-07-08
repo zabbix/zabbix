@@ -22,6 +22,32 @@
 class CTemplateScreenImporter extends CAbstractScreenImporter {
 
 	/**
+	 * @var CImportReferencer
+	 */
+	protected $referencer;
+
+	/**
+	 * @var CImportFormatter
+	 */
+	protected $formatter;
+
+	/**
+	 * @var array
+	 */
+	protected $options = array();
+
+	/**
+	 * @param array             $options
+	 * @param CImportReferencer $referencer
+	 * @param CImportFormatter  $formatter
+	 */
+	public function __construct(array $options, CImportReferencer $referencer, CImportFormatter $formatter) {
+		$this->options = $options;
+		$this->referencer = $referencer;
+		$this->formatter = $formatter;
+	}
+
+	/**
 	 * Import template screens.
 	 *
 	 * @param array $allScreens
@@ -29,8 +55,8 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 	 * @return null
 	 */
 	public function import(array $allScreens) {
-		if (!$this->options['templateScreens']['createMissing']
-				&& !$this->options['templateScreens']['updateExisting']) {
+		if ((!$this->options['templateScreens']['createMissing']
+				&& !$this->options['templateScreens']['updateExisting']) || !$allScreens) {
 			return;
 		}
 
@@ -79,16 +105,26 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 			return;
 		}
 
+		$templates = $this->formatter->getTemplates();
+
+		if (!$templates) {
+			return;
+		}
+
+		$templates = zbx_objectValues($templates, 'host');
+
 		$templateIdsXML = array();
+
+		foreach ($templates as $template) {
+			$templateId = $this->referencer->resolveTemplate($template);
+			$templateIdsXML[$template] = $templateId;
+		}
+
 		$templateScreenIdsXML = array();
 
-		foreach ($allScreens as $template => $screens) {
-			$templateId = $this->referencer->resolveTemplate($template);
-
-			// it's possible that we didn't check template update/create,
-			// so we have no template ID here and we'll skip deleting templated screens
-			if ($templateId) {
-				$templateIdsXML[$templateId] = $templateId;
+		if ($allScreens) {
+			foreach ($allScreens as $template => $screens) {
+				$templateId = $templateIdsXML[$template];
 
 				foreach ($screens as $screenName => $screen) {
 					$templateScreenId = $this->referencer->resolveTemplateScreen($templateId, $screenName);
@@ -98,11 +134,6 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 					}
 				}
 			}
-		}
-
-		// no templates have been processed
-		if (!$templateIdsXML) {
-			return;
 		}
 
 		$dbTemplateScreenIds = API::TemplateScreen()->get(array(
