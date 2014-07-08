@@ -14,6 +14,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8375] fixed multiple issues in various forms: removed duplicate hidden fields, added missing field translations, added JS confirmation message encoding and fixed displaying submitted values on failure (Ivo)
 ..F....... [ZBX-8240] fixed multiselect input placeholder behaviour on IE8, input cursor issue and removed "clear field" button for multiselect in IE10+ (Oleg, Krists)
 ..F....... [ZBXNEXT-1782] fixed trigger expression testing not working incorrectly for some expressions that contain nested parentheses (Pavels)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
