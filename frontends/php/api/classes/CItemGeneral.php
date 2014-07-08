@@ -321,8 +321,8 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				$res = calculateItemNextcheck(0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
-				if ($res == ZBX_JAN_2038) {
+				$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $fullItem['delay_flex'], time());
+				if ($nextCheck == ZBX_JAN_2038) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Item will not be refreshed. Please enter a correct update interval.'));
 				}
