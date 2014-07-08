@@ -659,7 +659,9 @@ class CAction extends CApiService {
 							unset($conditionsDb[$conditionId]);
 
 							// collect and group existing action conditions for formula calculation later
-							$conditionsForCustomExpressions[$actionId][] = $condition;
+							if ($actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+								$conditionsForCustomExpressions[$actionId][] = $condition;
+							}
 						}
 					}
 				}
