@@ -50,7 +50,7 @@ $fields = array(
 	'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 /* other */
 	'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-	'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
+	'form_refresh'=>array(T_ZBX_INT, O_OPT, null,	null,	null)
 );
 
 check_fields($fields);
