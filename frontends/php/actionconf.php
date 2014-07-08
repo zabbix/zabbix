@@ -186,6 +186,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 
 		// check existing conditions and remove duplicate condition values
+		$lastFormulaId = false;
 		foreach ($conditions as $condition) {
 			if ($newCondition['conditiontype'] == $condition['conditiontype']) {
 				if (is_array($newCondition['value'])) {
@@ -201,7 +202,12 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 					}
 				}
 			}
+			if($condition['formulaid'] > $lastFormulaId) {
+				$lastFormulaId = $condition['formulaid'];
+			}
 		}
+
+		$newCondition['formulaid'] = chr(ord($lastFormulaId) + 1);
 
 		$validateConditions = $conditions;
 
@@ -430,12 +436,19 @@ if (hasRequest('form')) {
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	if($data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-		$sortFields = array(
-			array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-			array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-			array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-		);
+	if (!hasRequest('add_condition')) {
+		if ($data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			$sortFields = array(
+				array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+				array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+				array('field' => 'value', 'order' => ZBX_SORT_DOWN)
+			);
+		}
+		else {
+			$sortFields = array(
+				array('field' => 'formulaid', 'order' => ZBX_SORT_UP)
+			);
+		}
 		CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
 	}
 

@@ -86,7 +86,8 @@ foreach ($this->data['action']['filter']['conditions'] as $condition) {
 		continue;
 	}
 
-	$label = num2letter($i);
+	$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+
 	$labelSpan = new CSpan($label, 'label');
 	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
 	$labelSpan->setAttribute('data-formulaid', $label);
