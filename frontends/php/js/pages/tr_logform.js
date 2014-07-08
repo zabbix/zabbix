@@ -96,7 +96,7 @@ function add_logexpr() {
 	tr.appendChild(td);
 	td.appendChild(document.createTextNode(expression));
 
-	jQuery(td).append(jQuery('<input>', {
+	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][value]',
 		type: 'hidden',
 		value: expression
@@ -107,7 +107,7 @@ function add_logexpr() {
 
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
-	jQuery(td).append(jQuery('<input>', {
+	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][type]',
 		type: 'hidden',
 		value: expr_t.value

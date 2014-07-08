@@ -480,8 +480,10 @@ class CScreenBuilder {
 					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
 				}
 				else {
-					$removeRowLink = 'javascript: if (Confirm("'._('This screen-row is not empty. Delete it?').'")) {'.
-						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'"; }';
+					$removeRowLink = 'javascript:'.
+						' if (confirm('.CJs::encodeJson(_('This screen-row is not empty. Delete it?')).')) {'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";'.
+						' }';
 				}
 				$icon->addAction('onclick', $removeRowLink);
 				array_push($newColumns, new CCol($icon));
@@ -498,8 +500,10 @@ class CScreenBuilder {
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
 				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
 				if (isset($emptyScreenColumns[$i])) {
-					$removeColumnLink = 'javascript: if (Confirm("'._('This screen-column is not empty. Delete it?').'")) {'.
-						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i.'"; }';
+					$removeColumnLink = 'javascript:'.
+						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";'.
+						' }';
 				}
 				else {
 					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
