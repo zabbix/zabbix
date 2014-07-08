@@ -41,7 +41,12 @@ abstract class CAbstractScreenImporter extends CImporter {
 					$screenItem['resourceid'] = 0;
 					continue;
 				}
-
+				if ($screenItem['rowspan'] == 0) {
+					$screenItem['rowspan'] = 1;
+				}
+				if ($screenItem['colspan'] == 0) {
+					$screenItem['colspan'] = 1;
+				}
 				switch ($screenItem['resourcetype']) {
 					case SCREEN_RESOURCE_HOSTS_INFO:
 					case SCREEN_RESOURCE_TRIGGERS_INFO:
