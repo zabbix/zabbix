@@ -34,7 +34,6 @@ else {
 $graphForm = new CForm();
 $graphForm->setName('graphForm');
 $graphForm->addVar('form', $this->data['form']);
-$graphForm->addVar('form_refresh', $this->data['form_refresh']);
 $graphForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
