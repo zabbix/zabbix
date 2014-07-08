@@ -544,7 +544,6 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 		m->maintenance_from = atoi(row[3]);
 		m->next = maintenances;
 		maintenances = m;
-		ret++;
 	}
 	DBfree_result(result);
 
@@ -565,6 +564,8 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 		DBexecute("%s", sql);
 
 		DCconfig_set_maintenance(ids, ids_num, HOST_MAINTENANCE_STATUS_OFF, 0, 0);
+
+		ret += ids_num;
 	}
 
 	DBcommit();
@@ -768,7 +769,8 @@ static int	process_maintenance(void)
 		if (maintenance_from < db_active_since)
 			maintenance_from = db_active_since;
 
-		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid, db_maintenance_type);
+		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid,
+				db_maintenance_type);
 	}
 	DBfree_result(result);
 
@@ -838,7 +840,7 @@ void	main_timer_loop(void)
 				else
 				{
 					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, %d maint.hosts in " ZBX_FS_DBL " sec, processing time "
+							" sec, %d maintenances in " ZBX_FS_DBL " sec, processing time "
 							"functions]",
 							get_process_type_string(process_type),
 							triggers_count, events_count, total_sec, hm_count,
@@ -857,7 +859,7 @@ void	main_timer_loop(void)
 				else
 				{
 					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, %d maint.hosts in " ZBX_FS_DBL " sec, idle %d sec]",
+							" sec, %d maintenances in " ZBX_FS_DBL " sec, idle %d sec]",
 							get_process_type_string(process_type),
 							triggers_count, events_count, total_sec, hm_count,
 							total_sec_maint, sleeptime);
@@ -891,7 +893,7 @@ void	main_timer_loop(void)
 			else
 			{
 				zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-						" sec, %d maint.hosts in " ZBX_FS_DBL " sec, processing time "
+						" sec, %d maintenances in " ZBX_FS_DBL " sec, processing time "
 						"functions]",
 						get_process_type_string(process_type),
 						old_triggers_count, old_events_count, old_total_sec, old_hm_count,
@@ -916,7 +918,7 @@ void	main_timer_loop(void)
 		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
 			zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-					" sec, %d maint.hosts in " ZBX_FS_DBL " sec, processing maintenance periods]",
+					" sec, %d maintenances in " ZBX_FS_DBL " sec, processing maintenance periods]",
 					get_process_type_string(process_type),
 					triggers_count, events_count, total_sec, old_hm_count,
 					old_total_sec_maint);
