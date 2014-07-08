@@ -71,6 +71,8 @@
 .inventory-host .formlist .formrow .interfaces { min-width: 500px; }
 .inventory-host .formlist .formrow .description { padding-top: 2px; width: 550px; white-space: pre-wrap; }
 .inventory-host .formlist .formrow .text-field { width: 550px; white-space: pre-wrap; }
+.inventory-host .formlist .formrow .inventory-text-field { margin-top: 2px; height: 14px; }
+.inventory-host .formlist .formrow .inventory-text-field-wrap { margin-top: 2px; display: block; width: 550px; }
 
 /* icon mapping */
 #iconMapTable .sortable { height: 30px; line-height: 30px; }

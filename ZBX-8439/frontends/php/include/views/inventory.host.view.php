@@ -256,7 +256,12 @@ if ($this->data['host']['inventory']) {
 		if (!zbx_empty($value)) {
 			$detailsFormList->addRow(
 				$this->data['tableTitles'][$key]['title'],
-				new CSpan(zbx_str2links($value), 'text-field')
+				array(
+					new CDiv(
+						new CSpan(zbx_str2links($value), 'inventory-text-field'),
+						'inventory-text-field-wrap'
+					)
+				)
 			);
 
 			$inventoryValues = true;
