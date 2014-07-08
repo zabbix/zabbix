@@ -102,7 +102,6 @@ $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation
 	new CCheckBox('enableConfirmation', $this->get('enableConfirmation')));
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$confirmationLabel->setAttribute('id', 'confirmationLabel');
 $scriptFormList->addRow($confirmationLabel, array(
 	new CTextBox('confirmation', $this->get('confirmation'), ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,

@@ -43,6 +43,8 @@ function addRegexp(array $regexp, array $expressions) {
 		// check required fields
 		$dbFields = array('name' => null, 'test_string' => '');
 
+		validateRegexp($expressions);
+
 		if (!check_db_fields($dbFields, $regexp)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [addRegexp]');
 		}
@@ -73,6 +75,8 @@ function updateRegexp(array $regexp, array $expressions) {
 	try {
 		$regexpId = $regexp['regexpid'];
 		unset($regexp['regexpid']);
+
+		validateRegexp($expressions);
 
 		// check existence
 		if (!getRegexp($regexpId)) {
@@ -108,6 +112,24 @@ function updateRegexp(array $regexp, array $expressions) {
 	}
 
 	return true;
+}
+
+function validateRegexp($expressions) {
+	$validator = new CRegexValidator(array(
+		'messageType' => _('Regular expression must be a string'),
+		'messageInvalid' => _('Incorrect regular expression "%1$s": "%2$s"')
+	));
+
+	foreach ($expressions as $expression) {
+		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE ||
+			$expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
+
+			if (!$validator->validate($expression['expression'])) {
+				throw new \Exception($validator->getError());
+			}
+		}
+	}
+
 }
 
 /**

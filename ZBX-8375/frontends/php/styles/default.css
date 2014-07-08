@@ -358,6 +358,7 @@ table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; paddi
 table.tableinfo > tbody > tr > td:first-child { width: 1px; }
 table.tableinfo tr td.wraptext { white-space: normal; }
 table.tableinfo tr td.message { text-align: center; }
+table.tableinfo tr td.pre { white-space: pre; }
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
 table.tableinfo caption {
 	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
@@ -521,6 +522,12 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
+
+/* IE10+ "clear field" X button removing */
+.multiselect input[type="text"]::-ms-clear {
+	display: none;
+}
+
 .multiselect .selected ul {
 	padding: 0 0 0 1px; margin: 0; min-height: 18px;
 	background: #ffffff; border: 1px solid #AAAAAA;
