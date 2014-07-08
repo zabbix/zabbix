@@ -26,7 +26,6 @@ $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 $proxyForm = new CForm();
 $proxyForm->setName('proxyForm');
 $proxyForm->addVar('form', $this->data['form']);
-$proxyForm->addVar('form_refresh', $this->data['form_refresh']);
 if ($this->data['proxyid']) {
 	$proxyForm->addVar('proxyid', $this->data['proxyid']);
 }
