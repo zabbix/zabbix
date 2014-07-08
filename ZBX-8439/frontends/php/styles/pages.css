@@ -50,8 +50,10 @@
 .host-edit .dropArea .interface-add-control,
 .hostprototype-edit .dropArea .interface-add-control { visibility: hidden; }
 .host-edit #groups { height: 140px; }
-.host-edit #linkedTemplateTable { min-width: 400px; }
+.host-edit #linkedTemplateTable { width: 100%; }
+.host-edit #newTemplateTable { width: 100%; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
+.atLeastFourHundred { min-width: 400px; }
 
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
