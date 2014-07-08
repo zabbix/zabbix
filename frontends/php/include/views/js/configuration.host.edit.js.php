@@ -8,8 +8,8 @@
 	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
-			<label for="interfaces[#{iface.interfaceid}][bulk]">Use bulk requests</label>
+			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk} />
+			<label for="interfaces[#{iface.interfaceid}][bulk]"><?php echo _('Use bulk requests'); ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
@@ -208,28 +208,6 @@
 			return footerRowId;
 		}
 
-		function getHostInterfaceNumericType(typeName) {
-			var typeNum;
-
-			switch (typeName) {
-				case 'agent':
-					typeNum = '<?php echo INTERFACE_TYPE_AGENT; ?>';
-					break;
-				case 'snmp':
-					typeNum = '<?php echo INTERFACE_TYPE_SNMP; ?>';
-					break;
-				case 'jmx':
-					typeNum = '<?php echo INTERFACE_TYPE_JMX; ?>';
-					break;
-				case 'ipmi':
-					typeNum = '<?php echo INTERFACE_TYPE_IPMI; ?>';
-					break;
-				default:
-					throw new Error('Unknown host interface type name.');
-			}
-			return typeNum;
-		}
-
 		function createNewHostInterface(hostInterfaceType) {
 			var newInterface = {
 				isNew: true,
@@ -239,7 +217,7 @@
 				ip: '127.0.0.1'
 			};
 
-			if (hostInterfaceType === 'snmp') {
+			if (newInterface.type == <?php echo INTERFACE_TYPE_SNMP; ?>) {
 				newInterface.bulk = 1;
 			}
 
@@ -365,7 +343,7 @@
 
 				ui.helper.remove();
 
-				if (hostInterfaceTypeName === 'snmp') {
+				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?php echo INTERFACE_TYPE_SNMP; ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
 						var bulkDiv = jQuery('<div>', {
 							'class': 'interface-bulk'
@@ -384,7 +362,7 @@
 						// append label
 						bulkDiv.append(jQuery('<label>', {
 							'for': 'interfaces[' + hostInterfaceId + '][bulk]',
-							text: 'Use bulk requests'
+							text: '<?php echo _('Use bulk requests'); ?>'
 						}));
 
 						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkDiv);
@@ -451,6 +429,28 @@
 			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).change();
 	});
+
+	function getHostInterfaceNumericType(typeName) {
+		var typeNum;
+
+		switch (typeName) {
+			case 'agent':
+				typeNum = '<?php echo INTERFACE_TYPE_AGENT; ?>';
+				break;
+			case 'snmp':
+				typeNum = '<?php echo INTERFACE_TYPE_SNMP; ?>';
+				break;
+			case 'jmx':
+				typeNum = '<?php echo INTERFACE_TYPE_JMX; ?>';
+				break;
+			case 'ipmi':
+				typeNum = '<?php echo INTERFACE_TYPE_IPMI; ?>';
+				break;
+			default:
+				throw new Error('Unknown host interface type name.');
+		}
+		return typeNum;
+	}
 
 	function removeTemplate(templateid) {
 		jQuery('#templates_' + templateid).remove();

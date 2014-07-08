@@ -326,6 +326,8 @@ class CHostInterface extends CApiService {
 				$this->checkPort($interface);
 			}
 
+			$this->checkBulk($interface);
+
 			if ($update) {
 				$interface = $updInterface;
 			}
@@ -461,6 +463,7 @@ class CHostInterface extends CApiService {
 			$this->checkDns($interface);
 			$this->checkIp($interface);
 			$this->checkPort($interface);
+			$this->checkBulk($interface);
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), array(
@@ -632,6 +635,22 @@ class CHostInterface extends CApiService {
 	protected function checkHostPermissions(array $hostIds) {
 		if (!API::Host()->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Validates interface "bulk" field.
+	 *
+	 * @throws APIException if bulk field is incorrect.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkBulk(array $interface) {
+		if (($interface['type'] != INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+				&& $interface['bulk'] != SNMP_BULK_ENABLE)
+				|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+					&& $interface['bulk'] !== SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLE)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
 		}
 	}
 
