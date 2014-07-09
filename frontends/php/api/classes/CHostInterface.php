@@ -640,6 +640,8 @@ class CHostInterface extends CApiService {
 
 	/**
 	 * Validates interface "bulk" field.
+	 * For SNMP interfaces bulk value should be either 0 (disabled) or 1 (enabled).
+	 * For other non-SNMP interfaces bulk value should be 1 (default).
 	 *
 	 * @throws APIException if bulk field is incorrect.
 	 *
