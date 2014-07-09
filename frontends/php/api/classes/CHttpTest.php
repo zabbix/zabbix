@@ -651,14 +651,12 @@ class CHttpTest extends CApiService {
 		}
 
 		$followRedirectsValidator = new CLimitedSetValidator(array(
-				'values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON),
-				'messageType' => _('Incorrect value type for "Follow redirects" flag.')
+				'values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 			)
 		);
 
 		$retrieveModeValidator = new CLimitedSetValidator(array(
-				'values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS),
-				'messageType' => _('Incorrect value type for "Retrieve only headers" flag.')
+				'values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 			)
 		);
 
@@ -686,6 +684,7 @@ class CHttpTest extends CApiService {
 					$step['name'],
 					$httpTest['name']
 				);
+				$followRedirectsValidator->messageType = $followRedirectsValidator->messageInvalid;
 
 				$this->checkValidator($step['follow_redirects'], $followRedirectsValidator);
 			}
@@ -696,6 +695,7 @@ class CHttpTest extends CApiService {
 					$step['name'],
 					$httpTest['name']
 				);
+				$retrieveModeValidator->messageType = $retrieveModeValidator->messageInvalid;
 
 				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
 			}
@@ -883,7 +883,7 @@ class CHttpTest extends CApiService {
 			array(
 				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
 				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".'),
-				'messageType' => _('Incorrect SSL verify peer type for web scenario "%1$s".')
+				'messageType' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
 			)
 		);
 		$verifyPeerValidator->setObjectName($httpTest['name']);
@@ -893,7 +893,7 @@ class CHttpTest extends CApiService {
 			array(
 				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
 				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".'),
-				'messageType' => _('Incorrect SSL verify host type for web scenario "%1$s".')
+				'messageType' => _('Incorrect SSL verify host value for web scenario "%1$s".')
 			)
 		);
 

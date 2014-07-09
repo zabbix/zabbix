@@ -843,7 +843,7 @@ class CDiscoveryRule extends CItemGeneral {
 						CONDITION_EVAL_TYPE_EXPRESSION
 					),
 					'messageInvalid' => _('Incorrect type of calculation for discovery rule "%1$s".'),
-					'messageType' => _('Incorrect type of calculation type for discovery rule "%1$s".')
+					'messageType' => _('Incorrect type of calculation for discovery rule "%1$s".')
 				)),
 				'formula' => new CStringValidator(array(
 					'empty' => true
@@ -890,7 +890,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'operator' => new CLimitedSetValidator(array(
 					'values' => array(CONDITION_OPERATOR_REGEXP),
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".'),
-					'messageType' => _('Incorrect filter condition operator type for discovery rule "%1$s".')
+					'messageType' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				))
 			),
 			'required' => array('macro', 'value'),
