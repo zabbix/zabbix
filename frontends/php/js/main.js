@@ -902,7 +902,7 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 	});
 
 	// resize multiselects in the flicker
-	if (typeof flickerResizeMultiselect === 'undefined' && state == 1) {
+	if (jQuery('.multiselect').length > 0 && typeof flickerResizeMultiselect === 'undefined' && state == 1) {
 		flickerResizeMultiselect = true;
 
 		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
