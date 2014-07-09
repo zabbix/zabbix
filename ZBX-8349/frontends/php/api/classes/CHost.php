@@ -544,7 +544,7 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
-		$statusValidator = new CSetValidator(array(
+		$statusValidator = new CLimitedSetValidator(array(
 			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 			'messageInvalid' => _('Incorrect status for host "%1$s".'),
 			'messageType' => _('Incorrect status type for host "%1$s".')

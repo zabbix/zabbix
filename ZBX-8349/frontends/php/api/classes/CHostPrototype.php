@@ -180,7 +180,7 @@ class CHostPrototype extends CHostBase {
 					// just in case
 					'messageEmpty' => _('Empty name for host prototype "%1$s".')
 				)),
-				'status' => new CSetValidator(array(
+				'status' => new CLimitedSetValidator(array(
 					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 					'messageInvalid' => _('Incorrect status for host prototype "%1$s".'),
 					'messageType' => _('Incorrect status type for host prototype "%1$s".')
