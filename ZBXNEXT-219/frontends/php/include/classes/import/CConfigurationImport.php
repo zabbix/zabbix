@@ -166,6 +166,7 @@ class CConfigurationImport {
 
 			// items can be deleted after graphs are deleted, because graphs can have min/max value as items
 			$this->deleteMissingItems();
+			$this->deleteMissingApplications();
 
 			$this->processImages();
 			$this->processMaps();
@@ -535,15 +536,19 @@ class CConfigurationImport {
 	 * Import applications.
 	 */
 	protected function processApplications() {
-		$allApplciations = $this->getFormattedApplications();
+		if (!$this->options['applications']['createMissing']) {
+			return;
+		}
 
-		if (empty($allApplciations)) {
+		$allApplications = $this->getFormattedApplications();
+
+		if (empty($allApplications)) {
 			return;
 		}
 
 		$applicationsToCreate = array();
 
-		foreach ($allApplciations as $host => $applications) {
+		foreach ($allApplications as $host => $applications) {
 			if (!$this->referencer->isProcessedHost($host)) {
 				continue;
 			}
@@ -1368,6 +1373,55 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Deletes applications from DB that are missing in XML.
+	 *
+	 * @return null
+	 */
+	protected function deleteMissingApplications() {
+		if (!$this->options['applications']['deleteMissing']) {
+			return;
+		}
+
+		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+
+		// no hosts have been processed
+		if (!$hostIdsXML) {
+			return;
+		}
+
+		$applicationIdsXML = array();
+
+		$allApplications = $this->getFormattedApplications();
+
+		if ($allApplications) {
+			foreach ($allApplications as $host => $applications) {
+				$hostId = $hostIdsXML[$host];
+
+				foreach ($applications as $application) {
+					$applicationId = $this->referencer->resolveApplication($hostId, $application['name']);
+					$applicationIdsXML[$applicationId] = $applicationId;
+				}
+			}
+		}
+
+		$dbApplicationIds = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'hostids' => $hostIdsXML,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		));
+
+		$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
+		if ($applicationsToDelete) {
+			API::Application()->delete(array_keys($applicationsToDelete));
+		}
+
+		// refresh applications because templated ones can be inherited to host and used in items
+		$this->referencer->refreshApplications();
+	}
+
+	/**
 	 * Deletes triggers from DB that are missing in XML.
 	 *
 	 * @return null
@@ -1779,10 +1833,14 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['applications'])) {
 			$this->formattedData['applications'] = array();
 
-			if ($this->options['templates']['updateExisting']
-					|| $this->options['templates']['createMissing']
-					|| $this->options['hosts']['updateExisting']
-					|| $this->options['hosts']['createMissing']) {
+			// application list is required when items, item prototypes are created and/or updated
+			// or applications are handled separately
+			if ($this->options['items']['updateExisting']
+					|| $this->options['items']['createMissing']
+					|| $this->options['discoveryRules']['updateExisting']
+					|| $this->options['discoveryRules']['createMissing']
+					|| $this->options['applications']['createMissing']
+					|| $this->options['applications']['deleteMissing']) {
 				$this->formattedData['applications'] = $this->formatter->getApplications();
 			}
 		}
