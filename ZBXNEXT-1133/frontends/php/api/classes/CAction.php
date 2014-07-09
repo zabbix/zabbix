@@ -619,14 +619,9 @@ class CAction extends CApiService {
 		$operationsToUpdate = array();
 		$operationIdsForDelete = array();
 
-		$conditionsToCreate = array();
-		$conditionsToUpdate = array();
-		$conditionIdsForDelete = array();
-
-		$conditionsForCustomExpressions = array();
-
 		$actionsUpdateData = array();
 
+		$newActionConditions = null;
 		foreach ($actions as $actionId => $action) {
 			$actionDb = $actionsDb[$actionId];
 
@@ -642,31 +637,6 @@ class CAction extends CApiService {
 
 			if (isset($action['filter'])) {
 				$actionFilter = $action['filter'];
-
-				$conditionsDb = isset($actionDb['filter']['conditions']) ? $actionDb['filter']['conditions'] : array();
-				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
-
-				foreach ($actionFilter['conditions'] as $condition) {
-					if (!isset($condition['conditionid'])) {
-						$condition['actionid'] = $actionId;
-						$conditionsToCreate[] = $condition;
-					}
-					else {
-						$conditionId = $condition['conditionid'];
-
-						if (isset($conditionsDb[$conditionId])) {
-							$conditionsToUpdate[] = $condition;
-							unset($conditionsDb[$conditionId]);
-
-							// collect and group existing action conditions for formula calculation later
-							if ($actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-								$conditionsForCustomExpressions[$actionId][] = $condition;
-							}
-						}
-					}
-				}
-
-				$conditionIdsForDelete = array_merge($conditionIdsForDelete, array_keys($conditionsDb));
 
 				// set formula to empty string of not custom expression
 				if ($actionFilter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
@@ -711,24 +681,48 @@ class CAction extends CApiService {
 			$this->deleteOperations($operationIdsForDelete);
 		}
 
-		// add, update and delete conditions
-		$newConditions = $this->addConditions($conditionsToCreate);
-		$this->updateConditions($conditionsToUpdate);
-		if (!empty($conditionIdsForDelete)) {
-			$this->deleteConditions($conditionIdsForDelete);
-		}
+		// set actionid for all conditions and group by actionid into $newActionConditions
+		$newActionConditions = null;
+		foreach ($actions as $actionId => $action) {
+			if (isset($action['filter'])) {
+				if ($newActionConditions === null) {
+					$newActionConditions = array();
+				}
 
-		foreach($newConditions as $newCondition) {
-			$action = $actions[$newCondition['actionid']];
-
-			if (isset($action['filter']) && $action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$conditionsForCustomExpressions[$newCondition['actionid']][] = $newCondition;
+				$newActionConditions[$actionId] = array();
+				foreach ($action['filter']['conditions'] as $condition) {
+					$condition['actionid'] = $actionId;
+					$newActionConditions[$actionId][] = $condition;
+				}
 			}
 		}
 
-		foreach ($conditionsForCustomExpressions as $actionId => $conditionsForAction) {
-			$actionFilter = $actions[$actionId]['filter'];
-			$this->updateFormula($actionId, $actionFilter['formula'], $conditionsForAction);
+		// if we have any conditions, fetch current conditions from db and do replace by position and group result
+		// by actionid into $actionConditions
+		$actionConditions = array();
+		if ($newActionConditions !== null) {
+			$existingConditions = DBfetchArray(DBselect(
+					'SELECT conditionid,actionid,conditiontype,operator,value'.
+					' FROM conditions'.
+					' WHERE '.dbConditionInt('actionid', $actionIds).
+					' ORDER BY conditionid'
+				));
+			$existingActionConditions = array();
+			foreach ($existingConditions as $condition) {
+				$existingActionConditions[$condition['actionid']][] = $condition;
+			}
+
+			$conditions = DB::replaceByPosition('conditions', $existingActionConditions, $newActionConditions);
+			foreach ($conditions as $condition) {
+				$actionConditions[$condition['actionid']][] = $condition;
+			}
+		}
+
+		// update formulas for user expressions using new conditions
+		foreach ($actions as $actionId => $action) {
+			if (isset($action['filter']) && $action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$this->updateFormula($actionId, $action['filter']['formula'], $actionConditions[$actionId]);
+			}
 		}
 
 		return array('actionids' => $actionIds);
@@ -1828,9 +1822,12 @@ class CAction extends CApiService {
 					'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
 				))
 			),
+			'required' => array('conditiontype', 'operator', 'value'),
 			'postValidators' => array(
 				new CActionCondValidator()
-			)
+			),
+			'messageRequired' => _('No "%2$s" given for a condition of action "%1$s".'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for a condition of action "%1$s".')
 		);
 	}
 
@@ -2039,7 +2036,7 @@ class CAction extends CApiService {
 
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 
-		$filterConditionValidator = new CPartialSchemaValidator($this->getFilterConditionSchema());
+		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 		$filterConditionValidator->setValidator('actionid', new CIdValidator(array(
 			'empty' => true,
 			'messageRegex' => _('Incorrect action ID for action "%1$s".')
@@ -2049,11 +2046,12 @@ class CAction extends CApiService {
 			'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
 		)));
 
-		$conditionsToValidateForCreate = array();
-		$conditionsToValidateForUpdate = array();
 		$operationsToValidate = array();
+		$conditionsToValidate = array();
 
 		foreach ($actions as $actionId => $action) {
+			$actionDb = $actionsDb[$actionId];
+
 			if (isset($action['name'])) {
 				$actionName = $action['name'];
 
@@ -2071,40 +2069,20 @@ class CAction extends CApiService {
 				}
 			}
 			else {
-				$actionName = $actionsDb[$actionId]['name'];
+				$actionName = $actionDb['name'];
 			}
 
 			if (isset($action['filter'])) {
+				$actionFilter = $action['filter'];
 
 				$filterValidator->setObjectName($actionName);
-				$this->checkValidator($action['filter'], $filterValidator);
+				$filterConditionValidator->setObjectName($actionName);
 
-				$conditionsDb = isset($actionsDb[$actionId]['filter']['conditions'])
-					? $actionsDb[$actionId]['filter']['conditions']
-					: array();
-				$conditionsDb = zbx_toHash($conditionsDb, 'conditionid');
+				$this->checkValidator($actionFilter, $filterValidator);
 
-				foreach ($action['filter']['conditions'] as $condition) {
-					$filterConditionValidator->setObjectName($actionName);
+				foreach ($actionFilter['conditions'] as $condition) {
 					$this->checkValidator($condition, $filterConditionValidator);
-
-					if (!isset($condition['conditionid'])) {
-						$conditionsToValidateForCreate[] = $condition;
-					}
-					elseif (isset($conditionsDb[$condition['conditionid']])) {
-						// value and operator validation depends on condition type
-						$defaultConditionFields = array('conditiontype', 'operator', 'value');
-						foreach ($defaultConditionFields as $field) {
-							$condition[$field] = isset($condition[$field])
-								? $condition[$field]
-								: $conditionsDb[$condition['conditionid']][$field];
-						}
-
-						$conditionsToValidateForUpdate[] = $condition;
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action filter conditionid.'));
-					}
+					$conditionsToValidate[] = $condition;
 				}
 			}
 
@@ -2128,11 +2106,8 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($conditionsToValidateForCreate) {
-			$this->validateConditionsPermissions($conditionsToValidateForCreate);
-		}
-		if ($conditionsToValidateForUpdate) {
-			$this->validateConditionsPermissions($conditionsToValidateForUpdate, true);
+		if ($conditionsToValidate) {
+			$this->validateConditionsPermissions($conditionsToValidate);
 		}
 		if ($operationsToValidate) {
 			$this->validateOperationsIntegrity($operationsToValidate);
@@ -2143,9 +2118,8 @@ class CAction extends CApiService {
 	 * Check permissions to DB entities referenced by action conditions.
 	 *
 	 * @param array $conditions   conditions for which permissions to referenced DB entities will be checked
-	 * @param bool  $update       true for false mode check, false for update mode check
 	 */
-	protected function validateConditionsPermissions(array $conditions, $update = false) {
+	protected function validateConditionsPermissions(array $conditions) {
 		$hostGroupIdsAll = array();
 		$templateIdsAll = array();
 		$triggerIdsAll = array();
@@ -2154,11 +2128,6 @@ class CAction extends CApiService {
 		$proxyIdsAll = array();
 
 		foreach ($conditions as $condition) {
-			// if not update and no value for condition, skip
-			if ($update && !isset($condition['value'])) {
-				continue;
-			}
-
 			$conditionValue = $condition['value'];
 			// validate condition values depending on condition type
 			switch ($condition['conditiontype']) {
