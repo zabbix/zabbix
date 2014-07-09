@@ -1,14 +1,9 @@
 <script type="text/javascript">
-	function confirmDeleteMissing() {
-		var deleteMissing;
-
-		jQuery('.deleteMissing').each(function() {
-			if (this.checked) {
-				deleteMissing = confirm('<?php echo _('Delete all elements that are not present in the XML file?') ?>');
-				return false;
+	jQuery(function($) {
+		$('#import').click(function() {
+			if ($('.deleteMissing:checked').length > 0) {
+				return confirm('<?php echo _('Delete all elements that are not present in the XML file?') ?>');
 			}
 		});
-
-		return deleteMissing;
-	}
+	});
 </script>
