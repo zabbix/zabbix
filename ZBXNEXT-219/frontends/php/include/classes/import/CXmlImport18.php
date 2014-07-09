@@ -856,6 +856,9 @@ class CXmlImport18 {
 			// stores parsed host IDs that exist on XML
 			$hostIdsXML = array();
 
+			// store application IDs that exist on XML
+			$applicationIdsXML = array();
+
 			// store items IDs that exist on XML
 			$itemIdsXML = array();
 
@@ -1275,91 +1278,89 @@ class CXmlImport18 {
 // ITEMS {{{
 				if ($rules['items']['updateExisting']
 						|| $rules['items']['createMissing']
-						|| $rules['items']['deleteMissing']) {
+						|| $rules['items']['deleteMissing']
+						|| $rules['applications']['createMissing']
+						|| $rules['applications']['deleteMissing']) {
+					// applications are located under items in version 1.8,
+					// so we need to get item list in any of these cases
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
 					// cycle each XML item
 					foreach ($items as $item) {
-						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-						$item_db['hostid'] = $current_hostid;
+						if ($rules['items']['updateExisting']
+								|| $rules['items']['createMissing']
+								|| $rules['items']['deleteMissing']) {
+							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+							$item_db['hostid'] = $current_hostid;
 
-						// item needs interfaces
-						if ($old_version_input) {
-							// 'snmp_port' column was renamed to 'port'
-							if ($item_db['snmp_port'] != 0) {
-								// zabbix agent items have no ports
-								$item_db['port'] = $item_db['snmp_port'];
+							// item needs interfaces
+							if ($old_version_input) {
+								// 'snmp_port' column was renamed to 'port'
+								if ($item_db['snmp_port'] != 0) {
+									// zabbix agent items have no ports
+									$item_db['port'] = $item_db['snmp_port'];
+								}
+								unset($item_db['snmp_port']);
+
+								// assigning appropriate interface depending on item type
+								switch ($item_db['type']) {
+									// zabbix agent interface
+									case ITEM_TYPE_ZABBIX:
+									case ITEM_TYPE_SIMPLE:
+									case ITEM_TYPE_EXTERNAL:
+									case ITEM_TYPE_SSH:
+									case ITEM_TYPE_TELNET:
+										$item_db['interfaceid'] = $agent_interface_id;
+										break;
+									// snmp interface
+									case ITEM_TYPE_SNMPV1:
+									case ITEM_TYPE_SNMPV2C:
+									case ITEM_TYPE_SNMPV3:
+										// for an item with different port - different interface
+										$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
+										break;
+									case ITEM_TYPE_IPMI:
+										$item_db['interfaceid'] = $ipmi_interface_id;
+										break;
+									// no interfaces required for these item types
+									case ITEM_TYPE_HTTPTEST:
+									case ITEM_TYPE_CALCULATED:
+									case ITEM_TYPE_AGGREGATE:
+									case ITEM_TYPE_INTERNAL:
+									case ITEM_TYPE_ZABBIX_ACTIVE:
+									case ITEM_TYPE_TRAPPER:
+									case ITEM_TYPE_DB_MONITOR:
+										$item_db['interfaceid'] = null;
+										break;
+								}
+
+								$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
 							}
-							unset($item_db['snmp_port']);
 
-							// assigning appropriate interface depending on item type
-							switch ($item_db['type']) {
-								// zabbix agent interface
-								case ITEM_TYPE_ZABBIX:
-								case ITEM_TYPE_SIMPLE:
-								case ITEM_TYPE_EXTERNAL:
-								case ITEM_TYPE_SSH:
-								case ITEM_TYPE_TELNET:
-									$item_db['interfaceid'] = $agent_interface_id;
-									break;
-								// snmp interface
-								case ITEM_TYPE_SNMPV1:
-								case ITEM_TYPE_SNMPV2C:
-								case ITEM_TYPE_SNMPV3:
-									// for an item with different port - different interface
-									$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
-									break;
-								case ITEM_TYPE_IPMI:
-									$item_db['interfaceid'] = $ipmi_interface_id;
-									break;
-								// no interfaces required for these item types
-								case ITEM_TYPE_HTTPTEST:
-								case ITEM_TYPE_CALCULATED:
-								case ITEM_TYPE_AGGREGATE:
-								case ITEM_TYPE_INTERNAL:
-								case ITEM_TYPE_ZABBIX_ACTIVE:
-								case ITEM_TYPE_TRAPPER:
-								case ITEM_TYPE_DB_MONITOR:
-									$item_db['interfaceid'] = null;
-									break;
-							}
+							$current_item = API::Item()->get(array(
+								'filter' => array(
+									'hostid' => $item_db['hostid'],
+									'key_' => $item_db['key_']
+								),
+								'webitems' => true,
+								'editable' => true,
+								'output' => array('itemid')
+							));
+							$current_item = reset($current_item);
 
-							$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
+							// items created and updated during should be "preserved", so we must store item IDs
+							// before we skip some rules, otherwise all items get deleted
+							$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
 						}
 
-						$current_item = API::Item()->get(array(
-							'filter' => array(
-								'hostid' => $item_db['hostid'],
-								'key_' => $item_db['key_']
-							),
-							'webitems' => true,
-							'editable' => true,
-							'output' => array('itemid')
-						));
-						$current_item = reset($current_item);
-
-						// items created and updated during should be "preserved", so we must store item IDs
-						// before we skip some rules, otherwise all items get deleted
-						$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
-
-						// if item does not exist and there is no need to create it, skip item creation
-						if (!$current_item && empty($rules['items']['createMissing'])) {
-							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue;
-						}
-
-						// if item exists, but there there is no need for update, skip item update
-						if ($current_item && empty($rules['items']['updateExisting'])) {
-							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue;
-						}
-
-// ITEM APPLICATIONS {{{
+						// create applications independently of create or update item options
+						// in case we update items, we need to assign items to applications,
+						// so we also gather application IDs independetly of selected application options
 						$applications = $xpath->query('applications/application', $item);
 
-						$item_applications = array();
-						$applications_to_add = array();
+						$itemApplications = array();
+						$applicationsToAdd = array();
 						$applicationsIds = array();
 
 						foreach ($applications as $application) {
@@ -1376,61 +1377,77 @@ class CXmlImport18 {
 							$applicationValue = reset($current_application);
 
 							if ($current_application) {
-								if (empty($item_applications)) {
-									$item_applications = $current_application;
-									$applicationsIds[] = $applicationValue['applicationid'];
+								if (!$itemApplications) {
+									$itemApplications = $current_application;
 								}
-								else {
-									if (!in_array($applicationValue['applicationid'], $applicationsIds)) {
-										$item_applications = array_merge($item_applications, $current_application);
-										$applicationsIds[] = $applicationValue['applicationid'];
-									}
+								elseif (!in_array($applicationValue['applicationid'], $applicationsIds)) {
+									$itemApplications = array_merge($itemApplications, $current_application);
 								}
+								$applicationsIds[] = $applicationValue['applicationid'];
 							}
 							else {
-								$applications_to_add[] = $application_db;
+								$applicationsToAdd[] = $application_db;
 							}
 						}
 
-						if (!empty($applications_to_add)) {
-							$result = API::Application()->create($applications_to_add);
+						if ($applicationsToAdd && $rules['applications']['createMissing']) {
+							$result = API::Application()->create($applicationsToAdd);
 
-							$options = array(
+							$newApplications = API::Application()->get(array(
 								'applicationids' => $result['applicationids'],
 								'output' => API_OUTPUT_EXTEND
-							);
-							$new_applications = API::Application()->get($options);
-
-							$item_applications = array_merge($item_applications, $new_applications);
-						}
-// }}} ITEM APPLICATIONS
-
-						if ($current_item && !empty($rules['items']['updateExisting'])) {
-							$item_db['itemid'] = $current_item['itemid'];
-							$result = API::Item()->update($item_db);
-
-							$current_item = API::Item()->get(array(
-								'itemids' => $result['itemids'],
-								'webitems' => true,
-								'output' => array('itemid')
 							));
+
+							$itemApplications = array_merge($itemApplications, $newApplications);
 						}
 
-						if (!$current_item && !empty($rules['items']['createMissing'])) {
-							$result = API::Item()->create($item_db);
-
-							$current_item = API::Item()->get(array(
-								'itemids' => $result['itemids'],
-								'webitems' => true,
-								'output' => array('itemid')
-							));
+						if ($itemApplications) {
+							foreach ($itemApplications as $itemApp) {
+								$applicationIdsXML[$itemApp['applicationid']] = $itemApp['applicationid'];
+							}
 						}
 
-						if (!empty($item_applications)) {
-							API::Application()->massAdd(array(
-								'applications' => $item_applications,
-								'items' => $current_item
-							));
+						if ($rules['items']['updateExisting'] || $rules['items']['createMissing']) {
+							// if item does not exist and there is no need to create it, skip item creation
+							if (!$current_item && !$rules['items']['createMissing']) {
+								info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
+								continue;
+							}
+
+							// if item exists, but there there is no need for update, skip item update
+							if ($current_item && !$rules['items']['updateExisting']) {
+								info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
+								continue;
+							}
+
+							if ($current_item && $rules['items']['updateExisting']) {
+								$item_db['itemid'] = $current_item['itemid'];
+								$result = API::Item()->update($item_db);
+
+								$current_item = API::Item()->get(array(
+									'itemids' => $result['itemids'],
+									'webitems' => true,
+									'output' => array('itemid')
+								));
+							}
+
+							if (!$current_item && $rules['items']['createMissing']) {
+								$result = API::Item()->create($item_db);
+
+								$current_item = API::Item()->get(array(
+									'itemids' => $result['itemids'],
+									'webitems' => true,
+									'output' => array('itemid')
+								));
+							}
+
+							// after items are created or updated, see to if items need to assigned to applications
+							if (isset($itemApplications) && $itemApplications) {
+								API::Application()->massAdd(array(
+									'applications' => $itemApplications,
+									'items' => $current_item
+								));
+							}
 						}
 					}
 				}
@@ -1874,6 +1891,22 @@ class CXmlImport18 {
 
 				if ($itemsToDelete) {
 					API::Item()->delete(array_keys($itemsToDelete));
+				}
+			}
+
+			// delete missing applications
+			if ($rules['applications']['deleteMissing']) {
+				$dbApplicationIds = API::Application()->get(array(
+					'output' => array('applicationid'),
+					'hostids' => $hostIdsXML,
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'inherited' => false
+				));
+
+				$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
+				if ($applicationsToDelete) {
+					API::Application()->delete(array_keys($applicationsToDelete));
 				}
 			}
 
