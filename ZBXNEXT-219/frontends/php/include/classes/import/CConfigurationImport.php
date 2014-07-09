@@ -1352,7 +1352,6 @@ class CConfigurationImport {
 		$dbItemIds = API::Item()->get(array(
 			'output' => array('itemid'),
 			'hostids' => $hostIdsXML,
-			'webitems' => true,
 			'preservekeys' => true,
 			'editable' => true,
 			'inherited' => false,

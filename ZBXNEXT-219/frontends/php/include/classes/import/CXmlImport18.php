@@ -1864,7 +1864,6 @@ class CXmlImport18 {
 				$dbItemIds = API::Item()->get(array(
 					'output' => array('itemid'),
 					'hostids' => $hostIdsXML,
-					'webitems' => true,
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'inherited' => false,
