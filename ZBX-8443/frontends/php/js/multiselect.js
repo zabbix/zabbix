@@ -504,9 +504,7 @@ jQuery(function($) {
 					});
 				}
 
-				obj.parent()
-					.append(popupButton)
-					.append($('<div>').css({clear: 'both'}));
+				obj.parent().append(popupButton)
 			}
 		});
 	};
