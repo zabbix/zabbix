@@ -688,7 +688,6 @@ if (!$isDiscovered) {
 		);
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
-	//$linkedTemplateTable->addRow(new CCol($fourHundredPixelDiv, null, 2));
 
 	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'atLeastFourHundred objectgroup inlineblock border_dotted ui-corner-all'));
 
@@ -722,7 +721,7 @@ else {
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'fourhundred objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'atLeastFourHundred objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
