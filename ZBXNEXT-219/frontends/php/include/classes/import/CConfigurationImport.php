@@ -1754,7 +1754,7 @@ class CConfigurationImport {
 			case '2.0':
 				$converter = new C24TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
 
-				return new C20ImportFormatter($converter);
+				return new C20ImportFormatter($converter, $this->options);
 			default:
 				throw new InvalidArgumentException('Unknown import version.');
 		}
@@ -2005,10 +2005,13 @@ class CConfigurationImport {
 		if ($hosts) {
 			$hosts = zbx_objectValues($hosts, 'host');
 		}
-		else {
-			$hosts = $this->getFormattedTemplates();
-			$hosts = zbx_objectValues($hosts, 'host');
+
+		$templates = $this->getFormattedTemplates();
+		if ($templates) {
+			$templates = zbx_objectValues($templates, 'host');
 		}
+
+		$hosts = array_merge($hosts, $templates);
 
 		$hostIdsXML = array();
 

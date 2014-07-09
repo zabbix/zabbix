@@ -32,10 +32,16 @@ class C20ImportFormatter extends CImportFormatter {
 	protected $triggerExpressionConverter;
 
 	/**
+	 * @var array
+	 */
+	protected $options;
+
+	/**
 	 * @param C24TriggerConverter $triggerExpressionConverter
 	 */
-	public function __construct(C24TriggerConverter $triggerExpressionConverter) {
+	public function __construct(C24TriggerConverter $triggerExpressionConverter, array $options = array()) {
 		$this->triggerExpressionConverter = $triggerExpressionConverter;
+		$this->options = $options;
 	}
 
 	public function getGroups() {
@@ -125,7 +131,8 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getApplications() {
 		$applicationsData = array();
 
-		if (isset($this->data['hosts'])) {
+		if (($this->options['hosts']['createMissing'] || $this->options['hosts']['updateExisting'])
+				&& isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['applications'])) {
 					foreach ($host['applications'] as $application) {
@@ -135,7 +142,8 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 		}
 
-		if (isset($this->data['templates'])) {
+		if (($this->options['templates']['createMissing'] || $this->options['templates']['updateExisting'])
+				&& isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['applications'])) {
 					foreach ($template['applications'] as $application) {
@@ -151,7 +159,8 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getItems() {
 		$itemsData = array();
 
-		if (isset($this->data['hosts'])) {
+		if (($this->options['hosts']['createMissing'] || $this->options['hosts']['updateExisting'])
+				&& isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
@@ -167,7 +176,9 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 			}
 		}
-		if (isset($this->data['templates'])) {
+
+		if (($this->options['templates']['createMissing'] || $this->options['templates']['updateExisting'])
+				&& isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {
 					foreach ($template['items'] as $item) {
@@ -185,7 +196,8 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getDiscoveryRules() {
 		$discoveryRulesData = array();
 
-		if (isset($this->data['hosts'])) {
+		if (($this->options['hosts']['createMissing'] || $this->options['hosts']['updateExisting'])
+				&& isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['discovery_rules'])) {
 					foreach ($host['discovery_rules'] as $item) {
@@ -202,7 +214,8 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 		}
 
-		if (isset($this->data['templates'])) {
+		if (($this->options['templates']['createMissing'] || $this->options['templates']['updateExisting'])
+				&& isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['discovery_rules'])) {
 					foreach ($template['discovery_rules'] as $item) {
