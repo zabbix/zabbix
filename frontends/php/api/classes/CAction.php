@@ -1482,29 +1482,29 @@ class CAction extends CApiService {
 
 		// build validators
 		$timePeriodValidator = new CTimePeriodValidator();
-		$discoveryCheckTypeValidator = new CSetValidator(array(
+		$discoveryCheckTypeValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(discovery_check_type2str())
 		));
-		$discoveryObjectStatusValidator = new CSetValidator(array(
+		$discoveryObjectStatusValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(discovery_object_status2str())
 		));
-		$triggerSeverityValidator = new CSetValidator(array(
+		$triggerSeverityValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(getSeverityCaption())
 		));
-		$discoveryObjectValidator = new CSetValidator(array(
+		$discoveryObjectValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(discovery_object2str())
 		));
-		$triggerValueValidator = new CSetValidator(array(
+		$triggerValueValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(trigger_value2str())
 		));
-		$eventTypeValidator = new CSetValidator(array(
+		$eventTypeValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(eventType())
 		));
 
 		foreach ($conditions as $condition) {
 			// on create operator is mandatory and needs validation, but on update it must be validated only if it's set
 			if (!$update || ($update && isset($condition['operator']))) {
-				$operatorValidator = new CSetValidator(array(
+				$operatorValidator = new CLimitedSetValidator(array(
 					'values' => get_operators_by_conditiontype($condition['conditiontype'])
 				));
 				if (!$operatorValidator->validate($condition['operator'])) {

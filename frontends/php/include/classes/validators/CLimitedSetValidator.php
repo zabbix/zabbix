@@ -19,7 +19,7 @@
 **/
 
 
-class CSetValidator extends CValidator {
+class CLimitedSetValidator extends CValidator {
 
 	/**
 	 * Allowed values.

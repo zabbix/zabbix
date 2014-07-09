@@ -19,7 +19,7 @@
 **/
 
 
-class CSetValidatorTest extends CValidatorTest {
+class CLimitedSetValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
 		return array(
@@ -122,6 +122,6 @@ class CSetValidatorTest extends CValidatorTest {
 	}
 
 	protected function createValidator(array $params = array()) {
-		return new CSetValidator($params);
+		return new CLimitedSetValidator($params);
 	}
 }

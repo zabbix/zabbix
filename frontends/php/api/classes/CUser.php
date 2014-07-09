@@ -235,7 +235,7 @@ class CUser extends CApiService {
 
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$themeValidator = new CSetValidator(array(
+		$themeValidator = new CLimitedSetValidator(array(
 				'values' => $themes,
 				'messageType' => _('Incorrect value type for user theme.')
 			)
