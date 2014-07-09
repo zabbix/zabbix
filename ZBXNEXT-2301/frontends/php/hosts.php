@@ -422,7 +422,7 @@ elseif (hasRequest('save')) {
 					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
 				}
 				else {
-					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLE;
+					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
 				}
 
 				if ($interface['isNew']) {
