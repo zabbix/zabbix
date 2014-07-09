@@ -1,0 +1,5 @@
+Subdirectory misc/init.d contains examples of Zabbix server and agentd
+start/stop scripts.
+
+The scripts are not actively maintained and tested, they may be not
+up-to-date with the most recent versions of UNIX/Linux distributions.
