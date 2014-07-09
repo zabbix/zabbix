@@ -72,7 +72,7 @@ class CDecimalValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!is_numeric($value) || !preg_match('/^-?\d+(\.\d+)?$/', $value)) {
-			$this->error($this->messageType, $value);
+			$this->error($this->messageType, is_numeric($value) ? $value : gettype($value));
 
 			return false;
 		}
