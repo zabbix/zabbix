@@ -40,9 +40,9 @@ $titles = array(
 );
 $rules = $this->get('rules');
 foreach ($titles as $key => $title) {
-	$cbExist = SPACE;
-	$cbMissed = SPACE;
-	$cbDeleted = SPACE;
+	$cbExist = null;
+	$cbMissed = null;
+	$cbDeleted = null;
 
 	if (isset($rules[$key]['updateExisting'])) {
 		$cbExist = new CCheckBox('rules['.$key.'][updateExisting]', $rules[$key]['updateExisting'], null, 1);
