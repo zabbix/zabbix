@@ -647,9 +647,10 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkBulk(array $interface) {
 		if (($interface['type'] != INTERFACE_TYPE_SNMP && isset($interface['bulk'])
-				&& $interface['bulk'] != SNMP_BULK_ENABLE)
+				&& $interface['bulk'] != SNMP_BULK_ENABLED)
 				|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['bulk'])
-					&& $interface['bulk'] !== SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLE)) {
+					&& (zbx_empty($interface['bulk'])
+						|| ($interface['bulk'] != SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLED)))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
 		}
 	}
