@@ -253,22 +253,24 @@
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
 		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
-
-		if (IE8) {
-			row.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
+		var rowParent = row.parent();
 
 		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpmsgUserRow(userid) {
 		var row = jQuery('#opmsgUserRow_' + userid);
-
-		if (IE8) {
-			row.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
+		var rowParent = row.parent();
 
 		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpGroupRow(groupid) {
