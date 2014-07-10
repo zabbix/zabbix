@@ -80,6 +80,10 @@
 			tr.appendChild(td);
 			document.getElementById('service_children').firstChild.appendChild(tr);
 			jQuery('#service_children .message').css('display', 'none');
+
+			if (IE8) {
+				jQuery('#service_children').parent().addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			}
 		}
 	}
 
