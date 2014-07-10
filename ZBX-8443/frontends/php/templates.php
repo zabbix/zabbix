@@ -74,7 +74,7 @@ $fields = array(
 	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT, null,		null,	null)
+	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,		null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
