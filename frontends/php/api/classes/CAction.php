@@ -602,16 +602,14 @@ class CAction extends CApiService {
 		$actions = zbx_toHash($actions, 'actionid');
 		$actionIds = array_keys($actions);
 
-		$actionsDb = $this->get(
-			array(
-				'actionids'        => $actionIds,
-				'editable'         => true,
-				'output'           => API_OUTPUT_EXTEND,
-				'preservekeys'     => true,
-				'selectOperations' => API_OUTPUT_EXTEND,
-				'selectFilter'     => array('formula', 'conditions')
-			)
-		);
+		$actionsDb = $this->get(array(
+			'actionids'        => $actionIds,
+			'editable'         => true,
+			'output'           => API_OUTPUT_EXTEND,
+			'preservekeys'     => true,
+			'selectOperations' => API_OUTPUT_EXTEND,
+			'selectFilter'     => array('formula', 'conditions')
+		));
 
 		$this->validateUpdate($actions, $actionsDb);
 
@@ -1892,15 +1890,12 @@ class CAction extends CApiService {
 				);
 			}
 			if (isset($action['esc_period']) && $action['esc_period'] < SEC_PER_MIN
-				&& $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s(
-						'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
-						$action['name'],
-						SEC_PER_MIN
-					)
-				);
+					&& $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
+					$action['name'], SEC_PER_MIN
+				));
 			}
 			if (isset($duplicates[$action['name']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
@@ -1986,27 +1981,20 @@ class CAction extends CApiService {
 			$actionName = isset($action['name']) ? $action['name'] : $actionsDb[$action['actionid']]['name'];
 
 			if (!check_db_fields(array('actionid' => null), $action)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s(
-						'Incorrect parameters for action update method "%1$s".',
-						$actionName
-					)
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Incorrect parameters for action update method "%1$s".', $actionName
+				));
 			}
 
 			// check if user changed esc_period for trigger eventsource
 			if (isset($action['esc_period'])
-				&& $action['esc_period'] < SEC_PER_MIN
-				&& $actionsDb[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s(
-						'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
-						$actionName,
-						SEC_PER_MIN
-					)
-				);
+					&& $action['esc_period'] < SEC_PER_MIN
+					&& $actionsDb[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
+					$actionName, SEC_PER_MIN
+				));
 			}
 
 			$this->checkNoParameters(
