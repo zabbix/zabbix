@@ -689,7 +689,7 @@ if (!$isDiscovered) {
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'atLeastFourHundred objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 
 	// create new linked template table
 	$newTemplateTable = new CTable(null, 'formElementTable');
@@ -709,7 +709,7 @@ if (!$isDiscovered) {
 
 	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'atLeastFourHundred objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 }
 // templates for discovered hosts
 else {
@@ -721,7 +721,7 @@ else {
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'atLeastFourHundred objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
