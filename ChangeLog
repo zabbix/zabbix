@@ -14,6 +14,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+A......... [ZBX-8315] fixed host interface imports to work properly and use same resolution rules for 1.8 and 2.* (Krists)
 ..F....... [ZBX-8439] fixed layout problems in host and template configuration, host inventory in Safari (Krists)
 ..F....... [ZBX-8443] fixed host mass update form to be displayed correctly in Opera (Krists)
 ..F....... [ZBX-8437] fixed JS errors after show/hide frontend filter (Oleg)
