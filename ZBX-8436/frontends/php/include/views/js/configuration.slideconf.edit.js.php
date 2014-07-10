@@ -34,6 +34,10 @@
 		}
 
 		recalculateSortOrder();
+
+		if (IE8) {
+			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function recalculateSortOrder() {
