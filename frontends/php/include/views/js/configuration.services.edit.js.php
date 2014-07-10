@@ -94,10 +94,16 @@
 	}
 
 	function removeTime(id) {
+		var parent = jQuery('#times_' + id).parent();
+
 		removeObjectById('times_' + id);
 		removeObjectById('times_' + id + '_type');
 		removeObjectById('times_' + id + '_from');
 		removeObjectById('times_' + id + '_to');
 		removeObjectById('times_' + id + '_note');
+
+		if (IE8) {
+			parent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 </script>
