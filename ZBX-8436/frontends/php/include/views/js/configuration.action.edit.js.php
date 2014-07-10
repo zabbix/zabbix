@@ -252,11 +252,23 @@
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
-		jQuery('#opmsgUsrgrpRow_' + usrgrpid).remove();
+		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
+
+		if (IE8) {
+			row.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
+
+		row.remove();
 	}
 
 	function removeOpmsgUserRow(userid) {
-		jQuery('#opmsgUserRow_' + userid).remove();
+		var row = jQuery('#opmsgUserRow_' + userid);
+
+		if (IE8) {
+			row.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
+
+		row.remove();
 	}
 
 	function removeOpGroupRow(groupid) {
