@@ -40,6 +40,11 @@ class CConfigurationImport {
 	protected $referencer;
 
 	/**
+	 * @var CImportedObjectContainer
+	 */
+	protected $importedObjectContainer;
+
+	/**
 	 * @var array
 	 */
 	protected $options;
@@ -143,6 +148,7 @@ class CConfigurationImport {
 			// export has root key "zabbix_export" which is not passed
 			$this->formatter->setData($this->data['zabbix_export']);
 			$this->referencer = new CImportReferencer();
+			$this->importedObjectContainer = new CImportedObjectContainer($this, $this->referencer, $this->options);
 
 			// parse all import for references to resolve them all together with less sql count
 			$this->gatherReferences();
@@ -562,7 +568,9 @@ class CConfigurationImport {
 		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
 			$templates = $this->getFormattedTemplates();
 			if ($templates) {
-				$templateImporter = new CTemplateImporter($this->options, $this->referencer);
+				$templateImporter = new CTemplateImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
 				$templateImporter->import($templates);
 			}
 		}
@@ -577,7 +585,7 @@ class CConfigurationImport {
 		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
 			$hosts = $this->getFormattedHosts();
 			if ($hosts) {
-				$hostImporter = new CHostImporter($this->options, $this->referencer);
+				$hostImporter = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$hostImporter->import($hosts);
 			}
 		}
@@ -600,7 +608,8 @@ class CConfigurationImport {
 		$applicationsToCreate = array();
 
 		foreach ($allApplications as $host => $applications) {
-			if (!$this->referencer->isProcessedHost($host)) {
+			if (!$this->importedObjectContainer->isHostProcessed($host)
+					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
 				continue;
 			}
 
@@ -648,7 +657,8 @@ class CConfigurationImport {
 		$itemsToUpdate = array();
 
 		foreach ($allItems as $host => $items) {
-			if (!$this->referencer->isProcessedHost($host)) {
+			if (!$this->importedObjectContainer->isHostProcessed($host)
+					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
 				continue;
 			}
 
@@ -740,7 +750,8 @@ class CConfigurationImport {
 
 		// unset rules that are related to hosts we did not process
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			if (!$this->referencer->isProcessedHost($host)) {
+			if (!$this->importedObjectContainer->isHostProcessed($host)
+					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
 				unset($allDiscoveryRules[$host]);
 			}
 		}
@@ -1313,11 +1324,18 @@ class CConfigurationImport {
 	 * Import images.
 	 *
 	 * @throws Exception
+	 *
+	 * @return null
 	 */
 	protected function processImages() {
+		if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN
+				|| (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing'])) {
+			return;
+		}
+
 		$allImages = $this->getFormattedImages();
 
-		if (empty($allImages)) {
+		if (!$allImages) {
 			return;
 		}
 
@@ -1386,9 +1404,12 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+		$hostIdsXML = $this->importedObjectContainer->getHostIds();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		// no hosts have been processed
+		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+
+		// no hosts or templates have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
@@ -1439,9 +1460,12 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+		$hostIdsXML = $this->importedObjectContainer->getHostIds();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		// no hosts have been processed
+		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+
+		// no hosts or templates have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
@@ -1488,9 +1512,12 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+		$hostIdsXML = $this->importedObjectContainer->getHostIds();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		// no hosts have been processed
+		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+
+		// no hosts or templates have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
@@ -1549,9 +1576,12 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+		$hostIdsXML = $this->importedObjectContainer->getHostIds();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		// no hosts have been processed
+		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+
+		// no hosts or templates have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
@@ -1635,9 +1665,12 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->getProcessedHostOrTemplateIds();
+		$hostIdsXML = $this->importedObjectContainer->getHostIds();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		// no hosts have been processed
+		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+
+		// no hosts or templates have been processed
 		if (!$hostIdsXML) {
 			return;
 		}
@@ -1848,7 +1881,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedTemplates() {
+	public function getFormattedTemplates() {
 		if (!isset($this->formattedData['templates'])) {
 			$this->formattedData['templates'] = $this->formatter->getTemplates();
 		}
@@ -1861,7 +1894,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedHosts() {
+	public function getFormattedHosts() {
 		if (!isset($this->formattedData['hosts'])) {
 			$this->formattedData['hosts'] = $this->formatter->getHosts();
 		}
@@ -1941,12 +1974,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedImages() {
 		if (!isset($this->formattedData['images'])) {
-			$this->formattedData['images'] = array();
-
-			if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
-					&& $this->options['images']['updateExisting'] || $this->options['images']['createMissing']) {
-				$this->formattedData['images'] = $this->formatter->getImages();
-			}
+			$this->formattedData['images'] = $this->formatter->getImages();
 		}
 
 		return $this->formattedData['images'];
@@ -1989,44 +2017,5 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['templateScreens'];
-	}
-
-	/**
-	 * Get array of processed host or template name and ID pairs.
-	 *
-	 * @return array
-	 */
-	protected function getProcessedHostOrTemplateIds() {
-		$hosts = array();
-
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-			$hosts = $this->getFormattedHosts();
-			if ($hosts) {
-				$hosts = zbx_objectValues($hosts, 'host');
-			}
-		}
-
-		$templates = array();
-		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
-			$templates = $this->getFormattedTemplates();
-			if ($templates) {
-				$templates = zbx_objectValues($templates, 'host');
-			}
-		}
-
-		$hosts = array_merge($hosts, $templates);
-
-		$hostIdsXML = array();
-
-		foreach ($hosts as $host) {
-			if (!$this->referencer->isProcessedHost($host)) {
-				continue;
-			}
-
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$hostIdsXML[$host] = $hostId;
-		}
-
-		return $hostIdsXML;
 	}
 }

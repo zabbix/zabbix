@@ -59,7 +59,7 @@ class CHostImporter extends CImporter {
 				$hostHost = $hostsToCreate[$hnum]['host'];
 				$processedHostIds[$hostHost] = $hostid;
 				$this->referencer->addHostRef($hostHost, $hostid);
-				$this->referencer->addProcessedHost($hostHost);
+				$this->importedObjectContainer->addHost($hostHost);
 
 				if (!empty($templateLinkage[$hostHost])) {
 					API::Template()->massAdd(array(
@@ -72,7 +72,7 @@ class CHostImporter extends CImporter {
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
-				$this->referencer->addProcessedHost($host['host']);
+				$this->importedObjectContainer->addHost($host['host']);
 				$processedHostIds[$host['host']] = $host['hostid'];
 
 				if (!empty($templateLinkage[$host['host']])) {

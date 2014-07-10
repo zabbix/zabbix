@@ -77,7 +77,7 @@ class CTemplateImporter extends CImporter {
 				foreach ($templatesToCreate as $num => $createdTemplate) {
 					$hostId = $newHostIds['templateids'][$num];
 					$this->referencer->addTemplateRef($createdTemplate['host'], $hostId);
-					$this->referencer->addProcessedHost($createdTemplate['host']);
+					$this->importedObjectContainer->addTemplate($createdTemplate['host']);
 
 					if (!empty($templateLinkage[$createdTemplate['host']])) {
 						API::Template()->massAdd(array(
@@ -91,7 +91,7 @@ class CTemplateImporter extends CImporter {
 				API::Template()->update($templatesToUpdate);
 
 				foreach ($templatesToUpdate as $updatedTemplate) {
-					$this->referencer->addProcessedHost($updatedTemplate['host']);
+					$this->importedObjectContainer->addTemplate($updatedTemplate['host']);
 
 					if (!empty($templateLinkage[$updatedTemplate['host']])) {
 						API::Template()->massAdd(array(

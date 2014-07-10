@@ -27,6 +27,11 @@ abstract class CImporter {
 	protected $referencer;
 
 	/**
+	 * @var CImportedObjectContainer
+	 */
+	protected $importedObjectContainer;
+
+	/**
 	 * @var array
 	 */
 	protected $options = array();
@@ -35,9 +40,11 @@ abstract class CImporter {
 	 * @param array             $options
 	 * @param CImportReferencer $referencer
 	 */
-	public function __construct(array $options, CImportReferencer $referencer) {
+	public function __construct(array $options, CImportReferencer $referencer,
+			CImportedObjectContainer $importedObjectContainer) {
 		$this->options = $options;
 		$this->referencer = $referencer;
+		$this->importedObjectContainer = $importedObjectContainer;
 	}
 
 	/**
