@@ -63,7 +63,7 @@
 			server_num, get_process_type_string(process_type), process_num)
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix server";
+const char	title_message[] = "zabbix_server";
 const char	syslog_app_name[] = "zabbix_server";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 

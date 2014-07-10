@@ -27,7 +27,7 @@
 #include "zbxjson.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Sender";
+const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
 const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 

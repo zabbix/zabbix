@@ -30,7 +30,7 @@
 #include "threads.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix agent";
+const char	title_message[] = "zabbix_agent";
 const char	syslog_app_name[] = "zabbix_agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 

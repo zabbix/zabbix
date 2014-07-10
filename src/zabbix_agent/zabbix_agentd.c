@@ -59,7 +59,7 @@ const char	*progname = NULL;
 #endif
 
 /* application TITLE */
-const char	title_message[] = APPLICATION_NAME
+const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
 				" Win64"
 #elif defined(WIN32)
