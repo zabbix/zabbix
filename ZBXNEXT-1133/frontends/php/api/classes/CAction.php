@@ -702,11 +702,11 @@ class CAction extends CApiService {
 		$actionConditions = array();
 		if ($newActionConditions !== null) {
 			$existingConditions = DBfetchArray(DBselect(
-					'SELECT conditionid,actionid,conditiontype,operator,value'.
-					' FROM conditions'.
-					' WHERE '.dbConditionInt('actionid', $actionIds).
-					' ORDER BY conditionid'
-				));
+				'SELECT conditionid,actionid,conditiontype,operator,value'.
+				' FROM conditions'.
+				' WHERE '.dbConditionInt('actionid', $actionIds).
+				' ORDER BY conditionid'
+			));
 			$existingActionConditions = array();
 			foreach ($existingConditions as $condition) {
 				$existingActionConditions[$condition['actionid']][] = $condition;
@@ -1826,8 +1826,8 @@ class CAction extends CApiService {
 			'postValidators' => array(
 				new CActionCondValidator()
 			),
-			'messageRequired' => _('No "%2$s" given for a condition of action "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for a condition of action "%1$s".')
+			'messageRequired' => _('No "%2$s" given for a filter condition of action "%1$s".'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of action "%1$s".')
 		);
 	}
 
