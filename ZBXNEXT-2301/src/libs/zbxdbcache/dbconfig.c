@@ -521,7 +521,7 @@ static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 		ZBX_DC_INTERFACE	*interface;
 
 		if (NULL == (interface = zbx_hashset_search(&config->interfaces, &item->interfaceid)) ||
-				0 == interface->bulk)
+				SNMP_BULK_ENABLED != interface->bulk)
 		{
 			return item->itemid;
 		}
@@ -1498,13 +1498,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		/* store new information in interface structure */
 
-		if (0 == found || interface->hostid != hostid || interface->type != type ||
-				interface->useip != useip || (interface->bulk != bulk && 1 == bulk))
-		{
-			reset_snmp_stats = 1;
-		}
-		else
-			reset_snmp_stats = 0;
+		reset_snmp_stats = (0 == found || interface->hostid != hostid || interface->type != type ||
+				interface->useip != useip || interface->bulk != bulk);
 
 		interface->hostid = hostid;
 		interface->type = type;
@@ -2744,7 +2739,7 @@ void	DCsync_configuration(void)
 	int			i;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
-				expr_sec2, total2;
+				expr_sec2, total, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2944,6 +2939,7 @@ void	DCsync_configuration(void)
 
 	strpool = zbx_strpool_info();
 
+	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 + expr_sec2;
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -2969,10 +2965,8 @@ void	DCsync_configuration(void)
 			fsec, fsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			expr_sec, expr_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total      : " ZBX_FS_DBL " sec.", __function_name,
-			csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
-			total2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
 			config->proxies.num_data, config->proxies.num_slots);
@@ -2982,6 +2976,8 @@ void	DCsync_configuration(void)
 			config->hosts_h.num_data, config->hosts_h.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
+			config->host_inventories.num_data, config->host_inventories.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
 			config->htmpls.num_data, config->htmpls.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
@@ -4403,7 +4399,8 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) && 1 == dc_interface->bulk)
+	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) &&
+			SNMP_BULK_ENABLED == dc_interface->bulk)
 	{
 		if (dc_interface->max_snmp_succeed < max_snmp_succeed)
 			dc_interface->max_snmp_succeed = (unsigned char)max_snmp_succeed;
@@ -4427,9 +4424,9 @@ static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int
 	dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid);
 
 	if (NULL != bulk)
-		*bulk = (NULL == dc_interface ? 0 : dc_interface->bulk);
+		*bulk = (NULL == dc_interface ? SNMP_BULK_DISABLED : dc_interface->bulk);
 
-	if (NULL == dc_interface || 0 == dc_interface->bulk)
+	if (NULL == dc_interface || SNMP_BULK_ENABLED != dc_interface->bulk)
 		return 1;
 
 	if (1 >= dc_interface->max_snmp_succeed || MAX_SNMP_ITEMS + 1 != dc_interface->min_snmp_fail)
