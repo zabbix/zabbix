@@ -76,7 +76,7 @@ $fields = array(
 	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>						array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 
 check_fields($fields);
