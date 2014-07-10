@@ -1002,19 +1002,21 @@ class CXmlImport18 {
 						$current_host = reset($current_host);
 					}
 
-					$currentMainInterfaces = array();
-					$currentInterfacesByType = array();
-
-					foreach ($current_host['interfaces'] as $currentInterface) {
-						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
-							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
-						}
-
-						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
-					}
-
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
+						$currentMainInterfaces = array();
+						$currentInterfacesByType = array();
+
+						// group existing main interfaces by interface type into $currentMainInterfaces
+						// and group interfaces by type into $currentInterfacesByType
+						foreach ($current_host['interfaces'] as $currentInterface) {
+							if ($currentInterface['main'] == INTERFACE_PRIMARY) {
+								$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
+							}
+
+							$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
+						}
+
 						// loop through all interfaces we got from XML
 						foreach ($interfaces as &$interfaceXml) {
 							$interfaceXmlType = $interfaceXml['type'];
