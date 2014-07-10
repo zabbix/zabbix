@@ -202,253 +202,256 @@ class CConfigurationImport {
 		$proxyRefs = array();
 		$hostPrototypeRefs = array();
 
-		foreach ($this->getFormattedGroups() as $group) {
-			$groupsRefs[$group['name']] = $group['name'];
-		}
-
-		foreach ($this->getFormattedTemplates() as $template) {
-			$templatesRefs[$template['host']] = $template['host'];
-
-			foreach ($template['groups'] as $group) {
+		if ($this->options['groups']['createMissing']) {
+			foreach ($this->getFormattedGroups() as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
+		}
 
-			foreach ($template['macros'] as $macro) {
-				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
-			}
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+			foreach ($this->getFormattedTemplates() as $template) {
+				$templatesRefs[$template['host']] = $template['host'];
 
-			if (!empty($template['templates'])) {
-				foreach ($template['templates'] as $linkedTemplate) {
-					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+				foreach ($template['groups'] as $group) {
+					$groupsRefs[$group['name']] = $group['name'];
+				}
+
+				foreach ($template['macros'] as $macro) {
+					$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+				}
+
+				if (!empty($template['templates'])) {
+					foreach ($template['templates'] as $linkedTemplate) {
+						$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+					}
 				}
 			}
 		}
 
-		foreach ($this->getFormattedHosts() as $host) {
-			$hostsRefs[$host['host']] = $host['host'];
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+			foreach ($this->getFormattedHosts() as $host) {
+				$hostsRefs[$host['host']] = $host['host'];
 
-			foreach ($host['groups'] as $group) {
-				$groupsRefs[$group['name']] = $group['name'];
-			}
+				foreach ($host['groups'] as $group) {
+					$groupsRefs[$group['name']] = $group['name'];
+				}
 
-			foreach ($host['macros'] as $macro) {
-				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
-			}
+				foreach ($host['macros'] as $macro) {
+					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+				}
 
-			if (!empty($host['templates'])) {
-				foreach ($host['templates'] as $linkedTemplate) {
-					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+				if (!empty($host['templates'])) {
+					foreach ($host['templates'] as $linkedTemplate) {
+						$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+					}
+				}
+
+				if (!empty($host['proxy'])) {
+					$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
 				}
 			}
-
-			if (!empty($host['proxy'])) {
-				$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
-			}
 		}
 
-		foreach ($this->getFormattedApplications() as $host => $applications) {
-			foreach ($applications as $app) {
-				$applicationsRefs[$host][$app['name']] = $app['name'];
-			}
-		}
-
-		foreach ($this->getFormattedItems() as $host => $items) {
-			foreach ($items as $item) {
-				$itemsRefs[$host][$item['key_']] = $item['key_'];
-
-				foreach ($item['applications'] as $app) {
+		// application list is required when items, item prototypes are created and/or updated
+		// or applications are handled separately
+		if ($this->options['items']['updateExisting']
+				|| $this->options['items']['createMissing']
+				|| $this->options['discoveryRules']['updateExisting']
+				|| $this->options['discoveryRules']['createMissing']
+				|| $this->options['applications']['createMissing']
+				|| $this->options['applications']['deleteMissing']) {
+			foreach ($this->getFormattedApplications() as $host => $applications) {
+				foreach ($applications as $app) {
 					$applicationsRefs[$host][$app['name']] = $app['name'];
 				}
-
-				if (!empty($item['valuemap'])) {
-					$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
-				}
 			}
 		}
 
-		foreach ($this->getFormattedDiscoveryRules() as $host => $discoveryRules) {
-			foreach ($discoveryRules as $discoveryRule) {
-				$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
+		if ($this->options['items']['updateExisting']
+				|| $this->options['items']['createMissing']
+				|| $this->options['items']['deleteMissing']) {
+			foreach ($this->getFormattedItems() as $host => $items) {
+				foreach ($items as $item) {
+					$itemsRefs[$host][$item['key_']] = $item['key_'];
 
-				foreach ($discoveryRule['item_prototypes'] as $itemp) {
-					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
-
-					foreach ($itemp['applications'] as $app) {
+					foreach ($item['applications'] as $app) {
 						$applicationsRefs[$host][$app['name']] = $app['name'];
 					}
 
-					if (!empty($itemp['valuemap'])) {
-						$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
+					if (!empty($item['valuemap'])) {
+						$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
 					}
 				}
+			}
+		}
 
-				foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
-					$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
+		if ($this->options['discoveryRules']['updateExisting']
+				|| $this->options['discoveryRules']['createMissing']
+				|| $this->options['discoveryRules']['deleteMissing']) {
+			foreach ($this->getFormattedDiscoveryRules() as $host => $discoveryRules) {
+				foreach ($discoveryRules as $discoveryRule) {
+					$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
+
+					foreach ($discoveryRule['item_prototypes'] as $itemp) {
+						$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
+
+						foreach ($itemp['applications'] as $app) {
+							$applicationsRefs[$host][$app['name']] = $app['name'];
+						}
+
+						if (!empty($itemp['valuemap'])) {
+							$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
+						}
+					}
+
+					foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
+						$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
+					}
+
+					foreach ($discoveryRule['graph_prototypes'] as $graph) {
+						if ($graph['ymin_item_1']) {
+							$yMinItem = $graph['ymin_item_1'];
+							$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
+						}
+
+						if ($graph['ymax_item_1']) {
+							$yMaxItem = $graph['ymax_item_1'];
+							$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
+						}
+
+						foreach ($graph['gitems'] as $gitem) {
+							$gitemItem = $gitem['item'];
+							$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+						}
+					}
+
+					foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
+						$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
+
+						foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
+							if (isset($groupPrototype['group'])) {
+								$groupsRefs[$groupPrototype['group']['name']] = $groupPrototype['group']['name'];
+							}
+						}
+
+						foreach ($hostPrototype['templates'] as $template) {
+							$templatesRefs[$template['name']] = $template['name'];
+						}
+					}
+				}
+			}
+		}
+
+		if ($this->options['graphs']['updateExisting']
+				|| $this->options['graphs']['createMissing']
+				|| $this->options['graphs']['deleteMissing']) {
+			foreach ($this->getFormattedGraphs() as $graph) {
+				if ($graph['ymin_item_1']) {
+					$yMinItem = $graph['ymin_item_1'];
+
+					$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
+					$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 				}
 
-				foreach ($discoveryRule['graph_prototypes'] as $graph) {
-					if ($graph['ymin_item_1']) {
-						$yMinItem = $graph['ymin_item_1'];
-						$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
-					}
+				if ($graph['ymax_item_1']) {
+					$yMaxItem = $graph['ymax_item_1'];
 
-					if ($graph['ymax_item_1']) {
-						$yMaxItem = $graph['ymax_item_1'];
-						$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
-					}
+					$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
+					$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
+				}
 
+				if (isset($graph['gitems']) && $graph['gitems']) {
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemItem = $gitem['item'];
+
+						$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
 						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 					}
 				}
+			}
+		}
 
-				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
-					$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
+		if ($this->options['triggers']['updateExisting']
+				|| $this->options['triggers']['createMissing']
+				|| $this->options['triggers']['deleteMissing']) {
+			foreach ($this->getFormattedTriggers() as $trigger) {
+				$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
 
-					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
-						if (isset($groupPrototype['group'])) {
-							$groupsRefs[$groupPrototype['group']['name']] = $groupPrototype['group']['name'];
+				foreach ($trigger['dependencies'] as $dependency) {
+					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+				}
+			}
+		}
+
+		if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
+			foreach ($this->getFormattedMaps() as $map) {
+				$mapsRefs[$map['name']] = $map['name'];
+
+				if (!empty($map['iconmap'])) {
+					$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
+				}
+
+				if (isset($map['selements'])) {
+					foreach ($map['selements'] as $selement) {
+						switch ($selement['elementtype']) {
+							case SYSMAP_ELEMENT_TYPE_MAP:
+								$mapsRefs[$selement['element']['name']] = $selement['element']['name'];
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+								$groupsRefs[$selement['element']['name']] = $selement['element']['name'];
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_HOST:
+								$hostsRefs[$selement['element']['host']] = $selement['element']['host'];
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_TRIGGER:
+								$el = $selement['element'];
+								$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
+								break;
 						}
 					}
-
-					foreach ($hostPrototype['templates'] as $template) {
-						$templatesRefs[$template['name']] = $template['name'];
-					}
 				}
-			}
-		}
 
-		foreach ($this->getFormattedGraphs() as $graph) {
-			if ($graph['ymin_item_1']) {
-				$yMinItem = $graph['ymin_item_1'];
-
-				$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
-				$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
-			}
-
-			if ($graph['ymax_item_1']) {
-				$yMaxItem = $graph['ymax_item_1'];
-
-				$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
-				$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
-			}
-
-			if (isset($graph['gitems']) && $graph['gitems']) {
-				foreach ($graph['gitems'] as $gitem) {
-					$gitemItem = $gitem['item'];
-
-					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
-					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
-				}
-			}
-		}
-
-		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
-
-			foreach ($trigger['dependencies'] as $dependency) {
-				$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
-			}
-		}
-
-		foreach ($this->getFormattedMaps() as $map) {
-			$mapsRefs[$map['name']] = $map['name'];
-
-			if (!empty($map['iconmap'])) {
-				$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
-			}
-
-			if (isset($map['selements'])) {
-				foreach ($map['selements'] as $selement) {
-					switch ($selement['elementtype']) {
-						case SYSMAP_ELEMENT_TYPE_MAP:
-							$mapsRefs[$selement['element']['name']] = $selement['element']['name'];
-							break;
-
-						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-							$groupsRefs[$selement['element']['name']] = $selement['element']['name'];
-							break;
-
-						case SYSMAP_ELEMENT_TYPE_HOST:
-							$hostsRefs[$selement['element']['host']] = $selement['element']['host'];
-							break;
-
-						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$el = $selement['element'];
-							$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
-							break;
-					}
-				}
-			}
-
-			if (isset($map['links'])) {
-				foreach ($map['links'] as $link) {
-					if (isset($link['linktriggers'])) {
-						foreach ($link['linktriggers'] as $linkTrigger) {
-							$t = $linkTrigger['trigger'];
-							$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
+				if (isset($map['links'])) {
+					foreach ($map['links'] as $link) {
+						if (isset($link['linktriggers'])) {
+							foreach ($link['linktriggers'] as $linkTrigger) {
+								$t = $linkTrigger['trigger'];
+								$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
+							}
 						}
 					}
 				}
 			}
 		}
 
-		foreach ($this->getFormattedScreens() as $screen) {
-			$screensRefs[$screen['name']] = $screen['name'];
-
-			if (!empty($screen['screenitems'])) {
-				foreach ($screen['screenitems'] as $screenItem) {
-					$resource = $screenItem['resource'];
-
-					if (empty($resource)) {
-						continue;
-					}
-
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupsRefs[$resource['name']] = $resource['name'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-							// TODO: gather graphs too
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$mapsRefs[$resource['name']] = $resource['name'];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$screensRefs[$resource['name']] = $resource['name'];
-							break;
-					}
-				}
-			}
-		}
-
-		foreach ($this->getFormattedTemplateScreens() as $screens) {
-			foreach ($screens as $screen) {
-				$templateScreensRefs[$screen['name']] = $screen['name'];
+		if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
+			foreach ($this->getFormattedScreens() as $screen) {
+				$screensRefs[$screen['name']] = $screen['name'];
 
 				if (!empty($screen['screenitems'])) {
 					foreach ($screen['screenitems'] as $screenItem) {
 						$resource = $screenItem['resource'];
 
+						if (empty($resource)) {
+							continue;
+						}
+
 						switch ($screenItem['resourcetype']) {
+							case SCREEN_RESOURCE_HOSTS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+							case SCREEN_RESOURCE_DATA_OVERVIEW:
+							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+								$groupsRefs[$resource['name']] = $resource['name'];
+								break;
+
+							case SCREEN_RESOURCE_HOST_TRIGGERS:
+								$hostsRefs[$resource['host']] = $resource['host'];
+								break;
+
 							case SCREEN_RESOURCE_GRAPH:
 								// TODO: gather graphs too
 								break;
@@ -458,6 +461,42 @@ class CConfigurationImport {
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 								break;
+
+							case SCREEN_RESOURCE_MAP:
+								$mapsRefs[$resource['name']] = $resource['name'];
+								break;
+
+							case SCREEN_RESOURCE_SCREEN:
+								$screensRefs[$resource['name']] = $resource['name'];
+								break;
+						}
+					}
+				}
+			}
+		}
+
+		if ($this->options['templateScreens']['updateExisting']
+				|| $this->options['templateScreens']['createMissing']
+				|| $this->options['templateScreens']['deleteMissing']) {
+			foreach ($this->getFormattedTemplateScreens() as $screens) {
+				foreach ($screens as $screen) {
+					$templateScreensRefs[$screen['name']] = $screen['name'];
+
+					if (!empty($screen['screenitems'])) {
+						foreach ($screen['screenitems'] as $screenItem) {
+							$resource = $screenItem['resource'];
+
+							switch ($screenItem['resourcetype']) {
+								case SCREEN_RESOURCE_GRAPH:
+									// TODO: gather graphs too
+									break;
+
+								case SCREEN_RESOURCE_SIMPLE_GRAPH:
+								case SCREEN_RESOURCE_PLAIN_TEXT:
+									$hostsRefs[$resource['host']] = $resource['host'];
+									$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+									break;
+							}
 						}
 					}
 				}
@@ -482,8 +521,14 @@ class CConfigurationImport {
 
 	/**
 	 * Import groups.
+	 *
+	 * @return null
 	 */
 	protected function processGroups() {
+		if (!$this->options['groups']['createMissing']) {
+			return;
+		}
+
 		$groups = $this->getFormattedGroups();
 
 		if (empty($groups)) {
@@ -514,9 +559,12 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates() {
-		if ($templates = $this->getFormattedTemplates()) {
-			$templateImporter = new CTemplateImporter($this->options, $this->referencer);
-			$templateImporter->import($templates);
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+			$templates = $this->getFormattedTemplates();
+			if ($templates) {
+				$templateImporter = new CTemplateImporter($this->options, $this->referencer);
+				$templateImporter->import($templates);
+			}
 		}
 	}
 
@@ -526,9 +574,12 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts() {
-		if ($hosts = $this->getFormattedHosts()) {
-			$hostImporter = new CHostImporter($this->options, $this->referencer);
-			$hostImporter->import($hosts);
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+			$hosts = $this->getFormattedHosts();
+			if ($hosts) {
+				$hostImporter = new CHostImporter($this->options, $this->referencer);
+				$hostImporter->import($hosts);
+			}
 		}
 	}
 
@@ -1293,9 +1344,12 @@ class CConfigurationImport {
 	 * Import maps.
 	 */
 	protected function processMaps() {
-		if ($maps = $this->getFormattedMaps()) {
-			$mapImporter = new CMapImporter($this->options, $this->referencer);
-			$mapImporter->import($maps);
+		if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
+			$maps = $this->getFormattedMaps();
+			if ($maps) {
+				$mapImporter = new CMapImporter($this->options, $this->referencer);
+				$mapImporter->import($maps);
+			}
 		}
 	}
 
@@ -1303,9 +1357,12 @@ class CConfigurationImport {
 	 * Import screens.
 	 */
 	protected function processScreens() {
-		if ($screens = $this->getFormattedScreens()) {
-			$screenImporter = new CScreenImporter($this->options, $this->referencer);
-			$screenImporter->import($screens);
+		if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
+			$screens = $this->getFormattedScreens();
+			if ($screens) {
+				$screenImporter = new CScreenImporter($this->options, $this->referencer);
+				$screenImporter->import($screens);
+			}
 		}
 	}
 
@@ -1774,158 +1831,111 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted groups, if either "createMissing" groups option is true.
+	 * Get formatted groups.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedGroups() {
 		if (!isset($this->formattedData['groups'])) {
-			$this->formattedData['groups'] = array();
-
-			if ($this->options['groups']['createMissing']) {
-				$this->formattedData['groups'] = $this->formatter->getGroups();
-			}
+			$this->formattedData['groups'] = $this->formatter->getGroups();
 		}
 
 		return $this->formattedData['groups'];
 	}
 
 	/**
-	 * Get formatted templates, if either "createMissing" or "updateExisting" templates option is true.
+	 * Get formatted templates.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedTemplates() {
 		if (!isset($this->formattedData['templates'])) {
-			$this->formattedData['templates'] = array();
-
-			if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
-				$this->formattedData['templates'] = $this->formatter->getTemplates();
-			}
+			$this->formattedData['templates'] = $this->formatter->getTemplates();
 		}
 
 		return $this->formattedData['templates'];
 	}
 
 	/**
-	 * Get formatted hosts, if either "createMissing" or "updateExisting" hosts option is true.
+	 * Get formatted hosts.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedHosts() {
 		if (!isset($this->formattedData['hosts'])) {
-			$this->formattedData['hosts'] = array();
-
-			if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-				$this->formattedData['hosts'] = $this->formatter->getHosts();
-			}
+			$this->formattedData['hosts'] = $this->formatter->getHosts();
 		}
 
 		return $this->formattedData['hosts'];
 	}
 
 	/**
-	 * Get formatted applications, if either "createMissing" or "updateExisting" applications option is true.
+	 * Get formatted applications.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedApplications() {
 		if (!isset($this->formattedData['applications'])) {
-			$this->formattedData['applications'] = array();
-
-			// application list is required when items, item prototypes are created and/or updated
-			// or applications are handled separately
-			if ($this->options['items']['updateExisting']
-					|| $this->options['items']['createMissing']
-					|| $this->options['discoveryRules']['updateExisting']
-					|| $this->options['discoveryRules']['createMissing']
-					|| $this->options['applications']['createMissing']
-					|| $this->options['applications']['deleteMissing']) {
-				$this->formattedData['applications'] = $this->formatter->getApplications();
-			}
+			$this->formattedData['applications'] = $this->formatter->getApplications();
 		}
 
 		return $this->formattedData['applications'];
 	}
 
 	/**
-	 * Get formatted items, if either "createMissing" or "updateExisting" items option is true.
+	 * Get formatted items.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedItems() {
 		if (!isset($this->formattedData['items'])) {
-			$this->formattedData['items'] = array();
-
-			if ($this->options['items']['updateExisting']
-					|| $this->options['items']['createMissing']
-					|| $this->options['items']['deleteMissing']) {
-				$this->formattedData['items'] = $this->formatter->getItems();
-			}
+			$this->formattedData['items'] = $this->formatter->getItems();
 		}
 
 		return $this->formattedData['items'];
 	}
 
 	/**
-	 * Get formatted discovery rules, if either "createMissing" or "updateExisting" discovery rules option is true.
+	 * Get formatted discovery rules.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedDiscoveryRules() {
 		if (!isset($this->formattedData['discoveryRules'])) {
-			$this->formattedData['discoveryRules'] = array();
-
-			if ($this->options['discoveryRules']['updateExisting']
-					|| $this->options['discoveryRules']['createMissing']
-					|| $this->options['discoveryRules']['deleteMissing']) {
-				$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
-			}
+			$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
 		}
 
 		return $this->formattedData['discoveryRules'];
 	}
 
 	/**
-	 * Get formatted triggers, if either "createMissing" or "updateExisting" triggers option is true.
+	 * Get formatted triggers.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedTriggers() {
 		if (!isset($this->formattedData['triggers'])) {
-			$this->formattedData['triggers'] = array();
-
-			if ($this->options['triggers']['updateExisting']
-					|| $this->options['triggers']['createMissing']
-					|| $this->options['triggers']['deleteMissing']) {
 				$this->formattedData['triggers'] = $this->formatter->getTriggers();
-			}
 		}
 
 		return $this->formattedData['triggers'];
 	}
 
 	/**
-	 * Get formatted graphs, if either "createMissing" or "updateExisting" graphs option is true.
+	 * Get formatted graphs.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedGraphs() {
 		if (!isset($this->formattedData['graphs'])) {
-			$this->formattedData['graphs'] = array();
-
-			if ($this->options['graphs']['updateExisting']
-					|| $this->options['graphs']['createMissing']
-					|| $this->options['graphs']['deleteMissing']) {
-				$this->formattedData['graphs'] = $this->formatter->getGraphs();
-			}
+			$this->formattedData['graphs'] = $this->formatter->getGraphs();
 		}
 
 		return $this->formattedData['graphs'];
 	}
 
 	/**
-	 * Get formatted images, if user is super admin and either "createMissing" or "updateExisting" images option is true.
+	 * Get formatted images.
 	 *
 	 * @return array
 	 */
@@ -1943,53 +1953,39 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted maps, if either "createMissing" or "updateExisting" maps option is true.
+	 * Get formatted maps.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedMaps() {
 		if (!isset($this->formattedData['maps'])) {
-			$this->formattedData['maps'] = array();
-
-			if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-				$this->formattedData['maps'] = $this->formatter->getMaps();
-			}
+			$this->formattedData['maps'] = $this->formatter->getMaps();
 		}
 
 		return $this->formattedData['maps'];
 	}
 
 	/**
-	 * Get formatted screens, if either "createMissing" or "updateExisting" screens option is true.
+	 * Get formatted screens.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedScreens() {
 		if (!isset($this->formattedData['screens'])) {
-			$this->formattedData['screens'] = array();
-
-			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-				$this->formattedData['screens'] = $this->formatter->getScreens();
-			}
+			$this->formattedData['screens'] = $this->formatter->getScreens();
 		}
 
 		return $this->formattedData['screens'];
 	}
 
 	/**
-	 * Get formatted template screens, if either "createMissing" or "updateExisting" template screens option is true.
+	 * Get formatted template screens.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedTemplateScreens() {
 		if (!isset($this->formattedData['templateScreens'])) {
-			$this->formattedData['templateScreens'] = array();
-
-			if ($this->options['templateScreens']['updateExisting']
-					|| $this->options['templateScreens']['createMissing']
-					|| $this->options['templateScreens']['deleteMissing']) {
 				$this->formattedData['templateScreens'] = $this->formatter->getTemplateScreens();
-			}
 		}
 
 		return $this->formattedData['templateScreens'];
@@ -2001,14 +1997,21 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getProcessedHostOrTemplateIds() {
-		$hosts = $this->getFormattedHosts();
-		if ($hosts) {
-			$hosts = zbx_objectValues($hosts, 'host');
+		$hosts = array();
+
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+			$hosts = $this->getFormattedHosts();
+			if ($hosts) {
+				$hosts = zbx_objectValues($hosts, 'host');
+			}
 		}
 
-		$templates = $this->getFormattedTemplates();
-		if ($templates) {
-			$templates = zbx_objectValues($templates, 'host');
+		$templates = array();
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+			$templates = $this->getFormattedTemplates();
+			if ($templates) {
+				$templates = zbx_objectValues($templates, 'host');
+			}
 		}
 
 		$hosts = array_merge($hosts, $templates);
