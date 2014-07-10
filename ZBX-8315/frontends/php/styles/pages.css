@@ -50,8 +50,10 @@
 .host-edit .dropArea .interface-add-control,
 .hostprototype-edit .dropArea .interface-add-control { visibility: hidden; }
 .host-edit #groups { height: 140px; }
-.host-edit #linkedTemplateTable { min-width: 400px; }
+.host-edit #linkedTemplateTable { width: 100%; }
+.host-edit #newTemplateTable { width: 100%; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
+.template-link-block { min-width: 400px; }
 
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
@@ -71,6 +73,8 @@
 .inventory-host .formlist .formrow .interfaces { min-width: 500px; }
 .inventory-host .formlist .formrow .description { padding-top: 2px; width: 550px; white-space: pre-wrap; }
 .inventory-host .formlist .formrow .text-field { width: 550px; white-space: pre-wrap; }
+.inventory-host .formlist .formrow .inventory-text-field { margin-top: 2px; height: 14px; }
+.inventory-host .formlist .formrow .inventory-text-field-wrap { clear: both; margin-top: 2px; display: block; width: 550px; }
 
 /* icon mapping */
 #iconMapTable .sortable { height: 30px; line-height: 30px; }
