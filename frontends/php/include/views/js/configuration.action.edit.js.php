@@ -240,8 +240,15 @@
 	}
 
 	function removeOperation(index) {
-		jQuery('#operations_' + index).find('*').remove();
-		jQuery('#operations_' + index).remove();
+		var row = jQuery('#operations_' + index);
+		var rowParent = row.parent();
+
+		row.find('*').remove();
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOperationCondition(index) {
