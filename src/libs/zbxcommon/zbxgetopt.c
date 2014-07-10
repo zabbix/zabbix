@@ -532,7 +532,7 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
               zbx_error("unrecognized zbx_option `-%c'", c);
 #else
             /* 1003.2 specifies the format of this message.  */
-            zbx_error("illegal zbx_option -- %c", c);
+            zbx_error("invalid zbx_option -- %c", c);
 #endif
           }
         zbx_optopt = c;

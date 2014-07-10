@@ -225,7 +225,7 @@ int	main(int argc, char **argv)
 		int	i;
 
 		for (i = zbx_optind; i < argc; i++)
-			zbx_error("illegal parameter \"%s\"", argv[i]);
+			zbx_error("invalid parameter \"%s\"", argv[i]);
 
 		ret = FAIL;
 	}
