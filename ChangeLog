@@ -14,6 +14,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8443] fixed host mass update form to be displayed correctly in Opera (Krists)
 ..F....... [ZBX-8437] fixed JS errors after show/hide frontend filter (Oleg)
 ..F....... [ZBX-8411] fixed item selection by click-and-drag and element form hiding in sysmap configuration with IE8 (Krists)
 A.F.I..... [ZBX-8406] fixed typos "overriden" to "overridden", "occurence" to "occurrance", changed "WEB" to "web" in translations and database patch files (Krists)
