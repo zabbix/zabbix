@@ -110,4 +110,27 @@ abstract class CValidator {
 
 		$this->setError(vsprintf($message, $arguments));
 	}
+
+
+	/**
+	 * Returns string represenation of a variable
+	 *
+	 * @param mixed $value
+	 * @return string
+	 */
+	protected function stringify($value)
+	{
+		if (is_bool($value)) {
+			return $value ? 'true' : 'false';
+		}
+		elseif (is_object($value)) {
+			return get_class($value);
+		}
+		elseif (is_scalar($value)) {
+			return (string)$value;
+		}
+		else {
+			return gettype($value);
+		}
+	}
 }
