@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.2');
 define('ZABBIX_API_VERSION', '2.3.2');
-define('ZABBIX_DB_VERSION',	 2030109);
+define('ZABBIX_DB_VERSION',	 2030111);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -255,6 +255,9 @@ define('INTERFACE_TYPE_AGENT',		1);
 define('INTERFACE_TYPE_SNMP',		2);
 define('INTERFACE_TYPE_IPMI',		3);
 define('INTERFACE_TYPE_JMX',		4);
+
+define('SNMP_BULK_DISABLED',	0);
+define('SNMP_BULK_ENABLED',		1);
 
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);

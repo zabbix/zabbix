@@ -1,6 +1,7 @@
 Changes for 2.3.2
 
 New features:
+..F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (Oleg,asaveljevs)
 ..F....... [ZBX-2603] added validation while working with regular expressions (Andrejs)
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 ..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
