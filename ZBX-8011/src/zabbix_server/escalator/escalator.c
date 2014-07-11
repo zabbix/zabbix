@@ -627,6 +627,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 				MEDIA_STATUS_ACTIVE, userid, mediatypeid);
 	}
 
+	mediatypeid = 0;
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(mediatypeid, row[0]);
@@ -672,7 +674,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	DBfree_result(result);
 
-	if (0 == medias_num)
+	if (0 == mediatypeid)
 	{
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
