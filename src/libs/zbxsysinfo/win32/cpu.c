@@ -57,8 +57,8 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*tmp;
-	int	cpu_num;
+	char	*tmp, *error = NULL;
+	int	cpu_num, ret = FAIL;
 	double	value;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
@@ -94,36 +94,43 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
-		return SYSINFO_RET_FAIL;
-	}
-
 	tmp = get_rparam(request, 2);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN);
+	{
+		ret = get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN, &value, &error);
+	}
 	else if (0 == strcmp(tmp, "avg5"))
-		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 5 * SEC_PER_MIN);
+	{
+		ret = get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 5 * SEC_PER_MIN, &value, &error);
+	}
 	else if (0 == strcmp(tmp, "avg15"))
-		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], USE_DEFAULT_INTERVAL);
+	{
+		ret =  get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 15 * SEC_PER_MIN, &value, &error);
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, value);
+	if (SUCCEED == ret)
+	{
+		SET_DBL_RESULT(result, value);
+		return SYSINFO_RET_OK;
+	}
 
-	return SYSINFO_RET_OK;
+	SET_MSG_RESULT(result, NULL != error ? error :
+			zbx_strdup(NULL, "Cannot obtain performance information from collector."));
+
+	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*tmp;
+	char	*tmp, *error = NULL;
 	double	value;
-	int	per_cpu = 1, cpu_num;
+	int	cpu_num, ret = FAIL;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -140,44 +147,51 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
-		per_cpu = 0;
-	else if (0 != strcmp(tmp, "percpu"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
+		cpu_num = 1;
 	}
-
-	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	tmp = get_rparam(request, 1);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		value = compute_average_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN);
-	else if (0 == strcmp(tmp, "avg5"))
-		value = compute_average_value(collector->cpus.queue_counter, 5 * SEC_PER_MIN);
-	else if (0 == strcmp(tmp, "avg15"))
-		value = compute_average_value(collector->cpus.queue_counter, USE_DEFAULT_INTERVAL);
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (1 == per_cpu)
+	else if (0 == strcmp(tmp, "percpu"))
 	{
 		if (0 >= (cpu_num = get_cpu_num()))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
-		value /= cpu_num;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, value);
+	tmp = get_rparam(request, 1);
 
-	return SYSINFO_RET_OK;
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	{
+		ret = get_perf_counter_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN, &value, &error);
+	}
+	else if (0 == strcmp(tmp, "avg5"))
+	{
+		ret = get_perf_counter_value(collector->cpus.queue_counter, 5 * SEC_PER_MIN, &value, &error);
+	}
+	else if (0 == strcmp(tmp, "avg15"))
+	{
+		ret = get_perf_counter_value(collector->cpus.queue_counter, 15 * SEC_PER_MIN, &value, &error);
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED == ret)
+	{
+		SET_DBL_RESULT(result, value / cpu_num);
+		return SYSINFO_RET_OK;
+	}
+
+	SET_MSG_RESULT(result, NULL != error ? error :
+			zbx_strdup(NULL, "Cannot obtain performance information from collector."));
+
+	return SYSINFO_RET_FAIL;
 }
