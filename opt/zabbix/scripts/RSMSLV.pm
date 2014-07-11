@@ -1321,7 +1321,7 @@ sub process_slv_avail
     my $probes_with_positive = 0;
     foreach my $itemid (keys(%$values_ref))
     {
-	my $result = check_item_values($values_ref->{$itemid});
+	my $result = $check_value_ref->($values_ref->{$itemid});
 
 	$probes_with_positive++ if (SUCCESS == $result);
 
