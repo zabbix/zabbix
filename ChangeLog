@@ -119,7 +119,6 @@ A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">="
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
 ..F....... [ZBXNEXT-2270] changed "Status" dropdown in host and host prototype forms to "Enabled" checkbox (Krists)
-..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
 ..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
