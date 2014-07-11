@@ -745,7 +745,7 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 #define DEFAULT_REFRESH_UNSUPPORTED	600
 static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
 
-static int	DCsync_config(DB_RESULT result)
+static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
 	const char	*__function_name = "DCsync_config";
 	DB_ROW		row;
@@ -803,7 +803,14 @@ static int	DCsync_config(DB_RESULT result)
 	{
 		/* store the config data */
 
-		config->config->refresh_unsupported = atoi(row[0]);
+		if (atoi(row[0]) != config->config->refresh_unsupported)
+		{
+			config->config->refresh_unsupported = atoi(row[0]);
+
+			if (NULL != refresh_unsupported_changed)
+				*refresh_unsupported_changed = 1;
+		}
+
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 
@@ -1075,7 +1082,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_items(DB_RESULT result)
+static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 {
 	const char		*__function_name = "DCsync_items";
 
@@ -1277,6 +1284,7 @@ static void	DCsync_items(DB_RESULT result)
 			}
 
 			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
+					(ITEM_STATE_NOTSUPPORTED && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state &&
 					(delay != item->delay || 0 != delay_flex_changed))))
 			{
@@ -2722,7 +2730,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		if_result = NULL;
 	DB_RESULT		expr_result = NULL;
 
-	int			i;
+	int			i, refresh_unsupported_change = 0;
 	double			sec, csec, hsec, isec, tsec, dsec, fsec, hisec, htsec, gmsec, hmsec, ifsec, expr_sec,
 				csec2, hsec2, isec2, tsec2, dsec2, fsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2,
 				expr_sec2, total2;
@@ -2876,7 +2884,7 @@ void	DCsync_configuration(void)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_config(conf_result);
+	DCsync_config(conf_result, &refresh_unsupported_change);
 	csec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2884,7 +2892,7 @@ void	DCsync_configuration(void)
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result);	/* relies on host status, must be after DCsync_hosts() */
+	DCsync_items(item_result, refresh_unsupported_change);	/* relies on host status, must be after DCsync_hosts() */
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -3522,7 +3530,7 @@ void	DCload_config()
 
 	LOCK_CACHE;
 
-	DCsync_config(result);
+	DCsync_config(result, NULL);
 
 	UNLOCK_CACHE;
 
