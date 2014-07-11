@@ -472,6 +472,7 @@ function make_hoststat_summary($filter) {
 	// get host groups
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => 1,
 		'output' => array('groupid', 'name')
 	));
@@ -484,7 +485,7 @@ function make_hoststat_summary($filter) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
-		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'name'),
