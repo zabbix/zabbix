@@ -678,8 +678,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 	{
 		medias_num++;
 
-		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
-				zbx_user_string(userid));
+		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"", zbx_user_string(userid));
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype", NULL);
