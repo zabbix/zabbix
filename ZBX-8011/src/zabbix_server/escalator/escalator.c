@@ -676,6 +676,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	if (0 == mediatypeid)
 	{
+		medias_num++;
+
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
