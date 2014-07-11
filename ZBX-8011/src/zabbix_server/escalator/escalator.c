@@ -687,9 +687,12 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 				escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
 	}
 
-	zbx_db_insert_autoincrement(&db_insert, "alertid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (0 < medias_num)
+	{
+		zbx_db_insert_autoincrement(&db_insert, "alertid");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
