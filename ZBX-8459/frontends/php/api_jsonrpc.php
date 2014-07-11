@@ -24,7 +24,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Max-Age: 1000');
 
-if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 	return;
 }
 
@@ -77,4 +77,3 @@ catch (Exception $e) {
 
 	echo CJs::encodeJson($response);
 }
-
