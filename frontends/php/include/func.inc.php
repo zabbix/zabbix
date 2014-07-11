@@ -1415,46 +1415,36 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
+function validate_sort_and_sortorder($defaultSort = null, $defaultSortOrder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
-	$currentSortField = getPageSortField($sort);
-	$currentSortOrder = getPageSortOrder($sortorder);
+	$sortKey = 'sort';
+	$sortOrderKey = 'sortorder';
+
+	if (hasRequest($sortKey) && $allowedColumns && !in_array(getRequest($sortKey), $allowedColumns)) {
+		error(_s('Cannot sort by field "%1$s".', getRequest($sortKey)));
+		invalid_url();
+	}
+
+	if (hasRequest($sortOrderKey) && !in_array(getRequest($sortOrderKey), array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+		error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+			getRequest($sortOrderKey), ZBX_SORT_UP, ZBX_SORT_DOWN
+		));
+		invalid_url();
+	}
 
 	$profileSortFieldIndex = 'web.'.$page['file'].'.sort';
 	$profileSortOrderIndex = 'web.'.$page['file'].'.sortorder';
 
-	if (!is_null($currentSortField)) {
-		if ($allowedColumns && !in_array($currentSortField, $allowedColumns)) {
-			if (CProfile::has($profileSortFieldIndex) && CProfile::get($profileSortFieldIndex)) {
-				CProfile::delete($profileSortFieldIndex);
-				$currentSortField = null;
-			}
-			else {
-				error(_s('Cannot sort by field "%1$s".', $currentSortField));
-				invalid_url();
-			}
-		}
+	$currentSortField = getPageSortField($defaultSort);
+	$currentSortOrder = getPageSortOrder($defaultSortOrder);
 
-		if (!in_array($currentSortOrder, array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-			if (CProfile::has($profileSortOrderIndex) && CProfile::get($profileSortOrderIndex)) {
-				CProfile::delete($profileSortOrderIndex);
-				$currentSortOrder = null;
-			}
-			else {
-				error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-					$currentSortOrder, ZBX_SORT_UP, ZBX_SORT_DOWN
-				));
-				invalid_url();
-			}
-		}
-
+	if ($currentSortField) {
 		CProfile::update($profileSortOrderIndex, $currentSortOrder, PROFILE_TYPE_STR);
 		CProfile::update($profileSortFieldIndex, $currentSortField, PROFILE_TYPE_STR);
 
-		$_REQUEST['sort'] = $currentSortField;
-		$_REQUEST['sortorder'] = $currentSortOrder;
-
+		$_REQUEST[$sortKey] = $currentSortField;
+		$_REQUEST[$sortOrderKey] = $currentSortOrder;
 	}
 }
 
@@ -1516,7 +1506,7 @@ function make_sorting_header($obj, $tabfield) {
 function  getPageSortField($default = null) {
 	global $page;
 
-	$sort = get_request('sort', CProfile::get('web.'.$page['file'].'.sort'));
+	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort'));
 
 	return ($sort) ? $sort : $default;
 }
@@ -1531,7 +1521,7 @@ function  getPageSortField($default = null) {
 function getPageSortOrder($default = ZBX_SORT_UP) {
 	global $page;
 
-	$sortorder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
+	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
 
 	return ($sortorder) ? $sortorder : $default;
 }
