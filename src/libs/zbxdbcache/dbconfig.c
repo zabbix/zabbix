@@ -3998,6 +3998,23 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 	UNLOCK_CACHE;
 }
 
+void	DCconfig_get_trigger_by_triggerids(DC_TRIGGER *trigger, int *errcode, zbx_uint64_t triggerid)
+{
+	ZBX_DC_TRIGGER	*dc_trigger;
+
+	LOCK_CACHE;
+
+	if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+		errcode[0] = FAIL;
+	else
+	{
+		DCget_trigger(trigger, dc_trigger);
+		errcode[0] = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_set_item_db_state                                       *
@@ -6025,6 +6042,58 @@ int	DCget_item_count()
 	UNLOCK_CACHE;
 
 	return count;
+}
+
+void	DCconfig_check_functions_by_triggerid(zbx_uint64_t triggerid, char **error)
+{
+	const char		*p, *q;
+	zbx_uint64_t		functionid;
+	const ZBX_DC_TRIGGER	*dc_trigger;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+		return;
+
+		for (p = dc_trigger->expression; '\0' != *p; p++)
+		{
+			if ('{' != *p)
+				continue;
+
+			for (q = p + 1; '}' != *q && '\0' != *q; q++)
+			{
+				if ('0' > *q || '9' < *q)
+					break;
+			}
+
+			if ('}' != *q)
+				continue;
+
+			sscanf(p + 1, ZBX_FS_UI64, &functionid);
+
+			if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)))
+			{
+				if (NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
+					ITEM_STATUS_DISABLED == dc_item->status)
+				{
+					*error = zbx_dsprintf(*error, "item '%s' disabled.", dc_item->key);
+					break;
+				}
+
+				if (NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
+					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
+						HOST_STATUS_NOT_MONITORED == dc_host->status)
+				{
+					*error = zbx_dsprintf(*error, "host '%s' disabled.", dc_host->host);
+					break;
+				}
+			}
+			p = q;
+		}
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
