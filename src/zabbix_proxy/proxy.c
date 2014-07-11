@@ -675,12 +675,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBinit();
 	if (SUCCEED != DBcheck_version())
-	{
-#ifdef HAVE_SQLITE3
-		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite database upgrades.");
-#endif
 		exit(EXIT_FAILURE);
-	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
