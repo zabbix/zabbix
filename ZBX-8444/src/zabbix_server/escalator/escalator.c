@@ -1121,6 +1121,11 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	source = 0xff, object = 0xff;
+	DC_TRIGGER	trigger;
+	DC_ITEM		item;
+	zbx_uint64_t	itemid;
+	DC_HOST		host;
+	int		errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
@@ -1139,58 +1144,18 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 	{
 		/* trigger disabled or deleted? */
 
-		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
-				escalation->triggerid);
+		DCconfig_get_trigger_by_triggerids(&trigger, &errcode, escalation->triggerid);
 
-		if (NULL == (row = DBfetch(result)))
-		{
+		if (SUCCEED != errcode)
 			*error = zbx_dsprintf(*error, "trigger [" ZBX_FS_UI64 "] deleted.", escalation->triggerid);
-		}
-		else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
-		{
-			*error = zbx_dsprintf(*error, "trigger '%s' disabled.", row[0]);
-		}
-		DBfree_result(result);
+		else if (TRIGGER_STATUS_DISABLED == trigger.status)
+			*error = zbx_dsprintf(*error, "trigger '%s' disabled.", trigger.description);
 	}
 
-	if (EVENT_SOURCE_TRIGGERS == source)
+	if (EVENT_SOURCE_TRIGGERS == source && NULL == *error && EVENT_OBJECT_TRIGGER == object)
 	{
-		if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
-		{
-			/* item disabled? */
-
-			result = DBselect(
-					"select i.name"
-					" from items i,functions f,triggers t"
-					" where i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and i.status=%d",
-					escalation->triggerid, ITEM_STATUS_DISABLED);
-
-			if (NULL != (row = DBfetch(result)))
-				*error = zbx_dsprintf(*error, "item '%s' disabled.", row[0]);
-			DBfree_result(result);
-		}
-
-		if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
-		{
-			/* host disabled? */
-
-			result = DBselect(
-					"select h.host"
-					" from hosts h,items i,functions f,triggers t"
-					" where h.hostid=i.hostid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and h.status=%d",
-					escalation->triggerid, HOST_STATUS_NOT_MONITORED);
-
-			if (NULL != (row = DBfetch(result)))
-				*error = zbx_dsprintf(*error, "host '%s' disabled.", row[0]);
-			DBfree_result(result);
-		}
+		/* item or host disabled? */
+		DCconfig_check_functions_by_triggerid(escalation->triggerid, error);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
 	{
@@ -1198,35 +1163,22 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 		{
 			/* item disabled or deleted? */
 
-			result = DBselect("select name,status from items where itemid=" ZBX_FS_UI64,
-					escalation->itemid);
+			itemid = escalation->itemid;
+			DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-			if (NULL == (row = DBfetch(result)))
+			if (SUCCEED != errcode)
 			{
 				*error = zbx_dsprintf(*error, "item [" ZBX_FS_UI64 "] deleted.", escalation->itemid);
 			}
-			else if (ITEM_STATUS_DISABLED == atoi(row[1]))
+			else if (ITEM_STATUS_DISABLED == item.status)
 			{
-				*error = zbx_dsprintf(*error, "item '%s' disabled.", row[0]);
+				*error = zbx_dsprintf(*error, "item '%s' disabled.", item.key_orig);
 			}
-			DBfree_result(result);
-		}
-
-		if (NULL == *error && (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object))
-		{
-			/* host disabled? */
-
-			result = DBselect(
-					"select h.host"
-					" from hosts h,items i"
-					" where h.hostid=i.hostid"
-						" and i.itemid=" ZBX_FS_UI64
-						" and h.status=%d",
-					escalation->itemid, HOST_STATUS_NOT_MONITORED);
-
-			if (NULL != (row = DBfetch(result)))
-				*error = zbx_dsprintf(*error, "host '%s' disabled.", row[0]);
-			DBfree_result(result);
+			else if (SUCCEED == DCget_host_by_hostid(&host, item.host.hostid) &&
+					HOST_STATUS_MONITORED != host.status)
+			{
+				*error = zbx_dsprintf(*error, "host '%s' disabled.", host.host);
+			}
 		}
 	}
 
