@@ -68,9 +68,9 @@ class CDecimalValidatorTest extends CValidatorTest {
 				'Invalid decimal'
 			),
 			array(
-				array('messageType' => 'Invalid decimal'),
+				array('messageType' => 'Invalid decimal "%1$s"'),
 				array(),
-				'Invalid decimal'
+				'Invalid decimal "array"'
 			),
 			array(
 				array(
