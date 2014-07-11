@@ -115,7 +115,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int				cpu_num, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[8];
-	char				counterPath[PDH_MAX_COUNTER_PATH];
+	char				counterPath[PDH_MAX_COUNTER_PATH], *error = NULL;
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -138,8 +138,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 			goto clean;
 
-		if (NULL == (pcpus->cpu_counter[cpu_num] = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
+		if (NULL == (pcpus->cpu_counter[cpu_num] = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY,
+				&error)))
+		{
 			goto clean;
+		}
 	}
 
 	cpe.szObjectName = get_counter_name(PCI_SYSTEM);
@@ -149,11 +152,17 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 		goto clean;
 
-	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
+	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY, &error)))
 		goto clean;
 
 	ret = SUCCEED;
 clean:
+	if (NULL != error)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add performance counter \"%s\": %s", counterPath, error);
+		zbx_free(error);
+	}
+
 #else	/* not _WINDOWS */
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
@@ -430,7 +439,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_USER);
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_NICE);
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_SYS);
-			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_INTR);
+			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES +
+					CP_INTR);
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_IDLE);
 
 			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
