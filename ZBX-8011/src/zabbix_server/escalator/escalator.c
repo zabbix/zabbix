@@ -689,7 +689,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 				escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
 	}
 
-	if (0 < medias_num)
+	if (0 != medias_num)
 	{
 		zbx_db_insert_autoincrement(&db_insert, "alertid");
 		zbx_db_insert_execute(&db_insert);
