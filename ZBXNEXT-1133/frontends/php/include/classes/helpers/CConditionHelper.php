@@ -186,4 +186,35 @@ class CConditionHelper {
 			return ($len1 < $len2) ? -1 : 1;
 		}
 	}
+
+	/**
+	 * Returns next formula ID - A => B, B => C, ..., Z => AA, ..., ZZ => AAA, ...
+	 *
+	 * @param array $formulaIds
+	 *
+	 * @throws InvalidArgumentException
+	 * @return string
+	 */
+	public static function getNextFormulaId(array $formulaIds) {
+		if (!$formulaIds) {
+			$nextFormulaId = 'A';
+		}
+		else {
+			usort($formulaIds, array('CConditionHelper', 'compareFormulaIds'));
+
+			$lastFormulaId = array_pop($formulaIds);
+
+			$head = substr($lastFormulaId, 0, -1);
+			$tail = substr($lastFormulaId, -1);
+
+			if ($tail == 'Z') {
+				$nextFormulaId = $head ? self::getNextFormulaId($head).'A' : 'AA';
+			}
+			else {
+				$nextFormulaId = $head.chr(ord($tail) + 1);
+			}
+		}
+
+		return $nextFormulaId;
+	}
 }
