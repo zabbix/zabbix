@@ -118,12 +118,7 @@ elseif (hasRequest('save')) {
 		'recovery_msg' => get_request('recovery_msg', 0),
 		'r_shortdata' => get_request('r_shortdata', ''),
 		'r_longdata' => get_request('r_longdata', ''),
-		'operations' => get_request('operations', array()),
-		'filter' => array(
-			'conditions' => getRequest('conditions', array()),
-			'evaltype' => getRequest('evaltype'),
-			'formula' => getRequest('formula')
-		)
+		'operations' => get_request('operations', array())
 	);
 
 	foreach ($action['operations'] as $num => $operation) {
@@ -131,6 +126,23 @@ elseif (hasRequest('save')) {
 			$action['operations'][$num]['opmessage']['default_msg'] = 0;
 		}
 	}
+
+	$filter = array(
+		'conditions' => getRequest('conditions', array()),
+		'evaltype' => getRequest('evaltype')
+	);
+
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		if (count($filter['conditions']) > 1) {
+			$filter['formula'] = getRequest('formula');
+		}
+		else {
+			// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
+			$filter['formula'] = '';
+			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		}
+	}
+	$action['filter'] = $filter;
 
 	DBstart();
 
@@ -178,7 +190,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 	$newCondition = getRequest('new_condition');
 
 	if ($newCondition) {
-		$conditions = getRequest('conditions');
+		$conditions = getRequest('conditions', array());
 
 		// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
 		if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
@@ -385,7 +397,7 @@ if (hasRequest('form')) {
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
-		$data['action']['filter']['conditions'] = getRequest('conditions');
+		$data['action']['filter']['conditions'] = getRequest('conditions', array());
 
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
