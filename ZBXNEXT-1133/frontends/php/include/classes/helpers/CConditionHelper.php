@@ -204,15 +204,21 @@ class CConditionHelper {
 
 			$lastFormulaId = array_pop($formulaIds);
 
-			$head = substr($lastFormulaId, 0, -1);
-			$tail = substr($lastFormulaId, -1);
+			$calculateNextFormulaId = function($formulaId) use (&$calculateNextFormulaId) {
+				$head = substr($formulaId, 0, -1);
+				$tail = substr($formulaId, -1);
 
-			if ($tail == 'Z') {
-				$nextFormulaId = $head ? self::getNextFormulaId($head).'A' : 'AA';
-			}
-			else {
-				$nextFormulaId = $head.chr(ord($tail) + 1);
-			}
+				if ($tail == 'Z') {
+					$nextFormulaId = $head ? $calculateNextFormulaId($head).'A' : 'AA';
+				}
+				else {
+					$nextFormulaId = $head.chr(ord($tail) + 1);
+				}
+
+				return $nextFormulaId;
+			};
+
+			$nextFormulaId = $calculateNextFormulaId($lastFormulaId);
 		}
 
 		return $nextFormulaId;
