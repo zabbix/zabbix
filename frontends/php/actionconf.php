@@ -447,7 +447,7 @@ if (hasRequest('form')) {
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	if (!hasRequest('add_condition')) {
+	if (!hasRequest('add_condition') && !(getRequest('form') == 'update' && hasRequest('form_refresh'))) {
 		if ($data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			$sortFields = array(
 				array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
