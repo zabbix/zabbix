@@ -441,6 +441,9 @@ Other options
 		(default: off)
 
 Options for adding new probe. Argument --add.
+    --ip
+          IP of new probe node
+          (default: empty)
 	--epp
 		Enable EPP support for the Probe
 		(default: disabled)
@@ -481,6 +484,10 @@ sub validate_input {
 
     if (defined($OPTS{'add'}) and !defined($OPTS{'resolver'})) {
         $OPTS{'resolver'} = '127.0.0.1';
+    }
+    
+    if (defined($OPTS{'add'}) and !defined($OPTS{'ip'})) {
+        $msg .= "You need to specify IP of the new node using --ip option\n";
     }
 
     $OPTS{'epp'} = 0 unless defined($OPTS{'epp'});
