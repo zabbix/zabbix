@@ -186,7 +186,6 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 
 		// check existing conditions and remove duplicate condition values
-		$lastFormulaId = false;
 		foreach ($conditions as $condition) {
 			if ($newCondition['conditiontype'] == $condition['conditiontype']) {
 				if (is_array($newCondition['value'])) {
@@ -202,12 +201,11 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 					}
 				}
 			}
-			if($condition['formulaid'] > $lastFormulaId) {
-				$lastFormulaId = $condition['formulaid'];
-			}
 		}
 
-		$newCondition['formulaid'] = chr(ord($lastFormulaId) + 1);
+		$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
+
+		$newCondition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
 
 		$validateConditions = $conditions;
 
