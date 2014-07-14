@@ -971,6 +971,12 @@ return array(
 				'length' => 64,
 				'default' => '10050',
 			),
+			'bulk' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'valuemaps' => array(
