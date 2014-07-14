@@ -265,7 +265,7 @@
 		row.remove();
 
 		if (IE8) {
-			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 
@@ -276,7 +276,7 @@
 		row.remove();
 
 		if (IE8) {
-			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 
