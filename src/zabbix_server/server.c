@@ -85,7 +85,7 @@ const char	*help_message[] = {
 	"  No option                       All processes",
 	"  =pid                            Pid number of a process",
 	"  =process                        All specified processes (e.g. all poller processes)",
-	"  =process, N                     Process name and number (e.g. poller #1, http poller #3)",
+	"  =process,N                      Process name and number (e.g. poller #1, http poller #3)",
 	"",
 	"Other options:",
 	"  -h --help                       Give this help",
