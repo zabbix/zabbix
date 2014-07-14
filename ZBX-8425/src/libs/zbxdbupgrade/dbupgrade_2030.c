@@ -1154,6 +1154,13 @@ static int	DBpatch_2030110(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030111(void)
+{
+	const ZBX_FIELD	field = {"bulk", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -1270,5 +1277,6 @@ DBPATCH_ADD(2030107, 0, 1)
 DBPATCH_ADD(2030108, 0, 1)
 DBPATCH_ADD(2030109, 0, 1)
 DBPATCH_ADD(2030110, 0, 0)
+DBPATCH_ADD(2030111, 0, 1)
 
 DBPATCH_END()
