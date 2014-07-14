@@ -1821,7 +1821,7 @@ class CAction extends CApiService {
 					'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
 				))
 			),
-			'required' => array('conditiontype', 'operator', 'value'),
+			'required' => array('conditiontype', 'value'),
 			'postValidators' => array(
 				new CActionCondValidator()
 			),
