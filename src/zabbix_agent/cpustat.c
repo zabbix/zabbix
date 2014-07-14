@@ -701,7 +701,7 @@ int	get_cpu_statuses(zbx_vector_uint64_t *vector)
 	ZBX_CPUS_STAT_DATA		*pcpus;
 
 	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
-		return SYSINFO_RET_FAIL;
+		return FAIL;
 
 	LOCK_CPUSTATS;
 
@@ -721,5 +721,5 @@ int	get_cpu_statuses(zbx_vector_uint64_t *vector)
 
 	UNLOCK_CPUSTATS;
 
-	return SYSINFO_RET_OK;
+	return SUCCEED;
 }
