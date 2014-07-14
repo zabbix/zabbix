@@ -274,4 +274,34 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedFormula, $generatedFormula);
 	}
 
+	/**
+	 * @dataProvider testSortConditionsByFormulaIdProvider
+	 *
+	 * @param array $conditions
+	 */
+	public function testSortConditionsByFormulaId($conditions, $expectedConditions) {
+		$sortedConditions = CConditionHelper::sortConditionsByFormulaId($conditions);
+
+		$this->assertSame($expectedConditions, $sortedConditions);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function testSortConditionsByFormulaIdProvider() {
+		return array(
+			array(
+				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C')),
+				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C'))
+			),
+			array(
+				array(2 => array('formulaid' => 'C'), 0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B')),
+				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C'))
+			),
+			array(
+				array(2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'A')),
+				array(0 => array('formulaid' => 'A'), 2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'))
+			)
+		);
+	}
 }
