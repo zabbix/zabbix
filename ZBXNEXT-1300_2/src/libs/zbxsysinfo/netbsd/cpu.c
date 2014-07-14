@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "stats.h"
 #include "log.h"
+#include "zbxalgo.h"
+#include "zbxjson.h"
 
 static int	get_cpu_num()
 {
@@ -37,6 +39,46 @@ static int	get_cpu_num()
 #else
 	return -1;
 #endif
+}
+
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			ret = SYSINFO_RET_FAIL, i;
+	zbx_vector_uint64_t	cpus;
+	struct zbx_json		json;
+
+	zbx_vector_uint64_create(&cpus);
+
+	if (SUCCEED != get_cpu_statuses(&cpus))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
+		zbx_vector_uint64_destroy(&cpus);
+		return ret;
+	}
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < cpus.values_num; i++)
+	{
+		zbx_json_addobject(&json, NULL);
+
+		zbx_json_adduint64(&json, "{#CPUID}", i);
+		zbx_json_addstring(&json, "{#STATUS}", (SYSINFO_RET_OK == cpus.values[i] ?
+				"online" : "offline"), ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+	}
+
+	zbx_json_close(&json);
+	SET_STR_RESULT(result, zbx_strdup(result->str, json.buffer));
+
+	zbx_json_free(&json);
+	zbx_vector_uint64_destroy(&cpus);
+
+	ret = SYSINFO_RET_OK;
+
+	return ret;
 }
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
