@@ -1530,6 +1530,7 @@ class CAction extends CApiService {
 					$formulaIds = CConditionHelper::getFormulaIds($formula);
 					foreach ($filter['conditions'] as &$condition) {
 						$condition['formulaid'] = $formulaIds[$condition['conditionid']];
+						unset($condition['actionid'], $condition['conditionid']);
 					}
 					unset($condition);
 
@@ -2025,14 +2026,6 @@ class CAction extends CApiService {
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		$filterConditionValidator->setValidator('actionid', new CIdValidator(array(
-			'empty' => true,
-			'messageRegex' => _('Incorrect action ID for action "%1$s".')
-		)));
-		$filterConditionValidator->setValidator('conditionid', new CIdValidator(array(
-			'empty' => true,
-			'messageRegex' => _('Incorrect action condition ID for action "%1$s".')
-		)));
 
 		$operationsToValidate = array();
 		$conditionsToValidate = array();
