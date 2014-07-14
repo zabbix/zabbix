@@ -590,9 +590,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
-#define HTTP_DEBUG_ENABLED	1
-#define HTTP_DEBUG_DISABLED	0
-
 /* user permissions */
 typedef enum
 {
@@ -718,9 +715,7 @@ typedef enum
 	ZBX_TASK_STOP_SERVICE,
 	ZBX_TASK_CONFIG_CACHE_RELOAD,
 	ZBX_TASK_LOG_LEVEL_INCREASE,
-	ZBX_TASK_LOG_LEVEL_DECREASE,
-	ZBX_TASK_START_HTTP_DEBUG,
-	ZBX_TASK_STOP_HTTP_DEBUG
+	ZBX_TASK_LOG_LEVEL_DECREASE
 }
 zbx_task_t;
 
