@@ -152,4 +152,38 @@ class CConditionHelper {
 
 		return $formula;
 	}
+
+	/**
+	 * Sort conditions by formula id as if they were numbers.
+	 *
+	 * @param array		$conditions		conditions
+	 * @return array
+	 */
+	public static function sortConditionsByFormulaId($conditions) {
+		uasort($conditions, function ($condition1, $condition2) {
+			return CConditionHelper::compareFormulaIds($condition1['formulaid'], $condition2['formulaid']);
+		});
+
+		return $conditions;
+	}
+
+	/**
+	 * Compare formula IDs.
+	 *
+	 * @param string $formulaId1
+	 * @param string $formulaId2
+	 *
+	 * @return int
+	 */
+	public static function compareFormulaIds($formulaId1, $formulaId2) {
+		$len1 = strlen($formulaId1);
+		$len2 = strlen($formulaId2);
+
+		if ($len1 == $len2) {
+			return strcmp($formulaId1, $formulaId2);
+		}
+		else {
+			return ($len1 < $len2) ? -1 : 1;
+		}
+	}
 }

@@ -444,13 +444,13 @@ if (hasRequest('form')) {
 				array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
 				array('field' => 'value', 'order' => ZBX_SORT_DOWN)
 			);
+			CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
 		}
 		else {
-			$sortFields = array(
-				array('field' => 'formulaid', 'order' => ZBX_SORT_UP)
+			$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
+				$data['action']['filter']['conditions']
 			);
 		}
-		CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
 	}
 
 	// new condition
