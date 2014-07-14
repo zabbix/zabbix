@@ -418,6 +418,13 @@ elseif (hasRequest('save')) {
 					continue;
 				}
 
+				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
+					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
+				}
+				else {
+					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
+				}
+
 				if ($interface['isNew']) {
 					unset($interfaces[$key]['interfaceid']);
 				}
