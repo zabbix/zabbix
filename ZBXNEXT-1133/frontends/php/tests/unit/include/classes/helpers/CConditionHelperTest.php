@@ -278,6 +278,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider testSortConditionsByFormulaIdProvider
 	 *
 	 * @param array $conditions
+	 * @param array $expectedConditions
 	 */
 	public function testSortConditionsByFormulaId($conditions, $expectedConditions) {
 		$sortedConditions = CConditionHelper::sortConditionsByFormulaId($conditions);
@@ -301,6 +302,47 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			array(
 				array(2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'A')),
 				array(0 => array('formulaid' => 'A'), 2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'))
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider testGetNextFormulaIdProvider
+	 *
+	 * @param array $formulaIds
+	 * @param string $expectedFormulaId
+	 */
+	public function testGetNextFormulaId($formulaIds, $expectedFormulaId) {
+		$nextFormulaId = CConditionHelper::getNextFormulaId($formulaIds);
+
+		$this->assertSame($expectedFormulaId, $nextFormulaId);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function testGetNextFormulaIdProvider() {
+		return array(
+			array(
+				array('A', 'B', 'C'), 'D'
+			),
+			array(
+				array('C', 'A', 'B'), 'D'
+			),
+			array(
+				array('X', 'Y', 'Z'), 'AA'
+			),
+			array(
+				array('AX', 'AY', 'AZ'), 'BA'
+			),
+			array(
+				array('ZX', 'ZY', 'ZZ'), 'AAA'
+			),
+			array(
+				array('AAX', 'AAY', 'AAZ'), 'ABA'
+			),
+			array(
+				array('ZZZX', 'ZZZY', 'ZZZZ'), 'AAAAA'
 			)
 		);
 	}
