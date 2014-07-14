@@ -4,7 +4,7 @@ New features:
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
-..F....... [ZBX-8245] fixed "Host status" widget displaying problematic host if one of its groups is set to hidden in dashboard filter (Ivo)
+..F....... [ZBX-8425] fixed "Host status" widget displaying problematic host if one of its groups is set to hidden in dashboard filter (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.3.2
