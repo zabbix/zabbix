@@ -39,6 +39,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$report_timetill = $_REQUEST['report_timetill'];
 
 	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name', 'zbx_report');
 	$reportForm->setAttribute('id', 'zbx_report');
 
@@ -147,6 +148,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$showlegend = get_request('showlegend', 0);
 
 	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name', 'zbx_report');
 	$reportForm->setAttribute('id', 'zbx_report');
 
@@ -179,7 +181,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$color = new CColorCell(null, $period['color']);
 
 			$edit_link = 'popup_period.php?period_id='.$pid.'&config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
-				'&dstfrm='.$reportForm->getName().'&caption='.$period['caption'].'&report_timesince='.
+				'&dstfrm='.$reportForm->getName().url_param($period['caption'], false, 'caption').'&report_timesince='.
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
@@ -288,6 +290,7 @@ function valueComparisonFormForMultiplePeriods() {
 	$palettetype = get_request('palettetype', 0);
 
 	$reportForm = new CFormTable(null,null,'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 

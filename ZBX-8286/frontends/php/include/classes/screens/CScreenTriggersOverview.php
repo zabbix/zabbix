@@ -27,19 +27,42 @@ class CScreenTriggersOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$hostids = array();
+		// fetch hosts
+		$hosts = API::Host()->get(array(
+			'output' => array('hostid', 'status'),
+			'selectGraphs' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+			'selectScreens' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+			'groupids' => $this->screenitem['resourceid'],
+			'preservekeys' => true
+		));
 
-		$dbHostGroups = DBselect(
-			'SELECT DISTINCT hg.hostid'.
-			' FROM hosts_groups hg'.
-			' WHERE hg.groupid='.zbx_dbstr($this->screenitem['resourceid'])
+		$hostIds = array_keys($hosts);
+
+		$options = array(
+			'output' => array(
+				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+			),
+			'selectHosts' => array('hostid', 'name', 'status'),
+			'hostids' => $hostIds,
+			'monitored' => true,
+			'skipDependent' => true,
+			'sortfield' => 'description'
 		);
-		while ($dbHostGroup = DBfetch($dbHostGroups)) {
-			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
+
+		// application filter
+		if ($this->screenitem['application'] !== '') {
+			$applications = API::Application()->get(array(
+				'output' => array('applicationid'),
+				'hostids' => $hostIds,
+				'search' => array('name' => $this->screenitem['application'])
+			));
+			$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 		}
 
-		return $this->getOutput(getTriggersOverview($hostids, $this->screenitem['application'],
-				$this->pageFile, $this->screenitem['style'], $this->screenid
+		$triggers = API::Trigger()->get($options);
+
+		return $this->getOutput(getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'],
+			$this->screenid
 		));
 	}
 }

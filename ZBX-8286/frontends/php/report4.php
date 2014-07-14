@@ -130,7 +130,7 @@ else {
 		case 'yearly':
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
 
-			$dateFormat = 'Y';
+			$dateFormat = _x('Y', DATE_FORMAT_CONTEXT);
 			array_unshift($header, new CCol(_('Year'), 'center'));
 
 			for ($i = $minYear; $i <= date('Y'); $i++) {
@@ -142,7 +142,7 @@ else {
 		case 'monthly':
 			$minTime = mktime(0, 0, 0, 1, 1, $year);
 
-			$dateFormat = _x('F', 'Month long name');
+			$dateFormat = _x('F', DATE_FORMAT_CONTEXT);
 			array_unshift($header, new CCol(_('Month'),'center'));
 
 			$max = ($year == $currentYear) ? date('n') : 12;
@@ -207,7 +207,7 @@ else {
 
 		// interval end, displayed only for week intervals
 		if ($period == 'weekly') {
-			$row[] = _(zbx_date2str($dateFormat, min($till, time())));
+			$row[] = zbx_date2str($dateFormat, min($till, time()));
 		}
 
 		// counting alert count for each user and media type

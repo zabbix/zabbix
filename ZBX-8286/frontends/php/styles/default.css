@@ -37,6 +37,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
+.pre-wrap { white-space: pre-wrap; }
+.break-lines { word-break: break-all; }
 .placeholder { color: #aaa; }
 .maxwidth { width: 100%; }
 .paddingless { padding: 0; }
@@ -147,7 +149,7 @@ form { margin: 0; }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
 .input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { color: #ACA899; cursor: default; }
+.input[disabled] { border-color: #d0d0d0; background-color: #eee; color: #aca899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
@@ -161,10 +163,10 @@ input[type="button"],
 input[type="submit"],
 input[type="reset"],
 input[type="file"] { height: auto; }
-input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #ffffff; height: 20px; }
+input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #fff; height: 20px; }
 input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
-input[type="submit"].input[disabled].formlist { cursor: default; }
+input[type="submit"].input[disabled].formlist { cursor: default; background: #fff; border-color: #aca899; }
 input.jqueryinput,
 .jqueryinputset input[type="button"],
 .jqueryinputset input[type="submit"] { height: auto; }
@@ -188,7 +190,7 @@ textarea.textarea_big { height: auto; }
 	text-decoration: none; padding: 1px 1px 0 1px; margin: 0; cursor: pointer;
 }
 .link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
-.link_menu[disabled] { color: #DDD; cursor: default; border: 0; }
+.link_menu[disabled] { color: #ddd; cursor: default; border: 0; background-color: white; }
 .link_menu[disabled]:hover { border: 0; }
 
 /* transparent - must be after input! */
@@ -341,7 +343,7 @@ table.tableinfo tr.header td.hover_grey {
 	white-space: nowrap; word-spacing: 0; font-weight: bold; border-width: 0; cursor: pointer;
 }
 table.tableinfo tr.vertical_header td {
-	padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center;
+	padding: 5px 0 5px 0px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center;
 }
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
@@ -454,6 +456,7 @@ table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
+table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; margin-left: 3px; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -461,6 +464,11 @@ table.filter tr.item-list-row { height: 26px; }
 
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
+
+/* old-style filter */
+.old-filter .form_row_l { text-align: right; }
+.old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
+.old-filter .filter-button { height: 16px; }
 
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }
@@ -509,11 +517,17 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
-.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; }
+.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; float: left; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
+
+/* IE10+ "clear field" X button removing */
+.multiselect input[type="text"]::-ms-clear {
+	display: none;
+}
+
 .multiselect .selected ul {
 	padding: 0 0 0 1px; margin: 0; min-height: 18px;
 	background: #ffffff; border: 1px solid #AAAAAA;
@@ -555,6 +569,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; display: list-item; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+.multiselect-wrapper .select-popup { margin-left: 10px; }
 
 /* menu popup */
 .menuPopup {

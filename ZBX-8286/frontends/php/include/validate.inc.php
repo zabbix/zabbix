@@ -460,7 +460,7 @@ function check_field(&$fields, &$field, $checks) {
 		}
 	}
 
-	if (!($flags & NO_TRIM)) {
+	if (!($flags & P_NO_TRIM)) {
 		check_trim($_REQUEST[$field]);
 	}
 

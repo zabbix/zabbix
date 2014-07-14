@@ -651,8 +651,8 @@ $graph->setSeriesColor($graph_data['colors']);
 $graph->showLegend($showlegend);
 
 $graph->setWidth(1024);
-$graph->setHeight(400);
+$graph->setMinChartHeight(250);
 
-$graph->Draw();
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

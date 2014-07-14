@@ -18,29 +18,6 @@
 **/
 
 
-function remove_expression(expr_id) {
-	var expr_tr = document.getElementById(expr_id);
-	var id = getIdFromNodeId(expr_id);
-	if (is_number(id)) {
-		var elm_v = document.getElementsByName('expressions[' + id + '][value]')[0];
-		var elm_t = document.getElementsByName('expressions[' + id + '][type]')[0];
-		var elm_s = document.getElementsByName('expressions[' + id + '][view]')[0];
-
-		if (typeof(elm_v) != 'undefined') {
-			elm_v.parentNode.removeChild(elm_v);
-		}
-		if (typeof(elm_t) != 'undefined') {
-			elm_t.parentNode.removeChild(elm_t);
-		}
-		if (typeof(elm_s) != 'undefined') {
-			elm_s.parentNode.removeChild(elm_s);
-		}
-	}
-	if (typeof(expr_tr) != 'undefined') {
-		expr_tr.parentNode.removeChild(expr_tr);
-	}
-}
-
 function getIdFromNodeId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /logtr([0-9])/i;

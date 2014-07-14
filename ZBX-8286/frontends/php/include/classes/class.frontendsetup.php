@@ -67,7 +67,7 @@ class FrontendSetup {
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
-		if (mbstrings_available()) {
+		if (extension_loaded('mbstring')) {
 			$result[] = $this->checkPhpMbstringFuncOverload();
 		}
 		$result[] = $this->checkPhpSockets();
@@ -297,7 +297,7 @@ class FrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpMbstring() {
-		$current = mbstrings_available();
+		$current = extension_loaded('mbstring');
 
 		return array(
 			'name' => _('PHP mbstring'),

@@ -57,7 +57,7 @@ class CTriggerExpression {
 	/**
 	 * An options array
 	 *
-	 * Supported otions:
+	 * Supported options:
 	 *   'lldmacros' => true	low-level discovery macros can contain in trigger expression
 	 *
 	 * @var array
@@ -201,7 +201,9 @@ class CTriggerExpression {
 		$level = 0;
 
 		while (isset($this->expression[$this->pos])) {
-			if (isset($this->spaceChars[$this->expression[$this->pos]])) {
+			$char = $this->expression[$this->pos];
+
+			if (isset($this->spaceChars[$char])) {
 				$afterSpace = true;
 				$this->pos++;
 				continue;
@@ -209,17 +211,17 @@ class CTriggerExpression {
 
 			switch ($state) {
 				case self::STATE_AFTER_OPEN_BRACE:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case '-':
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'-', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$level++;
 							break;
@@ -238,17 +240,17 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_BINARY_OPERATOR:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case '-':
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'-', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$level++;
 							break;
@@ -274,19 +276,19 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_LOGICAL_OPERATOR:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case '-':
 							if (!$afterSpace) {
 								break 3;
 							}
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'-', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
 						case '(':
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
@@ -311,13 +313,13 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_CLOSE_BRACE:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case ')':
 							if ($level == 0) {
 								break 3;
 							}
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$level--;
 							break;
@@ -352,13 +354,13 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_CONSTANT:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case ')':
 							if ($level == 0) {
 								break 3;
 							}
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								')', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$level--;
 							$state = self::STATE_AFTER_CLOSE_BRACE;
@@ -392,19 +394,19 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_NOT_OPERATOR:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case '-':
 							if (!$afterSpace) {
 								break 3;
 							}
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'-', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
 						case '(':
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
@@ -424,10 +426,10 @@ class CTriggerExpression {
 
 					break;
 				case self::STATE_AFTER_MINUS_OPERATOR:
-					switch ($this->expression[$this->pos]) {
+					switch ($char) {
 						case '(':
 							$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'(', $this->pos, 1
+								$char, $this->pos, 1
 							);
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;

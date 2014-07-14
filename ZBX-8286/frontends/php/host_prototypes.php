@@ -58,7 +58,7 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 
@@ -256,7 +256,7 @@ if (isset($_REQUEST['form'])) {
 			'templateid' => get_request('templateid'),
 			'host' => get_request('host'),
 			'name' => get_request('name'),
-			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+			'status' => getRequest('status', HOST_STATUS_MONITORED),
 			'templates' => array(),
 			'inventory' => array(
 				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)
@@ -365,11 +365,7 @@ else {
 		order_result($data['hostPrototypes'], $sortfield, getPageSortOrder());
 	}
 
-	$data['paging'] = getPagingLine(
-		$data['hostPrototypes'],
-		array('hostid'),
-		array('parent_discoveryid' => get_request('parent_discoveryid'))
-	);
+	$data['paging'] = getPagingLine($data['hostPrototypes']);
 
 	// fetch templates linked to the prototypes
 	$templateIds = array();

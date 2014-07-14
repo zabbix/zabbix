@@ -439,8 +439,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
-						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg="
+						ZBX_FS_DBL ",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64
+						" and clock=%d;\n",
 						trend->num,
 						trend->value_min.dbl,
 						trend->value_avg.dbl,
@@ -469,8 +470,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
-						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg="
+						ZBX_FS_UI64 ",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64
+						" and clock=%d;\n",
 						trend->num,
 						trend->value_min.ui64,
 						avg.lo,
@@ -646,7 +648,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
  *                                                                            *
  * Function: DCmass_update_trends                                             *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -732,7 +734,7 @@ static void	DCsync_trends()
  *                                                                            *
  * Purpose: re-calculate and update values of triggers related to the items   *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
@@ -1064,7 +1066,13 @@ notsupported:
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
-			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: \"%s\"", item->host.host, item->key_orig, h->value_orig.err);
+
+			if (ITEM_STATE_NOTSUPPORTED == item->db_state)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
+						item->key_orig, h->value_orig.err);
+			}
+
 			zbx_free(value_esc);
 
 			update_cache = 1;
@@ -1174,7 +1182,7 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
@@ -1293,7 +1301,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
@@ -1519,7 +1527,7 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -1733,7 +1741,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
