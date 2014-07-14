@@ -56,7 +56,7 @@ sub new($$) {
             request   => $req,
             count     => 0,
             auth      => $authid,
-            error => '',
+            error => undef,
             };
 
 	bless( $self, $class );
@@ -98,7 +98,7 @@ sub new($$) {
         request   => $req,
         count     => 1,
         auth      => $auth,
-	error => '',
+	error => undef,
     }, $class;
 }
 
@@ -156,8 +156,9 @@ sub set_last_error {
     my ($self, $error) = @_;
 
     shift->{'error'} = $error if defined $error;
+    return if defined $error;
 
-    shift->{'error'} = '';
+    shift->{'error'} = undef;
 }
 
 

@@ -44,65 +44,41 @@ use Digest::MD5 qw(md5_hex);
 use Expect;
 use Data::Dumper;
 use RSM;
+use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
+use TLDs;
 
-use constant LINUX_TEMPLATEID => 10001;
+sub create_global_macros;
+sub create_tld_host($$$);
+sub create_probe_health_tmpl;
+sub manage_tld_objects($$$$$);
+sub manage_tld_hosts($$);
 
-use constant VALUE_TYPE_AVAIL => 0;
-use constant VALUE_TYPE_PERC => 1;
-use constant VALUE_TYPE_NUMBER => 2;
+sub check_api_error($);
 
-use constant ZBX_EC_INTERNAL          => -1;   # internal error (general)
-use constant ZBX_EC_DNS_NS_NOREPLY    => -200; # no reply from Name Server
-use constant ZBX_EC_DNS_NS_ERRREPLY   => -201; # invalid reply from Name Server
-use constant ZBX_EC_DNS_NS_NOTS       => -202; # no UNIX timestamp
-use constant ZBX_EC_DNS_NS_ERRTS      => -203; # invalid UNIX timestamp
-use constant ZBX_EC_DNS_NS_ERRSIG     => -204; # DNSSEC error
-use constant ZBX_EC_DNS_RES_NOREPLY   => -205; # no reply from resolver
-use constant ZBX_EC_DNS_RES_NOADBIT   => -206; # no AD bit in the answer from resolver
-use constant ZBX_EC_RDDS43_NOREPLY    => -200; # no reply from RDDS43 server
-use constant ZBX_EC_RDDS43_NONS       => -201; # Whois server returned no NS
-use constant ZBX_EC_RDDS43_NOTS       => -202; # no Unix timestamp
-use constant ZBX_EC_RDDS43_ERRTS      => -203; # invalid Unix timestamp
-use constant ZBX_EC_RDDS80_NOREPLY    => -204; # no reply from RDDS80 server
-use constant ZBX_EC_RDDS_ERRRES       => -205; # cannot resolve a Whois host
-use constant ZBX_EC_RDDS80_NOHTTPCODE => -206; # no HTTP response code in response from RDDS80 server
-use constant ZBX_EC_RDDS80_EHTTPCODE  => -207; # invalid HTTP response code in response from RDDS80 server
-use constant ZBX_EC_EPP_NO_IP         => -200; # IP is missing for EPP server
-use constant ZBX_EC_EPP_CONNECT       => -201; # cannot connect to EPP server
-use constant ZBX_EC_EPP_CRYPT         => -202; # invalid certificate or private key
-use constant ZBX_EC_EPP_FIRSTTO       => -203; # first message timeout
-use constant ZBX_EC_EPP_FIRSTINVAL    => -204; # first message is invalid
-use constant ZBX_EC_EPP_LOGINTO       => -205; # LOGIN command timeout
-use constant ZBX_EC_EPP_LOGININVAL    => -206; # invalid reply to LOGIN command
-use constant ZBX_EC_EPP_UPDATETO      => -207; # UPDATE command timeout
-use constant ZBX_EC_EPP_UPDATEINVAL   => -208; # invalid reply to UPDATE command
-use constant ZBX_EC_EPP_INFOTO        => -209; # INFO command timeout
-use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
+my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
-use constant RSM_ROLLWEEK_THRESHOLDS => '0,5,10,25,50,75,100';
+my $cfg_global_macros = cfg_global_macros;
 
-use constant cfg_probe_status_delay => 60;
-use constant cfg_default_rdds_ns_string => 'Name Server:';
+my ($rsm_groupid, $rsm_hostid);
 
-use constant rsm_host => 'rsm'; # global config history
-use constant rsm_group => 'rsm';
+my ($ns_servers, $root_servers_macros);
 
-my $trigger_rollweek_thresholds = { '1' => {'threshold' => '10', 'priority' => 2},
-				    '2' => {'threshold' => '25', 'priority' => 3},
-				    '3' => {'threshold' => '50', 'priority' => 3},
-				    '4' => {'threshold' => '75', 'priority' => 4},
-				    '5' => {'threshold' => '100', 'priority' => 5}
-				  };
+my ($main_templateid, $tld_groupid, $tlds_groupid, $tld_hostid, $probes_groupid, $probes_mon_groupid, $proxy_mon_templateid);
 
 my %OPTS;
 my $rv = GetOptions(\%OPTS,
 		    "tld=s",
+		    "delete!",
+		    "disable!",
 		    "rdds43-servers=s",
 		    "rdds80-servers=s",
 		    "dns-test-prefix=s",
 		    "rdds-test-prefix=s",
 		    "ipv4!",
 		    "ipv6!",
+		    "dns!",
+		    "epp!",
+		    "rdds!",
 		    "dnssec!",
 		    "epp-servers=s",
 		    "epp-user=s",
@@ -125,180 +101,107 @@ usage() if ($OPTS{'help'} or not $rv);
 validate_input();
 lc_options();
 
-# TODO: add command-line parameters:
-# - rdds43 hosts (2nd parameter of rsm.rdds)
-# - rdds80 hosts (3rd parameter of rsm.rdds)
-# ...
-
-my $main_templateid;
-my $ns_servers;
-
 # Expect stuff for EPP
 my $exp_timeout = 3;
 my $exp_command = '/opt/zabbix/bin/rsm_epp_enc';
 my $exp_output;
 
-use constant value_mappings => {'rsm_dns' => 13,
-				'rsm_probe' => 14,
-				'rsm_rdds_rttudp' => 15,
-				'rsm_avail' => 16,
-				'rsm_rdds_avail' => 18,
-                                'rsm_epp' => 19};
-
-use constant APP_SLV_MONTHLY => 'SLV monthly';
-use constant APP_SLV_ROLLWEEK => 'SLV rolling week';
-use constant APP_SLV_PARTTEST => 'SLV particular test';
-
 my $config = get_rsm_config();
-my $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, user => $config->{'zapi'}->{'user'}, password => $config->{'zapi'}->{'password'}});
 
-create_cron_items();
-exit if (defined($OPTS{'only-cron'}));
+pfail("Zabbix API URL is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'url'};
+pfail("Username for Zabbix API is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'user'};
+pfail("Password for Zabbix API is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'password'};
 
+my $result = zbx_connect($config->{'zapi'}->{'url'}, $config->{'zapi'}->{'user'}, $config->{'zapi'}->{'password'});
+
+if ( $result ne true ) {
+    pfail("Could not connect to Zabbix API. ".$result->{'data'});
+}
+
+#### Deleting TLD or TLD objects ####
+if (defined($OPTS{'delete'})) {
+    manage_tld_objects('delete', $OPTS{'tld'}, $OPTS{'dns'}, $OPTS{'epp'}, $OPTS{'rdds'});
+    exit;
+}
+
+#### Disabling TLD or TLD objects ####
+if (defined($OPTS{'disable'})) {
+    manage_tld_objects('disable',$OPTS{'tld'}, $OPTS{'dns'}, $OPTS{'epp'}, $OPTS{'rdds'});
+    exit;
+}
+
+#### Creating cron objects ####
+if (defined($OPTS{'only-cron'})) {
+    pfail("SLV cron script path is not specified. Please check configuration file") unless defined $config->{'slv'}->{'path'};
+    create_cron_items($config->{'slv'}->{'path'});
+}
+
+#### Adding new TLD ####
 my $proxies = get_proxies_list();
 
-pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
+pfail("Cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
 
-create_macro('{$RSM.IP4.MIN.PROBE.ONLINE}', 25, undef);
-create_macro('{$RSM.IP6.MIN.PROBE.ONLINE}', 20, undef);
+## Creating all global macros##
+## Please check the function to change default values of macros ##
+create_global_macros();
 
-create_macro('{$RSM.IP4.MIN.SERVERS}', 4, undef);
-create_macro('{$RSM.IP6.MIN.SERVERS}', 4, undef);
-create_macro('{$RSM.IP4.REPLY.MS}', 200, undef);
-create_macro('{$RSM.IP6.REPLY.MS}', 200, undef);
-
-create_macro('{$RSM.DNS.TCP.RTT.LOW}', 1500, undef);
-create_macro('{$RSM.DNS.TCP.RTT.HIGH}', 7500, undef);
-create_macro('{$RSM.DNS.UDP.RTT.LOW}', 500, undef);
-create_macro('{$RSM.DNS.UDP.RTT.HIGH}', 2500, undef);
-create_macro('{$RSM.DNS.UDP.DELAY}', 60, undef);
-create_macro('{$RSM.DNS.TCP.DELAY}', 3000, undef);
-create_macro('{$RSM.DNS.UPDATE.TIME}', 3600, undef);
-create_macro('{$RSM.DNS.PROBE.ONLINE}', 20, undef);
-create_macro('{$RSM.DNS.AVAIL.MINNS}', 2, undef);
-create_macro('{$RSM.DNS.ROLLWEEK.SLA}', 240, undef);
-
-create_macro('{$RSM.RDDS.RTT.LOW}', 2000, undef);
-create_macro('{$RSM.RDDS.RTT.HIGH}', 10000, undef);
-create_macro('{$RSM.RDDS.DELAY}', 300, undef);
-create_macro('{$RSM.RDDS.UPDATE.TIME}', 3600, undef);
-create_macro('{$RSM.RDDS.PROBE.ONLINE}', 10, undef);
-create_macro('{$RSM.RDDS.ROLLWEEK.SLA}', 48, undef);
-create_macro('{$RSM.RDDS.MAXREDIRS}', 10, undef);
-
-create_macro('{$RSM.EPP.DELAY}', 300, undef);
-create_macro('{$RSM.EPP.LOGIN.RTT.LOW}', 4000, undef);
-create_macro('{$RSM.EPP.LOGIN.RTT.HIGH}', 20000, undef);
-create_macro('{$RSM.EPP.UPDATE.RTT.LOW}', 4000, undef);
-create_macro('{$RSM.EPP.UPDATE.RTT.HIGH}', 20000, undef);
-create_macro('{$RSM.EPP.INFO.RTT.LOW}', 2000, undef);
-create_macro('{$RSM.EPP.INFO.RTT.HIGH}', 10000, undef);
-create_macro('{$RSM.EPP.PROBE.ONLINE}', 5, undef);
-create_macro('{$RSM.EPP.ROLLWEEK.SLA}', 48, undef);
-
-create_macro('{$RSM.PROBE.ONLINE.DELAY}', 180, undef);
-
-create_macro('{$RSM.TRIG.DOWNCOUNT}', '#1', undef);
-create_macro('{$RSM.TRIG.UPCOUNT}', '#3', undef);
-
-create_macro('{$RSM.INCIDENT.DNS.FAIL}', 3, undef);
-create_macro('{$RSM.INCIDENT.DNS.RECOVER}', 3, undef);
-create_macro('{$RSM.INCIDENT.DNSSEC.FAIL}', 3, undef);
-create_macro('{$RSM.INCIDENT.DNSSEC.RECOVER}', 3, undef);
-create_macro('{$RSM.INCIDENT.RDDS.FAIL}', 2, undef);
-create_macro('{$RSM.INCIDENT.RDDS.RECOVER}', 2, undef);
-create_macro('{$RSM.INCIDENT.EPP.FAIL}', 2, undef);
-create_macro('{$RSM.INCIDENT.EPP.RECOVER}', 2, undef);
-
-create_macro('{$RSM.SLV.DNS.UDP.RTT}', 99, undef);
-create_macro('{$RSM.SLV.DNS.TCP.RTT}', 99, undef);
-create_macro('{$RSM.SLV.NS.AVAIL}', 99, undef);
-create_macro('{$RSM.SLV.RDDS43.RTT}', 99, undef);
-create_macro('{$RSM.SLV.RDDS80.RTT}', 99, undef);
-create_macro('{$RSM.SLV.RDDS.UPD}', 99, undef);
-create_macro('{$RSM.SLV.DNS.NS.UPD}', 99, undef);
-create_macro('{$RSM.SLV.EPP.LOGIN}', 99, undef);
-create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
-create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
-
-create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', RSM_ROLLWEEK_THRESHOLDS, undef);
-create_macro('{$RSM.ROLLWEEK.SECONDS}', 604800, undef);
-create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef); # For finding unreachable probes. Probes are considered unreachable if last access time is over this limit of seconds.
-
-my $result;
-my $m = '{$RSM.DNS.UDP.DELAY}';
-unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-	and defined $result->{'value'}) {
-    pfail('cannot get macro ', $m);
+## Geting some global macros related to item refresh interval ##
+## Values are used as item update interval ##
+foreach my $macro (keys %{$cfg_global_macros}) {
+    $cfg_global_macros->{$macro} = get_global_macro_value($macro);
+    pfail('cannot get global macro ', $macro) unless defined($cfg_global_macros->{$macro});
 }
-my $cfg_dns_udp_delay = $result->{'value'};
-$m = '{$RSM.DNS.TCP.DELAY}';
-unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-	and defined $result->{'value'}) {
-    pfail('cannot get macro ', $m);
-}
-my $cfg_dns_tcp_delay = $result->{'value'};
-$m = '{$RSM.RDDS.DELAY}';
-unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-	and defined $result->{'value'}) {
-    pfail('cannot get macro ', $m);
-}
-my $cfg_rdds_delay = $result->{'value'};
-$m = '{$RSM.EPP.DELAY}';
-unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-	         and defined $result->{'value'}) {
-        pfail('cannot get macro ', $m);
-    }
-my $cfg_epp_delay = $result->{'value'};
 
-my $rsm_groupid = create_group(rsm_group);
 
-my $rsm_hostid = create_host({'groups' => [{'groupid' => $rsm_groupid}],
+# RSM host is required to have history of global configuration changes #
+# There are monitored changes of global macros #
+$rsm_groupid = create_group(rsm_group);
+
+if (defined($rsm_groupid)) {
+    $rsm_hostid = create_host({'groups' => [{'groupid' => $rsm_groupid}],
 			      'host' => rsm_host,
-			      'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+			      'interfaces' => [{'type' => INTERFACE_TYPE_AGENT, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
-# calculated items, configuration history (TODO: rename host to something like config_history)
-create_rsm_items($rsm_hostid);
+    if (defined($rsm_hostid)) {
+        # calculated items, configuration history (TODO: rename host to something like config_history)
+#	create_rsm_items($rsm_hostid);
+    }
+    else {
+	print "Could not create/update '".rsm_host."' host. Items are not created/updated.\n";
+    }
+}
+else {
+    print "Could not create/update '".rsm_group."' host group. RSM host is not created/updated.\n";
+}
 
-$ns_servers = get_ns_servers($OPTS{'tld'});
 
-my $root_servers_macros = update_root_servers();
+#$ns_servers = get_ns_servers($OPTS{'tld'});
+
+#pfail("Could not retrive NS servers for '".$OPTS{'tld'}."' TLD") unless (scalar(keys %{$ns_servers}));
+
+#$root_servers_macros = update_root_servers();
+
+unless (defined($root_servers_macros)) {
+    print "Could not retrive list of root servers or create global macros\n";
+}
 
 $main_templateid = create_main_template($OPTS{'tld'}, $ns_servers);
 
-my $tld_groupid = create_group('TLD '.$OPTS{'tld'});
+exit;
 
-my $tlds_groupid = create_group('TLDs');
+$tld_groupid = create_group('TLD '.$OPTS{'tld'});
 
-my $tld_hostid = create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $tlds_groupid}],
-			      'host' => $OPTS{'tld'},
-			      'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+$tlds_groupid = create_group('TLDs');
 
-create_slv_items($ns_servers, $tld_hostid, $OPTS{'tld'});
+$tld_hostid = create_tld_host($OPTS{'tld'}, $tld_groupid, $tlds_groupid);
 
-my $probes_groupid = create_group('Probes');
+$probes_groupid = create_group('Probes');
 
-my $probes_mon_groupid = create_group('Probes - Mon');
+$probes_mon_groupid = create_group('Probes - Mon');
 
-my $proxy_mon_templateid = create_template('Template Proxy Health', LINUX_TEMPLATEID);
+$proxy_mon_templateid = create_probe_health_tmpl();
 
-my $item_key = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
-
-my $options = {'name' => 'Availability of $2 Probe',
-                                          'key_'=> $item_key,
-                                          'hostid' => $proxy_mon_templateid,
-                                          'applications' => [get_application_id('Probe Availability', $proxy_mon_templateid)],
-                                          'type' => 5, 'value_type' => 3,
-                                          'units' => 'unixtime', delay => '60'};
-
-create_item($options);
-
-$options = { 'description' => 'PROBE {HOST.NAME}: Probe {$RSM.PROXY_NAME} is not available',
-                     'expression' => '{Template Proxy Health:'.$item_key.'.fuzzytime(2m)}=0',
-                    'priority' => '4',
-            };
-
-create_trigger($options);
+## Creating TLD hosts for each probe ##
 
 foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_name = $proxies->{$proxyid}->{'host'};
@@ -309,7 +212,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     my $proxy_groupid = create_group($probe_name);
 
     my $probe_templateid = create_probe_template($probe_name);
-    my $probe_status_templateid = create_probe_status_template($probe_name, $probe_templateid);
+    my $probe_status_templateid = create_probe_status_template($probe_name, $probe_templateid, $root_servers_macros);
 
     create_host({'groups' => [{'groupid' => $proxy_groupid}, {'groupid' => $probes_groupid}],
                                           'templates' => [{'templateid' => $probe_status_templateid}],
@@ -341,50 +244,6 @@ create_probe_status_host($probes_mon_groupid);
 
 ########### FUNCTIONS ###############
 
-sub create_host {
-    my $options = shift;
-
-    unless ($zabbix->exist('host',{'name' => $options->{'host'}})) {
-	print("creating host '", $options->{'host'}, "'\n");
-        my $result = $zabbix->create('host', $options);
-
-        return $result->{'hostids'}[0];
-    }
-
-    my $result = $zabbix->get('host', {'output' => ['hostid'], 'filter' => {'host' => [$options->{'host'}]}});
-
-    pfail("more than one host named \"", $options->{'host'}, "\" found") if ('ARRAY' eq ref($result));
-    pfail("host \"", $options->{'host'}, "\" not found") unless (defined($result->{'hostid'}));
-
-    $options->{'hostid'} = $result->{'hostid'};
-    delete($options->{'interfaces'});
-    $result = $zabbix->update('host', $options);
-
-    my $hostid = $result->{'hostid'} ? $result->{'hostid'} : $options->{'hostid'};
-
-    return $hostid;
-}
-
-sub get_application_id {
-    my $name = shift;
-    my $templateid = shift;
-
-    unless ($zabbix->exist('application',{'name' => $name, 'hostid' => $templateid})) {
-	my $result = $zabbix->create('application', {'name' => $name, 'hostid' => $templateid});
-	return $result->{'applicationids'}[0];
-    }
-
-    my $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $name}});
-    return $result->{'applicationid'};
-}
-
-sub get_proxies_list {
-    my $proxies_list;
-
-    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'], 'preservekeys' => 1 });
-
-    return $proxies_list;
-}
 
 sub get_ns_servers {
     my $tld = shift;
@@ -447,107 +306,6 @@ sub get_ns_servers {
     return $ns_servers;
 }
 
-sub create_group {
-    my $name = shift;
-
-    my $groupid;
-
-    unless ($zabbix->exist('hostgroup',{'name' => $name})) {
-        my $result = $zabbix->create('hostgroup', {'name' => $name});
-	$groupid = $result->{'groupids'}[0];
-    }
-    else {
-	my $result = $zabbix->get('hostgroup', {'filter' => {'name' => [$name]}});
-        $groupid = $result->{'groupid'};
-    }
-
-    return $groupid;
-}
-
-sub create_template {
-    my $name = shift;
-    my $child_templateid = shift;
-
-    my ($result, $templateid, $options, $groupid);
-
-    unless ($zabbix->exist('hostgroup', {'name' => 'Templates - TLD'})) {
-        $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
-        $groupid = $result->{'groupids'}[0];
-    }
-    else {
-        $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates - TLD'}});
-        $groupid = $result->{'groupid'};
-    }
-
-    unless ($zabbix->exist('template',{'host' => $name})) {
-        $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
-
-        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-
-        $result = $zabbix->create('template', $options);
-        $templateid = $result->{'templateids'}[0];
-    }
-    else {
-        $result = $zabbix->get('template', {'filter' => {'host' => $name}});
-        $templateid = $result->{'templateid'};
-
-        $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
-        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-
-        $result = $zabbix->update('template', $options);
-        $templateid = $result->{'templateids'}[0];
-    }
-
-    return $templateid;
-}
-
-sub create_item {
-    my $options = shift;
-    my $result;
-
-    pfail("cannot add item: hostid not specified\n", Dumper($options)) unless (defined($options->{'hostid'}));
-
-    if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}})) {
-	$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
-
-	if ('ARRAY' eq ref($result))
-	{
-	    pfail("Request: ", Dumper($options),
-		  "returned more than one item with key ", $options->{'key_'}, ":\n",
-		  Dumper($result));
-	}
-
-	$options->{'itemid'} = $result->{'itemid'};
-
-	$result = $zabbix->update('item', $options);
-    }
-    else {
-        $result = $zabbix->create('item', $options);
-    }
-
-    $result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
-
-    pfail("cannot create item:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
-
-    return $result;
-}
-
-sub create_trigger {
-    my $options = shift;
-    my $result;
-
-    if ($zabbix->exist('trigger',{'expression' => $options->{'expression'}})) {
-        $result = $zabbix->update('trigger', $options);
-    }
-    else {
-        $result = $zabbix->create('trigger', $options);
-    }
-
-#    pfail("cannot create trigger:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
-
-    return $result;
-}
-
 sub create_item_dns_rtt {
     my $ns_name = shift;
     my $ip = shift;
@@ -569,7 +327,7 @@ sub create_item_dns_rtt {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'rsm_dns'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
 
     create_item($options);
 
@@ -657,7 +415,7 @@ sub create_slv_item {
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 3,
 					      'applications' => $applicationids,
-					      'valuemapid' => value_mappings->{'rsm_avail'}};
+					      'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
     }
     elsif ($value_type == VALUE_TYPE_PERC) {
 	$options = {'name' => $name,
@@ -666,13 +424,6 @@ sub create_slv_item {
                                               'type' => 2, 'value_type' => 0,
                                               'applications' => $applicationids,
 					      'units' => '%'};
-    }
-    elsif ($value_type == VALUE_TYPE_NUMBER) {
-	$options = {'name' => $name,
-                                              'key_'=> $key,
-                                              'hostid' => $hostid,
-                                              'type' => 2, 'value_type' => 3,
-                                              'applications' => $applicationids};
     }
     else {
 	pfail("Unknown value type $value_type.");
@@ -694,7 +445,7 @@ sub create_item_dns_udp_upd {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'rsm_dns'},
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'},
 		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
     return create_item($options);
 }
@@ -712,7 +463,7 @@ sub create_items_dns {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_dns_tcp_delay};
+                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.TCP.DELAY}'}};
 
     create_item($options);
 
@@ -732,7 +483,7 @@ sub create_items_dns {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_dns_udp_delay, 'valuemapid' => value_mappings->{'rsm_dns'}};
+                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
 
     create_item($options);
 
@@ -758,7 +509,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
     $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
@@ -768,7 +519,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
     $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: Internal error',
@@ -821,7 +572,7 @@ sub create_items_rdds {
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => value_mappings->{'rsm_rdds_rttudp'},
+		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
 		    'status' => 0};
 	create_item($options);
 
@@ -849,7 +600,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
     $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: Internal error',
@@ -894,8 +645,8 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('RDDS', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-					      'delay' => $cfg_rdds_delay,
-                                              'valuemapid' => value_mappings->{'rsm_rdds_avail'}};
+					      'delay' => $cfg_global_macros->{'{$RSM.RDDS.DELAY}'},
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_avail'}};
     create_item($options);
 }
 
@@ -914,7 +665,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 3, 'value_type' => 3,
-		'delay' => $cfg_epp_delay, 'valuemapid' => value_mappings->{'rsm_avail'}};
+		'delay' => $cfg_global_macros->{'{$RSM.EPP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
 
     create_item($options);
 
@@ -935,7 +686,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
@@ -946,7 +697,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
@@ -957,7 +708,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
@@ -1046,129 +797,6 @@ sub create_items_epp {
     create_trigger($options);
 }
 
-sub create_macro {
-    my $name = shift;
-    my $value = shift;
-    my $templateid = shift;
-    my $force_update = shift;
-
-    my $result;
-
-    if (defined($templateid)) {
-	if ($zabbix->get('usermacro',{'countOutput' => 1, 'hostids' => $templateid, 'filter' => {'macro' => $name}})) {
-	    $result = $zabbix->get('usermacro',{'output' => 'hostmacroid', 'hostids' => $templateid, 'filter' => {'macro' => $name}} );
-    	    $result = $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'}
-														     and defined($force_update);
-	}
-	else {
-	    $result = $zabbix->create('usermacro',{'hostid' => $templateid, 'macro' => $name, 'value' => $value});
-        }
-
-	return $result->{'hostmacroids'}[0];
-    }
-    else {
-	if ($zabbix->get('usermacro',{'countOutput' => 1, 'globalmacro' => 1, 'filter' => {'macro' => $name}})) {
-            $result = $zabbix->get('usermacro',{'output' => 'globalmacroid', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
-            $result = $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'}
-															and defined($force_update);
-        }
-        else {
-            $result = $zabbix->macro_global_create({'macro' => $name, 'value' => $value});
-        }
-
-	return $result->{'globalmacroids'}[0];
-    }
-
-}
-
-sub create_probe_status_template {
-    my $probe_name = shift;
-    my $child_templateid = shift;
-
-    my $template_name = 'Template '.$probe_name.' Status';
-
-    my $templateid = create_template($template_name, $child_templateid);
-
-    my $options = {'name' => 'Probe status ($1)',
-                                              'key_'=> 'rsm.probe.status[automatic,'.$root_servers_macros.']',
-                                              'hostid' => $templateid,
-                                              'applications' => [get_application_id('Probe status', $templateid)],
-                                              'type' => 3, 'value_type' => 3, 'delay' => cfg_probe_status_delay,
-                                              'valuemapid' => value_mappings->{'rsm_probe'}};
-
-    create_item($options);
-
-    $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago',
-                         'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
-                        'priority' => '3',
-                };
-
-    create_trigger($options);
-
-
-    $options = {'name' => 'Probe status ($1)',
-                                              'key_'=> 'rsm.probe.status[manual]',
-                                              'hostid' => $templateid,
-                                              'applications' => [get_application_id('Probe status', $templateid)],
-                                              'type' => 2, 'value_type' => 3,
-                                              'valuemapid' => value_mappings->{'rsm_probe'}};
-
-    create_item($options);
-
-    $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
-                         'expression' => '{'.$template_name.':rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"].last(0)}=0',
-                        'priority' => '4',
-                };
-
-    create_trigger($options);
-
-
-
-    return $templateid;
-}
-
-sub create_probe_template {
-    my $root_name = shift;
-
-    my $templateid = create_template('Template '.$root_name);
-
-    create_macro('{$RSM.IP4.ENABLED}', '1', $templateid);
-    create_macro('{$RSM.IP6.ENABLED}', '1', $templateid);
-    create_macro('{$RSM.RESOLVER}', '127.0.0.1', $templateid);
-    create_macro('{$RSM.RDDS.ENABLED}', '1', $templateid);
-    create_macro('{$RSM.EPP.ENABLED}', '1', $templateid);
-
-    return $templateid;
-}
-
-sub update_root_servers {
-    my $content = LWP::UserAgent->new->get('http://www.internic.net/zones/named.root')->{'_content'};
-
-    my $macro_value_v4 = "";
-    my $macro_value_v6 = "";
-
-    return unless defined $content;
-
-    for my $str (split("\n", $content)) {
-	if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/) {
-	    $macro_value_v4 .= ',' if ($macro_value_v4 ne "");
-	    $macro_value_v4 .= $1;
-	}
-
-	if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/) {
-	    $macro_value_v6 .= ',' if ($macro_value_v6 ne "");
-	    $macro_value_v6 .= $1;
-        }
-    }
-
-    print("macro_value_v4:$macro_value_v4\n");
-    print("macro_value_v6:$macro_value_v6\n");
-
-    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
-    create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
-
-    return '"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"';
-}
 
 sub trim
 {
@@ -1299,7 +927,9 @@ sub create_main_template {
 
     my $templateid = create_template($template_name);
 
-    pfail("cannot create Template '".$template_name."'") unless ($templateid);
+    pfail("Could not create main template for '".$tld."' TLD. ".$templateid->{'error'}->{'data'}) if check_api_error($templateid) eq true;
+
+    print Dumper($templateid);
 
     my $delay = 300;
     my $appid = get_application_id('Configuration', $templateid);
@@ -1314,9 +944,10 @@ sub create_main_template {
                     'applications' => [$appid],
                     'params' => '{$'.$m.'}',
                     'delay' => $delay,
-                    'type' => 15, 'value_type' => 3};
+                    'type' => ITEM_TYPE_CALCULATED, 'value_type' => ITEM_VALUE_TYPE_UINT64};
 
-        create_item($options);
+        my $itemid = create_item($options);
+	print Dumper($itemid);
     }
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
@@ -1379,11 +1010,8 @@ sub create_main_template {
     if ($OPTS{'epp-servers'})
     {
 	my $m = '{$RSM.EPP.KEYSALT}';
-	unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-		and defined $result->{'value'}) {
-	    pfail('cannot get macro ', $m);
-	}
-	my $keysalt = $result->{'value'};
+	my $keysalt = get_global_macro_value($m);
+	pfail('cannot get macro ', $m) unless defined($keysalt);
 	trim($keysalt);
 	pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
 
@@ -1420,9 +1048,6 @@ sub create_all_slv_ns_items {
     create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'rsm.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
     create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('DNS NS probes with results: $1 ($2)', 'rsm.slv.dns.ns.results['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('DNS NS probes with positive results: $1 ($2)', 'rsm.slv.dns.ns.positive['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('DNS NS required probes with positive results: $1 ($2)', 'rsm.slv.dns.ns.required['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUMBER, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
     create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
 
@@ -1491,7 +1116,7 @@ sub create_slv_items {
 	$triggerid = $triggerid->{'triggerids'}[0];
 
         if (defined($depend_down)) {
-            my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+            my $result = add_dependency($triggerid, $depend_down);
         }
 
         $depend_down = $triggerid;
@@ -1534,7 +1159,7 @@ sub create_slv_items {
     	    $triggerid = $triggerid->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	        my $result = add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;
@@ -1579,7 +1204,7 @@ sub create_slv_items {
     	    $triggerid = $triggerid->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	        my $result = add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;
@@ -1631,7 +1256,7 @@ sub create_slv_items {
     	    $triggerid = $triggerid->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	        my $result = add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;
@@ -1648,92 +1273,51 @@ sub create_rsm_items {
     my $options;
     my $appid = get_application_id('Configuration', $hostid);
 
-    my $delay = 60; # every minute
-    foreach my $m (
-	'RSM.INCIDENT.DNS.FAIL',
-	'RSM.INCIDENT.DNS.RECOVER',
-	'RSM.INCIDENT.DNSSEC.FAIL',
-	'RSM.INCIDENT.DNSSEC.RECOVER',
-	'RSM.INCIDENT.RDDS.FAIL',
-	'RSM.INCIDENT.RDDS.RECOVER',
-	'RSM.INCIDENT.EPP.FAIL',
-	'RSM.INCIDENT.EPP.RECOVER',
-	'RSM.DNS.UDP.DELAY',
-	'RSM.RDDS.DELAY',
-	'RSM.EPP.DELAY',
-	'RSM.DNS.UDP.RTT.HIGH',
-	'RSM.DNS.AVAIL.MINNS',
-	'RSM.DNS.ROLLWEEK.SLA',
-	'RSM.RDDS.ROLLWEEK.SLA',
-	'RSM.EPP.ROLLWEEK.SLA')
-    {
-	$options = {'name' => '$1 value',
-		   'key_'=> 'rsm.configvalue['.$m.']',
-		   'hostid' => $hostid,
-		   'applications' => [$appid],
-		   'params' => '{$'.$m.'}',
-		   'delay' => $delay,
-		   'type' => 15, 'value_type' => 3};
+    my $macros = { 
+		&TIME_MINUTE => [
+			'RSM.INCIDENT.DNS.FAIL',
+    			'RSM.INCIDENT.DNS.RECOVER',
+		        'RSM.INCIDENT.DNSSEC.FAIL',
+		        'RSM.INCIDENT.DNSSEC.RECOVER',
+		        'RSM.INCIDENT.RDDS.FAIL',
+		        'RSM.INCIDENT.RDDS.RECOVER',
+		        'RSM.INCIDENT.EPP.FAIL',
+		        'RSM.INCIDENT.EPP.RECOVER',                                     
+		        'RSM.DNS.UDP.DELAY',                                            
+		        'RSM.RDDS.DELAY',                                               
+		        'RSM.EPP.DELAY',                                                
+		        'RSM.DNS.UDP.RTT.HIGH',                                         
+		        'RSM.DNS.AVAIL.MINNS',                                          
+		        'RSM.DNS.ROLLWEEK.SLA',                                         
+		        'RSM.RDDS.ROLLWEEK.SLA',
+		        'RSM.EPP.ROLLWEEK.SLA'
+		],
+		&TIME_DAY => [
+			'RSM.SLV.DNS.UDP.RTT',
+		        'RSM.SLV.DNS.TCP.RTT',
+		        'RSM.SLV.NS.AVAIL',
+		        'RSM.SLV.RDDS43.RTT',
+		        'RSM.SLV.RDDS80.RTT',
+		        'RSM.SLV.RDDS.UPD',
+		        'RSM.SLV.DNS.NS.UPD',
+		        'RSM.SLV.EPP.LOGIN',
+		        'RSM.SLV.EPP.UPDATE',
+		        'RSM.SLV.EPP.INFO'
+		]};
 
-	create_item($options);
-    }
+    foreach my $delay (keys %{$macros}) {
+	foreach my $macro (@{$macros->{$delay}}) {
+	    $options = {'name' => '$1 value',
+                   'key_'=> 'rsm.configvalue['.$macro.']',
+                   'hostid' => $hostid,
+                   'applications' => [$appid],
+                   'params' => '{$'.$macro.'}',
+                   'delay' => $delay,
+                   'type' => ITEM_TYPE_CALCULATED, 'value_type' => ITEM_VALUE_TYPE_UINT64};
 
-    $delay = 60 * 60 * 24; # every day
-    foreach my $m (
-	'RSM.SLV.DNS.UDP.RTT',
-	'RSM.SLV.DNS.TCP.RTT',
-	'RSM.SLV.NS.AVAIL',
-	'RSM.SLV.RDDS43.RTT',
-	'RSM.SLV.RDDS80.RTT',
-	'RSM.SLV.RDDS.UPD',
-	'RSM.SLV.DNS.NS.UPD',
-	'RSM.SLV.EPP.LOGIN',
-	'RSM.SLV.EPP.UPDATE',
-	'RSM.SLV.EPP.INFO')
-    {
-	$options = {'name' => '$1 value',
-		   'key_'=> 'rsm.configvalue['.$m.']',
-		   'hostid' => $hostid,
-		   'applications' => [$appid],
-		   'params' => '{$'.$m.'}',
-		   'delay' => $delay,
-		   'type' => 15, 'value_type' => 3};
+    	    my $itemid = create_item($options);
 
-	create_item($options);
-    }
-}
-
-sub pfail {
-    print("Error: ", @_, "\n");
-    exit -1;
-}
-
-sub create_cron_items {
-    my $slv_path = $config->{'slv'}->{'path'};
-
-    my $rv = opendir DIR, $slv_path;
-
-    pfail("cannot open $slv_path") unless ($rv);
-
-    my $avail_shift = 30;
-    my $rollweek_shift = 0;
-
-    my $slv_file;
-    while (($slv_file = readdir DIR)) {
-	next unless ($slv_file =~ /^rsm\.slv\..*\.pl$/);
-
-	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
-	    # check monthly data once a day
-	    system("echo '0 0 * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
-	} elsif ($slv_file =~ /\.slv\..*\.avail\.pl$/) {
-	    # separate rollweek and avail by some delay
-	    system("echo '* * * * * root sleep $avail_shift; $slv_path/$slv_file' > /etc/cron.d/$slv_file");
-	    $avail_shift += 5;
-	    $avail_shift = 30 unless ($avail_shift < 60);
-	} else {
-	    system("echo '* * * * * root sleep $rollweek_shift; $slv_path/$slv_file' > /etc/cron.d/$slv_file");
-	    $rollweek_shift += 5;
-	    $rollweek_shift = 0 unless ($rollweek_shift < 30);
+	    pfail($itemid->{'data'}) if check_api_error($itemid) eq true;
 	}
     }
 }
@@ -1799,6 +1383,16 @@ Other options
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
         --only-cron
 		only create cron jobs and exit
+The default option is add new TLD. There is possible to --delete or --disable a part of TLD or all of TLD objects
+	--epp
+		Action with EPP
+		(default: no)
+	--dns
+		Action with DNS
+		(default: no)
+	--rdds
+		Action with RDDS
+		(default: no)
         --help
                 display this message
 EOF
@@ -1811,8 +1405,8 @@ sub validate_input {
     return if (defined($OPTS{'only-cron'}));
 
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
-    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
-    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
+    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and (!defined($OPTS{'ipv4'}) or !defined($OPTS{'ipv6'})));
+    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
 									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
@@ -1825,6 +1419,10 @@ sub validate_input {
 	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP Server certificate file must be specified (--epp-servercert)\n" unless ($OPTS{'epp-servercert'});
     }
+
+    $OPTS{'dns'} = 0 unless defined $OPTS{'dns'};
+    $OPTS{'rdds'} = 0 unless defined $OPTS{'rdds'};
+    $OPTS{'epp'} = 0 unless defined $OPTS{'epp'};
 
     unless ($msg eq "") {
 	print($msg);
@@ -1842,156 +1440,257 @@ sub lc_options {
     }
 }
 
-sub create_probe_status_host {
-    my $groupid = shift;
-
-    my $name = 'Probes Status';
-
-    my $hostid = create_host({'groups' => [{'groupid' => $groupid}],
-                                          'host' => $name,
-                                          'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1,
-                                                            'ip'=> '127.0.0.1',
-                                                            'dns' => '', 'port' => '10050'}]
-                });
-
-    my $interfaceid = $zabbix->get('hostinterface', {'hostids' => $hostid, 'output' => ['interfaceid']});
-
-    my $options = {'name' => 'Total number of probes for DNS tests',
-                                              'key_'=> 'online.nodes.pl[total,dns]',
-                                              'hostid' => $hostid,
-					      'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-					      'delay' => 300,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Number of online probes for DNS tests',
-                                              'key_'=> 'online.nodes.pl[online,dns]',
-                                              'hostid' => $hostid,
-					      'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-					      'delay' => 60,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Total number of probes for EPP tests',
-                                              'key_'=> 'online.nodes.pl[total,epp]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 300,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Number of online probes for EPP tests',
-                                              'key_'=> 'online.nodes.pl[online,epp]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 60,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Total number of probes for RDDS tests',
-                                              'key_'=> 'online.nodes.pl[total,rdds]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 300,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Number of online probes for RDDS tests',
-                                              'key_'=> 'online.nodes.pl[online,rdds]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 60,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Total number of probes with enabled IPv4',
-                                              'key_'=> 'online.nodes.pl[total,ipv4]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 300,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Number of online probes with enabled IPv4',
-                                              'key_'=> 'online.nodes.pl[online,ipv4]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 60,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Total number of probes with enabled IPv6',
-                                              'key_'=> 'online.nodes.pl[total,ipv6]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 300,
-                                              };
-    create_item($options);
-
-    $options = {'name' => 'Number of online probes with enabled IPv6',
-                                              'key_'=> 'online.nodes.pl[online,ipv6]',
-                                              'hostid' => $hostid,
-                                              'interfaceid' => $interfaceid->{'interfaceid'},
-                                              'applications' => [get_application_id('Probes availability', $hostid)],
-                                              'type' => 10, 'value_type' => 3,
-                                              'delay' => 60,
-                                              };
-    create_item($options);
-
-    $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.DNS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$RSM.DNS.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.RDDS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,rdds].last(0)}<{$RSM.RDDS.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.EPP.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$RSM.EPP.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP4.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$RSM.IP4.MIN.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP6.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$RSM.IP6.MIN.PROBE.ONLINE}',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
-}
-
 sub add_default_actions() {
 
+}
+
+sub create_global_macros() {
+    create_macro('{$RSM.IP4.MIN.PROBE.ONLINE}', 2, undef);
+    create_macro('{$RSM.IP6.MIN.PROBE.ONLINE}', 2, undef);
+
+    create_macro('{$RSM.IP4.MIN.SERVERS}', 4, undef);
+    create_macro('{$RSM.IP6.MIN.SERVERS}', 4, undef);
+    create_macro('{$RSM.IP4.REPLY.MS}', 500, undef);
+    create_macro('{$RSM.IP6.REPLY.MS}', 500, undef);
+
+    create_macro('{$RSM.DNS.TCP.RTT.LOW}', 1500, undef);
+    create_macro('{$RSM.DNS.TCP.RTT.HIGH}', 7500, undef);
+    create_macro('{$RSM.DNS.UDP.RTT.LOW}', 500, undef);
+    create_macro('{$RSM.DNS.UDP.RTT.HIGH}', 2500, undef);
+    create_macro('{$RSM.DNS.UDP.DELAY}', 60, undef);
+    create_macro('{$RSM.DNS.TCP.DELAY}', 60, undef);
+    create_macro('{$RSM.DNS.UPDATE.TIME}', 3600, undef);
+    create_macro('{$RSM.DNS.PROBE.ONLINE}', 2, undef);
+    create_macro('{$RSM.DNS.AVAIL.MINNS}', 2, undef);
+    create_macro('{$RSM.DNS.ROLLWEEK.SLA}', 60, undef);
+
+    create_macro('{$RSM.RDDS.RTT.LOW}', 2000, undef);
+    create_macro('{$RSM.RDDS.RTT.HIGH}', 10000, undef);
+    create_macro('{$RSM.RDDS.DELAY}', 60, undef);
+    create_macro('{$RSM.RDDS.UPDATE.TIME}', 3600, undef);
+    create_macro('{$RSM.RDDS.PROBE.ONLINE}', 2, undef);
+    create_macro('{$RSM.RDDS.ROLLWEEK.SLA}', 60, undef);
+    create_macro('{$RSM.RDDS.MAXREDIRS}', 10, undef);
+
+    create_macro('{$RSM.EPP.DELAY}', 60, undef);
+    create_macro('{$RSM.EPP.LOGIN.RTT.LOW}', 4000, undef);
+    create_macro('{$RSM.EPP.LOGIN.RTT.HIGH}', 20000, undef);
+    create_macro('{$RSM.EPP.UPDATE.RTT.LOW}', 4000, undef);
+    create_macro('{$RSM.EPP.UPDATE.RTT.HIGH}', 20000, undef);
+    create_macro('{$RSM.EPP.INFO.RTT.LOW}', 2000, undef);
+    create_macro('{$RSM.EPP.INFO.RTT.HIGH}', 10000, undef);
+    create_macro('{$RSM.EPP.PROBE.ONLINE}', 2, undef);
+    create_macro('{$RSM.EPP.ROLLWEEK.SLA}', 60, undef);
+
+    create_macro('{$RSM.PROBE.ONLINE.DELAY}', 60, undef);
+
+    create_macro('{$RSM.TRIG.DOWNCOUNT}', '#1', undef);
+    create_macro('{$RSM.TRIG.UPCOUNT}', '#3', undef);
+
+    create_macro('{$RSM.INCIDENT.DNS.FAIL}', 3, undef);
+    create_macro('{$RSM.INCIDENT.DNS.RECOVER}', 3, undef);
+    create_macro('{$RSM.INCIDENT.DNSSEC.FAIL}', 3, undef);
+    create_macro('{$RSM.INCIDENT.DNSSEC.RECOVER}', 3, undef);
+    create_macro('{$RSM.INCIDENT.RDDS.FAIL}', 2, undef);
+    create_macro('{$RSM.INCIDENT.RDDS.RECOVER}', 2, undef);
+    create_macro('{$RSM.INCIDENT.EPP.FAIL}', 2, undef);
+    create_macro('{$RSM.INCIDENT.EPP.RECOVER}', 2, undef);
+
+    create_macro('{$RSM.SLV.DNS.UDP.RTT}', 99, undef);
+    create_macro('{$RSM.SLV.DNS.TCP.RTT}', 99, undef);
+    create_macro('{$RSM.SLV.NS.AVAIL}', 99, undef);
+    create_macro('{$RSM.SLV.RDDS43.RTT}', 99, undef);
+    create_macro('{$RSM.SLV.RDDS80.RTT}', 99, undef);
+    create_macro('{$RSM.SLV.RDDS.UPD}', 99, undef);
+    create_macro('{$RSM.SLV.DNS.NS.UPD}', 99, undef);
+    create_macro('{$RSM.SLV.EPP.LOGIN}', 99, undef);
+    create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
+    create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
+
+    create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', RSM_ROLLWEEK_THRESHOLDS, undef);
+    create_macro('{$RSM.ROLLWEEK.SECONDS}', 7200, undef);
+    create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef); # For finding unreachable probes. Probes are considered unreachable if last access time is over this limit of seconds.
+}
+
+sub create_tld_host($$$) {
+    my $tld_name = shift;
+    my $tld_groupid = shift;
+    my $tlds_groupid = shift;
+
+    my $tld_hostid = create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $tlds_groupid}],
+                              'host' => $tld_name,
+                              'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+
+    create_slv_items($ns_servers, $tld_hostid, $tld_name);
+
+    return $tld_hostid;
+}
+
+sub create_probe_health_tmpl() {
+    my $templateid = create_template('Template Proxy Health', LINUX_TEMPLATEID);
+
+    my $item_key = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
+
+    my $options = {'name' => 'Availability of $2 Probe',
+                                          'key_'=> $item_key,
+                                          'hostid' => $templateid,
+                                          'applications' => [get_application_id('Probe Availability', $templateid)],
+                                          'type' => 5, 'value_type' => 3,
+                                          'units' => 'unixtime', delay => '60'};
+
+    create_item($options);
+
+    $options = { 'description' => 'PROBE {HOST.NAME}: Probe {$RSM.PROXY_NAME} is not available',
+                     'expression' => '{Template Proxy Health:'.$item_key.'.fuzzytime(2m)}=0',
+                    'priority' => '4',
+            };
+
+    create_trigger($options);
+
+    return $templateid;
+}
+
+sub manage_tld_objects($$$$$) {
+    my $action = shift;
+    my $tld = shift;
+    my $dns = shift;
+    my $epp = shift;
+    my $rdds = shift;
+
+    my $types = {'dns' => $dns, 'epp' => $epp, 'rdds' => $rdds};
+
+    my $main_temlateid;
+
+    my @tld_hostids;
+
+    print "Trying to $action '$tld' TLD\n";
+
+    print "Getting main host of the TLD: ";
+    my $main_hostid = get_host($tld, false);
+
+    if (scalar(%{$main_hostid})) {                                         
+        $main_hostid = $main_hostid->{'hostid'};                                
+	print "success\n";
+    }                                                                 
+    else {                                                            
+        print "Could not find '$tld' host\n";                         
+        exit;                                                         
+    }
+
+    print "Getting main template of the TLD: ";
+    my $tld_template = get_template('Template '.$tld, false, true);
+
+    if (scalar(%{$tld_template})) {
+        $main_templateid = $tld_template->{'templateid'};
+	print "success\n";
+    }                                                                 
+    else {                                                            
+        print "Could not find 'Template .$tld' template\n";
+        exit;                                                        
+    }
+
+    foreach my $host (@{$tld_template->{'hosts'}}) {
+	push @tld_hostids, $host->{'hostid'};
+    }
+
+
+    if ($dns eq true and $epp eq true and $rdds eq true) {
+	print "You have choosed all possible options. Trying to $action TLD.\n";
+
+	my @tmp_hostids;
+	my @hostids_arr;
+
+	push @tmp_hostids, {'hostid' => $main_hostid};
+
+	foreach my $hostid (@tld_hostids) {
+                push @tmp_hostids, {'hostid' => $hostid};
+		push @hostids_arr, $hostid;
+        }
+
+	if ($action eq 'disable') {
+	    my $result = disable_hosts(\@tmp_hostids);
+	    
+	    if (scalar(%{$result})) {
+		compare_arrays(\@hostids_arr, \@{$result->{'hostids'}});
+	    }
+	    else {
+		print "An error happened while removing hosts!\n";
+	    }
+
+
+	    exit;
+	}
+    
+	if ($action eq 'delete') {
+	    remove_hosts( \@tmp_hostids );
+	    remove_templates([ $main_templateid ]);
+	    
+	    my $hostgroupid = get_host_group('TLD '.$tld, false);
+	    $hostgroupid = $hostgroupid->{'groupid'};
+	    remove_hostgroups( [ $hostgroupid ] );
+	    return;	    
+	}
+    }
+
+    foreach my $type (keys %{$types}) {
+	next if $types->{$type} eq false;
+
+	my @itemids;
+
+	my $template_items = get_items_like($main_templateid, $type, true);
+	my $host_items = get_items_like($main_hostid, $type, false);
+
+	if (scalar(%{$template_items})) {
+	    foreach my $itemid (%{$template_items}) {
+		push @itemids, $itemid;
+	    }
+	}
+	else {
+	    print "Could not find $type related items on the template level\n";
+	}
+
+	if (scalar(%{$host_items})) {
+	    foreach my $itemid (%{$host_items}) {
+		push @itemids, $itemid;
+	    }
+	}
+	else {
+	    print "Could not find $type related items on host level\n";
+	}
+
+	if ($action eq 'disable' and scalar(@itemids)) {
+	    disable_items(\@itemids);
+	}
+
+	if ($action eq 'delete' and scalar(@itemids)) {
+	    remove_items(\@itemids);
+#	    remove_applications_by_items(\@itemids);
+	}
+    }
+}
+
+sub compare_arrays($$) {
+    my $array_A = shift;
+    my $array_B = shift;
+
+    my @result;
+
+    foreach my $a (@{$array_A}) {
+	my $found = false;
+	foreach $b (@${array_B}) {
+	    $found = true if $a eq $b;
+	}
+	
+	push @result, $a if $found eq false;
+    }
+
+    return @result;
+}
+
+sub check_api_error($) {
+    my $str = shift;
+
+    return true if 'HASH' eq ref($str) and defined $str->{'error'};
+
+    return false;
 }
