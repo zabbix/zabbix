@@ -531,28 +531,29 @@ class CDRule extends CApiService {
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
 			$newChecks = array();
+			$oldChecks = array();
 
 			foreach ($dRule['dchecks'] as $cnum => $check) {
-				if (!isset($check['druleid'])) {
-					$check['druleid'] = $dRule['druleid'];
+				$check['druleid'] = $dRule['druleid'];
+
+				if (substr($cnum, 0, 3) === 'new') {
 					unset($check['dcheckid']);
-
 					$newChecks[] = array_merge($defaultValues, $check);
-
-					unset($dRule['dchecks'][$cnum]);
+				} else {
+					$oldChecks[] = $check;
 				}
 			}
 
 			$delDCheckIds = array_diff(
 				zbx_objectValues($dbChecks, 'dcheckid'),
-				zbx_objectValues($dRule['dchecks'], 'dcheckid')
+				zbx_objectValues($oldChecks, 'dcheckid')
 			);
 
 			if ($delDCheckIds) {
 				$this->deleteActionConditions($delDCheckIds);
 			}
 
-			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
+			DB::replace('dchecks', $dbChecks, array_merge($oldChecks, $newChecks));
 		}
 
 		DB::update('drules', $dRulesUpdate);
