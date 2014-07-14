@@ -38,7 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = new Curl($url);
+	$curl = new CUrl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
 	exit;
@@ -180,7 +180,7 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }
 
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occurred
 function dowHrMinToSec($dow, $hr, $min) {
 	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
 		return false;
@@ -205,7 +205,7 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Retun 'Never' if 0.
+// Convert timestamp to string representation. Return 'Never' if 0.
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
@@ -617,7 +617,7 @@ function convert_units($options = array()) {
 	}
 
 	// any other unit
-	// black list wich do not require units metrics..
+	// black list of units that should have no multiplier prefix (K, M, G etc) applied
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
@@ -686,7 +686,7 @@ function convert_units($options = array()) {
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip mili & micro for values without units
+			// skip milli & micro for values without units
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -813,7 +813,7 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parametr as integer either
+// accepts parameter as integer either
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1411,37 +1411,42 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @param string $sort
  * @param string $sortorder
+ * @param array $allowedColumns
  *
- * @retur void
+ * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
 	$_REQUEST['sort'] = getPageSortField($sort);
 	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
-		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
+		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
+			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
+			invalid_url();
+		}
+
+		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
+			));
+			invalid_url();
+		}
+
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
-
-	if (!str_in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		$_REQUEST['sortorder'] = ZBX_SORT_UP;
-	}
-
-	CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 }
 
 // creates header col for sorting in table header
-function make_sorting_header($obj, $tabfield, $url = '') {
+function make_sorting_header($obj, $tabfield) {
 	global $page;
 
 	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-	$link = new Curl($url);
-	if (empty($url)) {
-		$link->formatGetArguments();
-	}
+	$link = CUrlFactory::getContextUrl();
+
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
 
@@ -1536,12 +1541,10 @@ function getPageNumber() {
  * Returns paging line.
  *
  * @param array $items				list of items
- * @param array $removeUrlParams	params to remove from URL
- * @param array $urlParams			params to add in URL
  *
  * @return CTable
  */
-function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
+function getPagingLine(&$items) {
 	global $page;
 
 	$config = select_config();
@@ -1591,18 +1594,7 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 	$table = null;
 
 	if ($pagesCount > 1) {
-		$url = new Curl();
-
-		if (is_array($urlParams) && $urlParams) {
-			foreach ($urlParams as $key => $value) {
-				$url->setArgument($key, $value);
-			}
-		}
-
-		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));
-		foreach ($removeUrlParams as $param) {
-			$url->removeArgument($param);
-		}
+		$url = CUrlFactory::getContextUrl();
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
@@ -2121,13 +2113,15 @@ function get_status() {
 	$dbTriggers = DBselect(
 		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
 			' FROM triggers t'.
-			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-			' INNER JOIN items i ON f.itemid=i.itemid'.
-			' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-			' GROUP BY t.status,t.value');
+			' WHERE NOT EXISTS ('.
+				'SELECT f.functionid FROM functions f'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' JOIN hosts h ON i.hostid=h.hostid'.
+					' WHERE f.triggerid=t.triggerid AND (i.status<>'.ITEM_STATUS_ACTIVE.' OR h.status<>'.HOST_STATUS_MONITORED.')'.
+				')'.
+			' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+			' GROUP BY t.status,t.value'
+		);
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:

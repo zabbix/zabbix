@@ -103,7 +103,7 @@ $fields = array(
 		'isset({save})&&isset({type})&&{type}=='.ITEM_TYPE_SNMPV3.'&&{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV),
 	'snmpv3_privpassphrase' =>	array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({type})&&{type}=='.ITEM_TYPE_SNMPV3.'&&{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV),
-	'ipmi_sensor' =>			array(T_ZBX_STR, O_OPT, NO_TRIM, NOT_EMPTY,
+	'ipmi_sensor' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM, NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.ITEM_TYPE_IPMI, _('IPMI sensor')),
 	'trapper_hosts' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&{type}==2'),
 	'units' =>					array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({value_type})&&'.
@@ -178,7 +178,7 @@ $fields = array(
 	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'history', 'trends', 'status', 'type'));
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
@@ -1163,7 +1163,7 @@ else {
 		order_result($data['items'], $data['sortfield'], getPageSortOrder());
 	}
 
-	$data['paging'] = getPagingLine($data['items'], array('itemid'));
+	$data['paging'] = getPagingLine($data['items']);
 
 	$itemTriggerIds = array();
 	foreach ($data['items'] as $item) {

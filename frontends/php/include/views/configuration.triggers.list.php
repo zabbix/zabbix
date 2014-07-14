@@ -94,7 +94,7 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$link = new Curl();
+$link = new CUrl();
 if (!empty($this->data['parent_discoveryid'])) {
 	$link->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -217,7 +217,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && !zbx_empty($trigger['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($trigger['error'], '', 'on');
+			$info->setHint($trigger['error'], 'on');
 		}
 		else {
 			$info = '';

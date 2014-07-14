@@ -41,7 +41,7 @@ $fields = array(
 	'command' =>			array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
-	'access' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({save})'),
+	'host_access' =>		array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({save})'),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,			DB_ID,		'isset({save})&&{hgstype}!=0'),
 	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
 	'hgstype' =>			array(T_ZBX_INT, O_OPT, null,			null,		null),
@@ -60,7 +60,7 @@ check_fields($fields);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
@@ -108,7 +108,7 @@ elseif (isset($_REQUEST['save'])) {
 			'description' => $_REQUEST['description'],
 			'usrgrpid' => $_REQUEST['usrgrpid'],
 			'groupid' => $_REQUEST['groupid'],
-			'host_access' => $_REQUEST['access'],
+			'host_access' => getRequest('host_access'),
 			'confirmation' => get_request('confirmation', '')
 		);
 
@@ -196,7 +196,7 @@ if (isset($_REQUEST['form'])) {
 		$data['description'] = get_request('description', '');
 		$data['usrgrpid'] = get_request('usrgrpid', 0);
 		$data['groupid'] = get_request('groupid', 0);
-		$data['access'] = get_request('host_access', 0);
+		$data['host_access'] = getRequest('host_access', 0);
 		$data['confirmation'] = get_request('confirmation', '');
 		$data['enableConfirmation'] = get_request('enableConfirmation', false);
 		$data['hgstype'] = get_request('hgstype', 0);
@@ -215,29 +215,13 @@ if (isset($_REQUEST['form'])) {
 		$data['description'] = $script['description'];
 		$data['usrgrpid'] = $script['usrgrpid'];
 		$data['groupid'] = $script['groupid'];
-		$data['access'] = $script['host_access'];
+		$data['host_access'] = $script['host_access'];
 		$data['confirmation'] = $script['confirmation'];
 		$data['enableConfirmation'] = !zbx_empty($script['confirmation']);
 		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 
-	$scriptView = new CView('administration.script.edit');
-
-	$scriptView->set('form', $data['form']);
-	$scriptView->set('form_refresh', $data['form_refresh']);
-	$scriptView->set('scriptid', $data['scriptid']);
-	$scriptView->set('name', $data['name']);
-	$scriptView->set('type', $data['type']);
-	$scriptView->set('execute_on', $data['execute_on']);
-	$scriptView->set('command', $data['command']);
-	$scriptView->set('commandipmi', $data['commandipmi']);
-	$scriptView->set('description', $data['description']);
-	$scriptView->set('usrgrpid', $data['usrgrpid']);
-	$scriptView->set('groupid', $data['groupid']);
-	$scriptView->set('access', $data['access']);
-	$scriptView->set('confirmation', $data['confirmation']);
-	$scriptView->set('enableConfirmation', $data['enableConfirmation']);
-	$scriptView->set('hgstype', $data['hgstype']);
+	$scriptView = new CView('administration.script.edit', $data);
 
 	// get host gruop
 	$hostGroup = null;
@@ -302,7 +286,7 @@ else {
 
 	// sorting & paging
 	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['scripts'], array('scriptid'));
+	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view
 	$scriptView = new CView('administration.script.list', $data);

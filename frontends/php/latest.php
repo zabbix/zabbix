@@ -139,7 +139,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('host', 'name', 'lastclock'));
 
 $sortField = getPageSortField();
 $sortOrder = getPageSortOrder();
@@ -212,7 +212,7 @@ if ($items) {
 
 	if ($items) {
 		// get history
-		$history = Manager::History()->getLast($items, 2);
+		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
 		if (!$filterShowWithoutData) {
@@ -277,10 +277,11 @@ if ($items) {
 				'countOutput' => true,
 				'groupCount' => true
 			));
-
-			foreach ($screens as $screen) {
-				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
+			$screens = zbx_toHash($screens, 'hostid');
+			foreach ($hosts as &$host) {
+				$host['screens'] = isset($screens[$host['hostid']]);
 			}
+			unset($host);
 		}
 	}
 }
@@ -301,6 +302,7 @@ $form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $latestWidget->addHeader(_('Items'), $form);
 
 $filterForm = new CFormTable(null, null, 'get');
+$filterForm->setTableClass('formtable old-filter');
 $filterForm->setAttribute('name',' zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filterSelect, 20));
@@ -459,7 +461,7 @@ foreach ($items as $key => $item){
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], '', 'on');
+			$info->setHint($item['error'], 'on');
 		}
 		else {
 			$info = '';
@@ -638,7 +640,7 @@ foreach ($items as $item) {
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], '', 'on');
+			$info->setHint($item['error'], 'on');
 		}
 		else {
 			$info = '';

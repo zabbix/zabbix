@@ -38,7 +38,7 @@ $fields = array(
 	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'group_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'selusrgrp' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
 	'users' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save})'),
 	'users_status' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -70,10 +70,10 @@ $fields = array(
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
-	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,		 null,	null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
 $_REQUEST['debug_mode'] = get_request('debug_mode', 0);
@@ -465,7 +465,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['usergroups'], array('usrgrpid'));
+	$data['paging'] = getPagingLine($data['usergroups']);
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.list', $data);

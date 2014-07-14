@@ -6,6 +6,9 @@
 		});
 	});
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		if (!isset('object', list)) {
 			return false;

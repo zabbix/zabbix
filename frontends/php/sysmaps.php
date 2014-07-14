@@ -79,7 +79,7 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'width', 'height'));
 
 /*
  * Permissions
@@ -299,7 +299,7 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
+	$data['paging'] = getPagingLine($data['maps']);
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

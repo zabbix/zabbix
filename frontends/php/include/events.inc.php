@@ -359,7 +359,7 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
-					$ackLink->setHint($ackLinkHints, '', '', false);
+					$ackLink->setHint($ackLinkHints, '', false);
 				}
 				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}
@@ -388,7 +388,7 @@ function getLastEvents($options) {
 	$triggerOptions = array(
 		'filter' => array(),
 		'skipDependent' => 1,
-		'selectHosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'name'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,

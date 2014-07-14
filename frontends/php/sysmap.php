@@ -82,7 +82,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = API::Map()->update($sysmapUpdate);
 
 			if ($result !== false) {
-				echo 'if (Confirm("'._('Map is saved! Return?').'")) { location.href = "sysmaps.php"; }';
+				echo 'if (confirm('.CJs::encodeJson(_('Map is saved! Return?')).')) { location.href = "sysmaps.php"; }';
 			}
 			else {
 				throw new Exception(_('Map save operation failed.')."\n\r");

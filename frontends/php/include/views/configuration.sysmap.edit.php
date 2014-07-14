@@ -28,7 +28,7 @@ $sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
 $sysmapForm = new CForm();
 $sysmapForm->setName('map.edit.php');
 $sysmapForm->addVar('form', get_request('form', 1));
-$sysmapForm->addVar('form_refresh', get_request('form_refresh', 0) + 1);
+
 if (isset($this->data['sysmap']['sysmapid'])) {
 	$sysmapForm->addVar('sysmapid', $this->data['sysmap']['sysmapid']);
 }
@@ -60,7 +60,7 @@ $iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
 $iconMappingsLink->setAttribute('target', '_blank');
 $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
 
-// append multiple checkboxs to form list
+// append multiple checkboxes to form list
 $sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $this->data['sysmap']['highlight'], null, 1));
 $sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $this->data['sysmap']['markelements'], null, 1));
 $sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $this->data['sysmap']['expandproblem'], null, 1));

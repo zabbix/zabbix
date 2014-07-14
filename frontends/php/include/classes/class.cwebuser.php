@@ -23,6 +23,16 @@ class CWebUser {
 
 	public static $data = null;
 
+	/**
+	 * Tries to login a user and populates self::$data on success.
+	 *
+	 * @param string $login			user login
+	 * @param string $password		user password
+	 *
+	 * @throws Exception if user cannot be logged in
+	 *
+	 * @return bool
+	 */
 	public static function login($login, $password) {
 		try {
 			self::setDefault();
@@ -60,9 +70,7 @@ class CWebUser {
 			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie('zbx_sessionid')));
 
 			if ($result) {
-				zbx_setcookie('zbx_sessionid', self::$data['sessionid'],
-					self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0
-				);
+				self::setSessionCookie(self::$data['sessionid']);
 
 				add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, self::$data['userid'], '', null, null, null);
 			}
@@ -76,18 +84,18 @@ class CWebUser {
 	}
 
 	public static function logout() {
-		self::$data['sessionid'] = get_cookie('zbx_sessionid');
+		self::$data['sessionid'] = self::getSessionCookie();
 		self::$data = API::User()->logout();
 		zbx_unsetcookie('zbx_sessionid');
 	}
 
-	public static function checkAuthentication($sessionid) {
+	public static function checkAuthentication($sessionId) {
 		try {
-			if ($sessionid !== null) {
-				self::$data = API::User()->checkAuthentication(array($sessionid));
+			if ($sessionId !== null) {
+				self::$data = API::User()->checkAuthentication(array($sessionId));
 			}
 
-			if ($sessionid === null || empty(self::$data)) {
+			if ($sessionId === null || empty(self::$data)) {
 				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
@@ -99,21 +107,41 @@ class CWebUser {
 					clear_messages(1);
 					throw new Exception();
 				}
-				$sessionid = self::$data['sessionid'];
+				$sessionId = self::$data['sessionid'];
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
 
-			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
+			self::setSessionCookie($sessionId);
 
-			return true;
+			return $sessionId;
 		}
 		catch (Exception $e) {
 			self::setDefault();
 			return false;
 		}
+	}
+
+	/**
+	 * Shorthand method for setting current session ID in cookies.
+	 *
+	 * @param string $sessionId		Session ID string
+	 */
+	public static function setSessionCookie($sessionId) {
+		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
+
+		zbx_setcookie('zbx_sessionid', $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
+	}
+
+	/**
+	 * Retrieves current session ID from zbx_sessionid cookie.
+	 *
+	 * @return string
+	 */
+	public static function getSessionCookie() {
+		return get_cookie('zbx_sessionid');
 	}
 
 	public static function setDefault() {

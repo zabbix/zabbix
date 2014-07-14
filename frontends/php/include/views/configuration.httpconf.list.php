@@ -99,7 +99,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
 			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, '', 'on');
+			$infoIcon->setHint($errorMessage, 'on');
 		}
 		else {
 			$infoIcon = '';
@@ -133,19 +133,19 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 // create go buttons
 $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('activate', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected WEB scenarios?'));
+$goOption->setAttribute('confirm', _('Enable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm',_('Disable selected WEB scenarios?'));
+$goOption->setAttribute('confirm',_('Disable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('clean_history', _('Clear history for selected'));
-$goOption->setAttribute('confirm', _('Delete history of selected WEB scenarios?'));
+$goOption->setAttribute('confirm', _('Delete history of selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected WEB scenarios?'));
+$goOption->setAttribute('confirm', _('Delete selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');

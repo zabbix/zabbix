@@ -144,6 +144,16 @@ class GlobalRegExp {
 		return $result;
 	}
 
+	/**
+	 * Matches expression against test string, respecting expression type.
+	 *
+	 * @static
+	 *
+	 * @param array $expression
+	 * @param $string
+	 *
+	 * @return bool
+	 */
 	public static function matchExpression(array $expression, $string) {
 		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
 			$result = self::_matchRegular($expression, $string);
@@ -166,14 +176,31 @@ class GlobalRegExp {
 	 * @return bool
 	 */
 	private static function _matchRegular(array $expression, $string) {
+		$pattern = self::buildRegularExpression($expression);
+
+		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
+
+		return preg_match($pattern, $string) == $expectedResult;
+	}
+
+	/**
+	 * Combines regular expression provided as definition array into a string.
+	 *
+	 * @static
+	 *
+	 * @param array $expression
+	 *
+	 * @return string
+	 */
+	private static function buildRegularExpression(array $expression) {
+		$expression['expression'] = str_replace('/', '\/', $expression['expression']);
+
 		$pattern = '/'.$expression['expression'].'/';
 		if (!$expression['case_sensitive']) {
 			$pattern .= 'i';
 		}
 
-		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
-
-		return preg_match($pattern, $string) == $expectedResult;
+		return $pattern;
 	}
 
 	/**
@@ -198,16 +225,16 @@ class GlobalRegExp {
 
 		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
 
-		if ($expression['case_sensitive']) {
+		if (!$expression['case_sensitive']) {
 			$string = mb_strtolower($string);
 		}
 
 		foreach ($patterns as $pattern) {
-			if ($expression['case_sensitive']) {
+			if (!$expression['case_sensitive']) {
 				$pattern = mb_strtolower($pattern);
 			}
 
-			$pos = mb_strpos($pattern, $string);
+			$pos = mb_strpos($string, $pattern);
 			$tmp = (($pos !== false) == $expectedResult);
 
 			if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED && $tmp) {

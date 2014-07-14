@@ -78,7 +78,7 @@ if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = getRequest('go', 'none');
 
@@ -496,7 +496,7 @@ else {
 
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
-	$data['paging'] = getPagingLine($data['actions'], array('actionid'));
+	$data['paging'] = getPagingLine($data['actions']);
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

@@ -494,6 +494,7 @@ class CConfigurationExportBuilder {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
+				'bulk' => $interface['bulk'],
 				'interface_ref' => $interface['interface_ref']
 			);
 		}
@@ -845,6 +846,7 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
+				'application' => $element['application'],
 				'urls' => $this->formatMapElementUrls($element['urls'])
 			);
 		}

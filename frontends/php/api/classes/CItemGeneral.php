@@ -321,8 +321,8 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				$res = calculateItemNextcheck(0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
-				if ($res == ZBX_JAN_2038) {
+				$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $fullItem['delay_flex'], time());
+				if ($nextCheck == ZBX_JAN_2038) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Item will not be refreshed. Please enter a correct update interval.'));
 				}
@@ -621,7 +621,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @abstract
 	 *
 	 * @param array $items          an array of items to inherit
-	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, teh children will be updated on all
+	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, the children will be updated on all
 	 *                              child hosts
 	 *
 	 * @return bool

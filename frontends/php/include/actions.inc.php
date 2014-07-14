@@ -878,7 +878,7 @@ function getActionMessages(array $alerts) {
 		}
 		else {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($alert['error'], '', 'on');
+			$info->setHint($alert['error'], 'on');
 		}
 
 		$table->addRow(array(

@@ -701,7 +701,7 @@ class CScreenItem extends CApiService {
 	 */
 	protected function checkSpans(array $screenItem, array $screen) {
 		if (isset($screenItem['rowspan'])) {
-			if (!zbx_is_int($screenItem['rowspan']) || $screenItem['rowspan'] < 0) {
+			if (!zbx_is_int($screenItem['rowspan']) || $screenItem['rowspan'] < 1) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s(
@@ -715,7 +715,7 @@ class CScreenItem extends CApiService {
 		}
 
 		if (isset($screenItem['colspan'])) {
-			if (!zbx_is_int($screenItem['colspan']) || $screenItem['colspan'] < 0) {
+			if (!zbx_is_int($screenItem['colspan']) || $screenItem['colspan'] < 1) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s(
@@ -808,7 +808,10 @@ class CScreenItem extends CApiService {
 					continue;
 				}
 
-				if ($screenItem['x'] == $screenItem2['x'] && $screenItem['y'] == $screenItem2['y']) {
+				if ($screenItem['x'] == $screenItem2['x'] &&
+					$screenItem['y'] == $screenItem2['y'] &&
+					$screenItem['screenid'] == $screenItem2['screenid']
+				) {
 					$screenId = isset($screenItem['screenitemid'])
 						? $dbScreenItems[$screenItem['screenitemid']]['screenid']
 						: $screenItem['screenid'];

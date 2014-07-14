@@ -386,7 +386,6 @@ $tmplList = new CFormList('tmpllist');
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
 $linkedTemplateTable->attr('id', 'linkedTemplateTable');
-$linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoredTemplates = array();
@@ -413,7 +412,7 @@ foreach ($this->data['linkedTemplates'] as $template) {
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 
 // create new linked template table
 $newTemplateTable = new CTable(null, 'formElementTable');
@@ -423,7 +422,13 @@ $newTemplateTable->attr('style', 'min-width: 400px;');
 $newTemplateTable->addRow(array(new CMultiSelect(array(
 	'name' => 'add_templates[]',
 	'objectName' => 'templates',
-	'ignored' => $ignoredTemplates
+	'ignored' => $ignoredTemplates,
+	'popup' => array(
+		'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
+		'width' => 450,
+		'height' => 450
+	)
 ))));
 
 $newTemplateTable->addRow(
@@ -432,7 +437,7 @@ $newTemplateTable->addRow(
 	)
 );
 
-$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
