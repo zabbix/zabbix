@@ -528,7 +528,7 @@ else {
 			$options['groupids'] = $pageFilter->groupid;
 		}
 		else {
-			$options['groupids'] = array_keys($pageFilter->groups);
+			$options['groupids'] = null;
 		}
 	}
 	else {
