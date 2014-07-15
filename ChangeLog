@@ -5,6 +5,7 @@ New features:
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8467] removed "make_latest_issues" function extra argument (Oleg)
 ..F....... [ZBX-8436] fixed page layout being broken with IE8 in cases when item rows are added or removed (Krists)
 ..F....... [ZBX-8286] fixed undefined index when enabling or disabling hosts in a host group (Krists)
 .......PS. [ZBX-8037] added informative log message about Zabbix not upgrading SQLite3 databases (Juris)
