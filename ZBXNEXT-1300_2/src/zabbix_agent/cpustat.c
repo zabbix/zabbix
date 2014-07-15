@@ -716,7 +716,7 @@ int	get_cpu_statuses(zbx_vector_uint64_t *vector)
 
 		zbx_vector_uint64_append(vector, cpu->h_status[index]);
 #else
-		zbx_vector_uint64_append(vector, pcpus->cpu_counter[i]->status);
+		zbx_vector_uint64_append(vector, pcpus->cpu_counter[i + 1]->status);
 #endif
 	}
 
