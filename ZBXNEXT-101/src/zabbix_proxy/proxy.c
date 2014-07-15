@@ -35,6 +35,7 @@
 
 #include "daemon.h"
 #include "zbxself.h"
+#include "../libs/zbxnix/control.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
@@ -575,27 +576,14 @@ void	zbx_sigusr_handler(zbx_task_t task)
 	switch (((unsigned char *)&task)[0])
 	{
 		case ZBX_TASK_CONFIG_CACHE_RELOAD:
-			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-				zbx_wakeup();
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
+			zbx_wakeup();
 			break;
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
-			if (ZBX_PROCESS_TYPE_ALL == ((unsigned char *)&task)[1] ||
-				ZBX_PROCESS_TYPE_PID == ((unsigned char *)&task)[1] ||
-				process_type == ((unsigned char *)&task)[1])
-			{
-				set_debug_level(UP, get_process_type_string(process_type));
-			}
+			set_debug_level(UP, get_process_type_string(process_type));
 			break;
 		case ZBX_TASK_LOG_LEVEL_DECREASE:
-			if (ZBX_PROCESS_TYPE_ALL == ((unsigned char *)&task)[1] ||
-				ZBX_PROCESS_TYPE_PID == ((unsigned char *)&task)[1] ||
-				process_type == ((unsigned char *)&task)[1])
-			{
-				set_debug_level(DOWN, get_process_type_string(process_type));
-			}
+			set_debug_level(DOWN, get_process_type_string(process_type));
 			break;
 		default:
 			break;
@@ -613,109 +601,6 @@ void	zbx_sigusr_handler(zbx_task_t task)
 static void	zbx_free_config()
 {
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
-}
-
-static void	set_log_level_task(int log_level_mode, zbx_task_t *task)
-{
-	char	*delim1 = NULL, proc_name[MAX_PROCESS_NAME], *proc_number = NULL;
-	int	proc_number_digits, proc_type, i;
-	double	max_proc_num;
-
-	((char *)task)[0] = log_level_mode;
-
-	if (strlen(ZBX_LOG_LEVEL_INCREASE) == strlen(zbx_optarg) || strlen(ZBX_LOG_LEVEL_DECREASE) == strlen(zbx_optarg))
-	{
-		((char *)task)[1] = ZBX_PROCESS_TYPE_ALL;
-		((short *)task)[1] = 0;
-	}
-	else if (NULL != (delim1 = (char*) memchr(zbx_optarg, '=', strlen(ZBX_LOG_LEVEL_INCREASE) + 1)))
-	{
-		delim1++;
-
-		proc_number_digits = floor(log10(pow(2, MAX_PROCESS_NUMBER_BITS))) + 1;
-		proc_number = zbx_malloc(proc_number, proc_number_digits * sizeof(char));
-		max_proc_num = pow(2, MAX_PROCESS_NUMBER_BITS) - 1;
-
-		if (NULL != (char*) memchr(delim1, ',', MAX_PROCESS_NAME + 1))
-		{
-			char format[22];
-
-			zbx_snprintf(format, sizeof(format), "%%%d[^','],%%%ds", MAX_PROCESS_NAME, proc_number_digits + 1);
-
-			sscanf(delim1, format, proc_name, proc_number);
-
-			if (FAIL == (proc_type = compare_process_type_string(proc_name)))
-			{
-				printf("invalid runtime control option (process type): %s\n", proc_name);
-				exit(EXIT_FAILURE);
-			}
-
-			((char *)task)[1] = proc_type;
-
-			for (i = 0; i < strlen(proc_number); i++)
-			{
-				if (!isdigit(proc_number[i]))
-				{
-					printf ("invalid runtime control option (proccess number must contain only digits)\n");
-					exit(EXIT_FAILURE);
-				}
-			}
-
-			if (max_proc_num < atoi(proc_number))
-			{
-				printf ("invalid runtime control option (proccess number is out of range [0-%.0lf])\n", max_proc_num);
-				exit(EXIT_FAILURE);
-			}
-
-				((short *)task)[1] = atoi(proc_number);
-		}
-		else if (isdigit(delim1[0]))
-		{
-			char	format[4];
-
-			zbx_snprintf(format, sizeof(format), "%%%ds", proc_number_digits + 1);
-
-			sscanf(delim1, format, proc_number);
-
-			for (i = 0; i < strlen(proc_number); i++)
-			{
-				if (!isdigit(proc_number[i]))
-				{
-					printf ("invalid runtime control option (proccess number must contain only digits)\n");
-					exit(EXIT_FAILURE);
-				}
-			}
-
-			if (max_proc_num < atoi(proc_number))
-			{
-				printf ("invalid runtime control option (proccess number is out of range [0-%.0lf])\n", max_proc_num);
-				exit(EXIT_FAILURE);
-			}
-
-			((char *)task)[1] = ZBX_PROCESS_TYPE_PID;
-			((short *)task)[1] = atoi(delim1);
-		}
-		else
-		{
-			int	proc_type;
-
-			if (FAIL == (proc_type = compare_process_type_string(delim1)))
-			{
-				printf("invalid runtime control option (process type): %s\n", delim1);
-				exit(EXIT_FAILURE);
-			}
-
-			((char *)task)[1] = proc_type;
-			((short *)task)[1] = 0;
-		}
-
-		zbx_free(proc_number);
-	}
-	else
-	{
-		printf("invalid runtime control option: %s\n", zbx_optarg);
-		exit(EXIT_FAILURE);
-	}
 }
 
 /******************************************************************************
@@ -747,11 +632,17 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
-					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
+					((char *)&task)[0] = ZBX_TASK_CONFIG_CACHE_RELOAD;
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
-					set_log_level_task(ZBX_TASK_LOG_LEVEL_INCREASE, &task);
+				{
+					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE), &task, get_process_type_by_name);
+				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE, strlen(ZBX_LOG_LEVEL_DECREASE)))
-					set_log_level_task(ZBX_TASK_LOG_LEVEL_DECREASE, &task);
+				{
+					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE), &task, get_process_type_by_name);
+				}
 				else
 				{
 					printf("invalid runtime control option: %s\n", zbx_optarg);
@@ -781,8 +672,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_CONFIG_CACHE_RELOAD == ((char *)&task)[0] || ZBX_TASK_LOG_LEVEL_INCREASE == ((char *)&task)[0] ||
-			ZBX_TASK_LOG_LEVEL_DECREASE == ((char *)&task)[0])
+	if (ZBX_TASK_START != task)
 	{
 		exit(SUCCEED == zbx_sigusr_send(task) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
