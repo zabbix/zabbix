@@ -23,7 +23,7 @@
 static const char	copyright_message[] =
 	"Copyright (C) 2014 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
-	"This is free software: you are free to change and redistribute it.\n"
+	"This is free software: you are free to change and redistribute it according to the license.\n"
 	"There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
