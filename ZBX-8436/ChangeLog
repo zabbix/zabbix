@@ -1,9 +1,11 @@
 Changes for 2.3.3
 
 New features:
+...G...... [ZBXNEXT-1300] added low-level discovery support for enumerating CPUs on all supported platforms (Juris)
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8286] fixed undefined index when enabling or disabling hosts in a host group (Krists)
 .......PS. [ZBX-8037] added informative log message about Zabbix not upgrading SQLite3 databases (Juris)
 ..F....... [ZBX-8425] fixed "Host status" widget displaying problematic host if one of its groups is set to hidden in dashboard filter (Ivo)
 
