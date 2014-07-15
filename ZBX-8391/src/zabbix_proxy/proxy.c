@@ -539,6 +539,7 @@ int	main(int argc, char **argv)
 {
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch;
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -551,9 +552,12 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'R':
+				opt_r++;
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
 				else
@@ -575,6 +579,37 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 		}
+	}
+
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_r)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* check for mutually exclusive options */
+	if (0 < opt_c && 0 < opt_r)
+	{
+		zbx_error("options \"-c\" and \"-R\" cannot be used together");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are not allowed. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_FILE)
