@@ -5,6 +5,7 @@ New features:
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8436] fixed page layout being broken with IE8 in cases when item rows are added or removed (Krists)
 ..F....... [ZBX-8286] fixed undefined index when enabling or disabling hosts in a host group (Krists)
 .......PS. [ZBX-8037] added informative log message about Zabbix not upgrading SQLite3 databases (Juris)
 ..F....... [ZBX-8425] fixed "Host status" widget displaying problematic host if one of its groups is set to hidden in dashboard filter (Ivo)
