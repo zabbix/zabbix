@@ -272,7 +272,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
 	wchar_t 	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL, *pCh,
-			aInsertStrings[MAX_INSERT_STRS];
+			*aInsertStrings[MAX_INSERT_STRS];
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
