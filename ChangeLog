@@ -1,6 +1,7 @@
 Changes for 2.3.3
 
 New features:
+...G...... [ZBXNEXT-1300] added low-level discovery support for enumerating CPUs on all supported platforms (Juris)
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
