@@ -645,7 +645,7 @@ int	main(int argc, char **argv)
 				}
 				else
 				{
-					printf("invalid runtime control option: %s\n", zbx_optarg);
+					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
 				break;
