@@ -54,8 +54,8 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		zbx_json_addobject(&json, NULL);
 
-		zbx_json_adduint64(&json, "{#CPUID}", i);
-		zbx_json_addstring(&json, "{#STATUS}", (PERF_COUNTER_ACTIVE == cpus.values[i]) ?
+		zbx_json_adduint64(&json, "{#CPU.NUMBER}", i);
+		zbx_json_addstring(&json, "{#CPU.STATUS}", (PERF_COUNTER_ACTIVE == cpus.values[i]) ?
 				"online" :
 				(PERF_COUNTER_INITIALIZED == cpus.values[i]) ? "unknown" : "offline",
 				ZBX_JSON_TYPE_STRING);
