@@ -200,7 +200,7 @@ elseif (hasRequest('go')) {
 			DBstart();
 
 			$hosts = API::Host()->get(array(
-				'output' => array('hostid', 'status'),
+				'output' => array('hostid', 'status', 'host'),
 				'groupids' => $groupIds,
 				'editable' => true
 			));
