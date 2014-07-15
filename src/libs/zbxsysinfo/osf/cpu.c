@@ -25,7 +25,7 @@
 
 int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, i;
+	int			i;
 	zbx_vector_uint64_t	cpus;
 	struct zbx_json		json;
 
@@ -35,7 +35,7 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		zbx_vector_uint64_destroy(&cpus);
-		return ret;
+		return SYSINFO_RET_FAIL;
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -58,9 +58,7 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&json);
 	zbx_vector_uint64_destroy(&cpus);
 
-	ret = SYSINFO_RET_OK;
-
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
