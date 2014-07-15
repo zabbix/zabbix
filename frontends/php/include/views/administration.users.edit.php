@@ -49,7 +49,7 @@ if (!$data['is_profile']) {
 	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
 	$nameTextBox->attr('autofocus', 'autofocus');
 	$userFormList->addRow(_('Alias'), $nameTextBox);
-	$userFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
