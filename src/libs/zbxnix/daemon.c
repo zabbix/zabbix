@@ -101,7 +101,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 		s.ZBX_SIVAL_INT = task;
 
-		if (ZBX_PROCESS_TYPE_ALL == ((unsigned char *)&task)[1])
+		if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
+				0 == ((unsigned short *)&task)[1])
 		{
 			for (i = 0; i < threads_num; i++)
 			{
@@ -117,7 +118,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				}
 			}
 		}
-		else if (ZBX_PROCESS_TYPE_PID == ((unsigned char *)&task)[1])
+		else if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
+				0 != ((unsigned short *)&task)[1])
 		{
 			for (i = 0; i < threads_num; i++)
 			{
