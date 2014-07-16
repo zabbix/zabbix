@@ -209,7 +209,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
 	}
-	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",<type>,"available"] */
+	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{
 		if (3 != nparams)
 		{
@@ -219,29 +219,47 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		get_param(params, 3, tmp, sizeof(tmp));
 
-		if (0 != strcmp(tmp, "available"))
+		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<host>,"available"] */
+		{
+			get_param(params, 2, tmp, sizeof(tmp));
+
+			if (0 == strcmp(tmp, "agent"))
+				SET_UI64_RESULT(result, item->host.available);
+			else if (0 == strcmp(tmp, "snmp"))
+				SET_UI64_RESULT(result, item->host.snmp_available);
+			else if (0 == strcmp(tmp, "ipmi"))
+				SET_UI64_RESULT(result, item->host.ipmi_available);
+			else if (0 == strcmp(tmp, "jmx"))
+				SET_UI64_RESULT(result, item->host.jmx_available);
+			else
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto notsupported;
+			}
+
+			result->ui64 = 2 - result->ui64;
+		}
+		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
+		{
+			get_param(params, 2, tmp, sizeof(tmp));
+
+			if ('\0' != *tmp)
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto notsupported;
+			}
+
+			if (HOST_MAINTENANCE_STATUS_ON == item->host.maintenance_status)
+				SET_UI64_RESULT(result, item->host.maintenance_type + 1);
+			else
+				SET_UI64_RESULT(result, 0);
+		}
+		else
 		{
 			error = zbx_strdup(error, "Invalid third parameter.");
 			goto notsupported;
 		}
 
-		get_param(params, 2, tmp, sizeof(tmp));
-
-		if (0 == strcmp(tmp, "agent"))
-			SET_UI64_RESULT(result, item->host.available);
-		else if (0 == strcmp(tmp, "snmp"))
-			SET_UI64_RESULT(result, item->host.snmp_available);
-		else if (0 == strcmp(tmp, "ipmi"))
-			SET_UI64_RESULT(result, item->host.ipmi_available);
-		else if (0 == strcmp(tmp, "jmx"))
-			SET_UI64_RESULT(result, item->host.jmx_available);
-		else
-		{
-			error = zbx_strdup(error, "Invalid second parameter.");
-			goto notsupported;
-		}
-
-		result->ui64 = 2 - result->ui64;
 	}
 	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
 	{
