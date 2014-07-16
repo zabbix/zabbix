@@ -19,8 +19,6 @@
 **/
 
 
-zbx_add_post_js('jqBlink.blink();');
-
 $overviewWidget = new CWidget();
 
 $typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
@@ -29,49 +27,19 @@ $typeComboBox->addItem(SHOW_DATA, _('Data'));
 
 $headerForm = new CForm('get');
 $headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$headerForm->addItem(array(SPACE, _('Application'), SPACE, $this->data['pageFilter']->getApplicationsCB()));
 $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 
 $overviewWidget->addHeader(_('Overview'), $headerForm);
 
-$hintTable = new CTableInfo();
-$hintTable->setAttribute('style', 'width: 200px');
-
-if ($this->data['type'] == SHOW_TRIGGERS) {
-	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
-}
-
+// hint table
+$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
 for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
 }
+$hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
-$config = select_config();
-
-if ($this->data['type'] == SHOW_TRIGGERS) {
-	// blinking preview in help popup (only if blinking is enabled)
-	if ($config['blink_period'] > 0) {
-		$row = new CRow(null);
-		$row->addItem(new CCol(SPACE, 'normal'));
-		for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-			$row->addItem(new CCol(SPACE, getSeverityStyle($i)));
-		}
-		$col = new CTable('', 'blink overview-mon-severities');
-		$col->addRow($row);
-
-		// double div necassary for FireFox
-		$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));
-
-		$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($config['blink_period']))));
-	}
-
-	$hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
-}
-else {
-	$hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
-}
-
-$help = new CHelp('web.view.php', 'right');
-$help->setHint($hintTable, '', '', true, false);
+$help = new CHelp();
+$help->setHint($hintTable);
 
 // header right
 $overviewWidget->addPageHeader(_('OVERVIEW'), array(
@@ -91,24 +59,37 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
-	if ($this->data['type'] == SHOW_DATA) {
-		$dataTable = getItemsDataOverview(
-			array_keys($this->data['pageFilter']->hosts),
-			$this->data['pageFilter']->application,
-			$this->data['view_style']
-		);
-	}
-	elseif ($this->data['type'] == SHOW_TRIGGERS) {
-		global $page;
+// filter
+$filterForm = new CFormTable(null, null, 'get');
+$filterForm->setTableClass('formtable old-filter');
+$filterForm->setAttribute('name', 'zbx_filter');
+$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm->addVar('fullscreen', $this->data['fullscreen']);
+$filterForm->addVar('groupid', $this->data['groupid']);
+$filterForm->addVar('hostid', $this->data['hostid']);
 
-		$dataTable = getTriggersOverview(
-			array_keys($this->data['pageFilter']->hosts),
-			$this->data['pageFilter']->application,
-			$page['file'],
-			$this->data['view_style']
-		);
-	}
+// application
+$filterForm->addRow(_('Filter by application'), array(
+	new CTextBox('application', $this->data['filter']['application'], 40),
+	new CButton('application_name', _('Select'),
+		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
+		'&dstfrm='.$filterForm->getName().'");',
+		'filter-button'
+	)
+));
+
+// filter buttons
+$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+
+$overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
+
+// data table
+$config = select_config();
+if ($config['dropdown_first_entry']) {
+	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
+		$this->data['view_style']
+	);
 }
 else {
 	$dataTable = new CTableInfo(_('No items found.'));

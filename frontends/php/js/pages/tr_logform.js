@@ -96,7 +96,7 @@ function add_logexpr() {
 	tr.appendChild(td);
 	td.appendChild(document.createTextNode(expression));
 
-	jQuery(td).append(jQuery('<input>', {
+	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][value]',
 		type: 'hidden',
 		value: expression
@@ -107,7 +107,7 @@ function add_logexpr() {
 
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
-	jQuery(td).append(jQuery('<input>', {
+	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][type]',
 		type: 'hidden',
 		value: expr_t.value
@@ -121,28 +121,22 @@ function add_logexpr() {
 
 	var img = document.createElement('img');
 	img.setAttribute('src', 'images/general/arrow_up.png');
+	img.setAttribute('onclick', 'element_up("logtr' + logexpr_count + '");');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'up');
+	img.setAttribute('class', 'updown');
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: element_up("logtr' + logexpr_count + '");');
-	url.setAttribute(classattr, 'action');
-	url.appendChild(img);
-
-	td.appendChild(url);
+	td.appendChild(img);
 	td.appendChild(document.createTextNode(' '));
 
 	var img = document.createElement('img');
 	img.setAttribute('src', 'images/general/arrow_down.png');
+	img.setAttribute('onclick', 'element_down("logtr' + logexpr_count + '");');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'down');
+	img.setAttribute('class', 'updown');
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: element_down("logtr' + logexpr_count + '");');
-	url.setAttribute(classattr, 'action');
-	url.appendChild(img);
-
-	td.appendChild(url);
+	td.appendChild(img);
 
 	var td = document.createElement('td');
 	tr.appendChild(td);
@@ -159,6 +153,44 @@ function add_logexpr() {
 	expr_t.selectedIndex=0;
 	bt_and.disabled = false;
 	bt_or.disabled = false;
+
+	processExpressionList();
+}
+
+function remove_expression(expr_id) {
+	var expr_tr = document.getElementById(expr_id);
+	var id = getIdFromNodeId(expr_id);
+	if (is_number(id)) {
+		var elm_v = document.getElementsByName('expressions[' + id + '][value]')[0];
+		var elm_t = document.getElementsByName('expressions[' + id + '][type]')[0];
+		var elm_s = document.getElementsByName('expressions[' + id + '][view]')[0];
+
+		if (typeof(elm_v) != 'undefined') {
+			elm_v.parentNode.removeChild(elm_v);
+		}
+		if (typeof(elm_t) != 'undefined') {
+			elm_t.parentNode.removeChild(elm_t);
+		}
+		if (typeof(elm_s) != 'undefined') {
+			elm_s.parentNode.removeChild(elm_s);
+		}
+	}
+	if (typeof(expr_tr) != 'undefined') {
+		expr_tr.parentNode.removeChild(expr_tr);
+	}
+
+	processExpressionList();
+}
+
+function processExpressionList() {
+	actions = jQuery('#exp_list td:nth-child(3) .updown');
+	actions.show();
+	actions.first().hide();
+	actions.last().hide();
+
+	rows = jQuery('#exp_list tr').not(':first');
+	rows.filter(':even').attr('class', 'even_row');
+	rows.filter(':odd').attr('class', 'odd_row');
 }
 
 function element_up(elementid) {
@@ -174,6 +206,8 @@ function element_up(elementid) {
 		swapNodes(c2_obj, c_obj);
 		swapNodesNames(c2_obj, c_obj);
 	}
+
+	processExpressionList();
 }
 
 function element_down(elementid) {
@@ -189,6 +223,8 @@ function element_down(elementid) {
 		swapNodes(c_obj, c2_obj);
 		swapNodesNames(c_obj, c2_obj);
 	}
+
+	processExpressionList();
 }
 
 function swapNodes(n1, n2) {

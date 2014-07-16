@@ -27,7 +27,6 @@ $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
 $scriptForm = new CForm();
 $scriptForm->setName('scripts');
 $scriptForm->addVar('form', $this->get('form'));
-$scriptForm->addVar('form_refresh', $this->get('form_refresh') + 1);
 
 if ($this->get('scriptid')) {
 	$scriptForm->addVar('scriptid', $this->get('scriptid'));
@@ -95,7 +94,7 @@ $scriptFormList->addRow(null, new CMultiSelect(array(
 )), null, 'hostGroupSelection');
 
 // access
-$accessComboBox = new CCombobox('access', $this->get('access'));
+$accessComboBox = new CCombobox('host_access', $this->get('host_access'));
 $accessComboBox->addItem(PERM_READ, _('Read'));
 $accessComboBox->addItem(PERM_READ_WRITE, _('Write'));
 $scriptFormList->addRow(_('Required host permissions'), $accessComboBox);
@@ -103,7 +102,6 @@ $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enableConfirmation
 	new CCheckBox('enableConfirmation', $this->get('enableConfirmation')));
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$confirmationLabel->setAttribute('id', 'confirmationLabel');
 $scriptFormList->addRow($confirmationLabel, array(
 	new CTextBox('confirmation', $this->get('confirmation'), ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,

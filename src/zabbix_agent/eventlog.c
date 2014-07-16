@@ -169,7 +169,7 @@ static HINSTANCE	zbx_load_message_file(const wchar_t *szFileName)
 	do
 	{
 		if (0 != (sz = len))
-			dll_name = zbx_realloc(dll_name, sz);
+			dll_name = zbx_realloc(dll_name, sz * sizeof(wchar_t));
 
 		len = ExpandEnvironmentStrings(szFileName, dll_name, sz);
 	}
@@ -272,7 +272,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
 	wchar_t 	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL, *pCh,
-			aInsertStrings[MAX_INSERT_STRS];
+			*aInsertStrings[MAX_INSERT_STRS];
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;

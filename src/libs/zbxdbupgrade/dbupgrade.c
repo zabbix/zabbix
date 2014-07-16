@@ -706,6 +706,8 @@ int	DBcheck_version(void)
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
 				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
+		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+
 		goto out;
 #endif
 	}
@@ -737,6 +739,10 @@ int	DBcheck_version(void)
 				" Required mandatory version: %08d.",
 				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy",
 				db_mandatory, db_optional, required);
+#ifdef HAVE_SQLITE3
+		if (required > db_mandatory)
+			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+#endif
 		goto out;
 	}
 

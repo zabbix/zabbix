@@ -135,6 +135,9 @@
 		userscript: <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>
 	};
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		var i,
 			value,
@@ -237,8 +240,15 @@
 	}
 
 	function removeOperation(index) {
-		jQuery('#operations_' + index).find('*').remove();
-		jQuery('#operations_' + index).remove();
+		var row = jQuery('#operations_' + index);
+		var rowParent = row.parent();
+
+		row.find('*').remove();
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOperationCondition(index) {
@@ -249,11 +259,25 @@
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
-		jQuery('#opmsgUsrgrpRow_' + usrgrpid).remove();
+		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
+		var rowParent = row.parent();
+
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpmsgUserRow(userid) {
-		jQuery('#opmsgUserRow_' + userid).remove();
+		var row = jQuery('#opmsgUserRow_' + userid);
+		var rowParent = row.parent();
+
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpGroupRow(groupid) {
