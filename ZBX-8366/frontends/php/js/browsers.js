@@ -32,7 +32,6 @@ var agt = navigator.userAgent.toLowerCase(),
 	KQ = (agt.indexOf('konqueror') && agt.indexOf('khtml') != -1 && agt.indexOf('applewebkit') == -1),
 	GK = (agt.indexOf('gecko') != -1);
 
-
 // redirect outdated browser to warning page
 if (document.cookie.indexOf('browserwarning_ignore') < 0) {
 	if (IE6 || IE7 || KQ) {
