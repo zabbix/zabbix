@@ -444,14 +444,84 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_item_processed_by_server                                      *
+ *                                                                            *
+ * Parameters: type - [IN] item type [ITEM_TYPE_* flag]                       *
+ *             key  - [IN] item key                                           *
+ *                                                                            *
+ * Return value: SUCCEED when an item should be processed by server           *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ * Comments: list of the items, always processed by server                    *
+ *           ,------------------+-------------------------------,             *
+ *           | type             | key                           |             *
+ *           +------------------+-------------------------------+             *
+ *           | Zabbix internal  | zabbix[host,,maintenance]     |             *
+ *           | Zabbix internal  | zabbix[host,<type>,available] |             *
+ *           | Zabbix aggregate | *                             |             *
+ *           | Calculated       | *                             |             *
+ *           '------------------+-------------------------------'             *
+ *                                                                            *
+ ******************************************************************************/
+int	is_item_processed_by_server(unsigned char type, const char *key)
+{
+	int	ret = FAIL;
+
+	switch (type)
+	{
+		case ITEM_TYPE_AGGREGATE:
+		case ITEM_TYPE_CALCULATED:
+			ret = SUCCEED;
+			break;
+
+		case ITEM_TYPE_INTERNAL:
+			if (0 == strncmp(key, "zabbix[", 7))
+			{
+				AGENT_REQUEST	request;
+				char		*arg1, *arg2, *arg3;
+
+				init_request(&request);
+
+				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
+					goto clean;
+
+				arg1 = get_rparam(&request, 0);
+
+				if (0 == strcmp(arg1, "host"))
+				{
+					arg2 = get_rparam(&request, 1);
+					arg3 = get_rparam(&request, 2);
+
+					if (0 != strcmp(arg3, "maintenance") || '\0' != *arg2)
+						goto clean;
+				}
+				else if (0 == strcmp(arg1, "proxy"))
+				{
+					arg3 = get_rparam(&request, 2);
+
+					if (0 != strcmp(arg3, "lastaccess"))
+						goto clean;
+				}
+				else
+					goto clean;
+
+				ret = SUCCEED;
+clean:
+				free_request(&request);
+			}
+			break;
+	}
+
+	return ret;
+}
+
 static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		unsigned char item_type, const char *key, unsigned char flags)
 {
-	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
-				ITEM_TYPE_CALCULATED != item_type))
-	{
+	if (0 != proxy_hostid && SUCCEED != is_item_processed_by_server(item_type, key))
 		return ZBX_NO_POLLER;
-	}
 
 	switch (item_type)
 	{
