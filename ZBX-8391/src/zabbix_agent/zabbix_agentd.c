@@ -156,6 +156,10 @@ void zbx_co_uninitialize();
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch = '\0';
+	int	opt_c = 0, opt_p = 0, opt_t = 0;
+#ifdef _WINDOWS
+	int     opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+#endif
 
 	t->task = ZBX_TASK_START;
 
@@ -165,7 +169,9 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -179,10 +185,12 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'p':
+				opt_p++;
 				if (ZBX_TASK_START == t->task)
 					t->task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
+				opt_t++;
 				if (ZBX_TASK_START == t->task)
 				{
 					t->task = ZBX_TASK_TEST_METRIC;
@@ -191,18 +199,23 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifdef _WINDOWS
 			case 'i':
+				opt_i++;
 				t->task = ZBX_TASK_INSTALL_SERVICE;
 				break;
 			case 'd':
+				opt_d++;
 				t->task = ZBX_TASK_UNINSTALL_SERVICE;
 				break;
 			case 's':
+				opt_s++;
 				t->task = ZBX_TASK_START_SERVICE;
 				break;
 			case 'x':
+				opt_x++;
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
+				opt_m++;
 				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
@@ -210,6 +223,61 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				t->task = ZBX_TASK_SHOW_USAGE;
 				break;
 		}
+	}
+
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_p || 1 < opt_t)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" specified multiple times");
+		if (1 < opt_p)
+			zbx_error("option \"-p\" specified multiple times");
+		if (1 < opt_t)
+			zbx_error("option \"-t\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+#ifdef _WINDOWS
+	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
+	{
+		if (1 < opt_i)
+			zbx_error("option \"-i\" specified multiple times");
+		if (1 < opt_d)
+			zbx_error("option \"-d\" specified multiple times");
+		if (1 < opt_s)
+			zbx_error("option \"-s\" specified multiple times");
+		if (1 < opt_x)
+			zbx_error("option \"-x\" specified multiple times");
+		if (1 < opt_m)
+			zbx_error("option \"-m\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+#endif
+	/* check for mutually exclusive options */
+#ifdef _WINDOWS
+	if (1 < opt_c + opt_p + opt_t + opt_i + opt_d + opt_s + opt_x + opt_m)
+	{
+		zbx_error("only one command line option can be used");
+		exit(EXIT_FAILURE);
+	}
+#else
+	if (1 < opt_c + opt_p + opt_t)
+	{
+		zbx_error("only one of options \"-c\", \"-p\" or \"-t\" can be used");
+		exit(EXIT_FAILURE);
+	}
+#endif
+	/* Parameters which are not option values are not allowed. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_FILE)
