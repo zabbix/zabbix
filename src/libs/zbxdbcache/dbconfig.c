@@ -3546,6 +3546,39 @@ void	DCload_config()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: in_maintenance_without_data_collection                           *
+ *                                                                            *
+ * Parameters: maintenance_status - [IN] maintenance status                   *
+ *                                       HOST_MAINTENANCE_STATUS_* flag       *
+ *             maintenance_type   - [IN] maintenance type                     *
+ *                                       MAINTENANCE_TYPE_* flag              *
+ *             type               - [IN] item type                            *
+ *                                       ITEM_TYPE_* flag                     *
+ *                                                                            *
+ * Return value: SUCCEED if host in maintenance without data collection       *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+#define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
+		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
+				dc_host->maintenance_type, dc_item->type)
+int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
+		unsigned char type)
+{
+	if (HOST_MAINTENANCE_STATUS_ON != maintenance_status)
+		return FAIL;
+
+	if (MAINTENANCE_TYPE_NODATA != maintenance_type)
+		return FAIL;
+
+	if (ITEM_TYPE_INTERNAL == type)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 {
 	const ZBX_DC_IPMIHOST		*ipmihost;
@@ -4354,8 +4387,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 					ITEM_STATUS_ACTIVE == dc_item->status &&
 					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 					HOST_STATUS_MONITORED == dc_host->status &&
-					!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
+					SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
 			{
 				found = 1;
 				break;
@@ -4624,8 +4656,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
 			old_nextcheck = dc_item->nextcheck;
 			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -4781,12 +4812,6 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 	if (HOST_STATUS_MONITORED != dc_host->status)
 		goto unlock;
 
-	if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-			MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
-	{
-		goto unlock;
-	}
-
 	if (NULL == (dc_interface_snmpitem = zbx_hashset_search(&config->interface_snmpitems, &interfaceid)))
 		goto unlock;
 
@@ -4798,6 +4823,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
 
 		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
@@ -5919,11 +5947,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
-		{
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
-		}
 
 		switch (dc_item->type)
 		{
