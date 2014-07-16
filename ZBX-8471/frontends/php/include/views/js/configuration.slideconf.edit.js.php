@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
-<tr id="slides_#{rowId}" class="sortable">
+<tr class="sortable" id="slides_#{rowId}">
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
@@ -44,15 +44,17 @@
 		var i = 0;
 
 		jQuery('#slideTable tr.sortable .rowNum').each(function() {
-			var step = (i == 0) ? '0' : i;
+			var newStep = (i == 0) ? '0' : i;
+
+			var currentStep = jQuery(this).closest('tr').attr('id').split('_')[1];
 
 			// rewrite ids to temp
-			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
-			jQuery('#slides_' + step).attr('id', 'tmp_slides_' + step);
-			jQuery('#slides_' + step + '_slideid').attr('id', 'tmp_slides_' + step + '_slideid');
-			jQuery('#slides_' + step + '_screenid').attr('id', 'tmp_slides_' + step + '_screenid');
-			jQuery('#slides_' + step + '_delay').attr('id', 'tmp_slides_' + step + '_delay');
-			jQuery('#current_slide_' + step).attr('id', 'tmp_current_slide_' + step);
+			jQuery('#remove_' + currentStep).attr('id', 'tmp_remove_' + newStep);
+			jQuery('#slides_' + currentStep).attr('id', 'tmp_slides_' + newStep);
+			jQuery('#slides_' + currentStep + '_slideid').attr('id', 'tmp_slides_' + newStep + '_slideid');
+			jQuery('#slides_' + currentStep + '_screenid').attr('id', 'tmp_slides_' + newStep + '_screenid');
+			jQuery('#slides_' + currentStep + '_delay').attr('id', 'tmp_slides_' + newStep + '_delay');
+			jQuery('#current_slide_' + currentStep).attr('id', 'tmp_current_slide_' + newStep);
 
 			// set order number
 			jQuery(this)
@@ -64,6 +66,7 @@
 		// rewrite ids in new order
 		for (var n = 0; n < i; n++) {
 			var newStep = jQuery('#tmp_current_slide_' + n).attr('new_slide');
+			jQuery('#tmp_current_slide_' + n).removeAttr('new_slide');
 
 			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
 			jQuery('#tmp_slides_' + n).attr('id', 'slides_' + newStep);
@@ -74,7 +77,9 @@
 			jQuery('#slides_' + newStep + '_slideid').attr('name', 'slides[' + newStep + '][slideid]');
 			jQuery('#slides_' + newStep + '_screenid').attr('name', 'slides[' + newStep + '][screenid]');
 			jQuery('#slides_' + newStep + '_delay').attr('name', 'slides[' + newStep + '][delay]');
-			jQuery('#remove_' + newStep).attr('remove_slide', newStep);
+			jQuery('#remove_' + newStep)
+				.attr('remove_slide', newStep)
+				.attr('name', 'remove_' + newStep);
 
 			// set new slide order position
 			jQuery('#tmp_current_slide_' + n).attr('id', 'current_slide_' + newStep);
