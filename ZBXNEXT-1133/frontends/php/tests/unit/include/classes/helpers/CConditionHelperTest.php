@@ -302,6 +302,10 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			array(
 				array(2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'A')),
 				array(0 => array('formulaid' => 'A'), 2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'))
+			),
+			array(
+				array(2 => array('formulaid' => 'CC'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'AA')),
+				array(3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'AA'), 2 => array('formulaid' => 'CC'))
 			)
 		);
 	}

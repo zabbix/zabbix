@@ -175,7 +175,7 @@ class CConditionHelper {
 	 *
 	 * @return int
 	 */
-	public static function compareFormulaIds($formulaId1, $formulaId2) {
+	protected static function compareFormulaIds($formulaId1, $formulaId2) {
 		$len1 = strlen($formulaId1);
 		$len2 = strlen($formulaId2);
 
