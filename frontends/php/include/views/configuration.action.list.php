@@ -56,8 +56,8 @@ $actionTable->setHeader(array(
 
 foreach ($this->data['actions'] as $action) {
 	$conditions = array();
-	order_result($action['conditions'], 'conditiontype', ZBX_SORT_DOWN);
-	foreach ($action['conditions'] as $condition) {
+	order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+	foreach ($action['filter']['conditions'] as $condition) {
 		$conditions[] = get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']);
 		$conditions[] = BR();
 	}
