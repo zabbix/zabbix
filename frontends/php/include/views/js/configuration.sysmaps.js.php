@@ -402,7 +402,7 @@
 							<tfoot>
 							<tr>
 								<td colspan="4">
-									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1');"><?php echo _('Add'); ?></span>
+									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?php echo _('Add'); ?></span>
 								</td>
 							</tr>
 							</tfoot>
