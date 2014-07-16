@@ -2123,8 +2123,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type &&
+		if (SUCCEED == in_maintenance_without_data_collection(items[i].host.maintenance_status,
+				items[i].host.maintenance_type, items[i].type) &&
 				items[i].host.maintenance_from <= values[i].ts.sec)
 			continue;
 
