@@ -447,20 +447,10 @@ if (hasRequest('form')) {
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	if (!hasRequest('add_condition') && !(getRequest('form') == 'update' && hasRequest('form_refresh'))) {
-		if ($data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			$sortFields = array(
-				array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-				array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-				array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-			);
-			CArrayHelper::sort($data['action']['filter']['conditions'], $sortFields);
-		}
-		else {
-			$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
-				$data['action']['filter']['conditions']
-			);
-		}
+	if (!hasRequest('add_condition')) {
+		$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
+			$data['action']['filter']['conditions']
+		);
 	}
 
 	// new condition
