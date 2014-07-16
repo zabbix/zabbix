@@ -241,6 +241,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
 		{
+			/* this item always processed by server */
+
 			get_param(params, 2, tmp, sizeof(tmp));
 
 			if ('\0' != *tmp)
@@ -265,8 +267,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		int	lastaccess;
 
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
+		/* this item always processed by server */
 
 		if (3 != nparams)
 		{
