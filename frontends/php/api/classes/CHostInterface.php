@@ -504,7 +504,7 @@ class CHostInterface extends CApiService {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
-				'bulk' => $interface['bulk']
+				'bulk' => isset($interface['bulk']) ? $interface['bulk'] : SNMP_BULK_ENABLED
 			));
 		}
 
