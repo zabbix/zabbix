@@ -26,24 +26,30 @@
 #define ZBX_VMWARE_STATE_READY		0x002
 #define ZBX_VMWARE_STATE_FAILED		0x004
 
-#define ZBX_VMWARE_STATE_UPDATING	0x100
+#define ZBX_VMWARE_STATE_MASK		0x0FF
 
+#define ZBX_VMWARE_STATE_UPDATING	0x100
+#define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
+
+/* an entity monitored with performance counters */
 typedef struct
 {
-	zbx_uint64_t	nic_packets_rx;
-	zbx_uint64_t	nic_packets_tx;
-	zbx_uint64_t	nic_received;
-	zbx_uint64_t	nic_transmitted;
+	/* entity type: HostSystem or VirtualMachine */
+	char			*type;
 
-	zbx_uint64_t	disk_read;
-	zbx_uint64_t	disk_write;
-	zbx_uint64_t	disk_number_read_averaged;
-	zbx_uint64_t	disk_number_write_averaged;
+	/* entity id */
+	char			*id;
 
-	zbx_uint64_t	datastore_read_latency;
-	zbx_uint64_t	datastore_write_latency;
+	/* the peformance counte refresh rate */
+	int			refresh;
+
+	/* timestamp when the entity was queried last time */
+	int			last_seen;
+
+	/* the performance counters to monitor */
+	zbx_vector_uint64_t	counters;
 }
-zbx_vmware_counters_t;
+zbx_vmware_perf_entity_t;
 
 typedef struct
 {
@@ -67,7 +73,6 @@ typedef struct
 	char			*uuid;
 	char			*id;
 	char			*details;
-	char			*stats;
 	zbx_vector_ptr_t	devs;
 }
 zbx_vmware_vm_t;
@@ -79,7 +84,6 @@ typedef struct
 	char			*id;
 	char			*details;
 	char			*clusterid;
-	char			*stats;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
 }
@@ -118,16 +122,26 @@ typedef struct
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
 	int			state;
 
-	/* the performance counters */
-	zbx_vmware_counters_t	counters;
-
 	int			lastcheck;
+	int			lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
 
 	/* the vmware service instance contents */
 	char			*contents;
+
+	/* the performance counter values */
+	char			*stats;
+
+	/* the performance counters */
+	zbx_hashset_t 		counters;
+
+	/* list of entities to monitor with performance counters */
+	zbx_vector_ptr_t	perf_entities;
+
+	/* list of entities monitored during last performance update*/
+	zbx_vector_ptr_t	stats_entities;
 
 	/* The service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
@@ -159,6 +173,10 @@ void	zbx_vmware_unlock(void);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
+
+int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
+int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid);
 
 /*
  * XML support

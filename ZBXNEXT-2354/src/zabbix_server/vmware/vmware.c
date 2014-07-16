@@ -40,12 +40,16 @@
  * as updating.
  *
  * The service object is updated by creating a new data object, initializing it
- * with the latest data from VMware vCenter (or vSphere), destroying the old data
+ * with the latest data from VMware vCenter (or Hypervisor), destroying the old data
  * object and replacing it with the new one.
  *
  * The collector must be locked only when accessing service object list and working with
  * a service object. It is not locked for new data object creation during service update,
  * which is the most time consuming task.
+ *
+ * Independently VMware collector updates statistics (performance counter data) which is
+ * stored directly in VMware service (outside data object). The statistics data contains
+ * performance counters of all hypervisors/virtual machines discovered by VMware service.
  */
 
 /* external variables */
@@ -54,12 +58,14 @@ extern int		process_num;
 
 extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
+extern int		CONFIG_VMWARE_PERF_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
 
 #define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
+#define ZBX_VMWARE_PERF_TTL	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
 static ZBX_MUTEX	vmware_lock;
@@ -76,6 +82,8 @@ static zbx_vmware_t	*vmware = NULL;
 #define ZBX_VMWARE_SERVICE_VCENTER	2
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -101,6 +109,14 @@ typedef struct
 	zbx_uint64_t	*pcounter;
 }
 zbx_perfcounter_mapping_t;
+
+/* mapping of performance counter group/key to its id (net/transmitted -> <id>) */
+typedef struct
+{
+	char		*path;
+	zbx_uint64_t	id;
+}
+zbx_vmware_perfcounter_t;
 
 /*
  * SOAP support
@@ -132,7 +148,7 @@ ZBX_HTTPPAGE;
 
 static ZBX_HTTPPAGE	page;
 
-static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
 
@@ -141,10 +157,33 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	return r_size;
 }
 
-static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	return size * nmemb;
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * performance counter hashset support functions                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_hash_t	vmware_counter_hash_func(const void *data)
+{
+	zbx_vmware_perfcounter_t	*counter = (zbx_vmware_perfcounter_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(counter->path, strlen(counter->path), ZBX_DEFAULT_HASH_SEED);
+}
+
+int	vmware_counter_compare_func(const void *d1, const void *d2)
+{
+	zbx_vmware_perfcounter_t	*c1 = (zbx_vmware_perfcounter_t *)d1;
+	zbx_vmware_perfcounter_t	*c2 = (zbx_vmware_perfcounter_t *)d2;
+
+
+	return strcmp(c1->path, c2->path);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -173,6 +212,63 @@ static char	*vmware_shared_strdup(const char *source)
 	}
 
 	return ptr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_shared_counters_copy                                      *
+ *                                                                            *
+ * Purpose: copies performance counter vector into shared memory hashset      *
+ *                                                                            *
+ * Parameters: dst - [IN] the destination hashset                             *
+ *             src - [IN] the source vector                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_shared_counters_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src)
+{
+	int				i;
+	zbx_vmware_perfcounter_t	*csrc, *cdst;
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		csrc = src->values[i];
+
+		cdst = zbx_hashset_insert(dst, csrc, sizeof(zbx_vmware_perfcounter_t));
+		cdst->path = vmware_shared_strdup(csrc->path);
+	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_shared_perf_entities_dup                                  *
+ *                                                                            *
+ * Purpose: copies performance entity vector into shared memory               *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_shared_perf_entities_dup(zbx_vector_ptr_t *dst, const zbx_vector_ptr_t *src)
+{
+	int	i;
+	zbx_vmware_perf_entity_t	*src_entity, *dst_entity;
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		src_entity = src->values[i];
+		dst_entity = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_entity_t));
+
+		dst_entity->type = vmware_shared_strdup(src_entity->type);
+		dst_entity->id = vmware_shared_strdup(src_entity->id);
+
+		zbx_vector_uint64_create_ext(&dst_entity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
+				__vm_mem_free_func);
+		zbx_vector_uint64_reserve(&dst_entity->counters, src_entity->counters.values_num);
+		memcpy(dst_entity->counters.values, src_entity->counters.values, src_entity->counters.values_num *
+				sizeof(zbx_uint64_t));
+		dst_entity->counters.values_num = src_entity->counters.values_num;
+
+		dst_entity->last_seen = dst_entity->refresh = 0;
+		zbx_vector_ptr_append(dst, dst_entity);
+	}
 }
 
 /******************************************************************************
@@ -231,9 +327,6 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	if (NULL != vm->uuid)
 		__vm_mem_free_func(vm->uuid);
 
-	if (NULL != vm->stats)
-		__vm_mem_free_func(vm->stats);
-
 	if (NULL != vm->details)
 		__vm_mem_free_func(vm->details);
 
@@ -268,9 +361,6 @@ static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 
 	if (NULL != hv->clusterid)
 		__vm_mem_free_func(hv->clusterid);
-
-	if (NULL != hv->stats)
-		__vm_mem_free_func(hv->stats);
 
 	__vm_mem_free_func(hv);
 }
@@ -329,7 +419,40 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_free                                              *
+ * Function: vmware_shared_perf_entity_free                                   *
+ *                                                                            *
+ * Purpose: frees shared memory vmware peformance entity and the resources    *
+ *          allocated by it                                                   *
+ *                                                                            *
+ * Parameters: entity - [IN] the entity to free                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_shared_perf_entity_free(zbx_vmware_perf_entity_t *entity)
+{
+	zbx_vector_uint64_destroy(&entity->counters);
+
+	__vm_mem_free_func(entity->type);
+	__vm_mem_free_func(entity->id);
+	__vm_mem_free_func(entity);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_shared_perfcounter_clean                                  *
+ *                                                                            *
+ * Purpose: frees resources allocated by vmware performance counter           *
+ *                                                                            *
+ * Parameters: counter - [IN] the performance counter to free                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_shared_perfcounter_clean(zbx_vmware_perfcounter_t *counter)
+{
+	__vm_mem_free_func(counter->path);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_shared_free                                       *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
  *                                                                            *
@@ -338,6 +461,9 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  ******************************************************************************/
 static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 {
+	zbx_hashset_iter_t		iter;
+	zbx_vmware_perfcounter_t	*counter;
+
 	__vm_mem_free_func(service->url);
 	__vm_mem_free_func(service->username);
 	__vm_mem_free_func(service->password);
@@ -346,6 +472,22 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 		__vm_mem_free_func(service->contents);
 
 	vmware_data_shared_free(service->data);
+
+	zbx_vector_ptr_clean(&service->perf_entities, (zbx_mem_free_func_t)vmware_shared_perf_entity_free);
+	zbx_vector_ptr_destroy(&service->perf_entities);
+
+	zbx_vector_ptr_clean(&service->stats_entities, (zbx_mem_free_func_t)vmware_shared_perf_entity_free);
+	zbx_vector_ptr_destroy(&service->stats_entities);
+
+	if (NULL != service->stats)
+		__vm_mem_free_func(service->stats);
+
+	zbx_hashset_iter_reset(&service->counters, &iter);
+
+	while (NULL != (counter = zbx_hashset_iter_next(&iter)))
+		vmware_shared_perfcounter_clean(counter);
+
+	zbx_hashset_destroy(&service->counters);
 
 	__vm_mem_free_func(service);
 }
@@ -440,7 +582,6 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	vm->id = vmware_shared_strdup(src->id);
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->details = vmware_shared_strdup(src->details);
-	vm->stats = vmware_shared_strdup(src->stats);
 
 	for (i = 0; i < src->devs.values_num; i++)
 		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup(src->devs.values[i]));
@@ -472,7 +613,6 @@ static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
 	hv->uuid = vmware_shared_strdup(src->uuid);
 	hv->id = vmware_shared_strdup(src->id);
 	hv->details = vmware_shared_strdup(src->details);
-	hv->stats = vmware_shared_strdup(src->stats);
 	hv->clusterid = vmware_shared_strdup(src->clusterid);
 
 	for (i = 0; i < src->datastores.values_num; i++)
@@ -564,7 +704,6 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 	zbx_free(vm->id);
 	zbx_free(vm->uuid);
-	zbx_free(vm->stats);
 	zbx_free(vm->details);
 	zbx_free(vm);
 }
@@ -590,7 +729,6 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 	zbx_free(hv->id);
 	zbx_free(hv->details);
 	zbx_free(hv->clusterid);
-	zbx_free(hv->stats);
 	zbx_free(hv);
 }
 
@@ -635,6 +773,40 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_perf_entity_free                                          *
+ *                                                                            *
+ * Purpose: frees vmware peformance entity and the resources allocated by it  *
+ *                                                                            *
+ * Parameters: entity - [IN] the entity to free                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_perf_entity_free(zbx_vmware_perf_entity_t *entity)
+{
+	zbx_vector_uint64_destroy(&entity->counters);
+
+	zbx_free(entity->type);
+	zbx_free(entity->id);
+	zbx_free(entity);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_perfcounter_free                                          *
+ *                                                                            *
+ * Purpose: frees vmware performance counter and the resources allocated by   *
+ *          it                                                                *
+ *                                                                            *
+ * Parameters: counter - [IN] the performance counter to free                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_perfcounter_free(zbx_vmware_perfcounter_t *counter)
+{
+	zbx_free(counter->path);
+	zbx_free(counter);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_authenticate                                      *
  *                                                                            *
  * Purpose: authenticates vmware service                                      *
@@ -670,15 +842,16 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION,
+					curl_header_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -691,7 +864,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 			goto out;
 		}
 
@@ -731,7 +904,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -739,7 +912,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -783,7 +956,7 @@ static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easy
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMWARE_CONTENTS)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -803,31 +976,6 @@ static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easy
 	ret = SUCCEED;
 out:
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_add_perfcounter_metric                                    *
- *                                                                            *
- * Purpose: adds performance counter metric to the soap request               *
- *                                                                            *
- * Parameters: tmp        - [IN/OUT] the request body                         *
- *             tmp_alloc  - [IN/OUT] the size of allocated memory for request *
- *             tmp_offset - [IN/OUT] the size of used memory in request       *
- *             instance   - [IN] the device instance id                       *
- *             counterid  - [IN] the performance counter id                   *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_add_perfcounter_metric(char **tmp, size_t *tmp_alloc, size_t *tmp_offset, const char *instance,
-		zbx_uint64_t counterid)
-{
-	if (0 == counterid)
-		return;
-
-	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:metricId>");
-	zbx_snprintf_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>", counterid);
-	zbx_snprintf_alloc(tmp, tmp_alloc, tmp_offset, "<ns0:instance>%s</ns0:instance>", instance);
-	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "</ns0:metricId>");
 }
 
 /******************************************************************************
@@ -872,7 +1020,7 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -889,115 +1037,19 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 
 	if (NULL == (value = zbx_xml_read_value(page.data, ZBX_XPATH_LN2("returnval", "refreshRate"))))
 	{
-		*error = zbx_strdup(*error, "Cannot get refreshRate");
+		*error = zbx_strdup(*error, "Cannot find refreshRate.");
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() refresh_rate:%s", __function_name, value);
 
 	if (SUCCEED != (ret = is_uint31(value, refresh_rate)))
-		*error = zbx_strdup(*error, "Cannot get refreshRate");
+		*error = zbx_dsprintf(*error, "Cannot convert refreshRate from %s.",  value);
 
 	zbx_free(value);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_get_group_perfcounters                                    *
- *                                                                            *
- * Purpose: read the specified performance counter ids filtered by a group    *
- *                                                                            *
- * Parameters: data     - [IN] XML data                                       *
- *             size     - [IN] the size of XML data                           *
- *             group    - [IN] the group name                                 *
- *             counters - [IN/OUT] mapping of counter keys to output values   *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_get_group_perfcounters(const char *data, int size, const char *group,
-		zbx_perfcounter_mapping_t *counters)
-{
-	xmlDoc				*doc;
-	xmlXPathContext			*xpathCtx;
-	xmlXPathObject			*xpathObj;
-	xmlNodeSetPtr			nodeset;
-	char				*xpath = NULL, *key, *counterId;
-	int				i, ret = FAIL;
-	zbx_perfcounter_mapping_t	*counter;
-
-	if (NULL == (doc = xmlReadMemory(data, size, "noname.xml", NULL, 0)))
-		goto out;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	xpath = zbx_dsprintf(xpath, "//*[local-name()='PerfCounterInfo'][*[local-name()='groupInfo']"
-			"/*[local-name()='key']/text()='%s']", group);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		if (NULL == (key = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-				"*[local-name()='nameInfo']/*[local-name()='key']")))
-		{
-			continue;
-		}
-
-		for (counter = counters; NULL != counter->key; counter++)
-		{
-			if (0 != strcmp(counter->key, key))
-				continue;
-
-			if (NULL == (counterId = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-					"*[local-name()='key']")))
-			{
-				continue;
-			}
-
-			is_uint64(counterId, counter->pcounter);
-			zbx_free(counterId);
-		}
-
-		zbx_free(key);
-	}
-
-	for (counter = counters; NULL != counter->key; counter++)
-	{
-		if (0 == *counter->pcounter)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to retrieve VMware performance counter: %s/%s",
-					group, counter->key);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "found VMware performance counter %s/%s: " ZBX_FS_UI64,
-					group, counter->key, *counter->pcounter);
-		}
-	}
-
-	ret = SUCCEED;
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	zbx_free(xpath);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-out:
 	return ret;
 }
 
@@ -1015,7 +1067,8 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
+static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_ptr_t *counters, char **error)
 {
 #	define ZBX_POST_VMWARE_GET_PERFCOUTNER							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -1034,27 +1087,13 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_perf_counters";
-	char		tmp[MAX_STRING_LEN];
-	int		opts, err, ret = SUCCEED;
-
-	zbx_perfcounter_mapping_t disk_counters[] = {
-			{"read", &service->counters.disk_read},
-			{"write", &service->counters.disk_write},
-			{"numberReadAveraged", &service->counters.disk_number_read_averaged},
-			{"numberWriteAveraged", &service->counters.disk_number_write_averaged},
-			{NULL, NULL}};
-
-	zbx_perfcounter_mapping_t nic_counters[] = {
-			{"packetsRx", &service->counters.nic_packets_rx},
-			{"packetsTx", &service->counters.nic_packets_tx},
-			{"received", &service->counters.nic_received},
-			{"transmitted", &service->counters.nic_transmitted},
-			{NULL, NULL}};
-
-	zbx_perfcounter_mapping_t datastore_counters[] = {
-			{"totalReadLatency", &service->counters.datastore_read_latency},
-			{"totalWriteLatency", &service->counters.datastore_write_latency},
-			{NULL, NULL}};
+	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL,
+			*counterid = NULL;
+	int		opts, err, ret = SUCCEED, i;
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1066,7 +1105,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opts = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opts, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opts, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1081,22 +1120,58 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "virtualDisk", disk_counters))
+
+	if (NULL == (doc = xmlReadMemory(page.data, page.offset, "noname.xml", NULL, 0)))
 	{
-		*error = zbx_strdup(*error, "Cannot find performance counters for virtualDisk group");
+		*error = zbx_strdup(*error, "Cannot parse performance counter list.");
 		goto out;
 	}
 
-	if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "net", nic_counters))
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='PerfCounterInfo']", xpathCtx)))
 	{
-		*error = zbx_strdup(*error, "Cannot find performance counters for net group");
-		goto out;
+		*error = zbx_strdup(*error, "Cannot make performance counter list parsing query.");
+		goto clean;
 	}
 
-	if (SUCCEED != vmware_get_group_perfcounters(page.data, page.offset, "datastore", datastore_counters))
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
-		*error = zbx_strdup(*error, "Cannot find performance counters for datastore group");
-		goto out;
+		*error = zbx_strdup(*error, "Cannot find items in performance counter list.");
+		goto clean;
+	}
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_perfcounter_t	*counter;
+
+		group = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='groupInfo']/*[local-name()='key']");
+
+		key = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+						"*[local-name()='nameInfo']/*[local-name()='key']");
+
+		rollup = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='rollupType']");
+		counterid = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']");
+
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
+		{
+			counter = zbx_malloc(NULL, sizeof(zbx_vmware_perfcounter_t));
+			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
+			ZBX_STR2UINT64(counter->id, counterid);
+
+			zbx_vector_ptr_append(counters, counter);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "adding performance counter %s:" ZBX_FS_UI64, counter->path,
+					counter->id);
+		}
+
+		zbx_free(counterid);
+		zbx_free(rollup);
+		zbx_free(key);
+		zbx_free(group);
 	}
 
 	/* The counter data uses a lot of memory which is needed only once during initialization. */
@@ -1106,195 +1181,18 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 	page.offset = 0;
 
 	ret = SUCCEED;
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_service_hv_get_stats                                      *
- *                                                                            *
- * Purpose: retrieves hypervisor performance statistics                       *
- *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             hv           - [IN] the vmware hypervisor                      *
- *             error        - [OUT] the error message in the case of failure  *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
-static int	 vmware_service_hv_get_stats (const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vmware_hv_t *hv, char **error)
-{
-	const char		*__function_name = "vmware_service_hv_get_stats";
-
-	int			err, opt, ret = FAIL, refresh_rate;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != vmware_service_get_perfcounter_refreshrate(service, easyhandle, "HostSystem", hv->id,
-			&refresh_rate, error))
-	{
-		goto out;
-	}
-
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerf>");
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>",
-			vmware_service_objects[service->type].performance_manager);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>");
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:entity type=\"HostSystem\">%s</ns0:entity>",
-			hv->id);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
-
-	/* add total host networking stats */
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "", service->counters.nic_received);
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "", service->counters.nic_transmitted);
-
-	/* add datastore stats */
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.datastore_read_latency);
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.datastore_write_latency);
-
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", refresh_rate);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
-
-	hv->stats = zbx_strdup(NULL, page.data);
-
-	ret = SUCCEED;
-out:
-	zbx_free(tmp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_service_vm_get_stats                                      *
- *                                                                            *
- * Purpose: retrieves virtual machine statistics                              *
- *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             vm           - [IN] the virtual machine                        *
- *             error        - [OUT] the error message in the case of failure  *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_service_vm_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle, zbx_vmware_vm_t *vm,
-		char **error)
-{
-	const char		*__function_name = "vmware_service_get_vm_stats";
-
-	int			i, err, o, ret = FAIL, refresh_rate;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
-	zbx_vmware_dev_t	*dev;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != vmware_service_get_perfcounter_refreshrate(service, easyhandle, "VirtualMachine", vm->id,
-			&refresh_rate, error))
-	{
-		goto out;
-	}
-
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerf>");
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>",
-			vmware_service_objects[service->type].performance_manager);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>");
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:entity type=\"VirtualMachine\">%s</ns0:entity>",
-			vm->id);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
-
-	/* first add networking devices which are already populated in device list */
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
-
-		switch (dev->type)
-		{
-			case ZBX_VMWARE_DEV_TYPE_NIC:
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_packets_rx);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_packets_tx);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_received);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_transmitted);
-				break;
-		}
-	}
-
-	/* then add all virtual disk devices */
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.disk_read);
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.disk_write);
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.disk_number_read_averaged);
-	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.disk_number_write_averaged);
-
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>", refresh_rate);
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
-
-	vm->stats = zbx_strdup(NULL, page.data);
-
-	ret = SUCCEED;
-out:
-	zbx_free(tmp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 
 /******************************************************************************
  *                                                                            *
@@ -1365,7 +1263,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: wmware_vm_get_devices_by_counterid                               *
+ * Function: wmware_service_get_devices_by_perfcounter                        *
  *                                                                            *
  * Purpose: gets devices from virtual machine stats filtered by the specified *
  *          performance counter id                                            *
@@ -1374,65 +1272,59 @@ out:
  *             counterid - [IN] the performance counter id                    *
  *                                                                            *
  ******************************************************************************/
-static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t counterid)
+static void	wmware_service_get_devices_by_perfcounter(zbx_vmware_service_t *service, zbx_vmware_vm_t *vm,
+		const char *path)
 {
-	const char	*__function_name = "wmware_vm_get_devices_by_counterid";
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	char		*xpath = NULL;
-	int		i, nics = 0;
+	const char	*__function_name = "wmware_service_get_devices_by_perfcounter";
+	char			*xpath = NULL;
+	int			i, devs = 0;
+	zbx_uint64_t		counterid;
+	zbx_vector_str_t	instances;
+	zbx_vmware_dev_t	*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->stats, strlen(vm->stats), "noname.xml", NULL, 0)))
-		goto out;
+	zbx_vector_str_create(&instances);
 
-	xpathCtx = xmlXPathNewContext(doc);
-
-	xpath = zbx_dsprintf(xpath, "//*[local-name()='value']/*[local-name()='id']"
-			"[*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']", counterid);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
+	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
 	{
-		char			*instance;
-		zbx_vmware_dev_t	*dev;
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter: %s", path);
+		goto out;
+	}
 
-		if (NULL == (instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-				"*[local-name()='instance']")))
-		{
-			continue;
-		}
+	xpath = zbx_dsprintf(NULL, "//*[local-name()='returnval']"
+			"[*[local-name()='entity'][@type='VirtualMachine']/text()='%s']"
+			"//*[local-name()='id'][*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']"
+			"/*[local-name()='instance'][text()]", vm->id, counterid);
 
+	zbx_vmware_lock();
+
+	if (NULL == service->stats)
+		zabbix_log(LOG_LEVEL_DEBUG, "performance counter data is not present");
+	else
+		zbx_xml_read_values(service->stats, xpath, &instances);
+
+	zbx_vmware_unlock();
+
+	for (i = 0; i < instances.values_num; i++)
+	{
 		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
-		dev->instance = zbx_strdup(NULL, instance);
+
+		/* transfer instance string ownership form vector to device object */
+		dev->instance = instances.values[i];
 
 		zbx_vector_ptr_append(&vm->devs, dev);
-		nics++;
-
-		zbx_free(instance);
+		devs++;
 	}
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
 
+out:
 	zbx_free(xpath);
 
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
+	/* the vector contents are transferred to vm devices, so skip the cleaning of vector contents */
+	zbx_vector_str_destroy(&instances);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, devs);
 }
 
 /******************************************************************************
@@ -1451,7 +1343,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_vm_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *vmid,
+static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyhandle, const char *vmid,
 		char **data, char **error)
 {
 #	define ZBX_POST_VMWARE_VM_STATUS_EX 						\
@@ -1485,7 +1377,7 @@ static int	vmware_service_get_vm_data(const zbx_vmware_service_t *service, CURL 
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1524,7 +1416,7 @@ out:
  *               detected.                                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *service,  CURL *easyhandle,
+static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service,  CURL *easyhandle,
 		const char *id, char **error)
 {
 	const char	*__function_name = "vmware_service_create_vm";
@@ -1553,10 +1445,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 
 	wmware_vm_get_nic_devices(vm);
 
-	if (SUCCEED != vmware_service_vm_get_stats(service, easyhandle, vm, error))
-		goto out;
-
-	wmware_vm_get_devices_by_counterid(vm, service->counters.disk_read);
+	wmware_service_get_devices_by_perfcounter(service, vm, "virtualDisk/read[average]");
 
 	ret = SUCCEED;
 out:
@@ -1704,7 +1593,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1743,7 +1632,7 @@ out:
  *               detected.                                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *service, CURL *easyhandle,
+static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *id, char **error)
 {
 	const char		*__function_name = "vmware_service_create_hv";
@@ -1786,9 +1675,6 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 		if (NULL != (datastore = vmware_service_create_datastore(service, easyhandle, datastores.values[i])))
 			zbx_vector_ptr_append(&hv->datastores, datastore);
 	}
-
-	if (SUCCEED != vmware_service_hv_get_stats(service, easyhandle, hv, error))
-		goto out;
 
 	zbx_xml_read_values(hv->details, "//*[@type='VirtualMachine']", &vms);
 
@@ -1964,9 +1850,10 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	if (ZBX_VMWARE_SERVICE_VCENTER == service->type)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS,
+				ZBX_POST_VCENTER_HV_LIST)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 			goto out;
 		}
 
@@ -2035,7 +1922,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -2052,7 +1939,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	if (NULL == (*event_session = zbx_xml_read_value(page.data, "//*[@type='EventHistoryCollector']")))
 	{
-		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session");
+		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session.");
 		goto out;
 	}
 
@@ -2114,7 +2001,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -2286,7 +2173,7 @@ static int	vmware_service_get_clusters(const zbx_vmware_service_t *service, CURL
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_CLUSTER)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -2358,7 +2245,7 @@ static int	vmware_service_get_cluster_status(const zbx_vmware_service_t *service
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -2473,24 +2360,191 @@ out:
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-	int	ret = FAIL;
-	char	*contents = NULL;
+	int			ret = FAIL;
+	char			*contents = NULL;
+	zbx_vector_ptr_t	counters;
 
-	if (SUCCEED != vmware_service_get_perfcounters(service, easyhandle, error))
+	zbx_vector_ptr_create(&counters);
+
+	if (SUCCEED != vmware_service_get_perfcounters(service, easyhandle, &counters, error))
 		goto out;
 
 	if (SUCCEED != vmware_service_get_contents(service, easyhandle, &contents, error))
 		goto out;
 
 	zbx_vmware_lock();
+
 	service->contents = vmware_shared_strdup(contents);
+	vmware_shared_counters_copy(&service->counters, &counters);
+
 	zbx_vmware_unlock();
 
 	ret = SUCCEED;
 out:
 	zbx_free(contents);
 
+	zbx_vector_ptr_clean(&counters, (zbx_mem_free_func_t)vmware_perfcounter_free);
+	zbx_vector_ptr_destroy(&counters);
+
 	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_perf_entity                                   *
+ *                                                                            *
+ * Purpose: gets performance entity by type and id                            *
+ *                                                                            *
+ * Parameters: service - [IN] the vmware service                              *
+ *             type    - [IN] the performance entity type                     *
+ *             id      - [IN] the performance entity id                       *
+ *                                                                            *
+ * Return value: the performance entity or NULL if not found                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_perf_entity_t	*vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id)
+{
+	const char			*__function_name = "vmware_service_get_perf_entity";
+	int				i;
+	zbx_vmware_perf_entity_t	*entity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s", __function_name, type, id);
+
+	for (i = 0; i < service->perf_entities.values_num; i++)
+	{
+		entity = service->perf_entities.values[i];
+
+		if (0 == strcmp(entity->type, type) && 0 == strcmp(entity->id, id))
+			goto out;
+	}
+
+	entity = NULL;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, entity);
+
+	return entity;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_add_perf_entity                                   *
+ *                                                                            *
+ * Purpose: adds entity to vmware service performance entity list             *
+ *                                                                            *
+ * Parameters: service  - [IN] the vmware service                             *
+ *             uuid     - [IN] the entity uuid                                *
+ *             counters - [IN] NULL terminated list of performance counters   *
+ *                             to be monitored for this entity                *
+ *             now      - [IN] the current timestamp                          *
+ *                                                                            *
+ * Comments: The performance counters are specified by their path:            *
+ *             <group>/<key>[<rollup type>]                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const char *type, const char *id,
+		const char **counters, int now)
+{
+	const char		*__function_name = "vmware_service_add_perf_entity";
+
+	zbx_vmware_perf_entity_t	*entity;
+	zbx_uint64_t			counterid;
+	int				i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s", __function_name, type, id);
+
+	if (NULL == (entity = vmware_service_get_perf_entity(service, type, id)))
+	{
+		entity = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_entity_t));
+		entity->refresh = 0;
+		entity->type = vmware_shared_strdup(type);
+		entity->id = vmware_shared_strdup(id);
+
+		zbx_vector_uint64_create_ext(&entity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
+				__vm_mem_free_func);
+
+		for (i = 0; NULL != counters[i]; i++)
+		{
+			if(FAIL == zbx_vmware_service_get_perfcounterid(service, counters[i], &counterid))
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
+			else
+				zbx_vector_uint64_append(&entity->counters, counterid);
+		}
+
+		zbx_vector_ptr_append(&service->perf_entities, entity);
+	}
+
+	entity->last_seen = now;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() perfcounters:%d", __function_name, entity->counters.values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_update_perf_entities                              *
+ *                                                                            *
+ * Purpose: adds new or remove old entities (hypervisors, virtual machines)   *
+ *          from service performance entity list                              *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
+{
+	const char			*__function_name = "vmware_service_add_perf_entity";
+
+	int				now, i, j;
+	zbx_vmware_perf_entity_t	*entity;
+	zbx_vmware_hv_t			*hv;
+	zbx_vmware_vm_t			*vm;
+
+	const char			*hv_perfcounters[] = {
+						"net/packetsRx[summation]", "net/packetsTx[summation]",
+						"net/received[average]", "net/transmitted[average]",
+						"datastore/totalReadLatency[average]",
+						"datastore/totalWriteLatency[average]", NULL
+					};
+	const char			*vm_perfcounters[] = {
+						"virtualDisk/read[average]", "virtualDisk/write[average]",
+						"virtualDisk/numberReadAveraged[average]",
+						"virtualDisk/numberWriteAveraged[average]",
+						"net/packetsRx[summation]", "net/packetsTx[summation]",
+						"net/received[average]", "net/transmitted[average]", NULL
+					};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	now = time(NULL);
+
+	/* update current performance entities */
+	for (i = 0; i < service->data->hvs.values_num; i++)
+	{
+		hv = service->data->hvs.values[i];
+		vmware_service_add_perf_entity(service, "HostSystem", hv->id, hv_perfcounters, now);
+
+		for (j = 0; j < hv->vms.values_num; j++)
+		{
+			vm = hv->vms.values[j];
+			vmware_service_add_perf_entity(service, "VirtualMachine", vm->id, vm_perfcounters, now);
+		}
+	}
+
+	/* remove old entities */
+	for (i = 0; i < service->perf_entities.values_num;)
+	{
+		entity = service->perf_entities.values[i];
+
+		if (0 != entity->last_seen && entity->last_seen < now)
+		{
+			vmware_shared_perf_entity_free(entity);
+			zbx_vector_ptr_remove_noorder(&service->perf_entities, i);
+			continue;
+		}
+		i++;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entities:%d", __function_name, service->perf_entities.values_num);
 }
 
 /******************************************************************************
@@ -2524,7 +2578,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot init cURL library");
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");
 		goto out;
 	}
 
@@ -2533,7 +2587,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -2576,7 +2630,9 @@ clean:
 out:
 	zbx_vmware_lock();
 
-	service->state = (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
+	/* remove UPDATING flag and set READY or FAILED flag */
+	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
+	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
@@ -2584,9 +2640,201 @@ out:
 
 	service->lastcheck = time(NULL);
 
+	vmware_service_update_perf_entities(service);
+
 	zbx_vmware_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_update_perf                                       *
+ *                                                                            *
+ * Purpose: updates vmware statistics data                                    *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_update_perf(zbx_vmware_service_t *service)
+{
+	const char	*__function_name = "vmware_service_update_perf";
+
+	CURL				*easyhandle = NULL;
+	struct curl_slist		*headers = NULL;
+	int				err, opt, i, j;
+	char				*error = NULL, *tmp = NULL;
+	size_t				tmp_alloc = 0, tmp_offset = 0;
+	zbx_vector_ptr_t		entities;
+	zbx_vmware_perf_entity_t	*entity, *local_entity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");
+		goto out;
+	}
+
+	zbx_vector_ptr_create(&entities);
+
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
+	{
+		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &error))
+		goto clean;
+
+	/* update performance counter refresh rate for entities */
+
+	/* create a local list of entities with zero refresh rate */
+	zbx_vector_ptr_create(&entities);
+
+	zbx_vmware_lock();
+
+	for (i = 0; i < service->perf_entities.values_num; i++)
+	{
+		entity = service->perf_entities.values[i];
+
+		if (0 != entity->refresh)
+			continue;
+
+		local_entity = zbx_malloc(NULL, sizeof(zbx_vmware_perf_entity_t));
+		local_entity->type = zbx_strdup(NULL, entity->type);
+		local_entity->id = zbx_strdup(NULL, entity->id);
+		local_entity->refresh = 0;
+		zbx_vector_uint64_create(&local_entity->counters);
+
+		zbx_vector_ptr_append(&entities, local_entity);
+	}
+
+	zbx_vmware_unlock();
+
+	/* get refresh rates */
+	for (i = 0; i < entities.values_num; i++)
+	{
+		local_entity = entities.values[i];
+
+		vmware_service_get_perfcounter_refreshrate(service, easyhandle, local_entity->type, local_entity->id,
+				&local_entity->refresh, &error);
+
+		if (NULL != error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get refresh rate for performance entity type:%s id:%s "
+					"error:%s", local_entity->type, local_entity->id, error);
+			zbx_free(error);
+		}
+	}
+
+	/* update refresh rates and create performance query request */
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerf>");
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>",
+			vmware_service_objects[service->type].performance_manager);
+
+	zbx_vmware_lock();
+
+	for (i = 0; i < service->perf_entities.values_num; i++)
+	{
+		entity = service->perf_entities.values[i];
+
+		if (0 == entity->refresh)
+		{
+			/* udpate entity refresh rate */
+			for (j = 0; j < entities.values_num; j++)
+			{
+				local_entity = entities.values[j];
+
+				if (0 == strcmp(local_entity->type, entity->type) &&
+						0 == strcmp(local_entity->id, entity->id))
+				{
+					break;
+				}
+			}
+
+			if (j == entities.values_num)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "skipping performance entity with zero refresh rate "
+						"type:%s id:%d", entity->type, entity->id);
+				continue;
+			}
+
+			entity->refresh = local_entity->refresh;
+		}
+
+		/* add entity performance counter request */
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"
+				"<ns0:entity type=\"%s\">%s</ns0:entity><ns0:maxSample>1</ns0:maxSample>",
+				entity->type, entity->id);
+
+		for (j = 0; j < entity->counters.values_num; j++)
+		{
+			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:metricId><ns0:counterId>" ZBX_FS_UI64
+					"</ns0:counterId><ns0:instance>*</ns0:instance></ns0:metricId>",
+					entity->counters.values[j]);
+		}
+
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId></ns0:querySpec>",
+				entity->refresh);
+	}
+
+	zbx_vmware_unlock();
+
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
+	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
+
+	zbx_vector_ptr_clean(&entities, (zbx_mem_free_func_t)vmware_perf_entity_free);
+	zbx_vector_ptr_destroy(&entities);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	{
+		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		goto clean;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		error = zbx_strdup(error, curl_easy_strerror(err));
+
+clean:
+	zbx_free(tmp);
+
+	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
+out:
+	zbx_vmware_lock();
+
+	if (NULL != error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot update vmware service performance statistics: %s", error);
+		zbx_free(error);
+	}
+	else
+	{
+		if (NULL != service->stats)
+			__vm_mem_free_func(service->stats);
+
+		service->stats = vmware_shared_strdup(page.data);
+
+		/* remember the performance counters queried by last update to avoid   */
+		/* setting not supported status for added, but not yet processed items */
+		zbx_vector_ptr_clean(&service->stats_entities, (zbx_mem_free_func_t)vmware_shared_perf_entity_free);
+		service->stats_entities.values_num = 0;
+		vmware_shared_perf_entities_dup(&service->stats_entities, &service->perf_entities);
+	}
+
+	service->state &= ~(ZBX_VMWARE_STATE_UPDATING_PERF);
+	service->lastperfcheck = time(NULL);
+
+	zbx_vmware_unlock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /*
@@ -2658,6 +2906,13 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->type = ZBX_VMWARE_SERVICE_UNKNOWN;
 	service->state = ZBX_VMWARE_STATE_NEW;
 	service->lastaccess = now;
+
+	zbx_vector_ptr_create_ext(&service->perf_entities, __vm_mem_malloc_func, __vm_mem_realloc_func,
+			__vm_mem_free_func);
+	zbx_vector_ptr_create_ext(&service->stats_entities, __vm_mem_malloc_func, __vm_mem_realloc_func,
+			__vm_mem_free_func);
+	zbx_hashset_create_ext(&service->counters, ZBX_VMWARE_COUNTERS_INIT_SIZE, vmware_counter_hash_func,
+			vmware_counter_compare_func, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
 
 	zbx_vector_ptr_append(&vmware->services, service);
 
@@ -2734,7 +2989,8 @@ void	zbx_vmware_destroy(void)
 #define	ZBX_VMWARE_SERVICE_NONE		0
 #define	ZBX_VMWARE_SERVICE_IDLE		1
 #define	ZBX_VMWARE_SERVICE_UPDATE	2
-#define	ZBX_VMWARE_SERVICE_REMOVE	3
+#define	ZBX_VMWARE_SERVICE_UPDATE_PERF	3
+#define	ZBX_VMWARE_SERVICE_REMOVE	4
 
 /******************************************************************************
  *                                                                            *
@@ -2747,7 +3003,7 @@ void	main_vmware_loop(void)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	int			i, now, state, next_update, updated_services = 0, removed_services = 0,
-				old_updated_services = 0, old_removed_services = 0, sleeptime = -1;
+				old_updated_services = 0, old_removed_services = 0, sleeptime = -1, nextcheck;
 	zbx_vmware_service_t	*service = NULL;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t			last_stat_time;
@@ -2781,8 +3037,26 @@ void	main_vmware_loop(void)
 			{
 				service = vmware->services.values[i];
 
+				if (0 == (service->state & ZBX_VMWARE_STATE_UPDATING_PERF) &&
+						0 != (service->state & ZBX_VMWARE_STATE_READY) &&
+						now - service->lastperfcheck >= ZBX_VMWARE_PERF_TTL)
+				{
+					service->state |= ZBX_VMWARE_STATE_UPDATING_PERF;
+					state = ZBX_VMWARE_SERVICE_UPDATE_PERF;
+					updated_services++;
+					break;
+				}
+
 				if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
 					continue;
+
+				if (now - service->lastcheck >= ZBX_VMWARE_CACHE_TTL)
+				{
+					service->state |= ZBX_VMWARE_STATE_UPDATING;
+					state = ZBX_VMWARE_SERVICE_UPDATE;
+					updated_services++;
+					break;
+				}
 
 				if (now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
 				{
@@ -2793,22 +3067,18 @@ void	main_vmware_loop(void)
 					break;
 				}
 
-				if (now - service->lastcheck >= ZBX_VMWARE_CACHE_TTL)
-				{
-					service->state |= ZBX_VMWARE_STATE_UPDATING;
-					state = ZBX_VMWARE_SERVICE_UPDATE;
-					updated_services++;
-					break;
-				}
+				nextcheck = MIN(ZBX_VMWARE_CACHE_TTL, ZBX_VMWARE_PERF_TTL);
 
-				if (service->lastcheck + ZBX_VMWARE_CACHE_TTL < next_update)
-					next_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
+				if (service->lastcheck + nextcheck < next_update)
+					next_update = service->lastcheck + nextcheck;
 			}
 
 			zbx_vmware_unlock();
 
 			if (ZBX_VMWARE_SERVICE_UPDATE == state)
 				vmware_service_update(service);
+			else if (ZBX_VMWARE_SERVICE_UPDATE_PERF == state)
+				vmware_service_update_perf(service);
 
 		} while (ZBX_VMWARE_SERVICE_IDLE != state);
 
@@ -2845,6 +3115,92 @@ void	main_vmware_loop(void)
 #undef STAT_INTERVAL
 #endif
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_service_get_perfcounterid                             *
+ *                                                                            *
+ * Purpose: gets vmware performance counter id by the path                    *
+ *                                                                            *
+ * Parameters: counters  - [IN] the counters hashset                          *
+ *             path      - [IN] the path of counter to retrieve in format     *
+ *                             <group>/<key>[<rollup type>]                   *
+ *             counterid - [OUT] the counter id                               *
+ *                                                                            *
+ * Return value: SUCCEED if the counter was found, FAIL otherwise             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path,
+		zbx_uint64_t *counterid)
+{
+	const char			*__function_name = "zbx_vmware_service_get_perfcounterid";
+	zbx_vmware_perfcounter_t	*counter;
+	int				ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __function_name, path);
+
+	if (NULL != (counter = zbx_hashset_search(&service->counters, &path)))
+	{
+		*counterid = counter->id;
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counterid:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
+			*counterid);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_service_start_monitoring                              *
+ *                                                                            *
+ * Purpose: start monitoring performance counter of the specified entity      *
+ *                                                                            *
+ * Parameters: service   - [IN] the vmware service                            *
+ *             type      - [IN] the entity type                               *
+ *             id        - [IN] the entity id                                 *
+ *             counterid - [IN] the performance counter id                    *
+ *                                                                            *
+ * Return value: SUCCEED - the entity counter was added to monitoring list.   *
+ *               FAIL    - the performance counter of the specified entity    *
+ *                         is already being monitored.                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid)
+{
+	const char			*__function_name = "zbx_vmware_service_start_monitoring";
+	int				ret = FAIL;
+	zbx_vmware_perf_entity_t	*entity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64, __function_name, type, id,
+			counterid);
+
+	if (NULL == (entity = vmware_service_get_perf_entity(service, type, id)))
+	{
+		entity = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_entity_t));
+		entity->refresh = 0;
+		entity->last_seen = 0;
+		entity->type = vmware_shared_strdup(type);
+		entity->id = vmware_shared_strdup(id);
+		zbx_vector_uint64_create_ext(&entity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
+				__vm_mem_free_func);
+
+		zbx_vector_ptr_append(&service->perf_entities, entity);
+	}
+
+	if (FAIL == zbx_vector_uint64_search(&entity->counters, counterid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	{
+		zbx_vector_uint64_append(&entity->counters, counterid);
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 
 /******************************************************************************
  *                                                                            *
