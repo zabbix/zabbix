@@ -547,12 +547,12 @@ class CAction extends CApiService {
 
 		// Insert actions into db, get back array with new actionids.
 		$actions = DB::save('actions', $actions);
+		$actions = zbx_toHash($actions, 'actionid');
 
 		$conditionsToCreate = array();
 		$operationsToCreate = array();
 		// Collect conditions and operations to be created and set appropriate action ID.
-		foreach ($actions as &$action) {
-			$actionId = $action['actionid'];
+		foreach ($actions as $actionId => &$action) {
 			if (isset($action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionId;
@@ -576,10 +576,11 @@ class CAction extends CApiService {
 		}
 
 		// Update "formula" field if evaltype is custom expression.
-		foreach ($actions as $createdActionId => $action) {
+		foreach ($actions as $actionId => $action) {
 			if (isset($action['filter'])) {
-				if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$this->updateFormula($createdActionId, $action['filter']['formula'], $conditionsForActions[$createdActionId]);
+				$actionFilter = $action['filter'];
+				if ($actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$this->updateFormula($actionId, $actionFilter['formula'], $conditionsForActions[$actionId]);
 				}
 			}
 		}
