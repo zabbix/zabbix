@@ -1480,7 +1480,10 @@ class CConfigurationImport {
 
 				foreach ($applications as $application) {
 					$applicationId = $this->referencer->resolveApplication($hostId, $application['name']);
-					$applicationIdsXML[$applicationId] = $applicationId;
+
+					if ($applicationId) {
+						$applicationIdsXML[$applicationId] = $applicationId;
+					}
 				}
 			}
 		}
@@ -1685,6 +1688,7 @@ class CConfigurationImport {
 
 				foreach ($discoveryRules as $discoveryRule) {
 					$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+
 					if ($discoveryRuleId) {
 						$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
 					}
@@ -1721,39 +1725,41 @@ class CConfigurationImport {
 			foreach ($discoveryRules as $discoveryRule) {
 				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
 
-				// gather host prototype IDs to delete
-				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
-					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $discoveryRuleId,
-						$hostPrototype['host']
-					);
+				if ($discoveryRuleId) {
+					// gather host prototype IDs to delete
+					foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
+						$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $discoveryRuleId,
+							$hostPrototype['host']
+						);
 
-					if ($hostPrototypeId) {
-						$hostPrototypeIdsXML[$hostPrototypeId] = $hostPrototypeId;
+						if ($hostPrototypeId) {
+							$hostPrototypeIdsXML[$hostPrototypeId] = $hostPrototypeId;
+						}
 					}
-				}
 
-				// gather trigger prototype IDs to delete
-				foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
-					$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
-						$triggerPrototype['expression']
-					);
+					// gather trigger prototype IDs to delete
+					foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
+						$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
+							$triggerPrototype['expression']
+						);
 
-					if ($triggerPrototypeId) {
-						$triggerPrototypeIdsXML[$triggerPrototypeId] = $triggerPrototypeId;
+						if ($triggerPrototypeId) {
+							$triggerPrototypeIdsXML[$triggerPrototypeId] = $triggerPrototypeId;
+						}
 					}
-				}
 
-				// gather graph prototype names for later usage
-				foreach ($discoveryRule['graph_prototypes'] as $graphPrototype) {
-					$graphPrototypeNames[] = $graphPrototype['name'];
-				}
+					// gather graph prototype names for later usage
+					foreach ($discoveryRule['graph_prototypes'] as $graphPrototype) {
+						$graphPrototypeNames[] = $graphPrototype['name'];
+					}
 
-				// gather item prototype IDs to delete
-				foreach ($discoveryRule['item_prototypes'] as $itemPrototype) {
-					$itemPrototypeId = $this->referencer->resolveItem($hostId, $itemPrototype['key_']);
+					// gather item prototype IDs to delete
+					foreach ($discoveryRule['item_prototypes'] as $itemPrototype) {
+						$itemPrototypeId = $this->referencer->resolveItem($hostId, $itemPrototype['key_']);
 
-					if ($itemPrototypeId) {
-						$itemPrototypeIdsXML[$itemPrototypeId] = $itemPrototypeId;
+						if ($itemPrototypeId) {
+							$itemPrototypeIdsXML[$itemPrototypeId] = $itemPrototypeId;
+						}
 					}
 				}
 			}
