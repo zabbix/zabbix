@@ -217,8 +217,6 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 
 		$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
 
-		$newCondition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
-
 		$validateConditions = $conditions;
 
 		if (isset($newCondition['value'])) {
@@ -226,6 +224,8 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			foreach ($newConditionValues as $newValue) {
 				$condition = $newCondition;
 				$condition['value'] = $newValue;
+				$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
+				$usedFormulaIds[] = $condition['formulaid'];
 				$validateConditions[] = $condition;
 			}
 		}
