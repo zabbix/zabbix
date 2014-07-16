@@ -1327,7 +1327,7 @@ class CConfigurationImport {
 		if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
 			$maps = $this->getFormattedMaps();
 			if ($maps) {
-				$mapImporter = new CMapImporter($this->options, $this->referencer);
+				$mapImporter = new CMapImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$mapImporter->import($maps);
 			}
 		}
@@ -1340,7 +1340,9 @@ class CConfigurationImport {
 		if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
 			$screens = $this->getFormattedScreens();
 			if ($screens) {
-				$screenImporter = new CScreenImporter($this->options, $this->referencer);
+				$screenImporter = new CScreenImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
 				$screenImporter->import($screens);
 			}
 		}
@@ -1354,7 +1356,9 @@ class CConfigurationImport {
 				|| $this->options['templateScreens']['createMissing']
 				|| $this->options['templateScreens']['deleteMissing']) {
 			$screens = $this->getFormattedTemplateScreens();
-			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer, $this->formatter);
+			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer,
+				$this->importedObjectContainer
+			);
 			$screenImporter->import($screens);
 			$screenImporter->delete($screens);
 		}

@@ -87,12 +87,12 @@ class CImportedObjectContainer {
 	/**
 	 * Checks if template has been created and updated during the current import.
 	 *
-	 * @param $host
+	 * @param $template
 	 *
 	 * @return bool
 	 */
-	public function isTemplateProcessed($host) {
-		return isset($this->templates[$host]);
+	public function isTemplateProcessed($template) {
+		return isset($this->templates[$template]);
 	}
 
 	/**

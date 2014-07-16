@@ -22,32 +22,6 @@
 class CTemplateScreenImporter extends CAbstractScreenImporter {
 
 	/**
-	 * @var CImportReferencer
-	 */
-	protected $referencer;
-
-	/**
-	 * @var CImportFormatter
-	 */
-	protected $formatter;
-
-	/**
-	 * @var array
-	 */
-	protected $options = array();
-
-	/**
-	 * @param array             $options
-	 * @param CImportReferencer $referencer
-	 * @param CImportFormatter  $formatter
-	 */
-	public function __construct(array $options, CImportReferencer $referencer, CImportFormatter $formatter) {
-		$this->options = $options;
-		$this->referencer = $referencer;
-		$this->formatter = $formatter;
-	}
-
-	/**
 	 * Import template screens.
 	 *
 	 * @param array $allScreens
@@ -64,6 +38,10 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$screensToUpdate = array();
 
 		foreach ($allScreens as $template => $screens) {
+			if ($this->importedObjectContainer->isTemplateProcessed($template)) {
+				continue;
+			}
+
 			$templateId = $this->referencer->resolveTemplate($template);
 
 			foreach ($screens as $screenName => $screen) {
@@ -105,22 +83,11 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 			return;
 		}
 
-		$templates = $this->formatter->getTemplates();
+		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
 
-		if (!$templates) {
+		// no templates have been processed
+		if (!$templateIdsXML) {
 			return;
-		}
-
-		$templates = zbx_objectValues($templates, 'host');
-
-		$templateIdsXML = array();
-
-		foreach ($templates as $template) {
-			$templateId = $this->referencer->resolveTemplate($template);
-
-			if ($templateId) {
-				$templateIdsXML[$template] = $templateId;
-			}
 		}
 
 		$templateScreenIdsXML = array();
