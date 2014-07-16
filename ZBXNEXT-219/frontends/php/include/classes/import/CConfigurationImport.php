@@ -208,256 +208,254 @@ class CConfigurationImport {
 		$proxyRefs = array();
 		$hostPrototypeRefs = array();
 
-		if ($this->options['groups']['createMissing']) {
-			foreach ($this->getFormattedGroups() as $group) {
+		foreach ($this->getFormattedGroups() as $group) {
+			$groupsRefs[$group['name']] = $group['name'];
+		}
+
+		foreach ($this->getFormattedTemplates() as $template) {
+			$templatesRefs[$template['host']] = $template['host'];
+
+			foreach ($template['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
-		}
 
-		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
-			foreach ($this->getFormattedTemplates() as $template) {
-				$templatesRefs[$template['host']] = $template['host'];
+			foreach ($template['macros'] as $macro) {
+				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+			}
 
-				foreach ($template['groups'] as $group) {
-					$groupsRefs[$group['name']] = $group['name'];
-				}
-
-				foreach ($template['macros'] as $macro) {
-					$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
-				}
-
-				if (!empty($template['templates'])) {
-					foreach ($template['templates'] as $linkedTemplate) {
-						$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
-					}
+			if (!empty($template['templates'])) {
+				foreach ($template['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
 			}
 		}
 
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-			foreach ($this->getFormattedHosts() as $host) {
-				$hostsRefs[$host['host']] = $host['host'];
+		foreach ($this->getFormattedHosts() as $host) {
+			$hostsRefs[$host['host']] = $host['host'];
 
-				foreach ($host['groups'] as $group) {
-					$groupsRefs[$group['name']] = $group['name'];
-				}
+			foreach ($host['groups'] as $group) {
+				$groupsRefs[$group['name']] = $group['name'];
+			}
 
-				foreach ($host['macros'] as $macro) {
-					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
-				}
+			foreach ($host['macros'] as $macro) {
+				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			}
 
-				if (!empty($host['templates'])) {
-					foreach ($host['templates'] as $linkedTemplate) {
-						$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
-					}
+			if (!empty($host['templates'])) {
+				foreach ($host['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
+			}
 
-				if (!empty($host['proxy'])) {
-					$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
-				}
+			if (!empty($host['proxy'])) {
+				$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
 			}
 		}
 
-		// application list is required when items, item prototypes are created and/or updated
-		// or applications are handled separately
-		if ($this->options['items']['updateExisting']
-				|| $this->options['items']['createMissing']
-				|| $this->options['discoveryRules']['updateExisting']
-				|| $this->options['discoveryRules']['createMissing']
-				|| $this->options['applications']['createMissing']
-				|| $this->options['applications']['deleteMissing']) {
-			foreach ($this->getFormattedApplications() as $host => $applications) {
-				foreach ($applications as $app) {
+
+		foreach ($this->getFormattedApplications() as $host => $applications) {
+			foreach ($applications as $app) {
+				$applicationsRefs[$host][$app['name']] = $app['name'];
+			}
+		}
+
+		foreach ($this->getFormattedItems() as $host => $items) {
+			foreach ($items as $item) {
+				$itemsRefs[$host][$item['key_']] = $item['key_'];
+
+				foreach ($item['applications'] as $app) {
 					$applicationsRefs[$host][$app['name']] = $app['name'];
 				}
+
+				if (!empty($item['valuemap'])) {
+					$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
+				}
 			}
 		}
 
-		if ($this->options['items']['updateExisting']
-				|| $this->options['items']['createMissing']
-				|| $this->options['items']['deleteMissing']) {
-			foreach ($this->getFormattedItems() as $host => $items) {
-				foreach ($items as $item) {
-					$itemsRefs[$host][$item['key_']] = $item['key_'];
+		foreach ($this->getFormattedDiscoveryRules() as $host => $discoveryRules) {
+			foreach ($discoveryRules as $discoveryRule) {
+				$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
 
-					foreach ($item['applications'] as $app) {
+				foreach ($discoveryRule['item_prototypes'] as $itemp) {
+					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
+
+					foreach ($itemp['applications'] as $app) {
 						$applicationsRefs[$host][$app['name']] = $app['name'];
 					}
 
-					if (!empty($item['valuemap'])) {
-						$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
+					if (!empty($itemp['valuemap'])) {
+						$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
 					}
 				}
-			}
-		}
 
-		if ($this->options['discoveryRules']['updateExisting']
-				|| $this->options['discoveryRules']['createMissing']
-				|| $this->options['discoveryRules']['deleteMissing']) {
-			foreach ($this->getFormattedDiscoveryRules() as $host => $discoveryRules) {
-				foreach ($discoveryRules as $discoveryRule) {
-					$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
-
-					foreach ($discoveryRule['item_prototypes'] as $itemp) {
-						$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
-
-						foreach ($itemp['applications'] as $app) {
-							$applicationsRefs[$host][$app['name']] = $app['name'];
-						}
-
-						if (!empty($itemp['valuemap'])) {
-							$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
-						}
-					}
-
-					foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
-						$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
-					}
-
-					foreach ($discoveryRule['graph_prototypes'] as $graph) {
-						if ($graph['ymin_item_1']) {
-							$yMinItem = $graph['ymin_item_1'];
-							$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
-						}
-
-						if ($graph['ymax_item_1']) {
-							$yMaxItem = $graph['ymax_item_1'];
-							$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
-						}
-
-						foreach ($graph['gitems'] as $gitem) {
-							$gitemItem = $gitem['item'];
-							$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
-						}
-					}
-
-					foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
-						$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
-
-						foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
-							if (isset($groupPrototype['group'])) {
-								$groupsRefs[$groupPrototype['group']['name']] = $groupPrototype['group']['name'];
-							}
-						}
-
-						foreach ($hostPrototype['templates'] as $template) {
-							$templatesRefs[$template['name']] = $template['name'];
-						}
-					}
-				}
-			}
-		}
-
-		if ($this->options['graphs']['updateExisting']
-				|| $this->options['graphs']['createMissing']
-				|| $this->options['graphs']['deleteMissing']) {
-			foreach ($this->getFormattedGraphs() as $graph) {
-				if ($graph['ymin_item_1']) {
-					$yMinItem = $graph['ymin_item_1'];
-
-					$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
-					$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
+				foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
+					$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
 				}
 
-				if ($graph['ymax_item_1']) {
-					$yMaxItem = $graph['ymax_item_1'];
+				foreach ($discoveryRule['graph_prototypes'] as $graph) {
+					if ($graph['ymin_item_1']) {
+						$yMinItem = $graph['ymin_item_1'];
+						$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
+					}
 
-					$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
-					$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
-				}
+					if ($graph['ymax_item_1']) {
+						$yMaxItem = $graph['ymax_item_1'];
+						$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
+					}
 
-				if (isset($graph['gitems']) && $graph['gitems']) {
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemItem = $gitem['item'];
-
-						$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
 						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 					}
 				}
-			}
-		}
 
-		if ($this->options['triggers']['updateExisting']
-				|| $this->options['triggers']['createMissing']
-				|| $this->options['triggers']['deleteMissing']) {
-			foreach ($this->getFormattedTriggers() as $trigger) {
-				$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
+					$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
 
-				foreach ($trigger['dependencies'] as $dependency) {
-					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
-				}
-			}
-		}
-
-		if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-			foreach ($this->getFormattedMaps() as $map) {
-				$mapsRefs[$map['name']] = $map['name'];
-
-				if (!empty($map['iconmap'])) {
-					$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
-				}
-
-				if (isset($map['selements'])) {
-					foreach ($map['selements'] as $selement) {
-						switch ($selement['elementtype']) {
-							case SYSMAP_ELEMENT_TYPE_MAP:
-								$mapsRefs[$selement['element']['name']] = $selement['element']['name'];
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-								$groupsRefs[$selement['element']['name']] = $selement['element']['name'];
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_HOST:
-								$hostsRefs[$selement['element']['host']] = $selement['element']['host'];
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_TRIGGER:
-								$el = $selement['element'];
-								$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
-								break;
+					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
+						if (isset($groupPrototype['group'])) {
+							$groupsRefs[$groupPrototype['group']['name']] = $groupPrototype['group']['name'];
 						}
 					}
-				}
 
-				if (isset($map['links'])) {
-					foreach ($map['links'] as $link) {
-						if (isset($link['linktriggers'])) {
-							foreach ($link['linktriggers'] as $linkTrigger) {
-								$t = $linkTrigger['trigger'];
-								$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
-							}
-						}
+					foreach ($hostPrototype['templates'] as $template) {
+						$templatesRefs[$template['name']] = $template['name'];
 					}
 				}
 			}
 		}
 
-		if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-			foreach ($this->getFormattedScreens() as $screen) {
-				$screensRefs[$screen['name']] = $screen['name'];
+		foreach ($this->getFormattedGraphs() as $graph) {
+			if ($graph['ymin_item_1']) {
+				$yMinItem = $graph['ymin_item_1'];
+
+				$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
+				$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
+			}
+
+			if ($graph['ymax_item_1']) {
+				$yMaxItem = $graph['ymax_item_1'];
+
+				$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
+				$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
+			}
+
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as $gitem) {
+					$gitemItem = $gitem['item'];
+
+					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
+					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+				}
+			}
+		}
+
+		foreach ($this->getFormattedTriggers() as $trigger) {
+			$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+
+			foreach ($trigger['dependencies'] as $dependency) {
+				$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+			}
+		}
+
+		foreach ($this->getFormattedMaps() as $map) {
+			$mapsRefs[$map['name']] = $map['name'];
+
+			if (!empty($map['iconmap'])) {
+				$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
+			}
+
+			if (isset($map['selements'])) {
+				foreach ($map['selements'] as $selement) {
+					switch ($selement['elementtype']) {
+						case SYSMAP_ELEMENT_TYPE_MAP:
+							$mapsRefs[$selement['element']['name']] = $selement['element']['name'];
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+							$groupsRefs[$selement['element']['name']] = $selement['element']['name'];
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_HOST:
+							$hostsRefs[$selement['element']['host']] = $selement['element']['host'];
+							break;
+
+						case SYSMAP_ELEMENT_TYPE_TRIGGER:
+							$el = $selement['element'];
+							$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
+							break;
+					}
+				}
+			}
+
+			if (isset($map['links'])) {
+				foreach ($map['links'] as $link) {
+					if (isset($link['linktriggers'])) {
+						foreach ($link['linktriggers'] as $linkTrigger) {
+							$t = $linkTrigger['trigger'];
+							$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($this->getFormattedScreens() as $screen) {
+			$screensRefs[$screen['name']] = $screen['name'];
+
+			if (!empty($screen['screenitems'])) {
+				foreach ($screen['screenitems'] as $screenItem) {
+					$resource = $screenItem['resource'];
+
+					if (empty($resource)) {
+						continue;
+					}
+
+					switch ($screenItem['resourcetype']) {
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							$groupsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$hostsRefs[$resource['host']] = $resource['host'];
+							break;
+
+						case SCREEN_RESOURCE_GRAPH:
+							// TODO: gather graphs too
+							break;
+
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$hostsRefs[$resource['host']] = $resource['host'];
+							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+							break;
+
+						case SCREEN_RESOURCE_MAP:
+							$mapsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_SCREEN:
+							$screensRefs[$resource['name']] = $resource['name'];
+							break;
+					}
+				}
+			}
+		}
+
+		foreach ($this->getFormattedTemplateScreens() as $screens) {
+			foreach ($screens as $screen) {
+				$templateScreensRefs[$screen['name']] = $screen['name'];
 
 				if (!empty($screen['screenitems'])) {
 					foreach ($screen['screenitems'] as $screenItem) {
 						$resource = $screenItem['resource'];
 
-						if (empty($resource)) {
-							continue;
-						}
-
 						switch ($screenItem['resourcetype']) {
-							case SCREEN_RESOURCE_HOSTS_INFO:
-							case SCREEN_RESOURCE_TRIGGERS_INFO:
-							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							case SCREEN_RESOURCE_DATA_OVERVIEW:
-							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-								$groupsRefs[$resource['name']] = $resource['name'];
-								break;
-
-							case SCREEN_RESOURCE_HOST_TRIGGERS:
-								$hostsRefs[$resource['host']] = $resource['host'];
-								break;
-
 							case SCREEN_RESOURCE_GRAPH:
 								// TODO: gather graphs too
 								break;
@@ -467,42 +465,6 @@ class CConfigurationImport {
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 								break;
-
-							case SCREEN_RESOURCE_MAP:
-								$mapsRefs[$resource['name']] = $resource['name'];
-								break;
-
-							case SCREEN_RESOURCE_SCREEN:
-								$screensRefs[$resource['name']] = $resource['name'];
-								break;
-						}
-					}
-				}
-			}
-		}
-
-		if ($this->options['templateScreens']['updateExisting']
-				|| $this->options['templateScreens']['createMissing']
-				|| $this->options['templateScreens']['deleteMissing']) {
-			foreach ($this->getFormattedTemplateScreens() as $screens) {
-				foreach ($screens as $screen) {
-					$templateScreensRefs[$screen['name']] = $screen['name'];
-
-					if (!empty($screen['screenitems'])) {
-						foreach ($screen['screenitems'] as $screenItem) {
-							$resource = $screenItem['resource'];
-
-							switch ($screenItem['resourcetype']) {
-								case SCREEN_RESOURCE_GRAPH:
-									// TODO: gather graphs too
-									break;
-
-								case SCREEN_RESOURCE_SIMPLE_GRAPH:
-								case SCREEN_RESOURCE_PLAIN_TEXT:
-									$hostsRefs[$resource['host']] = $resource['host'];
-									$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
-									break;
-							}
 						}
 					}
 				}
@@ -1388,10 +1350,14 @@ class CConfigurationImport {
 	 * Import template screens.
 	 */
 	protected function processTemplateScreens() {
-		$screens = $this->getFormattedTemplateScreens();
-		$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer, $this->formatter);
-		$screenImporter->import($screens);
-		$screenImporter->delete($screens);
+		if ($this->options['templateScreens']['updateExisting']
+				|| $this->options['templateScreens']['createMissing']
+				|| $this->options['templateScreens']['deleteMissing']) {
+			$screens = $this->getFormattedTemplateScreens();
+			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer, $this->formatter);
+			$screenImporter->import($screens);
+			$screenImporter->delete($screens);
+		}
 	}
 
 	/**
