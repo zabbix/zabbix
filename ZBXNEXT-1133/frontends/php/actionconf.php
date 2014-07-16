@@ -80,7 +80,7 @@ if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = getRequest('go', 'none');
 

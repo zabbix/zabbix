@@ -46,7 +46,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('cnt', 'name', 'delay'));
 
 if (!empty($_REQUEST['slides'])) {
 	natksort($_REQUEST['slides']);
@@ -160,7 +160,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'form' => get_request('form', null),
-		'form_refresh' => get_request('form_refresh', null),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'slideshowid' => get_request('slideshowid', null),
 		'name' => get_request('name', ''),
 		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),

@@ -24,7 +24,6 @@ include('include/views/js/administration.general.valuemapping.edit.js.php');
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valueMappingForm');
 $valueMappingForm->addVar('form', $this->data['form']);
-$valueMappingForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
 
 // create form list

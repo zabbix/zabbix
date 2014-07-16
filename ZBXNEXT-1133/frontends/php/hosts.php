@@ -92,7 +92,7 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,			null),
 	// filter
 	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
@@ -104,7 +104,7 @@ $fields = array(
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 
@@ -416,6 +416,13 @@ elseif (hasRequest('save')) {
 				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 					unset($interface[$key]);
 					continue;
+				}
+
+				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
+					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
+				}
+				else {
+					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
 				}
 
 				if ($interface['isNew']) {

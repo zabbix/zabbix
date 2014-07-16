@@ -35,7 +35,7 @@ $fields = array(
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// group
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
 	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -44,10 +44,10 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 /*
  * Form actions
@@ -200,7 +200,7 @@ elseif (hasRequest('go')) {
 			DBstart();
 
 			$hosts = API::Host()->get(array(
-				'output' => array('hostid', 'status'),
+				'output' => array('hostid', 'status', 'host'),
 				'groupids' => $groupIds,
 				'editable' => true
 			));

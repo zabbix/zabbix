@@ -9,11 +9,11 @@
 		</td>
 		<td>
 			<input class="input text" type="text" id="inventory_#{rowNum}_value" name="inventory[#{rowNum}][value]"
-					size="20" maxlength="255">
+				   size="20" maxlength="255">
 		</td>
 		<td>
 			<input class="input link_menu element-table-remove" type="button" id="inventory_#{rowNum}_remove"
-					name="inventory_#{rowNum}_remove" value="<?php echo _('Remove'); ?>">
+				   name="inventory_#{rowNum}_remove" value="<?php echo _('Remove'); ?>">
 		</td>
 	</tr>
 </script>

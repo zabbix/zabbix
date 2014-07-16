@@ -294,15 +294,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of WEB page. Default path is /')
+					'description' => _('Get content of web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full WEB page. Default path is /')
+					'description' => _('Get timing of loading full web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
-					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+					'description' => _('Get first occurrence of regexp in web page. Default path is /')
 				)
 			),
 			ITEM_TYPE_ZABBIX_ACTIVE => array(
@@ -552,15 +552,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of WEB page. Default path is /')
+					'description' => _('Get content of web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full WEB page. Default path is /')
+					'description' => _('Get timing of loading full web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
-					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+					'description' => _('Get first occurrence of regexp in web page. Default path is /')
 				)
 			),
 			ITEM_TYPE_AGGREGATE => array(

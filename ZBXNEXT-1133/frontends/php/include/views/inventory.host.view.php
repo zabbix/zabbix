@@ -167,19 +167,28 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['os']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['os']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['os']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['os']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 	if ($this->data['host']['inventory']['hardware']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['hardware']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['hardware']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['hardware']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 	if ($this->data['host']['inventory']['software']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['software']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['software']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['software']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 }
@@ -187,7 +196,10 @@ if ($this->data['host']['inventory']) {
 // description
 if ($this->data['host']['description'] !== '') {
 	$overviewFormList->addRow(_('Description'),
-		new CDiv(zbx_str2links($this->data['host']['description']), 'description')
+		array(new CDiv(new CSpan(
+			zbx_str2links($this->data['host']['description']), 'inventory-text-field'),
+			'inventory-text-field-wrap'
+		))
 	);
 }
 
@@ -256,7 +268,7 @@ if ($this->data['host']['inventory']) {
 		if (!zbx_empty($value)) {
 			$detailsFormList->addRow(
 				$this->data['tableTitles'][$key]['title'],
-				new CSpan(zbx_str2links($value), 'text-field')
+				array(new CDiv(new CSpan(zbx_str2links($value), 'inventory-text-field'), 'inventory-text-field-wrap'))
 			);
 
 			$inventoryValues = true;

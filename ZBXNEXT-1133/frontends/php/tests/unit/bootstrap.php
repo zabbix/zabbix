@@ -30,6 +30,7 @@ require_once __DIR__.'/../../include/validate.inc.php';
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 
 $autoloader = new CAutoloader(array(
+	__DIR__.'/../../include/classes',
 	__DIR__.'/../../include/classes/core',
 	__DIR__.'/../../include/classes/helpers',
 	__DIR__.'/../../include/classes/db',
