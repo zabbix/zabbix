@@ -98,8 +98,6 @@ static zbx_history_table_t areg = {
  *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
  *                          proxy is configured in passive mode               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
 {
@@ -160,8 +158,6 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
  *                                                                            *
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	update_proxy_lastaccess(const zbx_uint64_t hostid)
 {
@@ -173,8 +169,6 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  * Function: get_proxyconfig_table                                            *
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
@@ -418,8 +412,6 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
@@ -657,8 +649,6 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_parse *jp_obj,
@@ -1187,8 +1177,6 @@ out:
  *                                                                            *
  * Purpose: update configuration                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	process_proxyconfig(struct zbx_json_parse *jp_data)
 {
@@ -1305,8 +1293,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 #define CHECK_ARRAY_SIZE(array, alloc, num)				\
@@ -1466,8 +1452,6 @@ int	get_host_availability_data(struct zbx_json *j)
  * Function: process_host_availability                                        *
  *                                                                            *
  * Purpose: update proxy hosts availability                                   *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	process_host_availability(struct zbx_json_parse *jp)
@@ -1643,8 +1627,6 @@ out:
  *                                                                            *
  * Function: proxy_get_lastid                                                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
 {
@@ -1669,8 +1651,6 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 /******************************************************************************
  *                                                                            *
  * Function: proxy_set_lastid                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
@@ -1720,8 +1700,6 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  * Function: proxy_get_history_data_simple                                    *
  *                                                                            *
  * Purpose: Get history data from the database.                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_history_data_simple(struct zbx_json *j, const zbx_history_table_t *ht, zbx_uint64_t *lastid)
@@ -1806,8 +1784,6 @@ try_again:
  *                                                                            *
  * Purpose: Get history data from the database. Get items configuration from  *
  *          cache to speed things up.                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
@@ -2073,8 +2049,6 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             values_num   - [IN] number of elements in array                *
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t values_num, int *processed)
@@ -2259,8 +2233,6 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Alexander Vladishev, Alexei Vladishev                              *
- *                                                                            *
  ******************************************************************************/
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
@@ -2410,8 +2382,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  *                                                                            *
  * Purpose: update discovery data, received from proxy                        *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	process_dhis_data(struct zbx_json_parse *jp)
 {
@@ -2546,8 +2516,6 @@ exit:
  * Function: process_areg_data                                                *
  *                                                                            *
  * Purpose: update auto-registration data, received from proxy                *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
