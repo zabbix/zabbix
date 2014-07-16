@@ -328,6 +328,9 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	public function testGetNextFormulaIdProvider() {
 		return array(
 			array(
+				array(), 'A'
+			),
+			array(
 				array('A', 'B', 'C'), 'D'
 			),
 			array(

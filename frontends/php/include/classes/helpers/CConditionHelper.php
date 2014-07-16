@@ -192,7 +192,6 @@ class CConditionHelper {
 	 *
 	 * @param array $formulaIds
 	 *
-	 * @throws InvalidArgumentException
 	 * @return string
 	 */
 	public static function getNextFormulaId(array $formulaIds) {
