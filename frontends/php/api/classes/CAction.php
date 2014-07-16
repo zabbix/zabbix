@@ -464,21 +464,29 @@ class CAction extends CApiService {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 
-			foreach ($result as &$rule) {
+			foreach ($result as &$action) {
 				// unset the fields that are returned in the filter
-				unset($rule['formula'], $rule['evaltype']);
+				unset($action['formula'], $action['evaltype']);
 
 				if ($options['selectFilter'] !== null) {
 					$filter = $this->unsetExtraFields(
-						array($rule['filter']),
+						array($action['filter']),
 						array('conditions', 'formula', 'evaltype'),
 						$options['selectFilter']
 					);
+					$filter = reset($filter);
 
-					$rule['filter'] = reset($filter);
+					if (isset($filter['conditions'])) {
+						foreach ($filter['conditions'] as &$condition) {
+							unset($condition['actionid'], $condition['conditionid']);
+						}
+						unset($condition);
+					}
+
+					$action['filter'] = $filter;
 				}
 			}
-			unset($rule);
+			unset($action);
 		}
 
 		// removing keys (hash -> array)
@@ -1530,7 +1538,6 @@ class CAction extends CApiService {
 					$formulaIds = CConditionHelper::getFormulaIds($formula);
 					foreach ($filter['conditions'] as &$condition) {
 						$condition['formulaid'] = $formulaIds[$condition['conditionid']];
-						unset($condition['actionid'], $condition['conditionid']);
 					}
 					unset($condition);
 
