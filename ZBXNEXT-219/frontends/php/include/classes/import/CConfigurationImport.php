@@ -1458,7 +1458,7 @@ class CConfigurationImport {
 			'output' => array('applicationid'),
 			'hostids' => $hostIdsXML,
 			'preservekeys' => true,
-			'nopermissions' => true,
+			'editable' => true,
 			'inherited' => false
 		));
 
