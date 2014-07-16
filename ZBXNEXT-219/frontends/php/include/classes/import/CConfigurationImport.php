@@ -1584,21 +1584,6 @@ class CConfigurationImport {
 			));
 		}
 
-		// check permissions only if there was no update or create. Else permissions are already checked.
-		if (!$this->options['graphs']['createMissing'] && !$this->options['graphs']['updateExisting']) {
-			$allowedGraphs = API::Graph()->get(array(
-				'output' => array('graphid'),
-				'graphids' => array_keys($graphsXML),
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($graphsXML as $graph) {
-				if (!isset($allowedGraphs[$graph['graphid']])) {
-					throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
-				}
-			}
-		}
-
 		$dbGraphIds = API::Graph()->get(array(
 			'output' => array('graphid'),
 			'hostids' => $hostIdsXML,
