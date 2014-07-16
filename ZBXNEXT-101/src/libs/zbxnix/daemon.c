@@ -35,8 +35,7 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern unsigned char	get_process_type_by_server_num(int server_num);
-extern int		get_process_num_by_server_num(int server_num);
+extern void get_process_info_by_thread(int server_num, int *process_type, int *process_num);
 
 /******************************************************************************
  *                                                                            *
@@ -148,17 +147,23 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		}
 		else
 		{
+			int process_type;
+			int process_num;
+
 			for (i = 0; i < threads_num; i++)
 			{
-				if (((unsigned char *)&task)[1] == get_process_type_by_server_num(i+1) &&
+
+				get_process_info_by_thread(i+1, &process_type, &process_num);
+
+				if (((unsigned char *)&task)[1] == process_type &&
 						((0 == ((unsigned short *)&task)[1]) ||
-						((unsigned short *)&task)[1] == get_process_num_by_server_num(i+1)))
+						((unsigned short *)&task)[1] == process_num))
 				{
 					if (NULL != threads && -1 != sigqueue(threads[i], SIGUSR1, s))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "the signal is redirected to"
-								" [%s, #%d] process (pid: %d)", get_process_type_string(get_process_type_by_server_num(i+1)),
-								get_process_num_by_server_num(i+1), threads[i]);
+								" [%s, #%d] process (pid: %d)", get_process_type_string(process_type),
+								process_num, threads[i]);
 					}
 					else
 					{
@@ -166,11 +171,11 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 								zbx_strerror(errno));
 					}
 				}
-				else if (((unsigned char *)&task)[1] == get_process_type_by_server_num(i+1) &&
-						((unsigned short *)&task)[1] > get_process_type_forks(get_process_type_by_server_num(i+1)))
+				else if (((unsigned char *)&task)[1] == process_type &&
+						((unsigned short *)&task)[1] > get_process_type_forks(process_type))
 				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process [%s, #%d] does not exist",
-							get_process_type_string(get_process_type_by_server_num(i+1)), ((unsigned short *)&task)[1]);
+							get_process_type_string(process_type), ((unsigned short *)&task)[1]);
 					break;
 				}
 
