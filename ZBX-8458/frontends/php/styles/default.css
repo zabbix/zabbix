@@ -214,7 +214,7 @@ ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; display: ta
 ul.formlist li .dt { padding: 4px 0 2px; display: table-cell; white-space: nowrap; vertical-align: top; width: 20%; }
 ul.formlist li .dd { padding: 2px 0; vertical-align: top; }
 ul.formlist .formrow .dd .checkbox { vertical-align: middle; }
-ul.formlist .formrow .dd { margin-left: 10px; }
+ul.formlist .formrow .dd { margin-left: 10px; white-space: nowrap; }
 ul.formlist .formrow .text-field { margin-top: 2px; display: inline-block; height: 14px; }
 ul.formlist .hidden { display: none; }
 ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
