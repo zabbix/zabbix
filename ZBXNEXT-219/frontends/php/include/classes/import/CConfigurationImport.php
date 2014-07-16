@@ -1500,8 +1500,7 @@ class CConfigurationImport {
 				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
 				if ($triggerId) {
-					$triggersXML[$triggerId]['triggerid'] = $triggerId;
-					$triggersXML[$triggerId]['hosts'] = $this->referencer->resolveTriggerHostsById($triggerId);
+					$triggersXML[$triggerId] = $triggerId;
 				}
 			}
 		}

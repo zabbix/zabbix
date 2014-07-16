@@ -195,21 +195,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get trigger id by trigger name and expression.
-	 *
-	 * @param int $triggerId
-	 *
-	 * @return string|bool
-	 */
-	public function resolveTriggerHostsById($triggerId) {
-		if ($this->triggerHosts === null) {
-			$this->selectTriggers();
-		}
-
-		return isset($this->triggerHosts[$triggerId]) ? $this->triggerHosts[$triggerId] : false;
-	}
-
-	/**
 	 * Get icon map id by name.
 	 *
 	 * @param string $name

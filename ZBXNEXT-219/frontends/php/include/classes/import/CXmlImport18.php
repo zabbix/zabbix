@@ -1502,7 +1502,6 @@ class CXmlImport18 {
 								'output' => API_OUTPUT_EXTEND,
 								'filter' => array('description' => $trigger_db['description']),
 								'hostids' => array($current_hostid),
-								'selectHosts' => array('hostid'),
 								'editable' => true
 							));
 
@@ -1522,8 +1521,7 @@ class CXmlImport18 {
 							}
 
 							// we must store trigger data before we skip rules
-							$triggersXML[$currentTrigger['triggerid']]['triggerid'] = $currentTrigger['triggerid'];
-							$triggersXML[$currentTrigger['triggerid']]['hosts'] = $currentTrigger['hosts'];
+							$triggersXML[$currentTrigger['triggerid']] = $currentTrigger['triggerid'];
 						}
 						unset($trigger_db['hostid']);
 
