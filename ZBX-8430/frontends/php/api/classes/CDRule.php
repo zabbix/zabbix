@@ -533,7 +533,7 @@ class CDRule extends CApiService {
 			$newChecks = array();
 			$oldChecks = array();
 
-			foreach ($dRule['dchecks'] as $cnum => $check) {
+			foreach ($dRule['dchecks'] as $check) {
 				$check['druleid'] = $dRule['druleid'];
 
 				if (!isset($check['dcheckid'])) {
