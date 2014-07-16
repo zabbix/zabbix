@@ -124,7 +124,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (3 < nparams)
 		{
-			error = zbx_strdup(error, "Too many parameters.");
+			error = zbx_strdup(error, "Invalid number of parameters.");
 			goto notsupported;
 		}
 
@@ -245,7 +245,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (4 < nparams)
 		{
-			error = zbx_strdup(error, "Too many parameters.");
+			error = zbx_strdup(error, "Invalid number of parameters.");
 			goto notsupported;
 		}
 
