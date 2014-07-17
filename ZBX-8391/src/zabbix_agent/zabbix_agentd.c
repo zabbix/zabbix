@@ -268,7 +268,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	/* Parameters which are not option values are not allowed. The check relies on zbx_getopt_internal() which */
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
