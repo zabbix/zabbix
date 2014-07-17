@@ -36,6 +36,7 @@ class CImportReferencer {
 	protected $items = array();
 	protected $valueMaps = array();
 	protected $triggers = array();
+	protected $graphs = array();
 	protected $iconMaps = array();
 	protected $maps = array();
 	protected $screens = array();
@@ -50,6 +51,7 @@ class CImportReferencer {
 	protected $itemsRefs;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
+	protected $graphsRefs;
 	protected $triggerHosts = array();
 	protected $iconMapsRefs;
 	protected $mapsRefs;
@@ -192,6 +194,22 @@ class CImportReferencer {
 		}
 
 		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
+	}
+
+	/**
+	 * Get graph ID by host ID and graph name.
+	 *
+	 * @param string $hostId
+	 * @param strign $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveGraph($hostId, $name) {
+		if ($this->graphsRefs === null) {
+			$this->selectGraphs();
+		}
+
+		return isset($this->graphsRefs[$hostId][$name]) ? $this->graphsRefs[$hostId][$name] : false;
 	}
 
 	/**
@@ -384,17 +402,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add application name association with application id.
-	 *
-	 * @param string $hostId
-	 * @param string $name
-	 * @param string $appId
-	 */
-	public function addApplicationRef($hostId, $name, $appId) {
-		$this->applicationsRefs[$hostId][$name] = $appId;
-	}
-
-	/**
 	 * Add item keys that need association with a database item id.
 	 * Input array has format:
 	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
@@ -443,6 +450,22 @@ class CImportReferencer {
 				$this->triggers[$name] = array();
 			}
 			$this->triggers[$name] = array_unique(array_merge($this->triggers[$name], $expressions));
+		}
+	}
+
+	/**
+	 * Add graph names that need association with a database graph ID.
+	 * Input array has format:
+	 * array('hostname1' => array('graphname1', 'graphname2'), 'hostname2' => array('graphname1'), ...)
+	 *
+	 * @param array $graphs
+	 */
+	public function addGraphs(array $graphs) {
+		foreach ($graphs as $host => $hostGraphs) {
+			if (!isset($this->graphs[$host])) {
+				$this->graphs[$host] = array();
+			}
+			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
 		}
 	}
 
@@ -586,16 +609,6 @@ class CImportReferencer {
 				);
 			}
 		}
-	}
-
-	/**
-	 * Add host prototype host association with host id.
-	 *
-	 * @param string $host
-	 * @param string $hostPrototypeId
-	 */
-	public function addHostPrototypeRef($host, $hostPrototypeId) {
-		$this->hostPrototypes[$host] = $hostPrototypeId;
 	}
 
 	/**
@@ -794,10 +807,74 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Select graph IDs for previously added graph names.
+	 */
+	protected function selectGraphs() {
+		if ($this->graphs) {
+			$this->graphsRefs = array();
+
+			$graphNames = array();
+
+			foreach ($this->graphs as $graphs) {
+				foreach ($graphs as $graph) {
+					$graphNames[$graph] = $graph;
+				}
+			}
+
+			$dbGraphs = API::Graph()->get(array(
+				'output' => array('graphid', 'name'),
+				'selectHosts' => array('hostid'),
+				'filter' => array(
+					'name' => $graphNames,
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+				)
+			));
+
+			$graphIds = array();
+
+			foreach ($dbGraphs as $dbGraph) {
+				foreach ($dbGraph['hosts'] as $host) {
+					$this->graphsRefs[$host['hostid']][$dbGraph['name']] = $dbGraph['graphid'];
+				}
+				$graphIds[] = $dbGraph['graphid'];
+			}
+
+			$allowedGraphs = API::Graph()->get(array(
+				'graphids' => $graphIds,
+				'output' => array('graphid'),
+				'filter' => array(
+					'flags' => array(
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					)
+				),
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			foreach ($this->graphsRefs as $hostId => $graphs) {
+				foreach ($graphs as $graph => $graphId) {
+					if (!isset($allowedGraphs[$graphId])) {
+						unset($this->graphsRefs[$hostId][$graph]);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Unset trigger refs to make referencer select them from db again.
 	 */
 	public function refreshTriggers() {
 		$this->triggersRefs = null;
+	}
+
+	/**
+	 * Unset graph refs to make referencer select them from DB again.
+	 */
+	public function refreshGraphs() {
+		$this->graphsRefs = null;
 	}
 
 	/**

@@ -200,6 +200,7 @@ class CConfigurationImport {
 		$itemsRefs = array();
 		$valueMapsRefs = array();
 		$triggersRefs = array();
+		$graphsRefs = array();
 		$iconMapsRefs = array();
 		$mapsRefs = array();
 		$screensRefs = array();
@@ -307,6 +308,7 @@ class CConfigurationImport {
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemItem = $gitem['item'];
 						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+						$graphsRefs[$gitemItem['host']][$graph['name']] = $graph['name'];
 					}
 				}
 
@@ -347,6 +349,7 @@ class CConfigurationImport {
 
 					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
 					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+					$graphsRefs[$gitemItem['host']][$graph['name']] = $graph['name'];
 				}
 			}
 		}
@@ -426,7 +429,7 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
-							// TODO: gather graphs too
+							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
@@ -457,7 +460,7 @@ class CConfigurationImport {
 
 						switch ($screenItem['resourcetype']) {
 							case SCREEN_RESOURCE_GRAPH:
-								// TODO: gather graphs too
+								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
@@ -478,6 +481,7 @@ class CConfigurationImport {
 		$this->referencer->addItems($itemsRefs);
 		$this->referencer->addValueMaps($valueMapsRefs);
 		$this->referencer->addTriggers($triggersRefs);
+		$this->referencer->addGraphs($graphsRefs);
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
 		$this->referencer->addScreens($screensRefs);
@@ -587,14 +591,8 @@ class CConfigurationImport {
 			}
 		}
 
-		// create the applications and create a hash hostid->name->applicationid
 		if ($applicationsToCreate) {
-			$newApplicationsIds = API::Application()->create($applicationsToCreate);
-
-			foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
-				$application = $applicationsToCreate[$anum];
-				$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
-			}
+			API::Application()->create($applicationsToCreate);
 		}
 
 		// refresh applications because templated ones can be inherited to host and used in items
@@ -678,12 +676,7 @@ class CConfigurationImport {
 
 		// create/update the items and create a hash hostid->key_->itemid
 		if ($this->options['items']['createMissing'] && $itemsToCreate) {
-			$newItemsIds = API::Item()->create($itemsToCreate);
-
-			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
-				$item = $itemsToCreate[$inum];
-				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
-			}
+			API::Item()->create($itemsToCreate);
 		}
 
 		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
@@ -978,9 +971,7 @@ class CConfigurationImport {
 				}
 
 				// graph prototypes
-				foreach ($item['graph_prototypes'] as $graph) {
-					$graphHostIds = array();
-
+				foreach ($item['graph_prototypes'] as &$graph) {
 					if ($graph['ymin_item_1']) {
 						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
 						$itemId = $hostId
@@ -1029,31 +1020,18 @@ class CConfigurationImport {
 
 						$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
-						$graphHostIds[$gitemHostId] = $gitemHostId;
+						$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+
+						if ($graphId && !isset($graph['graphid'])) {
+							$graph['graphid'] = $graphId;
+						}
 					}
 					unset($gitem);
+				}
+				unset($graph);
 
-					// TODO: do this for all graphs at once
-					$sql = 'SELECT g.graphid'.
-							' FROM graphs g,graphs_items gi,items i'.
-							' WHERE g.graphid=gi.graphid'.
-								' AND gi.itemid=i.itemid'.
-								' AND g.name='.zbx_dbstr($graph['name']).
-								' AND '.dbConditionInt('i.hostid', $graphHostIds);
-					$graphExists = DBfetch(DBselect($sql));
-
-					if ($graphExists) {
-						$dbGraph = API::GraphPrototype()->get(array(
-							'graphids' => $graphExists['graphid'],
-							'output' => array('graphid'),
-							'editable' => true
-						));
-
-						if (empty($dbGraph)) {
-							throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
-						}
-
-						$graph['graphid'] = $graphExists['graphid'];
+				foreach ($item['graph_prototypes'] as $graph) {
+					if (isset($graph['graphid'])) {
 						$graphsToUpdate[] = $graph;
 					}
 					else {
@@ -1089,16 +1067,14 @@ class CConfigurationImport {
 
 		$allGraphs = $this->getFormattedGraphs();
 
-		if (empty($allGraphs)) {
+		if (!$allGraphs) {
 			return;
 		}
 
 		$graphsToCreate = array();
 		$graphsToUpdate = array();
 
-		foreach ($allGraphs as $graph) {
-			$graphHostIds = array();
-
+		foreach ($allGraphs as &$graph) {
 			if ($graph['ymin_item_1']) {
 				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
 				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']) : false;
@@ -1145,32 +1121,19 @@ class CConfigurationImport {
 
 					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
-					$graphHostIds[$gitemHostId] = $gitemHostId;
+					$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+
+					if ($graphId && !isset($graph['graphid'])) {
+						$graph['graphid'] = $graphId;
+					}
 				}
 				unset($gitem);
 			}
+		}
+		unset($graph);
 
-			// TODO: do this for all graphs at once
-			$sql = 'SELECT g.graphid'.
-					' FROM graphs g,graphs_items gi,items i'.
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' AND g.name='.zbx_dbstr($graph['name']).
-						' AND '.dbConditionInt('i.hostid', $graphHostIds);
-			$graphExists = DBfetch(DBselect($sql));
-
-			if ($graphExists) {
-				$dbGraph = API::Graph()->get(array(
-					'graphids' => $graphExists['graphid'],
-					'output' => array('graphid'),
-					'editable' => true
-				));
-
-				if (empty($dbGraph)) {
-					throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
-				}
-
-				$graph['graphid'] = $graphExists['graphid'];
+		foreach ($allGraphs as $graph) {
+			if (isset($graph['graphid'])) {
 				$graphsToUpdate[] = $graph;
 			}
 			else {
@@ -1184,6 +1147,8 @@ class CConfigurationImport {
 		if ($this->options['graphs']['updateExisting'] && $graphsToUpdate) {
 			API::Graph()->update($graphsToUpdate);
 		}
+
+		$this->referencer->refreshGraphs();
 	}
 
 	/**
@@ -1560,32 +1525,24 @@ class CConfigurationImport {
 
 		$graphNames = array();
 		$graphHostIds = array();
-		$graphsXML = array();
+		$graphsIdsXML = array();
 
 		// gather host IDs for graphs that exist in XML
 		$allGraphs = $this->getFormattedGraphs();
 
 		if ($allGraphs) {
 			foreach ($allGraphs as $graph) {
-				$graphNames[] = $graph['name'];
-
 				if (isset($graph['gitems']) && $graph['gitems']) {
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-						$graphHostIds[$gitemHostId] = $gitemHostId;
+						$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+
+						if ($graphId) {
+							$graphsIdsXML[$graphId] = $graphId;
+						}
 					}
 				}
 			}
-
-			// gather graph IDs and hosts graphs belong to
-			$graphsXML = API::Graph()->get(array(
-				'output' => array('graphid'),
-				'hostids' => $graphHostIds,
-				'selectHosts' => array('hostid'),
-				'preservekeys' => true,
-				'nopermissions' => true,
-				'filter' => array('name' => $graphNames)
-			));
 		}
 
 		$dbGraphIds = API::Graph()->get(array(
@@ -1601,7 +1558,7 @@ class CConfigurationImport {
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
 		$hostIdsXML = array_flip($hostIdsXML);
-		$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+		$graphsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
 
 		foreach ($graphsToDelete as $graphId => $graph) {
 			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
@@ -1610,6 +1567,8 @@ class CConfigurationImport {
 				API::Graph()->delete(array($graphId));
 			}
 		}
+
+		$this->referencer->refreshGraphs();
 	}
 
 	/**
@@ -1671,7 +1630,7 @@ class CConfigurationImport {
 		$triggerPrototypeIdsXML = array();
 		$graphPrototypeIdsXML = array();
 		$itemPrototypeIdsXML = array();
-		$graphPrototypeNames = array();
+		$graphPrototypeIdsXML = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $hostIdsXML[$host];
@@ -1702,9 +1661,13 @@ class CConfigurationImport {
 						}
 					}
 
-					// gather graph prototype names for later usage
+					// gather graph prototype IDs to delete
 					foreach ($discoveryRule['graph_prototypes'] as $graphPrototype) {
-						$graphPrototypeNames[] = $graphPrototype['name'];
+						$graphPrototypeId = $this->referencer->resolveGraph($hostId, $graphPrototype['name']);
+
+						if ($graphPrototypeId) {
+							$graphPrototypeIdsXML[$graphPrototypeId] = $graphPrototypeId;
+						}
 					}
 
 					// gather item prototype IDs to delete
@@ -1751,14 +1714,6 @@ class CConfigurationImport {
 		}
 
 		// delete missing graph prototypes
-		$graphPrototypeIdsXML = API::GraphPrototype()->get(array(
-			'output' => array('graphid'),
-			'hostids' => $hostIdsXML,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'filter' => array('name' => $graphPrototypeNames)
-		));
-
 		$dbGraphPrototypeIds = API::GraphPrototype()->get(array(
 			'output' => array('graphid'),
 			'hostids' => $hostIdsXML,
