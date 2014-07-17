@@ -1,3 +1,20 @@
+Changes for 2.3.3
+
+New features:
+A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditions (Krists)
+...G...... [ZBXNEXT-1300] added low-level discovery support for enumerating CPUs on all supported platforms (Juris)
+A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
+
+Bug fixes:
+..F....... [ZBX-8468] removed unnecessary "empty" buttons in map element popups (Andrejs)
+..F....... [ZBX-8431] added context for text string 'Name' (Oleg)
+..F....... [ZBX-8467] removed "make_latest_issues" function extra argument (Oleg)
+..F....... [ZBX-8436] fixed page layout being broken with IE8 in cases when item rows are added or removed (Krists)
+..F....... [ZBX-8286] fixed undefined index when enabling or disabling hosts in a host group (Krists)
+.......PS. [ZBX-8037] added informative log message about Zabbix not upgrading SQLite3 databases (Juris)
+..F....... [ZBX-8425] fixed "Host status" widget displaying problematic host if one of its groups is set to hidden in dashboard filter (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 2.3.2
 
 New features:
@@ -15,6 +32,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-7941] changed page footer to show debug in fullscreen mode again (sasha)
+........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 .......PS. [ZBX-8450] removed carriage return stripping from text values when inserting data into the database (Juris)
 ..F....... [ZBX-8439] fixed layout problems in host and template configuration, host inventory in Safari (Krists)
 ..F....... [ZBX-8443] fixed host mass update form to be displayed correctly in Opera (Krists)
@@ -120,6 +139,7 @@ A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">="
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
 ..F....... [ZBXNEXT-2270] changed "Status" dropdown in host and host prototype forms to "Enabled" checkbox (Krists)
+..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
 ..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
@@ -237,12 +257,26 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.6rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5
+
+2.2.5rc1 was released as 2.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.5rc1
 
 New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
 .......PS. [ZBX-8422] removed php mutex locking from server code because of not being used and incompatible licensing issues (wiper)

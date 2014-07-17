@@ -577,7 +577,7 @@ elseif ($srctbl == 'users') {
 	$table->setHeader(array(
 		($multiselect ? new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');") : null),
 		_('Alias'),
-		_('Name'),
+		_x('Name', 'user first name'),
 		_('Surname')
 	));
 
