@@ -1167,6 +1167,31 @@ static int	DBpatch_2030112(void)
 
 	return DBadd_field("actions", &field);
 }
+
+static int	DBpatch_2030113(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ('web.latest.php.sort', 'web.httpmon.php.sort')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030114(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.httpconf.php.sort' and value_str='h.hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030115(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.hostinventories.php.sort ' and value_str='hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -1285,5 +1310,8 @@ DBPATCH_ADD(2030109, 0, 1)
 DBPATCH_ADD(2030110, 0, 0)
 DBPATCH_ADD(2030111, 0, 1)
 DBPATCH_ADD(2030112, 0, 1)
+DBPATCH_ADD(2030113, 0, 0)
+DBPATCH_ADD(2030114, 0, 0)
+DBPATCH_ADD(2030115, 0, 0)
 
 DBPATCH_END()
