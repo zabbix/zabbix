@@ -262,6 +262,7 @@ Changes for 2.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.5
