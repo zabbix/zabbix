@@ -571,8 +571,8 @@ class CDRule extends CApiService {
 	public function delete(array $druleIds) {
 		$this->validateDelete($druleIds);
 
+		// process actions that depend on "Discovery rule = ..."
 		$actionIds = array();
-
 		$dbActions = DBselect(
 			'SELECT DISTINCT actionid'.
 			' FROM conditions'.
@@ -580,6 +580,7 @@ class CDRule extends CApiService {
 				' AND '.dbConditionString('value', $druleIds).
 			' ORDER BY actionid'
 		);
+
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
 		}
@@ -594,6 +595,46 @@ class CDRule extends CApiService {
 				'conditiontype' => CONDITION_TYPE_DRULE,
 				'value' => $druleIds
 			));
+		}
+
+		// process actions that depend on "Discovery check = ..."
+		$dbChecks = DBselect(
+			'SELECT dcheckid'.
+			' FROM dchecks'.
+			' WHERE '.dbConditionString('druleid', $druleIds)
+		);
+
+		$checkIds = array();
+
+		while ($dbCheck = DBfetch($dbChecks)) {
+			$checkIds[] = $dbCheck['dcheckid'];
+		}
+
+		if ($checkIds) {
+			$actionIds = array();
+			$dbActions = DBselect(
+				'SELECT DISTINCT actionid'.
+				' FROM conditions'.
+				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('value', $checkIds).
+				' ORDER BY actionid'
+			);
+
+			while ($dbAction = DBfetch($dbActions)) {
+				$actionIds[] = $dbAction['actionid'];
+			}
+
+			if ($actionIds) {
+				DB::update('actions', array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array('actionid' => $actionIds),
+				));
+
+				DB::delete('conditions', array(
+					'conditiontype' => CONDITION_TYPE_DCHECK,
+					'value' => $checkIds
+				));
+			}
 		}
 
 		$result = DB::delete('drules', array('druleid' => $druleIds));
