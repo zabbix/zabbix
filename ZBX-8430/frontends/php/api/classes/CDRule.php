@@ -538,7 +538,8 @@ class CDRule extends CApiService {
 
 				if (!isset($check['dcheckid'])) {
 					$newChecks[] = array_merge($defaultValues, $check);
-				} else {
+				}
+				else {
 					$oldChecks[] = $check;
 				}
 			}

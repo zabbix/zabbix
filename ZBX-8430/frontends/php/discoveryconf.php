@@ -119,7 +119,7 @@ if (isset($_REQUEST['save'])) {
 	$uniq = get_request('uniqueness_criteria', 0);
 
 	foreach ($dChecks as $dcnum => $check) {
-		if (substr($check['dcheckid'], 0, 3) == 'new') {
+		if (substr($check['dcheckid'], 0, 3) === 'new') {
 			unset($dChecks[$dcnum]['dcheckid']);
 		}
 
