@@ -455,14 +455,14 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem);
  *               FAIL otherwise                                               *
  *                                                                            *
  * Comments: list of the items, always processed by server                    *
- *           ,------------------+-------------------------------,             *
- *           | type             | key                           |             *
- *           +------------------+-------------------------------+             *
- *           | Zabbix internal  | zabbix[host,,maintenance]     |             *
- *           | Zabbix internal  | zabbix[host,<type>,available] |             *
- *           | Zabbix aggregate | *                             |             *
- *           | Calculated       | *                             |             *
- *           '------------------+-------------------------------'             *
+ *           ,------------------+--------------------------------------,      *
+ *           | type             | key                                  |      *
+ *           +------------------+--------------------------------------+      *
+ *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
+ *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
+ *           | Zabbix aggregate | *                                    |      *
+ *           | Calculated       | *                                    |      *
+ *           '------------------+--------------------------------------'      *
  *                                                                            *
  ******************************************************************************/
 int	is_item_processed_by_server(unsigned char type, const char *key)
