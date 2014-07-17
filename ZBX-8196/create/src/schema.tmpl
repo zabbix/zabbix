@@ -224,6 +224,7 @@ FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ip		|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_PROXY
+FIELD		|bulk		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
 
@@ -377,6 +378,7 @@ FIELD		|def_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|r_longdata	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|eventsource,status
 UNIQUE		|2		|name
 
@@ -1276,4 +1278,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030109	|2030113
+ROW		|2030112	|2030112
