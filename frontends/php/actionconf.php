@@ -40,7 +40,9 @@ $fields = array(
 		null
 	),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
-		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR)), 'isset({save})'),
+		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION)),
+		'isset({save})'),
+	'formula' =>			array(T_ZBX_STR, O_OPT, null,   null,		'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -108,17 +110,15 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 }
 elseif (hasRequest('save')) {
 	$action = array(
-		'name'			=> get_request('name'),
-		'evaltype'		=> get_request('evaltype', 0),
-		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
-		'esc_period'	=> get_request('esc_period', 0),
-		'def_shortdata'	=> get_request('def_shortdata', ''),
-		'def_longdata'	=> get_request('def_longdata', ''),
-		'recovery_msg'	=> get_request('recovery_msg', 0),
-		'r_shortdata'	=> get_request('r_shortdata', ''),
-		'r_longdata'	=> get_request('r_longdata', ''),
-		'conditions'	=> get_request('conditions', array()),
-		'operations'	=> get_request('operations', array())
+		'name' => get_request('name'),
+		'status' => get_request('status', ACTION_STATUS_DISABLED),
+		'esc_period' => get_request('esc_period', 0),
+		'def_shortdata' => get_request('def_shortdata', ''),
+		'def_longdata' => get_request('def_longdata', ''),
+		'recovery_msg' => get_request('recovery_msg', 0),
+		'r_shortdata' => get_request('r_shortdata', ''),
+		'r_longdata' => get_request('r_longdata', ''),
+		'operations' => get_request('operations', array())
 	);
 
 	foreach ($action['operations'] as $num => $operation) {
@@ -126,6 +126,23 @@ elseif (hasRequest('save')) {
 			$action['operations'][$num]['opmessage']['default_msg'] = 0;
 		}
 	}
+
+	$filter = array(
+		'conditions' => getRequest('conditions', array()),
+		'evaltype' => getRequest('evaltype')
+	);
+
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		if (count($filter['conditions']) > 1) {
+			$filter['formula'] = getRequest('formula');
+		}
+		else {
+			// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
+			$filter['formula'] = '';
+			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		}
+	}
+	$action['filter'] = $filter;
 
 	DBstart();
 
@@ -170,85 +187,74 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
-	try {
-		$newCondition = get_request('new_condition');
+	$newCondition = getRequest('new_condition');
 
-		if ($newCondition) {
-			$conditions = get_request('conditions', array());
+	if ($newCondition) {
+		$conditions = getRequest('conditions', array());
 
-			// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
-			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
-				$newCondition['value'] = '';
-			}
+		// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
+		if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+			$newCondition['value'] = '';
+		}
 
-			// check existing conditions and remove duplicate condition values
-			foreach ($conditions as $condition) {
-				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-					if (is_array($newCondition['value'])) {
-						foreach ($newCondition['value'] as $key => $newValue) {
-							if ($condition['value'] == $newValue) {
-								unset($newCondition['value'][$key]);
-							}
-						}
-					}
-					else {
-						if ($newCondition['value'] == $condition['value']) {
-							$newCondition['value'] = null;
+		// check existing conditions and remove duplicate condition values
+		foreach ($conditions as $condition) {
+			if ($newCondition['conditiontype'] == $condition['conditiontype']) {
+				if (is_array($newCondition['value'])) {
+					foreach ($newCondition['value'] as $key => $newValue) {
+						if ($condition['value'] == $newValue) {
+							unset($newCondition['value'][$key]);
 						}
 					}
 				}
-			}
-
-			$validateConditions = $conditions;
-
-			if (isset($newCondition['value'])) {
-				$newConditionValues = zbx_toArray($newCondition['value']);
-				foreach ($newConditionValues as $newValue) {
-					$condition = $newCondition;
-					$condition['value'] = $newValue;
-					$validateConditions[] = $condition;
+				else {
+					if ($newCondition['value'] == $condition['value']) {
+						$newCondition['value'] = null;
+					}
 				}
 			}
+		}
 
-			if ($validateConditions) {
-				CAction::validateConditions($validateConditions);
+		$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
+
+		$validateConditions = $conditions;
+
+		if (isset($newCondition['value'])) {
+			$newConditionValues = zbx_toArray($newCondition['value']);
+			foreach ($newConditionValues as $newValue) {
+				$condition = $newCondition;
+				$condition['value'] = $newValue;
+				$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
+				$usedFormulaIds[] = $condition['formulaid'];
+				$validateConditions[] = $condition;
 			}
+		}
 
+		$conditionsValid = true;
+		if ($validateConditions) {
+			$filterConditionValidator = new CActionCondValidator();
+			foreach ($validateConditions as $condition) {
+				if (!$filterConditionValidator->validate($condition)) {
+					$conditionsValid = false;
+					break;
+				}
+			}
+		}
+
+		if ($conditionsValid) {
 			$_REQUEST['conditions'] = $validateConditions;
 		}
-	}
-	catch (APIException $e) {
-		show_error_message(_('Cannot add action condition'));
-		error($e->getMessage());
-	}
-}
-elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
-	$new_opcondition = $_REQUEST['new_opcondition'];
-
-	try {
-		CAction::validateOperationConditions($new_opcondition);
-		$new_operation = get_request('new_operation', array());
-
-		if (!isset($new_operation['opconditions'])) {
-			$new_operation['opconditions'] = array();
+		else {
+			error($filterConditionValidator->getError());
+			show_error_message(_('Cannot add action condition'));
 		}
-		if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
-			array_push($new_operation['opconditions'], $new_opcondition);
-		}
-
-		$_REQUEST['new_operation'] = $new_operation;
-
-		unset($_REQUEST['new_opcondition']);
-	}
-	catch (APIException $e) {
-		error($e->getMessage());
 	}
 }
 elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
 	$new_operation = $_REQUEST['new_operation'];
 	$result = true;
 
-	if (API::Action()->validateOperations($new_operation)) {
+	if (API::Action()->validateOperationsIntegrity($new_operation)) {
 		$_REQUEST['operations'] = get_request('operations', array());
 
 		$uniqOperations = array(
@@ -364,18 +370,18 @@ if (hasRequest('form')) {
 		$data['action'] = API::Action()->get(array(
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectConditions' => API_OUTPUT_EXTEND,
+			'selectFilter' => array('formula', 'conditions', 'evaltype'),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$data['action'] = reset($data['action']);
+
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
 		$data['eventsource'] = getRequest('eventsource',
 			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 		);
-		$data['evaltype'] = getRequest('evaltype');
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
@@ -384,12 +390,14 @@ if (hasRequest('form')) {
 	}
 	else {
 		$data['action']['name'] = get_request('name');
-		$data['action']['evaltype'] = get_request('evaltype', 0);
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = get_request('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
-		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
+
+		$data['action']['filter']['evaltype'] = getRequest('evaltype');
+		$data['action']['filter']['formula'] = getRequest('formula');
+		$data['action']['filter']['conditions'] = getRequest('conditions', array());
 
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
@@ -422,7 +430,7 @@ if (hasRequest('form')) {
 	}
 
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['conditions'] = array(
+		$data['action']['filter']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 				'operator' => CONDITION_OPERATOR_EQUAL,
@@ -439,13 +447,11 @@ if (hasRequest('form')) {
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
 	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	// sort conditions
-	$sortFields = array(
-		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-	);
-	CArrayHelper::sort($data['action']['conditions'], $sortFields);
+	if (!hasRequest('add_condition')) {
+		$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
+			$data['action']['filter']['conditions']
+		);
+	}
 
 	// new condition
 	$data['new_condition'] = array(
@@ -482,20 +488,20 @@ else {
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
 	);
 
-	$sortfield = getPageSortField('name');
+	$sortField = getPageSortField('name');
 
 	$data['actions'] = API::Action()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array('eventsource' => array($data['eventsource'])),
-		'selectConditions' => API_OUTPUT_EXTEND,
+		'selectFilter' => array('formula', 'conditions', 'evaltype'),
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	// sorting && paging
-	order_result($data['actions'], $sortfield, getPageSortOrder());
+	order_result($data['actions'], $sortField, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions']);
 
 	// render view

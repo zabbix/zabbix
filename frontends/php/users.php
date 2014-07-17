@@ -42,7 +42,7 @@ $fields = array(
 	'group_userid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'filter_usrgrpid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'alias' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Alias')),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,	null,		null, _('Name')),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,	null,		null, _x('Name', 'user first name')),
 	'surname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null, _('Surname')),
 	'password1' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({form})&&{form}!="update"&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({form})&&{form}!="update"&&isset({change_password})'),
@@ -76,7 +76,7 @@ $fields = array(
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	// form
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
-	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,			null,	null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('alias', ZBX_SORT_UP, array('alias', 'name', 'surname', 'type'));
