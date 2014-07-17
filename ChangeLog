@@ -6,6 +6,7 @@ A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditi
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8468] removed unnecessary "empty" buttons in map element popups (Andrejs)
 ..F....... [ZBX-8431] added context for text string 'Name' (Oleg)
 ..F....... [ZBX-8467] removed "make_latest_issues" function extra argument (Oleg)
 ..F....... [ZBX-8436] fixed page layout being broken with IE8 in cases when item rows are added or removed (Krists)
