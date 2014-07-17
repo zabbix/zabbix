@@ -38,7 +38,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$screensToUpdate = array();
 
 		foreach ($allScreens as $template => $screens) {
-			if ($this->importedObjectContainer->isTemplateProcessed($template)) {
+			if (!$this->importedObjectContainer->isTemplateProcessed($template)) {
 				continue;
 			}
 
