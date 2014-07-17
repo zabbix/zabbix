@@ -52,7 +52,6 @@ class CImportReferencer {
 	protected $valueMapsRefs;
 	protected $triggersRefs;
 	protected $graphsRefs;
-	protected $triggerHosts = array();
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
@@ -775,7 +774,6 @@ class CImportReferencer {
 						foreach ($expressions as $expression) {
 							if ($expression == $dbExpr) {
 								$this->triggersRefs[$name][$expression] = $dbTrigger['triggerid'];
-								$this->triggerHosts[$dbTrigger['triggerid']] = $dbTrigger['hosts'];
 								$triggerIds[] = $dbTrigger['triggerid'];
 							}
 						}

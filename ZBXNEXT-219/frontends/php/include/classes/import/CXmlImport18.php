@@ -1657,8 +1657,7 @@ class CXmlImport18 {
 							}
 							$current_graph = reset($current_graph);
 
-							$graphsXML[$current_graph['graphid']]['graphid'] = $current_graph['graphid'];
-							$graphsXML[$current_graph['graphid']]['hosts'] = $current_graph['hosts'];
+							$graphsXML[$current_graph['graphid']] = $current_graph['graphid'];
 						}
 
 						if (!$current_graph && empty($rules['graphs']['createMissing'])) {
