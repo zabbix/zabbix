@@ -218,7 +218,7 @@ int	main(int argc, char **argv)
 		ret = FAIL;
 	}
 
-	/* Parameters which are not option values are not allowed. The check relies on zbx_getopt_internal() which */
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
