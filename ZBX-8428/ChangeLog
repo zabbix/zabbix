@@ -1,3 +1,17 @@
+Changes for 2.2.6rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5
+
+2.2.5rc1 was released as 2.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.5rc1
 
 New features:

@@ -524,12 +524,7 @@ else {
 	);
 
 	if ($pageFilter->groupsSelected) {
-		if ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		else {
-			$options['groupids'] = array_keys($pageFilter->groups);
-		}
+		$options['groupids'] = $pageFilter->groupid > 0 ? $pageFilter->groupid : null;
 	}
 	else {
 		$options['groupids'] = array();
