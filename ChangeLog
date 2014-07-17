@@ -19,6 +19,7 @@ New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+.........T [ZBX-8405] fixed typos in item descriptions for JMX Tomcat, FreeBSD, HP-UX, Linux and OpenBSD templates (Richlv)
 ........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
