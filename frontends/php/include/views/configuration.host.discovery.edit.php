@@ -295,17 +295,7 @@ if (!$conditions) {
 	$conditions = array(array('macro' => '', 'value' => '', 'formulaid' => num2letter(0)));
 }
 else {
-	// sort conditions by formula id as if they were numbers
-	uasort($conditions, function($condition1, $condition2) {
-		$len1 = strlen($condition1['formulaid']);
-		$len2 = strlen($condition2['formulaid']);
-
-		if (strlen($condition1['formulaid']) == strlen($condition2['formulaid'])) {
-			return strcmp($condition1['formulaid'], $condition2['formulaid']);
-		}
-
-		return ($len1 < $len2) ? -1 : 1;
-	});
+	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
 
 // fields
