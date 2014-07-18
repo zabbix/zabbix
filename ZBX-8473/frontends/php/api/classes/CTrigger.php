@@ -1227,15 +1227,6 @@ class CTrigger extends CTriggerGeneral {
 					$this->deleteByIds($cTrigIds);
 				}
 
-				// if the trigger contains templates, delete any events that may exist
-				if ($this->expressionHasTemplates($expressionData)) {
-					DB::delete('events', array(
-						'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-						'object' => EVENT_OBJECT_TRIGGER,
-						'objectid' => $trigger['triggerid']
-					));
-				}
-
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
 				try {
