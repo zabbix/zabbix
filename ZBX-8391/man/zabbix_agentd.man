@@ -6,9 +6,15 @@ zabbix_agentd \- Zabbix agent daemon
 .RB [ \-c
 .IR config-file ]
 .br
-.B zabbix_agentd \-p
+.B zabbix_agentd
+.RB [ \-c
+.IR config-file ]
+.B \-p
 .br
-.B zabbix_agentd -t
+.B zabbix_agentd
+.RB [ \-c
+.IR config-file ]
+.B \-t
 .I item-key
 .br
 .B zabbix_agentd \-h

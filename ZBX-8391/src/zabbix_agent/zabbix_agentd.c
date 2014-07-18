@@ -155,10 +155,11 @@ void zbx_co_uninitialize();
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char	ch = '\0';
-	int	opt_c = 0, opt_p = 0, opt_t = 0;
+	char		ch = '\0';
+	int		opt_c = 0, opt_p = 0, opt_t = 0;
 #ifdef _WINDOWS
-	int     opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+	unsigned int	opt_mask = 0;
 #endif
 
 	t->task = ZBX_TASK_START;
@@ -229,11 +230,11 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	if (1 < opt_c || 1 < opt_p || 1 < opt_t)
 	{
 		if (1 < opt_c)
-			zbx_error("option \"-c\" specified multiple times");
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_p)
-			zbx_error("option \"-p\" specified multiple times");
+			zbx_error("option \"-p\" or \"--print\" specified multiple times");
 		if (1 < opt_t)
-			zbx_error("option \"-t\" specified multiple times");
+			zbx_error("option \"-t\" or \"--test\" specified multiple times");
 
 		exit(EXIT_FAILURE);
 	}
@@ -241,30 +242,78 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
 	{
 		if (1 < opt_i)
-			zbx_error("option \"-i\" specified multiple times");
+			zbx_error("option \"-i\" or \"--install\" specified multiple times");
 		if (1 < opt_d)
-			zbx_error("option \"-d\" specified multiple times");
+			zbx_error("option \"-d\" or \"--uninstall\" specified multiple times");
 		if (1 < opt_s)
-			zbx_error("option \"-s\" specified multiple times");
+			zbx_error("option \"-s\" or \"--start\" specified multiple times");
 		if (1 < opt_x)
-			zbx_error("option \"-x\" specified multiple times");
+			zbx_error("option \"-x\" or \"--stop\" specified multiple times");
 		if (1 < opt_m)
-			zbx_error("option \"-m\" specified multiple times");
+			zbx_error("option \"-m\" or \"--multiple-agents\" specified multiple times");
 
 		exit(EXIT_FAILURE);
 	}
 #endif
 	/* check for mutually exclusive options */
 #ifdef _WINDOWS
-	if (1 < opt_c + opt_p + opt_t + opt_i + opt_d + opt_s + opt_x + opt_m)
+	/* Allowed option combinations.		*/
+	/* Option 'c' is always optional.	*/
+	/*   p  t  i  d  s  x  m    opt_mask	*/
+	/* ---------------------    --------	*/
+	/*   -  -  -  -  -  -  - 	0x00	*/
+	/*   p  -  -  -  -  -  -	0x40	*/
+	/*   -  t  -  -  -  -  -	0x20	*/
+	/*   -  -  i  -  -  -  -	0x10	*/
+	/*   -  -  -  d  -  -  -	0x08	*/
+	/*   -  -  -  -  s  -  -	0x04	*/
+	/*   -  -  -  -  -  x  -	0x02	*/
+	/*   -  -  i  -  -  -  m	0x11	*/
+	/*   -  -  -  d  -  -  m	0x09	*/
+	/*   -  -  -  -  s  -  m	0x05	*/
+	/*   -  -  -  -  -  x  m	0x03	*/
+
+	if (0 < opt_p)
+		opt_mask |= 0x40;
+	if (0 < opt_t)
+		opt_mask |= 0x20;
+	if (0 < opt_i)
+		opt_mask |= 0x10;
+	if (0 < opt_d)
+		opt_mask |= 0x08;
+	if (0 < opt_s)
+		opt_mask |= 0x04;
+	if (0 < opt_x)
+		opt_mask |= 0x02;
+	if (0 < opt_m)
+		opt_mask |= 0x01;
+
+	switch (opt_mask)
 	{
-		zbx_error("only one command line option can be used");
-		exit(EXIT_FAILURE);
+		case 0x00:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x08:
+		case 0x09:
+		case 0x10:
+		case 0x11:
+		case 0x20:
+		case 0x40:
+			break;
+		default:
+			zbx_error("Mutually exclusive options used. Valid combinations are:\n"
+					"\t[-c]\n"
+					"\t[-c] { -p | -t | -i | -d | -s | -x }\n"
+					"\t[-c] { -i | -d | -s | -x } -m");
+			exit(EXIT_FAILURE);
+			break;
 	}
 #else
-	if (1 < opt_c + opt_p + opt_t)
+	if (1 < opt_p + opt_t)
 	{
-		zbx_error("only one of options \"-c\", \"-p\" or \"-t\" can be used");
+		zbx_error("only one of options \"-p\", \"--print\", \"-t\" or \"--test\" can be used");
 		exit(EXIT_FAILURE);
 	}
 #endif
