@@ -1351,13 +1351,13 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->importedObjectContainer->getHostIds();
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostIds();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
 
-		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
 		// no hosts or templates have been processed
-		if (!$hostIdsXML) {
+		if (!$processedHostIds) {
 			return;
 		}
 
@@ -1381,7 +1381,7 @@ class CConfigurationImport {
 
 		$dbItemIds = API::Item()->get(array(
 			'output' => array('itemid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false,
@@ -1407,13 +1407,13 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->importedObjectContainer->getHostIds();
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostIds();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
 
-		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
 		// no hosts or templates have been processed
-		if (!$hostIdsXML) {
+		if (!$processedHostIds) {
 			return;
 		}
 
@@ -1437,7 +1437,7 @@ class CConfigurationImport {
 
 		$dbApplicationIds = API::Application()->get(array(
 			'output' => array('applicationid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -1462,13 +1462,13 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->importedObjectContainer->getHostIds();
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostIds();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
 
-		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
 		// no hosts or templates have been processed
-		if (!$hostIdsXML) {
+		if (!$processedHostIds) {
 			return;
 		}
 
@@ -1488,7 +1488,7 @@ class CConfigurationImport {
 
 		$dbTriggerIds = API::Trigger()->get(array(
 			'output' => array('triggerid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'selectHosts' => array('hostid'),
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -1500,11 +1500,11 @@ class CConfigurationImport {
 		// if some triggers belong to more hosts than current XML contains, don't delete them
 		$triggerIdsToDelete = array_diff_key($dbTriggerIds, $triggersXML);
 		$triggersToDelete = array();
-		$hostIdsXML = array_flip($hostIdsXML);
+		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($triggerIdsToDelete as $triggerId => $trigger) {
 			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
-			if (!array_diff_key($triggerHostIds, $hostIdsXML)) {
+			if (!array_diff_key($triggerHostIds, $processedHostIds)) {
 				$triggersToDelete[] = $triggerId;
 			}
 		}
@@ -1529,13 +1529,13 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->importedObjectContainer->getHostIds();
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostIds();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
 
-		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
 		// no hosts or templates have been processed
-		if (!$hostIdsXML) {
+		if (!$processedHostIds) {
 			return;
 		}
 
@@ -1563,7 +1563,7 @@ class CConfigurationImport {
 
 		$dbGraphIds = API::Graph()->get(array(
 			'output' => array('graphid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'selectHosts' => array('hostid'),
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -1575,12 +1575,12 @@ class CConfigurationImport {
 		// if some graphs belong to more hosts than current XML contains, don't delete them
 		$graphIdsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
 		$graphsToDelete = array();
-		$hostIdsXML = array_flip($hostIdsXML);
+		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($graphIdsToDelete as $graphId => $graph) {
 			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
-			if (!array_diff_key($graphHostIds, $hostIdsXML)) {
+			if (!array_diff_key($graphHostIds, $processedHostIds)) {
 				$graphsToDelete[] = $graphId;
 			}
 		}
@@ -1602,13 +1602,13 @@ class CConfigurationImport {
 			return;
 		}
 
-		$hostIdsXML = $this->importedObjectContainer->getHostIds();
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostIds();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
 
-		$hostIdsXML = array_merge($hostIdsXML, $templateIdsXML);
+		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
 		// no hosts or templates have been processed
-		if (!$hostIdsXML) {
+		if (!$processedHostIds) {
 			return;
 		}
 
@@ -1632,7 +1632,7 @@ class CConfigurationImport {
 
 		$dbDiscoveryRuleIds = API::DiscoveryRule()->get(array(
 			'output' => array('itemid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -1721,7 +1721,7 @@ class CConfigurationImport {
 		// delete missing trigger prototypes
 		$dbTriggerPrototypeIds = API::TriggerPrototype()->get(array(
 			'output' => array('triggerid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -1737,7 +1737,7 @@ class CConfigurationImport {
 		// delete missing graph prototypes
 		$dbGraphPrototypeIds = API::GraphPrototype()->get(array(
 			'output' => array('graphid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -1753,7 +1753,7 @@ class CConfigurationImport {
 		// delete missing item prototypes
 		$dbItemPrototypeIds = API::ItemPrototype()->get(array(
 			'output' => array('itemid'),
-			'hostids' => $hostIdsXML,
+			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
