@@ -1437,8 +1437,6 @@ class CXmlImport18 {
 									'webitems' => true,
 									'output' => array('itemid')
 								));
-
-								$itemIdsXML[$current_item[0]['itemid']] = $current_item[0]['itemid'];
 							}
 
 							if (!$current_item && $rules['items']['createMissing']) {
@@ -1563,9 +1561,6 @@ class CXmlImport18 {
 							'triggerids' => $result['triggerids']
 						));
 
-						$triggersXML = array_merge($triggersXML, zbx_objectValues($triggersUpdated, 'triggerid'));
-						$triggersXML = array_unique($triggersXML);
-						$triggersXML = array_combine($triggersXML, $result['triggerids']);
 						$triggersForDependencies = array_merge($triggersForDependencies, $triggersUpdated);
 					}
 
@@ -1740,10 +1735,7 @@ class CXmlImport18 {
 						$graphsXML = array_combine($graphsXML, $graphsXML);
 					}
 					if (!empty($graphs_to_upd)) {
-						$graphsUpdated = API::Graph()->update($graphs_to_upd);
-						$graphsXML = array_merge($graphsXML, $graphsUpdated['graphids']);
-						$graphsXML = array_unique($graphsXML);
-						$graphsXML = array_combine($graphsXML, $graphsXML);
+						API::Graph()->update($graphs_to_upd);
 					}
 				}
 			}
