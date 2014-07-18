@@ -1177,7 +1177,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				continue;
 			}
 
-			$lastValue = Manager::History()->getLast(array($item), 1);
+			$lastValue = Manager::History()->getLast(array($item));
 			if ($lastValue) {
 				$lastValue = reset($lastValue[$item['itemid']]);
 				$item['lastvalue'] = $lastValue['value'];
