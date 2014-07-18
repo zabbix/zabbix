@@ -59,9 +59,15 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			array('a'),
 			array('A B'),
 			array('A and'),
+			array('A and or'),
+			array('A an'),
 			array('(A'),
+			array('A)'),
 			array('((A)'),
+			array('(A))'),
+			array('(A)B'),
 			array('A and (B and C'),
+			array('A andB'),
 			array('AandB'),
 			array('A and BandC'),
 		);
@@ -78,8 +84,25 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(false, $result);
 	}
 
-	public function testParseConstants() {
-		// test whether the $constants property is populated correctly
-		$this->markTestIncomplete();
+	public function parseConstantsProvider() {
+		return array(
+			array('A', array('A')),
+			array('A and B', array('A', 'B')),
+			array('A and B or C', array('A', 'B', 'C')),
+			array('A and B or A', array('A', 'B')),
+		);
+	}
+
+	/**
+	 * @dataProvider parseConstantsProvider
+	 *
+	 * @param $string
+	 * @param $expectedConstants
+	 */
+	public function testParseConstants($string, $expectedConstants) {
+		$result = $this->conditionFormula->parse($string);
+
+		$this->assertSame(true, $result);
+		$this->assertSame($expectedConstants, $this->conditionFormula->constants);
 	}
 }
