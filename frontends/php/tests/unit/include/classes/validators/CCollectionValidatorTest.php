@@ -27,7 +27,7 @@ class CCollectionValidatorTest extends CValidatorTest {
 				'empty' => true,
 				'uniqueField' => 'field',
 				'uniqueField2' => 'field',
-				'messageType' => 'Not an array',
+				'messageInvalid' => 'Not an array',
 				'messageEmpty' => 'Empty collection',
 				'messageDuplicate' => 'Collection has duplicate values',
 			))
@@ -75,17 +75,17 @@ class CCollectionValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				'',
 				'Not an array'
 			),
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				0,
 				'Not an array'
 			),
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				null,
 				'Not an array'
 			),
@@ -120,17 +120,17 @@ class CCollectionValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+			array('messageInvalid' => 'Not an array for "%1$s"'),
 				'',
 				'Not an array for "object"'
 			),
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+				array('messageInvalid' => 'Not an array for "%1$s"'),
 				0,
 				'Not an array for "object"'
 			),
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+				array('messageInvalid' => 'Not an array for "%1$s"'),
 				null,
 				'Not an array for "object"'
 			),

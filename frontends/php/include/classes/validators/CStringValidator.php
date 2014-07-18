@@ -68,7 +68,7 @@ class CStringValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageType;
+	public $messageInvalid;
 
 	/**
 	 * Checks if the given string is:
@@ -82,7 +82,7 @@ class CStringValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!(is_string($value) || is_numeric($value))) {
-			$this->error($this->messageType);
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}

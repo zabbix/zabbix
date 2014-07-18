@@ -26,7 +26,7 @@ class CDecimalValidatorTest extends CValidatorTest {
 			array(array(
 				'maxPrecision' => 3,
 				'maxScale' => 2,
-				'messageType' => 'Invalid decimal',
+				'messageInvalid' => 'Invalid decimal',
 				'messagePrecision' => 'Value too long',
 				'messageNatural' => 'To many digits before the decimal point',
 				'messageScale' => 'To many digits after the decimal point'
@@ -53,22 +53,22 @@ class CDecimalValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid decimal'),
+				array('messageInvalid' => 'Invalid decimal'),
 				'',
 				'Invalid decimal'
 			),
 			array(
-				array('messageType' => 'Invalid decimal'),
+				array('messageInvalid' => 'Invalid decimal'),
 				'--1.0',
 				'Invalid decimal'
 			),
 			array(
-				array('messageType' => 'Invalid decimal'),
+				array('messageInvalid' => 'Invalid decimal'),
 				'1E3',
 				'Invalid decimal'
 			),
 			array(
-				array('messageType' => 'Invalid decimal "%1$s"'),
+				array('messageInvalid' => 'Invalid decimal "%1$s"'),
 				array(),
 				'Invalid decimal "array"'
 			),
@@ -159,17 +159,17 @@ class CDecimalValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid decimal value for "%1$s"'),
+				array('messageInvalid' => 'Invalid decimal value for "%1$s"'),
 				'',
 				'Invalid decimal value for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid decimal value for "%1$s"'),
+				array('messageInvalid' => 'Invalid decimal value for "%1$s"'),
 				array(),
 				'Invalid decimal value for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid decimal value "%2$s" for "%1$s"'),
+				array('messageInvalid' => 'Invalid decimal value "%2$s" for "%1$s"'),
 				'A',
 				'Invalid decimal value "A" for "object"'
 			),
