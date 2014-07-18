@@ -41,7 +41,7 @@ class CScreenClock extends CScreenBase {
 				$item = reset($items);
 				$host = reset($item['hosts']);
 
-				$lastValue = Manager::History()->getLast(array($item), 1);
+				$lastValue = Manager::History()->getLast(array($item));
 				if ($lastValue) {
 					$lastValue = reset($lastValue[$item['itemid']]);
 					$item['lastvalue'] = $lastValue['value'];
