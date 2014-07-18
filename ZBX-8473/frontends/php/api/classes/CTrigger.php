@@ -893,12 +893,6 @@ class CTrigger extends CTriggerGeneral {
 			'value_id' => $triggerIds
 		));
 
-		$housekeeperInserts = array();
-		foreach ($triggerIds as $triggerId) {
-			$housekeeperInserts[] = array('tablename' => 'events', 'field' => 'objectid', 'value' => $triggerId);
-		}
-		DB::insert('housekeeper', $housekeeperInserts);
-
 		DB::delete('sysmaps_elements', array(
 			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
