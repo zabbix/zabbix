@@ -894,15 +894,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from events"
-			" where source=%d"
-				" and object=%d"
-				" and",
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", triggerids->values, triggerids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 	/* delete from profiles */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from profiles"
