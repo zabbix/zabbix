@@ -29,11 +29,11 @@ class CIdValidator extends CValidator {
 	public $empty = false;
 
 	/**
-	 * Error message if the id has wrong type
+	 * Error message if the id has wrong type or id is out of range or invalid
 	 *
 	 * @var string
 	 */
-	public $messageType;
+	public $messageInvalid;
 
 	/**
 	 * Error message if the id is empty
@@ -41,13 +41,6 @@ class CIdValidator extends CValidator {
 	 * @var string
 	 */
 	public $messageEmpty;
-
-	/**
-	 * Error message if id is out of range or invalid
-	 *
-	 * @var string
-	 */
-	public $messageInvalid;
 
 	/**
 	 * Validates ID value
@@ -58,7 +51,7 @@ class CIdValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!is_string($value) && !is_int($value)) {
-			$this->error($this->messageType);
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}

@@ -323,7 +323,6 @@ class CUser extends CApiService {
 
 			if (isset($user['theme'])) {
 				$themeValidator->messageInvalid = _s('Incorrect theme for user "%1$s".', $dbUser['alias']);
-				$themeValidator->messageType = $themeValidator->messageInvalid;
 				$this->checkValidator($user['theme'], $themeValidator);
 			}
 

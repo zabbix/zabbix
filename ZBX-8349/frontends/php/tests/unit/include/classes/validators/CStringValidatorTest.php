@@ -27,7 +27,7 @@ class CStringValidatorTest extends CValidatorTest {
 				'empty' => true,
 				'maxLength' => 10,
 				'regex' => '/[a-z]+/',
-				'messageType' => 'Not a string',
+				'messageInvalid' => 'Not a string',
 				'messageEmpty' => 'String empty',
 				'messageMaxLength' => 'String too long',
 				'messageRegex' => 'Incorrect string'
@@ -62,12 +62,12 @@ class CStringValidatorTest extends CValidatorTest {
 				'Empty string'
 			),
 			array(
-				array('messageType' => 'Not a string'),
+				array('messageInvalid' => 'Not a string'),
 				null,
 				'Not a string'
 			),
 			array(
-				array('messageType' => 'Not a string'),
+				array('messageInvalid' => 'Not a string'),
 				array(),
 				'Not a string'
 			),
@@ -109,12 +109,12 @@ class CStringValidatorTest extends CValidatorTest {
 				'Empty string for "object"'
 			),
 			array(
-				array('messageType' => 'Not a string for "%1$s"'),
+				array('messageInvalid' => 'Not a string for "%1$s"'),
 				null,
 				'Not a string for "object"'
 			),
 			array(
-				array('messageType' => 'Not a string for "%1$s"'),
+				array('messageInvalid' => 'Not a string for "%1$s"'),
 				array(),
 				'Not a string for "object"'
 			),

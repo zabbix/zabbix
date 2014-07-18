@@ -54,7 +54,7 @@ class CCollectionValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageType;
+	public $messageInvalid;
 
 	/**
 	 * Error message if duplicate objects exist.
@@ -73,7 +73,7 @@ class CCollectionValidator extends CValidator {
 	public function validate($value)
 	{
 		if (!is_array($value)) {
-			$this->error($this->messageType);
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}

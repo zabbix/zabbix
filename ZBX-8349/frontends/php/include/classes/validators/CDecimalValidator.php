@@ -61,7 +61,7 @@ class CDecimalValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageType;
+	public $messageInvalid;
 
 	/**
 	 * Checks if the given string is correct double.
@@ -72,7 +72,7 @@ class CDecimalValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!is_numeric($value) || !preg_match('/^-?\d+(\.\d+)?$/', $value)) {
-			$this->error($this->messageType, $this->stringify($value));
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}

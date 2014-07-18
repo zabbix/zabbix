@@ -29,18 +29,11 @@ class CLimitedSetValidator extends CValidator {
 	public $values = array();
 
 	/**
-	 * Error message if the value is invalid.
+	 * Error message if the value is invalid or is not of an acceptable type.
 	 *
 	 * @var string
 	 */
 	public $messageInvalid;
-
-	/**
-	 * Error message if the value is not of an acceptable type
-	 *
-	 * @var string
-	 */
-	public $messageType;
 
 	/**
 	 * Checks if the given value belongs to some set.
@@ -51,7 +44,7 @@ class CLimitedSetValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!is_string($value) && !is_int($value)) {
-			$this->error($this->messageType);
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}

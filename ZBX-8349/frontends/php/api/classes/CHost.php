@@ -546,8 +546,7 @@ class CHost extends CHostGeneral {
 
 		$statusValidator = new CLimitedSetValidator(array(
 			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
-			'messageInvalid' => _('Incorrect status for host "%1$s".'),
-			'messageType' => _('Incorrect status for host "%1$s".')
+			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		));
 
 		$hostNames = array();

@@ -25,7 +25,6 @@ class CIdValidatorTest extends CValidatorTest {
 		return array(
 			array(array(
 				'empty' => true,
-				'messageType' => 'Invalid ID type',
 				'messageEmpty' => 'Empty ID',
 				'messageInvalid' => 'Incorrect ID specified'
 			))
@@ -45,22 +44,22 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID type'),
+				array('messageInvalid' => 'Invalid ID type'),
 				true,
 				'Invalid ID type'
 			),
 			array(
-				array('messageType' => 'Invalid ID type'),
+				array('messageInvalid' => 'Invalid ID type'),
 				null,
 				'Invalid ID type'
 			),
 			array(
-				array('messageType' => 'Invalid ID type'),
+				array('messageInvalid' => 'Invalid ID type'),
 				array(),
 				'Invalid ID type'
 			),
 			array(
-				array('messageType' => 'Invalid ID type'),
+				array('messageInvalid' => 'Invalid ID type'),
 				new stdClass(),
 				'Invalid ID type'
 			),
@@ -115,17 +114,17 @@ class CIdValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageInvalid' => 'Invalid ID for "%1$s"'),
 				true,
 				'Invalid ID for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageInvalid' => 'Invalid ID for "%1$s"'),
 				null,
 				'Invalid ID for "object"'
 			),
 			array(
-				array('messageType' => 'Invalid ID for "%1$s"'),
+				array('messageInvalid' => 'Invalid ID for "%1$s"'),
 				array(),
 				'Invalid ID for "object"'
 			),

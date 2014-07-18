@@ -118,10 +118,12 @@ abstract class CValidator {
 	 * @param mixed $value
 	 * @return string
 	 */
-	protected function stringify($value)
-	{
+	protected function stringify($value) {
 		if (is_bool($value)) {
 			return $value ? 'true' : 'false';
+		}
+		elseif (is_null($value)) {
+			return 'null';
 		}
 		elseif (is_object($value)) {
 			return get_class($value);
