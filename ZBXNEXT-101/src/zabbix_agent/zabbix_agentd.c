@@ -24,6 +24,9 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
+#include "zbxself.h"
+#include "../libs/zbxnix/control.h"
+
 #ifndef _WINDOWS
 #	include "zbxmodules.h"
 #endif
@@ -48,6 +51,11 @@
 #endif
 
 #include "setproctitle.h"
+
+#define ZBX_AGENT_PROCESS_TYPE_COLLECTOR	0
+#define ZBX_AGENT_PROCESS_TYPE_LISTENER		1
+#define ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS	2
+#define ZBX_AGENT_PROCESS_TYPE_COUNT		3
 
 const char	*progname = NULL;
 
@@ -113,6 +121,7 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
+	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
@@ -130,24 +139,26 @@ static struct zbx_option	longopts[] =
 };
 
 static char	shortopts[] =
-	"c:hVpt:"
+	"c:hVR:pt:"
 #ifdef _WINDOWS
 	"idsxm"
 #endif
 	;
 /* end of COMMAND LINE OPTIONS */
-
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
-unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL	unsigned char process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
+int				CONFIG_COLLECTOR_FORKS = 1;
 int				CONFIG_ACTIVE_FORKS = 0;
 int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
+
+char		*opt = NULL;
 
 #ifdef _WINDOWS
 void zbx_co_uninitialize();
@@ -166,6 +177,20 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		{
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
+				break;
+			case 'R':
+				opt = zbx_strdup(opt, zbx_optarg);
+
+				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
+					t->task = ZBX_TASK_LOG_LEVEL_INCREASE;
+				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE, strlen(ZBX_LOG_LEVEL_DECREASE)))
+					t->task = ZBX_TASK_LOG_LEVEL_DECREASE;
+				else
+				{
+					zbx_error("invalid runtime control option: %s", zbx_optarg);
+					exit(EXIT_FAILURE);
+				}
+
 				break;
 			case 'h':
 				help();
@@ -750,23 +775,89 @@ void	zbx_on_exit(void)
 #if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
 void	zbx_sigusr_handler(zbx_task_t task)
 {
-	/* nothing to do */
+	switch (((unsigned char *)&task)[0])
+	{
+		case ZBX_TASK_LOG_LEVEL_INCREASE:
+			set_debug_level(UP, get_process_type_string(process_type));
+			break;
+		case ZBX_TASK_LOG_LEVEL_DECREASE:
+			set_debug_level(DOWN, get_process_type_string(process_type));
+			break;
+		default:
+			break;
+	}
 }
 #endif
 
-int	get_process_type_forks(unsigned char process_type)
+int	get_process_type_forks(unsigned char proc_type)
 {
-	/* nothing to do */
+	switch (proc_type)
+	{
+		case ZBX_AGENT_PROCESS_TYPE_COLLECTOR:
+			return CONFIG_COLLECTOR_FORKS;
+		case ZBX_AGENT_PROCESS_TYPE_LISTENER:
+			return CONFIG_PASSIVE_FORKS;
+		case ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS:
+			return CONFIG_ACTIVE_FORKS;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(FAIL);
 }
 
-const char	*get_process_type_string(unsigned char process_type)
+const char	*get_process_type_string(unsigned char proc_type)
 {
-	/* nothing to do */
+	switch (proc_type)
+	{
+		case ZBX_AGENT_PROCESS_TYPE_COLLECTOR:
+			return "collector";
+		case ZBX_AGENT_PROCESS_TYPE_LISTENER:
+			return "listener";
+		case ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS:
+			return "active checks";
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(FAIL);
 }
 
 void get_process_info_by_thread(int server_num, int *process_type, int *process_num)
 {
-	/* nothing to do */
+	int	server_count = 0;
+
+	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	{
+		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*process_type = ZBX_AGENT_PROCESS_TYPE_COLLECTOR;
+	}
+	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	{
+		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
+	}
+	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	{
+		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(FAIL);
+	}
+}
+
+int	get_process_type_by_name(const char *proc_type_str)
+{
+	int	i;
+
+	for (i = 0; i < ZBX_AGENT_PROCESS_TYPE_COUNT; i++)
+	{
+		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
+			return i;
+	}
+
+	return FAIL;
 }
 
 int	main(int argc, char **argv)
@@ -801,6 +892,16 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_SHOW_USAGE:
 			usage();
 			exit(EXIT_FAILURE);
+			break;
+		case ZBX_TASK_LOG_LEVEL_INCREASE:
+			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
+			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task, get_process_type_by_name);
+			zbx_free(opt);
+			break;
+		case ZBX_TASK_LOG_LEVEL_DECREASE:
+			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
+			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task, get_process_type_by_name);
+			zbx_free(opt);
 			break;
 #ifdef _WINDOWS
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -864,6 +965,12 @@ int	main(int argc, char **argv)
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			break;
+	}
+
+	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((char *)&t.task)[0])
+	{
+		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+		exit(SUCCEED == zbx_sigusr_send(t.task) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);

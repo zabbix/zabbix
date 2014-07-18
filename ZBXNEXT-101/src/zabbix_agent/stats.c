@@ -37,6 +37,8 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
+extern unsigned char process_type;
+
 #ifndef _WINDOWS
 static int		shm_id;
 int 			my_diskstat_shmid = NONEXISTENT_SHMID;
@@ -414,6 +416,8 @@ void	diskstat_shm_extend()
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	assert(args);
+
+	process_type = ZBX_AGENT_PROCESS_TYPE_COLLECTOR;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
 
