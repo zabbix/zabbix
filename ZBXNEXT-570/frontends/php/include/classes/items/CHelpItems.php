@@ -815,6 +815,10 @@ class CHelpItems {
 					'description' => _('Number of values stored in table HISTORY_UINT.')
 				),
 				array(
+					'key' => 'zabbix[host,,maintenance]',
+					'description' => _('Returns current maintenance status of the host.')
+				),
+				array(
 					'key' => 'zabbix[host,<type>,available]',
 					'description' => _('Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx.')
 				),

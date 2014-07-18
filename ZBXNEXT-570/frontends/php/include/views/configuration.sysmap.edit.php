@@ -28,7 +28,7 @@ $sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
 $sysmapForm = new CForm();
 $sysmapForm->setName('map.edit.php');
 $sysmapForm->addVar('form', get_request('form', 1));
-$sysmapForm->addVar('form_refresh', get_request('form_refresh', 0) + 1);
+
 if (isset($this->data['sysmap']['sysmapid'])) {
 	$sysmapForm->addVar('sysmapid', $this->data['sysmap']['sysmapid']);
 }

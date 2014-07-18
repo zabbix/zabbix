@@ -494,6 +494,7 @@ class CConfigurationExportBuilder {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
+				'bulk' => $interface['bulk'],
 				'interface_ref' => $interface['interface_ref']
 			);
 		}

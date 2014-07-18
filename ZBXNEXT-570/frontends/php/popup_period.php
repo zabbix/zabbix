@@ -46,7 +46,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>	array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT, null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -58,10 +58,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME)));
 
 	$caption = getRequest('caption', '');
-	if (zbx_empty($caption) && hasRequest('report_timesince') && hasRequest('report_timetill')) {
-		$caption = zbx_date2str(DATE_TIME_FORMAT, getRequest('report_timesince')).' - '.
+	$autoCaption = '';
+
+	if (hasRequest('report_timesince') && hasRequest('report_timetill')) {
+		$autoCaption = zbx_date2str(DATE_TIME_FORMAT, getRequest('report_timesince')).' - '.
 			zbx_date2str(DATE_TIME_FORMAT, getRequest('report_timetill')
 		);
+	}
+
+	if (zbx_empty($caption)) {
+		$caption = $autoCaption;
 	}
 
 	if(isset($_REQUEST['save'])){
@@ -69,7 +75,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			insert_js("update_period('".
 				$_REQUEST['period_id']."',".
 				zbx_jsvalue($_REQUEST['dstfrm']).",".
-				zbx_jsvalue($_REQUEST['caption']).",'".
+				zbx_jsvalue($caption).",'".
 				$_REQUEST['report_timesince']."','".
 				$_REQUEST['report_timetill']."','".
 				$_REQUEST['color']."');\n");
@@ -108,7 +114,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$frmPd->addRow(
 			array(
-				new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
+				new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
+					_('Default')
+				),
 				_('Caption')
 			),
 			new CTextBox('caption', $caption, 42)
@@ -125,7 +133,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$reporttimetab->addRow($timeTillRow);
 
 		$frmPd->addRow(_('Period'), $reporttimetab);
-//*/
+
 		if($config != 1)
 			$frmPd->addRow(_('Colour'), new CColor('color',$color));
 		else

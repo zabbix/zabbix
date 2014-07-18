@@ -35,7 +35,6 @@ $userForm = new CForm();
 $userForm->setName('userForm');
 $userForm->addVar('config', get_request('config', 0));
 $userForm->addVar('form', $this->data['form']);
-$userForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
 if (isset($_REQUEST['userid'])) {
 	$userForm->addVar('userid', $this->data['userid']);
@@ -50,7 +49,7 @@ if (!$data['is_profile']) {
 	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
 	$nameTextBox->attr('autofocus', 'autofocus');
 	$userFormList->addRow(_('Alias'), $nameTextBox);
-	$userFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
@@ -250,7 +249,7 @@ if ($this->data['is_profile']) {
 		SPACE,
 		$soundList,
 		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'formlist'),
-		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 	);
 
 	$triggersTable = new CTable('', 'invisible');
@@ -287,7 +286,7 @@ if ($this->data['is_profile']) {
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
-			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+			new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 		));
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
