@@ -111,7 +111,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$dbTemplateScreenIds = API::TemplateScreen()->get(array(
 			'output' => array('screenid'),
 			'hostids' => $templateIdsXML,
-			'editable' => true,
+			'nopermissions' => true,
 			'preservekeys' => true
 		));
 
