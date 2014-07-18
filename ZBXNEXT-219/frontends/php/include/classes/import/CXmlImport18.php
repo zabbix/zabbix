@@ -1833,16 +1833,21 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+				$triggerIdsToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+				$triggersToDelete = array();
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
 				// if some triggers belong to more hosts than current XML contains, don't delete them
-				foreach ($triggersToDelete as $triggerId => $trigger) {
+				foreach ($triggerIdsToDelete as $triggerId => $trigger) {
 					$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
 					if (!array_diff_key($triggerHostIds, $hostIdsXML)) {
-						API::Trigger()->delete(array($triggerId));
+						$triggersToDelete[] = $triggerId;
 					}
+				}
+
+				if ($triggersToDelete) {
+					API::Trigger()->delete($triggersToDelete);
 				}
 			}
 
@@ -1860,16 +1865,21 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+				$graphsIdsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+				$graphsToDelete = array();
 
 				// check that potentially deletable graph belongs to same hosts that are in XML
 				// if some graphs belong to more hosts than current XML contains, don't delete them
-				foreach ($graphsToDelete as $graphId => $graph) {
+				foreach ($graphsIdsToDelete as $graphId => $graph) {
 					$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
 					if (!array_diff_key($graphHostIds, $hostIdsXML)) {
-						API::Graph()->delete(array($graphId));
+						$graphsToDelete[] = $graphId;
 					}
+				}
+
+				if ($graphsToDelete) {
+					API::Graph()->delete($graphsToDelete);
 				}
 			}
 
