@@ -34,122 +34,84 @@ class CImportedObjectContainer {
 	protected $templates = array();
 
 	/**
-	 * @var CConfigurationImport.
+	 * Add host IDs that have been created and updated.
+	 *
+	 * @param array $hostIds
 	 */
-	protected $configurationImport;
-
-	/**
-	 * @var CImportReferencer.
-	 */
-	protected $referencer;
-
-	/**
-	 * @var array importable object options "createMissing", "updateExisting", "deleteMissing".
-	 */
-	protected $options;
-
-	public function __construct (CConfigurationImport $configurationImport, CImportReferencer $referencer,
-			array $options = array()) {
-		$this->configurationImport = $configurationImport;
-		$this->referencer = $referencer;
-		$this->options = $options;
+	public function addHostIds(array $hostIds) {
+		foreach ($hostIds as $hostId) {
+			$this->hosts[$hostId] = $hostId;
+		}
 	}
 
 	/**
-	 * Add host that have been created and updated.
+	 * Add template IDs that have been created and updated.
 	 *
-	 * @param $host
+	 * @param array $templateIds
 	 */
-	public function addHost($host) {
-		$this->hosts[$host] = $host;
-	}
-
-	/**
-	 * Add template that have been created and updated.
-	 *
-	 * @param $host
-	 */
-	public function addTemplate($template) {
-		$this->templates[$template] = $template;
+	public function addTemplateIds(array $templateIds) {
+		foreach ($templateIds as $templateId) {
+			$this->templates[$templateId] = $templateId;
+		}
 	}
 
 	/**
 	 * Checks if host has been created and updated during the current import.
 	 *
-	 * @param $host
+	 * @param string $hostId
 	 *
 	 * @return bool
 	 */
-	public function isHostProcessed($host) {
-		return isset($this->hosts[$host]);
+	public function isHostProcessed($hostId) {
+		return isset($this->hosts[$hostId]);
 	}
 
 	/**
 	 * Checks if template has been created and updated during the current import.
 	 *
-	 * @param $template
+	 * @param string $templateId
 	 *
 	 * @return bool
 	 */
-	public function isTemplateProcessed($template) {
-		return isset($this->templates[$template]);
+	public function isTemplateProcessed($templateId) {
+		return isset($this->templates[$templateId]);
 	}
 
 	/**
-	 * Get array of created and updated hosts name and ID pairs.
+	 * Get array of created and updated hosts IDs.
 	 *
 	 * @return array
 	 */
 	public function getHostIds() {
-		$hosts = array();
+		$hostIds = array();
 
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-			$hosts = $this->configurationImport->getFormattedHosts();
-			if ($hosts) {
-				$hosts = zbx_objectValues($hosts, 'host');
-			}
-		}
-
-		$hostIdsXML = array();
-
-		foreach ($hosts as $host) {
-			if (!$this->isHostProcessed($host)) {
+		foreach ($this->hosts as $hostId) {
+			if (!$this->isHostProcessed($hostId)) {
 				continue;
 			}
 
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			$hostIdsXML[$host] = $hostId;
+			$hostIds[$hostId] = $hostId;
 		}
 
-		return $hostIdsXML;
+		return $hostIds;
 	}
 
 	/**
-	 * Get array of created and updated template name and ID pairs.
+	 * Get array of created and updated template IDs.
 	 *
 	 * @return array
 	 */
 	public function getTemplateIds() {
-		$templates = array();
+		$templateIds = array();
 
-		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
-			$templates = $this->configurationImport->getFormattedTemplates();
-			if ($templates) {
-				$templates = zbx_objectValues($templates, 'host');
-			}
-		}
-
-		$templateIdsXML = array();
-
-		foreach ($templates as $template) {
-			if (!$this->isTemplateProcessed($template)) {
+		foreach ($this->templates as $templateId) {
+			if (!$this->isTemplateProcessed($templateId)) {
 				continue;
 			}
 
-			$templateId = $this->referencer->resolveHostOrTemplate($template);
-			$templateIdsXML[$template] = $templateId;
+			$templateIds[$templateId] = $templateId;
 		}
 
-		return $templateIdsXML;
+		return $templateIds;
 	}
 }

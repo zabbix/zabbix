@@ -72,7 +72,8 @@ class CConfigurationImport {
 	 * @param string $source
 	 * @param array  $options
 	 */
-	public function __construct($source, array $options = array()) {
+	public function __construct($source, array $options = array(), CImportReferencer $referencer,
+			CImportedObjectContainer $importedObjectContainer) {
 		$this->options = array(
 			'groups' => array('createMissing' => false),
 			'hosts' => array('updateExisting' => false, 'createMissing' => false),
@@ -91,6 +92,8 @@ class CConfigurationImport {
 
 		$this->options = array_merge($this->options, $options);
 		$this->source = $source;
+		$this->referencer = $referencer;
+		$this->importedObjectContainer = $importedObjectContainer;
 	}
 
 	/**
@@ -147,8 +150,6 @@ class CConfigurationImport {
 			// pass data to formatter
 			// export has root key "zabbix_export" which is not passed
 			$this->formatter->setData($this->data['zabbix_export']);
-			$this->referencer = new CImportReferencer();
-			$this->importedObjectContainer = new CImportedObjectContainer($this, $this->referencer, $this->options);
 
 			// parse all import for references to resolve them all together with less sql count
 			$this->gatherReferences();
@@ -538,6 +539,10 @@ class CConfigurationImport {
 					$this->importedObjectContainer
 				);
 				$templateImporter->import($templates);
+
+				// get list of imported template IDs and add them processed template ID list
+				$templateIds = $templateImporter->getProcessedTemplateIds();
+				$this->importedObjectContainer->addTemplateIds($templateIds);
 			}
 		}
 	}
@@ -553,6 +558,10 @@ class CConfigurationImport {
 			if ($hosts) {
 				$hostImporter = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$hostImporter->import($hosts);
+
+				// get list of imported host IDs and add them processed host ID list
+				$hostIds = $hostImporter->getProcessedHostIds();
+				$this->importedObjectContainer->addHostIds($hostIds);
 			}
 		}
 	}
@@ -567,23 +576,23 @@ class CConfigurationImport {
 
 		$allApplications = $this->getFormattedApplications();
 
-		if (empty($allApplications)) {
+		if (!$allApplications) {
 			return;
 		}
 
 		$applicationsToCreate = array();
 
 		foreach ($allApplications as $host => $applications) {
-			if (!$this->importedObjectContainer->isHostProcessed($host)
-					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+
+			if (!$this->importedObjectContainer->isHostProcessed($hostId)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
 				continue;
 			}
 
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
-
 			foreach ($applications as $application) {
-				$application['hostid'] = $hostid;
-				$appId = $this->referencer->resolveApplication($hostid, $application['name']);
+				$application['hostid'] = $hostId;
+				$appId = $this->referencer->resolveApplication($hostId, $application['name']);
 
 				if (!$appId) {
 					$applicationsToCreate[] = $application;
@@ -609,7 +618,7 @@ class CConfigurationImport {
 
 		$allItems = $this->getFormattedItems();
 
-		if (empty($allItems)) {
+		if (!$allItems) {
 			return;
 		}
 
@@ -617,21 +626,21 @@ class CConfigurationImport {
 		$itemsToUpdate = array();
 
 		foreach ($allItems as $host => $items) {
-			if (!$this->importedObjectContainer->isHostProcessed($host)
-					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+
+			if (!$this->importedObjectContainer->isHostProcessed($hostId)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
 				continue;
 			}
 
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
-
 			foreach ($items as $item) {
-				$item['hostid'] = $hostid;
+				$item['hostid'] = $hostId;
 
 				if (isset($item['applications']) && $item['applications']) {
 					$applicationsIds = array();
 
 					foreach ($item['applications'] as $application) {
-						if ($applicationId = $this->referencer->resolveApplication($hostid, $application['name'])) {
+						if ($applicationId = $this->referencer->resolveApplication($hostId, $application['name'])) {
 							$applicationsIds[] = $applicationId;
 						}
 						else {
@@ -644,7 +653,7 @@ class CConfigurationImport {
 				}
 
 				if (isset($item['interface_ref']) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
 				if (isset($item['valuemap']) && $item['valuemap']) {
@@ -662,7 +671,7 @@ class CConfigurationImport {
 					$item['valuemapid'] = $valueMapId;
 				}
 
-				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemsId) {
 					$item['itemid'] = $itemsId;
@@ -699,14 +708,17 @@ class CConfigurationImport {
 
 		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 
-		if (empty($allDiscoveryRules)) {
+		if (!$allDiscoveryRules) {
 			return;
 		}
 
 		// unset rules that are related to hosts we did not process
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			if (!$this->importedObjectContainer->isHostProcessed($host)
-					&& !$this->importedObjectContainer->isTemplateProcessed($host)) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			echo '$hostId = ' . $hostId . '<br>';
+
+			if (!$this->importedObjectContainer->isHostProcessed($hostId)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
 				unset($allDiscoveryRules[$host]);
 			}
 		}
@@ -715,13 +727,13 @@ class CConfigurationImport {
 		$itemsToUpdate = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
-				$item['hostid'] = $hostid;
+				$item['hostid'] = $hostId;
 
 				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
 				unset($item['item_prototypes']);
@@ -729,7 +741,7 @@ class CConfigurationImport {
 				unset($item['graph_prototypes']);
 				unset($item['host_prototypes']);
 
-				$itemId = $this->referencer->resolveItem($hostid, $item['key_']);
+				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemId) {
 					$item['itemid'] = $itemId;
@@ -776,31 +788,31 @@ class CConfigurationImport {
 		$hostPrototypesToCreate = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
 				// if rule was not processed we should not create/update any of its prototypes
-				if (!isset($processedRules[$hostid][$item['key_']])) {
+				if (!isset($processedRules[$hostId][$item['key_']])) {
 					continue;
 				}
 
-				$item['hostid'] = $hostid;
-				$itemId = $this->referencer->resolveItem($hostid, $item['key_']);
+				$item['hostid'] = $hostId;
+				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				// prototypes
 				foreach ($item['item_prototypes'] as $prototype) {
-					$prototype['hostid'] = $hostid;
+					$prototype['hostid'] = $hostId;
 
 					$applicationsIds = array();
 
 					foreach ($prototype['applications'] as $application) {
-						$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						$applicationsIds[] = $this->referencer->resolveApplication($hostId, $application['name']);
 					}
 
 					$prototype['applications'] = $applicationsIds;
 
 					if (isset($prototype['interface_ref'])) {
-						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostid][$prototype['interface_ref']];
+						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
 					}
 
 					if ($prototype['valuemap']) {
@@ -819,8 +831,8 @@ class CConfigurationImport {
 						$prototype['valuemapid'] = $valueMapId;
 					}
 
-					$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
-					$prototype['rule'] = array('hostid' => $hostid, 'key' => $item['key_']);
+					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
+					$prototype['rule'] = array('hostid' => $hostId, 'key' => $item['key_']);
 
 					if ($prototypeId) {
 						$prototype['itemid'] = $prototypeId;
@@ -877,7 +889,7 @@ class CConfigurationImport {
 
 					$hostPrototype['templates'] = $templates;
 
-					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostid, $itemId, $hostPrototype['host']);
+					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $itemId, $hostPrototype['host']);
 
 					if ($hostPrototypeId) {
 						$hostPrototype['hostid'] = $hostPrototypeId;
@@ -890,14 +902,14 @@ class CConfigurationImport {
 				}
 
 				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 				unset($item['item_prototypes']);
 				unset($item['trigger_prototypes']);
 				unset($item['graph_prototypes']);
 				unset($item['host_prototypes']);
 
-				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemsId) {
 					$item['itemid'] = $itemsId;
@@ -949,11 +961,11 @@ class CConfigurationImport {
 		$graphsToUpdate = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $item) {
 				// if rule was not processed we should not create/update any of its prototypes
-				if (!isset($processedRules[$hostid][$item['key_']])) {
+				if (!isset($processedRules[$hostId][$item['key_']])) {
 					continue;
 				}
 
@@ -1161,7 +1173,7 @@ class CConfigurationImport {
 
 		$allTriggers = $this->getFormattedTriggers();
 
-		if (empty($allTriggers)) {
+		if (!$allTriggers) {
 			return;
 		}
 
@@ -1355,7 +1367,7 @@ class CConfigurationImport {
 
 		if ($allItems) {
 			foreach ($allItems as $host => $items) {
-				$hostId = $hostIdsXML[$host];
+				$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 				foreach ($items as $item) {
 					$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
@@ -1411,7 +1423,7 @@ class CConfigurationImport {
 
 		if ($allApplications) {
 			foreach ($allApplications as $host => $applications) {
-				$hostId = $hostIdsXML[$host];
+				$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 				foreach ($applications as $application) {
 					$applicationId = $this->referencer->resolveApplication($hostId, $application['name']);
@@ -1486,7 +1498,6 @@ class CConfigurationImport {
 
 		// check that potentially deletable trigger belongs to same hosts that are in XML
 		// if some triggers belong to more hosts than current XML contains, don't delete them
-		$hostIdsXML = array_flip($hostIdsXML);
 		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
 
 		foreach ($triggersToDelete as $triggerId => $trigger) {
@@ -1557,7 +1568,6 @@ class CConfigurationImport {
 
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
-		$hostIdsXML = array_flip($hostIdsXML);
 		$graphsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
 
 		foreach ($graphsToDelete as $graphId => $graph) {
@@ -1597,7 +1607,7 @@ class CConfigurationImport {
 
 		if ($allDiscoveryRules) {
 			foreach ($allDiscoveryRules as $host => $discoveryRules) {
-				$hostId = $hostIdsXML[$host];
+				$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 				foreach ($discoveryRules as $discoveryRule) {
 					$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
@@ -1633,7 +1643,7 @@ class CConfigurationImport {
 		$graphPrototypeIdsXML = array();
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $hostIdsXML[$host];
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
 			foreach ($discoveryRules as $discoveryRule) {
 				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);

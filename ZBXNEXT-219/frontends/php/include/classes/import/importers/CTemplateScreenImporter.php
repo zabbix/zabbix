@@ -38,11 +38,11 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$screensToUpdate = array();
 
 		foreach ($allScreens as $template => $screens) {
-			if (!$this->importedObjectContainer->isTemplateProcessed($template)) {
+			$templateId = $this->referencer->resolveTemplate($template);
+
+			if (!$this->importedObjectContainer->isTemplateProcessed($templateId)) {
 				continue;
 			}
-
-			$templateId = $this->referencer->resolveTemplate($template);
 
 			foreach ($screens as $screenName => $screen) {
 				$screen['screenid'] = $this->referencer->resolveTemplateScreen($templateId, $screenName);
@@ -94,7 +94,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 
 		if ($allScreens) {
 			foreach ($allScreens as $template => $screens) {
-				$templateId = isset($templateIdsXML[$template]) ? $templateIdsXML[$template] : false;
+				$templateId = $this->referencer->resolveTemplate($template);
 
 				if ($templateId) {
 					foreach ($screens as $screenName => $screen) {
