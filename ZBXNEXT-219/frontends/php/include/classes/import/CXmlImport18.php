@@ -1437,6 +1437,8 @@ class CXmlImport18 {
 									'webitems' => true,
 									'output' => array('itemid')
 								));
+
+								$itemIdsXML[$current_item[0]['itemid']] = $current_item[0]['itemid'];
 							}
 
 							if (!$current_item && $rules['items']['createMissing']) {
@@ -1447,6 +1449,8 @@ class CXmlImport18 {
 									'webitems' => true,
 									'output' => array('itemid')
 								));
+
+								$itemIdsXML[$current_item[0]['itemid']] = $current_item[0]['itemid'];
 							}
 
 							// after items are created or updated, see to if items need to assigned to applications
@@ -1559,6 +1563,9 @@ class CXmlImport18 {
 							'triggerids' => $result['triggerids']
 						));
 
+						$triggersXML = array_merge($triggersXML, zbx_objectValues($triggersUpdated, 'triggerid'));
+						$triggersXML = array_unique($triggersXML);
+						$triggersXML = array_combine($triggersXML, $result['triggerids']);
 						$triggersForDependencies = array_merge($triggersForDependencies, $triggersUpdated);
 					}
 
@@ -1569,6 +1576,10 @@ class CXmlImport18 {
 							'output' => API_OUTPUT_EXTEND,
 							'triggerids' => $result['triggerids']
 						));
+
+						$triggersXML = array_merge($triggersXML, $result['triggerids']);
+						$triggersXML = array_unique($triggersXML);
+						$triggersXML = array_combine($triggersXML, $triggersXML);
 
 						$triggersForDependencies = array_merge($triggersForDependencies, $triggersCreated);
 					}
@@ -1723,16 +1734,16 @@ class CXmlImport18 {
 					}
 
 					if (!empty($graphs_to_add)) {
-						$r = API::Graph()->create($graphs_to_add);
-						if ($r === false) {
-							throw new Exception();
-						}
+						$graphsCreated = API::Graph()->create($graphs_to_add);
+						$graphsXML = array_merge($graphsXML, $graphsCreated['graphids']);
+						$graphsXML = array_unique($graphsXML);
+						$graphsXML = array_combine($graphsXML, $graphsXML);
 					}
 					if (!empty($graphs_to_upd)) {
-						$r = API::Graph()->update($graphs_to_upd);
-						if ($r === false) {
-							throw new Exception();
-						}
+						$graphsUpdated = API::Graph()->update($graphs_to_upd);
+						$graphsXML = array_merge($graphsXML, $graphsUpdated['graphids']);
+						$graphsXML = array_unique($graphsXML);
+						$graphsXML = array_combine($graphsXML, $graphsXML);
 					}
 				}
 			}
