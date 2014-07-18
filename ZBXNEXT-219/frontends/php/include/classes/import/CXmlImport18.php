@@ -859,20 +859,20 @@ class CXmlImport18 {
 
 			$hosts = $xpath->query('hosts/host');
 
-			// stores parsed host IDs that exist on XML
-			$hostIdsXML = array();
+			// stores parsed host and template IDs
+			$processedHostIds = array();
 
-			// store application IDs that exist on XML
-			$applicationIdsXML = array();
+			// store application IDs have been created and exist on XML
+			$processedApplicationIds = array();
 
-			// store items IDs that exist on XML
-			$itemIdsXML = array();
+			// store items IDs that have been created and exist on XML
+			$processedItemIds = array();
 
-			// stores trigger IDs and hosts triggers belong to that exist on XML
-			$triggersXML = array();
+			// stores trigger IDs that have been created and exist on XML
+			$processedTriggerIds = array();
 
-			// stores graph IDs and hosts graphs belong to that exist on XML
-			$graphsXML = array();
+			// stores graph IDs that have been created and exist on XML
+			$processedGraphIds = array();
 
 			foreach ($hosts as $host) {
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
@@ -1205,7 +1205,7 @@ class CXmlImport18 {
 				$current_hostname = $host_db['host'];
 
 				// store parsed host IDs
-				$hostIdsXML[$current_hostid] = $current_hostid;
+				$processedHostIds[$current_hostid] = $current_hostid;
 				if ($old_version_input) {
 					if (!$interfaces_created_with_host) {
 						// if host had another interfaces, we are not touching them: they remain as is
@@ -1359,7 +1359,7 @@ class CXmlImport18 {
 
 							// items created and updated during should be "preserved", so we must store item IDs
 							// before we skip some rules, otherwise all items get deleted
-							$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
+							$processedItemIds[$current_item['itemid']] = $current_item['itemid'];
 						}
 
 						// create applications independently of create or update item options
@@ -1411,7 +1411,7 @@ class CXmlImport18 {
 
 						if ($itemApplications) {
 							foreach ($itemApplications as $itemApp) {
-								$applicationIdsXML[$itemApp['applicationid']] = $itemApp['applicationid'];
+								$processedApplicationIds[$itemApp['applicationid']] = $itemApp['applicationid'];
 							}
 						}
 
@@ -1448,7 +1448,7 @@ class CXmlImport18 {
 									'output' => array('itemid')
 								));
 
-								$itemIdsXML[$current_item[0]['itemid']] = $current_item[0]['itemid'];
+								$processedItemIds[$current_item[0]['itemid']] = $current_item[0]['itemid'];
 							}
 
 							// after items are created or updated, see to if items need to assigned to applications
@@ -1531,7 +1531,7 @@ class CXmlImport18 {
 							}
 
 							// we must store trigger data before we skip rules
-							$triggersXML[$currentTrigger['triggerid']] = $currentTrigger['triggerid'];
+							$processedTriggerIds[$currentTrigger['triggerid']] = $currentTrigger['triggerid'];
 						}
 						unset($trigger_db['hostid']);
 
@@ -1572,9 +1572,9 @@ class CXmlImport18 {
 							'triggerids' => $result['triggerids']
 						));
 
-						$triggersXML = array_merge($triggersXML, $result['triggerids']);
-						$triggersXML = array_unique($triggersXML);
-						$triggersXML = array_combine($triggersXML, $triggersXML);
+						$processedTriggerIds = array_merge($processedTriggerIds, $result['triggerids']);
+						$processedTriggerIds = array_unique($processedTriggerIds);
+						$processedTriggerIds = array_combine($processedTriggerIds, $processedTriggerIds);
 
 						$triggersForDependencies = array_merge($triggersForDependencies, $triggersCreated);
 					}
@@ -1671,7 +1671,7 @@ class CXmlImport18 {
 							}
 							$current_graph = reset($current_graph);
 
-							$graphsXML[$current_graph['graphid']] = $current_graph['graphid'];
+							$processedGraphIds[$current_graph['graphid']] = $current_graph['graphid'];
 						}
 
 						if (!$current_graph && empty($rules['graphs']['createMissing'])) {
@@ -1730,9 +1730,9 @@ class CXmlImport18 {
 
 					if (!empty($graphs_to_add)) {
 						$graphsCreated = API::Graph()->create($graphs_to_add);
-						$graphsXML = array_merge($graphsXML, $graphsCreated['graphids']);
-						$graphsXML = array_unique($graphsXML);
-						$graphsXML = array_combine($graphsXML, $graphsXML);
+						$processedGraphIds = array_merge($processedGraphIds, $graphsCreated['graphids']);
+						$processedGraphIds = array_unique($processedGraphIds);
+						$processedGraphIds = array_combine($processedGraphIds, $processedGraphIds);
 					}
 					if (!empty($graphs_to_upd)) {
 						API::Graph()->update($graphs_to_upd);
@@ -1746,7 +1746,7 @@ class CXmlImport18 {
 				// select only triggers from already parsed hosts
 				$dbTriggerIds = API::Trigger()->get(array(
 					'output' => array('triggerid'),
-					'hostids' => $hostIdsXML,
+					'hostids' => $processedHostIds,
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
 					'nopermissions' => true,
@@ -1754,7 +1754,7 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$triggerIdsToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+				$triggerIdsToDelete = array_diff_key($dbTriggerIds, $processedTriggerIds);
 				$triggersToDelete = array();
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
@@ -1762,7 +1762,7 @@ class CXmlImport18 {
 				foreach ($triggerIdsToDelete as $triggerId => $trigger) {
 					$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
-					if (!array_diff_key($triggerHostIds, $hostIdsXML)) {
+					if (!array_diff_key($triggerHostIds, $processedHostIds)) {
 						$triggersToDelete[] = $triggerId;
 					}
 				}
@@ -1778,7 +1778,7 @@ class CXmlImport18 {
 				// select only triggers from already parsed hosts
 				$dbGraphIds = API::Graph()->get(array(
 					'output' => array('graphid'),
-					'hostids' => $hostIdsXML,
+					'hostids' => $processedHostIds,
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
 					'nopermissions' => true,
@@ -1786,7 +1786,7 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$graphsIdsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+				$graphsIdsToDelete = array_diff_key($dbGraphIds, $processedGraphIds);
 				$graphsToDelete = array();
 
 				// check that potentially deletable graph belongs to same hosts that are in XML
@@ -1794,7 +1794,7 @@ class CXmlImport18 {
 				foreach ($graphsIdsToDelete as $graphId => $graph) {
 					$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
-					if (!array_diff_key($graphHostIds, $hostIdsXML)) {
+					if (!array_diff_key($graphHostIds, $processedHostIds)) {
 						$graphsToDelete[] = $graphId;
 					}
 				}
@@ -1808,14 +1808,14 @@ class CXmlImport18 {
 			if ($rules['items']['deleteMissing']) {
 				$dbItemIds = API::Item()->get(array(
 					'output' => array('itemid'),
-					'hostids' => $hostIdsXML,
+					'hostids' => $processedHostIds,
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'inherited' => false,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$itemsToDelete = array_diff_key($dbItemIds, $itemIdsXML);
+				$itemsToDelete = array_diff_key($dbItemIds, $processedItemIds);
 
 				if ($itemsToDelete) {
 					API::Item()->delete(array_keys($itemsToDelete));
@@ -1826,13 +1826,13 @@ class CXmlImport18 {
 			if ($rules['applications']['deleteMissing']) {
 				$dbApplicationIds = API::Application()->get(array(
 					'output' => array('applicationid'),
-					'hostids' => $hostIdsXML,
+					'hostids' => $processedHostIds,
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'inherited' => false
 				));
 
-				$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
+				$applicationsToDelete = array_diff_key($dbApplicationIds, $processedApplicationIds);
 				if ($applicationsToDelete) {
 					API::Application()->delete(array_keys($applicationsToDelete));
 				}
