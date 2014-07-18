@@ -52,11 +52,6 @@
 
 #include "setproctitle.h"
 
-#define ZBX_AGENT_PROCESS_TYPE_COLLECTOR	0
-#define ZBX_AGENT_PROCESS_TYPE_LISTENER		1
-#define ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS	2
-#define ZBX_AGENT_PROCESS_TYPE_COUNT		3
-
 const char	*progname = NULL;
 
 /* default config file location */
