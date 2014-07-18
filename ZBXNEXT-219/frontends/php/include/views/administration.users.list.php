@@ -52,7 +52,7 @@ $usersTable = new CTableInfo(_('No users found.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 	make_sorting_header(_('Alias'), 'alias'),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_x('Name', 'user first name'), 'name'),
 	make_sorting_header(_('Surname'), 'surname'),
 	make_sorting_header(_('User type'), 'type'),
 	_('Groups'),

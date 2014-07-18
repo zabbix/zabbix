@@ -150,6 +150,13 @@ ZABBIX.apps.map = (function($) {
 				});
 			}
 
+			// for some reason IE8 does not catch clicks if there is no background color and alpha opacity is 0
+			if (IE8) {
+				this.container.css({
+					backgroundColor: 'white'
+				});
+			}
+
 			if (IE || GK) {
 				this.base64image = false;
 				this.mapimg = $('#sysmap_img');
@@ -1293,7 +1300,7 @@ ZABBIX.apps.map = (function($) {
 
 		SelementForm.prototype = {
 			/**
-			 * Shows lement form.
+			 * Shows element form.
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');

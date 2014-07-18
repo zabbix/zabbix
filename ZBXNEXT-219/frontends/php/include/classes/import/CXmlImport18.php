@@ -459,6 +459,12 @@ class CXmlImport18 {
 				if (!isset($screenitem['resourceid'])) {
 					$screenitem['resourceid'] = 0;
 				}
+				if ($screenitem['rowspan'] == 0) {
+					$screenitem['rowspan'] = 1;
+				}
+				if ($screenitem['colspan'] == 0) {
+					$screenitem['colspan'] = 1;
+				}
 				if (is_array($screenitem['resourceid'])) {
 					switch ($screenitem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
@@ -1011,19 +1017,21 @@ class CXmlImport18 {
 						$current_host = reset($current_host);
 					}
 
-					$currentMainInterfaces = array();
-					$currentInterfacesByType = array();
-
-					foreach ($current_host['interfaces'] as $currentInterface) {
-						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
-							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
-						}
-
-						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
-					}
-
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
+						$currentMainInterfaces = array();
+						$currentInterfacesByType = array();
+
+						// group existing main interfaces by interface type into $currentMainInterfaces
+						// and group interfaces by type into $currentInterfacesByType
+						foreach ($current_host['interfaces'] as $currentInterface) {
+							if ($currentInterface['main'] == INTERFACE_PRIMARY) {
+								$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
+							}
+
+							$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
+						}
+
 						// loop through all interfaces we got from XML
 						foreach ($interfaces as &$interfaceXml) {
 							$interfaceXmlType = $interfaceXml['type'];
@@ -1724,96 +1732,6 @@ class CXmlImport18 {
 						$r = API::Graph()->update($graphs_to_upd);
 						if ($r === false) {
 							throw new Exception();
-						}
-					}
-				}
-
-// SCREENS
-				if (!empty($rules['screens']['updateExisting']) || !empty($rules['screens']['createMissing'])) {
-					$screens_node = $xpath->query('screens', $host);
-
-					if ($screens_node->length > 0) {
-						$importScreens = self::XMLtoArray($screens_node->item(0));
-
-						foreach ($importScreens as $screen) {
-
-							$current_screen = API::TemplateScreen()->get(array(
-								'filter' => array('name' => $screen['name']),
-								'templateids' => $current_hostid,
-								'output' => API_OUTPUT_EXTEND,
-								'editable' => 1,
-							));
-							$current_screen = reset($current_screen);
-
-							if (!$current_screen && empty($rules['screens']['createMissing'])) {
-								info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
-								continue;
-							}
-							if ($current_screen && empty($rules['screens']['updateExisting'])) {
-								info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
-								continue;
-							}
-
-							if (isset($screen['screenitems'])) {
-								foreach ($screen['screenitems'] as &$screenitem) {
-									if (!isset($screenitem['resourceid'])) {
-										$screenitem['resourceid'] = 0;
-									}
-
-									if (is_array($screenitem['resourceid'])) {
-										switch ($screenitem['resourcetype']) {
-											case SCREEN_RESOURCE_GRAPH:
-												$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
-
-												if (empty($db_graphs)) {
-													$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
-															$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
-													throw new Exception($error);
-												}
-
-												$tmp = reset($db_graphs);
-												$screenitem['resourceid'] = $tmp['graphid'];
-												break;
-											case SCREEN_RESOURCE_SIMPLE_GRAPH:
-											case SCREEN_RESOURCE_PLAIN_TEXT:
-												$db_items = API::Item()->getObjects($screenitem['resourceid']);
-
-												if (empty($db_items)) {
-													$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
-															$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
-													throw new Exception($error);
-												}
-
-												$tmp = reset($db_items);
-												$screenitem['resourceid'] = $tmp['itemid'];
-												break;
-											default:
-												$screenitem['resourceid'] = 0;
-												break;
-										}
-									}
-								}
-							}
-
-							$screen['templateid'] = $current_hostid;
-							if ($current_screen) {
-								$screen['screenid'] = $current_screen['screenid'];
-
-								$result = API::TemplateScreen()->update($screen);
-								if (!$result) {
-									throw new Exception(_('Cannot update screen.'));
-								}
-
-								info('['.$current_hostname.'] '._s('Screen "%1$s" updated.', $screen['name']));
-							}
-							else {
-								$result = API::TemplateScreen()->create($screen);
-								if (!$result) {
-									throw new Exception(_('Cannot create screen.'));
-								}
-
-								info('['.$current_hostname.'] '._s('Screen "%1$s" added.', $screen['name']));
-							}
 						}
 					}
 				}

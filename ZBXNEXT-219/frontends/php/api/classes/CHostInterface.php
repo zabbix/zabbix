@@ -326,6 +326,8 @@ class CHostInterface extends CApiService {
 				$this->checkPort($interface);
 			}
 
+			$this->checkBulk($interface);
+
 			if ($update) {
 				$interface = $updInterface;
 			}
@@ -461,6 +463,7 @@ class CHostInterface extends CApiService {
 			$this->checkDns($interface);
 			$this->checkIp($interface);
 			$this->checkPort($interface);
+			$this->checkBulk($interface);
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), array(
@@ -469,7 +472,8 @@ class CHostInterface extends CApiService {
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
-					'port' => $interface['port']
+					'port' => $interface['port'],
+					'bulk' => $interface['bulk']
 				)
 			));
 			if ($interfacesToRemove) {
@@ -499,7 +503,8 @@ class CHostInterface extends CApiService {
 				'hostid' => $data['hostids'],
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
-				'port' => $interface['port']
+				'port' => $interface['port'],
+				'bulk' => $interface['bulk']
 			));
 		}
 
@@ -630,6 +635,25 @@ class CHostInterface extends CApiService {
 	protected function checkHostPermissions(array $hostIds) {
 		if (!API::Host()->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Validates interface "bulk" field.
+	 * For SNMP interfaces bulk value should be either 0 (disabled) or 1 (enabled).
+	 * For other non-SNMP interfaces bulk value should be 1 (default).
+	 *
+	 * @throws APIException if bulk field is incorrect.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkBulk(array $interface) {
+		if (($interface['type'] != INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+				&& $interface['bulk'] != SNMP_BULK_ENABLED)
+				|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+					&& (zbx_empty($interface['bulk'])
+						|| ($interface['bulk'] != SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLED)))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
 		}
 	}
 
