@@ -27,6 +27,8 @@
 #include "sysinfo.h"
 #include "log.h"
 
+extern unsigned char process_type;
+
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON)
@@ -72,6 +74,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
+
+	process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
 
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
 	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;

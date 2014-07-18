@@ -51,4 +51,9 @@ void	load_perf_counters(const char **lines);
 void	tl_version();
 #endif
 
+#define ZBX_AGENT_PROCESS_TYPE_COLLECTOR	0
+#define ZBX_AGENT_PROCESS_TYPE_LISTENER		1
+#define ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS	2
+#define ZBX_AGENT_PROCESS_TYPE_COUNT		3
+
 #endif /* ZABBIX_ZBXCONF_H */

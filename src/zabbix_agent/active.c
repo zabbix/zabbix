@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "active.h"
+#include "zbxconf.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -32,6 +33,8 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
+
+extern unsigned char process_type;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1328,6 +1331,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
+
+	process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
 
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
 	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
