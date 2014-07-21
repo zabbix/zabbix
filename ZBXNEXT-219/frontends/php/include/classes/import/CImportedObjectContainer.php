@@ -26,12 +26,12 @@ class CImportedObjectContainer {
 	/**
 	 * @var array with created and updated hosts.
 	 */
-	protected $hosts = array();
+	protected $hostIds = array();
 
 	/**
 	 * @var array with created and updated templates.
 	 */
-	protected $templates = array();
+	protected $templateIds = array();
 
 	/**
 	 * Add host IDs that have been created and updated.
@@ -40,7 +40,7 @@ class CImportedObjectContainer {
 	 */
 	public function addHostIds(array $hostIds) {
 		foreach ($hostIds as $hostId) {
-			$this->hosts[$hostId] = $hostId;
+			$this->hostIds[$hostId] = $hostId;
 		}
 	}
 
@@ -51,7 +51,7 @@ class CImportedObjectContainer {
 	 */
 	public function addTemplateIds(array $templateIds) {
 		foreach ($templateIds as $templateId) {
-			$this->templates[$templateId] = $templateId;
+			$this->templateIds[$templateId] = $templateId;
 		}
 	}
 
@@ -63,7 +63,7 @@ class CImportedObjectContainer {
 	 * @return bool
 	 */
 	public function isHostProcessed($hostId) {
-		return isset($this->hosts[$hostId]);
+		return isset($this->hostIds[$hostId]);
 	}
 
 	/**
@@ -74,7 +74,7 @@ class CImportedObjectContainer {
 	 * @return bool
 	 */
 	public function isTemplateProcessed($templateId) {
-		return isset($this->templates[$templateId]);
+		return isset($this->templateIds[$templateId]);
 	}
 
 	/**
@@ -83,17 +83,7 @@ class CImportedObjectContainer {
 	 * @return array
 	 */
 	public function getHostIds() {
-		$hostIds = array();
-
-		foreach ($this->hosts as $hostId) {
-			if (!$this->isHostProcessed($hostId)) {
-				continue;
-			}
-
-			$hostIds[$hostId] = $hostId;
-		}
-
-		return $hostIds;
+		return array_values($this->hostIds);
 	}
 
 	/**
@@ -104,7 +94,7 @@ class CImportedObjectContainer {
 	public function getTemplateIds() {
 		$templateIds = array();
 
-		foreach ($this->templates as $templateId) {
+		foreach ($this->templateIds as $templateId) {
 			if (!$this->isTemplateProcessed($templateId)) {
 				continue;
 			}

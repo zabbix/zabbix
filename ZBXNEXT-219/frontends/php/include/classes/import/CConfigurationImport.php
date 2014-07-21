@@ -715,7 +715,6 @@ class CConfigurationImport {
 		// unset rules that are related to hosts we did not process
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
-			echo '$hostId = ' . $hostId . '<br>';
 
 			if (!$this->importedObjectContainer->isHostProcessed($hostId)
 					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
