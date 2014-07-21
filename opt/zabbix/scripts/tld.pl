@@ -187,8 +187,6 @@ unless (defined($root_servers_macros)) {
 
 $main_templateid = create_main_template($OPTS{'tld'}, $ns_servers);
 
-exit;
-
 $tld_groupid = create_group('TLD '.$OPTS{'tld'});
 
 $tlds_groupid = create_group('TLDs');
@@ -1273,7 +1271,7 @@ sub create_rsm_items {
     my $options;
     my $appid = get_application_id('Configuration', $hostid);
 
-    my $macros = { 
+    my $macros = {
 		&TIME_MINUTE => [
 			'RSM.INCIDENT.DNS.FAIL',
     			'RSM.INCIDENT.DNS.RECOVER',
@@ -1282,13 +1280,13 @@ sub create_rsm_items {
 		        'RSM.INCIDENT.RDDS.FAIL',
 		        'RSM.INCIDENT.RDDS.RECOVER',
 		        'RSM.INCIDENT.EPP.FAIL',
-		        'RSM.INCIDENT.EPP.RECOVER',                                     
-		        'RSM.DNS.UDP.DELAY',                                            
-		        'RSM.RDDS.DELAY',                                               
-		        'RSM.EPP.DELAY',                                                
-		        'RSM.DNS.UDP.RTT.HIGH',                                         
-		        'RSM.DNS.AVAIL.MINNS',                                          
-		        'RSM.DNS.ROLLWEEK.SLA',                                         
+		        'RSM.INCIDENT.EPP.RECOVER',
+		        'RSM.DNS.UDP.DELAY',
+		        'RSM.RDDS.DELAY',
+		        'RSM.EPP.DELAY',
+		        'RSM.DNS.UDP.RTT.HIGH',
+		        'RSM.DNS.AVAIL.MINNS',
+		        'RSM.DNS.ROLLWEEK.SLA',
 		        'RSM.RDDS.ROLLWEEK.SLA',
 		        'RSM.EPP.ROLLWEEK.SLA'
 		],
@@ -1568,13 +1566,13 @@ sub manage_tld_objects($$$$$) {
     print "Getting main host of the TLD: ";
     my $main_hostid = get_host($tld, false);
 
-    if (scalar(%{$main_hostid})) {                                         
-        $main_hostid = $main_hostid->{'hostid'};                                
+    if (scalar(%{$main_hostid})) {
+        $main_hostid = $main_hostid->{'hostid'};
 	print "success\n";
-    }                                                                 
-    else {                                                            
-        print "Could not find '$tld' host\n";                         
-        exit;                                                         
+    }
+    else {
+        print "Could not find '$tld' host\n";
+        exit;
     }
 
     print "Getting main template of the TLD: ";
@@ -1583,10 +1581,10 @@ sub manage_tld_objects($$$$$) {
     if (scalar(%{$tld_template})) {
         $main_templateid = $tld_template->{'templateid'};
 	print "success\n";
-    }                                                                 
-    else {                                                            
+    }
+    else {
         print "Could not find 'Template .$tld' template\n";
-        exit;                                                        
+        exit;
     }
 
     foreach my $host (@{$tld_template->{'hosts'}}) {
@@ -1609,7 +1607,7 @@ sub manage_tld_objects($$$$$) {
 
 	if ($action eq 'disable') {
 	    my $result = disable_hosts(\@tmp_hostids);
-	    
+
 	    if (scalar(%{$result})) {
 		compare_arrays(\@hostids_arr, \@{$result->{'hostids'}});
 	    }
@@ -1617,18 +1615,17 @@ sub manage_tld_objects($$$$$) {
 		print "An error happened while removing hosts!\n";
 	    }
 
-
 	    exit;
 	}
-    
+
 	if ($action eq 'delete') {
 	    remove_hosts( \@tmp_hostids );
 	    remove_templates([ $main_templateid ]);
-	    
+
 	    my $hostgroupid = get_host_group('TLD '.$tld, false);
 	    $hostgroupid = $hostgroupid->{'groupid'};
 	    remove_hostgroups( [ $hostgroupid ] );
-	    return;	    
+	    return;
 	}
     }
 
@@ -1680,7 +1677,7 @@ sub compare_arrays($$) {
 	foreach $b (@${array_B}) {
 	    $found = true if $a eq $b;
 	}
-	
+
 	push @result, $a if $found eq false;
     }
 
