@@ -28,18 +28,23 @@
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_get";
 const char	syslog_app_name[] = "zabbix_get";
-const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
+const char	*usage_message[] = {
+	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
 	"Options:",
-	"  -s --host <host name or IP>          Specify host name or IP address of a host",
-	"  -p --port <port number>              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
-	"  -I --source-address <IP address>     Specify source IP address",
+	"  -s --host host-name-or-IP          Specify host name or IP address of a host",
+	"  -p --port port-number              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
+	"  -I --source-address IP-address     Specify source IP address",
 	"",
-	"  -k --key <key of metric>             Specify key of item to retrieve value for",
+	"  -k --key item-key                  Specify key of item to retrieve value for",
 	"",
-	"  -h --help                            Give this help",
-	"  -V --version                         Display version number",
+	"  -h --help                          Display this help message",
+	"  -V --version                       Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
 	NULL	/* end of text */

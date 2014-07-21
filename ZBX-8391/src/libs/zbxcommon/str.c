@@ -79,7 +79,13 @@ void	version(void)
  ******************************************************************************/
 void	usage(void)
 {
-	printf("usage: %s %s\n", progname, usage_message);
+	const char	**p = usage_message;
+
+	if (NULL != *p)
+		printf("usage:\n");
+
+	while (NULL != *p)
+		printf("       %s %s\n", progname, *p++);
 }
 
 /******************************************************************************

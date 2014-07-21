@@ -29,7 +29,7 @@
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
-const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
+const char	*usage_message[] = { "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]" };
 
 const char	*help_message[] = {
 	"Options:",
@@ -55,7 +55,7 @@ const char	*help_message[] = {
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
 	"Other options:",
-	"  -h --help                            Give this help",
+	"  -h --help                            Display this help message",
 	"  -V --version                         Display version number",
 	NULL	/* end of text */
 };
