@@ -25,7 +25,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "";
-const char	usage_message[] = "";
+const char	*usage_message[] = {NULL};
 
 const char	*help_message[] = {NULL};
 

@@ -32,15 +32,22 @@
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_agent";
 const char	syslog_app_name[] = "zabbix_agent";
-const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -p",
+	"[-c config-file] -t item-key",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>  Absolute path to the configuration file",
-	"  -p --print          Print known items and exit",
-	"  -t --test <item>    Test specified item and exit",
-	"  -h --help           Give this help",
-	"  -V --version        Display version number",
+	"  -c --config config-file  Absolute path to the configuration file",
+	"  -p --print               Print known items and exit",
+	"  -t --test item-key       Test specified item and exit",
+	"  -h --help                Display this help message",
+	"  -V --version             Display version number",
 	NULL	/* end of text */
 };
 

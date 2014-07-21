@@ -61,19 +61,25 @@
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
-const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"-R option",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>              Absolute path to the configuration file",
-	"  -R --runtime-control <option>   Perform administrative functions",
+	"  -c --config config-file       Absolute path to the configuration file",
+	"  -R --runtime-control option   Perform administrative functions",
 	"",
-	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"    Runtime control options:",
+	"      " ZBX_CONFIG_CACHE_RELOAD "       Reload configuration cache",
 	"",
 	"Other options:",
-	"  -h --help                       Give this help",
-	"  -V --version                    Display version number",
+	"  -h --help                     Display this help message",
+	"  -V --version                  Display version number",
 	NULL	/* end of text */
 };
 
@@ -211,7 +217,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_set_defaults()
+static void	zbx_set_defaults(void)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -349,7 +355,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config()
+static void	zbx_load_config(void)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -521,7 +527,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
 }

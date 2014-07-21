@@ -76,23 +76,31 @@ const char	title_message[] = "zabbix_agentd"
 const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
-const char	usage_message[] =
-	"[-Vhp]"
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -p",
+	"[-c config-file] -t item-key",
 #ifdef _WINDOWS
-	" [-idsx] [-m]"
+	"[-c config-file] -i [-m]",
+	"[-c config-file] -d [-m]",
+	"[-c config-file] -s [-m]",
+	"[-c config-file] -x [-m]",
 #endif
-	" [-c <config-file>] [-t <item key>]";
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 /* end of application USAGE message */
 
 /* application HELP message */
 const char	*help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <config-file>  Absolute path to the configuration file",
-	"  -p --print                 Print known items and exit",
-	"  -t --test <item key>       Test specified item and exit",
-	"  -h --help                  Give this help",
-	"  -V --version               Display version number",
+	"  -c --config config-file  Absolute path to the configuration file",
+	"  -p --print               Print known items and exit",
+	"  -t --test item-key       Test specified item and exit",
+	"  -h --help                Display this help message",
+	"  -V --version             Display version number",
 #ifdef _WINDOWS
 	"",
 	"Functions:",
@@ -303,10 +311,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 0x40:
 			break;
 		default:
-			zbx_error("Mutually exclusive options used. Valid combinations are:\n"
-					"\t[-c]\n"
-					"\t[-c] { -p | -t | -i | -d | -s | -x }\n"
-					"\t[-c] { -i | -d | -s | -x } -m");
+			zbx_error("Mutually exclusive options used.\n");
+			usage();
 			exit(EXIT_FAILURE);
 			break;
 	}
