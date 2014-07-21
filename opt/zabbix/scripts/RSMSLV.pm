@@ -9,7 +9,7 @@ use Exporter qw(import);
 use Zabbix;
 use Sender;
 use File::Pid;
-use POSIX;
+use POSIX qw(floor);
 use Data::Dumper;
 
 use constant SUCCESS => 0;
