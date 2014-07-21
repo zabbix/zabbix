@@ -539,12 +539,24 @@ void	main_pinger_loop(void)
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
 	int			items_count = 0, itc;
+#ifndef _WINDOWS
+	sigset_t		mask, orig_mask;
+#endif
 
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in pinger process");
+#endif
+
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();
@@ -562,5 +574,10 @@ void	main_pinger_loop(void)
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
 		zbx_sleep_loop(sleeptime);
+
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 }

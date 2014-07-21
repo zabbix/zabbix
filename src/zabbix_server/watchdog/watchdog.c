@@ -202,15 +202,27 @@ exit:
  ******************************************************************************/
 void	main_watchdog_loop(void)
 {
-	int	now, nextsync = 0, action;
-	double	sec;
+	int		now, nextsync = 0, action;
+	double		sec;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
 
 	zbx_vector_ptr_create(&recipients);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in watchdog process");
+#endif
+
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 
 		sec = zbx_time();
@@ -249,5 +261,9 @@ void	main_watchdog_loop(void)
 		}
 
 		zbx_sleep_loop(DB_PING_FREQUENCY);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 }

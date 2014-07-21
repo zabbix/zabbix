@@ -779,11 +779,20 @@ static int	housekeeping_events(int now)
 
 void	main_housekeeper_loop(void)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
-	double	sec;
+	int		now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
+	double		sec;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
 
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in housekeeper process");
+#endif
 		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");
 		now = time(NULL);
 
@@ -825,5 +834,9 @@ void	main_housekeeper_loop(void)
 				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 }

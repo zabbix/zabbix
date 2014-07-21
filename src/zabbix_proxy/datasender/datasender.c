@@ -155,15 +155,25 @@ void	main_datasender_loop(void)
 	int		records = 0, r;
 	double		sec = 0.0;
 	struct zbx_json	j;
-
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in datasender process");
+#endif
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, sec);
 
@@ -199,5 +209,9 @@ retry_autoreg_host:
 				get_process_type_string(process_type), records, sec, CONFIG_PROXYDATA_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYDATA_FREQUENCY);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 }

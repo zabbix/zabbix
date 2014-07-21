@@ -88,9 +88,12 @@ static int	send_heartbeat(void)
  ******************************************************************************/
 void	main_heart_loop(void)
 {
-	int	start, sleeptime = 0, res;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	int		start, sleeptime = 0, res;
+	double		sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t		last_stat_time;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -99,8 +102,16 @@ void	main_heart_loop(void)
 
 	zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in heartbeat process");
+#endif
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s [sending heartbeat message %s in " ZBX_FS_DBL " sec, "
@@ -140,6 +151,10 @@ void	main_heart_loop(void)
 		}
 
 		zbx_sleep_loop(sleeptime);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 
 #undef STAT_INTERVAL

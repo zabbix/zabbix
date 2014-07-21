@@ -439,7 +439,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	{
 #ifndef _WINDOWS
 		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in listener process");
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in collector process");
 #endif
 
 		zbx_setproctitle("collector [processing data]");
