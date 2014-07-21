@@ -136,7 +136,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_VMWARE_FORKS;
 	}
 
-	assert(0);
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(FAIL);
 }
 
 /******************************************************************************
@@ -201,7 +202,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "vmware collector";
 	}
 
-	assert(0);
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(FAIL);
 }
 
 int	get_process_type_by_name(const char *proc_type_str)
