@@ -189,13 +189,11 @@ if ($isDiscovered) {
 	);
 }
 
-$hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered);
-$hostTB->setAttribute('maxlength', 64);
+$hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostTB->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
-$visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
