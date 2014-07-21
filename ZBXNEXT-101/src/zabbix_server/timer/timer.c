@@ -792,16 +792,17 @@ static int	process_maintenance(void)
  ******************************************************************************/
 void	main_timer_loop(void)
 {
-	int	now, nextcheck, sleeptime = -1,
-		triggers_count = 0, events_count = 0, hm_count = 0,
-		old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
-		tr_count, ev_count;
-
-	double	sec = 0.0, sec_maint = 0.0,
-		total_sec = 0.0, total_sec_maint = 0.0,
-		old_total_sec = 0.0, old_total_sec_maint = 0.0;
-
-	time_t	last_stat_time;
+	int		now, nextcheck, sleeptime = -1,
+			triggers_count = 0, events_count = 0, hm_count = 0,
+			old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
+			tr_count, ev_count;
+	double		sec = 0.0, sec_maint = 0.0,
+			total_sec = 0.0, total_sec_maint = 0.0,
+			old_total_sec = 0.0, old_total_sec_maint = 0.0;
+	time_t		last_stat_time;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -811,8 +812,16 @@ void	main_timer_loop(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in timer process");
+#endif
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
@@ -902,7 +911,7 @@ void	main_timer_loop(void)
 
 		/* only the "timer #1" process evaluates the maintenance periods */
 		if (1 != process_num)
-			continue;
+			goto unblock;
 
 		/* we process maintenance at every 00 sec */
 		/* process time functions can take long time */
@@ -918,6 +927,11 @@ void	main_timer_loop(void)
 			hm_count += process_maintenance();
 			total_sec_maint += zbx_time() - sec_maint;
 		}
+unblock:
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 
 #undef STAT_INTERVAL

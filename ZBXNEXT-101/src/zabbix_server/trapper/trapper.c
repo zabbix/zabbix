@@ -648,13 +648,25 @@ static void	process_trapper_child(zbx_sock_t *sock)
 void	main_trapper_loop(zbx_sock_t *s)
 {
 	double		sec = 0.0;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
+
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in listener process");
+#endif
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
@@ -673,12 +685,12 @@ void	main_trapper_loop(zbx_sock_t *s)
 
 			zbx_tcp_unaccept(s);
 		}
-		else if (EINTR == zbx_sock_last_error())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Trapper caught signal. Repeating connection");
-		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
 
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 }

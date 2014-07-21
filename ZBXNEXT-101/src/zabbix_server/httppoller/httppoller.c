@@ -96,9 +96,12 @@ static int	get_minnextcheck(int now)
  ******************************************************************************/
 void	main_httppoller_loop(void)
 {
-	int	now, nextcheck, sleeptime = -1, httptests_count = 0, old_httptests_count = 0;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	int		now, nextcheck, sleeptime = -1, httptests_count = 0, old_httptests_count = 0;
+	double		sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t		last_stat_time;
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -108,8 +111,16 @@ void	main_httppoller_loop(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
 	for (;;)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in httppoller process");
+#endif
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
@@ -147,6 +158,10 @@ void	main_httppoller_loop(void)
 		}
 
 		zbx_sleep_loop(sleeptime);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
+#endif
 	}
 
 #undef STAT_INTERVAL
