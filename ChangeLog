@@ -1,10 +1,16 @@
 Changes for 2.3.3
 
 New features:
+..F.....S. [ZBXNEXT-1848] added support for internal item zabbix[host,,maintenance] (Sasha)
+........S. [ZBXNEXT-1848] added processing of internal items in maintenance without data collection (Sasha)
+........S. [ZBXNEXT-2279] zabbix[proxy,,lastaccess] will be always performed by server (Sasha)
+A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditions (Krists)
 ...G...... [ZBXNEXT-1300] added low-level discovery support for enumerating CPUs on all supported platforms (Juris)
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+A......... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
+..F....... [ZBX-8468] removed unnecessary "empty" buttons in map element popups (Andrejs)
 ..F....... [ZBX-8431] added context for text string 'Name' (Oleg)
 ..F....... [ZBX-8467] removed "make_latest_issues" function extra argument (Oleg)
 ..F....... [ZBX-8436] fixed page layout being broken with IE8 in cases when item rows are added or removed (Krists)
@@ -255,12 +261,28 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.6rc1
+
+New features:
+
+Bug fixes:
+A.F....... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
+..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5
+
+2.2.5rc1 was released as 2.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.5rc1
 
 New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+.........T [ZBX-8405] fixed typos in item descriptions for JMX Tomcat, FreeBSD, HP-UX, Linux and OpenBSD templates (Richlv)
 ........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
