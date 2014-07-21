@@ -1538,8 +1538,6 @@ class CConfigurationImport {
 			return;
 		}
 
-		$graphNames = array();
-		$graphHostIds = array();
 		$graphsIdsXML = array();
 
 		// gather host IDs for graphs that exist in XML
@@ -1648,7 +1646,6 @@ class CConfigurationImport {
 
 		$hostPrototypeIdsXML = array();
 		$triggerPrototypeIdsXML = array();
-		$graphPrototypeIdsXML = array();
 		$itemPrototypeIdsXML = array();
 		$graphPrototypeIdsXML = array();
 
