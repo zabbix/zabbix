@@ -135,6 +135,10 @@ table.tableinfo-overview-hint { width: 200px; }
 .item-list table.filter tr td.label.col4 { width: 8%; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
+.item-list .filter .col1 .text { padding: 1px 0; }
+.item-list .filter .col1 span.text { padding: 0 4px; }
+.item-list .filter .multiselect { padding: 0; }
+.item-list .filter .multiselect-wrapper { width: 217px; }
 .item-list .menuPopup { width: 200px; }
 .item-list .filter .multiselect .selected ul { margin: 0;}
 
