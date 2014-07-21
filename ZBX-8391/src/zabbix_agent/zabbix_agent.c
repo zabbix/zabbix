@@ -124,7 +124,7 @@ static void	zbx_load_config(int optional)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
@@ -139,7 +139,7 @@ int	main(int argc, char **argv)
 	zbx_sock_t	s_in;
 	zbx_sock_t	s_out;
 
-	int		ret;
+	int		ret, opt_c = 0, opt_p = 0, opt_t = 0;
 	char		**value;
 
 	AGENT_RESULT	result;
@@ -152,7 +152,9 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -166,11 +168,13 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'p':
-				if (task == ZBX_TASK_START)
+				opt_p++;
+				if (ZBX_TASK_START == task)
 					task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
-				if (task == ZBX_TASK_START)
+				opt_t++;
+				if (ZBX_TASK_START == task)
 				{
 					task = ZBX_TASK_TEST_METRIC;
 					TEST_METRIC = strdup(zbx_optarg);
@@ -183,9 +187,40 @@ int	main(int argc, char **argv)
 		}
 	}
 
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_p || 1 < opt_t)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
+		if (1 < opt_p)
+			zbx_error("option \"-p\" or \"--print\" specified multiple times");
+		if (1 < opt_t)
+			zbx_error("option \"-t\" or \"--test\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* check for mutually exclusive options */
+	if (1 < opt_p + opt_t)
+	{
+		zbx_error("only one of options \"-p\", \"--print\", \"-t\" or \"--test\" can be used");
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
+	}
+
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-
 
 	/* load configuration */
 	if (ZBX_TASK_PRINT_SUPPORTED == task || ZBX_TASK_TEST_METRIC == task)
