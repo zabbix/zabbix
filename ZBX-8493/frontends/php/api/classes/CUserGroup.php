@@ -359,8 +359,8 @@ class CUserGroup extends CZBXAPI {
 			$linkedRights = array();
 			$sql = 'SELECT groupid,id'.
 				' FROM rights'.
-				' WHERE '.dbConditionInt('groupid', $usrgrpids);
-			' AND '.dbConditionInt('id', zbx_objectValues($rights, 'id'));
+				' WHERE '.dbConditionInt('groupid', $usrgrpids).
+					' AND '.dbConditionInt('id', zbx_objectValues($rights, 'id'));
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
 				if (!isset($linkedRights[$link['groupid']])) $linkedRights[$link['groupid']] = array();
@@ -370,7 +370,7 @@ class CUserGroup extends CZBXAPI {
 			$rightInsert = array();
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($rights as $right) {
-					if (!isset($linkedUsers[$usrgrpid][$right['id']])) {
+					if (!isset($linkedRights[$usrgrpid][$right['id']])) {
 						$rightInsert[] = array(
 							'groupid' => $usrgrpid,
 							'permission' => $right['permission'],
