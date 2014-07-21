@@ -1448,22 +1448,17 @@ sub get_results
 	{
 	    my $item_values_ref = $values_ref->{$target};
 
-	    my $probe_total = 0;
-	    my $probe_successful = 0;
-
 	    foreach (@$item_values_ref)
 	    {
 		$result{$target}->{'total'}++;
-		$probe_total++;
 
 		if ($check_value_ref->($_) == SUCCESS)
 		{
 		    $result{$target}->{'successful'}++;
-		    $probe_successful++;
 		}
 	    }
 
-	    dbg("[$probe] $target: $probe_successful/$probe_total");
+	    dbg("[$probe] $target: ", $result{$target}->{'successful'}, "/", $result{$target}->{'total'});
 	}
     }
 
