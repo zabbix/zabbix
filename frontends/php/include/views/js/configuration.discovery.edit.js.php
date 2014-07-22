@@ -506,6 +506,10 @@
 		if (showPrivProtocol) {
 			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
 		}
+
+		if (IE8) {
+			jQuery('#type').closest('li').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function saveNewDCheckForm(dcheckId) {
