@@ -574,11 +574,10 @@ class CDRule extends CApiService {
 		// process actions that depend on "Discovery rule = ..."
 		$actionIds = array();
 		$dbActions = DBselect(
-			'SELECT DISTINCT actionid'.
-			' FROM conditions'.
-			' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('value', $druleIds).
-			' ORDER BY actionid'
+			'SELECT DISTINCT c.actionid'.
+			' FROM conditions c'.
+			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionInt('c.value', $druleIds)
 		);
 
 		while ($dbAction = DBfetch($dbActions)) {
@@ -599,9 +598,9 @@ class CDRule extends CApiService {
 
 		// process actions that depend on "Discovery check = ..."
 		$dbChecks = DBselect(
-			'SELECT dcheckid'.
-			' FROM dchecks'.
-			' WHERE '.dbConditionString('druleid', $druleIds)
+			'SELECT dc.dcheckid'.
+			' FROM dchecks dc'.
+			' WHERE '.dbConditionInt('dc.druleid', $druleIds)
 		);
 
 		$checkIds = array();
@@ -613,11 +612,10 @@ class CDRule extends CApiService {
 		if ($checkIds) {
 			$actionIds = array();
 			$dbActions = DBselect(
-				'SELECT DISTINCT actionid'.
-				' FROM conditions'.
-				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-				' AND '.dbConditionString('value', $checkIds).
-				' ORDER BY actionid'
+				'SELECT DISTINCT c.actionid'.
+				' FROM conditions c'.
+				' WHERE c.conditiontype='.CONDITION_TYPE_DCHECK.
+					' AND '.dbConditionInt('c.value', $checkIds)
 			);
 
 			while ($dbAction = DBfetch($dbActions)) {
