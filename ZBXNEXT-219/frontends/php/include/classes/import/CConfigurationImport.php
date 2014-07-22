@@ -69,8 +69,10 @@ class CConfigurationImport {
 	 * Source string must be suitable for reader class,
 	 * i.e. if string contains json then reader should be able to read json.
 	 *
-	 * @param string $source
-	 * @param array  $options
+	 * @param string					$source						configuration data in specified format
+	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
+	 * @param CImportReferencer			$referencer					class containing all importable objects
+	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
 	 */
 	public function __construct($source, array $options = array(), CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {

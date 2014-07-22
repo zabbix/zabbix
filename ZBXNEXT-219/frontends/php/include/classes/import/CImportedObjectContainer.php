@@ -20,7 +20,7 @@
 
 
 /**
- * Class that holds created and updated hosts and templates during the current import.
+ * Class that holds processed (created and updated) host and template IDs during the current import.
  */
 class CImportedObjectContainer {
 	/**
@@ -92,16 +92,6 @@ class CImportedObjectContainer {
 	 * @return array
 	 */
 	public function getTemplateIds() {
-		$templateIds = array();
-
-		foreach ($this->templateIds as $templateId) {
-			if (!$this->isTemplateProcessed($templateId)) {
-				continue;
-			}
-
-			$templateIds[$templateId] = $templateId;
-		}
-
-		return $templateIds;
+		return array_values($this->templateIds);
 	}
 }
