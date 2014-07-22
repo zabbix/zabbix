@@ -512,10 +512,10 @@ function validateBarReportItems($items = array()) {
 	unset($item);
 
 	// check axis value. 0 = count
-	$calcFncValidator = new CSetValidator(array(
+	$calcFncValidator = new CLimitedSetValidator(array(
 		'values' => array(0, CALC_FNC_MIN, CALC_FNC_AVG, CALC_FNC_MAX)
 	));
-	$axisValidator = new CSetValidator(array(
+	$axisValidator = new CLimitedSetValidator(array(
 		'values' => array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT)
 	));
 
