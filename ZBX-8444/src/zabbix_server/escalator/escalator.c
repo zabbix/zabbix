@@ -1143,13 +1143,14 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 	if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
 	{
 		/* trigger disabled or deleted? */
-
-		DCconfig_get_trigger_by_triggerids(&trigger, &errcode, escalation->triggerid);
+		DCconfig_get_trigger_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
 
 		if (SUCCEED != errcode)
 			*error = zbx_dsprintf(*error, "trigger [" ZBX_FS_UI64 "] deleted.", escalation->triggerid);
 		else if (TRIGGER_STATUS_DISABLED == trigger.status)
 			*error = zbx_dsprintf(*error, "trigger '%s' disabled.", trigger.description);
+
+		DCconfig_clean_triggers(&trigger, &errcode, 1);
 	}
 
 	if (EVENT_SOURCE_TRIGGERS == source && NULL == *error && EVENT_OBJECT_TRIGGER == object)
