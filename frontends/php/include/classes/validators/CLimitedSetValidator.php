@@ -19,7 +19,7 @@
 **/
 
 
-class CSetValidator extends CValidator {
+class CLimitedSetValidator extends CValidator {
 
 	/**
 	 * Allowed values.
@@ -29,7 +29,7 @@ class CSetValidator extends CValidator {
 	public $values = array();
 
 	/**
-	 * Error message if the value is invalid.
+	 * Error message if the value is invalid or is not of an acceptable type.
 	 *
 	 * @var string
 	 */
@@ -42,8 +42,13 @@ class CSetValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
+	public function validate($value) {
+		if (!is_string($value) && !is_int($value)) {
+			$this->error($this->messageInvalid, $this->stringify($value));
+
+			return false;
+		}
+
 		$values = array_flip($this->values);
 
 		if (!isset($values[$value])) {
