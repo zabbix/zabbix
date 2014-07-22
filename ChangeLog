@@ -3,6 +3,7 @@ Changes for 2.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8492] fixed maintenance periods without hosts/hostgroups to be accessible by both admins and superadmins (Krists)
 A.F....... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
 ..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
 ..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
