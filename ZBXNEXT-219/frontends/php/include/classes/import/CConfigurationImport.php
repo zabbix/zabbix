@@ -984,7 +984,7 @@ class CConfigurationImport {
 				}
 
 				// graph prototypes
-				foreach ($item['graph_prototypes'] as &$graph) {
+				foreach ($item['graph_prototypes'] as $graph) {
 					if ($graph['ymin_item_1']) {
 						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
 						$itemId = $hostId
@@ -1040,10 +1040,7 @@ class CConfigurationImport {
 						}
 					}
 					unset($gitem);
-				}
-				unset($graph);
 
-				foreach ($item['graph_prototypes'] as $graph) {
 					if (isset($graph['graphid'])) {
 						$graphsToUpdate[] = $graph;
 					}
@@ -1087,7 +1084,7 @@ class CConfigurationImport {
 		$graphsToCreate = array();
 		$graphsToUpdate = array();
 
-		foreach ($allGraphs as &$graph) {
+		foreach ($allGraphs as $graph) {
 			if ($graph['ymin_item_1']) {
 				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
 				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']) : false;
@@ -1141,16 +1138,13 @@ class CConfigurationImport {
 					}
 				}
 				unset($gitem);
-			}
-		}
-		unset($graph);
 
-		foreach ($allGraphs as $graph) {
-			if (isset($graph['graphid'])) {
-				$graphsToUpdate[] = $graph;
-			}
-			else {
-				$graphsToCreate[] = $graph;
+				if (isset($graph['graphid'])) {
+					$graphsToUpdate[] = $graph;
+				}
+				else {
+					$graphsToCreate[] = $graph;
+				}
 			}
 		}
 
