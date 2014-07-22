@@ -1,6 +1,7 @@
 Changes for 2.3.3
 
 New features:
+..F....... [ZBXNEXT-1826] added proxy name as host prefix in item queue details page (Ivo)
 ..F.....S. [ZBXNEXT-1848] added support for internal item zabbix[host,,maintenance] (Sasha)
 ........S. [ZBXNEXT-1848] added processing of internal items in maintenance without data collection (Sasha)
 ........S. [ZBXNEXT-2279] zabbix[proxy,,lastaccess] will be always performed by server (Sasha)
