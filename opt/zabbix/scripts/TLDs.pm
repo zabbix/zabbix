@@ -7,7 +7,7 @@ use TLD_constants qw(:general :templates :api :config);
 use Data::Dumper;
 use base 'Exporter';
 
-our @EXPORT = qw(zbx_connect get_tld_list get_proxies_list 
+our @EXPORT = qw(zbx_connect get_tld_list get_proxies_list
 		create_probe_status_host
 		create_probe_template create_probe_status_template create_host create_group create_template create_item create_trigger create_macro update_root_servers
 		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host
@@ -45,9 +45,9 @@ sub get_proxies_list {
 
 sub is_probe_exist($) {
     my $name = shift;
-    
+
     my $result = $zabbix->get('proxy',{'output' => ['proxyid'], 'filter' => {'host' => $name}, 'preservekeys' => 1 });
-    
+
     return (keys %{$result}) ? true : false;
 }
 
@@ -85,7 +85,7 @@ sub get_template($$$) {
     my $options = {'output' => ['templateid', 'host'], 'filter' => {'host' => $template_name}};
 
     $options->{'selectMacros'} = 'extend' if (defined($selectMacros) and $selectMacros eq true);
-    
+
     $options->{'selectHosts'} = ['hostid', 'host'] if (defined($selectHosts) and $selectHosts eq true);
 
     my $result = $zabbix->get('template', $options);
@@ -125,21 +125,21 @@ sub disable_hosts($) {
 
 sub remove_hostgroups($) {
     my @hostgroupids = shift;
-    
+
     return unless scalar(@hostgroupids);
-    
+
     my $result = $zabbix->remove('hostgroup', @hostgroupids);
-    
+
     return $result;
 }
 
 sub remove_probes($) {
     my @probes = shift;
-            
+
     return unless scalar(@probes);
-    
+
     my $result = $zabbix->remove('proxy', @probes);
-    
+
     return $result;
 }
 
@@ -209,9 +209,9 @@ sub get_host($$) {
     my $options = {'output' => ['hostid', 'host'], 'filter' => {'host' => $host_name} };
 
     $options->{'selectGroups'} = 'extend' if (defined($selectGroups) and $selectGroups eq true);
-    
+
     my $result = $zabbix->get('host', $options);
-    
+
     return $result;
 }
 
@@ -459,13 +459,13 @@ sub create_probe_template {
     my $resolver = shift;
 
     my $templateid = create_template('Template '.$root_name);
-                                          
+
     create_macro('{$RSM.IP4.ENABLED}', defined($ipv4) ? $ipv4 : '1', $templateid);
     create_macro('{$RSM.IP6.ENABLED}', defined($ipv6) ? $ipv6 : '1', $templateid);
     create_macro('{$RSM.RESOLVER}', defined($resolver) ? $resolver : '127.0.0.1', $templateid);
     create_macro('{$RSM.RDDS.ENABLED}', defined($rdds) ? $rdds : '1', $templateid);
     create_macro('{$RSM.EPP.ENABLED}', defined($epp) ? $epp : '1', $templateid);
-                
+
     return $templateid;
 }
 

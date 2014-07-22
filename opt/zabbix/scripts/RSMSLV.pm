@@ -1019,7 +1019,7 @@ sub send_values
 	foreach my $hash_ref (@_sender_values)
         {
 	    $tld = $hash_ref->{'tld'};
-	    info($hash_ref->{'data'}->{'key'}, '=', $hash_ref->{'data'}->{'value'}, " ", $hash_ref->{'info'});
+	    info($hash_ref->{'info'}, " (", $hash_ref->{'data'}->{'key'}, '=', $hash_ref->{'data'}->{'value'}, ")");
 	}
 	$tld = $saved_tld;
 
@@ -1277,6 +1277,7 @@ sub process_slv_monthly
 sub process_slv_avail
 {
     my $tld = shift;
+    my $service = shift;
     my $cfg_key_in = shift;
     my $cfg_key_out = shift;
     my $from = shift;
@@ -1287,6 +1288,17 @@ sub process_slv_avail
     my $probes_ref = shift;
     my $check_value_ref = shift;
 
+    # first get current month downtime
+    my ($curmon_from) = get_curmon_bounds();
+    my $curmon_till = $from;
+
+    my $itemid = get_itemid($tld, $cfg_key_out);
+    my $downtime = get_downtime($itemid, $curmon_from, $curmon_till, 1); # no incidents check
+
+    push_value($tld, "rsm.slv.$service.downtime", $value_ts, $downtime, "$downtime minutes of downtime from ",
+	       ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");
+
+    # now the availability at a particular minute
     my $probes_count = scalar(@$probes_ref);
 
     if ($probes_count < $cfg_minonline)
@@ -1335,7 +1347,7 @@ sub process_slv_avail
 	    }
 	}
 
-	info("  i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(', ', @{$values_ref->{$itemid}}), ")");
+	dbg("i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(', ', @{$values_ref->{$itemid}}), ")");
     }
 
     my $result = DOWN;
@@ -1362,18 +1374,7 @@ sub process_slv_ns_avail
     dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
 
     my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
-    my $count = scalar(@$online_probes_ref);
-    if ($count < $cfg_minonline)
-    {
-	foreach my $target (@$targets_ref)
-	{
-	    push_value($tld, $cfg_key_out . $target . ']', $value_ts, UP, "Up (not enough probes online, $count while $cfg_minonline required)");
-	    push_value($tld, 'rsm.slv.dns.ns.results[' . $target . ']', $value_ts, 0, "");
-	    push_value($tld, 'rsm.slv.dns.ns.positive[' . $target . ']', $value_ts, 0, "");
-	    push_value($tld, 'rsm.slv.dns.ns.required[' . $target . ']', $value_ts, 0, "");
-	    return;
-	}
-    }
+    my $online_probes_count = scalar(@$online_probes_ref);
 
     my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
     my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
@@ -1382,35 +1383,54 @@ sub process_slv_ns_avail
 
     wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
+    # for current month downtime
+    my ($curmon_from) = get_curmon_bounds();
+    my $curmon_till = $from;
+
     foreach my $target (keys(%$values_ref))
     {
-	my $item_values_ref = $values_ref->{$target};
-	my $probes_with_results = scalar(@$item_values_ref);
 	my $out_key = $cfg_key_out . $target . ']';
 
+	# first calculate current month downtime
+	my $itemid = get_itemid($tld, $out_key);
+	my $downtime = get_downtime($itemid, $curmon_from, $curmon_till, 1); # no incidents check
+
+	push_value($tld, 'rsm.slv.dns.ns.downtime[' . $target . ']', $value_ts, $downtime,
+		   "$downtime minutes of downtime from ", ts_str($curmon_from), " ($curmon_from) till ",
+		   ts_str($curmon_till), " ($curmon_till)");
+
+	my $item_values_ref = $values_ref->{$target};
+
+	# now the availability
+	my $probes_with_results = scalar(@$item_values_ref);
 	my $probes_with_positive = 0;
+	my $positive_sla = floor($probes_with_results * SLV_UNAVAILABILITY_LIMIT / 100);
+
 	foreach (@$item_values_ref)
 	{
-	    info("  ", $_);
+	    dbg($_);
 	    $probes_with_positive++ if ($check_value_ref->($_) == SUCCESS);
 	}
 
-	my $positive_required = floor($probes_with_results * SLV_UNAVAILABILITY_LIMIT / 100);
-	my $perc = $probes_with_positive * 100 / $probes_with_results;
-	my $test_result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
-
-	if ($probes_with_results < $cfg_minonline)
+	if ($online_probes_count < $cfg_minonline)
+	{
+	    push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes online, $online_probes_count while $cfg_minonline required)");
+	}
+	elsif ($probes_with_results < $cfg_minonline)
 	{
 	    push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
 	}
 	else
 	{
+	    my $perc = $probes_with_positive * 100 / $probes_with_results;
+	    my $test_result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
+
 	    push_value($tld, $out_key, $value_ts, $test_result, avail_result_msg($test_result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
 	}
 
-	push_value($tld, 'rsm.slv.dns.ns.results[' . $target . ']', $value_ts, $probes_with_results, "");
-	push_value($tld, 'rsm.slv.dns.ns.positive[' . $target . ']', $value_ts, $probes_with_positive, "");
-	push_value($tld, 'rsm.slv.dns.ns.required[' . $target . ']', $value_ts, $positive_required, "");
+	push_value($tld, 'rsm.slv.dns.ns.results[' . $target . ']', $value_ts, $probes_with_results, "probes with results");
+	push_value($tld, 'rsm.slv.dns.ns.positive[' . $target . ']', $value_ts, $probes_with_positive, "probes with positive results");
+	push_value($tld, 'rsm.slv.dns.ns.sla[' . $target . ']', $value_ts, $positive_sla, "positive results according to SLA");
     }
 }
 
@@ -1534,7 +1554,7 @@ sub get_downtime
     my $till = shift;
     my $no_incidents_check = shift;
 
-    my $eventtimes = ($no_incidents_check) ? [] : __get_eventtimes($itemid, $from, $till);
+    my $eventtimes = ($no_incidents_check) ? [$from, $till] : __get_eventtimes($itemid, $from, $till);
 
     my $count = 0;
 
