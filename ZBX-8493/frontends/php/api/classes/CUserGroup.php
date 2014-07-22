@@ -312,7 +312,7 @@ class CUserGroup extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
-		$usrgrpids = zbx_toArray($data['usrgrpids']);
+		$usrgrpids = array_keys(array_flip(zbx_toArray($data['usrgrpids'])));
 		$userids = (isset($data['userids']) && !is_null($data['userids'])) ? zbx_toArray($data['userids']) : null;
 		$rights = (isset($data['rights']) && !is_null($data['rights'])) ? zbx_toArray($data['rights']) : null;
 
