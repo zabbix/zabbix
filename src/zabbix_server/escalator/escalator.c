@@ -1180,6 +1180,8 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 			{
 				*error = zbx_dsprintf(*error, "host '%s' disabled.", host.host);
 			}
+
+			DCconfig_clean_items(&item, &errcode, 1);
 		}
 	}
 
