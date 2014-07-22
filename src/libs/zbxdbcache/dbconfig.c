@@ -3998,18 +3998,23 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 	UNLOCK_CACHE;
 }
 
-void	DCconfig_get_trigger_by_triggerids(DC_TRIGGER *trigger, int *errcode, zbx_uint64_t triggerid)
+void	DCconfig_get_trigger_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode, size_t num)
 {
+	size_t		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
-		errcode[0] = FAIL;
-	else
+	for (i = 0; i < num; i++)
 	{
-		DCget_trigger(trigger, dc_trigger);
-		errcode[0] = SUCCEED;
+		if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &triggerids[i])))
+		{
+			errcode[i] = FAIL;
+			continue;
+		}
+
+		DCget_trigger(&triggers[i], dc_trigger);
+		errcode[i] = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
@@ -4090,6 +4095,21 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 			continue;
 
 		zbx_free(functions[i].function);
+	}
+}
+
+void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		zbx_free(triggers[i].description);
+		zbx_free(triggers[i].expression_orig);
+		zbx_free(triggers[i].error);
 	}
 }
 
