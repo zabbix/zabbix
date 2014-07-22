@@ -130,4 +130,12 @@ class CView {
 		}
 		$this->template->show();
 	}
+
+// show() and render() should be made deprecated. View should only output text, no objects, nothing.
+	public function getOutput() {
+		$data = $this->data;
+		ob_start();
+		include($this->filePath);
+		return ob_get_clean();
+	}
 }

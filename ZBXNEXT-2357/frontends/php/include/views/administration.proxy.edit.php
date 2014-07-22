@@ -18,15 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $proxyWidget = new CWidget();
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 
 // create form
 $proxyForm = new CForm();
 $proxyForm->setName('proxyForm');
-$proxyForm->addVar('form', $this->data['form']);
-$proxyForm->addVar('form_refresh', $this->data['form_refresh']);
 if ($this->data['proxyid']) {
 	$proxyForm->addVar('proxyid', $this->data['proxyid']);
 }
@@ -38,7 +35,8 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
 // append status to form list
-$statusBox = new CComboBox('status', $this->data['status'], 'submit()');
+// TODO Not a clean solution and won't work if we have more forms
+$statusBox = new CComboBox('status', $this->data['status'], 'javascript: document.forms[1].action = \'proxies.php?action=proxy.edit\'; submit();');
 $statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, _('Active'));
 $statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, _('Passive'));
 $proxyFormList->addRow(_('Proxy mode'), $statusBox);
@@ -96,17 +94,20 @@ $proxyForm->addItem($proxyTab);
 // append buttons to form
 if ($this->data['proxyid']) {
 	$proxyForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+//		new CSubmit('save', _('Save')),
+		new CButtonAction('proxy.update', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete proxy?'), url_param('form').url_param('proxyid')),
-			new CButtonCancel()
+//			new CButtonCancel(),
+			new CButtonAction('proxy.list', _('Cancel'))
 		)
 	));
 }
 else {
 	$proxyForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+//		new CSubmit('save', _('Save')),
+		new CButtonAction('proxy.create', _('Save')),
 		new CButtonCancel()
 	));
 }
@@ -114,4 +115,4 @@ else {
 // append form to widget
 $proxyWidget->addItem($proxyForm);
 
-return $proxyWidget;
+$proxyWidget->show();

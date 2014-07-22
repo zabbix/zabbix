@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $proxyWidget = new CWidget();
 
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create proxy')));
+//$createForm->addItem(new CSubmit('form', _('Create proxy')));
+$createForm->addItem(new CButtonAction('proxy.edit', _('Create proxy')));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
 $proxyWidget->addHeaderRowNumber();
@@ -86,7 +86,7 @@ foreach ($this->data['proxies'] as $proxy) {
 
 	$proxyTable->addRow(array(
 		new CCheckBox('hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
-		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']) : '',
+		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?proxyid='.$proxy['proxyid'].'&action=proxy.edit') : '',
 		(isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) ? _('Active') : _('Passive'),
 		$lastAccess,
 		isset($proxy['host']) ? count($proxy['hosts']) : '',
@@ -97,16 +97,16 @@ foreach ($this->data['proxies'] as $proxy) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('proxy.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('proxy.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('proxy.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected proxies?'));
 $goComboBox->addItem($goOption);
 
@@ -119,5 +119,6 @@ $proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['pagin
 
 // append form to widget
 $proxyWidget->addItem($proxyForm);
+$proxyWidget->show();
 
-return $proxyWidget;
+//return $proxyWidget;

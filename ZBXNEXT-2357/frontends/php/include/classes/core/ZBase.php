@@ -112,6 +112,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/images.inc.php';
 		require_once $this->getRootDir().'/include/items.inc.php';
 		require_once $this->getRootDir().'/include/maintenances.inc.php';
+		require_once $this->getRootDir().'/include/menu.inc.php';
 		require_once $this->getRootDir().'/include/maps.inc.php';
 		require_once $this->getRootDir().'/include/media.inc.php';
 		require_once $this->getRootDir().'/include/services.inc.php';
@@ -195,6 +196,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
+			$this->rootDir.'/include/classes/controllers',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
 			$this->rootDir.'/include/classes/validators',

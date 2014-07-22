@@ -1831,12 +1831,14 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
+/*
+TODO
 	if (!defined('PAGE_HEADER_LOADED')) {
 		return null;
 	}
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
-	}
+	}*/
 	if (!isset($page['type'])) {
 		$page['type'] = PAGE_TYPE_HTML;
 	}

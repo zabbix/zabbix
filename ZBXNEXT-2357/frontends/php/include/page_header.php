@@ -102,6 +102,7 @@ switch ($page['type']) {
 	case PAGE_TYPE_HTML:
 	default:
 		header('Content-Type: text/html; charset=UTF-8');
+		session_start();
 
 		// page title
 		$pageTitle = '';
