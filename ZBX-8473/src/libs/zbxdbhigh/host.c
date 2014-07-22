@@ -857,7 +857,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
+static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
