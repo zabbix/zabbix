@@ -323,7 +323,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$decimalValidator = new CDecimalValidator(array(
 			'maxPrecision' => 16,
 			'maxScale' => 4,
-			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
+			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
 			'messagePrecision' => _(
 				'Value "%2$s" of "%1$s" is too long: it cannot have more than %3$s digits before the decimal point '.
 				'and more than %4$s digits after the decimal point.'
@@ -347,7 +347,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	elseif ($type == T_ZBX_DBL_BIG) {
 		$decimalValidator = new CDecimalValidator(array(
 			'maxScale' => 4,
-			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
+			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
 			'messageScale' => _(
 				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
 				'it cannot have more than %3$s digits.'
