@@ -9,6 +9,7 @@ A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditi
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8492] fixed maintenance periods without hosts/hostgroups to be accessible by both admins and superadmins (Krists)
 ..F....... [ZBX-2570] fixed dashboard widgets showing error messages about expired/broken session (Krists)
 A......... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
 ..F....... [ZBX-8468] removed unnecessary "empty" buttons in map element popups (Andrejs)
@@ -23,7 +24,7 @@ A......... [ZBX-8428] fixed item.get API call to return values for "lastvalue", 
 Changes for 2.3.2
 
 New features:
-A.F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (Oleg,asaveljevs)
+A.F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (Oleg, asaveljevs)
 ..F....... [ZBX-2603] added validation while working with regular expressions (Andrejs)
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 ..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
@@ -267,6 +268,7 @@ Changes for 2.2.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8492] fixed maintenance periods without hosts/hostgroups to be accessible by both admins and superadmins (Krists)
 A.F....... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
 ..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
 ..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
