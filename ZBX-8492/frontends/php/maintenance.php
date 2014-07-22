@@ -523,11 +523,10 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 
-	if($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
+	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
 		$options['groupids'] = $pageFilter->groupid;
 	}
 	else {
-		$config = select_config();
 		$options['groupids'] = $config['dropdown_first_entry'] ? null : array();
 	}
 
