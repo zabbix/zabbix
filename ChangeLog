@@ -9,6 +9,7 @@ A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditi
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-2570] fixed dashboard widgets showing error messages about expired/broken session (Krists)
 A......... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
 ..F....... [ZBX-8468] removed unnecessary "empty" buttons in map element popups (Andrejs)
 ..F....... [ZBX-8431] added context for text string 'Name' (Oleg)
