@@ -111,6 +111,7 @@ my $config = get_rsm_config();
 pfail("Zabbix API URL is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'url'};
 pfail("Username for Zabbix API is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'user'};
 pfail("Password for Zabbix API is not specified. Please check configuration file") unless defined $config->{'zapi'}->{'password'};
+pfail("SLV scripts path is not specified. Please check configuration file") unless defined $config->{'slv'}->{'path'};
 
 my $result = zbx_connect($config->{'zapi'}->{'url'}, $config->{'zapi'}->{'user'}, $config->{'zapi'}->{'password'});
 
@@ -131,10 +132,8 @@ if (defined($OPTS{'disable'})) {
 }
 
 #### Creating cron objects ####
-if (defined($OPTS{'only-cron'})) {
-    pfail("SLV cron script path is not specified. Please check configuration file") unless defined $config->{'slv'}->{'path'};
-    create_cron_items($config->{'slv'}->{'path'});
-}
+create_cron_items($config->{'slv'}->{'path'});
+exit if (defined($OPTS{'only-cron'}));
 
 #### Adding new TLD ####
 my $proxies = get_proxies_list();
@@ -241,7 +240,6 @@ foreach my $proxyid (sort keys %{$proxies}) {
 create_probe_status_host($probes_mon_groupid);
 
 ########### FUNCTIONS ###############
-
 
 sub get_ns_servers {
     my $tld = shift;
