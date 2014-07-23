@@ -835,7 +835,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function getFilterSchema() {
 		return array(
 			'validators' => array(
-				'evaltype' => new CSetValidator(array(
+				'evaltype' => new CLimitedSetValidator(array(
 					'values' => array(
 						CONDITION_EVAL_TYPE_OR,
 						CONDITION_EVAL_TYPE_AND,
@@ -886,7 +886,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				)),
-				'operator' => new CSetValidator(array(
+				'operator' => new CLimitedSetValidator(array(
 					'values' => array(CONDITION_OPERATOR_REGEXP),
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				))
