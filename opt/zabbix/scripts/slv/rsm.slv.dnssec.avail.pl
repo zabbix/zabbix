@@ -106,12 +106,12 @@ sub get_values_by_items
 	$items_str .= $_->{'itemid'};
     }
 
-    my $res = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till");
+    my $rows_ref = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till");
 
     my @values;
-    while (my @row = $res->fetchrow_array)
+    foreach my $row_ref (@$rows_ref)
     {
-	push(@values, [$row[0], $row[1]]);
+	push(@values, [$row_ref->[0], $row_ref->[1]]);
     }
 
     return \@values;

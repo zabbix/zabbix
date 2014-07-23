@@ -61,7 +61,7 @@ sub get_up_count
 {
     my $itemid = shift;
 
-    my $res = db_select("select count(value) from history_uint where itemid=$itemid and value=" . UP . " and clock between $from and $till");
+    my $rows_ref = db_select("select count(value) from history_uint where itemid=$itemid and value=" . UP . " and clock between $from and $till");
 
-    return ($res->fetchrow_array)[0];
+    return $rows_ref->[0]->[0];
 }
