@@ -756,15 +756,14 @@ class CImportReferencer {
 		if (!empty($this->triggers)) {
 			$this->triggersRefs = array();
 
-			$triggerIds = array();
-
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
 				'selectHosts' => array('hostid'),
 				'filter' => array(
 					'description' => array_keys($this->triggers),
 					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
-				)
+				),
+				'editable' => true
 			));
 
 			foreach ($dbTriggers as $dbTrigger) {
@@ -774,30 +773,8 @@ class CImportReferencer {
 						foreach ($expressions as $expression) {
 							if ($expression == $dbExpr) {
 								$this->triggersRefs[$name][$expression] = $dbTrigger['triggerid'];
-								$triggerIds[] = $dbTrigger['triggerid'];
 							}
 						}
-					}
-				}
-			}
-
-			$allowedTriggers = API::Trigger()->get(array(
-				'triggerids' => $triggerIds,
-				'output' => array('triggerid'),
-				'filter' => array(
-					'flags' => array(
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					)
-				),
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($this->triggersRefs as $name => $expressions) {
-				foreach ($expressions as $expression => $triggerId) {
-					if (!isset($allowedTriggers[$triggerId])) {
-						unset($this->triggersRefs[$name][$expression]);
 					}
 				}
 			}
@@ -825,37 +802,13 @@ class CImportReferencer {
 				'filter' => array(
 					'name' => $graphNames,
 					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
-				)
+				),
+				'editable' => true
 			));
-
-			$graphIds = array();
 
 			foreach ($dbGraphs as $dbGraph) {
 				foreach ($dbGraph['hosts'] as $host) {
 					$this->graphsRefs[$host['hostid']][$dbGraph['name']] = $dbGraph['graphid'];
-				}
-				$graphIds[] = $dbGraph['graphid'];
-			}
-
-			$allowedGraphs = API::Graph()->get(array(
-				'graphids' => $graphIds,
-				'output' => array('graphid'),
-				'filter' => array(
-					'flags' => array(
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					)
-				),
-				'editable' => true,
-				'preservekeys' => true
-			));
-
-			foreach ($this->graphsRefs as $hostId => $graphs) {
-				foreach ($graphs as $graph => $graphId) {
-					if (!isset($allowedGraphs[$graphId])) {
-						unset($this->graphsRefs[$hostId][$graph]);
-					}
 				}
 			}
 		}
