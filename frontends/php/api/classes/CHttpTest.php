@@ -874,37 +874,25 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if SSL cert is present but SSL key is not.
 	 */
 	protected function checkSslParameters($httpTest) {
-
-		$verifyPeerValidator = new CSetValidator(
-			array(
-				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
-				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
-			)
-		);
+		$verifyPeerValidator = new CSetValidator(array(
+			'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
+			'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
+		));
 		$verifyPeerValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
 
-		$verifyHostValidator = new CSetValidator(
-			array(
-				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
-				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
-			)
-		);
+		$verifyHostValidator = new CSetValidator(array(
+			'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
+			'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
+		));
 		$verifyHostValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
 
-			if (($httpTest['ssl_key_password'] != '') && ($httpTest['ssl_key_file'] == '')) {
+		if ($httpTest['ssl_cert_file'] == ''
+				&& ($httpTest['ssl_key_password'] != '' || $httpTest['ssl_key_file'] != '')) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Empty SSL key file for web scenario "%1$s".', $httpTest['name'])
-			);
-		}
-
-		if (($httpTest['ssl_key_file'] != '') && ($httpTest['ssl_cert_file'] == '')) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Empty SSL certificate file for web scenario "%1$s".', $httpTest['name'])
-			);
+				_s('SSL key file or password specified without SSL certificate file in web scenario "1$s".', $httpTest['name']));
 		}
 	}
 }
