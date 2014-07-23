@@ -3998,7 +3998,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 	UNLOCK_CACHE;
 }
 
-void	DCconfig_get_trigger_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode, size_t num)
+void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode, size_t num)
 {
 	size_t		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
