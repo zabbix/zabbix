@@ -1155,8 +1155,85 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 
 	if (EVENT_SOURCE_TRIGGERS == source && NULL == *error && EVENT_OBJECT_TRIGGER == object)
 	{
+		int			i, *errcodes = NULL;
+		const char		*p, *q;
+		zbx_uint64_t		functionid;
+		DC_ITEM			*items = NULL;
+		DC_FUNCTION		*functions = NULL;
+		zbx_vector_uint64_t	functionids, itemids;
+
 		/* item or host disabled? */
-		DCconfig_check_functions_by_triggerid(escalation->triggerid, error);
+		DCconfig_get_trigger_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
+
+		if (SUCCEED == errcode)
+		{
+			zbx_vector_uint64_create(&functionids);
+
+			for (p = trigger.expression_orig; '\0' != *p; p++)
+			{
+				if ('{' != *p)
+					continue;
+
+				for (q = p + 1; '}' != *q && '\0' != *q; q++)
+				{
+					if ('0' > *q || '9' < *q)
+						break;
+				}
+
+				if ('}' != *q)
+					continue;
+
+				sscanf(p + 1, ZBX_FS_UI64, &functionid);
+				zbx_vector_uint64_append(&functionids, functionid);
+				p = q;
+			}
+
+			functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
+			errcodes = zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+
+			DCconfig_get_functions_by_functionids(functions, functionids.values,
+					errcodes, functionids.values_num);
+
+			zbx_vector_uint64_create(&itemids);
+
+			for (i = 0; i < functionids.values_num; i++)
+			{
+				if (SUCCEED == errcodes[i])
+					zbx_vector_uint64_append(&itemids, functions[i].itemid);
+			}
+
+			zbx_free(errcodes);
+
+			items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
+			errcodes = zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
+
+			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+
+			for (i = 0; i < itemids.values_num; i++)
+			{
+				if (SUCCEED != errcodes[i])
+					continue;
+
+				if (ITEM_STATUS_DISABLED == items[i].status)
+				{
+					*error = zbx_dsprintf(*error, "item '%s' disabled.", items[i].key_orig);
+					break;
+				}
+				if (ITEM_STATUS_DISABLED == items[i].host.status)
+				{
+					*error = zbx_dsprintf(*error, "host '%s' disabled.", items[i].host.host);
+					break;
+				}
+			}
+
+			zbx_vector_uint64_destroy(&functionids);
+			zbx_vector_uint64_destroy(&itemids);
+
+			zbx_free(errcodes);
+			zbx_free(functions);
+			zbx_free(items);
+		}
+		DCconfig_clean_triggers(&trigger, &errcode, 1);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
 	{
