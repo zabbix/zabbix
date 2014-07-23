@@ -571,68 +571,34 @@ class CDRule extends CApiService {
 	public function delete(array $druleIds) {
 		$this->validateDelete($druleIds);
 
-		// process actions that depend on "Discovery rule = ..."
 		$actionIds = array();
-		$dbActions = DBselect(
-			'SELECT DISTINCT c.actionid'.
+		$conditionIds = array();
+
+		$dbConditions = DBselect(
+			'SELECT c.conditionid, c.actionid'.
 			' FROM conditions c'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionInt('c.value', $druleIds)
+			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionInt('c.value', $druleIds).')'.
+				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND c.value IN'.
+					' (SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $druleIds).')'.
+				')'
 		);
 
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionIds[] = $dbAction['actionid'];
+		while ($dbCondition = DBfetch($dbConditions)) {
+			$conditionIds[] = $dbCondition['conditionid'];
+			$actionIds[] = $dbCondition['actionid'];
 		}
 
 		if ($actionIds) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionIds),
+				'where' => array('actionid' => array_unique($actionIds)),
 			));
+		}
 
+		if ($conditionIds) {
 			DB::delete('conditions', array(
-				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => $druleIds
+				'conditionid' => $conditionIds
 			));
-		}
-
-		// process actions that depend on "Discovery check = ..."
-		$dbChecks = DBselect(
-			'SELECT dc.dcheckid'.
-			' FROM dchecks dc'.
-			' WHERE '.dbConditionInt('dc.druleid', $druleIds)
-		);
-
-		$checkIds = array();
-
-		while ($dbCheck = DBfetch($dbChecks)) {
-			$checkIds[] = $dbCheck['dcheckid'];
-		}
-
-		if ($checkIds) {
-			$actionIds = array();
-			$dbActions = DBselect(
-				'SELECT DISTINCT c.actionid'.
-				' FROM conditions c'.
-				' WHERE c.conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.dbConditionInt('c.value', $checkIds)
-			);
-
-			while ($dbAction = DBfetch($dbActions)) {
-				$actionIds[] = $dbAction['actionid'];
-			}
-
-			if ($actionIds) {
-				DB::update('actions', array(
-					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array('actionid' => $actionIds),
-				));
-
-				DB::delete('conditions', array(
-					'conditiontype' => CONDITION_TYPE_DCHECK,
-					'value' => $checkIds
-				));
-			}
 		}
 
 		$result = DB::delete('drules', array('druleid' => $druleIds));
