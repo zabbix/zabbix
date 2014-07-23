@@ -432,14 +432,16 @@ if (hasRequest('form')) {
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$data['action']['filter']['conditions'] = array(
 			array(
-				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-				'operator' => CONDITION_OPERATOR_EQUAL,
-				'value' => TRIGGER_VALUE_TRUE
-			),
-			array(
+				'formulaid' => 'A',
 				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 				'operator' => CONDITION_OPERATOR_NOT_IN,
 				'value' => ''
+			),
+			array(
+				'formulaid' => 'B',
+				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'value' => TRIGGER_VALUE_TRUE
 			)
 		);
 	}

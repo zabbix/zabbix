@@ -356,14 +356,14 @@ class CEvent extends CApiService {
 	 * @return void
 	 */
 	protected function validateGet(array $options) {
-		$sourceValidator = new CSetValidator(array(
+		$sourceValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(eventSource())
 		));
 		if (!$sourceValidator->validate($options['source'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
 		}
 
-		$objectValidator = new CSetValidator(array(
+		$objectValidator = new CLimitedSetValidator(array(
 			'values' => array_keys(eventObject())
 		));
 		if (!$objectValidator->validate($options['object'])) {

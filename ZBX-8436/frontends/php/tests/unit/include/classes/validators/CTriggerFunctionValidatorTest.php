@@ -19,14 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../include/debug.inc.php';
-require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/validators/CValidator.php';
-require_once dirname(__FILE__).'/../../include/classes/validators/CTriggerFunctionValidator.php';
-
 class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
