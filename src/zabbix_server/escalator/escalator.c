@@ -1143,7 +1143,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 	if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
 	{
 		/* trigger disabled or deleted? */
-		DCconfig_get_trigger_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
+		DCconfig_get_triggers_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
 
 		if (SUCCEED != errcode)
 			*error = zbx_dsprintf(*error, "trigger [" ZBX_FS_UI64 "] deleted.", escalation->triggerid);
@@ -1163,7 +1163,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 		zbx_vector_uint64_t	functionids, itemids;
 
 		/* item or host disabled? */
-		DCconfig_get_trigger_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
+		DCconfig_get_triggers_by_triggerids(&trigger, &escalation->triggerid, &errcode, 1);
 
 		if (SUCCEED == errcode)
 		{
