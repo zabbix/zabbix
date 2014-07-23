@@ -19,13 +19,12 @@
 **/
 
 
-class CSetValidatorTest extends CValidatorTest {
+class CLimitedSetValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
 		return array(
 			array(array(
 				'values' => array(1, 2, 3),
-				'messageType' => 'Incorrect value type',
 				'messageInvalid' => 'Incorrect value'
 			))
 		);
@@ -44,13 +43,23 @@ class CSetValidatorTest extends CValidatorTest {
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Incorrect value type'),
+				array('messageInvalid' => 'Incorrect value type'),
 				null,
 				'Incorrect value type'
 			),
 			array(
-				array('messageType' => 'Incorrect value type'),
+				array('messageInvalid' => 'Incorrect value type'),
+				true,
+				'Incorrect value type'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect value type'),
 				array(),
+				'Incorrect value type'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect value type'),
+				1.1,
 				'Incorrect value type'
 			),
 			array(
@@ -74,13 +83,23 @@ class CSetValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Incorrect value type for "%1$s"'),
+				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
 				null,
 				'Incorrect value type for "object"'
 			),
 			array(
-				array('messageType' => 'Incorrect value type for "%1$s"'),
+				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
+				true,
+				'Incorrect value type for "object"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
 				array(),
+				'Incorrect value type for "object"'
+			),
+			array(
+				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
+				1.1,
 				'Incorrect value type for "object"'
 			),
 			array(
@@ -102,6 +121,6 @@ class CSetValidatorTest extends CValidatorTest {
 	}
 
 	protected function createValidator(array $params = array()) {
-		return new CSetValidator($params);
+		return new CLimitedSetValidator($params);
 	}
 }
