@@ -246,8 +246,11 @@ sub update_root_servers {
         }
     }
 
-    return unless create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4) eq true;
-    return unless create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6) eq true;
+# Temporary disable the check
+#    return unless create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4) eq true;
+#    return unless create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6) eq true;
+    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
+    create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
 
     return '"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"';
 }
@@ -324,8 +327,6 @@ sub create_template {
         $result = $zabbix->get('template', {'filter' => {'host' => $name}});
         $templateid = $result->{'templateid'};
 
-	print Dumper($result);
-
         $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
 
@@ -342,7 +343,7 @@ sub create_item {
     my $options = shift;
     my $result;
 
-    unless ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}})) {
+    if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}})) {
 	$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
 
 	if ('ARRAY' eq ref($result))
@@ -396,7 +397,7 @@ sub create_macro {
     if (defined($templateid)) {
 	if ($zabbix->get('usermacro',{'countOutput' => 1, 'hostids' => $templateid, 'filter' => {'macro' => $name}})) {
 	    $result = $zabbix->get('usermacro',{'output' => 'hostmacroid', 'hostids' => $templateid, 'filter' => {'macro' => $name}} );
-    	    $result = $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'}
+    	    $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'}
 														     and defined($force_update);
 	}
 	else {
@@ -408,7 +409,7 @@ sub create_macro {
     else {
 	if ($zabbix->get('usermacro',{'countOutput' => 1, 'globalmacro' => 1, 'filter' => {'macro' => $name}})) {
             $result = $zabbix->get('usermacro',{'output' => 'globalmacroid', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
-            $result = $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'}
+            $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'}
 															and defined($force_update);
         }
         else {

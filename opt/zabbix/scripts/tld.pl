@@ -175,11 +175,11 @@ else {
 }
 
 
-#$ns_servers = get_ns_servers($OPTS{'tld'});
+$ns_servers = get_ns_servers($OPTS{'tld'});
 
-#pfail("Could not retrive NS servers for '".$OPTS{'tld'}."' TLD") unless (scalar(keys %{$ns_servers}));
+pfail("Could not retrive NS servers for '".$OPTS{'tld'}."' TLD") unless (scalar(keys %{$ns_servers}));
 
-#$root_servers_macros = update_root_servers();
+$root_servers_macros = update_root_servers();
 
 unless (defined($root_servers_macros)) {
     print "Could not retrive list of root servers or create global macros\n";
@@ -935,8 +935,6 @@ sub create_main_template {
 
     pfail("Could not create main template for '".$tld."' TLD. ".$templateid->{'error'}->{'data'}) if check_api_error($templateid) eq true;
 
-    print Dumper($templateid);
-
     my $delay = 300;
     my $appid = get_application_id('Configuration', $templateid);
     my ($options, $key);
@@ -953,7 +951,6 @@ sub create_main_template {
                     'type' => ITEM_TYPE_CALCULATED, 'value_type' => ITEM_VALUE_TYPE_UINT64};
 
         my $itemid = create_item($options);
-	print Dumper($itemid);
     }
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
