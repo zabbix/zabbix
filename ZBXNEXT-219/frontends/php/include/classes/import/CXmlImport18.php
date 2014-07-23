@@ -1754,21 +1754,21 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$triggerIdsToDelete = array_diff_key($dbTriggerIds, $processedTriggerIds);
-				$triggersToDelete = array();
+				$triggersToDelete = array_diff_key($dbTriggerIds, $processedTriggerIds);
+				$triggerIdsToDelete = array();
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
 				// if some triggers belong to more hosts than current XML contains, don't delete them
-				foreach ($triggerIdsToDelete as $triggerId => $trigger) {
+				foreach ($triggersToDelete as $triggerId => $trigger) {
 					$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
 					if (!array_diff_key($triggerHostIds, $processedHostIds)) {
-						$triggersToDelete[] = $triggerId;
+						$triggerIdsToDelete[] = $triggerId;
 					}
 				}
 
-				if ($triggersToDelete) {
-					API::Trigger()->delete($triggersToDelete);
+				if ($triggerIdsToDelete) {
+					API::Trigger()->delete($triggerIdsToDelete);
 				}
 			}
 
@@ -1786,21 +1786,21 @@ class CXmlImport18 {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$graphsIdsToDelete = array_diff_key($dbGraphIds, $processedGraphIds);
-				$graphsToDelete = array();
+				$graphsToDelete = array_diff_key($dbGraphIds, $processedGraphIds);
+				$graphsIdsToDelete = array();
 
 				// check that potentially deletable graph belongs to same hosts that are in XML
 				// if some graphs belong to more hosts than current XML contains, don't delete them
-				foreach ($graphsIdsToDelete as $graphId => $graph) {
+				foreach ($graphsToDelete as $graphId => $graph) {
 					$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
 					if (!array_diff_key($graphHostIds, $processedHostIds)) {
-						$graphsToDelete[] = $graphId;
+						$graphsIdsToDelete[] = $graphId;
 					}
 				}
 
-				if ($graphsToDelete) {
-					API::Graph()->delete($graphsToDelete);
+				if ($graphsIdsToDelete) {
+					API::Graph()->delete($graphsIdsToDelete);
 				}
 			}
 

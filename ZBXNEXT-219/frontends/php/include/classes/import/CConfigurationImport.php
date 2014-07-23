@@ -1495,19 +1495,19 @@ class CConfigurationImport {
 
 		// check that potentially deletable trigger belongs to same hosts that are in XML
 		// if some triggers belong to more hosts than current XML contains, don't delete them
-		$triggerIdsToDelete = array_diff_key($dbTriggerIds, $triggersXML);
-		$triggersToDelete = array();
+		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+		$triggerIdsToDelete = array();
 		$processedHostIds = array_flip($processedHostIds);
 
-		foreach ($triggerIdsToDelete as $triggerId => $trigger) {
+		foreach ($triggersToDelete as $triggerId => $trigger) {
 			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 			if (!array_diff_key($triggerHostIds, $processedHostIds)) {
-				$triggersToDelete[] = $triggerId;
+				$triggerIdsToDelete[] = $triggerId;
 			}
 		}
 
-		if ($triggersToDelete) {
-			API::Trigger()->delete($triggersToDelete);
+		if ($triggerIdsToDelete) {
+			API::Trigger()->delete($triggerIdsToDelete);
 		}
 
 		// refresh triggers because template triggers can be inherited to host and used in maps
@@ -1568,20 +1568,20 @@ class CConfigurationImport {
 
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
-		$graphIdsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
-		$graphsToDelete = array();
+		$graphsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
+		$graphIdsToDelete = array();
 		$processedHostIds = array_flip($processedHostIds);
 
-		foreach ($graphIdsToDelete as $graphId => $graph) {
+		foreach ($graphsToDelete as $graphId => $graph) {
 			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
 			if (!array_diff_key($graphHostIds, $processedHostIds)) {
-				$graphsToDelete[] = $graphId;
+				$graphIdsToDelete[] = $graphId;
 			}
 		}
 
-		if ($graphsToDelete) {
-			API::Graph()->delete($graphsToDelete);
+		if ($graphIdsToDelete) {
+			API::Graph()->delete($graphIdsToDelete);
 		}
 
 		$this->referencer->refreshGraphs();
