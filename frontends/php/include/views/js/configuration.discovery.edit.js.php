@@ -320,6 +320,10 @@
 
 			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
 		}
+
+		if (IE8) {
+			jQuery('#dcheckList').find('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
@@ -501,6 +505,10 @@
 		}
 		if (showPrivProtocol) {
 			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
+		}
+
+		if (IE8) {
+			jQuery('#type').closest('li').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 
