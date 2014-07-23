@@ -51,7 +51,7 @@ $fields = array(
 	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({save})'),
 	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
-	'http_password'		=> array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+	'http_password'		=> array(T_ZBX_STR, O_OPT, NO_TRIM,	NOT_EMPTY,			'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
 	'http_proxy'		=> array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
 	'new_application'	=> array(T_ZBX_STR, O_OPT, null,	null,				null),
@@ -62,7 +62,7 @@ $fields = array(
 	'headers'			=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	'ssl_cert_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
-	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
+	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, NO_TRIM, null,				'isset({save})'),
 	// actions
 	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
