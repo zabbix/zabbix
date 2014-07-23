@@ -730,6 +730,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  * Purpose: check a byte stream for a valid hostname                          *
  *                                                                            *
  * Parameters: hostname - pointer to the first char of hostname               *
+ *             error - pointer to the error message (can be NULL)             *
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
@@ -738,18 +739,28 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_hostname(const char *hostname)
+int	zbx_check_hostname(const char *hostname, char **error)
 {
 	int	len = 0;
 
 	while ('\0' != hostname[len])
 	{
-		if (FAIL == is_hostname_char(hostname[len++]))
+		if (FAIL == is_hostname_char(hostname[len]))
+		{
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[len]);
 			return FAIL;
+		}
+
+		len++;
 	}
 
 	if (0 == len || MAX_ZBX_HOSTNAME_LEN < len)
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
