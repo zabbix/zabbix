@@ -44,9 +44,8 @@
 		var i = 0;
 
 		jQuery('#slideTable tr.sortable .rowNum').each(function() {
-			var newStep = (i == 0) ? '0' : i;
-
-			var currentStep = jQuery(this).closest('tr').attr('id').split('_')[1];
+			var newStep = (i == 0) ? '0' : i,
+				currentStep = jQuery(this).closest('tr').attr('id').split('_')[1];
 
 			// rewrite ids to temp
 			jQuery('#remove_' + currentStep).attr('id', 'tmp_remove_' + newStep);
