@@ -432,6 +432,7 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+							$hostsRefs[$resource['host']] = $resource['host'];
 							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
@@ -463,6 +464,7 @@ class CConfigurationImport {
 
 						switch ($screenItem['resourcetype']) {
 							case SCREEN_RESOURCE_GRAPH:
+								$hostsRefs[$resource['host']] = $resource['host'];
 								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
 
