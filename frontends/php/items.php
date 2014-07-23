@@ -429,7 +429,7 @@ elseif (isset($_REQUEST['save'])) {
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula'),
+			'formula' => getRequest('formula', '1'),
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
@@ -526,11 +526,12 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$db_delay_flex = null;
 	}
 
-	if (!is_null(getRequest('formula', null))) {
+	if (hasRequest('formula')) {
 		$_REQUEST['multiplier'] = 1;
 	}
 	if (getRequest('formula', null) === '0') {
 		$_REQUEST['multiplier'] = 0;
+		$_REQUEST['formula'] = '1';
 	}
 
 	$applications = getRequest('applications', null);
@@ -609,7 +610,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula'),
+			'formula' => getRequest('formula', '1'),
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
