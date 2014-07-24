@@ -5,9 +5,8 @@ zabbix_server \- Zabbix server daemon
 .B zabbix_server
 .RB [ \-c
 .IR config-file ]
-.br
-.B zabbix_server \-R
-.I option
+.RB [ \-R
+.IR option ]
 .br
 .B zabbix_server \-h
 .br

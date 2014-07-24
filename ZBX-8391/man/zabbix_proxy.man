@@ -5,9 +5,8 @@ zabbix_proxy \- Zabbix proxy daemon
 .B zabbix_proxy
 .RB [ \-c
 .IR config-file ]
-.br
-.B zabbix_proxy \-R
-.I option
+.RB [ \-R
+.IR option ]
 .br
 .B zabbix_proxy \-h
 .br
