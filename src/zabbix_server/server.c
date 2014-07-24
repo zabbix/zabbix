@@ -66,8 +66,7 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_server";
 const char	syslog_app_name[] = "zabbix_server";
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"-R option",
+	"[-c config-file] [-R option]",
 	"-h",
 	"-V",
 	NULL	/* end of text */
@@ -549,14 +548,6 @@ int	main(int argc, char **argv)
 			zbx_error("option \"-c\" specified multiple times");
 		if (1 < opt_r)
 			zbx_error("option \"-R\" specified multiple times");
-
-		exit(EXIT_FAILURE);
-	}
-
-	/* check for mutually exclusive options */
-	if (0 < opt_c && 0 < opt_r)
-	{
-		zbx_error("options \"-c\" and \"-R\" cannot be used together");
 
 		exit(EXIT_FAILURE);
 	}
