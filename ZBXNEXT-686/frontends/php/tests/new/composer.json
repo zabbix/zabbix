@@ -1,4 +1,8 @@
 {
+	"config": {
+		"__comment__": "This prevents composer to generate ComposerAutoloaderInitSOMEMD5HASHHERE classes on each atuloader dump",
+		"autoloader-suffix": "Zabbix"
+	},
 	"__comment__": "We bind to concrete versions to avoid updated and prefer zip/tarballs",
 	"preferred-install": "dist",
 	"require": {
@@ -9,5 +13,14 @@
 	"scripts": {
 		"post-update-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"],
 		"post-install-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"]
+	},
+	"autoload": {
+		"psr-4": {"Zabbix\\": "src/"},
+		"__comment__": "Add a list of directories here - all files from them will be autoloaded",
+		"classmap": [
+		],
+		"__comment__": "Put paths to all files that can not be autoloaded yet needs to be included",
+		"files": [
+		]
 	}
 }
