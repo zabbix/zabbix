@@ -34,6 +34,10 @@
 		}
 
 		recalculateSortOrder();
+
+		if (IE8) {
+			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function recalculateSortOrder() {
@@ -77,6 +81,9 @@
 		}
 	}
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		var initSize = jQuery('#slideTable tr.sortable .rowNum').length,
 			defaultDelay = jQuery('#delay').val();
@@ -101,6 +108,10 @@
 		}
 
 		createPlaceholders();
+
+		if (IE8) {
+			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function initSortable() {
@@ -133,7 +144,7 @@
 					td.width(slideTableColumnWidths[i]);
 				});
 
-				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
+				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixels to right
 				if (SF || IE8) {
 					// move back draggable element to proper position
 					ui.css('left', (ui.offset().left - 4) + 'px');

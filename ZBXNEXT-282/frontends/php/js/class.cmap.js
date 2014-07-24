@@ -150,6 +150,13 @@ ZABBIX.apps.map = (function($) {
 				});
 			}
 
+			// for some reason IE8 does not catch clicks if there is no background color and alpha opacity is 0
+			if (IE8) {
+				this.container.css({
+					backgroundColor: 'white'
+				});
+			}
+
 			if (IE || GK) {
 				this.base64image = false;
 				this.mapimg = $('#sysmap_img');
@@ -549,7 +556,7 @@ ZABBIX.apps.map = (function($) {
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0) ? '&hostid='+ data[0].id : ''),
+						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : ''),
 						450, 450
 					);
 				});
@@ -1293,7 +1300,7 @@ ZABBIX.apps.map = (function($) {
 
 		SelementForm.prototype = {
 			/**
-			 * Shows lement form.
+			 * Shows element form.
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
@@ -2051,17 +2058,3 @@ ZABBIX.apps.map = (function($) {
 		}
 	};
 }(jQuery));
-
-/**
- * Function that is executed by popup.php to ass selected values to destination.
- * It uses a sysmap global variable that created in sysmap.php file via 'var sysmap = ZABBIX.apps.map.run();'
- *
- * @param list link triggers selected in popup
- * @param {String} list.object name of objects which we returned
- * @param {Array} list.values list of link triggers
- */
-function addPopupValues(list) {
-	if (list.object === 'linktrigger') {
-		ZABBIX.apps.map.object.linkForm.addNewTriggers(list.values);
-	}
-}

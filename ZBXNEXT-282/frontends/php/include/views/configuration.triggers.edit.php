@@ -161,7 +161,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			if ($this->data['limited'] != 'yes') {
 				$deleteUrl = new CSpan(_('Delete'), 'link');
 				$deleteUrl->setAttribute('onclick', 'javascript:'.
-					' if (Confirm("'._('Delete expression?').'")) {'.
+					' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
 						' delete_expression("'.$e['id'] .'");'.
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
@@ -189,7 +189,7 @@ if ($this->data['input_method'] == IM_TREE) {
 							array_push($errorTexts, $expVal, ':', $errTxt);
 						}
 					}
-					$errorImg->setHint($errorTexts, '', 'left');
+					$errorImg->setHint($errorTexts, 'left');
 				}
 				$errorColumn = new CCol($errorImg, 'center');
 			}

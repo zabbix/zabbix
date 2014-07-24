@@ -326,6 +326,8 @@ class CHostInterface extends CApiService {
 				$this->checkPort($interface);
 			}
 
+			$this->checkBulk($interface);
+
 			if ($update) {
 				$interface = $updInterface;
 			}
@@ -461,6 +463,7 @@ class CHostInterface extends CApiService {
 			$this->checkDns($interface);
 			$this->checkIp($interface);
 			$this->checkPort($interface);
+			$this->checkBulk($interface);
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), array(
@@ -469,7 +472,8 @@ class CHostInterface extends CApiService {
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
-					'port' => $interface['port']
+					'port' => $interface['port'],
+					'bulk' => $interface['bulk']
 				)
 			));
 			if ($interfacesToRemove) {
@@ -494,16 +498,32 @@ class CHostInterface extends CApiService {
 
 		$this->validateMassRemove($data);
 
+		$interfaceIds = array();
 		foreach ($data['interfaces'] as $interface) {
-			DB::delete('interface', array(
-				'hostid' => $data['hostids'],
-				'ip' => $interface['ip'],
-				'dns' => $interface['dns'],
-				'port' => $interface['port']
+			$interfaces = $this->get(array(
+				'output' => array('interfaceid'),
+				'filter' => array(
+					'hostid' => $data['hostids'],
+					'ip' => $interface['ip'],
+					'dns' => $interface['dns'],
+					'port' => $interface['port'],
+					'bulk' => $interface['bulk']
+				),
+				'editable' => true,
+				'preservekeys' => true
 			));
+
+			if ($interfaces) {
+				$interfaceIds = array_merge($interfaceIds, array_keys($interfaces));
+			}
 		}
 
-		return array('interfaceids' => zbx_objectValues($data['interfaces'], 'interfaceid'));
+		if ($interfaceIds) {
+			$interfaceIds = array_keys(array_flip($interfaceIds));
+			DB::delete('interface', array('interfaceid' => $interfaceIds));
+		}
+
+		return array('interfaceids' => $interfaceIds);
 	}
 
 	/**
@@ -633,6 +653,25 @@ class CHostInterface extends CApiService {
 		}
 	}
 
+	/**
+	 * Validates interface "bulk" field.
+	 * For SNMP interfaces bulk value should be either 0 (disabled) or 1 (enabled).
+	 * For other non-SNMP interfaces bulk value should be 1 (default).
+	 *
+	 * @throws APIException if bulk field is incorrect.
+	 *
+	 * @param array $interface
+	 */
+	protected function checkBulk(array $interface) {
+		if ($interface['type'] !== null && (($interface['type'] != INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+				&& $interface['bulk'] != SNMP_BULK_ENABLED)
+				|| ($interface['type'] == INTERFACE_TYPE_SNMP && isset($interface['bulk'])
+					&& (zbx_empty($interface['bulk'])
+						|| ($interface['bulk'] != SNMP_BULK_DISABLED && $interface['bulk'] != SNMP_BULK_ENABLED))))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect bulk value for interface.'));
+		}
+	}
+
 	private function checkHostInterfaces(array $interfaces, $hostid) {
 		$interfacesWithMissingData = array();
 
@@ -693,7 +732,7 @@ class CHostInterface extends CApiService {
 			}
 		}
 
-		// gathrer missing host ids
+		// gather missing host ids
 		$hostIds = array();
 		if ($interfaceidsWithoutHostIds) {
 			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));

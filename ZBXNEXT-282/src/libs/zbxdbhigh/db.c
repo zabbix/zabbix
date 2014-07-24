@@ -37,7 +37,7 @@ extern int	txn_error;
 
 static int	connection_failure;
 
-void	DBclose()
+void	DBclose(void)
 {
 	zbx_db_close();
 }
@@ -98,7 +98,7 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit()
+void	DBinit(void)
 {
 	zbx_db_init(CONFIG_DBNAME, db_schema);
 }
@@ -797,7 +797,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 		ret = SUCCEED;
 	}
 	else
-		*error = zbx_dsprintf(*error, "proxy \"%s\" does not exist", hostname);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1013,8 +1013,8 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  *                                                                            *
  * Function: DBadd_condition_alloc                                            *
  *                                                                            *
- * Purpose: takes an initial part of SQL query and appends a generated        *
- *          WHERE condition. The WHERE condidion is generated from the given  *
+ * Purpose: Takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condition is generated from the given  *
  *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
  *          and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.            *
  *                                                                            *
@@ -1024,7 +1024,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  *             fieldname  - [IN] field name to be used in SQL WHERE condition *
  *             values     - [IN] array of numerical values sorted in          *
  *                               ascending order to be included in WHERE      *
- *             num        - [IN] number of elemnts in 'values' array          *
+ *             num        - [IN] number of elements in 'values' array         *
  *                                                                            *
  ******************************************************************************/
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
@@ -1138,6 +1138,82 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+#undef MAX_EXPRESSIONS
+#undef MIN_NUM_BETWEEN
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_str_condition_alloc                                        *
+ *                                                                            *
+ * Purpose: This function is similar to DBadd_condition_alloc(), except it is *
+ *          designed for generating WHERE conditions for strings. Hence, this *
+ *          function is simpler, because only IN condition is possible.       *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of string values                       *
+ *             num        - [IN] number of elements in 'values' array         *
+ *                                                                            *
+ ******************************************************************************/
+void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char **values, const int num)
+{
+#define MAX_EXPRESSIONS	950
+
+	int	i, cnt = 0;
+	char	*value_esc;
+
+	if (0 == num)
+		return;
+
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+
+	if (1 == num)
+	{
+		value_esc = DBdyn_escape_string(values[0]);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
+		zbx_free(value_esc);
+
+		return;
+	}
+
+	if (MAX_EXPRESSIONS < num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
+
+	for (i = 0; i < num; i++)
+	{
+		if (MAX_EXPRESSIONS == cnt)
+		{
+			cnt = 0;
+			(*sql_offset)--;
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
+		}
+
+		value_esc = DBdyn_escape_string(values[i]);
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");
+		zbx_free(value_esc);
+
+		cnt++;
+	}
+
+	(*sql_offset)--;
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+	if (MAX_EXPRESSIONS < num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+#undef MAX_EXPRESSIONS
 }
 
 static char	buf_string[640];
@@ -2099,10 +2175,20 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 #endif
 		switch (field->type)
 		{
+			case ZBX_TYPE_LONGTEXT:
+				if (0 == field->length)
+				{
+#ifdef HAVE_ORACLE
+					row[i].str = zbx_strdup(NULL, value->str);
+#else
+					row[i].str = DBdyn_escape_string(value->str);
+#endif
+					break;
+				}
+				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
 				row[i].str = NULL;
 				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
@@ -2430,7 +2516,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_execute                                            *
+ * Function: zbx_db_insert_autoincrement                                      *
  *                                                                            *
  * Purpose: executes the prepared database bulk insert operation              *
  *                                                                            *

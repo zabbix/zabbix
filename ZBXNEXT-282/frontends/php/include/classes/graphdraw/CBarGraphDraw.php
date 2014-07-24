@@ -26,7 +26,7 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->background = false;
 		$this->opacity = 15; // bar/column opacity
 		$this->sum = false;
-		$this->shiftlegendright = 0; // count of static chars * px/char + for color rectangle + space
+		$this->shiftLegendRight = 0; // count of static chars * px/char + for color rectangle + space
 		$this->shiftCaption = 0;
 		$this->maxCaption = 0;
 		$this->drawLegend = 0;
@@ -54,6 +54,7 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->side_values = array(GRAPH_YAXIS_SIDE_LEFT => ITEM_VALUE_TYPE_UINT64, GRAPH_YAXIS_SIDE_RIGHT => ITEM_VALUE_TYPE_UINT64); // 0 - float, 3 - uint
 		$this->column = null;
 		$this->units = array(GRAPH_YAXIS_SIDE_LEFT => '', GRAPH_YAXIS_SIDE_RIGHT => ''); // units for values
+		$this->minChartHeight = false;
 	}
 
 	/********************************************************************************************************/
@@ -132,8 +133,8 @@ class CBarGraphDraw extends CGraphDraw {
 			$this->seriesLegend[$key] = $value;
 
 			$tmp = mb_strlen($value) * 7 + 8; // count of chars * font size + color box
-			if ($tmp > $this->shiftlegendright) {
-				$this->shiftlegendright = $tmp;
+			if ($tmp > $this->shiftLegendRight) {
+				$this->shiftLegendRight = $tmp;
 			}
 		}
 	}
@@ -149,7 +150,7 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->shiftXright = 10;
 
 		if ($this->drawLegend == 0) {
-			$this->shiftlegendright = 0;
+			$this->shiftLegendRight = 0;
 		}
 
 		if ($this->column) {
@@ -494,14 +495,14 @@ class CBarGraphDraw extends CGraphDraw {
 			$i = 0;
 			foreach ($this->series as $key => $serie) {
 				$caption = $this->periodCaption[$key];
-				$dims = imageTextSize(7, 90, $caption);
+				$dims = imageTextSize(8, 90, $caption);
 
 				imageText(
 					$this->im,
-					7,
+					8,
 					90,
 					$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)+$dims['width']*2,
-					$this->sizeY+$this->shiftY + $dims['height'] +6,
+					$this->sizeY+$this->shiftY + $dims['height'] + 10,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption
 				);
@@ -634,7 +635,7 @@ class CBarGraphDraw extends CGraphDraw {
 		}
 
 		$shiftY = $this->shiftY;
-		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright;
+		$shiftX = $this->fullSizeX - $this->shiftLegendRight - $this->shiftXright;
 
 		$count = 0;
 		foreach ($this->series as $key => $serie) {
@@ -673,6 +674,10 @@ class CBarGraphDraw extends CGraphDraw {
 		}
 	}
 
+	public function setMinChartHeight($minChartHeight) {
+		$this->minChartHeight = $minChartHeight;
+	}
+
 	public function draw() {
 		$start_time = microtime(true);
 		set_image_header();
@@ -682,14 +687,28 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
-		if ($this->sizeX < 300 || $this->sizeY < 200) {
-			$this->showLegend(0);
+		if ($this->minChartHeight) {
+
+			$this->calcShifts();
+
+			$shiftsY = $this->shiftY + $this->shiftYLegend + $this->shiftYCaptionBottom + $this->shiftYCaptionTop;
+
+			if ($this->sizeY - $shiftsY < $this->minChartHeight) {
+				$this->sizeY = $this->minChartHeight;
+				$this->fullSizeY = $this->sizeY + $shiftsY + 10;
+			}
+		}
+		else {
+			if ($this->fullSizeX < 300 || $this->fullSizeY < 200) {
+				$this->showLegend(0);
+			}
+
+			$this->calcShifts();
+
+			$this->sizeY -= $this->shiftY + $this->shiftYLegend + $this->shiftYCaptionBottom + $this->shiftYCaptionTop;
 		}
 
-		$this->calcShifts();
-
-		$this->sizeX -= $this->shiftXleft + $this->shiftXright + $this->shiftlegendright + $this->shiftXCaptionLeft + $this->shiftXCaptionRight;
-		$this->sizeY -= $this->shiftY + $this->shiftYLegend + $this->shiftYCaptionBottom + $this->shiftYCaptionTop;
+		$this->sizeX -= $this->shiftXleft + $this->shiftXright + $this->shiftLegendRight + $this->shiftXCaptionLeft + $this->shiftXCaptionRight;
 
 		$this->calcSeriesWidth();
 		$this->calcMiniMax();

@@ -152,6 +152,9 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
+#define SNMP_BULK_DISABLED	0
+#define SNMP_BULK_ENABLED	1
+
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00
 #define ZBX_FLAG_DISCOVERY_RULE		0x01
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
@@ -787,7 +790,7 @@ char	*get_param_dyn(const char *param, int num);
  *                       for their parameters - 1 or higher (for arrays)      *
  *      num       - [IN] parameter number; for item keys and OIDs the level   *
  *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
  *                                                                            *
  * Return value: NULL if parameter doesn't change; a new string - otherwise   *

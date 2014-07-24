@@ -43,8 +43,8 @@ $fields = array(
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
-	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null, _('Column span')),
-	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null, _('Row span')),
+	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Column span')),
+	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Row span')),
 	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')),
 	'sort_triggers' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_RECIPIENT_DESC), null),
 	'valign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM), null),
@@ -177,17 +177,11 @@ if (isset($_REQUEST['save'])) {
 	if (!empty($_REQUEST['screenitemid'])) {
 		$screenItem['screenitemid'] = $_REQUEST['screenitemid'];
 
-		$messageSuccess = _('Item updated');
-		$messageFailed = _('Cannot update item');
-
 		$result = API::ScreenItem()->update($screenItem);
 	}
 	else {
 		$screenItem['x'] = get_request('x');
 		$screenItem['y'] = get_request('y');
-
-		$messageSuccess = _('Item added');
-		$messageFailed = _('Cannot add item');
 
 		$result = API::ScreenItem()->create($screenItem);
 	}
@@ -202,7 +196,7 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
-	show_messages($result, $messageSuccess, $messageFailed);
+	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
@@ -219,7 +213,7 @@ elseif (isset($_REQUEST['delete'])) {
 	unset($_REQUEST['x']);
 
 	$result = DBend($screenitemid);
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (isset($_REQUEST['add_row'])) {
 	DBstart();

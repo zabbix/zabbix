@@ -472,6 +472,7 @@ function make_hoststat_summary($filter) {
 	// get host groups
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => 1,
 		'output' => array('groupid', 'name')
 	));
@@ -484,7 +485,7 @@ function make_hoststat_summary($filter) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
-		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'name'),
@@ -1049,7 +1050,7 @@ function make_latest_issues(array $filter = array()) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// trigger has events
@@ -1087,8 +1088,7 @@ function make_latest_issues(array $filter = array()) {
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
-				'', '', false
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false
 			);
 		}
 
@@ -1208,7 +1208,7 @@ function make_webmon_overview($filter) {
 	foreach ($groups as $group) {
 		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
-				$group['name'],
+				new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
 				new CSpan(
 					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
@@ -1307,7 +1307,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// ack

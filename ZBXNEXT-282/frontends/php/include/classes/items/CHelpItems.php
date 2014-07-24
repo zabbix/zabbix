@@ -114,15 +114,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.tcp.port[<ip>,port]',
-					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
+					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 				),
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
-					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
+					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used.')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
@@ -170,7 +170,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.')
+					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used.')
 				),
 				array(
 					'key' => 'system.hostname[<type>]',
@@ -286,7 +286,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'vfs.fs.size[fs,<mode>]',
-					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
+					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
 				),
 				array(
 					'key' => 'vm.memory.size[<mode>]',
@@ -294,15 +294,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of WEB page. Default path is /')
+					'description' => _('Get content of web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full WEB page. Default path is /')
+					'description' => _('Get timing of loading full web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
-					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+					'description' => _('Get first occurrence of regexp in web page. Default path is /')
 				)
 			),
 			ITEM_TYPE_ZABBIX_ACTIVE => array(
@@ -372,15 +372,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.tcp.port[<ip>,port]',
-					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
+					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
+					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used.')
 				),
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
-					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
@@ -428,7 +428,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.')
+					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used.')
 				),
 				array(
 					'key' => 'system.hostname[<type>]',
@@ -544,7 +544,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'vfs.fs.size[fs,<mode>]',
-					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
+					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
 				),
 				array(
 					'key' => 'vm.memory.size[<mode>]',
@@ -552,15 +552,15 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of WEB page. Default path is /')
+					'description' => _('Get content of web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full WEB page. Default path is /')
+					'description' => _('Get timing of loading full web page. Default path is /')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
-					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+					'description' => _('Get first occurrence of regexp in web page. Default path is /')
 				)
 			),
 			ITEM_TYPE_AGGREGATE => array(
@@ -813,6 +813,10 @@ class CHelpItems {
 				array(
 					'key' => 'zabbix[history_uint]',
 					'description' => _('Number of values stored in table HISTORY_UINT.')
+				),
+				array(
+					'key' => 'zabbix[host,,maintenance]',
+					'description' => _('Returns current maintenance status of the host.')
 				),
 				array(
 					'key' => 'zabbix[host,<type>,available]',
