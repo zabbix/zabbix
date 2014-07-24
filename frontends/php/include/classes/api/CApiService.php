@@ -733,7 +733,7 @@ class CApiService {
 	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
 		$idValidator = new CIdValidator(array(
 			'messageEmpty' => $messageEmpty,
-			'messageRegex' => $messageInvalid
+			'messageInvalid' => $messageInvalid
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
@@ -927,7 +927,7 @@ class CApiService {
 	 *
 	 * @param array $array
 	 * @param CPartialValidatorInterface $validator
-	 * @parma array $fullArray
+	 * @param array $fullArray
 	 */
 	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
 		if (!$validator->validatePartial($array, $fullArray)) {

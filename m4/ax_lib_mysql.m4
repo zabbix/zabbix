@@ -93,7 +93,7 @@ AC_DEFUN([AX_LIB_MYSQL],
 	     ;;
 		    -lperconaserverclient)
 		        _client_lib_name="perconaserverclient"
-	        
+
              ;;
                    -L*)
                         MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"

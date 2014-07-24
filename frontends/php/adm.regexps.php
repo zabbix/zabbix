@@ -35,8 +35,8 @@ $fields = array(
 	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})', _('Test string')),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})', _('Test string')),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})'),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,	null),
@@ -46,7 +46,7 @@ $fields = array(
 	// ajax
 	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
 	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null)
+	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null)
 );
 check_fields($fields);
 
@@ -60,14 +60,27 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
 		$result = array(
 			'expressions' => array(),
+			'errors' => array(),
 			'final' => true
 		);
-		$testString = $ajaxData['testString'];
+
+		$validator = new CRegexValidator(array(
+			'messageInvalid' => _('Regular expression must be a string'),
+			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+		));
 
 		foreach ($ajaxData['expressions'] as $id => $expression) {
-			$match = GlobalRegExp::matchExpression($expression, $testString);
+			if (!in_array($expression['expression_type'], array(EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE)) ||
+				$validator->validate($expression['expression'])
+			) {
+				$match = GlobalRegExp::matchExpression($expression, $ajaxData['testString']);
 
-			$result['expressions'][$id] = $match;
+				$result['expressions'][$id] = $match;
+			} else {
+				$match = false;
+				$result['errors'][$id] = $validator->getError();
+			}
+
 			$result['final'] = $result['final'] && $match;
 		}
 

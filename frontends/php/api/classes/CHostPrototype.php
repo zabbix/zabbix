@@ -110,7 +110,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypeValidator = new CSchemaValidator($this->getHostPrototypeSchema());
 		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator(array(
 			'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-			'messageRegex' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+			'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 		)));
 
 		// group validators
@@ -180,7 +180,7 @@ class CHostPrototype extends CHostBase {
 					// just in case
 					'messageEmpty' => _('Empty name for host prototype "%1$s".')
 				)),
-				'status' => new CSetValidator(array(
+				'status' => new CLimitedSetValidator(array(
 					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
 				)),
@@ -238,7 +238,7 @@ class CHostPrototype extends CHostBase {
 			'validators' => array(
 				'groupid' => new CIdValidator(array(
 					'messageEmpty' => _('No host group ID for group prototype.'),
-					'messageRegex' => _('Incorrect host group ID for group prototype.')
+					'messageInvalid' => _('Incorrect host group ID for group prototype.')
 				))
 			),
 			'required' => array('groupid'),
@@ -373,7 +373,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypes
-	 * @param arary $dbHostPrototypes	array of existing host prototypes with hostids as keys
+	 * @param array $dbHostPrototypes	array of existing host prototypes with hostids as keys
 	 *
 	 * @return void
 	 */
@@ -393,14 +393,14 @@ class CHostPrototype extends CHostBase {
 		$groupLinkValidator = new CPartialSchemaValidator($this->getGroupLinkSchema());
 		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageRegex' => _('Incorrect group prototype ID.')
+			'messageInvalid' => _('Incorrect group prototype ID.')
 		)));
 
 		// group prototype validator
 		$groupPrototypeValidator = new CPartialSchemaValidator($this->getGroupPrototypeSchema());
 		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageRegex' => _('Incorrect group prototype ID.')
+			'messageInvalid' => _('Incorrect group prototype ID.')
 		)));
 
 		$groupPrototypeGroupIds = array();
@@ -1064,7 +1064,7 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the given host prototypes are not inherited from a template.
 	 *
-	 * @throws APIException 	if at least one host prototype is iherited
+	 * @throws APIException 	if at least one host prototype is inherited
 	 *
 	 * @param array $hostPrototypeIds
 	 */
@@ -1221,7 +1221,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 					' FROM group_prototype hg'.
 					' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.groupid!=0'
+					' AND hg.groupid IS NOT NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(
@@ -1242,7 +1242,7 @@ class CHostPrototype extends CHostBase {
 				'SELECT hg.group_prototypeid,hg.hostid'.
 				' FROM group_prototype hg'.
 				' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
-					' AND hg.name NOT LIKE '.zbx_dbstr('')
+					' AND hg.groupid IS NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(

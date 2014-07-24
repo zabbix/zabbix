@@ -143,6 +143,7 @@ static void	clean_events()
 int	process_events(void)
 {
 	const char	*__function_name = "process_events";
+	int		ret = (int)events_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -159,5 +160,5 @@ int	process_events(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return (int)events_num;		/* performance metric */
+	return ret;		/* performance metric */
 }

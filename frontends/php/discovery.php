@@ -34,7 +34,7 @@ $fields = array(
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('ip', ZBX_SORT_UP);
+validate_sort_and_sortorder('ip', ZBX_SORT_UP, array('ip'));
 
 // check discovery for existing if defined druleid
 if ($druleid = get_request('druleid')) {

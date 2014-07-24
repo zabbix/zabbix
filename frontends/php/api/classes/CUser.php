@@ -235,7 +235,10 @@ class CUser extends CApiService {
 
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$themeValidator = new CSetValidator(array('values' => $themes));
+		$themeValidator = new CLimitedSetValidator(array(
+				'values' => $themes
+			)
+		);
 		$alias = array();
 
 		foreach ($users as &$user) {
@@ -263,7 +266,7 @@ class CUser extends CApiService {
 				$dbUser = $dbUsers[$user['userid']];
 			}
 
-			// check if user alais
+			// check if user alias
 			if (isset($user['alias'])) {
 				// check if we change guest user
 				if ($dbUser['alias'] === ZBX_GUEST_USER && $user['alias'] !== ZBX_GUEST_USER) {

@@ -650,12 +650,14 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
-		$followRedirectsValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		$followRedirectsValidator = new CLimitedSetValidator(array(
+				'values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
+			)
 		);
 
-		$retrieveModeValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+		$retrieveModeValidator = new CLimitedSetValidator(array(
+				'values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
+			)
 		);
 
 		foreach ($httpTest['steps'] as $step) {
@@ -874,14 +876,14 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if SSL cert is present but SSL key is not.
 	 */
 	protected function checkSslParameters($httpTest) {
-		$verifyPeerValidator = new CSetValidator(array(
+		$verifyPeerValidator = new CLimitedSetValidator(array(
 			'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
 			'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
 		));
 		$verifyPeerValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
 
-		$verifyHostValidator = new CSetValidator(array(
+		$verifyHostValidator = new CLimitedSetValidator(array(
 			'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
 			'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
 		));

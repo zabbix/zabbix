@@ -21,6 +21,7 @@
 #define ZABBIX_CPUSTAT_H
 
 #include "sysinfo.h"
+#include "zbxalgo.h"
 
 #ifdef _WINDOWS
 #	include "perfmon.h"
@@ -71,5 +72,7 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
 #endif /* not _WINDOWS */
+
+int	get_cpu_statuses(zbx_vector_uint64_t *vector);
 
 #endif

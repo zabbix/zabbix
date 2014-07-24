@@ -544,7 +544,7 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
-		$statusValidator = new CSetValidator(array(
+		$statusValidator = new CLimitedSetValidator(array(
 			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		));
@@ -742,6 +742,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts ['useip'] Use IP. OPTIONAL
 	 * @param string $hosts ['dns'] DNS. OPTIONAL
 	 * @param string $hosts ['ip'] IP. OPTIONAL
+	 * @param int    $hosts ['bulk'] bulk. OPTIONAL
 	 * @param int    $hosts ['proxy_hostid'] Proxy Host ID. OPTIONAL
 	 * @param int    $hosts ['ipmi_authtype'] IPMI authentication type. OPTIONAL
 	 * @param int    $hosts ['ipmi_privilege'] IPMI privilege. OPTIONAL
@@ -819,6 +820,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts ['useip'] Use IP. OPTIONAL
 	 * @param string $hosts ['dns'] DNS. OPTIONAL
 	 * @param string $hosts ['ip'] IP. OPTIONAL
+	 * @param int    $hosts ['bulk'] bulk. OPTIONAL
 	 * @param int    $hosts ['proxy_hostid'] Proxy Host ID. OPTIONAL
 	 * @param int    $hosts ['ipmi_authtype'] IPMI authentication type. OPTIONAL
 	 * @param int    $hosts ['ipmi_privilege'] IPMI privilege. OPTIONAL
@@ -937,6 +939,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
+	 * @param int    $hosts['fields']['bulk']			bulk. OPTIONAL
 	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL

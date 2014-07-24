@@ -238,27 +238,28 @@ else {
 
 $messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
 $messageTable->addClass('acknowledge-edit');
-$messageTable->addVar('backurl', $_REQUEST['backurl']);
 
-if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
-	$messageTable->addVar('eventid', $_REQUEST['eventid']);
-	$messageTable->addVar('triggerid', $_REQUEST['triggerid']);
+$backURL = getRequest('backurl');
+$messageTable->addVar('backurl', $backURL);
+
+if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
+	$messageTable->addVar('triggerid', getRequest('triggerid'));
 	$messageTable->addVar('source', EVENT_SOURCE_TRIGGERS);
 }
-elseif (in_array($_REQUEST['backurl'], array('screenedit.php', 'screens.php'))) {
+elseif ($backURL === 'screenedit.php' || $backURL === 'screens.php') {
 	$messageTable->addVar('screenid', $_REQUEST['screenid']);
 }
 
-if (isset($_REQUEST['eventid'])) {
-	$messageTable->addVar('eventid', $_REQUEST['eventid']);
+if (hasRequest('eventid')) {
+	$messageTable->addVar('eventid', getRequest('eventid'));
 }
-elseif (isset($_REQUEST['triggers'])) {
-	foreach ($_REQUEST['triggers'] as $triggerId) {
+elseif (hasRequest('triggers')) {
+	foreach (getRequest('triggers') as $triggerId) {
 		$messageTable->addVar('triggers['.$triggerId.']', $triggerId);
 	}
 }
-elseif (isset($_REQUEST['events'])) {
-	foreach ($_REQUEST['events'] as $eventId) {
+elseif (hasRequest('events')) {
+	foreach (getRequest('events') as $eventId) {
 		$messageTable->addVar('events['.$eventId.']', $eventId);
 	}
 }

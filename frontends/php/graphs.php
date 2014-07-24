@@ -83,7 +83,7 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());
@@ -107,7 +107,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 			access_deny();
 		}
 
-		// sets coresponding hostid for later usage
+		// sets corresponding hostid for later usage
 		if (empty($_REQUEST['hostid'])) {
 			$_REQUEST['hostid'] = $discovery_rule['hostid'];
 		}
