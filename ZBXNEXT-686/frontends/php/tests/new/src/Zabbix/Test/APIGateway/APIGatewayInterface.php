@@ -12,7 +12,7 @@ interface APIGatewayInterface {
 	 * @param APITestRequest $request
 	 * @return APITestResponse
 	 */
-	public function apiRequest(APITestRequest $request);
+	public function execute(APITestRequest $request);
 
 	/**
 	 * @param string $username

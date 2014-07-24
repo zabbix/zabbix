@@ -31,7 +31,7 @@ class MockAPIGateway extends BaseAPIGateway {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function apiRequest(APITestRequest $request) {
+	public function execute(APITestRequest $request) {
 
 	}
 
