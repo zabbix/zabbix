@@ -5,25 +5,51 @@ zabbix_sender \- Zabbix sender utility
 .SH SYNOPSIS
 .B zabbix_sender
 .RB [ \-v ]
-.RB [ \-z
-.IR server ]
+.B \-z
+.I server
 .RB [ \-p
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
-.RB { \-s
+.B \-s
 .I host
 .B \-k
 .I key
 .B \-o
 .I value
-|
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-z
+.I server
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP-address ]
 .RB [ \-T ]
 .RB [ -r ]
 .B \-i
-.IR input-file }
+.I input-file
+.br
+.B zabbix_sender
+.RB [ \-v ]
 .RB [ \-c
 .IR config-file ]
+.B \-s
+.I host
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.RB [ \-c
+.IR config-file ]
+.RB [ \-T ]
+.RB [ -r ]
+.B \-i
+.I input-file
 .br
 .B zabbix_sender \-h
 .br
@@ -35,22 +61,22 @@ is a command line utility for sending data to a remote Zabbix server. On the Zab
 .IP "\fB-c\fR, \fB--config\fR \fIconfig-file\fR"
 Use \fIconfig-file\fR.
 .B Zabbix sender
-reads server details from the agent configuration file. By default
+reads server details from the agentd configuration file. By default
 .B Zabbix sender
 does not read any configuration file.
 Absolute path should be specified. Only parameters \fBHostname\fR, \fBServerActive\fR and \fBSourceIP\fR are supported. First entry from the \fBServerActive\fR parameter is used.
 .IP "\fB-z\fR, \fB--zabbix-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server. If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
 .IP "\fB-p\fR, \fB--port\fR \fIport\fR"
-Specify port number of server trapper running on the server. Default is 10051.
-.IP "\fB-s\fR, \fB--host\fR \fIhost\fR"
-Specify host name as registered in Zabbix front-end. Host IP address and DNS name will not work.
+Specify port number of Zabbix server trapper running on the server. Default is 10051.
 .IP "\fB-I\fR, \fB--source-address\fR \fIIP-address\fR"
 Specify source IP address.
+.IP "\fB-s\fR, \fB--host\fR \fIhost\fR"
+Specify host name the item belongs to (as registered in Zabbix front-end). Host IP address and DNS name will not work.
 .IP "\fB-k\fR, \fB--key\fR \fIkey\fR"
 Specify item key to send value to.
 .IP "\fB-o\fR, \fB--value\fR \fIvalue\fR"
-Specify value.
+Specify item value.
 .IP "\fB-i\fR, \fB--input-file\fR \fIinput-file\fR"
 Load values from input file. Specify \fB\-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. \
 Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument. All entries are sent in a sequential order top-down.
