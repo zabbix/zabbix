@@ -607,7 +607,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-		zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, *GET_MSG_RESULT(result));
 		goto notsupported;
 	}
 
