@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-24 21:56+0300\n"
-"PO-Revision-Date: 2014-06-04 11:15+0300\n"
+"POT-Creation-Date: 2014-07-24 21:59+0300\n"
+"PO-Revision-Date: 2014-07-03 09:09+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401873312.0\n"
+"X-POOTLE-MTIME: 1404371344.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -562,7 +562,7 @@ msgstr "Kontrole sumaryczne nie wymagają, by na monitorowanym hoście działał
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:631 users.php:44
 msgid "Alias"
-msgstr "Alias"
+msgstr "Alias (Login)"
 
 #: include/views/configuration.sysmap.constructor.php:56
 msgid "Align icons"
@@ -8512,7 +8512,7 @@ msgstr "Logowanie"
 
 #: include/views/general.login.php:80
 msgid "Login as Guest"
-msgstr "Zalogowany jako Gość"
+msgstr "Zaloguj jako Gość"
 
 #: api/classes/CUser.php:1136
 #, c-format
@@ -9621,7 +9621,7 @@ msgstr "Nie określono typu autoryzacji dla polecenia operacji akcji \"%s\"."
 #: api/classes/CAction.php:1358 api/classes/CAction.php:1372
 #, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Nie określono nazwy użytkownika autoryzacji dla polecenia operacji akcji \"%s\"."
+msgstr "Nie określono nazwy użytkownika do autoryzacji dla polecenia operacji akcji \"%s\"."
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
@@ -14697,7 +14697,7 @@ msgstr "Użytkownik o aliasie \"%s\" już istnieje."
 #: include/views/configuration.host.prototype.edit.php:278
 #: include/views/general.login.php:66 index.php:34
 msgid "Username"
-msgstr "Nazwa użytkownika"
+msgstr "Login"
 
 #: include/menu.inc.php:251
 #: include/views/administration.usergroups.edit.php:55
