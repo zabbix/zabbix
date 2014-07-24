@@ -1305,7 +1305,13 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
 					"a logrt[] item. Error: %s", format, err_buf);
 			ret = FAIL;
+#ifdef _WINDOWS
+			/* the Windows gnuregex implementation does not correctly clean up */
+			/* allocated memory after regcomp() failure                        */
+			goto clean2;
+#else
 			goto clean1;
+#endif
 		}
 
 		if (SUCCEED != pick_logfiles(directory, *mtime, &re, use_ino, logfiles, logfiles_alloc, logfiles_num))
