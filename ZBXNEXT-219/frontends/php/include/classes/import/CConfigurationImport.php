@@ -1034,16 +1034,12 @@ class CConfigurationImport {
 						}
 
 						$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
-
-						$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
-
-						if ($graphId && !isset($graph['graphid'])) {
-							$graph['graphid'] = $graphId;
-						}
 					}
 					unset($gitem);
 
-					if (isset($graph['graphid'])) {
+					$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+					if ($graphId) {
+						$graph['graphid'] = $graphId;
 						$graphsToUpdate[] = $graph;
 					}
 					else {
@@ -1132,16 +1128,12 @@ class CConfigurationImport {
 					}
 
 					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
-
-					$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
-
-					if ($graphId && !isset($graph['graphid'])) {
-						$graph['graphid'] = $graphId;
-					}
 				}
 				unset($gitem);
 
-				if (isset($graph['graphid'])) {
+				$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+				if ($graphId) {
+					$graph['graphid'] = $graphId;
 					$graphsToUpdate[] = $graph;
 				}
 				else {
