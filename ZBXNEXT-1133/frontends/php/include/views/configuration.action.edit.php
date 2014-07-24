@@ -456,6 +456,7 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
+	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[id]', $this->data['new_operation']['id']));
