@@ -1,0 +1,29 @@
+requests:
+    1:
+        method: test1
+        params:
+            -
+                hostname: foobar
+                ip: 123.123.123.123
+                enabled: 32
+    2:
+        method: test2.delete
+        params:
+            - [33]
+    3:
+        method: test3.delete
+        params:
+            - [33]
+responses:
+    1:
+        type: response
+        result: [33]
+    2:
+        type: response
+        result:
+            hostids: [33]
+    3:
+        type: exception
+        result:
+            message: Invalid params
+            data: Host with id "33" does not exists

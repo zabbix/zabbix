@@ -15,7 +15,10 @@
 		"post-install-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"]
 	},
 	"autoload": {
-		"psr-4": {"Zabbix\\": "src/"},
+		"psr-0": {
+			"Zabbix\\": "src/",
+			"Zabbix\\Tests\\": "tests/"
+		},
 		"__comment__": "Add a list of directories here - all files from them will be autoloaded",
 		"classmap": [
 		],
