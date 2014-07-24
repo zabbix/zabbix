@@ -755,7 +755,14 @@ int	zbx_check_hostname(const char *hostname, char **error)
 		len++;
 	}
 
-	if (0 == len || MAX_ZBX_HOSTNAME_LEN < len)
+	if (0 == len)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, "name is empty");
+		return FAIL;
+	}
+
+	if (MAX_ZBX_HOSTNAME_LEN < len)
 	{
 		if (NULL != error)
 			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
