@@ -33,8 +33,8 @@ zabbix_sender \- Zabbix sender utility
 .br
 .B zabbix_sender
 .RB [ \-v ]
-.RB [ \-c
-.IR config-file ]
+.B \-c
+.I config-file
 .B \-s
 .I host
 .B \-k
@@ -44,8 +44,8 @@ zabbix_sender \- Zabbix sender utility
 .br
 .B zabbix_sender
 .RB [ \-v ]
-.RB [ \-c
-.IR config-file ]
+.B \-c
+.I config-file
 .RB [ \-T ]
 .RB [ -r ]
 .B \-i
