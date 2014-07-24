@@ -29,27 +29,38 @@
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
-const char	*usage_message[] = { "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]" };
+
+const char	*usage_message[] = {
+	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
+	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
+	"[-v] -c config-file -s host -k key -o value",
+	"[-v] -c config-file [-T] [-r] -i input-file",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>                   Absolute path to the configuration file",
+	"  -c --config config-file              Absolute path to the Zabbix agentd configuration file",
 	"",
-	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix server",
-	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
-	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
-	"  -I --source-address <IP address>     Specify source IP address",
+	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to",
+	"  -p --port port                       Specify port number of Zabbix server trapper process running on Zabbix server or proxy.",
+	"                                       Default is " ZBX_DEFAULT_SERVER_PORT_STR,
+	"  -I --source-address IP-address       Specify source IP address",
 	"",
-	"  -k --key <key>                       Specify item key",
-	"  -o --value <key value>               Specify value",
+	"  -s --host host                       Specify host name the item belongs to (as registered in Zabbix front-end).",
+	"                                       Host IP address and DNS name will not work",
+	"  -k --key key                         Specify item key",
+	"  -o --value value                     Specify item value",
 	"",
-	"  -i --input-file <input file>         Load values from input file. Specify - for standard input",
-	"                                       Each line of file contains whitespace delimited: <hostname> <key> <value>",
-	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
-	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
-	"                                       This can be used with --input-file option",
+	"  -i --input-file input-file           Load values from input file. Specify - for standard input.",
+	"                                       Each line of file contains whitespace delimited: <host> <key> <value>.",
+	"                                       Specify - in <host> to use hostname from configuration file or --host argument",
+	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <host> <key> <timestamp> <value>.",
+	"                                       This can be used with --input-file option.",
 	"                                       Timestamp should be specified in Unix timestamp format",
-	"  -r --real-time                       Send metrics one by one as soon as they are received",
+	"  -r --real-time                       Send metrics one by one as soon as they are received.",
 	"                                       This can be used when reading from standard input",
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
@@ -299,7 +310,10 @@ static void    zbx_load_config(const char *config_file)
 
 static void	parse_commandline(int argc, char **argv)
 {
-	char	ch = '\0';
+	char		ch = '\0';
+	int		opt_c = 0, opt_cap_i = 0, opt_z = 0, opt_p = 0, opt_s = 0, opt_k = 0, opt_o = 0, opt_i = 0,
+			opt_cap_t = 0, opt_r = 0, opt_v = 0;
+	unsigned int	opt_mask = 0;
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -307,7 +321,9 @@ static void	parse_commandline(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -318,33 +334,49 @@ static void	parse_commandline(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
-				CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
+				opt_cap_i++;
+				if (NULL == CONFIG_SOURCE_IP)
+					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
 				break;
 			case 'z':
-				ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
+				opt_z++;
+				if (NULL == ZABBIX_SERVER)
+					ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
+				opt_p++;
 				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
-				ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, zbx_optarg);
+				opt_s++;
+				if (NULL == ZABBIX_HOSTNAME)
+					ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, zbx_optarg);
 				break;
 			case 'k':
-				ZABBIX_KEY = zbx_strdup(ZABBIX_KEY, zbx_optarg);
+				opt_k++;
+				if (NULL == ZABBIX_KEY)
+					ZABBIX_KEY = zbx_strdup(ZABBIX_KEY, zbx_optarg);
 				break;
 			case 'o':
-				ZABBIX_KEY_VALUE = zbx_strdup(ZABBIX_KEY_VALUE, zbx_optarg);
+				opt_o++;
+				if (NULL == ZABBIX_KEY_VALUE)
+					ZABBIX_KEY_VALUE = zbx_strdup(ZABBIX_KEY_VALUE, zbx_optarg);
 				break;
 			case 'i':
-				INPUT_FILE = zbx_strdup(INPUT_FILE, zbx_optarg);
+				opt_i++;
+				if (NULL == INPUT_FILE)
+					INPUT_FILE = zbx_strdup(INPUT_FILE, zbx_optarg);
 				break;
 			case 'T':
+				opt_cap_t++;
 				WITH_TIMESTAMPS = 1;
 				break;
 			case 'r':
+				opt_r++;
 				REAL_TIME = 1;
 				break;
 			case 'v':
+				opt_v++;
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
 				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
@@ -357,9 +389,130 @@ static void	parse_commandline(int argc, char **argv)
 		}
 	}
 
-	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
+			1 < opt_cap_t || 1 < opt_r || 2 < opt_v)
 	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
+		if (1 < opt_cap_i)
+			zbx_error("option \"-I\" or \"--source-address\" specified multiple times");
+		if (1 < opt_z)
+			zbx_error("option \"-z\" or \"--zabbix-server\" specified multiple times");
+		if (1 < opt_p)
+			zbx_error("option \"-p\" or \"--port\" specified multiple times");
+		if (1 < opt_s)
+			zbx_error("option \"-s\" or \"--host\" specified multiple times");
+		if (1 < opt_k)
+			zbx_error("option \"-k\" or \"--key\" specified multiple times");
+		if (1 < opt_o)
+			zbx_error("option \"-o\" or \"--value\" specified multiple times");
+		if (1 < opt_i)
+			zbx_error("option \"-i\" or \"--input-file\" specified multiple times");
+		if (1 < opt_cap_t)
+			zbx_error("option \"-T\" or \"--with-timestamps\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-r\" or \"--real-time\" specified multiple times");
+		/* '-v' or '-vv' can be specified */
+		if (2 < opt_v)
+			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* check for mutually exclusive options    */
+
+	/* Allowed option combinations.            */
+	/* Option 'v' is always optional.          */
+	/*   c  z  s  k  o  i  T  r  p  I opt_mask */
+	/* ------------------------------ -------- */
+	/*   -  z  -  -  -  i  -  -  -  -  0x110   */
+	/*   -  z  -  -  -  i  -  -  -  I  0x111   */
+	/*   -  z  -  -  -  i  -  -  p  -  0x112   */
+	/*   -  z  -  -  -  i  -  -  p  I  0x113   */
+	/*   -  z  -  -  -  i  -  r  -  -  0x114   */
+	/*   -  z  -  -  -  i  -  r  -  I  0x115   */
+	/*   -  z  -  -  -  i  -  r  p  -  0x116   */
+	/*   -  z  -  -  -  i  -  r  p  I  0x117   */
+	/*   -  z  -  -  -  i  T  -  -  -  0x118   */
+	/*   -  z  -  -  -  i  T  -  -  I  0x119   */
+	/*   -  z  -  -  -  i  T  -  p  -  0x11a   */
+	/*   -  z  -  -  -  i  T  -  p  I  0x11b   */
+	/*   -  z  -  -  -  i  T  r  -  -  0x11c   */
+	/*   -  z  -  -  -  i  T  r  -  I  0x11d   */
+	/*   -  z  -  -  -  i  T  r  p  -  0x11e   */
+	/*   -  z  -  -  -  i  T  r  p  I  0x11f   */
+	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   */
+	/*   -  z  s  k  o  -  -  -  -  I  0x1e1   */
+	/*   -  z  s  k  o  -  -  -  p  -  0x1e2   */
+	/*   -  z  s  k  o  -  -  -  p  I  0x1e3   */
+	/*   c  -  -  -  -  i  -  -  -  -  0x210   */
+	/*   c  -  -  -  -  i  -  r  -  -  0x214   */
+	/*   c  -  -  -  -  i  T  -  -  -  0x218   */
+	/*   c  -  -  -  -  i  T  r  -  -  0x21c   */
+	/*   c  -  s  k  o  -  -  -  -  -  0x2e0   */
+
+	if (0 == opt_c + opt_z)
+	{
+		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
+		exit(EXIT_FAILURE);
+	}
+
+	if (1 < opt_c + opt_z)
+	{
+		zbx_error("either '-c' or '-z' option must be specified but not both");
+		usage();
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 < opt_c)
+		opt_mask |= 0x200;
+	if (0 < opt_z)
+		opt_mask |= 0x100;
+	if (0 < opt_s)
+		opt_mask |= 0x80;
+	if (0 < opt_k)
+		opt_mask |= 0x40;
+	if (0 < opt_o)
+		opt_mask |= 0x20;
+	if (0 < opt_i)
+		opt_mask |= 0x10;
+	if (0 < opt_cap_t)
+		opt_mask |= 0x08;
+	if (0 < opt_r)
+		opt_mask |= 0x04;
+	if (0 < opt_p)
+		opt_mask |= 0x02;
+	if (0 < opt_cap_i)
+		opt_mask |= 0x01;
+
+	if (1 == opt_i && ((1 == opt_z && ! (0x110 <= opt_mask && opt_mask <= 0x11f)) ||
+			(1 == opt_c && 0x210 != opt_mask && 0x214 != opt_mask && 0x218 != opt_mask &&
+			0x21c != opt_mask)))
+	{
+		zbx_error("option '-i' can be used only with '-T' and '-r' options");
+		usage();
+		exit(EXIT_FAILURE);
+	}
+
+	if ((1 == opt_z && 0 == opt_i && ! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
+			(1 == opt_c && 0 == opt_i && 0x2e0 != opt_mask))
+	{
+		zbx_error("too few or mutually exclusive options used");
+		usage();
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
 		exit(EXIT_FAILURE);
 	}
 }
@@ -389,7 +542,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == ZABBIX_SERVER)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "'Server' parameter required");
+		zabbix_log(LOG_LEVEL_CRIT, "'Server' parameter required");
 		goto exit;
 	}
 	if (0 == ZABBIX_SERVER_PORT)
@@ -397,7 +550,7 @@ int	main(int argc, char **argv)
 
 	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Incorrect port number [%d]. Allowed [%d:%d]",
+		zabbix_log(LOG_LEVEL_CRIT, "Incorrect port number [%d]. Allowed [%d:%d]",
 				(int)ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT, (int)MAX_ZABBIX_PORT);
 		goto exit;
 	}
@@ -425,7 +578,7 @@ int	main(int argc, char **argv)
 		}
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			goto free;
 		}
 
@@ -443,7 +596,7 @@ int	main(int argc, char **argv)
 
 			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Hostname' required", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Hostname' required", total_count);
 				ret = FAIL;
 				break;
 			}
@@ -452,7 +605,7 @@ int	main(int argc, char **argv)
 			{
 				if (NULL == ZABBIX_HOSTNAME)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "[line %d] '-' encountered as 'Hostname', "
+					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname', "
 							"but no default hostname was specified", total_count);
 					ret = FAIL;
 					break;
@@ -463,7 +616,7 @@ int	main(int argc, char **argv)
 
 			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key' required", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key' required", total_count);
 				ret = FAIL;
 				break;
 			}
@@ -472,7 +625,7 @@ int	main(int argc, char **argv)
 			{
 				if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) || '\0' == *clock)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Timestamp' required", total_count);
+					zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Timestamp' required", total_count);
 					ret = FAIL;
 					break;
 				}
@@ -484,13 +637,13 @@ int	main(int argc, char **argv)
 			}
 			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key value' required", total_count);
 				ret = FAIL;
 				break;
 			}
 			else if ('\0' != *p)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[line %d] Too many parameters", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] Too many parameters", total_count);
 				ret = FAIL;
 				break;
 			}
