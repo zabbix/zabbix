@@ -1300,7 +1300,7 @@ ZABBIX.apps.map = (function($) {
 
 		SelementForm.prototype = {
 			/**
-			 * Shows lement form.
+			 * Shows element form.
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');

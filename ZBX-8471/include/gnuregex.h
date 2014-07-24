@@ -428,7 +428,7 @@ extern int re_compile_fastmap _RE_ARGS ((struct re_pattern_buffer *buffer));
    compiled into BUFFER.  Start searching at position START, for RANGE
    characters.  Return the starting position of the match, -1 for no
    match, or -2 for an internal error.  Also return register
-   information in REGS (if REGS and BUFFER->no_sub are nonzero).  */
+   information in REGS (if REGS and BUFFER->no_sub are non-zero).  */
 extern int re_search
   _RE_ARGS ((struct re_pattern_buffer *buffer, const char *string,
             int length, int start, int range, struct re_registers *regs));
