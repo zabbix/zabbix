@@ -180,6 +180,7 @@ if (isset($_REQUEST['form'])) {
 				'delay' => $slide['delay']
 			);
 		}
+		$data['slides'] = array_values($data['slides']);
 	}
 
 	// get slides without delay
