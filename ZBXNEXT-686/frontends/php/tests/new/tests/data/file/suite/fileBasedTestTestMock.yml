@@ -8,12 +8,10 @@ requests:
                 enabled: 32
     2:
         method: test2.delete
-        params:
-            - [33]
+        params: [33]
     3:
         method: test3.delete
-        params:
-            - [33]
+        params: [33]
 responses:
     1:
         type: response
@@ -26,4 +24,4 @@ responses:
         type: exception
         result:
             message: Invalid params
-            data: Host with id "33" does not exists
+            data: Host with id "33" does not exist

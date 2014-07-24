@@ -1,0 +1,30 @@
+step1:
+    request:
+        id: 1
+        method: test1
+        params:
+            -
+                hostname: foobar
+                ip: 123.123.123.123
+                enabled: 32
+    expect: response
+    response:
+        equals: [33]
+step2:
+    request:
+        id: 2
+        method: test2.delete
+        params: [@step1.response.[0]@]
+    expect: response
+    response:
+        equals:
+            hostids: [@step2.request.params[0]@]
+step3:
+    request:
+        id: 3
+        method: test3.delete
+        params: [@step2.response.params[0]@]
+    expect: error
+    error:
+        message: Invalid params
+        data: Host with id "[@step2.response.params[0]@]" does not exist
