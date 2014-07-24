@@ -195,5 +195,17 @@
 					+ stepNames, 600, 542);
 			});
 		<?php endforeach ?>
+
+		$('#authentication').on('change', function() {
+			var httpFieldsDisabled = $(this).val() == 0; // 0 == HTTPTEST_AUTH_NONE
+
+			$('#http_user')
+				.attr('disabled', httpFieldsDisabled)
+				.closest('li').toggleClass('hidden');
+
+			$('#http_password')
+				.attr('disabled', httpFieldsDisabled)
+				.closest('li').toggleClass('hidden');
+		});
 	});
 </script>

@@ -151,13 +151,22 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
 $httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
 
 // Authentication type
-$authenticationComboBox = new CComboBox('authentication', $this->data['authentication'], 'submit();');
+$authenticationComboBox = new CComboBox('authentication', $this->data['authentication']);
 $authenticationComboBox->addItems(httptest_authentications());
-$httpAuthenticationFormList->addRow(_('Authentication'), $authenticationComboBox);
-if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM))) {
-	$httpAuthenticationFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
-	$httpAuthenticationFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+$httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
+
+$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
+$httpAuthenticationPasswordTB=new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
+
+$authenticationInputsHidden=$this->data['authentication'] == HTTPTEST_AUTH_NONE;
+
+if ($authenticationInputsHidden) {
+	$httpAuthenticationUserTB->setAttribute('disabled', true);
+	$httpAuthenticationPasswordTB->setAttribute('disabled', true);
 }
+
+$httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden);
+$httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
 
 // SSL verify peer checkbox
 $httpAuthenticationFormList->addRow(_('SSL verify peer'), new CCheckBox('verify_peer', $this->data['verify_peer']));
