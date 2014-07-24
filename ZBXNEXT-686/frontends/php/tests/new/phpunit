@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+// This is just a shorthand to vendor's phpunit bin (since Zabbix post-commit hook says phpunit violates
+// "trailing newline" rule. Please do:
+// ➜  new  ln -s vendor/bin/phpunit phpunit
+// someday and remove the file. Before that, please keep it in sync with vendor/bin/phpunit
+require __DIR__.'/vendor/autoload.php';
+
+PHPUnit_TextUI_Command::main();

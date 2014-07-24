@@ -1,0 +1,13 @@
+{
+	"__comment__": "We bind to concrete versions to avoid updated and prefer zip/tarballs",
+	"preferred-install": "dist",
+	"require": {
+		"symfony/yaml": "2.5",
+		"phpunit/phpunit": "4.1.4"
+	},
+	"__comment__": "Lines below will be needed after vendors are merged to zabbix codebase",
+	"scripts": {
+		"post-update-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"],
+		"post-install-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"]
+	}
+}
