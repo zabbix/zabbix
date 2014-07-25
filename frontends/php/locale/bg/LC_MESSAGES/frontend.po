@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-24 22:02+0300\n"
+"POT-Creation-Date: 2014-07-26 00:46+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1309,7 +1309,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Не може да се добави приложение"
 
-#: api/classes/CTrigger.php:1382
+#: api/classes/CTrigger.php:1367
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не може да се добави зависимост от хост към шаблон."
 
@@ -1520,11 +1520,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Не може да се създаде друга връзка към базата данни."
 
-#: api/classes/CTrigger.php:1416
+#: api/classes/CTrigger.php:1401
 msgid "Cannot create circular dependencies."
 msgstr "Не може да създаде циклична зависимост."
 
-#: api/classes/CTrigger.php:1388
+#: api/classes/CTrigger.php:1373
 msgid "Cannot create dependency on trigger itself."
 msgstr "Не може да се създаде зависимост на тригера от себе си."
 
@@ -1579,7 +1579,7 @@ msgid_plural "Cannot delete applications"
 msgstr[0] "Не може да се изтрие приложението"
 msgstr[1] "Не може да се изтрие приложението"
 
-#: api/classes/CTrigger.php:1042
+#: api/classes/CTrigger.php:1036
 msgid "Cannot delete dependency"
 msgstr "Не може да се изтрие зависимостта"
 
@@ -1756,7 +1756,7 @@ msgstr "Не може да се изтрият шаблонни елементи
 msgid "Cannot delete templated items."
 msgstr "Не може да се изтрият шаблонни елементи на данните."
 
-#: api/classes/CTrigger.php:1864 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1849 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не може да се изтрие шаблонния тригер \"%1$s:%2$s\"."
@@ -2113,7 +2113,7 @@ msgstr "Не може да се изгради дървовидна структ
 msgid "Cannot have empty visible template name."
 msgstr ""
 
-#: api/classes/CTrigger.php:1075 api/classes/CTrigger.php:1214
+#: api/classes/CTrigger.php:1069 api/classes/CTrigger.php:1199
 #: api/classes/CTriggerPrototype.php:678 api/classes/CTriggerPrototype.php:736
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -3377,7 +3377,7 @@ msgstr "Създадено: елемент на данните \"%1$s\" в \"%2$
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: елемент на данните прототип \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1109
+#: api/classes/CTrigger.php:1103
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Тригер \"%1$s\" в \"%2$s\"."
@@ -4648,7 +4648,7 @@ msgstr "Първо влизане в падащо меню \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запомни избраното в падащо меню \"%1$s\"."
 
-#: api/classes/CTrigger.php:1558
+#: api/classes/CTrigger.php:1543
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублиране на зависимостите в тригер \"%1$s\"."
@@ -4842,8 +4842,8 @@ msgstr ""
 #: api/classes/CProxy.php:474 api/classes/CService.php:341
 #: api/classes/CService.php:376 api/classes/CService.php:442
 #: api/classes/CService.php:514 api/classes/CTemplate.php:577
-#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:917
-#: api/classes/CTrigger.php:1007 api/classes/CTriggerPrototype.php:578
+#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:911
+#: api/classes/CTrigger.php:1001 api/classes/CTriggerPrototype.php:578
 #: api/classes/CUserGroup.php:628 api/classes/CUserMacro.php:347
 #: api/classes/CUserMacro.php:499 api/classes/CUser.php:528
 msgid "Empty input parameter."
@@ -10172,8 +10172,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CService.php:1051 api/classes/CService.php:1066
 #: api/classes/CTemplateScreen.php:556 api/classes/CTemplateScreen.php:607
 #: api/classes/CTemplateScreen.php:659 api/classes/CTemplateScreen.php:665
-#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:936
-#: api/classes/CTrigger.php:957 api/classes/CTrigger.php:1843
+#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:930
+#: api/classes/CTrigger.php:951 api/classes/CTrigger.php:1828
 #: api/classes/CTriggerPrototype.php:504 api/classes/CTriggerPrototype.php:592
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:628 api/classes/CUser.php:807
@@ -10347,7 +10347,7 @@ msgstr "Непотвърдено"
 msgid "Not Templated items"
 msgstr "Няма шаблонни елементи на данните"
 
-#: api/classes/CTrigger.php:1461
+#: api/classes/CTrigger.php:1446
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не всички шаблони са свързани към \"%s\"."
@@ -13940,7 +13940,7 @@ msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", койт�
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропуснат - потребителско правило."
 
-#: api/classes/CTrigger.php:1600
+#: api/classes/CTrigger.php:1585
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
@@ -13949,7 +13949,7 @@ msgstr "Тригер \"%s\" принадлежи към шаблони с раз
 msgid "Trigger added"
 msgstr "Тригер добавен"
 
-#: api/classes/CTrigger.php:1504
+#: api/classes/CTrigger.php:1489
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -14661,7 +14661,7 @@ msgstr "Актуализирано: Елемент на данните \"%1$s\" 
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Прототип на елемент на данните \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1254
+#: api/classes/CTrigger.php:1239
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Тригер \"%1$s\" в \"%2$s\"."
