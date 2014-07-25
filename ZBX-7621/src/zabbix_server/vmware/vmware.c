@@ -1386,7 +1386,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 		zbx_vmware_dev_t	*dev;
 		char			*unitNumber = NULL, *controllerKey = NULL, *busNumber = NULL,
 					*scsiCtlrUnitNumber = NULL;
-		xmlXPathObject		*xpathObjController;
+		xmlXPathObject		*xpathObjController = NULL;
 
 		do
 		{
