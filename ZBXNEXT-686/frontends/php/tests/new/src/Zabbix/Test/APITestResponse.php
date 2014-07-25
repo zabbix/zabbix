@@ -82,4 +82,27 @@ class APITestResponse {
 	public function isResponse() {
 		return $this->type == APITestResponse::TYPE_RESPONSE;
 	}
+
+	/**
+	 * Returns current response type.
+	 *
+	 * @return int
+	 */
+	public function getType() {
+		return $this->type;
+	}
+
+	/**
+	 * API result getter (if it is not an exception).
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function getResult() {
+		if (!$this->isResponse()) {
+			throw new \Exception('Can not return response result: I am an exception');
+		}
+
+		return $this->result;
+	}
 }
