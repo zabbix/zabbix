@@ -50,7 +50,7 @@ class APITestCase extends BaseAPITestCase {
 				), $request
 			);
 
-			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id']);
+			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
 
 			$gateway->execute($apiRequest);
 		}
