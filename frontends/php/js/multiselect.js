@@ -93,9 +93,7 @@ jQuery(function($) {
 				var obj = $(this);
 				var ms = $(this).data('multiSelect');
 
-				if (ms.options.data.length) {
-					resizeAllSelectedTexts(obj, ms.options, ms.values);
-				}
+				resizeAllSelectedTexts(obj, ms.options, ms.values);
 			});
 		},
 
@@ -216,7 +214,7 @@ jQuery(function($) {
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
-					isAvailableOpenned: false,
+					isAvailableOpened: false,
 					selected: {},
 					available: {},
 					ignored: empty(options.ignored) ? {} : options.ignored
@@ -446,17 +444,17 @@ jQuery(function($) {
 				})
 				.append($('<ul>'))
 				.mouseenter(function() {
-					values.isAvailableOpenned = true;
+					values.isAvailableOpened = true;
 				})
 				.mouseleave(function() {
-					values.isAvailableOpenned = false;
+					values.isAvailableOpened = false;
 				});
 
 				// multi select
 				obj.append(available)
 				.focusout(function() {
 					setTimeout(function() {
-						if (!values.isAvailableOpenned && $('.available', obj).is(':visible')) {
+						if (!values.isAvailableOpened && $('.available', obj).is(':visible')) {
 							hideAvailable(obj);
 						}
 					}, 200);
@@ -505,6 +503,11 @@ jQuery(function($) {
 				}
 
 				obj.parent().append(popupButton);
+			}
+
+			// IE browsers use default width
+			if (IE) {
+				options.defaultWidth = $('input[type="text"]', obj).width();
 			}
 		});
 	};
@@ -885,14 +888,19 @@ jQuery(function($) {
 		}
 
 		if (IE) {
-			$('input[type="text"]', obj).css({
+			var input = $('input[type="text"]', obj);
+
+			input.css({
 				'padding-top': top,
-				'padding-left': left
+				'padding-left': left,
+				'width': options.defaultWidth - left
 			});
 
-			// IE8 hack to fix inline-block container resizing
+			// IE8 hack to fix inline-block container resizing and poke input element value to trigger reflow
 			if (IE8) {
 				$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+				var currentInputVal = input.val();
+				input.val(' ').val(currentInputVal);
 			}
 		}
 		else {
@@ -996,7 +1004,10 @@ jQuery(function($) {
 	}
 
 	function removePlaceholder(obj) {
-		$('input[type="text"]', obj).removeAttr('placeholder');
+		$('input[type="text"]', obj)
+			.removeAttr('placeholder')
+			.removeClass('placeholder')
+			.val('');
 	}
 
 	function getLimit(values, options) {

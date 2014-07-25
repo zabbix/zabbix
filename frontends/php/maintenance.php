@@ -76,7 +76,7 @@ $fields = array(
 	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>						array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 
 check_fields($fields);
@@ -509,18 +509,22 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	$data['maintenances'] = array();
+	$options = array(
+		'output' => array('maintenanceid'),
+		'editable' => true,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
+		'limit' => $config['search_limit'] + 1
+	);
 
-	if ($pageFilter->groupsSelected) {
-		$data['maintenances'] = API::Maintenance()->get(array(
-			'output' => array('maintenanceid'),
-			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'editable' => true,
-			'limit' => $config['search_limit'] + 1
-		));
+	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
+		$options['groupids'] = $pageFilter->groupid;
 	}
+	else {
+		$options['groupids'] = $config['dropdown_first_entry'] ? null : array();
+	}
+
+	$data['maintenances'] = API::Maintenance()->get($options);
 
 	$data['paging'] = getPagingLine($data['maintenances']);
 
