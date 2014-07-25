@@ -1,6 +1,7 @@
 Changes for 2.3.3
 
 New features:
+A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
 ..F....... [ZBXNEXT-1826] added proxy name as host prefix in item queue details page (Ivo)
 ..F.....S. [ZBXNEXT-1848] added support for internal item zabbix[host,,maintenance] (Sasha)
