@@ -15,7 +15,7 @@ step2:
         id: 2
         method: test2.delete
         params:
-            - @step1.response.[0]@
+            - @step1.response[0]@
     expect: response
     response:
         equals:
@@ -30,4 +30,4 @@ step3:
     expect: error
     error:
         message: Invalid params
-        data: Host with id "@step2.response.params[0]@" does not exist
+        data: Host with id "@step2.response.params[0]@" does not exist (method: @step3.request.method@)

@@ -55,9 +55,12 @@ class APITestCase extends BaseAPITestCase {
 			$request = array_merge(
 				array(
 					'jsonrpc' => '2.0',
-					'id' => rand()
+					'id' => rand(),
+					'params' => $request['params']
 				), $request
 			);
+
+			$request['params'] = $this->expandStepVariables($request['params']);
 
 			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
 
@@ -106,6 +109,51 @@ class APITestCase extends BaseAPITestCase {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
 			}
 		}
+	}
+
+	/**
+	 * Expands step variables like "@step1.data"
+	 *
+	 * @param array $data
+	 * @return array
+	 */
+	protected function expandStepVariables($data) {
+		array_walk_recursive($data, function (&$value, $index) {
+			if (!is_string($value)) {
+				return;
+			}
+
+			// TODO: this should be refactored to single regular expression like (@((([a-z0-9]+)[.[\]]*)+)@)
+			// extract variables
+			preg_match_all("/@(?:[a-z0-9[\\].]+)@/i", $value, $matches);
+
+			if (count($matches) == 1 && count($matches[0]) > 0) {
+				foreach ($matches[0] as $expression) {
+					$keys = preg_split('/(\[|]\.|\.|\])/', trim($expression, '@'), -1, PREG_SPLIT_NO_EMPTY);
+
+					if (count($keys) > 0) {
+						$newValue = $this->resolveStepVariable($keys);
+
+						$value = str_replace($expression, $newValue, $value);
+					}
+					else {
+						throw new \Exception(sprintf('Problem parsing expression "%s"', $expression));
+					}
+				}
+			}
+		});
+
+		return $data;
+	}
+
+	/**
+	 * Resolves actual value from array of keys like ['step1', 'response', 'hosts', 0, 'id']
+	 *
+	 * @param array $keys
+	 * @return mixed
+	 */
+	protected function resolveStepVariable(array $keys) {
+		return 'foobar';
 	}
 
 }
