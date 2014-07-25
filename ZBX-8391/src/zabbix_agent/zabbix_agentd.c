@@ -311,7 +311,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 0x40:
 			break;
 		default:
-			zbx_error("Mutually exclusive options used.\n");
+			zbx_error("mutually exclusive options used");
 			usage();
 			exit(EXIT_FAILURE);
 			break;
