@@ -88,6 +88,9 @@ class APITestCase extends BaseAPITestCase {
 			if ($expectation == 'response') {
 				// TODO: validators here
 				$responseExpectation = $definition['response'];
+				$responseExpectation = $this->expandStepVariables($responseExpectation);
+
+				reset($responseExpectation);
 
 				if (count($responseExpectation) != 1 || key($responseExpectation) != 'equals') {
 					throw new \Exception('Sorry, now we only support single key "equals" under "response" section. This is a "TODO"');
@@ -132,7 +135,16 @@ class APITestCase extends BaseAPITestCase {
 					$keys = preg_split('/(\[|]\.|\.|\])/', trim($expression, '@'), -1, PREG_SPLIT_NO_EMPTY);
 
 					if (count($keys) > 0) {
-						$newValue = $this->resolveStepVariable($keys);
+						try {
+							$newValue = $this->resolveStepVariable($keys);
+						} catch (\Exception $e) {
+							throw new \Exception(
+								sprintf('Parsing of expression "%s" failed with message "%s"',
+									$expression,
+									$e->getMessage()
+								)
+							);
+						}
 
 						$value = str_replace($expression, $newValue, $value);
 					}
@@ -150,10 +162,89 @@ class APITestCase extends BaseAPITestCase {
 	 * Resolves actual value from array of keys like ['step1', 'response', 'hosts', 0, 'id']
 	 *
 	 * @param array $keys
+	 * @throws \Exception
 	 * @return mixed
 	 */
 	protected function resolveStepVariable(array $keys) {
-		return 'foobar';
+		// first key should be valid step name
+		$stepName = array_shift($keys);
+
+		if (!isset($this->stepData[$stepName])) {
+			throw new \Exception(sprintf('No data for step "%s"', $stepName));
+		}
+
+		// second key is request/response; exceptions are not supported (since back-referencing exception message is
+		// a bit senseless
+		$type = array_shift($keys);
+
+		if (!in_array($type, array('request', 'response'))) {
+			throw new \Exception(sprintf('Second part of the expressions should be "request" or "response", "%s" given', $type));
+		}
+
+		// third key is method, params or result
+		$subtype = array_shift($keys);
+
+		if ($type == 'request') {
+			$allow = array('method', 'params');
+
+			if (!in_array($subtype, $allow)) {
+				throw new \Exception(
+					sprintf('Third part of request expression must be one of "%s", "%s" given',
+						implode(', ', $allow),
+						$subtype
+					)
+				);
+			}
+
+			die('request no working yet');
+		}
+
+		if ($type == 'response') {
+			$allow = array('result');
+
+			if (!in_array($subtype, $allow)) {
+				throw new \Exception('Third part of request expression must be one of "%s", "%s" given',
+					implode(', ', $allow),
+					$subtype
+				);
+			}
+
+			if (!isset($this->stepStack[$stepName]['response'])) {
+					throw new \Exception(sprintf('No response has been logged yet for step "%s"', $stepName));
+				}
+
+				/* @var $response \Zabbix\Test\APITestResponse */
+				$response = $this->stepStack[$stepName]['response'];
+
+				return $this->drillIn($response->getResult(), $keys);
+		}
+	}
+
+	/**
+	 * Drill in function - returns item from array $data defined by $keys.
+	 *
+	 * @param $data
+	 * @param $keys
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	protected function drillIn($data, $keys) {
+		foreach ($keys as $key) {
+			if (!is_array($data)) {
+				throw new \Exception(sprintf(
+					'Data nto an array for key "%s", have we gone too deep?', $key
+				));
+			}
+			elseif(!isset($data[$key])) {
+				throw new \Exception(sprintf(
+					'No key "%s" for data with keys "%s", have we gone too deep?', $key, implode(', ', array_keys($data))
+				));
+			}
+
+			$data = $data[$key];
+		}
+
+		return $data;
 	}
 
 }
