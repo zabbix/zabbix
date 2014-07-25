@@ -759,23 +759,21 @@ class CImportReferencer {
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
 				'selectHosts' => array('hostid'),
+				'expandExpression' => true,
 				'filter' => array(
 					'description' => array_keys($this->triggers),
-					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+					'flags' => array(
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					)
 				),
 				'editable' => true
 			));
 
 			foreach ($dbTriggers as $dbTrigger) {
-				$dbExpr = explode_exp($dbTrigger['expression']);
-				foreach ($this->triggers as $name => $expressions) {
-					if ($name == $dbTrigger['description']) {
-						foreach ($expressions as $expression) {
-							if ($expression == $dbExpr) {
-								$this->triggersRefs[$name][$expression] = $dbTrigger['triggerid'];
-							}
-						}
-					}
+				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
+					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
 				}
 			}
 		}
@@ -801,7 +799,11 @@ class CImportReferencer {
 				'selectHosts' => array('hostid'),
 				'filter' => array(
 					'name' => $graphNames,
-					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+					'flags' => array(
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					)
 				),
 				'editable' => true
 			));
