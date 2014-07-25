@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-24 22:02+0300\n"
+"POT-Creation-Date: 2014-07-26 00:46+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1306,7 +1306,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Não foi possível adicionar aplicação"
 
-#: api/classes/CTrigger.php:1382
+#: api/classes/CTrigger.php:1367
 msgid "Cannot add dependency from a host to a template."
 msgstr "Não foi possível adicionar dependência de um host para um template."
 
@@ -1517,11 +1517,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Não foi possível criar outra ligação à base de dados."
 
-#: api/classes/CTrigger.php:1416
+#: api/classes/CTrigger.php:1401
 msgid "Cannot create circular dependencies."
 msgstr "Não é possível criar uma dependência circular."
 
-#: api/classes/CTrigger.php:1388
+#: api/classes/CTrigger.php:1373
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar uma dependência de um trigger com ele mesmo."
 
@@ -1575,7 +1575,7 @@ msgid_plural "Cannot delete applications"
 msgstr[0] "Não foi possível eliminar aplicação"
 msgstr[1] "Não foi possível eliminar aplicação"
 
-#: api/classes/CTrigger.php:1042
+#: api/classes/CTrigger.php:1036
 msgid "Cannot delete dependency"
 msgstr "Não foi possível eliminar dependência"
 
@@ -1751,7 +1751,7 @@ msgstr "Não foi possível eliminar itens do template"
 msgid "Cannot delete templated items."
 msgstr "Não foi possível eliminar itens do template."
 
-#: api/classes/CTrigger.php:1864 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1849 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Não foi possível eliminar trigger \"%1$s:%2$s\" do template."
@@ -2107,7 +2107,7 @@ msgstr "Não foi possível formatar a estrutura em árvore."
 msgid "Cannot have empty visible template name."
 msgstr ""
 
-#: api/classes/CTrigger.php:1075 api/classes/CTrigger.php:1214
+#: api/classes/CTrigger.php:1069 api/classes/CTrigger.php:1199
 #: api/classes/CTriggerPrototype.php:678 api/classes/CTriggerPrototype.php:736
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -3367,7 +3367,7 @@ msgstr "Criado: Item \"%1$s\" em \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Protótipo de item \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CTrigger.php:1109
+#: api/classes/CTrigger.php:1103
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Trigger \"%1$s\" em \"%2$s\"."
@@ -4637,7 +4637,7 @@ msgstr "Primeira entrada \"%1$s\" de listas dropdown."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Lembrar selecção \"%1$s\" em listas dropdown."
 
-#: api/classes/CTrigger.php:1558
+#: api/classes/CTrigger.php:1543
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dependências duplicadas no trigger \"%1$s\"."
@@ -4831,8 +4831,8 @@ msgstr ""
 #: api/classes/CProxy.php:474 api/classes/CService.php:341
 #: api/classes/CService.php:376 api/classes/CService.php:442
 #: api/classes/CService.php:514 api/classes/CTemplate.php:577
-#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:917
-#: api/classes/CTrigger.php:1007 api/classes/CTriggerPrototype.php:578
+#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:911
+#: api/classes/CTrigger.php:1001 api/classes/CTriggerPrototype.php:578
 #: api/classes/CUserGroup.php:628 api/classes/CUserMacro.php:347
 #: api/classes/CUserMacro.php:499 api/classes/CUser.php:528
 msgid "Empty input parameter."
@@ -10152,8 +10152,8 @@ msgstr "Sem permissões para acesso ao sistema."
 #: api/classes/CService.php:1051 api/classes/CService.php:1066
 #: api/classes/CTemplateScreen.php:556 api/classes/CTemplateScreen.php:607
 #: api/classes/CTemplateScreen.php:659 api/classes/CTemplateScreen.php:665
-#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:936
-#: api/classes/CTrigger.php:957 api/classes/CTrigger.php:1843
+#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:930
+#: api/classes/CTrigger.php:951 api/classes/CTrigger.php:1828
 #: api/classes/CTriggerPrototype.php:504 api/classes/CTriggerPrototype.php:592
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:628 api/classes/CUser.php:807
@@ -10327,7 +10327,7 @@ msgstr "Por Reconher"
 msgid "Not Templated items"
 msgstr "Itens não pertencem a nenhum template"
 
-#: api/classes/CTrigger.php:1461
+#: api/classes/CTrigger.php:1446
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nem todos os templates estão ligados a \"%s\"."
@@ -13913,7 +13913,7 @@ msgstr "O trigger \"%1$s\" depende do trigger \"%2$s\", que não existe."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "O trigger \"%1$s\" foi ignorado - regra de utilizador."
 
-#: api/classes/CTrigger.php:1600
+#: api/classes/CTrigger.php:1585
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "O trigger \"%s\" pertence a templates com diferentes associações."
@@ -13922,7 +13922,7 @@ msgstr "O trigger \"%s\" pertence a templates com diferentes associações."
 msgid "Trigger added"
 msgstr "Trigger adicionado"
 
-#: api/classes/CTrigger.php:1504
+#: api/classes/CTrigger.php:1489
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -14634,7 +14634,7 @@ msgstr "Actualizado: Item \"%1$s\" em \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Actualizado: Protótipo de item \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CTrigger.php:1254
+#: api/classes/CTrigger.php:1239
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Actualizado: Trigger \"%1$s\" em \"%2$s\"."
