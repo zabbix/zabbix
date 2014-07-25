@@ -1,9 +1,28 @@
+Changes for 2.2.6rc1
+
+New features:
+A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-8493] fixed usergroup.massadd API call to not create duplicate entries in "rights" table (Krists)
+..F....... [ZBX-8492] fixed maintenance periods without hosts/hostgroups to be accessible by both admins and superadmins (Krists)
+A.F....... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
+..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5
+
+2.2.5rc1 was released as 2.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.5rc1
 
 New features:
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 
 Bug fixes:
+.........T [ZBX-8405] fixed typos in item descriptions for JMX Tomcat, FreeBSD, HP-UX, Linux and OpenBSD templates (Richlv)
 ........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 ........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
