@@ -1340,7 +1340,7 @@ clean:
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found:%d", __function_name, nics);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, nics);
 }
 
 /******************************************************************************
@@ -1461,7 +1461,7 @@ clean:
 	xmlCleanupParser();
 
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found:%d", __function_name, disks);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
 
 }
 
@@ -1856,7 +1856,7 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             hosts        - [OUT] list of host ids                          *
+ *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -2021,7 +2021,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret), hvs->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret), hvs->values_num);
 
 	return ret;
 }
@@ -2476,7 +2476,7 @@ out:
 	zbx_vector_str_clean(&ids);
 	zbx_vector_str_destroy(&ids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
 			clusters->values_num);
 
 	return ret;
