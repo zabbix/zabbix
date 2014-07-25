@@ -3,7 +3,7 @@
 namespace Zabbix\Test;
 
 class APITestResponse {
-	const TYPE_EXCEPION = 1;
+	const TYPE_EXCEPTION = 1;
 	const TYPE_RESPONSE = 2;
 
 	/**
@@ -42,11 +42,18 @@ class APITestResponse {
 	protected $message;
 
 	/**
-	 * Esception data.
+	 * Exception data.
 	 *
 	 * @var string
 	 */
 	protected $data;
+
+	/**
+	 * Exception code.
+	 *
+	 * @var integer
+	 */
+	protected $code;
 
 	/**
 	 * @param array $result
@@ -65,13 +72,26 @@ class APITestResponse {
 		return $responseObject;
 	}
 
+	public static function createTestException($message, $data = '', $code = -1, $id = null, $response = array()) {
+		$responseObject = new self;
+
+		$responseObject->message = $message;
+		$responseObject->data = $data;
+		$responseObject->code = $code;
+		$responseObject->id = is_null($id) ? rand() : $id;
+		$responseObject->type = APITestResponse::TYPE_EXCEPTION;
+		$responseObject->version = isset($response['version']) ? $response['version'] : '2.0';
+
+		return $responseObject;
+	}
+
 	/**
 	 * Checks if current response is an exception.
 	 *
 	 * @return bool
 	 */
 	public function isException() {
-		return $this->type == APITestResponse::TYPE_EXCEPION;
+		return $this->type == APITestResponse::TYPE_EXCEPTION;
 	}
 
 	/**
@@ -93,16 +113,55 @@ class APITestResponse {
 	}
 
 	/**
-	 * API result getter (if it is not an exception).
+	 * API result getter (if it is a plain result).
 	 *
 	 * @return mixed
 	 * @throws \Exception
 	 */
 	public function getResult() {
 		if (!$this->isResponse()) {
-			throw new \Exception('Can not return response result: I am an exception');
+			throw new \Exception('Can not return response result: I am not a plain result');
 		}
 
 		return $this->result;
+	}
+
+	/**
+	 * API error message getter (if it is an exception).
+	 *
+	 * @throws \Exception
+	 */
+	public function getMessage() {
+		if (!$this->isException()) {
+			throw new \Exception('Can not return error message: I am not an exception');
+		}
+
+		return $this->message;
+	}
+
+	/**
+	 * API error code getter (if it is an exception).
+	 *
+	 * @throws \Exception
+	 */
+	public function getCode() {
+		if (!$this->isException()) {
+			throw new \Exception('Can not return error code: I am not an exception');
+		}
+
+		return $this->code;
+	}
+
+	/**
+	 * API error data getter (if it is an exception).
+	 *
+	 * @throws \Exception
+	 */
+	public function getData() {
+		if (!$this->isException()) {
+			throw new \Exception('Can not return error data: I am not an exception');
+		}
+
+		return $this->data;
 	}
 }

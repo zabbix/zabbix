@@ -23,5 +23,6 @@ responses:
     3:
         type: exception
         result:
+            code: 42
             message: Invalid params
             data: Host with id "33" does not exist (method: test3.delete)

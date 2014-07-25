@@ -71,8 +71,8 @@ class APITestCase extends BaseAPITestCase {
 			$this->stepStack[$stepName]['response'] = $apiResponse;
 
 			// now we verify that the response is what we expected
-			if (!isset($definition['expect']) || !in_array($definition['expect'], array('response', 'exception'))) {
-				throw new \Exception('Wrong step definition: do not know what to expect, must be "expect: response|exception"');
+			if (!isset($definition['expect']) || !in_array($definition['expect'], array('response', 'error'))) {
+				throw new \Exception('Wrong step definition: do not know what to expect, must be "expect: response|error"');
 			}
 
 			$expectation = $definition['expect'];
@@ -105,8 +105,43 @@ class APITestCase extends BaseAPITestCase {
 						));
 				}
 			}
-			elseif ($expectation == 'exception') {
-				die('not processing exceptions yet');
+			elseif ($expectation == 'error') {
+				$errorExpectation = $definition['error'];
+				$errorExpectation = $this->expandStepVariables($errorExpectation);
+
+				if (!isset($errorExpectation['message']) || !isset($errorExpectation['code'])) {
+					throw new \Exception('Error expectation should have at least "message" and "code" fields');
+				}
+
+				if ($errorExpectation['message'] != $apiResponse->getMessage()) {
+					throw new \Exception(sprintf(
+						'Expected error message "%s", "%s" given in step "%s"',
+						$errorExpectation['message'],
+						$apiResponse->getMessage(),
+						$stepName
+					));
+				}
+
+				if ($errorExpectation['code'] != $apiResponse->getCode()) {
+					throw new \Exception(sprintf(
+						'Expected error code "%d", "%d" given in step "%s"',
+						$errorExpectation['code'],
+						$apiResponse->getCode(),
+						$stepName
+					));
+				}
+
+
+				if (isset($errorExpectation['data']) &&
+					$errorExpectation['data'] != $apiResponse->getData()
+				) {
+					throw new \Exception(sprintf(
+						'Expected error data "%s", "%s" given in step "%s"',
+						$errorExpectation['data'],
+						$apiResponse->getData(),
+						$stepName
+					));
+				}
 			}
 			else {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
@@ -160,6 +195,7 @@ class APITestCase extends BaseAPITestCase {
 
 	/**
 	 * Resolves actual value from array of keys like ['step1', 'response', 'hosts', 0, 'id']
+	 * @todo: this should be cached
 	 *
 	 * @param array $keys
 	 * @throws \Exception
@@ -196,27 +232,39 @@ class APITestCase extends BaseAPITestCase {
 				);
 			}
 
-			die('request no working yet');
+			if (!isset($this->stepStack[$stepName]['request'])) {
+				throw new \Exception(sprintf('No request has been logged yet for step "%s"', $stepName));
+			}
+
+			/* @var $request APITestRequest */
+			$request = $this->stepStack[$stepName]['request'];
+
+			if ($subtype == 'method') {
+				return $request->getMethod();
+			}
+
+			return $this->drillIn($request->getParams(), $keys);
 		}
 
 		if ($type == 'response') {
 			$allow = array('result');
 
 			if (!in_array($subtype, $allow)) {
-				throw new \Exception('Third part of request expression must be one of "%s", "%s" given',
-					implode(', ', $allow),
-					$subtype
+				throw new \Exception(sprintf('Third part of request expression must be one of "%s", "%s" given',
+						implode(', ', $allow),
+						$subtype
+					)
 				);
 			}
 
 			if (!isset($this->stepStack[$stepName]['response'])) {
-					throw new \Exception(sprintf('No response has been logged yet for step "%s"', $stepName));
-				}
+				throw new \Exception(sprintf('No response has been logged yet for step "%s"', $stepName));
+			}
 
-				/* @var $response \Zabbix\Test\APITestResponse */
-				$response = $this->stepStack[$stepName]['response'];
+			/* @var $response \Zabbix\Test\APITestResponse */
+			$response = $this->stepStack[$stepName]['response'];
 
-				return $this->drillIn($response->getResult(), $keys);
+			return $this->drillIn($response->getResult(), $keys);
 		}
 	}
 

@@ -26,8 +26,9 @@ step3:
         id: 3
         method: test3.delete
         params:
-            - @step2.response.params.hostids[0]@
+            - @step2.response.result.hostids[0]@
     expect: error
     error:
+        code: 42
         message: Invalid params
-        data: Host with id "@step2.response.params[0]@" does not exist (method: @step3.request.method@)
+        data: Host with id "@step2.response.result.hostids[0]@" does not exist (method: @step3.request.method@)

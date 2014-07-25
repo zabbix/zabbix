@@ -78,7 +78,16 @@ class MockAPIGateway extends BaseAPIGateway {
 
 			return APITestResponse::createTestResponse($mockResponse['result'], $request->getId());
 		} else {
-			die('exception not implemented');
+			$mockResponse = array_merge(
+				array(
+					'code' => -1,
+					'message' => 'Exception message',
+					'data' => null
+				),
+				$mockResponse['result']
+			);
+
+			return APITestResponse::createTestException($mockResponse['message'], $mockResponse['data'], $mockResponse['code'], $request->getId());
 		}
 	}
 
