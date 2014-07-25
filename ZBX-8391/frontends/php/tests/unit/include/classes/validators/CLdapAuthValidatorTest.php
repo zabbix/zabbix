@@ -18,8 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
+/**
+ * @incomplete
+ */
 class CLdapAuthValidatorTest extends CValidatorTest {
+
+	public function setUp() {
+		$this->markTestIncomplete('This test is not yet written');
+	}
 
 	public function validParamProvider() {
 		return array(
@@ -30,15 +36,15 @@ class CLdapAuthValidatorTest extends CValidatorTest {
 	}
 
 	public function validValuesProvider() {
-		return array();
+		return array(array());
 	}
 
 	public function invalidValuesProvider() {
-		return array();
+		return array(array());
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array();
+		return array(array());
 	}
 
 	protected function createValidator(array $params = array()) {

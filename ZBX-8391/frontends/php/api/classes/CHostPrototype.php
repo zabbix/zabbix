@@ -110,7 +110,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypeValidator = new CSchemaValidator($this->getHostPrototypeSchema());
 		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator(array(
 			'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-			'messageRegex' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+			'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 		)));
 
 		// group validators
@@ -180,7 +180,7 @@ class CHostPrototype extends CHostBase {
 					// just in case
 					'messageEmpty' => _('Empty name for host prototype "%1$s".')
 				)),
-				'status' => new CSetValidator(array(
+				'status' => new CLimitedSetValidator(array(
 					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
 					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
 				)),
@@ -238,7 +238,7 @@ class CHostPrototype extends CHostBase {
 			'validators' => array(
 				'groupid' => new CIdValidator(array(
 					'messageEmpty' => _('No host group ID for group prototype.'),
-					'messageRegex' => _('Incorrect host group ID for group prototype.')
+					'messageInvalid' => _('Incorrect host group ID for group prototype.')
 				))
 			),
 			'required' => array('groupid'),
@@ -393,14 +393,14 @@ class CHostPrototype extends CHostBase {
 		$groupLinkValidator = new CPartialSchemaValidator($this->getGroupLinkSchema());
 		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageRegex' => _('Incorrect group prototype ID.')
+			'messageInvalid' => _('Incorrect group prototype ID.')
 		)));
 
 		// group prototype validator
 		$groupPrototypeValidator = new CPartialSchemaValidator($this->getGroupPrototypeSchema());
 		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator(array(
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageRegex' => _('Incorrect group prototype ID.')
+			'messageInvalid' => _('Incorrect group prototype ID.')
 		)));
 
 		$groupPrototypeGroupIds = array();

@@ -18,10 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+error_reporting(E_ALL | E_STRICT); // because in some PHP versions E_ALL does not include E_STRICT
+
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
 require_once __DIR__.'/../../include/gettextwrapper.inc.php';
 require_once __DIR__.'/../../include/triggers.inc.php';
+require_once __DIR__.'/../../include/items.inc.php';
+require_once __DIR__.'/../../include/discovery.inc.php';
+require_once __DIR__.'/../../include/actions.inc.php';
+require_once __DIR__.'/../../include/validate.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
@@ -37,9 +43,11 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/parsers',
 	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../include/classes/validators',
+	__DIR__.'/../../include/classes/validators/action',
 	__DIR__.'/../../include/classes/triggers',
 	__DIR__.'/../../include/classes/import',
 	__DIR__.'/../../include/classes/services',
+	__DIR__.'/../../include/classes/helpers',
 	__DIR__.'/../../api/classes',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',

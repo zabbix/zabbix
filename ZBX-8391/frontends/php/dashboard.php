@@ -40,7 +40,7 @@ $fields = array(
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
 	'widgetName' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'widgetSort' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'widgetState' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
