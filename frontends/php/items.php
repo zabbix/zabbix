@@ -526,12 +526,19 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$db_delay_flex = null;
 	}
 
-	if (hasRequest('formula')) {
-		$_REQUEST['multiplier'] = 1;
+	$formula = getRequest('formula');
+	if ($formula === null) {
+		// no changes to formula/multiplier
+		$multiplier = null;
 	}
-	if (getRequest('formula', null) === '0') {
-		$_REQUEST['multiplier'] = 0;
-		$_REQUEST['formula'] = '1';
+	elseif ($formula === '0') {
+		// for mass update "magic" value '0' means that multiplier must be disabled and formula set to default value '1'
+		$multiplier = 0;
+		$formula = '1';
+	}
+	else {
+		// otherwise multiplier must be enabled with formula value entered by user
+		$multiplier = 1;
 	}
 
 	$applications = getRequest('applications', null);
@@ -601,7 +608,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			'trapper_hosts' => getRequest('trapper_hosts'),
 			'port' => getRequest('port'),
 			'units' => getRequest('units'),
-			'multiplier' => getRequest('multiplier'),
+			'multiplier' => $multiplier,
 			'delta' => getRequest('delta'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
@@ -610,7 +617,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula', '1'),
+			'formula' => $formula,
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
