@@ -37,7 +37,11 @@ class APITestCase extends BaseAPITestCase {
 
 		$gateway = $this->getGateway();
 
-		foreach ($this->stepData as $stepName => $definition) {
+		if (!isset($this->stepData['steps']) || !is_array($this->stepData['steps'])) {
+			throw new \Exception('Each test file should have top-level array "steps", can not find one in yours');
+		}
+
+		foreach ($this->stepData['steps'] as $stepName => $definition) {
 			$this->stepStack[$stepName] = array();
 
 			if (!isset($definition['request'])) {
@@ -205,7 +209,7 @@ class APITestCase extends BaseAPITestCase {
 		// first key should be valid step name
 		$stepName = array_shift($keys);
 
-		if (!isset($this->stepData[$stepName])) {
+		if (!isset($this->stepStack[$stepName])) {
 			throw new \Exception(sprintf('No data for step "%s"', $stepName));
 		}
 
