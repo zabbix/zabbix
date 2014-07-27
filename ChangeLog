@@ -30,12 +30,12 @@ A......... [ZBX-8428] fixed item.get API call to return values for "lastvalue", 
 Changes for 2.3.2
 
 New features:
-A.F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (Oleg, asaveljevs)
+A.F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (asaveljevs, Oleg)
 ..F....... [ZBX-2603] added validation while working with regular expressions (Andrejs)
 ..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
 ..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
 ..F....... [ZBX-8339] removed auto login/logout controls while editing guest user (Andrejs)
-...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris,asaveljevs)
+...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris, asaveljevs)
 ..F....... [ZBXNEXT-2254] added support for custom PostgreSQL schema to frontend and updated setup wizard (Krists)
 ..F....... [ZBX-8329] added styling for disabled buttons and inputs (Andrejs)
 ..F....... [ZBXNEXT-2344] added links on group names in "Web monitoring" widget (Ivo)
