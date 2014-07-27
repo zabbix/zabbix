@@ -24,6 +24,33 @@ if ($json['method'] == 'add.squelch') {
       sendErrorResponse('235','Invalid params','no username provided');
    }
 
+   $site = (isset($json['params']['site']) && $json['params']['site'] != '') ? addslashes($json['params']['site']) : '';
+
+   if ($site != '') {
+
+      $site = strtolower($site);
+      $hg_string = array();
+      $hg_string['net'] = 'llnw-hg_net-pop-'.$site;
+      $hg_string['sys'] = 'llnw-hg_sys-pop-'.$site;
+
+      $hgids = array();
+      foreach ($hg_string as $key=>$val) {
+         $hgs = getHostGrpIds('', '', $val);
+         foreach ($hgs as $a=>$b) {
+            array_push($hgids, $a);
+         }
+      }
+
+      $hostids = getHostsInHostGrp($hgids);
+      $resp = getHosts($hostids);
+
+      $json['params']['hostname'] = array();
+      foreach ($resp as $a=>$b) {
+         array_push($json['params']['hostname'], $b['name']);
+      }
+   }
+
+
    // validate hostname entries
    foreach ($json['params']['hostname'] as $key=>$hostname) {
       $hostname = addslashes($hostname);
@@ -113,6 +140,30 @@ if ($json['method'] == 'add.squelch') {
 
       $resp['result']['hostnames'][$key] = $hostname;
    }
+   sendResponse($resp);
+
+}
+elseif ($json['method'] == 'get.squelch') {
+   
+   $active = ($json['params']['active'] == 0) ? 0 : 1;
+
+   if ($active == 1) {
+      $sql = "SELECT MAX(l.id) AS id, l.hostname, l.start, l.end, l.reason, l.comment, l.created_by, l.created_date
+              FROM squelch AS s 
+              LEFT JOIN squelch_log AS l ON s.id = l.squelch_id 
+              GROUP BY s.hostname 
+              ORDER BY s.start ASC";
+   }
+   else {
+      $sql = "SELECT id, hostname, start, end, reason, created_by, created_date, comment
+              FROM squelch_log
+              WHERE end >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+              ORDER BY start ASC";
+   }
+
+   $resp = array();
+   $resp['result'] = $ldb->get_results($sql);
+
    sendResponse($resp);
 
 }
