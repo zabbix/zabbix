@@ -39,7 +39,7 @@
 
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
-extern int		process_num;
+extern int		thread_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -421,7 +421,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 					ZBX_JSON_TYPE_STRING);
 			queue_stats_export(&queue_stats, "proxyid", &json);
 			zbx_hashset_destroy(&queue_stats);
-
+src/zabbix_server/trapper/trapper.c
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
@@ -461,7 +461,7 @@ out:
 }
 
 static void	active_passive_misconfig(zbx_sock_t *sock)
-{
+{src/zabbix_server/trapper/trapper.c
 	const char	*msg = "misconfiguration error: the proxy is running in the active mode but server sends "
 			"requests to it as to proxy in passive mode";
 
@@ -645,12 +645,21 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, data);
 }
 
-void	main_trapper_loop(zbx_sock_t *s)
+ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
+	zbx_sock_t	s;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+			thread_num, get_process_type_string(process_type), process_num);
+
+	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -672,7 +681,7 @@ void	main_trapper_loop(zbx_sock_t *s)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		if (SUCCEED == zbx_tcp_accept(s))
+		if (SUCCEED == zbx_tcp_accept(&s))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -680,10 +689,10 @@ void	main_trapper_loop(zbx_sock_t *s)
 					process_num);
 
 			sec = zbx_time();
-			process_trapper_child(s);
+			process_trapper_child(&s);
 			sec = zbx_time() - sec;
 
-			zbx_tcp_unaccept(s);
+			zbx_tcp_unaccept(&s);
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");

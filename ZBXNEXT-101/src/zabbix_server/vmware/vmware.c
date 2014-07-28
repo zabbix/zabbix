@@ -48,13 +48,11 @@
  * which is the most time consuming task.
  */
 
-/* external variables */
-extern unsigned char	process_type;
-extern int		process_num;
-
 extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
+extern unsigned char	process_type;
+extern int		thread_num, process_num;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
@@ -2743,7 +2741,7 @@ void	zbx_vmware_destroy(void)
  * Purpose: the vmware collector main loop                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_vmware_loop(void)
+ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	int			i, now, state, next_update, updated_services = 0, removed_services = 0,
@@ -2754,6 +2752,12 @@ void	main_vmware_loop(void)
 #ifndef _WINDOWS
 	sigset_t		mask, orig_mask;
 #endif
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+			thread_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

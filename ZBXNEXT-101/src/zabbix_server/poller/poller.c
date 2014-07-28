@@ -44,7 +44,7 @@
 #include "checks_calculated.h"
 
 extern unsigned char	process_type;
-extern int		process_num;
+extern int		thread_num, process_num;
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
@@ -756,17 +756,32 @@ exit:
 	return num;
 }
 
-void	main_poller_loop(unsigned char poller_type)
+ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t		last_stat_time;
+	unsigned char	poller_type;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
+
+	poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+			thread_num, get_process_type_string(process_type), process_num);
+
+#ifdef HAVE_SNMP
+	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+		init_snmp("zabbix_server");
+#endif
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
-void	main_pinger_loop(void);
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(pinger_thread, args);
 
 #endif

@@ -42,7 +42,7 @@ typedef struct
 ZBX_USER_MSG;
 
 extern unsigned char	process_type;
-extern int		process_num;
+extern int		thread_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -1539,7 +1539,7 @@ next:
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_escalator_loop(void)
+ZBX_THREAD_ENTRY(escalator_thread, args)
 {
 	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
@@ -1547,6 +1547,12 @@ void	main_escalator_loop(void)
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+			thread_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

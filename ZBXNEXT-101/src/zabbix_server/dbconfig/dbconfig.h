@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-void	main_dbconfig_loop(void);
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(dbconfig_thread, args);
 
 #endif

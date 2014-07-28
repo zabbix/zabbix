@@ -54,15 +54,6 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 
-#define MAX_PROCESS_NAME 20
-#define MAX_PROCESS_NUMBER_BITS 16
-
-#define INIT_PROXY(type, count)									\
-	process_type = type;									\
-	process_num = proxy_num - proxy_count + count;						\
-	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #%d started [%s #%d]",				\
-			proxy_num, get_process_type_string(process_type), process_num)
-
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
@@ -109,6 +100,7 @@ static char	shortopts[] = "c:n:hVR:";
 
 int	threads_num = 0;
 pid_t	*threads = NULL;
+int	thread_num;
 
 unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
@@ -697,9 +689,8 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, proxy_num = 0, proxy_count = 0;
+	int		i;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -800,143 +791,92 @@ int	MAIN_ZABBIX_ENTRY()
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (0 == (pid = zbx_child_fork()))
+		zbx_thread_args_t	thread_args;
+		unsigned char		poller_type;
+
+		get_process_info_by_thread(i + 1, &process_type, &process_num);
+
+		thread_num = i + 1;
+		thread_args.process_type = process_type;
+		thread_args.thread_num = thread_num;
+		thread_args.process_num = process_num;
+		thread_args.args = NULL;
+
+		switch (process_type)
 		{
-			proxy_num = i + 1;	/* child processes are numbered starting from 1 */
+			case ZBX_PROCESS_TYPE_CONFSYNCER:
+				threads[i] = zbx_thread_start(proxyconfig_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HEARTBEAT:
+				threads[i] = zbx_thread_start(heart_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_DATASENDER:
+				threads[i] = zbx_thread_start(datasender_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_POLLER:
+				poller_type = ZBX_PROCESS_TYPE_POLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_UNREACHABLE:
+				poller_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_TRAPPER:
+				thread_args.args = &listen_sock;
+				threads[i] = zbx_thread_start(trapper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_PINGER:
+				threads[i] = zbx_thread_start(pinger_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				threads[i] = zbx_thread_start(housekeeper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HTTPPOLLER:
+				threads[i] = zbx_thread_start(httppoller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_DISCOVERER:
+				threads[i] = zbx_thread_start(discoverer_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HISTSYNCER:
+				threads[i] = zbx_thread_start(dbsyncer_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_IPMIPOLLER:
+				poller_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_JAVAPOLLER:
+				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
+				threads[i] = zbx_thread_start(snmptrapper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_SELFMON:
+				threads[i] = zbx_thread_start(selfmon_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_VMWARE:
+				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
+				break;
+		}
+	}
+
+	while (-1 == wait(&i))	/* wait for any child to exit */
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;
 		}
-		else
-			threads[i] = pid;
 	}
 
-	if (0 == proxy_num)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+	/* all exiting child processes should be caught by signal handlers */
+	THIS_SHOULD_NEVER_HAPPEN;
 
-		while (-1 == wait(&i))	/* wait for any child to exit */
-		{
-			if (EINTR != errno)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-				break;
-			}
-		}
-
-		/* all exiting child processes should be caught by signal handlers */
-		THIS_SHOULD_NEVER_HAPPEN;
-
-		zbx_on_exit();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_CONFSYNCER_FORKS))
-	{
-		/* !!! configuration syncer must be proxy #1 - child_signal_handler() uses threads[0] !!! */
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
-
-		main_proxyconfig_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HEARTBEAT_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HEARTBEAT, CONFIG_HEARTBEAT_FORKS);
-
-		main_heart_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_DATASENDER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_DATASENDER, CONFIG_DATASENDER_FORKS);
-
-		main_datasender_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_POLLER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_POLLER, CONFIG_POLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_TRAPPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_TRAPPER, CONFIG_TRAPPER_FORKS);
-
-		main_trapper_loop(&listen_sock);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_PINGER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_PINGER, CONFIG_PINGER_FORKS);
-
-		main_pinger_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HOUSEKEEPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HOUSEKEEPER, CONFIG_HOUSEKEEPER_FORKS);
-
-		main_housekeeper_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HTTPPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HTTPPOLLER, CONFIG_HTTPPOLLER_FORKS);
-
-		main_httppoller_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_DISCOVERER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
-
-		main_discoverer_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HISTSYNCER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HISTSYNCER, CONFIG_HISTSYNCER_FORKS);
-
-		main_dbsyncer_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_IPMIPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_IPMIPOLLER, CONFIG_IPMIPOLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_IPMI);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_JAVAPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_JAVAPOLLER, CONFIG_JAVAPOLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_JAVA);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_SNMPTRAPPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_SNMPTRAPPER, CONFIG_SNMPTRAPPER_FORKS);
-
-		main_snmptrapper_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_SELFMON_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_SELFMON, CONFIG_SELFMON_FORKS);
-
-		main_selfmon_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_VMWARE_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_VMWARE, CONFIG_VMWARE_FORKS);
-
-		main_vmware_loop();
-	}
+	zbx_on_exit();
 
 	return SUCCEED;
 }
