@@ -646,8 +646,8 @@ else {
 				'limit' => $allEventsSliceLimit + 1
 			);
 
-			if (getRequest('triggerid')) {
-				$filterTriggerIds = array(getRequest('triggerid'));
+			if ($triggerId) {
+				$filterTriggerIds = array($triggerId);
 				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
 				$validTriggerIds = $knownTriggerIds;
 
