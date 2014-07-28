@@ -853,6 +853,12 @@ if ($host || $data['filter_search']) {
 					)
 				));
 
+				if (count($itemKeys) != count($items)) {
+					show_error_message(_s('Missed service configuration items on host "%1$s".', RSM_HOST));
+					require_once dirname(__FILE__).'/include/page_footer.php';
+					exit;
+				}
+
 				// set rolling week time
 				$weekTimeFrom = $serverTime - $rollWeekSeconds['value'];
 				$weekTimeTill = $serverTime;
