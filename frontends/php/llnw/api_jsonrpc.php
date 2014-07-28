@@ -1,5 +1,5 @@
 <?php
-$d='/var/www/zabbix/llnw/';
+$d = __DIR__ . '/';
 include($d.'config.php');
 
 // THIS PAGE IS LIVE!!!
@@ -27,7 +27,7 @@ $trans_id = (isset($json['id'])) ? $json['id'] : '';
 // check for the master variable above so only the included scripts will run if $master is defined and equal to 1.
 
 
-if ($json['method'] == 'add.squelch') {
+if ($json['method'] == 'add.squelch' || $json['method'] == 'get.squelch') {
    include($base_dir.'squelch.php');
 }
 elseif ($json['method'] == 'get.ack') {

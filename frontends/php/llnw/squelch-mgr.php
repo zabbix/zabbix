@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$d='/var/www/zabbix-prod/llnw/';
+$d = __DIR__ . '/';
 include($d.'config.php');
 
 // this script maintains the squelch db table
