@@ -10,7 +10,7 @@ steps:
                     enabled: 32
         expect: response
         response:
-            equals: [33]
+            __equals: [33]
     step2:
         request:
             id: 2
@@ -19,7 +19,7 @@ steps:
                 - @step1.response.result[0]@
         expect: response
         response:
-            equals:
+            __equals:
                 hostids:
                     - @step2.request.params[0]@
     step3:

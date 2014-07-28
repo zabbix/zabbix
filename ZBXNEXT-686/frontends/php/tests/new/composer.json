@@ -7,7 +7,8 @@
 	"preferred-install": "dist",
 	"require": {
 		"symfony/yaml": "2.5",
-		"phpunit/phpunit": "4.1.4"
+		"phpunit/phpunit": "4.1.4",
+		"respect/validation": "0.6.1"
 	},
 	"__comment__": "Lines below will be needed after vendors are merged to zabbix codebase",
 	"scripts": {

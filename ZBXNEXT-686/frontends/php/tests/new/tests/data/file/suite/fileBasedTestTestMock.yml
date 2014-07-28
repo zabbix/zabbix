@@ -1,4 +1,5 @@
 requests:
+    # file based test integration data
     1:
         method: test1
         params:
@@ -12,7 +13,12 @@ requests:
     3:
         method: test3.delete
         params: [33]
+    # validation requests
+    1001:
+        method: validate1
+        params: []
 responses:
+    # file based test integration data
     1:
         type: response
         result: [33]
@@ -26,3 +32,8 @@ responses:
             code: 42
             message: Invalid params
             data: Host with id "33" does not exist (method: test3.delete)
+    # validation requests
+    1001:
+        type: response
+        result:
+            { a: 1, b: 2, c: 3 }

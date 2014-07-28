@@ -2,7 +2,10 @@
 
 namespace Zabbix\Test;
 
+use Respect\Validation\Exceptions\ValidationException;
+use Respect\Validation\Rules\AbstractRule;
 use Symfony\Component\Yaml\Yaml;
+use Respect\Validation\Validator as v;
 
 class APITestCase extends BaseAPITestCase {
 
@@ -96,18 +99,7 @@ class APITestCase extends BaseAPITestCase {
 
 				reset($responseExpectation);
 
-				if (count($responseExpectation) != 1 || key($responseExpectation) != 'equals') {
-					throw new \Exception('Sorry, now we only support single key "equals" under "response" section. This is a "TODO"');
-				}
-
-				if ($responseExpectation['equals'] != $apiResponse->getResult()) {
-					throw new \Exception(
-						sprintf('Response for step "%s" does not look like we expected ("%s" expected, "%s" given).',
-							$stepName,
-							json_encode($responseExpectation['equals']),
-							json_encode($apiResponse->getResult())
-						));
-				}
+				$this->validate($responseExpectation, $apiResponse->getResult());
 			}
 			elseif ($expectation == 'error') {
 				$errorExpectation = $definition['error'];
@@ -297,6 +289,56 @@ class APITestCase extends BaseAPITestCase {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Todo: add keys to error messages here
+	 *
+	 * @param $rules
+	 * @param $data
+	 * @throws \Exception
+	 */
+	protected function validate($rules, $data) {
+		$validator = v::create();
+
+		foreach ($rules as $item => $rule) {
+			if ($item == '__equals') {
+				if ($data != $rule) {
+					throw new \Exception(sprintf('Data "%s" is not the same as expected ("%s")',
+						json_encode($data),
+						json_encode($rule)
+					));
+				}
+			}
+			elseif ($item == '__each') {
+				$this->validate($rule, $data);
+			}
+			elseif ($item == '__keys') {
+				$keys = array_keys($data);
+
+				foreach ($keys as $key) {
+					$this->validateSingle($key, $rule);
+				}
+			}
+			else {
+				throw new \Exception(sprintf('Can not understand item "%s"', $item));
+			}
+		}
+	}
+
+	protected function validateSingle($value, $ruleDefinition) {
+		$rules = explode('|', $ruleDefinition);
+		$validator = v::create();
+
+		foreach ($rules as $rule) {
+			$validatorInstance = call_user_func(array($validator, $rule));
+			/* @var $validatorInstance AbstractRule */
+			try {
+				$validatorInstance->assert($value);
+			} catch (\InvalidArgumentException $e) {
+				throw new \Exception(sprintf('Rule "%s" failed for "%s"', $rule, ValidationException::stringify($value)));
+			}
+		}
 	}
 
 }
