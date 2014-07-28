@@ -596,9 +596,7 @@ class CDRule extends CApiService {
 		}
 
 		if ($conditionIds) {
-			DB::delete('conditions', array(
-				'conditionid' => $conditionIds
-			));
+			DB::delete('conditions', array('conditionid' => $conditionIds));
 		}
 
 		$result = DB::delete('drules', array('druleid' => $druleIds));
