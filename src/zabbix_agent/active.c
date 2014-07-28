@@ -1327,7 +1327,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, thread_num2;
+	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, process_num;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
@@ -1338,9 +1338,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
 
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
-	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", thread_num, thread_num2);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", thread_num, process_num);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
@@ -1369,7 +1369,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextrefresh)
 		{
-			zbx_setproctitle("active checks #%d [getting list of active checks]", thread_num2);
+			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
 			if (FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
 			{
@@ -1383,7 +1383,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
-			zbx_setproctitle("active checks #%d [processing active checks]", thread_num2);
+			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
 			process_active_checks(activechk_args.host, activechk_args.port);
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
@@ -1395,7 +1395,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
-			zbx_setproctitle("active checks #%d [idle 1 sec]", thread_num2);
+			zbx_setproctitle("active checks #%d [idle 1 sec]", process_num);
 			zbx_sleep(1);
 		}
 

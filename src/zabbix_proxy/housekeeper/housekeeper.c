@@ -137,7 +137,7 @@ static int housekeeping_history(int now)
         return records;
 }
 
-void	main_housekeeper_loop(void)
+ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int		records, start, sleeptime;
 	double		sec;

@@ -69,7 +69,7 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
-	int		ret, local_request_failed = 0, thread_num, thread_num2;
+	int		ret, local_request_failed = 0, thread_num, process_num;
 	zbx_sock_t	s;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
@@ -81,9 +81,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
 
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
-	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", thread_num, thread_num2);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", thread_num, process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
@@ -101,13 +101,13 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in listener process");
 #endif
 
-		zbx_setproctitle("listener #%d [waiting for connection]", thread_num2);
+		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
 			local_request_failed = 0;     /* reset consecutive errors counter */
 
-			zbx_setproctitle("listener #%d [processing request]", thread_num2);
+			zbx_setproctitle("listener #%d [processing request]", process_num);
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))
 				process_listener(&s);

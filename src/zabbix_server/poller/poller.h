@@ -20,11 +20,13 @@
 #ifndef ZABBIX_POLLER_H
 #define ZABBIX_POLLER_H
 
+#include "threads.h"
+
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 
-void	main_poller_loop(unsigned char poller_type);
+ZBX_THREAD_ENTRY(poller_thread, args);
 
 #endif
