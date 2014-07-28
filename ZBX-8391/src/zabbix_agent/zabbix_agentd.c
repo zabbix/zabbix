@@ -296,25 +296,12 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	if (0 < opt_m)
 		opt_mask |= 0x01;
 
-	switch (opt_mask)
+	if (! (0x02 <= opt_mask <= 0x05 || 0x00 == opt_mask || 0x08 == opt_mask || 0x09 == opt_mask || 0x10 == opt_mask
+			|| 0x11 == opt_mask || 0x20 == opt_mask || 0x40 == opt_mask))
 	{
-		case 0x00:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x08:
-		case 0x09:
-		case 0x10:
-		case 0x11:
-		case 0x20:
-		case 0x40:
-			break;
-		default:
-			zbx_error("mutually exclusive options used");
-			usage();
-			exit(EXIT_FAILURE);
-			break;
+		zbx_error("mutually exclusive options used");
+		usage();
+		exit(EXIT_FAILURE);
 	}
 #else
 	if (1 < opt_p + opt_t)
