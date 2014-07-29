@@ -13,4 +13,4 @@ steps:
                 hostname: notEmpty|string|length(5,10)
                 templates:
                     __each:
-                        string|length(,12)
+                        string|length(0,12)

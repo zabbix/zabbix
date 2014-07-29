@@ -311,12 +311,25 @@ class APITestCase extends BaseAPITestCase {
 				}
 			}
 			elseif ($item == '__each') {
-				if (!is_array($data)) {
-					throw new \Exception('__each specified but data is not an array');
-				}
+				if (is_array($rule)) {
+					/*
+					 * __each:
+					 *     foo: string
+					 *     bar: int
+					 */
+					if (!is_array($data)) {
+						throw new \Exception('__each specified but data is not an array');
+					}
 
-				foreach ($data as $value) {
-					$this->validate($rule, $value, $previous);
+					foreach ($data as $value) {
+						$this->validate($rule, $value, $data);
+					}
+				}
+				else {
+					/* __each: string|length(10,2) */
+					foreach ($data as $value) {
+						$this->validateSingle($value, $rule);
+					}
 				}
 			}
 			elseif ($item == '__keys') {
@@ -326,9 +339,12 @@ class APITestCase extends BaseAPITestCase {
 					$this->validateSingle($key, $rule);
 				}
 			}
-			elseif (is_array($data) && isset($data[$item]) && !is_array($data[$item])) {
-				/* we have direct "field: validation|rules|array match */
-				$this->validateSingle($data[$item], $rule);
+			elseif (is_array($data) && isset($data[$item])) {
+				if (is_scalar($data[$item])) {
+					$this->validateSingle($data[$item], $rule);
+				} else {
+					$this->validate($rule, $data[$item]);
+				}
 			}
 			else {
 				throw new \Exception(sprintf('Can not understand item "%s"', $item));

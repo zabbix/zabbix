@@ -44,4 +44,4 @@ responses:
         type: response
         result:
             - { id: 12, hostname: foobar.com, templates: [one, two, three] }
-            - { id: 13, hostname: barbuzz.com, templates: [two, three, four] }
+            - { id: 13, hostname: barfoo.com, templates: [two, three, four] }
