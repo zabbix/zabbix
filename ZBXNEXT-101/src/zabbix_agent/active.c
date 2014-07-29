@@ -20,6 +20,7 @@
 #include "common.h"
 #include "active.h"
 #include "zbxconf.h"
+#include "zbxself.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -1335,7 +1336,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
+	process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
 
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

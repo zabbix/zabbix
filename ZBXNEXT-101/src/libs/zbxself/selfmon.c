@@ -72,8 +72,12 @@ extern int	CONFIG_CONFSYNCER_FORKS;
 extern int	CONFIG_HEARTBEAT_FORKS;
 extern int	CONFIG_SELFMON_FORKS;
 extern int	CONFIG_VMWARE_FORKS;
+extern int	CONFIG_COLLECTOR_FORKS;
+extern int	CONFIG_ACTIVE_FORKS;
+extern int	CONFIG_PASSIVE_FORKS;
+
 extern unsigned char	process_type;
-extern int	process_num;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -134,6 +138,12 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_SELFMON_FORKS;
 		case ZBX_PROCESS_TYPE_VMWARE:
 			return CONFIG_VMWARE_FORKS;
+		case ZBX_PROCESS_TYPE_COLLECTOR:
+			return CONFIG_COLLECTOR_FORKS;
+		case ZBX_PROCESS_TYPE_LISTENER:
+			return CONFIG_PASSIVE_FORKS;
+		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+			return CONFIG_ACTIVE_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -200,6 +210,12 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "self-monitoring";
 		case ZBX_PROCESS_TYPE_VMWARE:
 			return "vmware collector";
+		case ZBX_PROCESS_TYPE_COLLECTOR:
+			return "collector";
+		case ZBX_PROCESS_TYPE_LISTENER:
+			return "listener";
+		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+			return "active checks";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
