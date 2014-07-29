@@ -157,6 +157,7 @@ foreach my $macro (keys %{$cfg_global_macros}) {
 
 # RSM host is required to have history of global configuration changes #
 # There are monitored changes of global macros #
+
 $rsm_groupid = create_group(rsm_group);
 
 if (defined($rsm_groupid)) {
@@ -166,7 +167,7 @@ if (defined($rsm_groupid)) {
 
     if (defined($rsm_hostid)) {
         # calculated items, configuration history (TODO: rename host to something like config_history)
-#	create_rsm_items($rsm_hostid);
+	create_rsm_items($rsm_hostid);
     }
     else {
 	print "Could not create/update '".rsm_host."' host. Items are not created/updated.\n";
@@ -189,15 +190,25 @@ unless (defined($root_servers_macros)) {
 
 $main_templateid = create_main_template($OPTS{'tld'}, $ns_servers);
 
+pfail("Main templateid is not defined") unless defined $main_templateid;
+
 $tld_groupid = create_group('TLD '.$OPTS{'tld'});
 
+pfail $tld_groupid->{'data'} if check_api_error($tld_groupid) eq true;
+
 $tlds_groupid = create_group('TLDs');
+
+pfail $tlds_groupid->{'data'} if check_api_error($tlds_groupid) eq true;
 
 $tld_hostid = create_tld_host($OPTS{'tld'}, $tld_groupid, $tlds_groupid);
 
 $probes_groupid = create_group('Probes');
 
+pfail $probes_groupid->{'data'} if check_api_error($probes_groupid) eq true;
+
 $probes_mon_groupid = create_group('Probes - Mon');
+
+pfail $probes_mon_groupid->{'data'} if check_api_error($probes_mon_groupid) eq true;
 
 $proxy_mon_templateid = create_probe_health_tmpl();
 
@@ -218,7 +229,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
                                           'templates' => [{'templateid' => $probe_status_templateid}],
                                           'host' => $probe_name,
                                           'proxy_hostid' => $proxyid,
-                                          'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1,
+                                          'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
 							    'ip'=> '127.0.0.1',
 							    'dns' => '', 'port' => '10050'}]
 		});
@@ -226,7 +237,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     my $hostid = create_host({'groups' => [{'groupid' => $probes_mon_groupid}],
                                           'templates' => [{'templateid' => $proxy_mon_templateid}],
                                           'host' => $probe_name.' - mon',
-                                          'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1,
+                                          'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
                                                             'ip'=> $proxies->{$proxyid}->{'interfaces'}[0]->{'ip'},
                                                             'dns' => '', 'port' => '10050'}]
             		    });
@@ -237,13 +248,15 @@ foreach my $proxyid (sort keys %{$proxies}) {
                                           'templates' => [{'templateid' => $main_templateid}, {'templateid' => $probe_templateid}],
                                           'host' => $OPTS{'tld'}.' '.$probe_name,
                                           'proxy_hostid' => $proxyid,
-                                          'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+                                          'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 }
 
 create_probe_status_host($probes_mon_groupid);
 
 #### Creating cron objects ####
 create_cron_items($config->{'slv'}->{'path'});
+
+exit;
 
 ########### FUNCTIONS ###############
 
@@ -937,7 +950,7 @@ sub create_main_template {
 
     my $templateid = create_template($template_name);
 
-    pfail("Could not create main template for '".$tld."' TLD. ".$templateid->{'error'}->{'data'}) if check_api_error($templateid) eq true;
+    pfail("Could not create main template for '".$tld."' TLD. ".$templateid->{'data'}) if check_api_error($templateid) eq true;
 
     my $delay = 300;
     my $appid = get_application_id('Configuration', $templateid);
@@ -955,6 +968,8 @@ sub create_main_template {
                     'type' => ITEM_TYPE_CALCULATED, 'value_type' => ITEM_VALUE_TYPE_UINT64};
 
         my $itemid = create_item($options);
+
+	print $itemid->{'data'}."\n" if check_api_error($itemid) eq true;
     }
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
@@ -978,7 +993,9 @@ sub create_main_template {
                 	    'priority' => '2',
                 };
 
-	        create_trigger($options);
+	        my $triggerid = create_trigger($options);
+
+		
     	    }
         }
 
@@ -997,7 +1014,7 @@ sub create_main_template {
                             'priority' => '2',
                 };
 
-                create_trigger($options);
+                my $triggerid = create_trigger($options);
 	    }
         }
     }
@@ -1533,7 +1550,9 @@ sub create_tld_host($$$) {
 
     my $tld_hostid = create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $tlds_groupid}],
                               'host' => $tld_name,
-                              'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+                              'interfaces' => [{'type' => INTERFACE_TYPE_AGENT, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
+
+    pfail $tld_hostid->{'data'} if check_api_error($tld_hostid) eq true;
 
     create_slv_items($ns_servers, $tld_hostid, $tld_name);
 
@@ -1703,7 +1722,7 @@ sub compare_arrays($$) {
 sub check_api_error($) {
     my $str = shift;
 
-    return true if 'HASH' eq ref($str) and defined $str->{'error'};
+    return true if 'HASH' eq ref($str) and (defined $str->{'error'} or defined $str->{'code'});
 
     return false;
 }
