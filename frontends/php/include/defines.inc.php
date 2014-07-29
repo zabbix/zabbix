@@ -759,7 +759,11 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
+/**
+ * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
+ */
 define('SPACE',	'&nbsp;');
+
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
 
