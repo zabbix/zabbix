@@ -178,7 +178,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	// check items
 	if (count($macroItems) != count($macroItemKey)) {
-		show_error_message(_s('Missed calculated items on the host "%1$s"!', RSM_HOST));
+		show_error_message(_s('Missing calculated items at host "%1$s"!', RSM_HOST));
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit;
 	}

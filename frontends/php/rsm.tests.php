@@ -394,7 +394,7 @@ if ($items) {
 		$item = reset($item);
 	}
 	else {
-		show_error_message(_s('Missed items for host "%1$s"!', RSM_HOST));
+		show_error_message(_s('Missing items at host "%1$s"!', RSM_HOST));
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit;
 	}
