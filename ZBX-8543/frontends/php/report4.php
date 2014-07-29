@@ -249,7 +249,7 @@ else {
 	$table->show();
 
 	if ($media_type == 0) {
-		echo SBR;
+		echo BR();
 
 		$links = array();
 		foreach ($media_types as $id => $description) {

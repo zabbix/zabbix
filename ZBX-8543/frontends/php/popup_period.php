@@ -90,7 +90,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 	}
 	else{
-		echo SBR;
+		echo BR();
 
 		$frmPd = new CFormTable(_('Period'));
 		$frmPd->setName('period');

@@ -759,7 +759,6 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
-define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');

@@ -97,7 +97,7 @@ if (isset($_REQUEST['save']) && isset($_REQUEST['gid'])) {
 	);
 }
 else {
-	echo SBR;
+	echo BR();
 
 	$frmGItem = new CFormTable(_('New item for the graph'));
 	$frmGItem->setName('graph_item');
