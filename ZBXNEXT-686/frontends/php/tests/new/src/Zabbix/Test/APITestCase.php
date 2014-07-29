@@ -339,8 +339,9 @@ class APITestCase extends BaseAPITestCase {
 					$this->validateSingle($key, $rule);
 				}
 			}
-			elseif (is_array($data) && isset($data[$item])) {
-				if (is_scalar($data[$item])) {
+			// here comes a little magic that null, it is happens, is not scalar and is not isset
+			elseif (is_array($data) && array_key_exists($item, $data)) {
+				if (is_scalar($data[$item]) || is_null($data[$item])) {
 					$this->validateSingle($data[$item], $rule);
 				} else {
 					$this->validate($rule, $data[$item]);

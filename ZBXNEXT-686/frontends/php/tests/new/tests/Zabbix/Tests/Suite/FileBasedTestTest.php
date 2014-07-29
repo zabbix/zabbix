@@ -21,6 +21,15 @@ class FileBasedTestTest extends APITestCase {
 		$this->processFileTest('suite/validationIntegerKeys');
 	}
 
+	/**
+	 * @expectedException		  Exception
+	 * @expectedExceptionMessage  Rule "notEmpty" failed for ""
+	 */
+	public function testValidationRequired() {
+		$this->processFileTest('suite/validationRequired');
+	}
+
+
 	public function testValidationSuccess() {
 		$this->processFileTest('suite/validationSuccess');
 	}

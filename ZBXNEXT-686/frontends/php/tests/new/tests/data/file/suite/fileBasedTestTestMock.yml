@@ -20,6 +20,9 @@ requests:
     1002:
         method: validate1
         params: []
+    1003:
+        method: validate1
+        params: []
 responses:
     # file based test integration data
     1:
@@ -45,3 +48,7 @@ responses:
         result:
             - { id: 12, hostname: foobar.com, templates: [one, two, three] }
             - { id: 13, hostname: barfoo.com, templates: [two, three, four] }
+    1003:
+        type: response
+        result:
+            - { id: ~ }

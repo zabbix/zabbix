@@ -1,0 +1,11 @@
+steps:
+    step1:
+        request:
+            id: 1003
+            method: validate1
+            params: []
+        expect: response
+        response:
+            __each:
+                __keys: int
+                id: notEmpty|int
