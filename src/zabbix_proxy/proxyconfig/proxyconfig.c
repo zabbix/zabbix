@@ -30,7 +30,7 @@
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
 extern unsigned char	process_type;
-extern int		thread_num, process_num;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -127,11 +127,11 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
-			thread_num, get_process_type_string(process_type), process_num);
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

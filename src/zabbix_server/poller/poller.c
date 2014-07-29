@@ -44,7 +44,7 @@
 #include "checks_calculated.h"
 
 extern unsigned char	process_type;
-extern int		thread_num, process_num;
+extern int		server_num, process_num;
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
@@ -772,11 +772,11 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
-			thread_num, get_process_type_string(process_type), process_num);
+			server_num, get_process_type_string(process_type), process_num);
 
 #ifdef HAVE_SNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)

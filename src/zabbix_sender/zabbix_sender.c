@@ -403,7 +403,7 @@ int	main(int argc, char **argv)
 		goto exit;
 	}
 
-	thread_args.thread_num = 0;
+	thread_args.server_num = 0;
 	thread_args.args = &sentdval_args;
 
 	sentdval_args.server = ZABBIX_SERVER;

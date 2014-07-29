@@ -572,7 +572,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	zbx_thread_args_t	*thread_args;
 	zbx_sock_t		listen_sock;
-	int			i, thread_num = 0;
+	int			i, server_num = 0;
 #ifdef _WINDOWS
 	DWORD			res;
 #endif
@@ -599,7 +599,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -614,7 +614,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* --- START THREADS ---*/
 
 	/* allocate memory for a collector, all listeners and an active check */
-	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
+	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
 #ifdef _WINDOWS
 	if (MAXIMUM_WAIT_OBJECTS < threads_num)
@@ -629,29 +629,29 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-	thread_args->thread_num = thread_num;
+	thread_args->server_num = server_num;
 	thread_args->process_num = 1;
 	thread_args->args = NULL;
-	threads[thread_num++] = zbx_thread_start(collector_thread, thread_args);
+	threads[server_num++] = zbx_thread_start(collector_thread, thread_args);
 
 	/* start listeners */
 	for (i = 0; i < CONFIG_PASSIVE_FORKS; i++)
 	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->thread_num = thread_num;
+		thread_args->server_num = server_num;
 		thread_args->process_num = i + 1;
 		thread_args->args = &listen_sock;
-		threads[thread_num++] = zbx_thread_start(listener_thread, thread_args);
+		threads[server_num++] = zbx_thread_start(listener_thread, thread_args);
 	}
 
 	/* start active check */
 	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
 	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->thread_num = thread_num;
+		thread_args->server_num = server_num;
 		thread_args->process_num = i + 1;
 		thread_args->args = &CONFIG_ACTIVE_ARGS[i];
-		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
+		threads[server_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
 
 #ifdef _WINDOWS
@@ -797,7 +797,7 @@ int	get_process_type_forks(unsigned char proc_type)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 const char	*get_process_type_string(unsigned char proc_type)
@@ -813,7 +813,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 void get_process_info_by_thread(int server_num, int *process_type, int *process_num)
@@ -822,23 +822,24 @@ void get_process_info_by_thread(int server_num, int *process_type, int *process_
 
 	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
 		*process_type = ZBX_AGENT_PROCESS_TYPE_COLLECTOR;
+		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
 	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
 		*process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
+		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+
 	}
 	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
 		*process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
+		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 

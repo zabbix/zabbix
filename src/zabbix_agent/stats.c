@@ -423,7 +423,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	process_type = ZBX_AGENT_PROCESS_TYPE_COLLECTOR;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->server_num);
 
 	zbx_free(args);
 
