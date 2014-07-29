@@ -1061,17 +1061,17 @@ function getItemFormData(array $item = array(), array $options = array()) {
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
 						$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
 						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
 						$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
 				$itemid = $item['templateid'];
@@ -1409,7 +1409,7 @@ function getTriggerFormData($exprAction) {
 					$link,
 					'highlight underline weight_normal'
 				);
-				$data['templates'][] = SPACE.RARR.SPACE;
+				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
 		} while ($tmp_triggerid != 0);

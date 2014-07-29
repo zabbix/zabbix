@@ -93,7 +93,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot update macro.'));
 			}
 			foreach ($macrosToUpdate as $macro) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -104,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot remove macro.'));
 			}
 			foreach ($globalMacros as $macro) {
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -125,7 +125,7 @@ if (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_EXTEND
 			));
 			foreach ($newMacrosCreated as $macro) {
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
