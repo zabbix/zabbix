@@ -137,7 +137,7 @@ int	get_process_type_forks(unsigned char proc_type)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -203,7 +203,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 int	get_process_type_by_name(const char *proc_type_str)

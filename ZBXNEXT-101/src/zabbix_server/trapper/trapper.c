@@ -39,7 +39,7 @@
 
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
-extern int		thread_num, process_num;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -421,7 +421,6 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 					ZBX_JSON_TYPE_STRING);
 			queue_stats_export(&queue_stats, "proxyid", &json);
 			zbx_hashset_destroy(&queue_stats);
-src/zabbix_server/trapper/trapper.c
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
@@ -461,7 +460,7 @@ out:
 }
 
 static void	active_passive_misconfig(zbx_sock_t *sock)
-{src/zabbix_server/trapper/trapper.c
+{
 	const char	*msg = "misconfiguration error: the proxy is running in the active mode but server sends "
 			"requests to it as to proxy in passive mode";
 
@@ -653,11 +652,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	sigset_t	mask, orig_mask;
 #endif
 	process_type = ((zbx_thread_args_t *)args)->process_type;
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
-			thread_num, get_process_type_string(process_type), process_num);
+			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 

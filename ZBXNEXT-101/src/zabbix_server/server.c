@@ -104,12 +104,12 @@ static char	shortopts[] = "c:n:hVR:";
 
 int	threads_num = 0;
 pid_t	*threads = NULL;
-int	thread_num;
 
 unsigned char	daemon_type		= ZBX_DAEMON_TYPE_SERVER;
 
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
+int		server_num		= 0;
 
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -787,9 +787,9 @@ int	MAIN_ZABBIX_ENTRY()
 
 		get_process_info_by_thread(i + 1, &process_type, &process_num);
 
-		thread_num = i + 1;
+		server_num = i + 1;
 		thread_args.process_type = process_type;
-		thread_args.thread_num = thread_num;
+		thread_args.server_num = server_num;
 		thread_args.process_num = process_num;
 		thread_args.args = NULL;
 

@@ -69,7 +69,7 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
-	int		ret, local_request_failed = 0, thread_num, process_num;
+	int		ret, local_request_failed = 0, server_num, process_num;
 	zbx_sock_t	s;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
@@ -80,10 +80,10 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
 
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", thread_num, process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", server_num, process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 

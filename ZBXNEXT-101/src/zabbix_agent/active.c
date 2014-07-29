@@ -1327,7 +1327,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, thread_num, process_num;
+	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, server_num, process_num;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
@@ -1337,10 +1337,10 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
 
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", thread_num, process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", server_num, process_num);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;

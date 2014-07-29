@@ -98,7 +98,6 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	}
 
 #else
-
 	if (0 == (thread = zbx_child_fork()))	/* child process */
 	{
 		(*handler)(thread_args);

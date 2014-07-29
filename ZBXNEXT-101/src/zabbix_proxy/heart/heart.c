@@ -27,7 +27,7 @@
 #include "../servercomms.h"
 
 extern unsigned char	process_type;
-extern int		thread_num, process_num;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -100,11 +100,11 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
-			thread_num, get_process_type_string(process_type), process_num);
+			server_num, get_process_type_string(process_type), process_num);
 
 	last_stat_time = time(NULL);
 
