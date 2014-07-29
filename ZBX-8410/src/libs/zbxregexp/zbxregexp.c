@@ -24,9 +24,13 @@
 #	include "gnuregex.h"
 #endif
 
+char	*regerrstr = NULL;
+int	regerr = 0;
+
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
 	char		*c = NULL;
+	char		error[MAX_STRING_LEN];
 	static char	*old_pattern = NULL;
 	static int	old_flags;
 	static regex_t	re;
@@ -48,7 +52,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 	else
 		goto execute;
 compile:
-	if (0 == regcomp(&re, pattern, flags))
+	if (0 == (regerr = regcomp(&re, pattern, flags)))
 	{
 		old_pattern = zbx_strdup(old_pattern, pattern);
 		old_flags = flags;
@@ -67,6 +71,18 @@ execute:
 			*len = match.rm_eo - match.rm_so;
 	}
 out:
+	if (0 != regerr)
+	{
+		regerror(regerr, &re, error, MAX_STRING_LEN);
+		regerrstr = zbx_strdup(regerrstr, error);
+	}
+	else
+	{
+
+		if (NULL != regerrstr)
+			*regerrstr = '\0';
+	}
+
 	return c;
 }
 
@@ -195,6 +211,7 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 	static regex_t	re;
 	regmatch_t	match[10];	/* up to 10 capture groups in regexp */
 	char		*ptr = NULL;
+	char		error[MAX_STRING_LEN];
 	static char	*old_pattern = NULL;
 	static int	old_flags;
 
@@ -214,13 +231,18 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 	else
 		goto execute;
 compile:
-	if (0 == regcomp(&re, pattern, flags))
+	if (0 == (regerr = regcomp(&re, pattern, flags)))
 	{
 		old_pattern = zbx_strdup(old_pattern, pattern);
 		old_flags = flags;
+
+		if (NULL != regerrstr)
+			*regerrstr = '\0';
 	}
 	else
 	{
+		regerror(regerr, &re, error, MAX_STRING_LEN);
+		regerrstr = zbx_strdup(regerrstr, error);
 		zbx_free(old_pattern);
 		return NULL;
 	}

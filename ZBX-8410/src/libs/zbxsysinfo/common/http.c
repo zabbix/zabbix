@@ -158,10 +158,11 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			*buffer = NULL, *ptr = NULL, *s, *p;
+			*buffer = NULL, *ptr = NULL, *s, *p, *tmperr;
 	int		length;
 	const char	*output;
 	unsigned short	port_number;
+	size_t		alloc_len = 0, offset = 0;
 
 	if (6 < request->nparam)
 	{
@@ -237,7 +238,16 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != ptr)
 		SET_STR_RESULT(result, ptr);
 	else
-		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
+	{
+		if (0 == regerr)
+			SET_STR_RESULT(result, zbx_strdup(NULL, ""));
+		else
+		{
+			zbx_snprintf_alloc(&tmperr, &alloc_len, &offset, "Failed to compile regular expression: '%s': %s", regexp, regerrstr);
+			SET_STR_RESULT(result, tmperr);
+			zbx_free(tmperr);
+		}
+	}
 
 	zbx_free(buffer);
 

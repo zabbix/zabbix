@@ -247,9 +247,9 @@ err:
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
+	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr, *tmperr;
 	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
+	size_t	start_line, end_line, current_line = 0, alloc_len = 0, offset = 0;
 	double	ts;
 
 	ts = zbx_time();
@@ -339,6 +339,16 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_STR_RESULT(result, ptr);
 			break;
 		}
+		else
+		{
+			if (0 != regerr)
+			{
+				zbx_snprintf_alloc(&tmperr, &alloc_len, &offset, "Failed to compile regular expression: '%s': %s", regexp, regerrstr);
+				SET_STR_RESULT(result, tmperr);
+				zbx_free(tmperr);
+				goto err;
+			}
+		}
 
 		if (current_line >= end_line)
 		{
@@ -367,10 +377,10 @@ err:
 
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, *tmp, encoding[32];
+	char	*filename, *regexp, *tmp, encoding[32], *tmperr = NULL;
 	char	buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
 	int	nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
+	size_t	start_line, end_line, current_line = 0, alloc_len = 0, offset = 0;
 	double	ts;
 
 	ts = zbx_time();
@@ -456,6 +466,14 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
 			res = 1;
 		zbx_free(utf8);
+
+		if (0 != regerr)
+		{
+			zbx_snprintf_alloc(&tmperr, &alloc_len, &offset, "Failed to compile regular expression: '%s': %s", regexp, regerrstr);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, tmperr));
+			zbx_free(tmperr);
+			goto err;
+		}
 
 		if (current_line >= end_line)
 			break;

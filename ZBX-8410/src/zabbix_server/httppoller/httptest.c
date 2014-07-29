@@ -357,6 +357,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	zbx_httpstat_t	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
+	size_t		alloc_len = 0, offset = 0;
 #ifdef HAVE_LIBCURL
 	int		err;
 	char		*auth = NULL;
@@ -633,7 +634,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
 						httpstep.required, NULL))
 				{
-					err_str = zbx_strdup(err_str, "required pattern not found");
+					if (0 != regerr)
+						zbx_snprintf(&err_str, &alloc_len, &offset, "pattern compilation failed: %s: '%s'", httpstep.required, regerrstr);
+					else
+						err_str = zbx_strdup(err_str, "required pattern not found");
 				}
 
 				/* variables defined in scenario */

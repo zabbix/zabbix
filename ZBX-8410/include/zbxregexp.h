@@ -31,6 +31,9 @@ typedef struct
 }
 zbx_expression_t;
 
+extern char	*regerrstr;
+extern int	regerr;
+
 /* regular expressions */
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
