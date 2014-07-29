@@ -37,6 +37,13 @@ class FileBasedTestTest extends APITestCase {
 		$this->processFileTest('suite/validationLongHostnames');
 	}
 
+	/**
+	 * @expectedException		  Exception
+	 * @expectedExceptionMessage  Rule "string" failed for "-7"
+	 */
+	public function testValidationType() {
+		$this->processFileTest('suite/validationType');
+	}
 
 	public function testValidationSuccess() {
 		$this->processFileTest('suite/validationSuccess');

@@ -1,0 +1,16 @@
+steps:
+    step1:
+        request:
+            id: 1005
+            method: validate1
+            params: []
+        expect: response
+        response:
+        # it should contain array if [id: decimal, hostname: string, templates; <array of string>]
+            __each:
+                __keys: int
+                id: notEmpty|int
+                hostname: notEmpty|string|length(5,10)
+                templates:
+                    __each:
+                        string|length(0,12)
