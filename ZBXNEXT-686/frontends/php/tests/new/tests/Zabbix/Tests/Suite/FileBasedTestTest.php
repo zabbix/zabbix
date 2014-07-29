@@ -29,6 +29,14 @@ class FileBasedTestTest extends APITestCase {
 		$this->processFileTest('suite/validationRequired');
 	}
 
+	/**
+	 * @expectedException		  Exception
+	 * @expectedExceptionMessage  Rule "length" failed for "a very long hostname that does not match validation rule"
+	 */
+	public function testValidationLongHostnames() {
+		$this->processFileTest('suite/validationLongHostnames');
+	}
+
 
 	public function testValidationSuccess() {
 		$this->processFileTest('suite/validationSuccess');

@@ -23,6 +23,9 @@ requests:
     1003:
         method: validate1
         params: []
+    1004:
+        method: validate1
+        params: []
 responses:
     # file based test integration data
     1:
@@ -52,3 +55,7 @@ responses:
         type: response
         result:
             - { id: ~ }
+    1004:
+        type: response
+        result:
+            - { id: 14, hostname: a very long hostname that does not match validation rule }

@@ -1,0 +1,12 @@
+steps:
+    step1:
+        request:
+            id: 1004
+            method: validate1
+            params: []
+        expect: response
+        response:
+            __each:
+                __keys: int
+                id: notEmpty|int
+                hostname: notEmpty|string|length(5,10)
