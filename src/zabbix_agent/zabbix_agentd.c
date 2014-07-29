@@ -147,11 +147,34 @@ ZBX_THREAD_HANDLE	*threads = NULL;
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
 ZBX_THREAD_LOCAL	unsigned char process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL	int process_num;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
-int				CONFIG_COLLECTOR_FORKS = 1;
-int				CONFIG_ACTIVE_FORKS = 0;
-int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
+
+int	CONFIG_ALERTER_FORKS		= 0;
+int	CONFIG_DISCOVERER_FORKS		= 0;
+int	CONFIG_HOUSEKEEPER_FORKS	= 0;
+int	CONFIG_PINGER_FORKS		= 0;
+int	CONFIG_POLLER_FORKS		= 0;
+int	CONFIG_UNREACHABLE_POLLER_FORKS	= 0;
+int	CONFIG_HTTPPOLLER_FORKS		= 0;
+int	CONFIG_IPMIPOLLER_FORKS		= 0;
+int	CONFIG_TIMER_FORKS		= 0;
+int	CONFIG_TRAPPER_FORKS		= 0;
+int	CONFIG_SNMPTRAPPER_FORKS	= 0;
+int	CONFIG_JAVAPOLLER_FORKS		= 0;
+int	CONFIG_ESCALATOR_FORKS		= 0;
+int	CONFIG_SELFMON_FORKS		= 0;
+int	CONFIG_WATCHDOG_FORKS		= 0;
+int	CONFIG_DATASENDER_FORKS		= 0;
+int	CONFIG_HEARTBEAT_FORKS		= 0;
+int	CONFIG_PROXYPOLLER_FORKS	= 0;
+int	CONFIG_HISTSYNCER_FORKS		= 0;
+int	CONFIG_CONFSYNCER_FORKS		= 0;
+int	CONFIG_VMWARE_FORKS		= 0;
+int	CONFIG_COLLECTOR_FORKS		= 1;
+int	CONFIG_ACTIVE_FORKS		= 0;
+int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
 
 char		*opt = NULL;
 
@@ -784,56 +807,24 @@ void	zbx_sigusr_handler(zbx_task_t task)
 }
 #endif
 
-int	get_process_type_forks(unsigned char proc_type)
-{
-	switch (proc_type)
-	{
-		case ZBX_AGENT_PROCESS_TYPE_COLLECTOR:
-			return CONFIG_COLLECTOR_FORKS;
-		case ZBX_AGENT_PROCESS_TYPE_LISTENER:
-			return CONFIG_PASSIVE_FORKS;
-		case ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS:
-			return CONFIG_ACTIVE_FORKS;
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-const char	*get_process_type_string(unsigned char proc_type)
-{
-	switch (proc_type)
-	{
-		case ZBX_AGENT_PROCESS_TYPE_COLLECTOR:
-			return "collector";
-		case ZBX_AGENT_PROCESS_TYPE_LISTENER:
-			return "listener";
-		case ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS:
-			return "active checks";
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-void get_process_info_by_thread(int server_num, int *process_type, int *process_num)
+void	get_process_info_by_thread(int server_num, int *process_type, int *process_num)
 {
 	int	server_count = 0;
 
 	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
-		*process_type = ZBX_AGENT_PROCESS_TYPE_COLLECTOR;
+		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
 		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
 	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
-		*process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
+		*process_type = ZBX_PROCESS_TYPE_LISTENER;
 		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
 
 	}
 	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
-		*process_type = ZBX_AGENT_PROCESS_TYPE_ACTIVE_CHECKS;
+		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
 		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
@@ -841,19 +832,6 @@ void get_process_info_by_thread(int server_num, int *process_type, int *process_
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
-}
-
-int	get_process_type_by_name(const char *proc_type_str)
-{
-	int	i;
-
-	for (i = 0; i < ZBX_AGENT_PROCESS_TYPE_COUNT; i++)
-	{
-		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
-			return i;
-	}
-
-	return FAIL;
 }
 
 int	main(int argc, char **argv)

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "listener.h"
+#include "zbxself.h"
 
 #include "comms.h"
 #include "cfg.h"
@@ -78,7 +79,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	process_type = ZBX_AGENT_PROCESS_TYPE_LISTENER;
+	process_type = ZBX_PROCESS_TYPE_LISTENER;
 
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

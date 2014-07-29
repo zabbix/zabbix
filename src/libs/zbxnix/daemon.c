@@ -35,7 +35,7 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern void get_process_info_by_thread(int server_num, int *process_type, int *process_num);
+extern void	get_process_info_by_thread(int server_num, int *process_type, int *process_num);
 
 /******************************************************************************
  *                                                                            *
