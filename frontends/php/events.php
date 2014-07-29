@@ -648,7 +648,7 @@ else {
 
 			if ($triggerId) {
 				$filterTriggerIds = array($triggerId);
-				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
+				$knownTriggerIds = array($triggerId => $triggerId);
 				$validTriggerIds = $knownTriggerIds;
 
 				$eventOptions['objectids'] = $filterTriggerIds;
