@@ -432,7 +432,7 @@ if (isset($_REQUEST['form'])) {
 						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid'],
 						'highlight underline weight_normal'
 					);
-					$data['templates'][] = SPACE.RARR.SPACE;
+					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
 			}
