@@ -30,7 +30,6 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*counter, *error = NULL;
 	double			value;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (1 != request->nparam)
@@ -39,26 +38,23 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	counter = get_rparam(request, 0);
-
-	if (NULL == counter || '\0' == *counter)
+	if (NULL == (counter = get_rparam(request, 0)) || '\0' == *counter)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto out;
 	}
 
-	if (SUCCEED == get_perf_counter_value_by_name(counter, &value, &error))
-	{
-		SET_DBL_RESULT(result, value);
-		ret = SYSINFO_RET_OK;
-	}
-	else
+	if (SUCCEED != get_perf_counter_value_by_name(counter, &value, &error))
 	{
 		SET_MSG_RESULT(result, error != NULL ? error :
 				zbx_strdup(NULL, "Cannot obtain performance information from collector."));
+		goto out;
 	}
+
+	SET_DBL_RESULT(result, value);
+	ret = SYSINFO_RET_OK;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -88,9 +84,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	strscpy(counterpath, tmp);
 
-	tmp = get_rparam(request, 1);
-
-	if (NULL == tmp || '\0' == *tmp)
+	if (NULL == (tmp = get_rparam(request, 1)) || '\0' == *tmp)
 	{
 		interval = 1;
 	}
@@ -106,18 +100,17 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (SUCCEED == get_perf_counter_value_by_path(counterpath, interval, &value, &error))
-	{
-		ret = SYSINFO_RET_OK;
-		SET_DBL_RESULT(result, value);
-	}
-	else
+	if (SUCCEED != get_perf_counter_value_by_path(counterpath, interval, &value, &error))
 	{
 		SET_MSG_RESULT(result, error != NULL ? error :
 				zbx_strdup(NULL, "Cannot obtain performance information from collector."));
+		goto out;
 	}
+
+	ret = SYSINFO_RET_OK;
+	SET_DBL_RESULT(result, value);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

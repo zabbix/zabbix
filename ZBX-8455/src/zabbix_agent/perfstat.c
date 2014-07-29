@@ -27,8 +27,8 @@
 static ZBX_PERF_STAT_DATA	ppsd;
 static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
 
-#define LOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_lock(&perfstat_access);
-#define UNLOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_unlock(&perfstat_access);
+#define LOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_lock(&perfstat_access)
+#define UNLOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_unlock(&perfstat_access)
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +58,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 	PERF_COUNTER_DATA	*cptr = NULL;
 	char			*alias_name;
 	PDH_STATUS		pdh_status;
-	int			result = FAIL;
+	int			added = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counter:'%s' interval:%d", __function_name, counterpath, interval);
 
@@ -86,8 +86,8 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			/* initialize the counter */
 			memset(cptr, 0, sizeof(PERF_COUNTER_DATA));
 			if (NULL != name)
-				cptr->name = strdup(name);
-			cptr->counterpath = strdup(counterpath);
+				cptr->name = zbx_strdup(NULL, name);
+			cptr->counterpath = zbx_strdup(NULL, counterpath);
 			cptr->interval = interval;
 			cptr->value_current = -1;
 			cptr->value_array = (double *)zbx_malloc(cptr->value_array, sizeof(double) * interval);
@@ -105,7 +105,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 				cptr = NULL;	/* indicate a failure */
 			}
 
-			result = SUCCEED;
+			added = SUCCEED;
 			break;
 		}
 
@@ -116,7 +116,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			break;
 	}
 
-	if (FAIL == result)
+	if (FAIL == added)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() counter '%s' already exists", __function_name, counterpath);
 	}
@@ -127,7 +127,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 		zbx_free(alias_name);
 	}
 out:
-	UNLOCK_PERFCOUNTERS
+	UNLOCK_PERFCOUNTERS;
 
 	return cptr;
 }
@@ -573,9 +573,8 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, double
 	}
 
 	/* if the requested counter is not already being monitored - start monitoring */
-	if (NULL == perfs && NULL == (perfs = add_perf_counter(NULL, counterpath, interval, error)))
-		goto out;
-
+	if (NULL == perfs)
+		perfs = add_perf_counter(NULL, counterpath, interval, error);
 out:
 	UNLOCK_PERFCOUNTERS;
 
