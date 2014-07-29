@@ -293,14 +293,14 @@ class APITestCase extends BaseAPITestCase {
 
 	/**
 	 * Todo: add keys to error messages here
+	 * "Previous" contains data from last key, for look-behind validation (__keys)
 	 *
 	 * @param $rules
 	 * @param $data
+	 * @param array $previous
 	 * @throws \Exception
 	 */
-	protected function validate($rules, $data) {
-		$validator = v::create();
-
+	protected function validate($rules, $data, $previous = array()) {
 		foreach ($rules as $item => $rule) {
 			if ($item == '__equals') {
 				if ($data != $rule) {
@@ -311,14 +311,24 @@ class APITestCase extends BaseAPITestCase {
 				}
 			}
 			elseif ($item == '__each') {
-				$this->validate($rule, $data);
+				if (!is_array($data)) {
+					throw new \Exception('__each specified but data is not an array');
+				}
+
+				foreach ($data as $value) {
+					$this->validate($rule, $value, $previous);
+				}
 			}
 			elseif ($item == '__keys') {
-				$keys = array_keys($data);
+				$keys = array_keys($previous);
 
 				foreach ($keys as $key) {
 					$this->validateSingle($key, $rule);
 				}
+			}
+			elseif (is_array($data) && isset($data[$item]) && !is_array($data[$item])) {
+				/* we have direct "field: validation|rules|array match */
+				$this->validateSingle($data[$item], $rule);
 			}
 			else {
 				throw new \Exception(sprintf('Can not understand item "%s"', $item));
@@ -331,7 +341,24 @@ class APITestCase extends BaseAPITestCase {
 		$validator = v::create();
 
 		foreach ($rules as $rule) {
-			$validatorInstance = call_user_func(array($validator, $rule));
+			preg_match("/^(?'rule'[a-z]+)(\((?'params'[^)]+)\)){0,1}$/i", $rule, $matches);
+
+			if (!isset($matches['rule'])) {
+				throw new \Exception(sprintf('Can not parse validation rule "%s"', $rule));
+			}
+
+			$rule = $matches['rule'];
+
+			if (isset($matches['params'])) {
+				$params = explode(',', $matches['params']);
+				$params = array_map(function ($value) {
+					return trim($value);
+				}, $params);
+			} else {
+				$params = array();
+			}
+
+			$validatorInstance = call_user_func_array(array($validator, $rule), $params);
 			/* @var $validatorInstance AbstractRule */
 			try {
 				$validatorInstance->assert($value);

@@ -17,8 +17,12 @@ class FileBasedTestTest extends APITestCase {
 	 * @expectedException 		  Exception
 	 * @expectedExceptionMessage  Rule "int" failed for "a"
 	 */
-	public function testValidation() {
-		$this->processFileTest('suite/validation1');
+	public function testValidationIntegerKeys() {
+		$this->processFileTest('suite/validationIntegerKeys');
+	}
+
+	public function testValidationSuccess() {
+		$this->processFileTest('suite/validationSuccess');
 	}
 
 	/**
