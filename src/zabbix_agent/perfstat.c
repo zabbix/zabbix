@@ -56,7 +56,6 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 {
 	const char		*__function_name = "add_perf_counter";
 	PERF_COUNTER_DATA	*cptr = NULL;
-	char			*alias_name;
 	PDH_STATUS		pdh_status;
 	int			added = FAIL;
 
@@ -122,6 +121,8 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 	}
 	else if (NULL != name)
 	{
+		char	*alias_name;
+
 		alias_name = zbx_dsprintf(NULL, "__UserPerfCounter[%s]", name);
 		add_alias(name, alias_name);
 		zbx_free(alias_name);
