@@ -69,7 +69,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 		goto out;
 	}
 
-	if (1 > interval || 900 < interval)
+	if (1 > interval || 15 * SEC_PER_MIN < interval)
 	{
 		*error = zbx_dsprintf(*error, "Interval out of range.", interval);
 		goto out;
