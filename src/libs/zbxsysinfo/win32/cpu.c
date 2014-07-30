@@ -41,10 +41,8 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 0);
-
 	/* only "online" (default) for parameter "type" is supported */
-	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "online"))
+	if (NULL != (tmp = get_rparam(request, 0)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -61,7 +59,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	cpu_num, ret = FAIL;
 	double	value;
 
-	if (!CPU_COLLECTOR_STARTED(collector))
+	if (0 == CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
@@ -73,9 +71,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 0);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	if (NULL == (tmp = get_rparam(request, 0)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (SUCCEED != is_uint_range(tmp, &cpu_num, 0, collector->cpus.count - 1))
 	{
@@ -85,18 +81,14 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		cpu_num++;
 
-	tmp = get_rparam(request, 1);
-
 	/* only "system" (default) for parameter "type" is supported */
-	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "system"))
+	if (NULL != (tmp = get_rparam(request, 1)) && '\0' != *tmp && 0 != strcmp(tmp, "system"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 2);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	if (NULL == (tmp = get_rparam(request, 2)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 	{
 		ret = get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN, &value, &error);
 	}
@@ -106,7 +98,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "avg15"))
 	{
-		ret =  get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 15 * SEC_PER_MIN, &value, &error);
+		ret = get_perf_counter_value(collector->cpus.cpu_counter[cpu_num], 15 * SEC_PER_MIN, &value, &error);
 	}
 	else
 	{
@@ -132,7 +124,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	value;
 	int	cpu_num, ret = FAIL;
 
-	if (!CPU_COLLECTOR_STARTED(collector))
+	if (0 == CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
@@ -144,9 +136,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 0);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	if (NULL == (tmp = get_rparam(request, 0)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 	{
 		cpu_num = 1;
 	}
@@ -164,9 +154,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 1);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	if (NULL == (tmp = get_rparam(request, 1)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 	{
 		ret = get_perf_counter_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN, &value, &error);
 	}
