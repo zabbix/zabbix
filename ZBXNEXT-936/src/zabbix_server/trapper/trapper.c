@@ -30,6 +30,7 @@
 #include "trapper.h"
 #include "active.h"
 #include "nodecommand.h"
+#include "proxycommand.h"
 #include "proxyconfig.h"
 #include "proxydiscovery.h"
 #include "proxyautoreg.h"
@@ -559,7 +560,28 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 			{
-				ret = node_process_command(sock, s, &jp);
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				{
+					char		id[MAX_ID_LEN];
+					zbx_uint64_t	hostid, proxy_hostid;
+					/* Parse front-end request and forward request to proxy in case host is actually */
+					/* monitored by it */
+					if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HOSTID, id,
+							sizeof(id)) &&
+							SUCCEED == ZBX_STR2UINT64(hostid, id))
+					{
+						if (SUCCEED == is_monitored_by_proxy(hostid, &proxy_hostid))
+							ret = send_proxycommand(sock, proxy_hostid, s, NULL, 0);
+						else
+							ret = node_process_command(sock, hostid, s, &jp);
+					}
+					else
+						zabbix_log(LOG_LEVEL_WARNING,
+								"Failed to get hostid from command request");
+				}
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					ret = recv_proxycommand(sock, &jp);
+
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 			{

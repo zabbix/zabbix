@@ -27,7 +27,7 @@
 #include "escalator.h"
 #include "../operations.h"
 #include "../actions.h"
-#include "../scripts.h"
+#include "scripts.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -460,6 +460,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	DB_ROW		row;
 	zbx_db_insert_t	db_insert;
 	int		alerts_num = 0;
+	zbx_uint64_t	proxy_host_id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -515,50 +516,27 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		ZBX_STR2UINT64(host.hostid, row[0]);
 
 		if (0 != host.hostid)
-		{
 			strscpy(host.host, row[1]);
-#ifdef HAVE_OPENIPMI
-			host.ipmi_authtype = (signed char)atoi(row[12]);
-			host.ipmi_privilege = (unsigned char)atoi(row[13]);
-			strscpy(host.ipmi_username, row[14]);
-			strscpy(host.ipmi_password, row[15]);
-#endif
-		}
 		else
 			rc = get_dynamic_hostid(event, &host, error, sizeof(error));
 
-		script.type = (unsigned char)atoi(row[2]);
-
-		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
+		if (0 != host.hostid && SUCCEED == is_monitored_by_proxy(host.hostid, &proxy_host_id))
 		{
-			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL,
-					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+			struct	zbx_json request;
+			zbx_json_init(&request, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addstring(&request, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_COMMAND,
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&request, ZBX_PROTO_TAG_OPERATIONID, operationid);
+			zbx_json_adduint64(&request, ZBX_PROTO_TAG_HOSTID, host.hostid);
+			rc = send_proxycommand(NULL, proxy_host_id, request.buffer, error, sizeof(error));
+			zbx_json_free(&request);
 		}
-
-		if (SUCCEED == rc)
+		else
 		{
-			switch (script.type)
-			{
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					script.execute_on = (unsigned char)atoi(row[4]);
-					break;
-				case ZBX_SCRIPT_TYPE_SSH:
-					script.authtype = (unsigned char)atoi(row[6]);
-					script.publickey = zbx_strdup(script.publickey, row[9]);
-					script.privatekey = zbx_strdup(script.privatekey, row[10]);
-					/* break; is not missing here */
-				case ZBX_SCRIPT_TYPE_TELNET:
-					script.port = zbx_strdup(script.port, row[5]);
-					script.username = zbx_strdup(script.username, row[7]);
-					script.password = zbx_strdup(script.password, row[8]);
-					break;
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					ZBX_DBROW2UINT64(script.scriptid, row[3]);
-					break;
-			}
-
-			rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
+			if (SUCCEED != (rc = zbx_operation_to_script(operationid, &host, actionid, event, &script)))
+				zbx_strlcpy(error, "Operation conversation to runnable script failed", sizeof(error));
+			else
+				rc = zbx_execute_script(&host, &script, NULL, error, sizeof(error));
 		}
 
 		status = (SUCCEED != rc ? ALERT_STATUS_FAILED : ALERT_STATUS_SENT);

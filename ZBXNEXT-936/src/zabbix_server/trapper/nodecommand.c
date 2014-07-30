@@ -23,7 +23,7 @@
 #include "zbxserver.h"
 #include "db.h"
 #include "log.h"
-#include "../scripts.h"
+#include "scripts.h"
 
 /******************************************************************************
  *                                                                            *
@@ -81,11 +81,11 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
+int	node_process_command(zbx_sock_t *sock, zbx_uint64_t hostid, const char *data, struct zbx_json_parse *jp)
 {
-	char		*result = NULL, *send = NULL, tmp[64];
+	char		*result = NULL, tmp[MAX_ID_LEN];
 	int		ret = FAIL;
-	zbx_uint64_t	scriptid, hostid;
+	zbx_uint64_t	scriptid;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
@@ -99,33 +99,16 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 		goto finish;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
-			FAIL == is_uint64(tmp, &hostid))
-	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_HOSTID);
-		goto finish;
-	}
+	ret = execute_script(scriptid, hostid, &result);
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, &result)))
-	{
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
-		send = j.buffer;
-	}
 finish:
-	if (SUCCEED != ret)
-	{
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_INFO, (NULL != result ? result : "Unknown error."),
-				ZBX_JSON_TYPE_STRING);
-		send = j.buffer;
-	}
+	zbx_compose_script_response(ret, result, &j);
 
 	alarm(CONFIG_TIMEOUT);
-	if (SUCCEED != zbx_tcp_send_raw(sock, send))
+	if (SUCCEED != zbx_tcp_send_raw(sock, j.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send); alarm(0);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, j.buffer); alarm(0);
 
 	zbx_json_free(&j);
 	zbx_free(result);

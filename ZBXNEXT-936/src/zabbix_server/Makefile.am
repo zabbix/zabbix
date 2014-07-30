@@ -24,7 +24,6 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
-	scripts.c scripts.h \
 	server.c
 
 zabbix_server_LDADD = \
@@ -62,6 +61,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \

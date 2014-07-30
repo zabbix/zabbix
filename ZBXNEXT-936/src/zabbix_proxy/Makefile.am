@@ -11,8 +11,7 @@ sbin_PROGRAMS = zabbix_proxy
 zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	proxy.c \
-	scripts.c
+	proxy.c 
 
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
@@ -46,6 +45,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \

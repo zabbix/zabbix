@@ -1417,6 +1417,7 @@ AC_OUTPUT([
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxjson/Makefile
+	src/libs/zbxscripts/Makefile
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxexec/Makefile

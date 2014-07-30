@@ -15,6 +15,7 @@ DIST_SUBDIRS = \
 	zbxlog \
 	zbxnix \
 	zbxconf \
+	zbxscripts \
 	zbxsysinfo \
 	zbxsys \
 	zbxjson \
@@ -33,6 +34,7 @@ SERVER_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxmemory \
+	zbxscripts \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
@@ -46,6 +48,7 @@ PROXY_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxmemory \
+	zbxscripts \
 	zbxserver \
 	zbxicmpping \
 	zbxself

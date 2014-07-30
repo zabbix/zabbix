@@ -18,10 +18,10 @@
 **/
 
 #include "common.h"
-#include "poller/checks_agent.h"
-#include "poller/checks_ipmi.h"
-#include "poller/checks_ssh.h"
-#include "poller/checks_telnet.h"
+#include "checks_agent.h"
+#include "checks_ipmi.h"
+#include "checks_ssh.h"
+#include "checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxserver.h"
 #include "db.h"
@@ -304,6 +304,116 @@ void	zbx_script_clean(zbx_script_t *script)
 
 /******************************************************************************
  *                                                                            *
+ * Function: operation_to_script                                              *
+ *                                                                            *
+ * Purpose: compose runnable script from opcommand table row                  *
+ *                                                                            *
+ * Parameters: operationid     - [IN] operation id in opcommand table         *
+ *             host            - [IN/OUT] host info. Will be modified if IPMI *
+ *                                    command is used. Should provide hostid  *
+ *             actionid        - [IN] action id in data base                  *
+ *                                    (currently ignored for proxy)           *
+ *             event           - [IN] event information                       *
+ *                                    (currently ignored for proxy)           *
+ *             script          - [OUT] parsed script                          *
+ *                                                                            *
+ * Return value: SUCCEED - operation conversation to runnable script succeeded*
+ *               FAIL    - fetchind data from data base failed                *
+ *                                                                            *
+ * Author: Arturs Galapovs                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_operation_to_script(const zbx_uint64_t operationid, DC_HOST *host, zbx_uint64_t actionid,
+		const DB_EVENT* event, zbx_script_t *script)
+{
+	const char	*__function_name = "operation_to_script";
+	int		ret = SUCCEED;
+	DB_RESULT	db_result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	db_result = DBselect(
+			"select o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,o.publickey"
+				",o.privatekey,o.command"
+#ifdef HAVE_OPENIPMI
+				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+#endif
+			" from opcommand o"
+#ifdef HAVE_OPENIPMI
+				",hosts h"
+#endif
+			" where o.operationid="ZBX_FS_UI64
+#ifdef HAVE_OPENIPMI
+				" and hostid="ZBX_FS_UI64
+#endif
+			,operationid
+#ifdef HAVE_OPENIPMI
+			,host->hostid
+#endif
+			);
+
+	if (NULL != (row = DBfetch(db_result)))
+	{
+		script->type = (unsigned char)atoi(row[0]);
+		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script->type)
+		{
+			extern unsigned char daemon_type;
+
+			script->command = zbx_strdup(script->command, row[9]);
+
+			/* server supports ACTION and EVENT macros. Proxy currently do not. */
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			{
+				substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL,
+						&script->command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
+			}
+		}
+
+		if (0 != host->hostid)
+		{
+			switch (script->type)
+			{
+				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+					script->execute_on = (unsigned char)atoi(row[2]);
+					break;
+				case ZBX_SCRIPT_TYPE_SSH:
+					script->authtype = (unsigned char)atoi(row[4]);
+					script->publickey = zbx_strdup(script->publickey, row[7]);
+					script->privatekey = zbx_strdup(script->privatekey, row[8]);
+					/* break; is not missing here */
+				case ZBX_SCRIPT_TYPE_TELNET:
+					script->port = zbx_strdup(script->port, row[3]);
+					script->username = zbx_strdup(script->username, row[5]);
+					script->password = zbx_strdup(script->password, row[6]);
+					break;
+				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+					ZBX_DBROW2UINT64(script->scriptid, row[1]);
+					break;
+			}
+
+#ifdef HAVE_OPENIPMI
+			host->ipmi_authtype = (signed char)atoi(row[10]);
+			host->ipmi_privilege = (unsigned char)atoi(row[11]);
+			strscpy(host->ipmi_username, row[12]);
+			strscpy(host->ipmi_password, row[13]);
+#endif
+		}
+	}
+	else
+	{
+		ret = FAIL;
+	}
+
+	DBfree_result(db_result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_execute_script                                               *
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
@@ -402,4 +512,32 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: compose_script_response                                          *
+ *                                                                            *
+ * Purpose: compose script execution response in JSON format                  *
+ *                                                                            *
+ * Parameters: return_code - [IN] script execution return code                *
+ *             result      - [IN] script result string                        *
+ *             response    - [OUT] actual response in JSON                    *
+ *                                                                            *
+ * Authors: Arturs Galapovs                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_compose_script_response(const int return_code, const char *result, struct zbx_json *response)
+{
+	if (SUCCEED == return_code)
+	{
+		zbx_json_addstring(response, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(response, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
+	}
+	else
+	{
+		zbx_json_addstring(response, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(response, ZBX_PROTO_TAG_INFO, (NULL != result ? result : "Unknown error."),
+				ZBX_JSON_TYPE_STRING);
+	}
 }

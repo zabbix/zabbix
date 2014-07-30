@@ -215,7 +215,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
-	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
+	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config,opcommand,scripts", table->table, ','))
 	{
 		char	field_name[ZBX_FIELDNAME_LEN + 3];
 
@@ -451,6 +451,8 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		{"httptestitem"},
 		{"httpstep"},
 		{"httpstepitem"},
+		{"scripts"},
+		{"opcommand"},
 		{NULL}
 	};
 

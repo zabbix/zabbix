@@ -17,17 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-#ifndef ZABBIX_NODECOMMAND_H
-#define ZABBIX_NODECOMMAND_H
+#ifndef ZABBIX_PROXYCOMMAND_H
+#define ZABBIX_PROXYCOMMAND_H
 
 #include "comms.h"
 #include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_SOURCE_IP;
 
-int	node_process_command(zbx_sock_t *sock, zbx_uint64_t hostid, const char *data, struct zbx_json_parse *jp);
+int is_monitored_by_proxy(const zbx_uint64_t hostid, zbx_uint64_t *proxy_hostid);
+int	send_proxycommand(zbx_sock_t *requester_sock, const zbx_uint64_t proxy_hostid, const char *jbuffer,
+		char *error, const int err_len);
+int	recv_proxycommand(zbx_sock_t *sock, struct zbx_json_parse *jp);
 
 #endif

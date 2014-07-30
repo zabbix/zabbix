@@ -25,6 +25,9 @@
 
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
+int	zbx_operation_to_script(const zbx_uint64_t operationid, DC_HOST *host, const zbx_uint64_t actionid,
+		const DB_EVENT* event, zbx_script_t *script);
 int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char *error, size_t max_error_len);
+void	zbx_compose_script_response(const int return_code, const char* result, struct zbx_json* response);
 
 #endif
