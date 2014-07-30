@@ -8,6 +8,7 @@ use Zabbix\Test\APITestCase;
 class FileBasedTestTest extends APITestCase {
 	/**
 	 * General test; no assertions, just should not throw errors.
+	 * @group suite
 	 */
 	public function testStepVariableSubstitution() {
 		$this->processFileTest('suite/variableSubstitution');
@@ -16,6 +17,7 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException 		  Exception
 	 * @expectedExceptionMessage  Rule "int" failed for "a" on path "_assert->_keys->_each[0]"
+	 * @group suite
 	 */
 	public function testValidationIntegerKeys() {
 		$this->processFileTest('suite/validationIntegerKeys');
@@ -24,6 +26,7 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException		  Exception
 	 * @expectedExceptionMessage  Rule "notEmpty" failed for "" on path "_assert->_keys->_each[0]->id"
+	 * @group suite
 	 */
 	public function testValidationRequired() {
 		$this->processFileTest('suite/validationRequired');
@@ -32,6 +35,7 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException		  Exception
 	 * @expectedExceptionMessage  Rule "length" failed for "a very long hostname that does not match validation rule" on path "_assert->_keys->_each[0]->id->hostname"
+	 * @group suite
 	 */
 	public function testValidationLongHostnames() {
 		$this->processFileTest('suite/validationLongHostnames');
@@ -40,11 +44,15 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException		  Exception
 	 * @expectedExceptionMessage  Rule "string" failed for "-7" on path "_assert->_keys->_each[1]->id->hostname->templates->_each[1]"
+	 * @group suite
 	 */
 	public function testValidationType() {
 		$this->processFileTest('suite/validationType');
 	}
 
+	/**
+	 * @group suite
+	 */
 	public function testValidationSuccessSequence() {
 		$this->processFileTest('suite/validationSuccessSequence');
 	}
@@ -52,6 +60,7 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException		  Exception
 	 * @expectedExceptionMessage  Rule "sequence" failed for "Array" on path "_assert->_keys"
+	 * @group suite
 	 */
 	public function testValidationFailSequence1() {
 		$this->processFileTest('suite/validationFailSequence1');
@@ -60,15 +69,22 @@ class FileBasedTestTest extends APITestCase {
 	/**
 	 * @expectedException		  Exception
 	 * @expectedExceptionMessage  Rule "sequence" failed for "Array" on path "_assert->_keys"
+	 * @group suite
 	 */
 	public function testValidationFailSequence2() {
 		$this->processFileTest('suite/validationFailSequence2');
 	}
 
+	/**
+	 * @group suite
+	 */
 	public function testValidationSuccess() {
 		$this->processFileTest('suite/validationSuccess');
 	}
 
+	/**
+	 * @group suite
+	 */
 	public function testValidationSuccessShortSyntax() {
 		$this->processFileTest('suite/validationSuccessShortSyntax');
 	}
