@@ -161,10 +161,10 @@ int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive c
 void zbx_co_uninitialize();
 #endif
 
-static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
+static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char		ch = '\0';
-	int		opt_c = 0, opt_p = 0, opt_t = 0;
+	int		opt_c = 0, opt_p = 0, opt_t = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
 	unsigned int	opt_mask = 0;
@@ -183,16 +183,11 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 			case 'h':
-				help();
-				exit(EXIT_SUCCESS);
-				break;
+				t->task = ZBX_TASK_SHOW_HELP;
+				goto out;
 			case 'V':
-				version();
-#ifdef _AIX
-				tl_version();
-#endif
-				exit(EXIT_SUCCESS);
-				break;
+				t->task = ZBX_TASK_SHOW_VERSION;
+				goto out;
 			case 'p':
 				opt_p++;
 				if (ZBX_TASK_START == t->task)
@@ -230,7 +225,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 			default:
 				t->task = ZBX_TASK_SHOW_USAGE;
-				break;
+				goto out;
 		}
 	}
 
@@ -244,7 +239,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		if (1 < opt_t)
 			zbx_error("option \"-t\" or \"--test\" specified multiple times");
 
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 #ifdef _WINDOWS
 	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
@@ -260,11 +256,11 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		if (1 < opt_m)
 			zbx_error("option \"-m\" or \"--multiple-agents\" specified multiple times");
 
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
-#endif
+
 	/* check for mutually exclusive options */
-#ifdef _WINDOWS
 	/* Allowed option combinations.		*/
 	/* Option 'c' is always optional.	*/
 	/*   p  t  i  d  s  x  m    opt_mask	*/
@@ -280,6 +276,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/*   -  -  -  d  -  -  m	0x09	*/
 	/*   -  -  -  -  s  -  m	0x05	*/
 	/*   -  -  -  -  -  x  m	0x03	*/
+	/*   -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
 
 	if (0 < opt_p)
 		opt_mask |= 0x40;
@@ -296,18 +293,34 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	if (0 < opt_m)
 		opt_mask |= 0x01;
 
-	if (! (0x02 <= opt_mask <= 0x05 || 0x00 == opt_mask || 0x08 == opt_mask || 0x09 == opt_mask || 0x10 == opt_mask
-			|| 0x11 == opt_mask || 0x20 == opt_mask || 0x40 == opt_mask))
+	switch (opt_mask)
 	{
-		zbx_error("mutually exclusive options used");
-		usage();
-		exit(EXIT_FAILURE);
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x08:
+		case 0x09:
+		case 0x10:
+		case 0x11:
+		case 0x20:
+		case 0x40:
+			break;
+		default:
+			zbx_error("mutually exclusive options used");
+			usage();
+			ret = FAIL;
+			goto out;
 	}
 #else
+	/* check for mutually exclusive options */
 	if (1 < opt_p + opt_t)
 	{
 		zbx_error("only one of options \"-p\", \"--print\", \"-t\" or \"--test\" can be used");
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 #endif
 	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
@@ -319,11 +332,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+out:
+	return ret;
 }
 
 /******************************************************************************
@@ -884,7 +900,8 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	parse_commandline(argc, argv, &t);
+	if (SUCCEED != parse_commandline(argc, argv, &t))
+		exit(EXIT_FAILURE);
 
 	import_symbols();
 
@@ -952,6 +969,17 @@ int	main(int argc, char **argv)
 #endif
 			free_metrics();
 			alias_list_free();
+			exit(EXIT_SUCCESS);
+			break;
+		case ZBX_TASK_SHOW_VERSION:
+			version();
+#ifdef _AIX
+			tl_version();
+#endif
+			exit(EXIT_SUCCESS);
+			break;
+		case ZBX_TASK_SHOW_HELP:
+			help();
 			exit(EXIT_SUCCESS);
 			break;
 		default:
