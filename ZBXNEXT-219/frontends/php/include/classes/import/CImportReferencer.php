@@ -758,7 +758,6 @@ class CImportReferencer {
 
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
-				'selectHosts' => array('hostid'),
 				'expandExpression' => true,
 				'filter' => array(
 					'description' => array_keys($this->triggers),

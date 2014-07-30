@@ -159,28 +159,22 @@ class CConfigurationImport {
 			$this->processGroups();
 			$this->processTemplates();
 			$this->processHosts();
-			$this->processApplications();
-			$this->processItems();
-			$this->processDiscoveryRules();
 
-			// after discovery rules and prototypes have been processed, remove missing discovery rules and prototypes
+			// delete missing objects from processed hosts and templates
 			$this->deleteMissingDiscoveryRules();
-
-			// triggers and graphs can be processed after prototypes are deleted, otherwise we lose those references
-			$this->processTriggers();
-			$this->processGraphs();
-
 			$this->deleteMissingTriggers();
 			$this->deleteMissingGraphs();
-
-			// items can be deleted after graphs are deleted, because graphs can have min/max value as items
 			$this->deleteMissingItems();
 			$this->deleteMissingApplications();
 
+			// import objects
+			$this->processApplications();
+			$this->processItems();
+			$this->processDiscoveryRules();
+			$this->processTriggers();
+			$this->processGraphs();
 			$this->processImages();
 			$this->processMaps();
-
-			// screens should be created after all other elements
 			$this->processTemplateScreens();
 			$this->processScreens();
 		}
@@ -1508,8 +1502,6 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes graphs from DB that are missing in XML.
-	 *
-	 * @throws Exception if premission check fails.
 	 *
 	 * @return null
 	 */
