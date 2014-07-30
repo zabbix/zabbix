@@ -339,6 +339,14 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 out:
+	if (FAIL == ret)
+	{
+		zbx_free(TEST_METRIC);
+
+		if (DEFAULT_CONFIG_FILE != CONFIG_FILE)
+			zbx_free(CONFIG_FILE);
+	}
+
 	return ret;
 }
 
