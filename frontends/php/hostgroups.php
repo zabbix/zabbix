@@ -151,22 +151,22 @@ if (hasRequest('form')) {
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
 		unset($_REQUEST['save']);
 
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 	elseif (hasRequest('delete') && hasRequest('groupid')) {
 		$result = API::HostGroup()->delete(array(getRequest('groupid')));
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
 		unset($_REQUEST['delete']);
 
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-		clearCookies($result);
 	}
 }
 /*
@@ -187,7 +187,7 @@ elseif (hasRequest('go')) {
 			);
 		}
 
-		clearCookies($result);
+		uncheckTableRows();
 	}
 	elseif (getRequest('go') == 'activate' || getRequest('go') == 'disable') {
 		$enable = (getRequest('go') == 'activate');
@@ -224,6 +224,10 @@ elseif (hasRequest('go')) {
 
 			$result = DBend($result);
 
+			if ($result) {
+				uncheckTableRows();
+			}
+
 			$updated = count($hosts);
 
 			$messageSuccess = $enable
@@ -234,7 +238,6 @@ elseif (hasRequest('go')) {
 				: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 			show_messages($result, $messageSuccess, $messageFailed);
-			clearCookies($result);
 		}
 	}
 }

@@ -149,7 +149,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
-	$dbResult = true;
+	$result = true;
 
 	DBstart();
 
@@ -157,10 +157,10 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 
 	$httpTest = get_httptest_by_httptestid($httptestId);
 	if ($httpTest) {
-		$dbResult = delete_history_by_httptestid($httptestId);
-		if ($dbResult) {
+		$result = delete_history_by_httptestid($httptestId);
+		if ($result) {
 
-			$dbResult = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+			$result = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
 
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
@@ -172,10 +172,13 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 		}
 	}
 
-	$dbResult = DBend($dbResult);
+	$result = DBend($result);
 
-	show_messages($dbResult, _('History cleared'), _('Cannot clear history'));
-	clearCookies($dbResult, getRequest('hostid'));
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['save'])) {
 
@@ -288,7 +291,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result, $_REQUEST['hostid']);
+				uncheckTableRows(getRequest('hostid'));
 			}
 		}
 		else {
@@ -297,7 +300,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result, $_REQUEST['hostid']);
+				uncheckTableRows(getRequest('hostid'));
 			}
 			$httpTestId = reset($result['httptestids']);
 		}
@@ -360,8 +363,12 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$result = true;
@@ -389,14 +396,21 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
-	$goResult = API::HttpTest()->delete($_REQUEST['group_httptestid']);
+	$result = API::HttpTest()->delete($_REQUEST['group_httptestid']);
 
-	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
+	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 
 show_messages();

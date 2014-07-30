@@ -171,7 +171,7 @@ elseif (hasRequest('save')) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result, getRequest('parent_discoveryid'));
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 
 	unset($_REQUEST['save']);
@@ -179,12 +179,12 @@ elseif (hasRequest('save')) {
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));
 
-	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
-	clearCookies($result, getRequest('parent_discoveryid'));
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
+
+	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
 elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
@@ -207,12 +207,12 @@ elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasReques
 		$result = true;
 	}
 
-	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
-	clearCookies($result, getRequest('parent_discoveryid'));
-
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
+
+	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
 	$enable = (getRequest('go') == 'activate');
@@ -240,6 +240,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		$result = true;
 	}
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
+
 	$updated = count($update);
 	$messageSuccess = $enable
 		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
@@ -249,13 +253,15 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
+
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 
 /*
