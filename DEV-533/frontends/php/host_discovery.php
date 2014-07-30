@@ -175,9 +175,12 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete(array(getRequest('itemid')));
 
-	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['hostid']);
+	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 }
 elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
@@ -292,7 +295,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		uncheckTableRows(getRequest('hostid'));
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_hostdruleid')) {
@@ -302,6 +305,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBstart();
 	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
 	$updated = count($groupHostDiscoveryRuleId);
 
@@ -313,13 +320,14 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable discovery rules', 'Cannot disable discovery rules', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
-	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+	$result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
-	show_messages($goResult, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 
 /*

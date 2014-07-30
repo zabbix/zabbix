@@ -196,7 +196,9 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
-	clearCookies($result);
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete'])) {
@@ -212,8 +214,10 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$groupIds = get_request('group_groupid', array());
@@ -240,8 +244,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 
 		$result = DBend($result);
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-		clearCookies($result);
 	}
 }
 elseif ($_REQUEST['go'] == 'set_gui_access') {
@@ -272,8 +278,10 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		}
 
 		$result = DBend($result);
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
-		clearCookies($result);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
@@ -306,8 +314,10 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		}
 
 		$result = DBend($result);
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
-		clearCookies($result);
 	}
 }
 elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))) {
@@ -348,8 +358,10 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
 
 		$result = DBend($result);
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 

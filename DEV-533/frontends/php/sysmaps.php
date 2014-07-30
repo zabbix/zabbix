@@ -182,8 +182,12 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 'delete') {
 	$sysmapIds = getRequest('maps', array());
@@ -210,8 +214,12 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
-	clearCookies($result);
 }
 
 /*

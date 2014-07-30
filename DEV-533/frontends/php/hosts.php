@@ -354,7 +354,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		DBend(true);
 
 		show_message(_('Hosts updated'));
-		clearCookies(true);
+		uncheckTableRows();
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
 	}
@@ -597,11 +597,13 @@ elseif (hasRequest('save')) {
 		}
 
 		$result = DBend(true);
-
-		show_messages($result, $msgOk, $msgFail);
-		clearCookies($result);
+		if ($result) {
+			uncheckTableRows();
+		}
 
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
+
+		show_messages($result, $msgOk, $msgFail);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -616,25 +618,28 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	$result = API::Host()->delete(array($_REQUEST['hostid']));
 	$result = DBend($result);
 
-	show_messages($result, _('Host deleted'), _('Cannot delete host'));
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
+		uncheckTableRows();
 	}
 
 	unset($_REQUEST['delete']);
-	clearCookies($result);
+
+	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$hostIds = get_request('hosts', array());
 
 	DBstart();
 
-	$goResult = API::Host()->delete($hostIds);
-	$goResult = DBend($goResult);
+	$result = API::Host()->delete($hostIds);
+	$result = DBend($result);
 
-	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+
+	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	$enable =(getRequest('go') == 'activate');
@@ -655,6 +660,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		$result = updateHostStatus($actHosts, $status);
 		$result = DBend($result);
 
+		if ($result) {
+			uncheckTableRows();
+		}
+
 		$updated = count($actHosts);
 
 		$messageSuccess = $enable
@@ -665,7 +674,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 			: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 

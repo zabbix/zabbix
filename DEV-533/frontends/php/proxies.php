@@ -124,8 +124,10 @@ if (isset($_REQUEST['save'])) {
 	unset($_REQUEST['save']);
 
 	$result = DBend($result);
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete'])) {
 	$result = API::Proxy()->delete(array($_REQUEST['proxyid']));
@@ -133,10 +135,10 @@ elseif (isset($_REQUEST['delete'])) {
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['proxyid']);
 		$proxy = reset($dbProxy);
+		uncheckTableRows();
 	}
 
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
-	clearCookies($result);
 
 	unset($_REQUEST['delete']);
 }
@@ -175,6 +177,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	$result = DBend($result && $hosts);
 
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	$messageSuccess = $enable
 		? _n('Host enabled', 'Hosts enabled', $updated)
 		: _n('Host disabled', 'Hosts disabled', $updated);
@@ -183,16 +189,18 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();
 
-	$goResult = API::Proxy()->delete(get_request('hosts'));
-	$goResult = DBend($goResult);
+	$result = API::Proxy()->delete(get_request('hosts'));
+	$result = DBend($result);
 
-	show_messages($goResult, _('Proxy deleted'), _('Cannot delete proxy'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+
+	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
 }
 
 /*

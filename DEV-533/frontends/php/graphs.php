@@ -272,7 +272,9 @@ elseif (hasRequest('save')) {
 
 	$result = DBend($result);
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $cookieId);
+	if ($result) {
+		uncheckTableRows($cookieId);
+	}
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
@@ -281,13 +283,17 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		$result = API::GraphPrototype()->delete(array($graphId));
 
 		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
-		clearCookies($result, getRequest('parent_discoveryid'));
+		if ($result) {
+			uncheckTableRows(getRequest('parent_discoveryid'));
+		}
 	}
 	else {
 		$result = API::Graph()->delete(array($graphId));
 
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
-		clearCookies($result, getRequest('hostid'));
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 	}
 
 	if ($result) {
@@ -301,17 +307,21 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
 
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
-		clearCookies($result, getRequest('parent_discoveryid'));
+		if ($result) {
+			uncheckTableRows(getRequest('parent_discoveryid'));
+		}
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
 
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
-		clearCookies($result, getRequest('hostid'));
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 	}
 } elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
-		$goResult = true;
+		$result = true;
 
 		$options = array(
 			'output' => array('hostid'),
@@ -348,15 +358,17 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$goResult &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
 			}
 		}
-		$goResult = DBend($goResult);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
-		clearCookies($goResult,
-			getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
-		);
+		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
+		if ($result) {
+			uncheckTableRows(
+				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
+			);
+		}
 
 		$_REQUEST['go'] = 'none2';
 	}

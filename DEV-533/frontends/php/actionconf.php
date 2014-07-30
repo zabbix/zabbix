@@ -173,18 +173,20 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	$result = API::Action()->delete(array(getRequest('actionid')));
 
-	show_messages($result, _('Action deleted'), _('Cannot delete action'));
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
-		clearCookies($result);
+		uncheckTableRows();
 	}
+
+	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
 	$newCondition = getRequest('new_condition');
@@ -330,7 +332,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		$updated++;
 	}
 
+	$result = DBend($result);
+
 	if ($result) {
+		uncheckTableRows();
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
 
@@ -341,15 +346,16 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable action', 'Cannot enable actions', $updated)
 		: _n('Cannot disable action', 'Cannot disable actions', $updated);
 
-	$result = DBend($result);
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
+	$result = API::Action()->delete($_REQUEST['g_actionid']);
 
-	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+
+	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 
 /*
