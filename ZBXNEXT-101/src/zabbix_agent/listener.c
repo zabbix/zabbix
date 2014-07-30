@@ -102,6 +102,11 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
+		else if (EINTR == zbx_sock_last_error())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Listener %d has been interrupted by the signal. Repeating connection", process_num);
+			continue;
+		}
 
 		if (SUCCEED == ret)
 			continue;
