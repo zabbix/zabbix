@@ -69,6 +69,10 @@ class FileBasedTestTest extends APITestCase {
 		$this->processFileTest('suite/validationSuccess');
 	}
 
+	public function testValidationSuccessShortSyntax() {
+		$this->processFileTest('suite/validationSuccessShortSyntax');
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

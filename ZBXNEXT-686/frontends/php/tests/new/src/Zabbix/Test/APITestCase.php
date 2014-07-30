@@ -301,9 +301,10 @@ class APITestCase extends BaseAPITestCase {
 	 */
 	protected function validate($definition, $data, $path = array()) {
 		if (!is_array($definition)) {
-			throw new \Exception(sprintf(
-				'Validation definition is not an array on path "%s"', implode('->', $path)
-			));
+			// shorthand syntax
+			$this->validateSingle($data, $definition, $path);
+
+			return;
 		}
 
 		foreach ($definition as $key => $rules) {
@@ -382,6 +383,14 @@ class APITestCase extends BaseAPITestCase {
 		}
 	}
 
+	/**
+	 * Validates value against validator chain
+	 *
+	 * @param $value
+	 * @param $ruleDefinition
+	 * @param $path
+	 * @throws \Exception
+	 */
 	protected function validateSingle($value, $ruleDefinition, $path) {
 		$rules = explode('|', $ruleDefinition);
 		$validator = v::create();
