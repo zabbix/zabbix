@@ -1329,9 +1329,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, server_num, process_num;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1350,18 +1347,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	init_active_metrics();
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
-
 	while (ZBX_IS_RUNNING())
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in active checks process");
-#endif
-
 		if (time(NULL) >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);
@@ -1388,7 +1375,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			process_active_checks(activechk_args.host, activechk_args.port);
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
-				goto unblock;
+				continue;
 
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
@@ -1399,12 +1386,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [idle 1 sec]", process_num);
 			zbx_sleep(1);
 		}
-
-unblock:
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 
 #ifdef _WINDOWS

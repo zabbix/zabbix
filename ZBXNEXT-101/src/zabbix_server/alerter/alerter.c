@@ -150,9 +150,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	DB_ROW		row;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
+
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -164,16 +162,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
 	for (;;)
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in alerter process");
-#endif
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
 
 		sec = zbx_time();
@@ -259,9 +249,5 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				CONFIG_SENDER_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 }

@@ -72,9 +72,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 {
 	int		ret, local_request_failed = 0, server_num, process_num;
 	zbx_sock_t	s;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -90,18 +87,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zbx_free(args);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
-
 	while (ZBX_IS_RUNNING())
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in listener process");
-#endif
-
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
@@ -117,7 +104,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		}
 
 		if (SUCCEED == ret)
-			goto unblock;
+			continue;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
 
@@ -129,12 +116,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 		if (ZBX_IS_RUNNING())
 			zbx_sleep(1);
-
-unblock:
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 
 #ifdef _WINDOWS

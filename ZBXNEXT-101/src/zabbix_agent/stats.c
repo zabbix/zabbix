@@ -417,10 +417,6 @@ void	diskstat_shm_extend()
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
-
 	assert(args);
 
 	process_type = ZBX_PROCESS_TYPE_COLLECTOR;
@@ -432,18 +428,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
-
 	while (ZBX_IS_RUNNING())
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in collector process");
-#endif
-
 		zbx_setproctitle("collector [processing data]");
 #ifdef _WINDOWS
 		collect_perfstat();
@@ -460,11 +446,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		zbx_setproctitle("collector [idle 1 sec]");
 		zbx_sleep(1);
-
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 
 #ifdef _WINDOWS
