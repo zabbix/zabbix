@@ -648,9 +648,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
 	zbx_sock_t	s;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
+
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -664,17 +662,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
-
 	for (;;)
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in listener process");
-#endif
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
@@ -695,10 +684,5 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
-
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 }

@@ -205,9 +205,7 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 {
 	int		now, nextsync = 0, action;
 	double		sec;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
+
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -217,17 +215,8 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 
 	zbx_vector_ptr_create(&recipients);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
 	for (;;)
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in watchdog process");
-#endif
-
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 
 		sec = zbx_time();
@@ -266,9 +255,5 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 		}
 
 		zbx_sleep_loop(DB_PING_FREQUENCY);
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 }

@@ -762,9 +762,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t		last_stat_time;
 	unsigned char	poller_type;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -788,16 +785,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
 	for (;;)
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in poller process");
-#endif
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
@@ -833,10 +822,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 
 #undef STAT_INTERVAL

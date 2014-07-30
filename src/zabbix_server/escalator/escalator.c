@@ -1544,9 +1544,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t		last_stat_time;
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
+
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
@@ -1562,16 +1560,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-#ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
-#endif
 	for (;;)
 	{
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not set sigprocmask to block the user signal in escalator process");
-#endif
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
@@ -1608,9 +1598,5 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-#ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zabbix_log(LOG_LEVEL_DEBUG, "could not restore sigprocmask");
-#endif
 	}
 }
