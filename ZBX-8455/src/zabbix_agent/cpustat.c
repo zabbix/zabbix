@@ -640,7 +640,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (!CPU_COLLECTOR_STARTED(collector))
+	if (0 == CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;

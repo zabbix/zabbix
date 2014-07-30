@@ -216,7 +216,6 @@ pc_fail:
 
 		exit(EXIT_FAILURE);
 	}
-#undef ZBX_PC_FAIL
 }
 #endif	/* _WINDOWS */
 
