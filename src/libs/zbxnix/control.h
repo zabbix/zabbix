@@ -17,7 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_CONTROL_H
+#define ZABBIX_CONTROL_H
+
 #include "common.h"
 #include "zbxself.h"
 
 void	set_log_level_task(const char *opt, zbx_task_t *task, int (*get_process_type_func)(const char *));
+#endif	/* ZABBIX_CONTROL_H */
