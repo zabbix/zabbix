@@ -417,6 +417,7 @@ class APITestCase extends BaseAPITestCase {
 			/* @var $validatorInstance AbstractRule */
 			try {
 				$validatorInstance->assert($value);
+				$this->addToAssertionCount(1);
 			} catch (\InvalidArgumentException $e) {
 				throw new \Exception(
 					sprintf('Rule "%s" failed for "%s" on path "%s"',
