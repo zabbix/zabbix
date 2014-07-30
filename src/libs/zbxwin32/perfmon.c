@@ -169,14 +169,16 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		zbx_sleep(1);
 
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&
-				ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, handle, &rawData2)))
+				ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath,
+				handle, &rawData2)))
 		{
 			pdh_status = PdhCalculateCounterFromRawValue(handle, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100,
 					&rawData2, &rawData, &counterValue);
 		}
 	}
 
-	if (ERROR_SUCCESS != pdh_status || (PDH_CSTATUS_VALID_DATA != counterValue.CStatus && PDH_CSTATUS_NEW_DATA != counterValue.CStatus))
+	if (ERROR_SUCCESS != pdh_status || (PDH_CSTATUS_VALID_DATA != counterValue.CStatus &&
+			PDH_CSTATUS_NEW_DATA != counterValue.CStatus))
 	{
 		if (ERROR_SUCCESS == pdh_status)
 			pdh_status = counterValue.CStatus;
