@@ -7,10 +7,15 @@ steps:
         expect: response
         response:
         # it should contain array if [id: decimal, hostname: string, templates; <array of string>]
-            __each:
-                __keys: int
-                id: notEmpty|int
-                hostname: notEmpty|string|length(5,10)
-                templates:
-                    __each:
-                        string|length(0,12)
+            _assert:
+                _keys:
+                    _each:
+                        _assert: int
+                _each:
+                    id:
+                        _assert: notEmpty|int
+                    hostname:
+                        _assert: notEmpty|string|length(5,10)
+                    templates:
+                        _each:
+                            _assert: string|length(0,12)

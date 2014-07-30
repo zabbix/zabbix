@@ -1,17 +1,13 @@
 steps:
     step1:
         request:
-            id: 1004
+            id: 1008
             method: validate1
             params: []
         expect: response
         response:
             _assert:
                 _keys:
+                    _assert: length(3)|sequence
                     _each:
                         _assert: int
-                _each:
-                    id:
-                        _assert: notEmpty|int
-                    hostname:
-                        _assert: notEmpty|string|length(5,10)

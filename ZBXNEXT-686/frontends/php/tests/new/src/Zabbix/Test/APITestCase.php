@@ -292,68 +292,97 @@ class APITestCase extends BaseAPITestCase {
 	}
 
 	/**
-	 * Todo: add keys to error messages here
-	 * "Previous" contains data from last key, for look-behind validation (__keys)
+	 * Validate data according to rules; path holds current validator chain
 	 *
-	 * @param $rules
+	 * @param $definition
 	 * @param $data
-	 * @param array $previous
+	 * @param array $path
 	 * @throws \Exception
 	 */
-	protected function validate($rules, $data, $previous = array()) {
-		foreach ($rules as $item => $rule) {
-			if ($item == '__equals') {
-				if ($data != $rule) {
-					throw new \Exception(sprintf('Data "%s" is not the same as expected ("%s")',
+	protected function validate($definition, $data, $path = array()) {
+		if (!is_array($definition)) {
+			throw new \Exception(sprintf(
+				'Validation definition is not an array on path "%s"', implode('->', $path)
+			));
+		}
+
+		foreach ($definition as $key => $rules) {
+			if ($key == '_assert') {
+				if (is_string($rules)) {
+					// simple assertion
+					$this->validateSingle($data, $rules, $path);
+
+					continue;
+				}
+				elseif (is_array($rules)) {
+					$path[] = $key;
+					$this->validate($rules, $data, $path);
+
+					continue;
+				} else {
+					throw new \Exception(
+						sprintf('Wrong value for "_assert" key, not a string or array on path "%s"', implode('->', $path))
+					);
+				}
+			}
+
+			if ($key == '_keys') {
+				if (!is_array($data)) {
+					throw new \Exception(
+						sprintf('Data for "_keys" is not an array on path "%s"', implode('->', $path))
+					);
+				}
+
+				$keys = array_keys($data);
+				$path[] = $key;
+
+				$this->validate($rules, $keys, $path);
+
+				continue;
+			}
+
+			if ($key == '_each') {
+				if (!is_array($data)) {
+					throw new \Exception(
+						sprintf('Data for "_each" is not an array on path "%s"', implode('->', $path))
+					);
+				}
+
+				foreach ($data as $index => $value) {
+					$subPath = $path;
+					$subPath[] = '_each['.$index.']';
+					$this->validate($rules, $value, $subPath);
+				}
+
+				continue;
+			}
+
+			if ($key == '_equals') {
+				if ($data != $rules) {
+					throw new \Exception(sprintf('Data "%s" is not the same as expected ("%s") on path "%s"',
 						json_encode($data),
-						json_encode($rule)
+						json_encode($rules),
+						implode('->', $path)
 					));
 				}
+				continue;
 			}
-			elseif ($item == '__each') {
-				if (is_array($rule)) {
-					/*
-					 * __each:
-					 *     foo: string
-					 *     bar: int
-					 */
-					if (!is_array($data)) {
-						throw new \Exception('__each specified but data is not an array');
-					}
 
-					foreach ($data as $value) {
-						$this->validate($rule, $value, $data);
-					}
-				}
-				else {
-					/* __each: string|length(10,2) */
-					foreach ($data as $value) {
-						$this->validateSingle($value, $rule);
-					}
-				}
-			}
-			elseif ($item == '__keys') {
-				$keys = array_keys($previous);
+			if (is_array($data) && array_key_exists($key, $data)) {
+				$path[] = $key;
 
-				foreach ($keys as $key) {
-					$this->validateSingle($key, $rule);
-				}
+				$this->validate($rules, $data[$key], $path);
+
+				continue;
 			}
-			// here comes a little magic that null, it is happens, is not scalar and is not isset
-			elseif (is_array($data) && array_key_exists($item, $data)) {
-				if (is_scalar($data[$item]) || is_null($data[$item])) {
-					$this->validateSingle($data[$item], $rule);
-				} else {
-					$this->validate($rule, $data[$item]);
-				}
-			}
-			else {
-				throw new \Exception(sprintf('Can not understand item "%s"', $item));
-			}
+
+			throw new \Exception(
+				sprintf('Do not know what to do processing key "%s" on path "%s"', $key, implode('->', $path))
+			);
 		}
 	}
 
-	protected function validateSingle($value, $ruleDefinition) {
+	protected function validateSingle($value, $ruleDefinition, $path) {
 		$rules = explode('|', $ruleDefinition);
 		$validator = v::create();
 
@@ -380,7 +409,13 @@ class APITestCase extends BaseAPITestCase {
 			try {
 				$validatorInstance->assert($value);
 			} catch (\InvalidArgumentException $e) {
-				throw new \Exception(sprintf('Rule "%s" failed for "%s"', $rule, ValidationException::stringify($value)));
+				throw new \Exception(
+					sprintf('Rule "%s" failed for "%s" on path "%s"',
+						$rule,
+						ValidationException::stringify($value),
+						implode('->', $path)
+					)
+				);
 			}
 		}
 	}

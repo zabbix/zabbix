@@ -18,7 +18,8 @@
 	"autoload": {
 		"psr-0": {
 			"Zabbix\\": "src/",
-			"Zabbix\\Tests\\": "tests/"
+			"Zabbix\\Tests\\": "tests/",
+            "Respect\\": "src/"
 		},
 		"__comment__": "Add a list of directories here - all files from them will be autoloaded",
 		"classmap": [
