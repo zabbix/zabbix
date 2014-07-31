@@ -1028,6 +1028,17 @@ class CConfigurationImport {
 						}
 
 						$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+
+						if (!$gitem['itemid']) {
+							throw new Exception(_s(
+								'Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+								$gitem['item']['key'],
+								$gitem['item']['host'],
+								$graph['name'],
+								$item['name'],
+								$host
+							));
+						}
 					}
 					unset($gitem);
 
@@ -1122,6 +1133,15 @@ class CConfigurationImport {
 					}
 
 					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+
+					if (!$gitem['itemid']) {
+						throw new Exception(_s(
+							'Cannot find item "%1$s" on "%2$s" used in prototype "%3$s".',
+							$gitem['item']['key'],
+							$gitem['item']['host'],
+							$graph['name']
+						));
+					}
 				}
 				unset($gitem);
 
