@@ -271,10 +271,11 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
-	show_messages($result, $messageSuccess, $messageFailed);
+
 	if ($result) {
 		uncheckTableRows($cookieId);
 	}
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
@@ -282,18 +283,18 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete(array($graphId));
 
-		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
 		if ($result) {
 			uncheckTableRows(getRequest('parent_discoveryid'));
 		}
+		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
 	}
 	else {
 		$result = API::Graph()->delete(array($graphId));
 
-		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 		}
+		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 	}
 
 	if ($result) {
@@ -306,18 +307,18 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
 
-		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
 		if ($result) {
 			uncheckTableRows(getRequest('parent_discoveryid'));
 		}
+		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
 
-		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 		}
+		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 } elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
@@ -363,12 +364,12 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		}
 		$result = DBend($result);
 
-		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
 		if ($result) {
 			uncheckTableRows(
 				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
 			);
 		}
+		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
 
 		$_REQUEST['go'] = 'none2';
 	}

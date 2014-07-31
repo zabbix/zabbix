@@ -153,9 +153,9 @@ if (hasRequest('form')) {
 			unset($_REQUEST['form']);
 			uncheckTableRows();
 		}
-		unset($_REQUEST['save']);
-
 		show_messages($result, $messageSuccess, $messageFailed);
+
+		unset($_REQUEST['save']);
 	}
 	elseif (hasRequest('delete') && hasRequest('groupid')) {
 		$result = API::HostGroup()->delete(array(getRequest('groupid')));
@@ -164,9 +164,9 @@ if (hasRequest('form')) {
 			unset($_REQUEST['form']);
 			uncheckTableRows();
 		}
-		unset($_REQUEST['delete']);
-
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
+
+		unset($_REQUEST['delete']);
 	}
 }
 /*
@@ -181,13 +181,14 @@ elseif (hasRequest('go')) {
 
 			$updated = count($groupIds);
 
+			if ($result) {
+				uncheckTableRows();
+			}
 			show_messages($result,
 				_n('Group deleted', 'Groups deleted', $updated),
 				_n('Cannot delete group', 'Cannot delete groups', $updated)
 			);
 		}
-
-		uncheckTableRows();
 	}
 	elseif (getRequest('go') == 'activate' || getRequest('go') == 'disable') {
 		$enable = (getRequest('go') == 'activate');

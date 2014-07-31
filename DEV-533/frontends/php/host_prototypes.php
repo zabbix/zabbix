@@ -112,19 +112,16 @@ elseif (get_request('unlink')) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
-
 	DBstart();
 	$result = API::HostPrototype()->delete(array(getRequest('hostid')));
-
-	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
-
-	unset($_REQUEST['hostid'], $_REQUEST['form']);
-
 	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows($discoveryRule['itemid']);
 	}
+	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
+
+	unset($_REQUEST['hostid'], $_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
@@ -241,7 +238,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	if ($result) {
 		uncheckTableRows($discoveryRule['itemid']);
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {

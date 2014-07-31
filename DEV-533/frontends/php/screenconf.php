@@ -188,7 +188,6 @@ elseif (isset($_REQUEST['save'])) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
 		uncheckTableRows();
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
@@ -236,7 +235,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Screen deleted'), _('Cannot delete screen'));
 }
 

@@ -114,6 +114,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -130,6 +131,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -154,7 +156,6 @@ elseif ($_REQUEST['go'] == 'delete') {
 		unset($_REQUEST['form']);
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
 

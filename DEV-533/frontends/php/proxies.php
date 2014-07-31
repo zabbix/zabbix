@@ -124,6 +124,7 @@ if (isset($_REQUEST['save'])) {
 	unset($_REQUEST['save']);
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -134,10 +135,8 @@ elseif (isset($_REQUEST['delete'])) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['proxyid']);
-		$proxy = reset($dbProxy);
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
 
 	unset($_REQUEST['delete']);
@@ -199,7 +198,6 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
 }
 

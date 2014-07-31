@@ -141,6 +141,10 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
@@ -173,10 +177,6 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	}
 
 	$result = DBend($result);
-
-	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
-	}
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
@@ -367,7 +367,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
@@ -400,7 +399,6 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
@@ -409,7 +407,6 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 

@@ -199,7 +199,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
 }
 elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])) {
@@ -239,7 +238,6 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
@@ -279,7 +277,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_triggerid')) {
@@ -312,10 +309,9 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_tri
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 		}
+		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 
 		$_REQUEST['go'] = 'none2';
-
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 	else {
 		show_error_message(_('No target selected'));
@@ -327,8 +323,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
-	show_messages(_('Triggers deleted'), _('Cannot delete triggers'));
+	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
 /*

@@ -178,9 +178,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
+	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 }
 elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
@@ -323,10 +323,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
 	$result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 
