@@ -443,8 +443,7 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
-		unsigned char item_type, const char *key, unsigned char flags)
+static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char item_type, const char *key)
 {
 	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
@@ -1101,9 +1100,8 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type, status;
-	int			delay, delay_flex_changed, found;
-	int			update_index, old_nextcheck;
+	unsigned char		old_type, old_poller_type, status;
+	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1170,9 +1168,7 @@ static void	DCsync_items(DB_RESULT result)
 		/* store new information in item structure */
 
 		item->hostid = hostid;
-		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
-		DCstrpool_replace(found, &item->key, row[6]);
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
@@ -1188,6 +1184,8 @@ static void	DCsync_items(DB_RESULT result)
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
 
+		key_changed = (SUCCEED == DCstrpool_replace(found, &item->key, row[6]));
+
 		if (0 == found)
 		{
 			item->triggers = NULL;
@@ -1200,6 +1198,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
+			old_type = 0xff;
 			old_poller_type = ZBX_NO_POLLER;
 			old_nextcheck = 0;
 		}
@@ -1208,6 +1207,7 @@ static void	DCsync_items(DB_RESULT result)
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
 
+			old_type = item->type;
 			old_poller_type = item->poller_type;
 			old_nextcheck = item->nextcheck;
 
@@ -1228,6 +1228,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		item->status = status;
+		ZBX_STR2UCHAR(item->type, row[3]);
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1265,8 +1266,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(itemid, host->proxy_hostid, item->type, item->key,
-					item->flags);
+			item->poller_type = poller_by_item(host->proxy_hostid, item->type, item->key);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -1276,9 +1276,9 @@ static void	DCsync_items(DB_RESULT result)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
+			if (0 == found || 0 != key_changed || old_type != item->type ||
 					(ITEM_STATE_NORMAL == item->state &&
-					(delay != item->delay || 0 != delay_flex_changed))))
+					(delay != item->delay || 0 != delay_flex_changed)))
 			{
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
@@ -4654,8 +4654,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
-				dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
-						dc_item->type, dc_item->key, dc_item->flags);
+				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
+						dc_item->key);
 
 				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -4952,8 +4952,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			return;
 
-		dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
-				dc_item->type, dc_item->key, dc_item->flags);
+		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
 	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
