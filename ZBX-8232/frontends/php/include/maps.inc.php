@@ -1153,16 +1153,50 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if (!empty($monitored_hostids)) {
+		// select triggers from given monitored hosts
+		$resource = DBselect(
+			'SELECT DISTINCT t.triggerid,t.status,t.value,t.priority,t.lastchange,t.description,t.expression,i.hostid'.
+			' FROM triggers t,functions f,items i'.
+			' WHERE '.dbConditionInt('i.hostid', $monitored_hostids).
+				' AND f.triggerid=t.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+				' AND i.status='.ITEM_STATUS_ACTIVE
+		);
+
+		$triggerIds = array();
+		while ($row = DBfetch($resource)) {
+			$triggerIds[] = $row['triggerid'];
+			$triggersData[$row['triggerid']] = array(
+				'triggerid' => $row['triggerid'],
+				'status' => $row['status'],
+				'priority' => $row['priority'],
+				'value' => $row['value'],
+				'lastchange' => $row['lastchange'],
+				'description' => $row['description'],
+				'expression' => $row['expression']
+			);
+			$triggersData[$row['triggerid']]['hosts'][$row['hostid']]['hostid'] = $row['hostid'];
+		}
+
+		// select only skip dependent from those triggers
 		$triggers = API::Trigger()->get(array(
-			'hostids' => $monitored_hostids,
-			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
-			'selectHosts' => array('hostid'),
+			'output' => array('triggerid'),
+			'triggerids' => $triggerIds,
 			'nopermissions' => true,
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
-			'monitored' => true,
 			'skipDependent' => true
 		));
+
+		foreach ($triggers as &$trigger) {
+			$trigger = $triggersData[$trigger['triggerid']];
+		}
+		unset($trigger);
+		unset($triggersData);
+		unset($triggerIds);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
