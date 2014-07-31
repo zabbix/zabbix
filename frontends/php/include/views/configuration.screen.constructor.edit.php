@@ -135,7 +135,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 	$screenFormList->addRow(_('Graph name'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		$selectButton
-	));
+	), false, null, 'nowrap');
 }
 
 /*
@@ -182,7 +182,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		$selectButton
-	));
+	), false, null, 'nowrap');
 }
 
 /*
