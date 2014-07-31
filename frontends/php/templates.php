@@ -333,8 +333,11 @@ elseif (hasRequest('save')) {
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -346,8 +349,6 @@ elseif (hasRequest('save')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
-
 	$result = API::Template()->massUpdate(array(
 		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 		'hosts' => array()
@@ -358,52 +359,51 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
 	$result = API::Template()->delete(array(getRequest('templateid')));
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
 	$templates = get_request('templates', array());
 
 	DBstart();
 
-	$goResult = true;
+	$result = true;
 
 	if ($_REQUEST['go'] == 'delete') {
-		$goResult = API::Template()->massUpdate(array(
+		$result = API::Template()->massUpdate(array(
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
 		));
 	}
 
-	if ($goResult) {
-		$goResult = API::Template()->delete($templates);
+	if ($result) {
+		$result = API::Template()->delete($templates);
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 
 /*
