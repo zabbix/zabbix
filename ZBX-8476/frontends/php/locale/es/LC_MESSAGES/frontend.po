@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-30 02:42+0300\n"
-"PO-Revision-Date: 2014-06-11 18:21+0300\n"
+"POT-Creation-Date: 2014-07-24 21:59+0300\n"
+"PO-Revision-Date: 2014-07-23 20:30+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402503683.0\n"
+"X-POOTLE-MTIME: 1406140231.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -3481,8 +3481,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALLES DEL ESCENARIO"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
+#: include/maps.inc.php:946
 msgid "DISABLED"
 msgstr "DESHABILITADO"
 
@@ -4130,21 +4130,21 @@ msgstr "Se ha eliminado la plantilla \"%1$s\"."
 #: api/classes/CTrigger.php:850
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el disparador \"%1$s\" de \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:693
 #, c-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el prototipo de disparador \"%1$s\" de \"%2$s\"."
 
 #: api/classes/CHttpTest.php:452
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Se ha eliminado el escenario web \"%1$s\" de \"%2$s\"."
 
 #: include/views/administration.general.regularexpressions.edit.php:53
 msgid "Delimiter"
-msgstr ""
+msgstr "Delimitador"
 
 #: include/views/configuration.item.edit.php:408
 #: include/views/configuration.item.massupdate.php:426
@@ -4165,11 +4165,11 @@ msgstr "Denegar"
 #: include/views/configuration.triggers.edit.php:289
 #: include/views/configuration.triggers.edit.php:306
 msgid "Dependencies"
-msgstr ""
+msgstr "Dependencias"
 
 #: include/triggers.inc.php:1419 tr_status.php:612
 msgid "Dependent"
-msgstr ""
+msgstr "Dependiente"
 
 #: include/triggers.inc.php:1399
 #: include/views/configuration.services.edit.php:114
@@ -4180,7 +4180,7 @@ msgstr "Depende de"
 
 #: include/hosts.inc.php:270
 msgid "Deployment status"
-msgstr ""
+msgstr "Estado de implementación"
 
 #: events.php:510 events.php:519 events.php:586 events.php:599
 #: include/classes/screens/CScreenEvents.php:42
@@ -4211,7 +4211,7 @@ msgstr "Detalles del escenario"
 
 #: include/actions.inc.php:104
 msgid "Device"
-msgstr ""
+msgstr "Dispositivo"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:415
@@ -4225,37 +4225,39 @@ msgstr "Lista de dispositivos - Lista los dispositivos PCI de manera predetermin
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:503
+#, fuzzy
 msgid "Device read statistics."
-msgstr ""
+msgstr "Estadísticas de lectura del dispositivo."
 
 #: discoveryconf.php:41 include/views/configuration.discovery.edit.php:69
+#, fuzzy
 msgid "Device uniqueness criteria"
-msgstr ""
+msgstr "Criterios únicos del dispositivo"
 
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:507
 msgid "Device write statistics."
-msgstr ""
+msgstr "Estadísticas de escritura del dispositivo."
 
 #: popup_trexpr.php:175
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "La diferencia entre los valores máximo y mínimo en un periodo T es < N"
 
 #: popup_trexpr.php:185
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "La diferencia entre los valores máximo y mínimo en un periodo T es = N"
 
 #: popup_trexpr.php:180
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "La diferencia entre los valores máximo y mínimo en un periodo T es > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "La diferencia entre los valores máximo y mínimo en un periodo T es ≠ N"
 
 #: popup_trexpr.php:231
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Si hay diferencia entre el valor más reciente y el que lo precede, entonces N=1; de lo contrario, N=0."
 
 #: popup_trexpr.php:235
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
@@ -4296,23 +4298,23 @@ msgstr ""
 
 #: include/views/administration.usergroups.list.php:150
 msgid "Disable debug mode in selected groups?"
-msgstr ""
+msgstr "¿Desea desactivar el modo de depuración en los grupos seleccionados?"
 
 #: include/actions.inc.php:412 include/actions.inc.php:640
 msgid "Disable host"
-msgstr ""
+msgstr "Desactivar equipo"
 
 #: hosts.php:939 hosts.php:952
 msgid "Disable host?"
-msgstr ""
+msgstr "¿Desea desactivar el equipo?"
 
 #: include/views/configuration.hostgroups.list.php:165
 msgid "Disable hosts in the selected host groups?"
-msgstr ""
+msgstr "¿Desea desactivar los equipos en los grupos de equipos seleccionados?"
 
 #: include/views/administration.proxy.list.php:109
 msgid "Disable hosts monitored by selected proxies?"
-msgstr ""
+msgstr "¿Desea desactivar los equipos monitoreados por los proxis seleccionados?"
 
 #: hosts.php:1015 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:108
@@ -4332,20 +4334,20 @@ msgstr "Desactivar"
 
 #: include/views/configuration.httpconf.list.php:102
 msgid "Disable selected WEB scenarios?"
-msgstr ""
+msgstr "¿Desea desactivar los escenarios web seleccionados?"
 
 #: include/views/configuration.action.list.php:102
 msgid "Disable selected actions?"
-msgstr ""
+msgstr "¿Desea desactivar las acciones seleccionadas?"
 
 #: include/views/configuration.application.list.php:117
 msgid "Disable selected applications?"
-msgstr ""
+msgstr "¿Desea desactivar las aplicaciones seleccionadas?"
 
 #: include/views/configuration.discovery.list.php:74
 #: include/views/configuration.host.discovery.list.php:141
 msgid "Disable selected discovery rules?"
-msgstr ""
+msgstr "¿Desea desactivar las reglas de descubrimiento seleccionadas?"
 
 #: include/views/administration.usergroups.list.php:142
 msgid "Disable selected groups?"
@@ -4412,11 +4414,11 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:165
 msgid "Discovered by"
-msgstr ""
+msgstr "Descubierto por"
 
 #: include/views/monitoring.discovery.php:41
 msgid "Discovered device"
-msgstr ""
+msgstr "Dispositivo descubierto"
 
 #: events.php:301 hosts.php:812 hosts.php:906 include/html.inc.php:391
 #: include/menu.inc.php:77 include/menu.inc.php:209
@@ -4430,29 +4432,32 @@ msgstr "Descubrimiento"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Discovery by proxy"
-msgstr ""
+msgstr "Descubierto por proxy"
 
 #: include/actions.inc.php:72
+#, fuzzy
 msgid "Discovery check"
-msgstr ""
+msgstr "Descubrimiento de verificación"
 
 #: include/views/js/configuration.discovery.edit.js.php:535
 #: include/views/js/configuration.discovery.edit.js.php:599
 #: include/views/js/configuration.discovery.edit.js.php:616
+#, fuzzy
 msgid "Discovery check error"
-msgstr ""
+msgstr "Error de descubrimiento de verificación"
 
 #: popup.php:112
+#, fuzzy
 msgid "Discovery checks"
-msgstr ""
+msgstr "Descubrimiento de verificaciones"
 
 #: include/html.inc.php:389
 msgid "Discovery list"
-msgstr ""
+msgstr "Lista de descubrimiento"
 
 #: include/actions.inc.php:74
 msgid "Discovery object"
-msgstr ""
+msgstr "Objeto de descubrimiento"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1203 include/forms.inc.php:1150
@@ -4465,7 +4470,7 @@ msgstr "Regla de descubrimiento"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "La regla de descubrimiento \"%1$s\" ya existe en \"%2$s\", heredada de otra plantilla."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
@@ -4534,19 +4539,19 @@ msgstr ""
 #: search.php:227 search.php:333 search.php:459
 #, c-format
 msgid "Displaying %1$s of %2$s found"
-msgstr ""
+msgstr "Mostrando %1$s de %2$s encontrados"
 
 #: report6.php:204
 msgid "Distribution of values for multiple items"
-msgstr ""
+msgstr "Distribución de valores para varios ítems"
 
 #: report6.php:203
 msgid "Distribution of values for multiple periods"
-msgstr ""
+msgstr "Distribución de valores para varios periodos"
 
 #: include/services.inc.php:61
 msgid "Do not calculate"
-msgstr "No calculado"
+msgstr "¿Quiere sustituir la expresión condicional?"
 
 #: jsLoader.php:103
 msgid "Do you wish to replace the conditional expression?"
@@ -6718,7 +6723,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:968
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -8150,7 +8155,7 @@ msgstr ""
 msgid "LDAP login was not successful"
 msgstr ""
 
-#: include/classes/screens/CScreenClock.php:70
+#: include/classes/screens/CScreenClock.php:81
 msgid "LOCAL"
 msgstr ""
 
@@ -8550,7 +8555,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:760
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -8623,7 +8628,7 @@ msgstr ""
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9257,7 +9262,7 @@ msgstr "MAPAS DE LA RED"
 msgid "NNTP"
 msgstr "NNTP"
 
-#: include/classes/screens/CScreenClock.php:59
+#: include/classes/screens/CScreenClock.php:70
 msgid "NO DATA"
 msgstr "SIN DATOS"
 
@@ -10459,8 +10464,8 @@ msgstr ""
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
+#: include/maps.inc.php:956 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10975,7 +10980,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr ""
@@ -11316,7 +11321,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr ""
@@ -11342,8 +11347,8 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
+#: include/maps.inc.php:900 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemas"
 
@@ -11957,7 +11962,7 @@ msgstr "PANTALLAS"
 msgid "SEARCH"
 msgstr "BUSCAR"
 
-#: include/classes/screens/CScreenClock.php:64
+#: include/classes/screens/CScreenClock.php:75
 msgid "SERVER"
 msgstr "SERVIDOR"
 
@@ -14140,7 +14145,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
 msgid "Unacknowledged"
 msgstr ""
 
