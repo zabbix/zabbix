@@ -217,7 +217,9 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
-		for (s = buffer, p = s; '\0' != *s; s++)
+		s = buffer;
+		p = s;
+		while (!('\0' == *s && p == s)) /* leave if p and s point to '\0' */
 		{
 			if ('\n' == *s)
 			{
@@ -231,6 +233,13 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				p = s + 1;
 			}
+			else if ('\0' == *s) /* check the last piece and leave */
+			{
+				ptr = zbx_regexp_sub(p, regexp, output);
+				break;
+			}
+
+			s++;
 		}
 	}
 
