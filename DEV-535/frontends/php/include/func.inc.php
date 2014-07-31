@@ -75,20 +75,6 @@ function getRequest($name, $def = null) {
 	return hasRequest($name) ? $_REQUEST[$name] : $def;
 }
 
-/**
- * Check request, if exist request - return request value, else return default value.
- *
- * @deprecated function, use getRequest() instead
- *
- * @param string	$name
- * @param mixed		$def
- *
- * @return mixed
- */
-function get_request($name, $def = null) {
-	return getRequest($name, $def);
-}
-
 function countRequest($str = null) {
 	if (!empty($str)) {
 		$count = 0;
@@ -1537,7 +1523,7 @@ function getPageSortOrder($default = ZBX_SORT_UP) {
 function getPageNumber() {
 	global $page;
 
-	$pageNumber = get_request('page');
+	$pageNumber = getRequest('page');
 	if (!$pageNumber) {
 		$lastPage = CProfile::get('web.paging.lastpage');
 		$pageNumber = ($lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;

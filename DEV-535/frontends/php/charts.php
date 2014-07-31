@@ -55,13 +55,13 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-if (get_request('graphid')) {
+if (getRequest('graphid')) {
 	$graphs = API::Graph()->get(array(
 		'graphids' => array($_REQUEST['graphid']),
 		'output' => array('graphid')
@@ -74,10 +74,10 @@ if (get_request('graphid')) {
 $pageFilter = new CPageFilter(array(
 	'groups' => array('real_hosts' => true, 'with_graphs' => true),
 	'hosts' => array('with_graphs' => true),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null),
+	'groupid' => getRequest('groupid', null),
+	'hostid' => getRequest('hostid', null),
 	'graphs' => array('templated' => 0),
-	'graphid' => get_request('graphid', null)
+	'graphid' => getRequest('graphid', null)
 ));
 
 /*
@@ -125,8 +125,8 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
-		'period' => get_request('period'),
-		'stime' => get_request('stime')
+		'period' => getRequest('period'),
+		'stime' => getRequest('stime')
 	));
 
 	$curl = new CUrl();

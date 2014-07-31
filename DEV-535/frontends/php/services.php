@@ -118,14 +118,14 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 }
 
 if (isset($_REQUEST['form'])) {
-	$_REQUEST['showsla'] = get_request('showsla', 0);
+	$_REQUEST['showsla'] = getRequest('showsla', 0);
 	$result = false;
 
 	// save
 	if (isset($_REQUEST['save_service'])) {
 		DBstart();
 
-		$children = get_request('children', array());
+		$children = getRequest('children', array());
 		$dependencies = array();
 		foreach ($children as $child) {
 			$dependencies[] = array(
@@ -135,14 +135,14 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		$serviceRequest = array(
-			'name' => get_request('name'),
-			'triggerid' => get_request('triggerid'),
-			'algorithm' => get_request('algorithm'),
-			'showsla' => get_request('showsla', 0),
-			'goodsla' => get_request('goodsla'),
-			'sortorder' => get_request('sortorder'),
-			'times' => get_request('times', array()),
-			'parentid' => get_request('parentid'),
+			'name' => getRequest('name'),
+			'triggerid' => getRequest('triggerid'),
+			'algorithm' => getRequest('algorithm'),
+			'showsla' => getRequest('showsla', 0),
+			'goodsla' => getRequest('goodsla'),
+			'sortorder' => getRequest('sortorder'),
+			'times' => getRequest('times', array()),
+			'parentid' => getRequest('parentid'),
 			'dependencies' => $dependencies
 		);
 
@@ -174,7 +174,7 @@ if (isset($_REQUEST['form'])) {
 	}
 	// validate and get service times
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
-		$_REQUEST['times'] = get_request('times', array());
+		$_REQUEST['times'] = getRequest('times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
 		$result = true;
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
@@ -350,12 +350,12 @@ elseif (isset($_REQUEST['cservices'])) {
  */
 elseif (isset($_REQUEST['form'])) {
 	$data = array();
-	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh', 0);
+	$data['form'] = getRequest('form');
+	$data['form_refresh'] = getRequest('form_refresh', 0);
 	$data['service'] = !empty($service) ? $service : null;
 
-	$data['times'] = get_request('times', array());
-	$data['new_service_time'] = get_request('new_service_time', array('type' => SERVICE_TIME_TYPE_UPTIME));
+	$data['times'] = getRequest('times', array());
+	$data['new_service_time'] = getRequest('new_service_time', array('type' => SERVICE_TIME_TYPE_UPTIME));
 
 	// populate the form from the object from the database
 	if (isset($data['service']['serviceid']) && !isset($_REQUEST['form_refresh'])) {
@@ -406,15 +406,15 @@ elseif (isset($_REQUEST['form'])) {
 	}
 	// populate the form from a submitted request
 	else {
-		$data['name'] = get_request('name', '');
-		$data['algorithm'] = get_request('algorithm', SERVICE_ALGORITHM_MAX);
-		$data['showsla'] = get_request('showsla', 0);
-		$data['goodsla'] = get_request('goodsla', SERVICE_SLA);
-		$data['sortorder'] = get_request('sortorder', 0);
-		$data['triggerid'] = get_request('triggerid', 0);
-		$data['parentid'] = get_request('parentid', 0);
-		$data['parentname'] = get_request('parentname', '');
-		$data['children'] = get_request('children', array());
+		$data['name'] = getRequest('name', '');
+		$data['algorithm'] = getRequest('algorithm', SERVICE_ALGORITHM_MAX);
+		$data['showsla'] = getRequest('showsla', 0);
+		$data['goodsla'] = getRequest('goodsla', SERVICE_SLA);
+		$data['sortorder'] = getRequest('sortorder', 0);
+		$data['triggerid'] = getRequest('triggerid', 0);
+		$data['parentid'] = getRequest('parentid', 0);
+		$data['parentname'] = getRequest('parentname', '');
+		$data['children'] = getRequest('children', array());
 	}
 
 	// get trigger

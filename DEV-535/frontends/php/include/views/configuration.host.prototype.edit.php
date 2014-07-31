@@ -37,7 +37,7 @@ if (!isset($_REQUEST['form_refresh'])) {
 
 $frmHost = new CForm();
 $frmHost->setName('hostPrototypeForm.');
-$frmHost->addVar('form', get_request('form', 1));
+$frmHost->addVar('form', getRequest('form', 1));
 $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 
 $hostList = new CFormList('hostlist');

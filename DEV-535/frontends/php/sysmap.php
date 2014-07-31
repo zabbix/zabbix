@@ -58,7 +58,7 @@ if (isset($_REQUEST['favobj'])) {
 	$json = new CJSON();
 
 	if ($_REQUEST['favobj'] == 'sysmap' && $_REQUEST['action'] == 'save') {
-		$sysmapid = get_request('sysmapid', 0);
+		$sysmapid = getRequest('sysmapid', 0);
 
 		@ob_start();
 

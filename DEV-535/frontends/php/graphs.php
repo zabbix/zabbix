@@ -69,7 +69,7 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null)
 );
-$percentVisible = get_request('visible');
+$percentVisible = getRequest('visible');
 if (!isset($percentVisible['percent_left'])) {
 	unset($_REQUEST['percent_left']);
 }
@@ -85,10 +85,10 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
 
-$_REQUEST['go'] = get_request('go', 'none');
-$_REQUEST['items'] = get_request('items', array());
-$_REQUEST['show_3d'] = get_request('show_3d', 0);
-$_REQUEST['show_legend'] = get_request('show_legend', 0);
+$_REQUEST['go'] = getRequest('go', 'none');
+$_REQUEST['items'] = getRequest('items', array());
+$_REQUEST['show_3d'] = getRequest('show_3d', 0);
+$_REQUEST['show_legend'] = getRequest('show_legend', 0);
 
 /*
  * Permissions
@@ -391,8 +391,8 @@ $pageFilter = new CPageFilter(array(
 		'editable' => true,
 		'templated_hosts' => true
 	),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null)
+	'groupid' => getRequest('groupid', null),
+	'hostid' => getRequest('hostid', null)
 ));
 
 if (empty($_REQUEST['parent_discoveryid'])) {
@@ -412,13 +412,13 @@ if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
-		'graphid' => get_request('graphid', 0),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'group_gid' => get_request('group_gid', array()),
-		'hostid' => get_request('hostid', 0),
-		'normal_only' => get_request('normal_only')
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'graphid' => getRequest('graphid', 0),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'group_gid' => getRequest('group_gid', array()),
+		'hostid' => getRequest('hostid', 0),
+		'normal_only' => getRequest('normal_only')
 	);
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
@@ -462,7 +462,7 @@ elseif (isset($_REQUEST['form'])) {
 				$parentGraph = getGraphByGraphId($parentGraphid);
 
 				// parent graph prototype link
-				if (get_request('parent_discoveryid')) {
+				if (getRequest('parent_discoveryid')) {
 					$parentGraphPrototype = API::GraphPrototype()->get(array(
 						'output' => array('graphid'),
 						'graphids' => $parentGraph['graphid'],
@@ -507,39 +507,39 @@ elseif (isset($_REQUEST['form'])) {
 		));
 	}
 	else {
-		$data['name'] = get_request('name', '');
-		$data['graphtype'] = get_request('graphtype', GRAPH_TYPE_NORMAL);
+		$data['name'] = getRequest('name', '');
+		$data['graphtype'] = getRequest('graphtype', GRAPH_TYPE_NORMAL);
 
 		if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			$data['width'] = get_request('width', 400);
-			$data['height'] = get_request('height', 300);
+			$data['width'] = getRequest('width', 400);
+			$data['height'] = getRequest('height', 300);
 		}
 		else {
-			$data['width'] = get_request('width', 900);
-			$data['height'] = get_request('height', 200);
+			$data['width'] = getRequest('width', 900);
+			$data['height'] = getRequest('height', 200);
 		}
 
-		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['yaxismin'] = get_request('yaxismin', 0);
-		$data['yaxismax'] = get_request('yaxismax', 100);
-		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
-		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
-		$data['show_work_period'] = get_request('show_work_period', 0);
-		$data['show_triggers'] = get_request('show_triggers', 0);
-		$data['show_legend'] = get_request('show_legend', 0);
-		$data['show_3d'] = get_request('show_3d', 0);
-		$data['visible'] = get_request('visible');
+		$data['ymin_type'] = getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['ymax_type'] = getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['yaxismin'] = getRequest('yaxismin', 0);
+		$data['yaxismax'] = getRequest('yaxismax', 100);
+		$data['ymin_itemid'] = getRequest('ymin_itemid', 0);
+		$data['ymax_itemid'] = getRequest('ymax_itemid', 0);
+		$data['show_work_period'] = getRequest('show_work_period', 0);
+		$data['show_triggers'] = getRequest('show_triggers', 0);
+		$data['show_legend'] = getRequest('show_legend', 0);
+		$data['show_3d'] = getRequest('show_3d', 0);
+		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = get_request('visible');
-		$data['items'] = get_request('items', array());
+		$data['visible'] = getRequest('visible');
+		$data['items'] = getRequest('items', array());
 
 		if (isset($data['visible']['percent_left'])) {
-			$data['percent_left'] = get_request('percent_left', 0);
+			$data['percent_left'] = getRequest('percent_left', 0);
 		}
 		if (isset($data['visible']['percent_right'])) {
-			$data['percent_right'] = get_request('percent_right', 0);
+			$data['percent_right'] = getRequest('percent_right', 0);
 		}
 	}
 
@@ -609,8 +609,8 @@ elseif (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'graphs' => array(),
 		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
 	);
@@ -622,7 +622,7 @@ else {
 	$options = array(
 		'hostids' => $data['hostid'] ? $data['hostid'] : null,
 		'groupids' => (!$data['hostid'] && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
-		'discoveryids' => empty($_REQUEST['parent_discoveryid']) ? null : get_request('parent_discoveryid'),
+		'discoveryids' => empty($_REQUEST['parent_discoveryid']) ? null : getRequest('parent_discoveryid'),
 		'editable' => true,
 		'output' => array('graphid', 'name', 'graphtype'),
 		'limit' => $config['search_limit'] + 1

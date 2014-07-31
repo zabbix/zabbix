@@ -219,7 +219,7 @@ class CPageFilter {
 	 */
 	public function __construct(array $options = array()) {
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
-		$this->config['DDReset'] = get_request('ddreset', null);
+		$this->config['DDReset'] = getRequest('ddreset', null);
 		$this->config['popupDD'] = isset($options['config']['popupDD']);
 
 		$config = select_config();

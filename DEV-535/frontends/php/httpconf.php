@@ -73,7 +73,7 @@ $fields = array(
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
+$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
@@ -101,7 +101,7 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 
 /*
@@ -219,7 +219,7 @@ elseif (isset($_REQUEST['save'])) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => get_request('applicationid'),
+			'applicationid' => getRequest('applicationid'),
 			'delay' => $_REQUEST['delay'],
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
