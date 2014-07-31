@@ -264,6 +264,12 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_CHART:
 				return new CScreenChart($options);
 
+			case SCREEN_RESOURCE_LLD_GRAPH:
+				return new CScreenLldGraph($options);
+
+			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+				return new CScreenLldSimpleGraph($options);
+
 			default:
 				return null;
 		}
