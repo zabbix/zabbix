@@ -824,10 +824,6 @@ jQuery(function($) {
 	}
 
 	function resize(obj, values, options) {
-		if (IE8) {
-			obj.closest('.template-link-block').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
-
 		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
