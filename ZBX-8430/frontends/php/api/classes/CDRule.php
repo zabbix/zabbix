@@ -574,13 +574,19 @@ class CDRule extends CApiService {
 		$actionIds = array();
 		$conditionIds = array();
 
+		$checkIds = array();
+
+		$dbChecks = DBselect('SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $druleIds));
+
+		while ($dbCheck = DBfetch($dbChecks)) {
+			$checkIds[] = $dbCheck['dcheckid'];
+		}
+
 		$dbConditions = DBselect(
-			'SELECT c.conditionid, c.actionid'.
+			'SELECT c.conditionid,c.actionid'.
 			' FROM conditions c'.
 			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionInt('c.value', $druleIds).')'.
-				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND c.value IN'.
-					' (SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $druleIds).')'.
-				')'
+				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND '.dbConditionInt('c.value', $checkIds).')'
 		);
 
 		while ($dbCondition = DBfetch($dbConditions)) {
@@ -591,7 +597,7 @@ class CDRule extends CApiService {
 		if ($actionIds) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => array_unique($actionIds)),
+				'where' => array('actionid' => array_unique($actionIds))
 			));
 		}
 
