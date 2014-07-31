@@ -197,12 +197,12 @@
 		<?php endforeach ?>
 
 		$('#authentication').on('change', function() {
-			var httpFieldsDisabled = $(this).val() == 0; // 0 == HTTPTEST_AUTH_NONE
+			var httpFieldsDisabled = $(this).val() == <?php echo HTTPTEST_AUTH_NONE; ?>;
 
 			$('#http_user').attr('disabled', httpFieldsDisabled);
 			$('#http_password').attr('disabled', httpFieldsDisabled);
 
-			if(httpFieldsDisabled) {
+			if (httpFieldsDisabled) {
 				$('#http_user').closest('li').addClass('hidden');
 				$('#http_password').closest('li').addClass('hidden');
 			}

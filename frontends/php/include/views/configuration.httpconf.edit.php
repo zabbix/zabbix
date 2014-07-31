@@ -156,9 +156,9 @@ $authenticationComboBox->addItems(httptest_authentications());
 $httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
 
 $httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
-$httpAuthenticationPasswordTB=new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
+$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
 
-$authenticationInputsHidden=$this->data['authentication'] == HTTPTEST_AUTH_NONE;
+$authenticationInputsHidden = $this->data['authentication'] == HTTPTEST_AUTH_NONE;
 
 if ($authenticationInputsHidden) {
 	$httpAuthenticationUserTB->setAttribute('disabled', true);
