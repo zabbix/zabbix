@@ -2330,15 +2330,12 @@ function checkRequiredKeys(array $array, array $keys) {
 }
 
 /**
- * Clear page cookies on action.
+ * Clears table rows selection's cookies.
  *
- * @param bool   $clear
- * @param string $id	parent id, is used as cookie prefix
+ * @param string $id	parent id, is used as cookie suffix
  */
-function clearCookies($clear = false, $id = null) {
-	if ($clear) {
-		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
-	}
+function uncheckTableRows($cookieId = null) {
+	insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($cookieId ? '_'.$cookieId : '').'")');
 }
 
 /**

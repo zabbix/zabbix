@@ -855,12 +855,6 @@ class CTrigger extends CTriggerGeneral {
 			'value_id' => $triggerIds
 		));
 
-		DB::delete('events', array(
-			'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-			'objectid' => $triggerIds,
-			'object' => EVENT_OBJECT_TRIGGER
-		));
-
 		DB::delete('sysmaps_elements', array(
 			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
@@ -1193,15 +1187,6 @@ class CTrigger extends CTriggerGeneral {
 						$cTrigIds[] = $cTrig['triggerid'];
 					}
 					$this->deleteByIds($cTrigIds);
-				}
-
-				// if the trigger contains templates, delete any events that may exist
-				if ($this->expressionHasTemplates($expressionData)) {
-					DB::delete('events', array(
-						'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-						'object' => EVENT_OBJECT_TRIGGER,
-						'objectid' => $trigger['triggerid']
-					));
 				}
 
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));

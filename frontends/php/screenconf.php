@@ -183,11 +183,12 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
+		uncheckTableRows();
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
 	$screenids = get_request('screens', array());
@@ -232,10 +233,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 
 	if ($result) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
+		uncheckTableRows();
 	}
-
 	show_messages($result, _('Screen deleted'), _('Cannot delete screen'));
-	clearCookies($result);
 }
 
 /*

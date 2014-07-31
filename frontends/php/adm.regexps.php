@@ -65,8 +65,8 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 		);
 
 		$validator = new CRegexValidator(array(
-			'messageType' => _('Regular expression must be a string'),
-			'messageInvalid' => _('Incorrect regular expression "%1$s": "%2$s"')
+			'messageInvalid' => _('Regular expression must be a string'),
+			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
 		));
 
 		foreach ($ajaxData['expressions'] as $id => $expression) {
@@ -154,8 +154,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
@@ -189,11 +192,14 @@ elseif (isset($_REQUEST['go'])) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result,
 			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
-		clearCookies($result);
 	}
 }
 

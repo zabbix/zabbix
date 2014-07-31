@@ -106,7 +106,7 @@ else {
 	$slideshowWidget->addItem(new CTableInfo(_('No slide shows found.')));
 }
 
-if ($this->data['elementId']) {
+if ($this->data['elementId'] && isset($this->data['element'])) {
 	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 }
 
