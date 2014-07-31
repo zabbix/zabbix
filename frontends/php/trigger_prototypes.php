@@ -79,17 +79,17 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
+$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP, array('priority', 'description', 'status'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 // validate permissions
-if (get_request('parent_discoveryid')) {
+if (getRequest('parent_discoveryid')) {
 	$discovery_rule = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -117,7 +117,7 @@ else {
 	access_deny();
 }
 
-$showdisabled = get_request('showdisabled', 0);
+$showdisabled = getRequest('showdisabled', 0);
 CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
 /*
@@ -277,11 +277,11 @@ elseif (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'showInfoColumn' => false,
 		'discovery_rule' => $discovery_rule,
-		'hostid' => get_request('hostid'),
-		'showdisabled' => get_request('showdisabled', 1),
+		'hostid' => getRequest('hostid'),
+		'showdisabled' => getRequest('showdisabled', 1),
 		'triggers' => array()
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);

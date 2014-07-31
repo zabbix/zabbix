@@ -32,7 +32,7 @@ ob_start();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$_REQUEST['go'] = get_request('go', null);
+$_REQUEST['go'] = getRequest('go', null);
 $bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -52,7 +52,7 @@ $fields = array(
 );
 check_fields($fields);
 
-$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
+$_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
 
 /*
  * Redirect
@@ -83,9 +83,9 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	show_message(_('No events to acknowledge'));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
-elseif (get_request('eventid')) {
+elseif (getRequest('eventid')) {
 	$event = API::Event()->get(array(
-		'eventids' => get_request('eventid'),
+		'eventids' => getRequest('eventid'),
 		'output' => array('eventid'),
 		'limit' => 1
 	));
@@ -93,9 +93,9 @@ elseif (get_request('eventid')) {
 		access_deny();
 	}
 }
-elseif (get_request('triggers')) {
+elseif (getRequest('triggers')) {
 	$trigger = API::Trigger()->get(array(
-		'triggerids' => get_request('triggers'),
+		'triggerids' => getRequest('triggers'),
 		'output' => array('triggerid'),
 		'limit' => 1
 	));

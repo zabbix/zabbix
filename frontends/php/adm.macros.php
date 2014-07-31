@@ -54,7 +54,7 @@ if (isset($_REQUEST['save'])) {
 			'preservekeys' => true
 		));
 
-		$newMacros = get_request('macros', array());
+		$newMacros = getRequest('macros', array());
 
 		// remove empty new macro lines
 		foreach ($newMacros as $number => $newMacro) {
@@ -173,11 +173,11 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 $data['macros'] = array();
 
 if ($data['form_refresh']) {
-	$data['macros'] = get_request('macros', array());
+	$data['macros'] = getRequest('macros', array());
 }
 else {
 	$data['macros'] = API::UserMacro()->get(array(

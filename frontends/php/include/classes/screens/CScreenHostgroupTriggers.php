@@ -67,8 +67,8 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			$params['groupids'] = $hostgroup['groupid'];
 		}
 		else {
-			$groupid = get_request('tr_groupid', CProfile::get('web.screens.tr_groupid', 0));
-			$hostid = get_request('tr_hostid', CProfile::get('web.screens.tr_hostid', 0));
+			$groupid = getRequest('tr_groupid', CProfile::get('web.screens.tr_groupid', 0));
+			$hostid = getRequest('tr_hostid', CProfile::get('web.screens.tr_hostid', 0));
 
 			CProfile::update('web.screens.tr_groupid', $groupid, PROFILE_TYPE_ID);
 			CProfile::update('web.screens.tr_hostid', $hostid, PROFILE_TYPE_ID);

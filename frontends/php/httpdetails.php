@@ -70,7 +70,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Collect data
  */
 $httpTest = API::HttpTest()->get(array(
-	'httptestids' => get_request('httptestid'),
+	'httptestids' => getRequest('httptestid'),
 	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
@@ -119,7 +119,7 @@ $httpdetailsWidget->addPageHeader(
 		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
 	),
 	array(
-		get_icon('reset', array('id' => get_request('httptestid'))),
+		get_icon('reset', array('id' => getRequest('httptestid'))),
 		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 	)
 );
@@ -274,9 +274,9 @@ $graphInScreen = new CScreenBase(array(
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_in',
 	'profileIdx' => 'web.httptest',
-	'profileIdx2' => get_request('httptestid'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'profileIdx2' => getRequest('httptestid'),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 ));
 $graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
 
@@ -316,9 +316,9 @@ $graphTimeScreen = new CScreenBase(array(
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_time',
 	'profileIdx' => 'web.httptest',
-	'profileIdx2' => get_request('httptestid'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'profileIdx2' => getRequest('httptestid'),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 ));
 
 $src = 'chart3.php?height=150'.

@@ -666,7 +666,7 @@ elseif (is_null($paramType)) {
  * Display
  */
 $data = array(
-	'parent_discoveryid' => get_request('parent_discoveryid', null),
+	'parent_discoveryid' => getRequest('parent_discoveryid', null),
 	'dstfrm' => $dstfrm,
 	'dstfld1' => $dstfld1,
 	'itemid' => $itemId,
@@ -679,8 +679,8 @@ $data = array(
 	'itemValueType' => $itemValueType,
 	'selectedFunction' => null,
 	'expr_type' => $exprType,
-	'insert' => get_request('insert', null),
-	'cancel' => get_request('cancel', null)
+	'insert' => getRequest('insert', null),
+	'cancel' => getRequest('cancel', null)
 );
 
 // check if submitted function is usable with selected item

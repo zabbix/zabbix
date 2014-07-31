@@ -79,19 +79,19 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+if (getRequest('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
 	access_deny();
 }
 
-$templateIds = get_request('templates', array());
+$templateIds = getRequest('templates', array());
 
 if ($exportData) {
 	$export = new CConfigurationExport(array('templates' => $templateIds));
@@ -381,7 +381,7 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
-	$templates = get_request('templates', array());
+	$templates = getRequest('templates', array());
 
 	DBstart();
 
@@ -419,14 +419,14 @@ $pageFilter = new CPageFilter(array(
 		'templated_hosts' => true,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null)
+	'groupid' => getRequest('groupid', null)
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
-	if ($templateId = get_request('templateid', 0)) {
+	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 
