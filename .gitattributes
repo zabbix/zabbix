@@ -170,6 +170,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/screens/CScreenLldGraph.php -text
+frontends/php/include/classes/screens/CScreenLldGraphBase.php -text
+frontends/php/include/classes/screens/CScreenLldSimpleGraph.php -text
 frontends/php/include/classes/validators/CActionCondValidator.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/menupopup.js -text svneol=unset#text/plain
