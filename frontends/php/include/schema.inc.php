@@ -490,6 +490,12 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
+			'max_columns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'slideshows' => array(
