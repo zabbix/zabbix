@@ -270,7 +270,7 @@ elseif (get_request('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
-clearCookies(true);
+uncheckTableRows();
 
 function get_window_opener($frame, $field, $value) {
 	if (empty($field)) {

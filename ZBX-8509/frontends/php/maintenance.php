@@ -206,8 +206,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	$maintenanceids = get_request('maintenanceid', array());
@@ -236,8 +239,11 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];

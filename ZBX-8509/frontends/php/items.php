@@ -364,9 +364,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
 		$result = API::Item()->delete(array(getRequest('itemid')));
 	}
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, getRequest('hostid'));
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -473,7 +476,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	$result = DBend($result);
 
-	if (isset($_REQUEST['itemid'])) {
+	if (hasRequest('itemid')) {
 		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
@@ -482,7 +485,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, getRequest('hostid'));
+		uncheckTableRows(getRequest('hostid'));
 	}
 }
 // cleaning history for one item
@@ -503,8 +506,8 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 
 	$result = DBend($result);
+
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, getRequest('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -667,12 +670,11 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	$result = DBend($result);
 
-	show_messages($result, _('Items updated'), _('Cannot update items'));
-
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-		clearCookies($result, getRequest('hostid'));
+		uncheckTableRows(getRequest('hostid'));
 	}
+	show_messages($result, _('Items updated'), _('Cannot update items'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
 	$groupItemId = getRequest('group_itemid');
@@ -681,6 +683,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBstart();
 	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
 	$updated = count($groupItemId);
 
@@ -692,7 +698,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
 elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
@@ -718,13 +723,15 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 
 		DBstart();
 
-		$goResult = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
-		$goResult = DBend($goResult);
-
-		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
-		clearCookies($goResult, getRequest('hostid'));
+		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
+		$result = DBend($result);
 
 		$_REQUEST['go'] = 'none2';
+
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
+		show_messages($result, _('Items copied'), _('Cannot copy items'));
 	}
 	else {
 		show_error_message(_('No target selected.'));
@@ -734,8 +741,7 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
 
-	$goResult = delete_history_by_itemid($_REQUEST['group_itemid']);
-
+	$result = delete_history_by_itemid($_REQUEST['group_itemid']);
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
@@ -747,10 +753,12 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 		);
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('History cleared'), $goResult);
-	clearCookies($goResult, getRequest('hostid'));
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('History cleared'), $result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
@@ -776,8 +784,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
-	clearCookies($result, getRequest('hostid'));
 }
 
 /*

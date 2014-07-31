@@ -27,7 +27,7 @@ class CCollectionValidatorTest extends CValidatorTest {
 				'empty' => true,
 				'uniqueField' => 'field',
 				'uniqueField2' => 'field',
-				'messageType' => 'Not an array',
+				'messageInvalid' => 'Not an array',
 				'messageEmpty' => 'Empty collection',
 				'messageDuplicate' => 'Collection has duplicate values',
 			))
@@ -61,23 +61,31 @@ class CCollectionValidatorTest extends CValidatorTest {
 					array('type' => 2, 'subtype' => 2),
 				)
 			),
+			array(
+				array('uniqueField' => 'type', 'uniqueField2' => null),
+				array(
+					array('type' => 1),
+					array('type' => 2),
+					array('type' => 3)
+				)
+			)
 		);
 	}
 
 	public function invalidValuesProvider() {
 		return array(
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				'',
 				'Not an array'
 			),
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				0,
 				'Not an array'
 			),
 			array(
-				array('messageType' => 'Not an array'),
+				array('messageInvalid' => 'Not an array'),
 				null,
 				'Not an array'
 			),
@@ -96,14 +104,15 @@ class CCollectionValidatorTest extends CValidatorTest {
 				'Duplicate type "1"'
 			),
 			array(
-				array('uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%1$s" and subtype "%2$s"'),
+				array('uniqueField' => 'type', 'uniqueField2' => 'subtype',
+					'messageDuplicate' => 'Duplicate type "%1$s" and subtype "%2$s"'),
 				array(
 					array('type' => 1, 'subtype' => 1),
 					array('type' => 1, 'subtype' => 2),
 					array('type' => 2, 'subtype' => 2),
 					array('type' => 2, 'subtype' => 2),
 				),
-				'Duplicate type "1" and subtype "2"'
+				'Duplicate type "2" and subtype "2"'
 			),
 		);
 	}
@@ -111,17 +120,17 @@ class CCollectionValidatorTest extends CValidatorTest {
 	public function invalidValuesWithObjectsProvider() {
 		return array(
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+			array('messageInvalid' => 'Not an array for "%1$s"'),
 				'',
 				'Not an array for "object"'
 			),
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+				array('messageInvalid' => 'Not an array for "%1$s"'),
 				0,
 				'Not an array for "object"'
 			),
 			array(
-				array('messageType' => 'Not an array for "%1$s"'),
+				array('messageInvalid' => 'Not an array for "%1$s"'),
 				null,
 				'Not an array for "object"'
 			),
@@ -140,14 +149,15 @@ class CCollectionValidatorTest extends CValidatorTest {
 				'Duplicate type "1" for "object"'
 			),
 			array(
-				array('uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%2$s" and subtype "%3$s" for "%1$s"'),
+				array('uniqueField' => 'type', 'uniqueField2' => 'subtype',
+					'messageDuplicate' => 'Duplicate type "%2$s" and subtype "%3$s" for "%1$s"'),
 				array(
 					array('type' => 1, 'subtype' => 1),
 					array('type' => 1, 'subtype' => 2),
 					array('type' => 2, 'subtype' => 2),
 					array('type' => 2, 'subtype' => 2),
 				),
-				'Duplicate type "1" and subtype "2" for "object"'
+				'Duplicate type "2" and subtype "2" for "object"'
 			),
 		);
 	}

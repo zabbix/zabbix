@@ -20,19 +20,20 @@
 
 class CRegexValidator extends CValidator
 {
-	/**
-	 * Error message if the argument is not a string.
-	 *
-	 * @var string
-	 */
-	public $messageType;
 
 	/**
-	 * Error message if the value is invalid.
+	 * Error message if the is not a string.
 	 *
 	 * @var string
 	 */
 	public $messageInvalid;
+
+	/**
+	 * Error message if the value is invalid
+	 *
+	 * @var string
+	 */
+	public $messageRegex;
 
 	/**
 	 * Check if regular expression is valid
@@ -43,7 +44,7 @@ class CRegexValidator extends CValidator
 	 */
 	public function validate($value) {
 		if (!is_string($value) && !is_numeric($value)) {
-			$this->error($this->messageType);
+			$this->error($this->messageInvalid);
 			return false;
 		}
 
@@ -65,7 +66,7 @@ class CRegexValidator extends CValidator
 
 		if ($error) {
 			$this->error(
-				$this->messageInvalid,
+				$this->messageRegex,
 				$value,
 				str_replace('preg_match(): ', '', $error)
 			);

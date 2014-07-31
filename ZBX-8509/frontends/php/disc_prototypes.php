@@ -187,9 +187,12 @@ elseif (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::Itemprototype()->delete(array(getRequest('itemid')));
 	$result = DBend($result);
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
 	show_messages($result, _('Item prototype deleted'), _('Cannot delete item prototype'));
+
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -290,9 +293,10 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, getRequest('parent_discoveryid'));
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
@@ -312,8 +316,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
 		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
 	DBstart();
@@ -321,8 +327,10 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
 	$result = API::Itemprototype()->delete(getRequest('group_itemid'));
 	$result = DBend($result);
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
 	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 
 /*
