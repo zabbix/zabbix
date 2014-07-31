@@ -12,6 +12,7 @@ A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditi
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8471] fixed removing slides from slideshows in cases when some slides have been deleted (Krists)
 ..F....... [ZBX-8509] fixed item custom multiplier formula default value to be "1" and not become unset in some cases (Krists)
 A.F....... [ZBX-8430] fixed cascade removal of action conditions when deleting related discovery rule and checks (Andrejs)
 ..F....... [ZBX-8432] fixed multiselect resize and IE11 visual issues (Oleg)
