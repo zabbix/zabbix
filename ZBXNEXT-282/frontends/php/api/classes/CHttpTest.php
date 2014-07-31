@@ -894,7 +894,7 @@ class CHttpTest extends CApiService {
 				&& ($httpTest['ssl_key_password'] != '' || $httpTest['ssl_key_file'] != '')) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('SSL key file or password specified without SSL certificate file in web scenario "1$s".', $httpTest['name']));
+				_s('SSL key file or password specified without SSL certificate file in web scenario "%1$s".', $httpTest['name']));
 		}
 	}
 }
