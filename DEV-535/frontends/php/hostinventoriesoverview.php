@@ -54,7 +54,7 @@ $options = array(
 	'groups' => array(
 		'real_hosts' => 1,
 	),
-	'groupid' => getRequest('groupid', null),
+	'groupid' => getRequest('groupid'),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;

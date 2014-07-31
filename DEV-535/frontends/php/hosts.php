@@ -685,7 +685,7 @@ $pageFilter = new CPageFilter(array(
 		'real_hosts' => true,
 		'editable' => true
 	),
-	'groupid' => getRequest('groupid', null)
+	'groupid' => getRequest('groupid')
 ));
 
 $_REQUEST['groupid'] = $pageFilter->groupid;

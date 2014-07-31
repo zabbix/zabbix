@@ -61,7 +61,7 @@ $data = array(
 
 $data['pageFilter'] = new CPageFilter(array(
 	'drules' => array('filter' => array('status' => DRULE_STATUS_ACTIVE)),
-	'druleid' => getRequest('druleid', null)
+	'druleid' => getRequest('druleid')
 ));
 
 if ($data['pageFilter']->drulesSelected) {

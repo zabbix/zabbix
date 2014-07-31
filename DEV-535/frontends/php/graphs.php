@@ -391,8 +391,8 @@ $pageFilter = new CPageFilter(array(
 		'editable' => true,
 		'templated_hosts' => true
 	),
-	'groupid' => getRequest('groupid', null),
-	'hostid' => getRequest('hostid', null)
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid')
 ));
 
 if (empty($_REQUEST['parent_discoveryid'])) {

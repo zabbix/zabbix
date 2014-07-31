@@ -82,7 +82,7 @@ function getUserFormData($userid, $isProfile = false) {
 		$data['rows_per_page']	= getRequest('rows_per_page', 50);
 		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
 		$data['user_groups']	= getRequest('user_groups', array());
-		$data['change_password']= getRequest('change_password', null);
+		$data['change_password']= getRequest('change_password');
 		$data['user_medias']	= getRequest('user_medias', array());
 
 		// set messages
@@ -953,14 +953,14 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
-		'parent_discoveryid' => getRequest('parent_discoveryid', !empty($options['is_discovery_rule']) ? getRequest('itemid', null) : null),
-		'itemid' => getRequest('itemid', null),
+		'parent_discoveryid' => getRequest('parent_discoveryid', !empty($options['is_discovery_rule']) ? getRequest('itemid') : null),
+		'itemid' => getRequest('itemid'),
 		'limited' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
 		'name' => getRequest('name', ''),
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
-		'hostname' => getRequest('hostname', null),
+		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', 90),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),

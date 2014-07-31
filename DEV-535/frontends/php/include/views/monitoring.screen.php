@@ -87,8 +87,8 @@ else {
 				'with_items' => true,
 				'DDFirstLabel' => _('not selected')
 			),
-			'hostid' => getRequest('hostid', null),
-			'groupid' => getRequest('groupid', null)
+			'hostid' => getRequest('hostid'),
+			'groupid' => getRequest('groupid')
 		));
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;

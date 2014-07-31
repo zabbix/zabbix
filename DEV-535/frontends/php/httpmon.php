@@ -58,8 +58,8 @@ $options = array(
 		'with_monitored_items' => true,
 		'with_httptests' => true
 	),
-	'hostid' => getRequest('hostid', null),
-	'groupid' => getRequest('groupid', null),
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid'),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;

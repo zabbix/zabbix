@@ -364,9 +364,9 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'form' => getRequest('form', null),
-		'parent_discoveryid' => getRequest('parent_discoveryid', null),
-		'hostid' => getRequest('hostid', null),
+		'form' => getRequest('form'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'hostid' => getRequest('hostid'),
 		'discovery_rule' => $discovery_rule
 	);
 

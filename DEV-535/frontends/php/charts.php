@@ -74,10 +74,10 @@ if (getRequest('graphid')) {
 $pageFilter = new CPageFilter(array(
 	'groups' => array('real_hosts' => true, 'with_graphs' => true),
 	'hosts' => array('with_graphs' => true),
-	'groupid' => getRequest('groupid', null),
-	'hostid' => getRequest('hostid', null),
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid'),
 	'graphs' => array('templated' => 0),
-	'graphid' => getRequest('graphid', null)
+	'graphid' => getRequest('graphid')
 ));
 
 /*

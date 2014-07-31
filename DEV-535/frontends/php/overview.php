@@ -177,8 +177,8 @@ $data['pageFilter'] = new CPageFilter(array(
 		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
-	'hostid' => getRequest('hostid', null),
-	'groupid' => getRequest('groupid', null)
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
 ));
 
 $data['groupid'] = $data['pageFilter']->groupid;

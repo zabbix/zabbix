@@ -232,8 +232,8 @@ $dstfld1 = getRequest('dstfld1', ''); // output field on destination form
 $dstfld2 = getRequest('dstfld2', ''); // second output field on destination form
 $dstfld3 = getRequest('dstfld3', ''); // third output field on destination form
 $srcfld1 = getRequest('srcfld1', ''); // source table field [can be different from fields of source table]
-$srcfld2 = getRequest('srcfld2', null); // second source table field [can be different from fields of source table]
-$srcfld3 = getRequest('srcfld3', null); //  source table field [can be different from fields of source table]
+$srcfld2 = getRequest('srcfld2'); // second source table field [can be different from fields of source table]
+$srcfld3 = getRequest('srcfld3'); //  source table field [can be different from fields of source table]
 $multiselect = getRequest('multiselect', 0); // if create popup with checkboxes
 $dstact = getRequest('dstact', '');
 $writeonly = getRequest('writeonly');
@@ -253,7 +253,7 @@ $submitParent = getRequest('submitParent', 0);
 $normalOnly = getRequest('normal_only');
 $group = getRequest('group', '');
 $host = getRequest('host', '');
-$onlyHostid = getRequest('only_hostid', null);
+$onlyHostid = getRequest('only_hostid');
 
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
@@ -306,8 +306,8 @@ $options = array(
 	'config' => array('select_latest' => true, 'deny_all' => true, 'popupDD' => true),
 	'groups' => array(),
 	'hosts' => array(),
-	'groupid' => getRequest('groupid', null),
-	'hostid' => getRequest('hostid', null)
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid')
 );
 
 if (!is_null($writeonly)) {

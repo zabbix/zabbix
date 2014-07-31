@@ -164,9 +164,9 @@ elseif ($_REQUEST['go'] == 'delete') {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => getRequest('form', null),
+		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
-		'slideshowid' => getRequest('slideshowid', null),
+		'slideshowid' => getRequest('slideshowid'),
 		'name' => getRequest('name', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'slides' => getRequest('slides', array())
