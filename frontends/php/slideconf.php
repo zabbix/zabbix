@@ -177,21 +177,20 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $dbSlideshow['delay'];
 
 		// get slides
-		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).' ORDER BY s.step');
-		while ($slide = DBfetch($db_slides)) {
-			$data['slides'][$slide['step']] = array(
-				'slideid' => $slide['slideid'],
-				'screenid' => $slide['screenid'],
-				'delay' => $slide['delay']
-			);
-		}
+		$data['slides'] = DBfetchArray(DBselect(
+				'SELECT s.slideid, s.screenid, s.delay'.
+				' FROM slides s'.
+				' WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).
+				' ORDER BY s.step'
+		));
 	}
 
 	// get slides without delay
 	$data['slides_without_delay'] = $data['slides'];
-	for ($i = 0, $size = count($data['slides_without_delay']); $i < $size; $i++) {
-		unset($data['slides_without_delay'][$i]['delay']);
+	foreach ($data['slides_without_delay'] as &$slide) {
+		unset($slide['delay']);
 	}
+	unset($slide);
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.edit', $data);
