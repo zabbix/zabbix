@@ -115,12 +115,15 @@ if (isset($_REQUEST['save'])) {
 			_('Application').' ['.$_REQUEST['appname'].'] ['.$applicationId.']'
 		);
 		unset($_REQUEST['form']);
-		clearCookies($dbApplications, $_REQUEST['hostid']);
 	}
 
 	unset($_REQUEST['save']);
 
 	$result = DBend($dbApplications);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
@@ -148,8 +151,11 @@ elseif (isset($_REQUEST['delete'])) {
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 		show_messages($result, _('Application deleted'), _('Cannot delete application'));
-		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif ($_REQUEST['go'] == 'delete') {
@@ -183,12 +189,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 		$deleted++;
 	}
 
-	$messageSuccess = _n('Application deleted', 'Applications deleted', $deleted);
-	$messageFailed = _n('Cannot delete application', 'Cannot delete applications', $deleted);
-
 	$result = DBend($result);
-	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $_REQUEST['hostid']);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result,
+		_n('Application deleted', 'Applications deleted', $deleted),
+		_n('Cannot delete application', 'Cannot delete applications', $deleted)
+	);
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	$result = true;
@@ -222,8 +231,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		? _n('Cannot enable item', 'Cannot enable items', $updated)
 		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
+	if ($result) {
+		uncheckTableRows($hostId);
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $hostId);
 }
 
 /*

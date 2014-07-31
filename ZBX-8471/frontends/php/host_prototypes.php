@@ -112,15 +112,16 @@ elseif (get_request('unlink')) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
-
 	DBstart();
 	$result = API::HostPrototype()->delete(array(getRequest('hostid')));
+	$result = DBend($result);
 
+	if ($result) {
+		uncheckTableRows($discoveryRule['itemid']);
+	}
 	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
 
 	unset($_REQUEST['hostid'], $_REQUEST['form']);
-	DBend($result);
-	clearCookies($result, $discoveryRule['itemid']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
@@ -201,12 +202,12 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
 	}
 
+	$result = DBend($result);
+
 	if ($result) {
+		uncheckTableRows($discoveryRule['itemid']);
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 	}
-
-	DBend($result);
-	clearCookies($result, $discoveryRule['itemid']);
 }
 // GO
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_hostid')) {
@@ -223,7 +224,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 
 	$result = API::HostPrototype()->update($update);
-	DBend($result);
+	$result = DBend($result);
 
 	$updated = count($update);
 
@@ -234,15 +235,20 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable host prototype', 'Cannot enable host prototypes', $updated)
 		: _n('Cannot disable host prototype', 'Cannot disable host prototypes', $updated);
 
+	if ($result) {
+		uncheckTableRows($discoveryRule['itemid']);
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $discoveryRule['itemid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
 	DBstart();
-	$go_result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
-	show_messages($go_result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
-	DBend($go_result);
-	clearCookies($go_result, $discoveryRule['itemid']);
+	$result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows($discoveryRule['itemid']);
+	}
+	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
 /*
