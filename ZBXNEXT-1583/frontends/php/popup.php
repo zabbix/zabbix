@@ -91,6 +91,14 @@ switch ($srctbl) {
 		$page['title'] = _('Graphs');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
+	case 'graph_prototypes':
+		$page['title'] = _('Graph prototypes');
+		$min_user_type = USER_TYPE_ZABBIX_USER;
+		break;
+	case 'item_prototypes':
+		$page['title'] = _('Item prototypes');
+		$min_user_type = USER_TYPE_ZABBIX_USER;
+		break;
 	case 'sysmaps':
 		$page['title'] = _('Maps');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -139,6 +147,8 @@ $allowedSrcFields = array(
 	'items'					=> '"itemid", "name"',
 	'prototypes'			=> '"itemid", "name", "flags"',
 	'graphs'				=> '"graphid", "name"',
+	'graph_prototypes'		=> '"graphid", "name"',
+	'item_prototypes'		=> '"itemid", "name"',
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
 	'help_items'			=> '"key"',
@@ -180,6 +190,7 @@ $fields = array(
 	'normal_only' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_applications' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_graphs' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_discovery_rules' => 		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_items' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_simple_graph_items' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_triggers' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -239,6 +250,7 @@ $dstact = get_request('dstact', '');
 $writeonly = get_request('writeonly');
 $withApplications = get_request('with_applications', 0);
 $withGraphs = get_request('with_graphs', 0);
+$withDiscoveryRules = getRequest('with_discovery_rules', 0);
 $withItems = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
 $excludeids = zbx_toHash(getRequest('excludeids', array()));
@@ -469,8 +481,8 @@ if (isset($onlyHostid)) {
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
 else {
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'templates', 'hosts',
-			'host_templates'))) {
+	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'templates',
+									'item_prototypes', 'hosts', 'host_templates'))) {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
 	}
 	if (str_in_array($srctbl, array('help_items'))) {
@@ -482,7 +494,8 @@ else {
 		}
 		$frmTitle->addItem(array(_('Type'), SPACE, $cmbTypes));
 	}
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs'))) {
+	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes',
+									'item_prototypes'))) {
 		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
 	}
 }
@@ -1065,15 +1078,16 @@ elseif ($srctbl == 'triggers') {
 }
 
 /*
- * Items
+ * Items or Item prototypes
  */
-elseif ($srctbl == 'items') {
+elseif ($srctbl == 'items' || $srctbl == 'item_prototypes') {
 	$form = new CForm();
 	$form->setName('itemform');
 	$form->setAttribute('id', 'items');
 
-	$table = new CTableInfo(_('No items found.'));
+	$itemPrototypesPopup = ($srctbl == 'item_prototypes');
 
+	$table = new CTableInfo($itemPrototypesPopup ? _('No item prototypes found.') : _('No items found.'));
 	$header = array(
 		$pageFilter->hostsAll ? _('Host') : null,
 		$multiselect ? new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');") : null,
@@ -1104,7 +1118,8 @@ elseif ($srctbl == 'items') {
 		$options['filter']['value_type'] = $value_types;
 	}
 
-	$items = API::Item()->get($options);
+	$api = $itemPrototypesPopup ? API::ItemPrototype() : API::Item();
+	$items = $api->get($options);
 
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 
@@ -1344,15 +1359,16 @@ elseif ($srctbl == 'applications') {
 }
 
 /*
- * Graphs
+ * Graphs or Graph prototypes
  */
-elseif ($srctbl == 'graphs') {
+elseif ($srctbl == 'graphs' || $srctbl == 'graph_prototypes') {
 	$form = new CForm();
 	$form->setName('graphform');
 	$form->setAttribute('id', 'graphs');
 
-	$table = new CTableInfo(_('No graphs found.'));
+	$graphPrototypesPopup = ($srctbl == 'graph_prototypes');
 
+	$table = new CTableInfo($graphPrototypesPopup ? _('No graph prototypes found.') : _('No graphs found.'));
 	if ($multiselect) {
 		$header = array(
 			array(new CCheckBox('all_graphs', null, "javascript: checkAll('".$form->getName()."', 'all_graphs', 'graphs');"), _('Description')),
@@ -1382,7 +1398,8 @@ elseif ($srctbl == 'graphs') {
 		if (!is_null($templated)) {
 			$options['templated'] = $templated;
 		}
-		$graphs = API::Graph()->get($options);
+		$api = $graphPrototypesPopup ? API::GraphPrototype() : API::Graph();
+		$graphs = $api->get($options);
 		order_result($graphs, 'name');
 	}
 	else {
