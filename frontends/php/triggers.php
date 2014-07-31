@@ -357,8 +357,8 @@ else {
 		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
-		'groupid' => getRequest('groupid', null),
-		'hostid' => getRequest('hostid', null)
+		'groupid' => getRequest('groupid'),
+		'hostid' => getRequest('hostid')
 	));
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;

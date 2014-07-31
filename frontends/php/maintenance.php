@@ -394,7 +394,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 
 $options = array(
 	'groups' => array('editable' => 1),
-	'groupid' => getRequest('groupid', null)
+	'groupid' => getRequest('groupid')
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;

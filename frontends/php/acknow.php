@@ -32,7 +32,7 @@ ob_start();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$_REQUEST['go'] = getRequest('go', null);
+$_REQUEST['go'] = getRequest('go');
 $bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

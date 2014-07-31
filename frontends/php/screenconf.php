@@ -243,9 +243,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => getRequest('form', null),
-		'screenid' => getRequest('screenid', null),
-		'templateid' => getRequest('templateid', null)
+		'form' => getRequest('form'),
+		'screenid' => getRequest('screenid'),
+		'templateid' => getRequest('templateid')
 	);
 
 	// screen
@@ -285,7 +285,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'templateid' => getRequest('templateid', null)
+		'templateid' => getRequest('templateid')
 	);
 
 	$sortfield = getPageSortField('name');

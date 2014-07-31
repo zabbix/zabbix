@@ -391,7 +391,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	}
 
 	$_REQUEST['period'] = getRequest('period', ZBX_PERIOD_DEFAULT);
-	$_REQUEST['stime'] = getRequest('stime', null);
+	$_REQUEST['stime'] = getRequest('stime');
 
 	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
 		show_message(_n('Minimum time period to display is %1$s hour.',

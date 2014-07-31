@@ -178,8 +178,8 @@ elseif (isset($_REQUEST['save'])) {
 		}
 	}
 	else {
-		$_REQUEST['password1'] = getRequest('password1', null);
-		$_REQUEST['password2'] = getRequest('password2', null);
+		$_REQUEST['password1'] = getRequest('password1');
+		$_REQUEST['password2'] = getRequest('password2');
 	}
 
 	if ($_REQUEST['password1'] != $_REQUEST['password2']) {

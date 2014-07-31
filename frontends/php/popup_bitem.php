@@ -106,8 +106,8 @@ else {
 	$frmGItem->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 	$config	= getRequest('config', 1);
-	$gid = getRequest('gid', null);
-	$list_name = getRequest('list_name', null);
+	$gid = getRequest('gid');
+	$list_name = getRequest('list_name');
 	$itemid = getRequest('itemid', 0);
 	$color = getRequest('color', '009900');
 	$calc_fnc = getRequest('calc_fnc', 2);

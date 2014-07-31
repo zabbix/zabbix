@@ -369,7 +369,7 @@ if (hasRequest('form')) {
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid'),
 		'new_condition' => getRequest('new_condition', array()),
-		'new_operation' => getRequest('new_operation', null)
+		'new_operation' => getRequest('new_operation')
 	);
 
 	$action = null;

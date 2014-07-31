@@ -418,7 +418,7 @@ show_messages();
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'hostid' => getRequest('hostid', 0),
-		'httptestid' => getRequest('httptestid', null),
+		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'templates' => array()
