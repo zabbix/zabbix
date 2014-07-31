@@ -183,7 +183,6 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
 elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
@@ -211,7 +210,6 @@ elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasReques
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
@@ -245,6 +243,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 
 	$updated = count($update);
+
 	$messageSuccess = $enable
 		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
 		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
@@ -260,7 +259,6 @@ elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
 }
 

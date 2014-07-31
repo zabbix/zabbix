@@ -364,6 +364,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
 		$result = API::Item()->delete(array(getRequest('itemid')));
 	}
+
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
@@ -475,7 +476,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	$result = DBend($result);
 
-	if (isset($_REQUEST['itemid'])) {
+	if (hasRequest('itemid')) {
 		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
@@ -505,9 +506,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 
 	$result = DBend($result);
-	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
-	}
+
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 // mass update
@@ -719,12 +718,11 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$result = DBend($result);
 
+		$_REQUEST['go'] = 'none2';
+
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 		}
-
-		$_REQUEST['go'] = 'none2';
-
 		show_messages($result, _('Items copied'), _('Cannot copy items'));
 	}
 	else {
@@ -736,7 +734,6 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	DBstart();
 
 	$result = delete_history_by_itemid($_REQUEST['group_itemid']);
-
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
@@ -753,7 +750,6 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('History cleared'), $result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
@@ -780,6 +776,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}

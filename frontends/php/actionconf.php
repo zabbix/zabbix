@@ -173,6 +173,7 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -185,7 +186,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
@@ -332,10 +332,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		$updated++;
 	}
 
-	$result = DBend($result);
-
 	if ($result) {
-		uncheckTableRows();
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
 
@@ -346,6 +343,11 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable action', 'Cannot enable actions', $updated)
 		: _n('Cannot disable action', 'Cannot disable actions', $updated);
 
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
@@ -354,7 +356,6 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 

@@ -186,7 +186,6 @@ if (isset($_REQUEST['save'])) {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 'delete') {
@@ -218,7 +217,6 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
 }
 

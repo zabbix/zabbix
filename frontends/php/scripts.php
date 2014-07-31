@@ -138,6 +138,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -157,6 +158,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -177,6 +179,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}

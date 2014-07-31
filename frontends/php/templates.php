@@ -333,6 +333,7 @@ elseif (hasRequest('save')) {
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -398,10 +399,10 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 

@@ -196,6 +196,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -214,6 +215,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -244,6 +246,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -278,6 +281,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		}
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -314,6 +318,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		}
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -358,6 +363,7 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}

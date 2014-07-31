@@ -256,6 +256,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$result = DBend($result);
+
 		if ($result) {
 			uncheckTableRows();
 		}
@@ -289,6 +290,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -314,6 +316,7 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
@@ -347,10 +350,10 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 }
 

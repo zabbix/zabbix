@@ -353,8 +353,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 
 		DBend(true);
 
-		show_message(_('Hosts updated'));
 		uncheckTableRows();
+		show_message(_('Hosts updated'));
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
 	}
@@ -597,13 +597,13 @@ elseif (hasRequest('save')) {
 		}
 
 		$result = DBend(true);
+
 		if ($result) {
 			uncheckTableRows();
 		}
+		show_messages($result, $msgOk, $msgFail);
 
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
-
-		show_messages($result, $msgOk, $msgFail);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -622,10 +622,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 		uncheckTableRows();
 	}
+	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 
 	unset($_REQUEST['delete']);
-
-	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$hostIds = get_request('hosts', array());
@@ -638,7 +637,6 @@ elseif ($_REQUEST['go'] == 'delete') {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {

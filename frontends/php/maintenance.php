@@ -210,7 +210,6 @@ elseif (isset($_REQUEST['save'])) {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
@@ -244,7 +243,6 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	if ($result) {
 		uncheckTableRows();
 	}
-
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {

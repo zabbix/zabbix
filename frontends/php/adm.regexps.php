@@ -146,16 +146,18 @@ elseif (isset($_REQUEST['save'])) {
 		$messageFailed = _('Cannot add regular expression');
 	}
 
-	$result = DBend($result);
-
 	if ($result) {
 		add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 			AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$_REQUEST['name']);
 
-		uncheckTableRows();
 		unset($_REQUEST['form']);
 	}
 
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['go'])) {
@@ -194,7 +196,6 @@ elseif (isset($_REQUEST['go'])) {
 		if ($result) {
 			uncheckTableRows();
 		}
-
 		show_messages($result,
 			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
