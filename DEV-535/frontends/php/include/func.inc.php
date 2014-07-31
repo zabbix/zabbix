@@ -72,7 +72,7 @@ function hasRequest($name) {
  * @return mixed
  */
 function getRequest($name, $def = null) {
-	return hasRequest($name) ? $_REQUEST[$name] : $def;
+	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
 
 function countRequest($str = null) {
