@@ -138,8 +138,11 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
@@ -155,8 +158,11 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
@@ -173,8 +179,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
 
 /*

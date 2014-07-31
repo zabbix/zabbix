@@ -114,8 +114,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	DBstart();
@@ -128,30 +131,32 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$goResult = true;
+	$result = true;
 
 	$shows = get_request('shows', array());
 	DBstart();
 
 	foreach ($shows as $showid) {
-		$goResult &= delete_slideshow($showid);
-		if (!$goResult) {
+		$result &= delete_slideshow($showid);
+		if (!$result) {
 			break;
 		}
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	if ($goResult) {
+	if ($result) {
 		unset($_REQUEST['form']);
+		uncheckTableRows();
 	}
-
-	show_messages($goResult, _('Slide show deleted'), _('Cannot delete slide show'));
-	clearCookies($goResult);
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
 
 /*

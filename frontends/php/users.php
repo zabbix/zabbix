@@ -256,8 +256,11 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['del_user_media'])) {
@@ -287,8 +290,11 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	$groupUserId = get_request('group_userid', array());
@@ -310,11 +316,14 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Users unblocked'), _('Cannot unblock users'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
-	$goResult = false;
+	$result = false;
 
 	$groupUserId = get_request('group_userid', array());
 
@@ -331,19 +340,21 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 			continue;
 		}
 
-		$goResult |= (bool) API::User()->delete(array($userId));
+		$result |= (bool) API::User()->delete(array($userId));
 
-		if ($goResult) {
+		if ($result) {
 			$userData = $dbUsers[$userId];
 
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$userData['alias'].'] name ['.$userData['name'].'] surname ['.$userData['surname'].']');
 		}
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('User deleted'), _('Cannot delete user'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('User deleted'), _('Cannot delete user'));
 }
 
 /*
