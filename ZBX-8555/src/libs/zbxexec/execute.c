@@ -405,8 +405,6 @@ close:
 			}
 		}
 
-		close(fd);
-
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
@@ -427,6 +425,8 @@ close:
 		}
 		else
 			ret = SUCCEED;
+
+		close(fd);
 	}
 	else
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
