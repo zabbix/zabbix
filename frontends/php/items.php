@@ -544,7 +544,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$multiplier = 1;
 	}
 
-	$applications = getRequest('applications', null);
+	$applications = getRequest('applications');
 	if (isset($applications[0]) && $applications[0] == '0') {
 		$applications = array();
 	}

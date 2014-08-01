@@ -92,7 +92,7 @@ elseif (hasRequest('filter_rst')) {
  */
 $effectivePeriod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
 $data = array(
-	'stime' => get_request('stime'),
+	'stime' => getRequest('stime'),
 	'actions' => array(),
 	'action' => CProfile::get('web.auditlogs.filter.action', -1),
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),

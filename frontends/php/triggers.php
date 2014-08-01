@@ -77,17 +77,17 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
+$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP, array('priority', 'description', 'status'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 // validate permissions
-if (get_request('triggerid')) {
+if (getRequest('triggerid')) {
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => array('triggerid'),
@@ -99,7 +99,7 @@ if (get_request('triggerid')) {
 		access_deny();
 	}
 }
-if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
 /*
@@ -136,10 +136,10 @@ elseif (isset($_REQUEST['save'])) {
 		'type' => $_REQUEST['type'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'dependencies' => zbx_toObject(get_request('dependencies', array()), 'triggerid')
+		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
 	);
 
-	if (get_request('triggerid')) {
+	if (getRequest('triggerid')) {
 		// update only changed fields
 		$oldTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
@@ -212,7 +212,7 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 	}
 }
 elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
-	$visible = get_request('visible', array());
+	$visible = getRequest('visible', array());
 
 	// update triggers
 	$triggersToUpdate = array();
@@ -220,10 +220,10 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		$trigger = array('triggerid' => $triggerid);
 
 		if (isset($visible['priority'])) {
-			$trigger['priority'] = get_request('priority');
+			$trigger['priority'] = getRequest('priority');
 		}
 		if (isset($visible['dependencies'])) {
-			$trigger['dependencies'] = zbx_toObject(get_request('dependencies', array()), 'triggerid');
+			$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
 		}
 
 		$triggersToUpdate[] = $trigger;
@@ -346,7 +346,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
 }
 else {
 	$data = array(
-		'showdisabled' => get_request('showdisabled', 1),
+		'showdisabled' => getRequest('showdisabled', 1),
 		'parent_discoveryid' => null,
 		'triggers' => array()
 	);
@@ -357,8 +357,8 @@ else {
 		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
-		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null)
+		'groupid' => getRequest('groupid'),
+		'hostid' => getRequest('hostid')
 	));
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
@@ -384,7 +384,7 @@ else {
 		$data['triggers'] = API::Trigger()->get($options);
 	}
 
-	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
+	$_REQUEST['hostid'] = getRequest('hostid', $data['pageFilter']->hostid);
 
 	// paging
 	$data['paging'] = getPagingLine($data['triggers']);
