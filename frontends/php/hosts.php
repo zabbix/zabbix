@@ -981,12 +981,12 @@ else {
 				}
 
 				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=disable'.url_param('groupid');
+				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&go=disable'.url_param('groupid');
 				break;
 
 			case HOST_STATUS_NOT_MONITORED:
 				$statusCaption = _('Disabled');
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=activate'.url_param('groupid');
+				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&go=activate'.url_param('groupid');
 				$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
 				$statusClass = 'disabled';
 				break;
@@ -994,7 +994,7 @@ else {
 			default:
 				$statusCaption = _('Unknown');
 				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=disable'.url_param('groupid');
+				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&go=disable'.url_param('groupid');
 				$statusClass = 'unknown';
 		}
 

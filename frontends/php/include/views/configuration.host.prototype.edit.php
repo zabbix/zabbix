@@ -50,7 +50,7 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
 			'highlight underline weight_normal'
 		);
-		$parents[] = SPACE.RARR.SPACE;
+		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
 	$hostList->addRow(_('Parent discovery rules'), $parents);
