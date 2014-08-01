@@ -1,5 +1,0 @@
-{
-	"require": {
-		"symfony/yaml": "dev-master"
-	}
-}

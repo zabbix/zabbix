@@ -2,6 +2,8 @@
 
 namespace Zabbix\Test\APIGateway;
 
+use Zabbix\Test\APITestRequest;
+
 abstract class BaseAPIGateway implements APIGatewayInterface {
 	/**
 	 * Current username.
@@ -16,6 +18,50 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 	 * @var string
 	 */
 	protected $password;
+
+	/**
+	 * Current authorization key
+	 *
+	 * @var string
+	 */
+	protected $authKey;
+
+	/**
+	 * Current test case configuration
+	 *
+	 * @var array
+	 */
+	protected $testConfig;
+
+	public function configure(array $params, array $testConfig) {
+		$this->testConfig = $testConfig;
+	}
+
+	protected function authorize() {
+		if (null !== $this->authKey) {
+			return $this->authKey;
+		}
+
+		$result = $this->execute(new APITestRequest(
+			'user.login',
+			array(
+				'user' => $this->testConfig['username'],
+				'password' => $this->testConfig['password']
+			))
+		);
+
+		if (!preg_match('/^[a-z0-9]{32}$/', $result->getResult())) {
+			throw new \RuntimeException(
+				sprintf('API auth token does not much expected format, "%s" given',
+					json_encode($result->getResult())
+				)
+			);
+		}
+
+		$this->authKey = $result->getResult()['result'];
+
+		return $this->authKey;
+	}
 
 	/**
 	 * {@inheritdoc}

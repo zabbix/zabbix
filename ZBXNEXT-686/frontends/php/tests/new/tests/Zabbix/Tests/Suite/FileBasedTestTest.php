@@ -97,7 +97,7 @@ class FileBasedTestTest extends APITestCase {
 		$gateway = new MockAPIGateway();
 		$gateway->configure(array(
 			'file' => ZABBIX_NEW_TEST_DIR.'/tests/data/file/suite/fileBasedTestTestMock.yml'
-		));
+		), $this->parsedConfig);
 
 		return $gateway;
 	}

@@ -25,6 +25,22 @@ class APITestRequest {
 	protected $id;
 
 	/**
+	 * Current API auth token
+	 *
+	 * @var string
+	 */
+	protected $token;
+
+	/**
+	 * Method names that does not require authorization
+	 *
+	 * @var array
+	 */
+	protected $publicMethods = array(
+		'user.login'
+	);
+
+	/**
 	 * Request parameters
 	 *
 	 * @var array
@@ -36,6 +52,7 @@ class APITestRequest {
 		$this->params = $params;
 		$this->id = is_null($id) ? rand() : $id;
 		$this->version = isset($request['version']) ? $request['version'] : '2.0';
+		$this->token = isset($request['token']) ? $request['token'] : null;
 	}
 
 	public function getId() {
@@ -49,4 +66,32 @@ class APITestRequest {
 	public function getParams() {
 		return $this->params;
 	}
+
+	public function isSecure() {
+		return !in_array($this->method, $this->publicMethods);
+	}
+
+	public function setToken($token) {
+		$this->token = $token;
+	}
+
+	public function getToken() {
+		return $this->token;
+	}
+
+	public function getBody() {
+		$body = array(
+			'method' => $this->method,
+			'params' => $this->params,
+			'id' => $this->id,
+			'jsonrpc' => $this->version
+		);
+
+		if ($this->token) {
+			$body['auth'] = $this->token;
+		}
+
+		return json_encode($body);
+	}
+
 }

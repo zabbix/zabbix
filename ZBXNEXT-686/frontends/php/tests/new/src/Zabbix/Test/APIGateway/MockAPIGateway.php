@@ -95,9 +95,10 @@ class MockAPIGateway extends BaseAPIGateway {
 	 * Configures test. Requires single parameter 'file' with mock data.
 	 *
 	 * @param array $params
+	 * @param array $testConfig
 	 * @throws \Exception
 	 */
-	public function configure(array $params) {
+	public function configure(array $params, array $testConfig) {
 		if (!isset($params['file'])) {
 			throw new \Exception('A configuration for MockAPIGateway must contain single "file" field');
 		}
@@ -108,6 +109,8 @@ class MockAPIGateway extends BaseAPIGateway {
 			!isset($this->stepData['responses']) || !is_array($this->stepData['responses'])) {
 			throw new \Exception('Mock file should contain two arrays, "requests" and "responses"');
 		}
+
+		parent::configure($params, $testConfig);
 	}
 
 }

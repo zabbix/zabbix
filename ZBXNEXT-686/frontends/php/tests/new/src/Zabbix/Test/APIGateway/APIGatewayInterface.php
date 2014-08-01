@@ -24,9 +24,9 @@ interface APIGatewayInterface {
 	 * Gateway - dependent configuration function.
 	 *
 	 * @param array $params
-	 * @throws \Exception
+	 * @param array $testConfig
 	 */
-	public function configure(array $params);
+	public function configure(array $params, array $testConfig);
 
 	/**
 	 * Current username getter.

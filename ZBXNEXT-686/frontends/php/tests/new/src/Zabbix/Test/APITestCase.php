@@ -93,7 +93,6 @@ class APITestCase extends BaseAPITestCase {
 			}
 
 			if ($expectation == 'response') {
-				// TODO: validators here
 				$responseExpectation = $definition['response'];
 				$responseExpectation = $this->expandStepVariables($responseExpectation);
 
@@ -127,7 +126,6 @@ class APITestCase extends BaseAPITestCase {
 					));
 				}
 
-
 				if (isset($errorExpectation['data']) &&
 					$errorExpectation['data'] != $apiResponse->getData()
 				) {
@@ -142,6 +140,9 @@ class APITestCase extends BaseAPITestCase {
 			else {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
 			}
+
+			// each step is one assertion
+			$this->addToAssertionCount(1);
 		}
 	}
 
