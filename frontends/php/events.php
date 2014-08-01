@@ -319,7 +319,7 @@ else {
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if (getRequest('triggerid') != 0) {
-			$r_form->addVar('triggerid', get_request('triggerid'));
+			$r_form->addVar('triggerid', getRequest('triggerid'));
 		}
 
 		$r_form->addItem(array(

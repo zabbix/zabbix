@@ -37,7 +37,7 @@ if (!isset($_REQUEST['form_refresh'])) {
 
 $frmHost = new CForm();
 $frmHost->setName('hostPrototypeForm.');
-$frmHost->addVar('form', get_request('form', 1));
+$frmHost->addVar('form', getRequest('form', 1));
 $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 
 $hostList = new CFormList('hostlist');
@@ -50,7 +50,7 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
 			'highlight underline weight_normal'
 		);
-		$parents[] = SPACE.RARR.SPACE;
+		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
 	$hostList->addRow(_('Parent discovery rules'), $parents);

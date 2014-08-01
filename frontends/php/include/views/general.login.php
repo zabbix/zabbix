@@ -22,8 +22,8 @@
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
 
-$request = CHtml::encode(get_request('request', ''));
-$message = CHtml::encode(get_request('message', '')) ;
+$request = CHtml::encode(getRequest('request', ''));
+$message = CHtml::encode(getRequest('message', '')) ;
 // remove debug code for login form message, trimming not in regex to relay only on [ ] in debug message.
 $message = trim(preg_replace('/\[.*\]/', '', $message));
 
@@ -69,7 +69,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 									<div class="label"><?php echo _('Password'); ?></div><input type="password" id="password" name="password" class="input"/>
 								</li>
 								<li style="margin-top: 8px; text-align: center;">
-									<input type="checkbox" id="autologin" name="autologin" value="1" <?php echo (get_request('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> />
+									<input type="checkbox" id="autologin" name="autologin" value="1" <?php echo (getRequest('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> />
 									<label for="autologin" class="bold" style="line-height: 20px; vertical-align: top;">
 										<?php echo _('Remember me for 30 days'); ?>
 									</label>
