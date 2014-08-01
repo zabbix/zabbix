@@ -138,18 +138,20 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	$result = API::Mediatype()->delete(array(getRequest('mediatypeid')));
 
 	if ($result) {
 		unset($_REQUEST['form']);
+		uncheckTableRows();
 	}
-
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
-	clearCookies($result);
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	$mediaTypeIds = getRequest('mediatypeids', array());
@@ -165,7 +167,12 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	}
 	$result = API::Mediatype()->update($update);
 
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	$updated = count($update);
+
 	$messageSuccess = $enable
 		? _n('Media type enabled', 'Media types enabled', $updated)
 		: _n('Media type disabled', 'Media types disabled', $updated);
@@ -174,13 +181,14 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		: _n('Cannot disable media type', 'Cannot disable media types', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$goResult = API::Mediatype()->delete(get_request('mediatypeids', array()));
+	$result = API::Mediatype()->delete(get_request('mediatypeids', array()));
 
-	show_messages($goResult, _('Media type deleted'), _('Cannot delete media type'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 }
 
 /*
