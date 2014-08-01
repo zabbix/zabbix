@@ -51,7 +51,7 @@ $fields = array(
 check_fields($fields);
 
 // validate permissions
-$items = get_request('items', array());
+$items = getRequest('items', array());
 $itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
 $itemsCount = API::Item()->get(array(
 	'itemids' => $itemIds,
@@ -62,19 +62,19 @@ if (count($itemIds) != $itemsCount) {
 	access_deny();
 }
 
-$config = get_request('config', 1);
-$title = get_request('title', _('Report'));
-$xlabel = get_request('xlabel', 'X');
-$ylabel = get_request('ylabel', 'Y');
+$config = getRequest('config', 1);
+$title = getRequest('title', _('Report'));
+$xlabel = getRequest('xlabel', 'X');
+$ylabel = getRequest('ylabel', 'Y');
 
-$showlegend = get_request('showlegend', 0);
-$sorttype = get_request('sorttype', 0);
+$showlegend = getRequest('showlegend', 0);
+$sorttype = getRequest('sorttype', 0);
 
 if ($config == 1) {
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
-	$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
-	$timetill = get_request('report_timetill', time());
+	$timesince = getRequest('report_timesince', time() - SEC_PER_DAY);
+	$timetill = getRequest('report_timetill', time());
 
 	$str_since['hour'] = date('H', $timesince);
 	$str_since['day'] = date('d', $timesince);
@@ -284,7 +284,7 @@ if ($config == 1) {
 	}
 }
 elseif ($config == 2) {
-	$periods = get_request('periods', array());
+	$periods = getRequest('periods', array());
 
 	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 1');
@@ -383,23 +383,23 @@ elseif ($config == 2) {
 	}
 }
 elseif ($config == 3) {
-	$hostids = get_request('hostids', array());
-	$groupids = get_request('groupids', array());
+	$hostids = getRequest('hostids', array());
+	$groupids = getRequest('groupids', array());
 
 	// validate permissions
 	if (!API::Host()->isReadable($hostids) || !API::HostGroup()->isReadable($groupids)) {
 		access_deny();
 	}
 
-	$title = get_request('title','Report 2');
-	$xlabel = get_request('xlabel','');
-	$ylabel = get_request('ylabel','');
+	$title = getRequest('title','Report 2');
+	$xlabel = getRequest('xlabel','');
+	$ylabel = getRequest('ylabel','');
 
-	$palette = get_request('palette',0);
-	$palettetype = get_request('palettetype',0);
+	$palette = getRequest('palette',0);
+	$palettetype = getRequest('palettetype',0);
 
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
-	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$avgperiod = getRequest('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 	if (!empty($groupids)) {
 		$sql = 'SELECT DISTINCT hg.hostid'.
@@ -432,8 +432,8 @@ elseif ($config == 3) {
 	$graph_data['legend'] = array();
 
 
-	$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
-	$timetill = get_request('report_timetill', time());
+	$timesince = getRequest('report_timesince', time() - SEC_PER_DAY);
+	$timetill = getRequest('report_timetill', time());
 
 	$str_since['hour'] = date('H', $timesince);
 	$str_since['day'] = date('d', $timesince);

@@ -26,7 +26,7 @@ $mapTable->setAttribute('style', 'margin-top: 4px;');
 $icon = $fsIcon = null;
 
 if (!empty($this->data['maps'])) {
-	$mapComboBox = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
+	$mapComboBox = new CComboBox('sysmapid', getRequest('sysmapid', 0), 'submit()');
 	foreach ($this->data['maps'] as $sysmapId => $map) {
 		$mapComboBox->addItem($sysmapId, $map['name']);
 	}

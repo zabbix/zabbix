@@ -31,7 +31,7 @@ $page['hist_arg'] = array('hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$paramsFieldName = getParamFieldNameByType(get_request('type', 0));
+$paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
 // supported eval types
 $evalTypes = array(
@@ -73,7 +73,7 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	$paramsFieldName =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.
 		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
-		getParamFieldLabelByType(get_request('type', 0))),
+		getParamFieldLabelByType(getRequest('type', 0))),
 	'snmp_community' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type'),
 		_('SNMP community')),
@@ -121,14 +121,14 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'type', 'status'));
 
-$_REQUEST['go'] = get_request('go', 'none');
-$_REQUEST['params'] = get_request($paramsFieldName, '');
+$_REQUEST['go'] = getRequest('go', 'none');
+$_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 /*
  * Permissions
  */
-if (get_request('itemid', false)) {
+if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -161,7 +161,7 @@ else {
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
-	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
+	$_REQUEST['delay_flex'] = getRequest('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
 		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
@@ -175,12 +175,15 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete(array(getRequest('itemid')));
 
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['save'])) {
-	$delay_flex = get_request('delay_flex', array());
+	$delay_flex = getRequest('delay_flex', array());
 
 	$db_delay_flex = '';
 	foreach ($delay_flex as $val) {
@@ -292,7 +295,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		uncheckTableRows(getRequest('hostid'));
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_hostdruleid')) {
@@ -302,6 +305,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBstart();
 	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
 	$updated = count($groupHostDiscoveryRuleId);
 
@@ -313,13 +320,14 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable discovery rules', 'Cannot disable discovery rules', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
-	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+	$result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
 
-	show_messages($goResult, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 
 /*
@@ -356,7 +364,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'hostid' => get_request('hostid', 0),
+		'hostid' => getRequest('hostid', 0),
 		'host' => $host,
 		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
 	);
