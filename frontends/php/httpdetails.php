@@ -250,7 +250,7 @@ $httpdetailsTable->addRow(array(
 $httpdetailsWidget->addItem($httpdetailsTable);
 $httpdetailsWidget->show();
 
-echo SBR;
+echo BR();
 
 // create graphs widget
 $graphsWidget = new CWidget();
