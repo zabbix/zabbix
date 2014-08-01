@@ -1052,14 +1052,9 @@ class CXmlImport18 {
 
 						$host_db['interfaces'] = $interfaces;
 					}
-					$interfaces_created_with_host = true;
 				}
 				elseif ($host_db['status'] != HOST_STATUS_TEMPLATE) {
 					$host_db['interfaces'] = $interfaces;
-					$interfaces_created_with_host = true;
-				}
-				else {
-					$interfaces_created_with_host = false;
 				}
 
 // HOST GROUPS {{{
