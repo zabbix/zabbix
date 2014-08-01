@@ -94,7 +94,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		}
 	}
 	else if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&task)[0] ||
-			ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&task)[0])
+		ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&task)[0])
 	{
 		union sigval	s;
 		int 		i;
@@ -102,7 +102,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		s.ZBX_SIVAL_INT = task;
 
 		if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
-				0 == ((unsigned short *)&task)[1])
+			0 == ((unsigned short *)&task)[1])
 		{
 			for (i = 0; i < threads_num; i++)
 			{
@@ -119,7 +119,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			}
 		}
 		else if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
-				0 != ((unsigned short *)&task)[1])
+			0 != ((unsigned short *)&task)[1])
 		{
 			for (i = 0; i < threads_num; i++)
 			{
@@ -138,27 +138,26 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 						break;
 					}
 				}
-			}
-
-			if (i == threads_num)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process with PID"
-						" \"%d\" does not exist", ((unsigned short *)&task)[1]);
+				else if (i == (threads_num - 1))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process with PID"
+							" \"%d\" does not exist", ((unsigned short *)&task)[1]);
+				}
 			}
 		}
 		else
 		{
 			unsigned char	process_type;
-			int		process_num;
+			int		process_num, found = 0;
 
 			for (i = 0; i < threads_num; i++)
 			{
 				get_process_info_by_thread(i+1, &process_type, &process_num);
 
-				if (((unsigned char *)&task)[1] == process_type &&
-						((0 == ((unsigned short *)&task)[1]) ||
-						((unsigned short *)&task)[1] == process_num))
+				if (((unsigned char *)&task)[1] == process_type && 0 == ((unsigned short *)&task)[1])
 				{
+					found = 1;
+
 					if (-1 != sigqueue(threads[i], SIGUSR1, s))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "the signal is redirected to"
@@ -172,8 +171,29 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 								zbx_strerror(errno));
 					}
 				}
+				else if (((unsigned char *)&task)[1] == process_type &&
+					((unsigned short *)&task)[1] == process_num)
+				{
+					found = 1;
+
+					if (-1 != sigqueue(threads[i], SIGUSR1, s))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "the signal is redirected to"
+								" [%s, #%d] process (pid: %d)",
+								get_process_type_string(process_type),
+								process_num, threads[i]);
+						break;
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
+								zbx_strerror(errno));
+						break;
+					}
+				}
 			}
-			if (i == threads_num)
+
+			if (found == 0)
 			{
 				if (0 == ((unsigned short *)&task)[1])
 				{
@@ -183,8 +203,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process [%s, #%d]"
-							" does not exist",
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process"
+							" [%s, #%d] does not exist",
 							get_process_type_string(((unsigned char *)&task)[1]),
 							((unsigned short *)&task)[1]);
 				}
