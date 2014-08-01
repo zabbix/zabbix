@@ -130,89 +130,6 @@ elseif (hasRequest('filter_rst')) {
 
 $triggerId = CProfile::get('web.events.filter.triggerid', 0);
 
-// change the triggerid when we change host id
-if ($triggerId != 0 && hasRequest('hostid')) {
-	$hostid = getRequest('hostid');
-
-	$oldTriggers = API::Trigger()->get(array(
-		'output' => array('triggerid', 'description', 'expression'),
-		'selectHosts' => array('hostid', 'host'),
-		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
-		'selectFunctions' => API_OUTPUT_EXTEND,
-		'triggerids' => $triggerId
-	));
-
-	foreach ($oldTriggers as $oldTrigger) {
-		$triggerId = 0;
-		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
-		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
-		$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
-		$oldExpression = triggerExpression($oldTrigger);
-
-		if (isset($oldTrigger['hosts'][$hostid])) {
-			break;
-		}
-
-		$newTriggers = API::Trigger()->get(array(
-			'output' => array('triggerid', 'description', 'expression'),
-			'selectHosts' => array('hostid', 'host'),
-			'selectItems' => array('itemid', 'key_'),
-			'selectFunctions' => API_OUTPUT_EXTEND,
-			'filter' => array('description' => $oldTrigger['description']),
-			'hostids' => $hostid
-		));
-
-		foreach ($newTriggers as $newTrigger) {
-			if (count($oldTrigger['items']) != count($newTrigger['items'])) {
-				continue;
-			}
-
-			$newTrigger['items'] = zbx_toHash($newTrigger['items'], 'itemid');
-			$newTrigger['hosts'] = zbx_toHash($newTrigger['hosts'], 'hostid');
-			$newTrigger['functions'] = zbx_toHash($newTrigger['functions'], 'functionid');
-
-			$found = false;
-			foreach ($newTrigger['functions'] as $fnum => $function) {
-				foreach ($oldTrigger['functions'] as $ofnum => $oldFunction) {
-					// compare functions
-					if (($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) {
-						continue;
-					}
-					// compare that functions uses same item keys
-					if ($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) {
-						continue;
-					}
-					// rewrite itemid so we could compare expressions
-					// of two triggers form different hosts
-					$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
-					$found = true;
-
-					unset($oldTrigger['functions'][$ofnum]);
-					break;
-				}
-				if (!$found) {
-					break;
-				}
-			}
-			if (!$found) {
-				continue;
-			}
-
-			// if we found same trigger we overwriting it's hosts and items for expression compare
-			$newTrigger['hosts'] = $oldTrigger['hosts'];
-			$newTrigger['items'] = $oldTrigger['items'];
-
-			$newExpression = triggerExpression($newTrigger);
-
-			if (strcmp($oldExpression, $newExpression) == 0) {
-				CProfile::update('web.events.filter.triggerid', $newTrigger['triggerid'], PROFILE_TYPE_ID);
-				$triggerId = $newTrigger['triggerid'];
-				break;
-			}
-		}
-	}
-}
-
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
 // calculate stime and period
@@ -276,6 +193,88 @@ else {
 
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
+
+		// change the triggerid when we change host id
+		$hostId = getRequest('hostid');
+		if ($triggerId != 0 && $hostId) {
+			$oldTriggers = API::Trigger()->get(array(
+				'output' => array('triggerid', 'description', 'expression'),
+				'selectHosts' => array('hostid', 'host'),
+				'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
+				'selectFunctions' => API_OUTPUT_EXTEND,
+				'triggerids' => $triggerId
+			));
+
+			foreach ($oldTriggers as $oldTrigger) {
+				$triggerId = 0;
+				$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
+				$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
+				$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
+				$oldExpression = triggerExpression($oldTrigger);
+
+				if (isset($oldTrigger['hosts'][$hostId])) {
+					break;
+				}
+
+				$newTriggers = API::Trigger()->get(array(
+					'output' => array('triggerid', 'description', 'expression'),
+					'selectHosts' => array('hostid', 'host'),
+					'selectItems' => array('itemid', 'key_'),
+					'selectFunctions' => API_OUTPUT_EXTEND,
+					'filter' => array('description' => $oldTrigger['description']),
+					'hostids' => $hostId
+				));
+
+				foreach ($newTriggers as $newTrigger) {
+					if (count($oldTrigger['items']) != count($newTrigger['items'])) {
+						continue;
+					}
+
+					$newTrigger['items'] = zbx_toHash($newTrigger['items'], 'itemid');
+					$newTrigger['hosts'] = zbx_toHash($newTrigger['hosts'], 'hostid');
+					$newTrigger['functions'] = zbx_toHash($newTrigger['functions'], 'functionid');
+
+					$found = false;
+					foreach ($newTrigger['functions'] as $fnum => $function) {
+						foreach ($oldTrigger['functions'] as $ofnum => $oldFunction) {
+							// compare functions
+							if (($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) {
+								continue;
+							}
+							// compare that functions uses same item keys
+							if ($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) {
+								continue;
+							}
+							// rewrite itemid so we could compare expressions
+							// of two triggers form different hosts
+							$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
+							$found = true;
+
+							unset($oldTrigger['functions'][$ofnum]);
+							break;
+						}
+						if (!$found) {
+							break;
+						}
+					}
+					if (!$found) {
+						continue;
+					}
+
+					// if we found same trigger we overwriting it's hosts and items for expression compare
+					$newTrigger['hosts'] = $oldTrigger['hosts'];
+					$newTrigger['items'] = $oldTrigger['items'];
+
+					$newExpression = triggerExpression($newTrigger);
+
+					if (strcmp($oldExpression, $newExpression) == 0) {
+						CProfile::update('web.events.filter.triggerid', $newTrigger['triggerid'], PROFILE_TYPE_ID);
+						$triggerId = $newTrigger['triggerid'];
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	$eventsWidget = new CWidget();
