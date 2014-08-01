@@ -706,7 +706,7 @@ static int	get_values(unsigned char poller_type)
 					items[i].state, results[i].msg);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, NULL, &lastlogsizes[i], NULL,
 				&errcodes[i], 1);
 
 		zbx_free(items[i].key);

@@ -681,7 +681,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
-		process_mass_data(sock, 0, &av, 1, NULL);
+		process_mass_data(sock, 0, NULL, &av, 1, NULL);
 
 		alarm(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))

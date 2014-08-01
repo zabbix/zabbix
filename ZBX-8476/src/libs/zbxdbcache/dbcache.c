@@ -910,7 +910,7 @@ static void	DCcalculate_item_delta_float(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 				" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 				h->value.dbl, zbx_item_value_type_string(item->value_type));
 
-		DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, NULL, NULL, &errcode, 1);
+		DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, NULL, NULL, NULL, &errcode, 1);
 	}
 }
 

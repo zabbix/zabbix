@@ -548,7 +548,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	return nextcheck;
 }
 
-static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
+static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
 {
 	switch (item->type)
 	{
@@ -574,7 +574,7 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 			/* nothing to do */;
 	}
 
-	return DCget_reachable_nextcheck(item, time(NULL));
+	return DCget_reachable_nextcheck(item, now);
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -4675,7 +4675,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 				old_nextcheck = dc_item->nextcheck;
 				if (disable_until > now)
-					dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+					dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
@@ -4683,7 +4683,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			else if (disable_until > now)
 			{
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+				dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host, now);
 
 				DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 				continue;
@@ -4926,13 +4926,13 @@ int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
 	return SUCCEED;
 }
 
-static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
+static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock, int proxydiff)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock - proxydiff) + proxydiff;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -4958,7 +4958,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
+static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, int proxydiff)
 {
 	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
@@ -4971,7 +4971,7 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 		return;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host, time(NULL) - proxydiff) + proxydiff;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -4991,11 +4991,12 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *proxydiffs,
+		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
+	int		proxydiff;
 
 	LOCK_CACHE;
 
@@ -5017,17 +5018,19 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL != mtimes)
 			dc_item->mtime = mtimes[i];
 
+		proxydiff = (NULL == proxydiffs ? 0 : proxydiffs[i]);
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
-				DCrequeue_reachable_item(dc_item, lastclocks[i]);
+				DCrequeue_reachable_item(dc_item, lastclocks[i], proxydiff);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				DCrequeue_unreachable_item(dc_item);
+				DCrequeue_unreachable_item(dc_item, proxydiff);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

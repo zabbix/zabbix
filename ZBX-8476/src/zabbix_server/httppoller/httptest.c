@@ -189,7 +189,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -277,7 +277,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 

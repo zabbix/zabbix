@@ -2082,7 +2082,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
+void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, const zbx_timespec_t *proxy_timediff,
 		AGENT_VALUE *values, size_t values_num, int *processed)
 {
 	const char	*__function_name = "process_mass_data";
@@ -2092,7 +2092,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	size_t		i;
 	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
 	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
+	int		*lastclocks = NULL, *proxydiffs = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2103,6 +2103,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
 	states = zbx_malloc(states, sizeof(unsigned char) * values_num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
+	proxydiffs = zbx_malloc(proxydiffs, sizeof(int) * values_num);
 	lastlogsizes = zbx_malloc(lastlogsizes, sizeof(zbx_uint64_t) * values_num);
 	mtimes = zbx_malloc(mtimes, sizeof(int) * values_num);
 	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
@@ -2223,16 +2224,23 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		lastlogsizes[num] = values[i].lastlogsize;
 		mtimes[num] = values[i].mtime;
 		errcodes2[num] = SUCCEED;
+
+		if (NULL == proxy_timediff)
+			proxydiffs[num] = 0;
+		else
+			proxydiffs[num] = proxy_timediff->sec + (values[i].ts.ns + proxy_timediff->ns > 999999999);
+
 		num++;
 	}
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
-	DCrequeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes2, num);
+	DCrequeue_items(itemids, states, lastclocks, proxydiffs, lastlogsizes, mtimes, errcodes2, num);
 
 	zbx_free(errcodes2);
 	zbx_free(mtimes);
 	zbx_free(lastlogsizes);
+	zbx_free(proxydiffs);
 	zbx_free(lastclocks);
 	zbx_free(states);
 	zbx_free(itemids);
@@ -2268,8 +2276,8 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  * Author: Alexander Vladishev, Alexei Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
-		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
+int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid, char *info,
+		int max_info_size)
 {
 #define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
@@ -2385,7 +2393,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (VALUES_MAX == values_num)
 		{
-			process_mass_data(sock, proxy_hostid, values, values_num, &processed);
+			process_mass_data(sock, proxy_hostid, &proxy_timediff, values, values_num, &processed);
 
 			clean_agent_values(values, values_num);
 			values_num = 0;
@@ -2395,7 +2403,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	zbx_free(tmp);
 
 	if (0 < values_num)
-		process_mass_data(sock, proxy_hostid, values, values_num, &processed);
+		process_mass_data(sock, proxy_hostid, &proxy_timediff, values, values_num, &processed);
 
 	clean_agent_values(values, values_num);
 

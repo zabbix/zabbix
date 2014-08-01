@@ -184,7 +184,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, NULL, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
