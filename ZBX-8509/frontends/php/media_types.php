@@ -61,7 +61,7 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP, array('description', 'type'));
 
-$mediaTypeId = get_request('mediatypeid');
+$mediaTypeId = getRequest('mediatypeid');
 
 /*
  * Permissions
@@ -90,23 +90,23 @@ if (isset($_REQUEST['go'])) {
 	}
 }
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
 	$mediaType = array(
-		'type' => get_request('type'),
-		'description' => get_request('description'),
-		'smtp_server' => get_request('smtp_server'),
-		'smtp_helo' => get_request('smtp_helo'),
-		'smtp_email' => get_request('smtp_email'),
-		'exec_path' => get_request('exec_path'),
-		'gsm_modem' => get_request('gsm_modem'),
-		'username' => get_request('username'),
-		'passwd' => get_request('password'),
-		'status' => get_request('status', MEDIA_TYPE_STATUS_DISABLED)
+		'type' => getRequest('type'),
+		'description' => getRequest('description'),
+		'smtp_server' => getRequest('smtp_server'),
+		'smtp_helo' => getRequest('smtp_helo'),
+		'smtp_email' => getRequest('smtp_email'),
+		'exec_path' => getRequest('exec_path'),
+		'gsm_modem' => getRequest('gsm_modem'),
+		'username' => getRequest('username'),
+		'passwd' => getRequest('password'),
+		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
 
 	if (is_null($mediaType['passwd'])) {
@@ -183,7 +183,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$result = API::Mediatype()->delete(get_request('mediatypeids', array()));
+	$result = API::Mediatype()->delete(getRequest('mediatypeids', array()));
 
 	if ($result) {
 		uncheckTableRows();
@@ -196,8 +196,8 @@ elseif ($_REQUEST['go'] == 'delete') {
  */
 if (!empty($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'mediatypeid' => $mediaTypeId
 	);
 
@@ -216,16 +216,16 @@ if (!empty($_REQUEST['form'])) {
 		$data['status'] = $mediaType['status'];
 	}
 	else {
-		$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
-		$data['description'] = get_request('description', '');
-		$data['smtp_server'] = get_request('smtp_server', 'localhost');
-		$data['smtp_helo'] = get_request('smtp_helo', 'localhost');
-		$data['smtp_email'] = get_request('smtp_email', 'zabbix@localhost');
-		$data['exec_path'] = get_request('exec_path', '');
-		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
-		$data['username'] = get_request('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
-		$data['password'] = get_request('password', '');
-		$data['status'] = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
+		$data['type'] = getRequest('type', MEDIA_TYPE_EMAIL);
+		$data['description'] = getRequest('description', '');
+		$data['smtp_server'] = getRequest('smtp_server', 'localhost');
+		$data['smtp_helo'] = getRequest('smtp_helo', 'localhost');
+		$data['smtp_email'] = getRequest('smtp_email', 'zabbix@localhost');
+		$data['exec_path'] = getRequest('exec_path', '');
+		$data['gsm_modem'] = getRequest('gsm_modem', '/dev/ttyS0');
+		$data['username'] = getRequest('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
+		$data['password'] = getRequest('password', '');
+		$data['status'] = getRequest('status', MEDIA_TYPE_STATUS_ACTIVE);
 	}
 
 	// render view

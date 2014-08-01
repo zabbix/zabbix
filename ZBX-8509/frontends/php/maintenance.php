@@ -86,7 +86,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'maintenance_type
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
 if (isset($_REQUEST['maintenanceid'])) {
@@ -94,7 +94,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectTimeperiods' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'maintenanceids' => get_request('maintenanceid'),
+		'maintenanceids' => getRequest('maintenanceid'),
 	));
 	if (empty($dbMaintenance)) {
 		access_deny();
@@ -103,7 +103,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 if (isset($_REQUEST['go']) && (!isset($_REQUEST['maintenanceids']) || !is_array($_REQUEST['maintenanceids']))) {
 	access_deny();
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -186,9 +186,9 @@ elseif (isset($_REQUEST['save'])) {
 			'description' => $_REQUEST['description'],
 			'active_since' => $activeSince,
 			'active_till' => $activeTill,
-			'timeperiods' => get_request('timeperiods', array()),
-			'hostids' => get_request('hostids', array()),
-			'groupids' => get_request('groupids', array())
+			'timeperiods' => getRequest('timeperiods', array()),
+			'hostids' => getRequest('hostids', array()),
+			'groupids' => getRequest('groupids', array())
 		);
 
 		if (isset($_REQUEST['maintenanceid'])) {
@@ -213,7 +213,7 @@ elseif (isset($_REQUEST['save'])) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
-	$maintenanceids = get_request('maintenanceid', array());
+	$maintenanceids = getRequest('maintenanceid', array());
 	if (isset($_REQUEST['maintenanceids'])) {
 		$maintenanceids = $_REQUEST['maintenanceids'];
 	}
@@ -301,7 +301,7 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 		}
 	}
 
-	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
+	$_REQUEST['timeperiods'] = getRequest('timeperiods', array());
 
 	$result = false;
 	if ($new_timeperiod['period'] < 300) {
@@ -375,7 +375,7 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 	}
 }
 elseif (isset($_REQUEST['del_timeperiodid'])) {
-	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
+	$_REQUEST['timeperiods'] = getRequest('timeperiods', array());
 	$delTimeperiodId = array_keys($_REQUEST['del_timeperiodid']);
 	$delTimeperiodId = reset($delTimeperiodId);
 	unset($_REQUEST['timeperiods'][$delTimeperiodId]);
@@ -383,7 +383,7 @@ elseif (isset($_REQUEST['del_timeperiodid'])) {
 elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	$_REQUEST['edit_timeperiodid'] = array_keys($_REQUEST['edit_timeperiodid']);
 	$edit_timeperiodid = $_REQUEST['edit_timeperiodid'] = array_pop($_REQUEST['edit_timeperiodid']);
-	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
+	$_REQUEST['timeperiods'] = getRequest('timeperiods', array());
 
 	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
 		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
@@ -394,7 +394,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 
 $options = array(
 	'groups' => array('editable' => 1),
-	'groupid' => get_request('groupid', null)
+	'groupid' => getRequest('groupid')
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
@@ -403,12 +403,12 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
  * Display
  */
 $data = array(
-	'form' => get_request('form')
+	'form' => getRequest('form')
 );
 
 if (!empty($data['form'])) {
-	$data['maintenanceid'] = get_request('maintenanceid');
-	$data['form_refresh'] = get_request('form_refresh', 0);
+	$data['maintenanceid'] = getRequest('maintenanceid');
+	$data['form_refresh'] = getRequest('form_refresh', 0);
 
 	if (isset($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
 		$dbMaintenance = reset($dbMaintenance);
@@ -441,8 +441,8 @@ if (!empty($data['form'])) {
 		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
 	}
 	else {
-		$data['mname'] = get_request('mname', '');
-		$data['maintenance_type'] = get_request('maintenance_type', 0);
+		$data['mname'] = getRequest('mname', '');
+		$data['maintenance_type'] = getRequest('maintenance_type', 0);
 		if (isset($_REQUEST['active_since'])) {
 			$data['active_since'] = mktime($_REQUEST['active_since_hour'],
 					$_REQUEST['active_since_minute'],
@@ -465,10 +465,10 @@ if (!empty($data['form'])) {
 		else {
 			$data['active_till'] = strtotime('tomorrow');
 		}
-		$data['description'] = get_request('description', '');
-		$data['timeperiods'] = get_request('timeperiods', array());
-		$data['hostids'] = get_request('hostids', array());
-		$data['groupids'] = get_request('groupids', array());
+		$data['description'] = getRequest('description', '');
+		$data['timeperiods'] = getRequest('timeperiods', array());
+		$data['hostids'] = getRequest('hostids', array());
+		$data['groupids'] = getRequest('groupids', array());
 	}
 
 	// get groups
@@ -480,7 +480,7 @@ if (!empty($data['form'])) {
 	));
 	order_result($data['all_groups'], 'name');
 
-	$data['twb_groupid'] = get_request('twb_groupid', 0);
+	$data['twb_groupid'] = getRequest('twb_groupid', 0);
 	if (!isset($data['all_groups'][$data['twb_groupid']])) {
 		$twb_groupid = reset($data['all_groups']);
 		$data['twb_groupid'] = $twb_groupid['groupid'];

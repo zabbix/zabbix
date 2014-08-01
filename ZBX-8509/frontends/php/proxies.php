@@ -53,7 +53,7 @@ validate_sort_and_sortorder('host', ZBX_SORT_UP, array('host'));
  */
 if (isset($_REQUEST['proxyid'])) {
 	$dbProxy = API::Proxy()->get(array(
-		'proxyids' => get_request('proxyid'),
+		'proxyids' => getRequest('proxyid'),
 		'selectHosts' => array('hostid', 'host'),
 		'selectInterface' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
@@ -79,16 +79,16 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
 	$proxy = array(
-		'host' => get_request('host'),
-		'status' => get_request('status'),
-		'interface' => get_request('interface'),
+		'host' => getRequest('host'),
+		'status' => getRequest('status'),
+		'interface' => getRequest('interface'),
 		'description' => getRequest('description')
 	);
 
@@ -96,7 +96,7 @@ if (isset($_REQUEST['save'])) {
 
 	// skip discovered hosts
 	$proxy['hosts'] = API::Host()->get(array(
-		'hostids' => get_request('hosts', array()),
+		'hostids' => getRequest('hosts', array()),
 		'output' => array('hostid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
@@ -192,7 +192,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();
 
-	$result = API::Proxy()->delete(get_request('hosts'));
+	$result = API::Proxy()->delete(getRequest('hosts'));
 	$result = DBend($result);
 
 	if ($result) {
@@ -206,13 +206,13 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0) + 1,
-		'proxyid' => get_request('proxyid', 0),
-		'name' => get_request('host', ''),
-		'status' => get_request('status', HOST_STATUS_PROXY_ACTIVE),
-		'hosts' => get_request('hosts', array()),
-		'interface' => get_request('interface', array()),
+		'form' => getRequest('form', 1),
+		'form_refresh' => getRequest('form_refresh', 0) + 1,
+		'proxyid' => getRequest('proxyid', 0),
+		'name' => getRequest('host', ''),
+		'status' => getRequest('status', HOST_STATUS_PROXY_ACTIVE),
+		'hosts' => getRequest('hosts', array()),
+		'interface' => getRequest('interface', array()),
 		'proxy' => array(),
 		'description' => getRequest('description', '')
 	);
