@@ -78,7 +78,8 @@ class CConfiguration extends CApiService {
 			$params['source'],
 			$params['rules'],
 			new CImportReferencer(),
-			new CImportedObjectContainer()
+			new CImportedObjectContainer(),
+			new CTriggerExpression()
 		);
 		$configurationImport->setReader($importReader);
 

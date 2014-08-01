@@ -45,6 +45,11 @@ class CConfigurationImport {
 	protected $importedObjectContainer;
 
 	/**
+	 * @var CTriggerExpression
+	 */
+	protected $triggerExpression;
+
+	/**
 	 * @var array
 	 */
 	protected $options;
@@ -73,9 +78,10 @@ class CConfigurationImport {
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
+	 * @param CTriggerExpression		$triggerExpression			class to parse trigger expression
 	 */
 	public function __construct($source, array $options = array(), CImportReferencer $referencer,
-			CImportedObjectContainer $importedObjectContainer) {
+			CImportedObjectContainer $importedObjectContainer, CTriggerExpression $triggerExpression) {
 		$this->options = array(
 			'groups' => array('createMissing' => false),
 			'hosts' => array('updateExisting' => false, 'createMissing' => false),
@@ -96,6 +102,7 @@ class CConfigurationImport {
 		$this->source = $source;
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
+		$this->triggerExpression = $triggerExpression;
 	}
 
 	/**
@@ -250,7 +257,6 @@ class CConfigurationImport {
 			}
 		}
 
-
 		foreach ($this->getFormattedApplications() as $host => $applications) {
 			foreach ($applications as $app) {
 				$applicationsRefs[$host][$app['name']] = $app['name'];
@@ -287,8 +293,14 @@ class CConfigurationImport {
 					}
 				}
 
-				foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
-					$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
+				foreach ($discoveryRule['trigger_prototypes'] as $trigger) {
+					$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+
+					// add found hosts and items to references from parsed trigger expressions
+					foreach ($trigger['parsedExpressions'] as $expression) {
+						$hostsRefs[$expression['host']] = $expression['host'];
+						$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
+					}
 				}
 
 				foreach ($discoveryRule['graph_prototypes'] as $graph) {
@@ -304,6 +316,8 @@ class CConfigurationImport {
 
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemItem = $gitem['item'];
+
+						$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
 						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 						$graphsRefs[$gitemItem['host']][$graph['name']] = $graph['name'];
 					}
@@ -353,6 +367,12 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+
+			// add found hosts and items to references from parsed trigger expressions
+			foreach ($trigger['parsedExpressions'] as $expression) {
+				$hostsRefs[$expression['host']] = $expression['host'];
+				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
+			}
 
 			foreach ($trigger['dependencies'] as $dependency) {
 				$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
@@ -968,6 +988,23 @@ class CConfigurationImport {
 
 				// trigger prototypes
 				foreach ($item['trigger_prototypes'] as $trigger) {
+					// search for existing  items in trigger prototype expressions
+					foreach ($trigger['parsedExpressions'] as $expression) {
+						$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
+						$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
+
+						if (!$itemId) {
+							throw new Exception(_s(
+								'Cannot find item "%1$s" on "%2$s" used in trigger prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+								$expression['item'],
+								$expression['host'],
+								$trigger['description'],
+								$item['name'],
+								$host
+							));
+						}
+					}
+
 					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
 					if ($triggerId) {
@@ -1022,12 +1059,10 @@ class CConfigurationImport {
 					}
 
 					foreach ($graph['gitems'] as &$gitem) {
-						if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
-							throw new Exception(_s('Cannot find host or template "%1$s" used in graph "%2$s".',
-								$gitem['item']['host'], $graph['name']));
-						}
-
-						$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+						$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+						$gitem['itemid'] = $gitemHostId
+							? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+							: false;
 
 						if (!$gitem['itemid']) {
 							throw new Exception(_s(
@@ -1123,20 +1158,13 @@ class CConfigurationImport {
 			if (isset($graph['gitems']) && $graph['gitems']) {
 				foreach ($graph['gitems'] as &$gitem) {
 					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-
-					if (!$gitemHostId) {
-						throw new Exception(_s(
-							'Cannot find host or template "%1$s" used in graph "%2$s".',
-							$gitem['item']['host'],
-							$graph['name']
-						));
-					}
-
-					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+					$gitem['itemid'] = $gitemHostId
+						? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+						: false;
 
 					if (!$gitem['itemid']) {
 						throw new Exception(_s(
-							'Cannot find item "%1$s" on "%2$s" used in prototype "%3$s".',
+							'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
 							$gitem['item']['key'],
 							$gitem['item']['host'],
 							$graph['name']
@@ -1146,6 +1174,7 @@ class CConfigurationImport {
 				unset($gitem);
 
 				$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+
 				if ($graphId) {
 					$graph['graphid'] = $graphId;
 					$graphsToUpdate[] = $graph;
@@ -1185,6 +1214,20 @@ class CConfigurationImport {
 		$triggersToCreateDependencies = array();
 
 		foreach ($allTriggers as $trigger) {
+			// search for existing items in trigger expressions
+			foreach ($trigger['parsedExpressions'] as $expression) {
+				$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
+				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
+
+				if (!$itemId) {
+					throw new Exception(_s('Cannot find item "%1$s" on "%2$s" used in trigger "%3$s".',
+						$expression['item'],
+						$expression['host'],
+						$trigger['description']
+					));
+				}
+			}
+
 			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
 			if ($triggerId) {
@@ -1192,9 +1235,11 @@ class CConfigurationImport {
 
 				foreach ($trigger['dependencies'] as $dependency) {
 					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-
 					if (!$depTriggerId) {
-						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
+							$trigger['description'],
+							$dependency['name']
+						));
 					}
 
 					$deps[] = array('triggerid' => $depTriggerId);
@@ -1870,6 +1915,33 @@ class CConfigurationImport {
 	protected function getFormattedDiscoveryRules() {
 		if (!isset($this->formattedData['discoveryRules'])) {
 			$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
+
+			if ($this->formattedData['discoveryRules']) {
+				foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
+					foreach ($discoveryRules as &$discoveryRule) {
+						if ($discoveryRule['trigger_prototypes']) {
+							foreach ($discoveryRule['trigger_prototypes'] as &$triggerPrototype) {
+								$result = $this->triggerExpression->parse($triggerPrototype['expression']);
+								if (!$result) {
+									throw new Exception($this->triggerExpression->error);
+								}
+
+								$enum = 0;
+								foreach ($result->getTokens() as $token) {
+									if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+										$triggerPrototype['parsedExpressions'][$enum]['host'] =  $token['data']['host'];
+										$triggerPrototype['parsedExpressions'][$enum]['item'] =  $token['data']['item'];
+										$enum++;
+									}
+								}
+							}
+							unset($triggerPrototype);
+						}
+					}
+					unset($discoveryRule);
+				}
+				unset($discoveryRules);
+			}
 		}
 
 		return $this->formattedData['discoveryRules'];
@@ -1882,7 +1954,26 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedTriggers() {
 		if (!isset($this->formattedData['triggers'])) {
-				$this->formattedData['triggers'] = $this->formatter->getTriggers();
+			$this->formattedData['triggers'] = $this->formatter->getTriggers();
+
+			if ($this->formattedData['triggers']) {
+				foreach ($this->formattedData['triggers'] as &$trigger) {
+					$result = $this->triggerExpression->parse($trigger['expression']);
+					if (!$result) {
+						throw new Exception($this->triggerExpression->error);
+					}
+
+					$enum = 0;
+					foreach ($result->getTokens() as $token) {
+						if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+							$trigger['parsedExpressions'][$enum]['host'] =  $token['data']['host'];
+							$trigger['parsedExpressions'][$enum]['item'] =  $token['data']['item'];
+							$enum++;
+						}
+					}
+				}
+				unset($trigger);
+			}
 		}
 
 		return $this->formattedData['triggers'];
