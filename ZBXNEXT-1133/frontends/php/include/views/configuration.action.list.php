@@ -70,13 +70,13 @@ foreach ($this->data['actions'] as $action) {
 
 	if ($action['status'] == ACTION_STATUS_DISABLED) {
 		$status = new CLink(_('Disabled'),
-			'actionconf.php?go=activate&g_actionid'.SQUAREBRACKETS.'='.$action['actionid'].url_param('eventsource'),
+			'actionconf.php?go=activate&g_actionid[]='.$action['actionid'].url_param('eventsource'),
 			'disabled'
 		);
 	}
 	else {
 		$status = new CLink(_('Enabled'),
-			'actionconf.php?go=disable&g_actionid'.SQUAREBRACKETS.'='.$action['actionid'].url_param('eventsource'),
+			'actionconf.php?go=disable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
 			'enabled'
 		);
 	}
