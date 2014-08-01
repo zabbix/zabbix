@@ -3065,7 +3065,7 @@ void	free_database_cache()
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
 	const char	*__function_name = "DCget_nextid";
-	int		i, nodeid;
+	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
@@ -3107,7 +3107,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
 	if (0 == CONFIG_NODEID)
 	{
