@@ -61,8 +61,8 @@ static void	app_title(void)
 void	version(void)
 {
 	app_title();
+	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-	printf("Revision %s %s, compilation time: %s %s\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 }
 
 /******************************************************************************
