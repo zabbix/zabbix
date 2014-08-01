@@ -1,21 +1,21 @@
-.TH ZABBIX_AGENTD 8 "2014-07-10" Zabbix
+.TH ZABBIX_AGENTD 8 "2014\-07\-10" Zabbix
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon
 .SH SYNOPSIS
 .B zabbix_agentd
 .RB [ \-c
-.IR config-file ]
+.IR config\-file ]
 .br
 .B zabbix_agentd
 .RB [ \-c
-.IR config-file ]
+.IR config\-file ]
 .B \-p
 .br
 .B zabbix_agentd
 .RB [ \-c
-.IR config-file ]
+.IR config\-file ]
 .B \-t
-.I item-key
+.I item\-key
 .br
 .B zabbix_agentd \-h
 .br
@@ -24,11 +24,11 @@ zabbix_agentd \- Zabbix agent daemon
 .B zabbix_agentd
 is a daemon for monitoring of various server parameters.
 .SH OPTIONS
-.IP "\fB-c\fR, \fB--config\fR \fIconfig-file\fR"
-Use the alternate \fIconfig-file\fR instead of the default one.
+.IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
+Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
 .
-.IP "\fB-p\fR, \fB--print\fR"
+.IP "\fB\-p\fR, \fB\-\-print\fR"
 Print known items and exit. For each item either generic defaults are used, or specific defaults for testing are supplied. These defaults are listed in square brackets as item key parameters.
 Returned values are enclosed in square brackets and prefixed with the type of the returned value, separated by a pipe character.
 For user parameters type is always \fBt\fR, as the agent can not determine all possible return values.
@@ -65,11 +65,11 @@ u
 Unsigned integer.
 .RE
 .RE
-.IP "\fB-t\fR, \fB--test\fR \fIitem-key\fR"
-Test single item and exit. See \fB--print\fR for output description.
-.IP "\fB-h\fR, \fB--help\fR"
+.IP "\fB\-t\fR, \fB\-\-test\fR \fIitem\-key\fR"
+Test single item and exit. See \fB\-\-print\fR for output description.
+.IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
-.IP "\fB-V\fR, \fB--version\fR"
+.IP "\fB\-V\fR, \fB\-\-version\fR"
 Output version information and exit.
 .SH FILES
 .TP
