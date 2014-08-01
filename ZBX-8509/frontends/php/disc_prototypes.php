@@ -250,7 +250,7 @@ elseif (hasRequest('save')) {
 		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-		'formula'		=> getRequest('formula'),
+		'formula'		=> getRequest('formula', '1'),
 		'logtimefmt'	=> getRequest('logtimefmt'),
 		'valuemapid'	=> getRequest('valuemapid'),
 		'authtype'		=> getRequest('authtype'),
