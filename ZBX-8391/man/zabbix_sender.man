@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "2014-07-10" Zabbix
+.TH ZABBIX_SENDER 1 "2014-07-10" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
