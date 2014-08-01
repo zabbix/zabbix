@@ -94,6 +94,8 @@ const char	*usage_message[] = {
 
 /* application HELP message */
 const char	*help_message[] = {
+	"A Zabbix daemon for monitoring of various server parameters.",
+	"",
 	"Options:",
 	"",
 	"  -c --config config-file  Absolute path to the configuration file",

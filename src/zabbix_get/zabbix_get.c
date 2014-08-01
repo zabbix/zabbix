@@ -36,6 +36,8 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
+	"Get data from a remote Zabbix agent.",
+	"",
 	"Options:",
 	"  -s --host host-name-or-IP          Specify host name or IP address of a host",
 	"  -p --port port-number              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
