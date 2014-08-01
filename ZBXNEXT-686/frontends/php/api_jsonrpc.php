@@ -33,14 +33,14 @@ $content_type = explode(';', $content_type);
 $content_type = $content_type[0];
 
 if (!isset($allowed_content[$content_type])) {
-	header('HTTP/1.0 412 Precondition Failed');
+	sendHeader('HTTP/1.0 412 Precondition Failed');
 	exit;
 }
 
 
 require_once dirname(__FILE__).'/include/classes/core/Z.php';
 
-header('Content-Type: application/json');
+sendHeader('Content-Type: application/json');
 $data = $http_request->body();
 
 try {

@@ -20,6 +20,36 @@
 
 
 /**
+ * Wrapper for header(); mostly needed for unit testing.
+ *
+ * @param string $header
+ */
+function sendHeader($header) {
+	if (isPHPUnit()) {
+		return;
+	}
+
+	header($header);
+}
+
+/**
+ * Checks if the current code was called from PHPUnit cli test runner.
+ *
+ * @return bool
+ */
+function isPHPUnit() {
+	$trace = debug_backtrace();
+
+	$last = array_pop($trace);
+
+	if (is_array($last) && isset($last['class']) && $last['class'] == 'PHPUnit_TextUI_Command') {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Verify that function exists and can be called as a function.
  *
  * @param array		$names
