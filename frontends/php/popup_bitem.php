@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
-$dstfrm = get_request('dstfrm', 0);
+$dstfrm = getRequest('dstfrm', 0);
 
 $page['title'] = _('Graph item');
 $page['file'] = 'popup_bitem.php';
@@ -57,7 +57,7 @@ check_fields($fields);
 
 $caption = getRequest('caption', '');
 $autoCaption = '';
-$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
+$_REQUEST['axisside'] = getRequest('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
 if (getRequest('itemid') > 0) {
 	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid(getRequest('itemid'))));
@@ -105,13 +105,13 @@ else {
 
 	$frmGItem->addVar('dstfrm', $_REQUEST['dstfrm']);
 
-	$config	= get_request('config', 1);
-	$gid = get_request('gid', null);
-	$list_name = get_request('list_name', null);
-	$itemid = get_request('itemid', 0);
-	$color = get_request('color', '009900');
-	$calc_fnc = get_request('calc_fnc', 2);
-	$axisside = get_request('axisside', GRAPH_YAXIS_SIDE_LEFT);
+	$config	= getRequest('config', 1);
+	$gid = getRequest('gid');
+	$list_name = getRequest('list_name');
+	$itemid = getRequest('itemid', 0);
+	$color = getRequest('color', '009900');
+	$calc_fnc = getRequest('calc_fnc', 2);
+	$axisside = getRequest('axisside', GRAPH_YAXIS_SIDE_LEFT);
 
 	$frmGItem->addVar('gid', $gid);
 	$frmGItem->addVar('config', $config);

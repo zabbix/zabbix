@@ -25,7 +25,7 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-$_REQUEST['fullscreen'] = get_request('fullscreen', 0);
+$_REQUEST['fullscreen'] = getRequest('fullscreen', 0);
 if ($_REQUEST['fullscreen'] === '1') {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);
