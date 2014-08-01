@@ -41,21 +41,46 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
-void set_debug_level(int value, const char *process_type)
+const char	*get_debug_level_string()
 {
-	if (log_level + value > LOG_LEVEL_TRACE)
+	switch (log_level)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "highest log level was previously set for \"%s\" process", process_type);
+		case LOG_LEVEL_EMPTY:
+			return "0 - no debug";
+		case LOG_LEVEL_CRIT:
+			return "1 - critical";
+		case LOG_LEVEL_ERR:
+			return "2 - error";
+		case LOG_LEVEL_WARNING:
+			return "3 - warning";
+		case LOG_LEVEL_DEBUG:
+			return "4 - debug";
+		case LOG_LEVEL_TRACE:
+			return "5 - trace";
 	}
-	else if (log_level + value < LOG_LEVEL_EMPTY)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "lowest log level was previously set for \"%s\" process", process_type);
-	}
-	else
-	{
-		log_level = log_level + value;
-		zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%d\" is set for \"%s\" process", log_level, process_type);
-	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	set_debug_level_up()
+{
+	if (log_level == LOG_LEVEL_TRACE)
+		return FAIL;
+
+	log_level = log_level + 1;
+
+	return SUCCEED;
+}
+
+int	set_debug_level_down()
+{
+	if (log_level == LOG_LEVEL_EMPTY)
+		return FAIL;
+
+	log_level = log_level - 1;
+
+	return SUCCEED;
 }
 
 #if !defined(_WINDOWS)

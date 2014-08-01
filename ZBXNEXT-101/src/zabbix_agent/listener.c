@@ -28,7 +28,8 @@
 #include "sysinfo.h"
 #include "log.h"
 
-extern unsigned char process_type;
+extern unsigned char	process_type;
+extern int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -70,18 +71,18 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
-	int		ret, local_request_failed = 0, server_num, process_num;
+	int		ret, local_request_failed = 0;
 	zbx_sock_t	s;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	process_type = ZBX_PROCESS_TYPE_LISTENER;
-
+	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", server_num, process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [%s #%d]",
+			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
@@ -104,7 +105,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		}
 		else if (EINTR == zbx_sock_last_error())
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Listener %d has been interrupted by the signal. Repeating connection", process_num);
+			zabbix_log(LOG_LEVEL_WARNING, "Listener %d has been interrupted by the signal."
+					" Repeating connection", process_num);
 			continue;
 		}
 
