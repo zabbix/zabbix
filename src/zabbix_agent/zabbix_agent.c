@@ -34,7 +34,9 @@ const char	title_message[] = "Zabbix agent";
 const char	syslog_app_name[] = "zabbix_agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
-ZBX_THREAD_LOCAL	unsigned char process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL	unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL	int process_num;
+ZBX_THREAD_LOCAL	int server_num			= 0;
 
 const char	*help_message[] = {
 	"Options:",

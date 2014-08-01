@@ -35,7 +35,8 @@
 #include "threads.h"
 #include "zbxjson.h"
 
-extern unsigned char process_type;
+extern unsigned char	process_type;
+extern int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1328,17 +1329,17 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	int		nextcheck = 0, nextrefresh = 0, nextsend = 0, server_num, process_num;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-
+	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", server_num, process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [%s #%d]",
+			server_num, get_process_type_string(process_type), process_num);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;

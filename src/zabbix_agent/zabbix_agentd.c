@@ -146,8 +146,9 @@ ZBX_THREAD_HANDLE	*threads = NULL;
 
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
-ZBX_THREAD_LOCAL	unsigned char process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL	unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 ZBX_THREAD_LOCAL	int process_num;
+ZBX_THREAD_LOCAL	int server_num			= 0;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 
@@ -181,6 +182,33 @@ char		*opt = NULL;
 #ifdef _WINDOWS
 void zbx_co_uninitialize();
 #endif
+
+void	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+{
+	int	server_count = 0;
+
+	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
+		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+	}
+	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_LISTENER;
+		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+
+	}
+	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
+		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+}
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
@@ -593,9 +621,8 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_thread_args_t	*thread_args;
 	zbx_sock_t		listen_sock;
-	int			i, server_num = 0;
+	int			i, j = 0;
 #ifdef _WINDOWS
 	DWORD			res;
 #endif
@@ -650,31 +677,31 @@ int	MAIN_ZABBIX_ENTRY()
 
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
-	/* start the collector thread */
-	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-	thread_args->server_num = server_num;
-	thread_args->process_num = 1;
-	thread_args->args = NULL;
-	threads[server_num++] = zbx_thread_start(collector_thread, thread_args);
-
-	/* start listeners */
-	for (i = 0; i < CONFIG_PASSIVE_FORKS; i++)
+	for (i = 0; i < threads_num; i++)
 	{
-		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->server_num = server_num;
-		thread_args->process_num = i + 1;
-		thread_args->args = &listen_sock;
-		threads[server_num++] = zbx_thread_start(listener_thread, thread_args);
-	}
+		zbx_thread_args_t	*thread_args;
 
-	/* start active check */
-	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
-	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->server_num = server_num;
-		thread_args->process_num = i + 1;
-		thread_args->args = &CONFIG_ACTIVE_ARGS[i];
-		threads[server_num++] = zbx_thread_start(active_checks_thread, thread_args);
+
+		get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num);
+
+		thread_args->server_num = i + 1;
+		thread_args->args = NULL;
+
+		switch (thread_args->process_type)
+		{
+			case ZBX_PROCESS_TYPE_COLLECTOR:
+				threads[i] = zbx_thread_start(collector_thread, thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_LISTENER:
+				thread_args->args = &listen_sock;
+				threads[i] = zbx_thread_start(listener_thread, thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+				thread_args->args = &CONFIG_ACTIVE_ARGS[j++];
+				threads[i] = zbx_thread_start(active_checks_thread, thread_args);
+				break;
+		}
 	}
 
 #ifdef _WINDOWS
@@ -796,43 +823,36 @@ void	zbx_sigusr_handler(zbx_task_t task)
 	switch (((unsigned char *)&task)[0])
 	{
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
-			set_debug_level(UP, get_process_type_string(process_type));
+			if (SUCCEED != set_debug_level_up())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level for \"%s #%d\" process:"
+						" maximal level has been already set",
+						get_process_type_string(process_type), process_num);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\""
+						" process", get_debug_level_string(), get_process_type_string(process_type), process_num);
+			}
 			break;
 		case ZBX_TASK_LOG_LEVEL_DECREASE:
-			set_debug_level(DOWN, get_process_type_string(process_type));
+			if (SUCCEED != set_debug_level_down())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level for \"%s #%d\" process:"
+						" minimal level has been already set",
+						get_process_type_string(process_type), process_num);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\""
+						" process", get_debug_level_string(), get_process_type_string(process_type), process_num);
+			}
 			break;
 		default:
 			break;
 	}
 }
 #endif
-
-void	get_process_info_by_thread(int server_num, int *process_type, int *process_num)
-{
-	int	server_count = 0;
-
-	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
-	{
-		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
-	}
-	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
-	{
-		*process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
-
-	}
-	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
-	{
-		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-}
 
 int	main(int argc, char **argv)
 {
@@ -941,7 +961,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((char *)&t.task)[0])
+	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&t.task)[0])
 	{
 		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 		exit(SUCCEED == zbx_sigusr_send(t.task) ? EXIT_SUCCESS : EXIT_FAILURE);

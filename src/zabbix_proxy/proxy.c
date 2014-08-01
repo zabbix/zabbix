@@ -586,10 +586,32 @@ void	zbx_sigusr_handler(zbx_task_t task)
 			zbx_wakeup();
 			break;
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
-			set_debug_level(UP, get_process_type_string(process_type));
+			if (SUCCEED != set_debug_level_up())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level for \"%s #%d\" process:"
+						" maximal level has been already set",
+						get_process_type_string(process_type), process_num);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\" process",
+						get_debug_level_string(), get_process_type_string(process_type),
+						process_num);
+			}
 			break;
 		case ZBX_TASK_LOG_LEVEL_DECREASE:
-			set_debug_level(DOWN, get_process_type_string(process_type));
+			if (SUCCEED != set_debug_level_down())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level for \"%s #%d\" process:"
+						" minimal level has been already set",
+						get_process_type_string(process_type), process_num);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\" process",
+						get_debug_level_string(), get_process_type_string(process_type),
+						process_num);
+			}
 			break;
 		default:
 			break;
@@ -639,15 +661,19 @@ int	main(int argc, char **argv)
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 					((char *)&task)[0] = ZBX_TASK_CONFIG_CACHE_RELOAD;
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
+				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
+						strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
 					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE), &task, get_process_type_by_name);
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
+							&task, get_process_type_by_name);
 				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE, strlen(ZBX_LOG_LEVEL_DECREASE)))
+				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
+						strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
 					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE), &task, get_process_type_by_name);
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
+							&task, get_process_type_by_name);
 				}
 				else
 				{
@@ -797,15 +823,12 @@ int	MAIN_ZABBIX_ENTRY()
 		zbx_thread_args_t	thread_args;
 		unsigned char		poller_type;
 
-		get_process_info_by_thread(i + 1, &process_type, &process_num);
+		get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num);
 
-		server_num = i + 1;
-		thread_args.process_type = process_type;
-		thread_args.server_num = server_num;
-		thread_args.process_num = process_num;
+		thread_args.server_num = i + 1;
 		thread_args.args = NULL;
 
-		switch (process_type)
+		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				threads[i] = zbx_thread_start(proxyconfig_thread, &thread_args);

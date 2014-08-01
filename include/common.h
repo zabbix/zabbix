@@ -71,9 +71,6 @@
 #define ON	1
 #define OFF	0
 
-#define	UP	1
-#define	DOWN	-1
-
 #if defined(_WINDOWS)
 #	define	ZBX_SERVICE_NAME_LEN	64
 extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
