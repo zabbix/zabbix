@@ -310,22 +310,22 @@ else {
 		)
 	);
 
-	$r_form = new CForm('get');
-	$r_form->addVar('fullscreen', getRequest('fullscreen'));
-	$r_form->addVar('stime', $stime);
-	$r_form->addVar('period', $period);
+	$headerForm = new CForm('get');
+	$headerForm->addVar('fullscreen', getRequest('fullscreen'));
+	$headerForm->addVar('stime', $stime);
+	$headerForm->addVar('period', $period);
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if (getRequest('triggerid') != 0) {
-			$r_form->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
+			$headerForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$r_form->addItem(array(
+		$headerForm->addItem(array(
 			_('Group').SPACE,
 			$pageFilter->getGroupsCB()
 		));
-		$r_form->addItem(array(
+		$headerForm->addItem(array(
 			SPACE._('Host').SPACE,
 			$pageFilter->getHostsCB()
 		));
@@ -335,10 +335,10 @@ else {
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
+		$headerForm->addItem(array(SPACE._('Source').SPACE, $cmbSource));
 	}
 
-	$eventsWidget->addHeader(_('Events'), $r_form);
+	$eventsWidget->addHeader(_('Events'), $headerForm);
 	$eventsWidget->addHeaderRowNumber();
 
 	$filterForm = null;
@@ -646,11 +646,10 @@ else {
 			);
 
 			if ($triggerId) {
-				$filterTriggerIds = array($triggerId);
 				$knownTriggerIds = array($triggerId => $triggerId);
 				$validTriggerIds = $knownTriggerIds;
 
-				$eventOptions['objectids'] = $filterTriggerIds;
+				$eventOptions['objectids'] = array($triggerId);;
 			}
 			elseif ($pageFilter->hostid > 0) {
 				$hostTriggers = API::Trigger()->get(array(
