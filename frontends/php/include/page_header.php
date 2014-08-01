@@ -326,7 +326,7 @@ if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $p
 	$table->show();
 }
 elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	echo SBR;
+	echo BR();
 }
 
 // unset multiple variables

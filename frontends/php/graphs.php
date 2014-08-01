@@ -489,7 +489,7 @@ elseif (isset($_REQUEST['form'])) {
 				}
 				if (isset($link)) {
 					$data['templates'][] = $link;
-					$data['templates'][] = SPACE.RARR.SPACE;
+					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);

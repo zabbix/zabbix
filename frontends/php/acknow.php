@@ -194,7 +194,7 @@ ob_end_flush();
  */
 show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
 
-echo SBR;
+echo BR();
 
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
