@@ -1,10 +1,10 @@
-.TH ZABBIX_SERVER 8 "2014-07-10" Zabbix
+.TH ZABBIX_SERVER 8 "2014\-07\-10" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
 .B zabbix_server
 .RB [ \-c
-.IR config-file ]
+.IR config\-file ]
 .RB [ \-R
 .IR option ]
 .br
@@ -15,10 +15,10 @@ zabbix_server \- Zabbix server daemon
 .B zabbix_server
 is the core daemon of Zabbix software.
 .SH OPTIONS
-.IP "\fB-c\fR, \fB--config\fR \fIconfig-file\fR"
-Use the alternate \fIconfig-file\fR instead of the default one.
+.IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
+Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
-.IP "\fB-R\fR, \fB--runtime-control\fR \fIoption\fR"
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIoption\fR"
 Perform administrative functions according to \fIoption\fR.
 .SS
 .RS 4
@@ -27,12 +27,12 @@ Runtime control options
 .TP 4
 .B config_cache_reload
 Reload configuration cache. Ignored if cache is being currently loaded.
-Default configuration file (unless \fB-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
+Default configuration file (unless \fB\-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
 .RE
 .RE
-.IP "\fB-h\fR, \fB--help\fR"
+.IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
-.IP "\fB-V\fR, \fB--version\fR"
+.IP "\fB\-V\fR, \fB\-\-version\fR"
 Output version information and exit.
 .SH FILES
 .TP
