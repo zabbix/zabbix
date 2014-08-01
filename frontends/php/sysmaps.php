@@ -103,7 +103,7 @@ else {
 }
 
 if ($isExportData) {
-	$export = new CConfigurationExport(array('maps' => get_request('maps', array())));
+	$export = new CConfigurationExport(array('maps' => getRequest('maps', array())));
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
@@ -118,7 +118,7 @@ if ($isExportData) {
 	exit;
 }
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -130,25 +130,25 @@ if (isset($_REQUEST['save'])) {
 		'height' => $_REQUEST['height'],
 		'backgroundid' => $_REQUEST['backgroundid'],
 		'iconmapid' => $_REQUEST['iconmapid'],
-		'highlight' => get_request('highlight', 0),
-		'markelements' => get_request('markelements', 0),
-		'expandproblem' => get_request('expandproblem', 0),
-		'label_format' => get_request('label_format', 0),
-		'label_type_host' => get_request('label_type_host', 2),
-		'label_type_hostgroup' => get_request('label_type_hostgroup', 2),
-		'label_type_trigger' => get_request('label_type_trigger', 2),
-		'label_type_map' => get_request('label_type_map', 2),
-		'label_type_image' => get_request('label_type_image', 2),
-		'label_string_host' => get_request('label_string_host', ''),
-		'label_string_hostgroup' => get_request('label_string_hostgroup', ''),
-		'label_string_trigger' => get_request('label_string_trigger', ''),
-		'label_string_map' => get_request('label_string_map', ''),
-		'label_string_image' => get_request('label_string_image', ''),
+		'highlight' => getRequest('highlight', 0),
+		'markelements' => getRequest('markelements', 0),
+		'expandproblem' => getRequest('expandproblem', 0),
+		'label_format' => getRequest('label_format', 0),
+		'label_type_host' => getRequest('label_type_host', 2),
+		'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
+		'label_type_trigger' => getRequest('label_type_trigger', 2),
+		'label_type_map' => getRequest('label_type_map', 2),
+		'label_type_image' => getRequest('label_type_image', 2),
+		'label_string_host' => getRequest('label_string_host', ''),
+		'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
+		'label_string_trigger' => getRequest('label_string_trigger', ''),
+		'label_string_map' => getRequest('label_string_map', ''),
+		'label_string_image' => getRequest('label_string_image', ''),
 		'label_type' => $_REQUEST['label_type'],
 		'label_location' => $_REQUEST['label_location'],
-		'show_unack' => get_request('show_unack', 0),
-		'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		'urls' => get_request('urls', array())
+		'show_unack' => getRequest('show_unack', 0),
+		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		'urls' => getRequest('urls', array())
 	);
 
 	foreach ($map['urls'] as $unum => $url) {
@@ -228,30 +228,30 @@ if (isset($_REQUEST['form'])) {
 		$data = array(
 			'sysmap' => array(
 				'sysmapid' => getRequest('sysmapid'),
-				'name' => get_request('name', ''),
-				'width' => get_request('width', 800),
-				'height' => get_request('height', 600),
-				'backgroundid' => get_request('backgroundid', 0),
-				'iconmapid' => get_request('iconmapid', 0),
-				'label_format' => get_request('label_format', 0),
-				'label_type_host' => get_request('label_type_host', 2),
-				'label_type_hostgroup' => get_request('label_type_hostgroup', 2),
-				'label_type_trigger' => get_request('label_type_trigger', 2),
-				'label_type_map' => get_request('label_type_map', 2),
-				'label_type_image' => get_request('label_type_image', 2),
-				'label_string_host' => get_request('label_string_host', ''),
-				'label_string_hostgroup' => get_request('label_string_hostgroup', ''),
-				'label_string_trigger' => get_request('label_string_trigger', ''),
-				'label_string_map' => get_request('label_string_map', ''),
-				'label_string_image' => get_request('label_string_image', ''),
-				'label_type' => get_request('label_type', 0),
-				'label_location' => get_request('label_location', 0),
-				'highlight' => get_request('highlight', 0),
-				'markelements' => get_request('markelements', 0),
-				'expandproblem' => get_request('expandproblem', 0),
-				'show_unack' => get_request('show_unack', 0),
-				'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'urls' => get_request('urls', array())
+				'name' => getRequest('name', ''),
+				'width' => getRequest('width', 800),
+				'height' => getRequest('height', 600),
+				'backgroundid' => getRequest('backgroundid', 0),
+				'iconmapid' => getRequest('iconmapid', 0),
+				'label_format' => getRequest('label_format', 0),
+				'label_type_host' => getRequest('label_type_host', 2),
+				'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
+				'label_type_trigger' => getRequest('label_type_trigger', 2),
+				'label_type_map' => getRequest('label_type_map', 2),
+				'label_type_image' => getRequest('label_type_image', 2),
+				'label_string_host' => getRequest('label_string_host', ''),
+				'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
+				'label_string_trigger' => getRequest('label_string_trigger', ''),
+				'label_string_map' => getRequest('label_string_map', ''),
+				'label_string_image' => getRequest('label_string_image', ''),
+				'label_type' => getRequest('label_type', 0),
+				'label_location' => getRequest('label_location', 0),
+				'highlight' => getRequest('highlight', 0),
+				'markelements' => getRequest('markelements', 0),
+				'expandproblem' => getRequest('expandproblem', 0),
+				'show_unack' => getRequest('show_unack', 0),
+				'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+				'urls' => getRequest('urls', array())
 			)
 		);
 	}

@@ -107,9 +107,9 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 		}
 
 		$filterForm->addRow(_('Items list'), array($itemListbox, BR(), $addItemButton, $deleteItemButton));
-		$filterForm->addRow(_('Select rows with value like'), new CTextBox('filter', get_request('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
+		$filterForm->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
 
-		$filterTask = get_request('filter_task', 0);
+		$filterTask = getRequest('filter_task', 0);
 
 		$taskComboBox = new CComboBox('filter_task', $filterTask, 'submit()');
 		$taskComboBox->addItem(FILTER_TASK_SHOW, _('Show selected'));
@@ -119,7 +119,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 		$tasks = array($taskComboBox);
 
 		if (str_in_array($filterTask, array(FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK))) {
-			$colorComboBox = new CComboBox('mark_color', get_request('mark_color', 0));
+			$colorComboBox = new CComboBox('mark_color', getRequest('mark_color', 0));
 			$colorComboBox->addItem(MARK_COLOR_RED, _('as Red'));
 			$colorComboBox->addItem(MARK_COLOR_GREEN, _('as Green'));
 			$colorComboBox->addItem(MARK_COLOR_BLUE, _('as Blue'));
@@ -144,9 +144,9 @@ $screen = CScreenBuilder::getScreen(array(
 	'profileIdx2' => reset($this->data['itemids']),
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
-	'filter' => get_request('filter'),
-	'filter_task' => get_request('filter_task'),
-	'mark_color' => get_request('mark_color'),
+	'filter' => getRequest('filter'),
+	'filter_task' => getRequest('filter_task'),
+	'mark_color' => getRequest('mark_color'),
 	'plaintext' => $this->data['plaintext']
 ));
 

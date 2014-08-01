@@ -57,14 +57,14 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
-$_REQUEST['dchecks'] = get_request('dchecks', array());
+$_REQUEST['dchecks'] = getRequest('dchecks', array());
 
 /*
  * Permissions
  */
 if (isset($_REQUEST['druleid'])) {
 	$dbDRule = API::DRule()->get(array(
-		'druleids' => get_request('druleid'),
+		'druleids' => getRequest('druleid'),
 		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
 		'selectDChecks' => array(
 			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -78,14 +78,14 @@ if (isset($_REQUEST['druleid'])) {
 	}
 }
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
-		$ajaxData = get_request('ajaxdata', array());
+		$ajaxData = getRequest('ajaxdata', array());
 
 		foreach ($ajaxData as $check) {
 			switch ($check['field']) {
@@ -115,8 +115,8 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
  * Action
  */
 if (isset($_REQUEST['save'])) {
-	$dChecks = get_request('dchecks', array());
-	$uniq = get_request('uniqueness_criteria', 0);
+	$dChecks = getRequest('dchecks', array());
+	$uniq = getRequest('uniqueness_criteria', 0);
 
 	foreach ($dChecks as $dcnum => $check) {
 		if (substr($check['dcheckid'], 0, 3) === 'new') {
@@ -127,18 +127,18 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$discoveryRule = array(
-		'name' => get_request('name'),
-		'proxy_hostid' => get_request('proxy_hostid'),
-		'iprange' => get_request('iprange'),
-		'delay' => get_request('delay'),
-		'status' => get_request('status'),
+		'name' => getRequest('name'),
+		'proxy_hostid' => getRequest('proxy_hostid'),
+		'iprange' => getRequest('iprange'),
+		'delay' => getRequest('delay'),
+		'status' => getRequest('status'),
 		'dchecks' => $dChecks
 	);
 
 	DBStart();
 
 	if (isset($_REQUEST['druleid'])) {
-		$discoveryRule['druleid'] = get_request('druleid');
+		$discoveryRule['druleid'] = getRequest('druleid');
 		$result = API::DRule()->update($discoveryRule);
 
 		$messageSuccess = _('Discovery rule updated');
@@ -223,10 +223,10 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'druleid' => get_request('druleid'),
+		'druleid' => getRequest('druleid'),
 		'drule' => array(),
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0)
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0)
 	);
 
 	// get drule
@@ -243,14 +243,14 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
-		$data['drule']['proxy_hostid'] = get_request('proxy_hostid', 0);
-		$data['drule']['name'] = get_request('name', '');
-		$data['drule']['iprange'] = get_request('iprange', '192.168.0.1-254');
-		$data['drule']['delay'] = get_request('delay', SEC_PER_HOUR);
-		$data['drule']['status'] = get_request('status', DRULE_STATUS_ACTIVE);
-		$data['drule']['dchecks'] = get_request('dchecks', array());
-		$data['drule']['nextcheck'] = get_request('nextcheck', 0);
-		$data['drule']['uniqueness_criteria'] = get_request('uniqueness_criteria', -1);
+		$data['drule']['proxy_hostid'] = getRequest('proxy_hostid', 0);
+		$data['drule']['name'] = getRequest('name', '');
+		$data['drule']['iprange'] = getRequest('iprange', '192.168.0.1-254');
+		$data['drule']['delay'] = getRequest('delay', SEC_PER_HOUR);
+		$data['drule']['status'] = getRequest('status', DRULE_STATUS_ACTIVE);
+		$data['drule']['dchecks'] = getRequest('dchecks', array());
+		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);
+		$data['drule']['uniqueness_criteria'] = getRequest('uniqueness_criteria', -1);
 	}
 
 	if (!empty($data['drule']['dchecks'])) {
