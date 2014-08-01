@@ -2228,7 +2228,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, const zbx_ti
 		if (NULL == proxy_timediff)
 			proxydiffs[num] = 0;
 		else
-			proxydiffs[num] = proxy_timediff->sec + (values[i].ts.ns + proxy_timediff->ns > 999999999);
+			proxydiffs[num] = proxy_timediff->sec + (values[i].ts.ns - proxy_timediff->ns < 0);
 
 		num++;
 	}
