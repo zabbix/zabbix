@@ -73,6 +73,8 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
+	"The core daemon of Zabbix software.",
+	"",
 	"Options:",
 	"  -c --config config-file       Absolute path to the configuration file",
 	"  -R --runtime-control option   Perform administrative functions",

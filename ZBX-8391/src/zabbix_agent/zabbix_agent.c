@@ -42,6 +42,8 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
+	"A Zabbix executable for monitoring of various server parameters, to be started upon request by inetd.",
+	"",
 	"Options:",
 	"  -c --config config-file  Absolute path to the configuration file",
 	"  -p --print               Print known items and exit",

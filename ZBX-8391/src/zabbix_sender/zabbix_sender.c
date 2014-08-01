@@ -41,6 +41,8 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
+	"Send data values to a remote Zabbix server.",
+	"",
 	"Options:",
 	"  -c --config config-file              Absolute path to the Zabbix agentd configuration file",
 	"",
