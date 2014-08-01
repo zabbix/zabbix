@@ -81,7 +81,7 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid'.SQUAREBRACKETS.'='.$userId, 'on')
+		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid[]='.$userId, 'on')
 		: new CSpan(_('Ok'), 'green');
 
 	// user groups

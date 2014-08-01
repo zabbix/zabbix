@@ -76,7 +76,7 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
-$_REQUEST['debug_mode'] = get_request('debug_mode', 0);
+$_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
 
 /*
  * Permissions
@@ -107,13 +107,13 @@ elseif (isset($_REQUEST['go'])) {
 		}
 	}
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
  */
 if (isset($_REQUEST['del_deny']) && isset($_REQUEST['right_to_del']['deny'])) {
-	$_REQUEST['group_rights'] = get_request('group_rights', array());
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
 
 	foreach ($_REQUEST['right_to_del']['deny'] as $name) {
 		if (!isset($_REQUEST['group_rights'][$name])) {
@@ -126,7 +126,7 @@ if (isset($_REQUEST['del_deny']) && isset($_REQUEST['right_to_del']['deny'])) {
 	}
 }
 elseif (isset($_REQUEST['del_read_only']) && isset($_REQUEST['right_to_del']['read_only'])) {
-	$_REQUEST['group_rights'] = get_request('group_rights', array());
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
 
 	foreach ($_REQUEST['right_to_del']['read_only'] as $name) {
 		if (!isset($_REQUEST['group_rights'][$name])) {
@@ -139,7 +139,7 @@ elseif (isset($_REQUEST['del_read_only']) && isset($_REQUEST['right_to_del']['re
 	}
 }
 elseif (isset($_REQUEST['del_read_write']) && isset($_REQUEST['right_to_del']['read_write'])) {
-	$_REQUEST['group_rights'] = get_request('group_rights', array());
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
 
 	foreach ($_REQUEST['right_to_del']['read_write'] as $name) {
 		if (!isset($_REQUEST['group_rights'][$name])) {
@@ -152,7 +152,7 @@ elseif (isset($_REQUEST['del_read_write']) && isset($_REQUEST['right_to_del']['r
 	}
 }
 elseif (isset($_REQUEST['new_right'])) {
-	$_REQUEST['group_rights'] = get_request('group_rights', array());
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
 
 	foreach ($_REQUEST['new_right'] as $id => $right) {
 		$_REQUEST['group_rights'][$id] = array(
@@ -168,8 +168,8 @@ elseif (isset($_REQUEST['save'])) {
 		'users_status' => $_REQUEST['users_status'],
 		'gui_access' => $_REQUEST['gui_access'],
 		'debug_mode' => $_REQUEST['debug_mode'],
-		'userids' => get_request('group_users', array()),
-		'rights' => array_values(get_request('group_rights', array()))
+		'userids' => getRequest('group_users', array()),
+		'rights' => array_values(getRequest('group_rights', array()))
 	);
 
 	DBstart();
@@ -196,7 +196,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
-	clearCookies($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete'])) {
@@ -212,11 +215,14 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$groupIds = get_request('group_groupid', array());
+	$groupIds = getRequest('group_groupid', array());
 	$groups = array();
 
 	$dbGroups = DBselect(
@@ -240,12 +246,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-		clearCookies($result);
 	}
 }
 elseif ($_REQUEST['go'] == 'set_gui_access') {
-	$groupIds = get_request('group_groupid', get_request('usrgrpid'));
+	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
 	$groups = array();
@@ -272,12 +281,15 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
-		clearCookies($result);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
-	$groupIds = get_request('group_groupid', get_request('usrgrpid'));
+	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
 	$setDebugMode = ($_REQUEST['go'] == 'enable_debug') ? GROUP_DEBUG_MODE_ENABLED : GROUP_DEBUG_MODE_DISABLED;
@@ -306,8 +318,11 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
-		clearCookies($result);
 	}
 }
 elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))) {
@@ -348,8 +363,11 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 
@@ -358,9 +376,9 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'usrgrpid' => get_request('usrgrpid'),
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0)
+		'usrgrpid' => getRequest('usrgrpid'),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0)
 	);
 
 	if (isset($_REQUEST['usrgrpid'])) {
@@ -405,15 +423,15 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
-		$data['name'] = get_request('gname', '');
-		$data['users_status'] = get_request('users_status', GROUP_STATUS_ENABLED);
-		$data['gui_access'] = get_request('gui_access', GROUP_GUI_ACCESS_SYSTEM);
-		$data['debug_mode'] = get_request('debug_mode', GROUP_DEBUG_MODE_DISABLED);
-		$data['group_users'] = get_request('group_users', array());
-		$data['group_rights'] = get_request('group_rights', array());
+		$data['name'] = getRequest('gname', '');
+		$data['users_status'] = getRequest('users_status', GROUP_STATUS_ENABLED);
+		$data['gui_access'] = getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM);
+		$data['debug_mode'] = getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED);
+		$data['group_users'] = getRequest('group_users', array());
+		$data['group_rights'] = getRequest('group_rights', array());
 	}
 
-	$data['selected_usrgrp'] = get_request('selusrgrp', 0);
+	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
 
 	// sort group rights
 	order_result($data['group_rights'], 'name');

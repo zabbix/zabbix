@@ -72,7 +72,7 @@ $fields = array(
 	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null)
 );
 check_fields($fields);
-$_REQUEST['dynamic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
+$_REQUEST['dynamic'] = getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 
 /*
  * Permissions
@@ -96,7 +96,7 @@ $screen = reset($screens);
  * Ajax
  */
 if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
-	$sw_pos = get_request('sw_pos', array());
+	$sw_pos = getRequest('sw_pos', array());
 	if (count($sw_pos) > 3) {
 		DBstart();
 
@@ -154,22 +154,22 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 if (isset($_REQUEST['save'])) {
 	$screenItem = array(
-		'screenid' => get_request('screenid'),
-		'resourceid' => get_request('resourceid'),
-		'resourcetype' => get_request('resourcetype'),
-		'caption' => get_request('caption'),
-		'style' => get_request('style'),
-		'url' => get_request('url'),
-		'width' => get_request('width'),
-		'height' => get_request('height'),
-		'halign' => get_request('halign'),
-		'valign' => get_request('valign'),
-		'colspan' => get_request('colspan'),
-		'rowspan' => get_request('rowspan'),
-		'dynamic' => get_request('dynamic'),
-		'elements' => get_request('elements', 0),
-		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
-		'application' => get_request('application', '')
+		'screenid' => getRequest('screenid'),
+		'resourceid' => getRequest('resourceid'),
+		'resourcetype' => getRequest('resourcetype'),
+		'caption' => getRequest('caption'),
+		'style' => getRequest('style'),
+		'url' => getRequest('url'),
+		'width' => getRequest('width'),
+		'height' => getRequest('height'),
+		'halign' => getRequest('halign'),
+		'valign' => getRequest('valign'),
+		'colspan' => getRequest('colspan'),
+		'rowspan' => getRequest('rowspan'),
+		'dynamic' => getRequest('dynamic'),
+		'elements' => getRequest('elements', 0),
+		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
+		'application' => getRequest('application', '')
 	);
 
 	DBstart();
@@ -180,8 +180,8 @@ if (isset($_REQUEST['save'])) {
 		$result = API::ScreenItem()->update($screenItem);
 	}
 	else {
-		$screenItem['x'] = get_request('x');
-		$screenItem['y'] = get_request('y');
+		$screenItem['x'] = getRequest('x');
+		$screenItem['y'] = getRequest('y');
 
 		$result = API::ScreenItem()->create($screenItem);
 	}
@@ -346,7 +346,7 @@ elseif (isset($_REQUEST['rmv_col'])) {
  * Display
  */
 $data = array(
-	'screenid' => get_request('screenid', 0)
+	'screenid' => getRequest('screenid', 0)
 );
 
 // getting updated screen, so we wont have to refresh the page to see changes
