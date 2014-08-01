@@ -73,13 +73,13 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -160,7 +160,7 @@ elseif (isset($_REQUEST['delete'])) {
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$result = true;
-	$applications = get_request('applications', array());
+	$applications = getRequest('applications', array());
 	$deleted = 0;
 
 	DBstart();
@@ -242,10 +242,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'applicationid' => get_request('applicationid'),
-		'groupid' => get_request('groupid', 0),
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0)
+		'applicationid' => getRequest('applicationid'),
+		'groupid' => getRequest('groupid', 0),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0)
 	);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
@@ -256,8 +256,8 @@ if (isset($_REQUEST['form'])) {
 
 	}
 	else {
-		$data['appname'] = get_request('appname', '');
-		$data['hostid'] = get_request('hostid');
+		$data['appname'] = getRequest('appname', '');
+		$data['hostid'] = getRequest('hostid');
 	}
 
 	// render view
@@ -270,8 +270,8 @@ else {
 		'pageFilter' => new CPageFilter(array(
 			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
-			'hostid' => get_request('hostid'),
-			'groupid' => get_request('groupid')
+			'hostid' => getRequest('hostid'),
+			'groupid' => getRequest('groupid')
 		))
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;

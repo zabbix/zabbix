@@ -63,7 +63,7 @@ $rows_per_page = CWebUser::$data['rows_per_page'];
 
 $searchWidget = new CWidget('search_wdgt');
 
-$search = get_request('search', '');
+$search = getRequest('search', '');
 
 // Header
 if (zbx_empty($search)) {

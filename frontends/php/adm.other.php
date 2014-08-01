@@ -48,21 +48,21 @@ if (isset($_REQUEST['save'])) {
 	$orig_config = select_config(false);
 
 	$configs = array(
-		'refresh_unsupported' => get_request('refresh_unsupported'),
-		'alert_usrgrpid' => get_request('alert_usrgrpid'),
-		'discovery_groupid' => get_request('discovery_groupid'),
-		'snmptrap_logging' => get_request('snmptrap_logging') ? 1 : 0
+		'refresh_unsupported' => getRequest('refresh_unsupported'),
+		'alert_usrgrpid' => getRequest('alert_usrgrpid'),
+		'discovery_groupid' => getRequest('discovery_groupid'),
+		'snmptrap_logging' => getRequest('snmptrap_logging') ? 1 : 0
 	);
 	$result = update_config($configs);
 
 	if ($result) {
 		$audit = array(
-			_s('Refresh unsupported items (in sec) "%1$s".', get_request('refresh_unsupported'))
+			_s('Refresh unsupported items (in sec) "%1$s".', getRequest('refresh_unsupported'))
 		);
 
 		if (hasRequest('discovery_groupid')) {
 			$hostGroup = API::HostGroup()->get(array(
-				'groupids' => get_request('discovery_groupid'),
+				'groupids' => getRequest('discovery_groupid'),
 				'editable' => true,
 				'output' => array('groupid', 'name')
 			));
@@ -79,7 +79,7 @@ if (isset($_REQUEST['save'])) {
 		}
 
 		if (hasRequest('alert_usrgrpid')) {
-			$userGroupId = get_request('alert_usrgrpid');
+			$userGroupId = getRequest('alert_usrgrpid');
 
 			if ($userGroupId) {
 				$userGroupName = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.zbx_dbstr($userGroupId)));
@@ -124,13 +124,13 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 
 if ($data['form_refresh']) {
-	$data['config']['discovery_groupid'] = get_request('discovery_groupid');
-	$data['config']['alert_usrgrpid'] = get_request('alert_usrgrpid');
-	$data['config']['refresh_unsupported'] = get_request('refresh_unsupported');
-	$data['config']['snmptrap_logging'] = get_request('snmptrap_logging');
+	$data['config']['discovery_groupid'] = getRequest('discovery_groupid');
+	$data['config']['alert_usrgrpid'] = getRequest('alert_usrgrpid');
+	$data['config']['refresh_unsupported'] = getRequest('refresh_unsupported');
+	$data['config']['snmptrap_logging'] = getRequest('snmptrap_logging');
 }
 else {
 	$data['config'] = select_config(false);
