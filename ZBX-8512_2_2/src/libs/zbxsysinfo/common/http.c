@@ -189,10 +189,10 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (NULL != (newline = strchr(str, '\n')))
 			{
-				*newline = '\0';
-
 				if (str != newline && '\r' == newline[-1])
 					newline[-1] = '\0';
+				else
+					*newline = '\0';
 			}
 
 			if (NULL != (ptr = zbx_regexp_sub(str, regexp, output)))
