@@ -278,19 +278,6 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate user alias "%s".', $user['alias']));
 					}
 				}
-
-				if (mb_strlen($user['alias']) > 64) {
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_n(
-							'Maximum alias length is %1$d characters, "%2$s" is %3$d character.',
-							'Maximum alias length is %1$d characters, "%2$s" is %3$d characters.',
-							64,
-							$user['alias'],
-							mb_strlen($user['alias'])
-						)
-					);
-				}
 			}
 
 			if (isset($user['usrgrps'])) {
