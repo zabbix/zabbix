@@ -329,11 +329,19 @@ foreach ($subfiltersList as $name) {
 }
 
 
-if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
+if (!hasRequest('form') && hasRequest('filter_hostid') && getRequest('filter_hostid')) {
+	$filterHostId = getRequest('filter_hostid');
+
 	if (!isset($host)) {
-		$host = API::Host()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
+		$host = API::Host()->get(array(
+			'filter' => array('hostid' => $filterHostId),
+			'output' => array('hostid')
+		));
 		if (empty($host)) {
-			$host = API::Template()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
+			$host = API::Template()->get(array(
+				'filter' => array('hostid' => $filterHostId),
+				'output' => array('templateid')
+			));
 		}
 		$host = reset($host);
 	}

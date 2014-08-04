@@ -69,13 +69,16 @@ abstract class CAbstractScreenImporter extends CImporter {
 						break;
 
 					case SCREEN_RESOURCE_GRAPH:
-						$dbGraphs = API::Graph()->getObjects($resource);
+						$dbGraphs = API::Graph()->get(array(
+							'filter' => $resource,
+							'output' => array('graphid')
+						));
 						if (empty($dbGraphs)) {
 							throw new Exception(_s('Cannot find graph "%1$s" used in screen "%2$s".',
 								$resource['name'], $screen['name']));
 						}
-
 						$tmp = reset($dbGraphs);
+
 						$screenItem['resourceid'] = $tmp['graphid'];
 						break;
 
