@@ -65,8 +65,8 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
-CProfile::update('web.screenconf.config', get_request('config', 0), PROFILE_TYPE_INT);
-$_REQUEST['go'] = get_request('go', 'none');
+CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
@@ -94,7 +94,7 @@ if (isset($_REQUEST['screenid'])) {
  * Export
  */
 if ($isExportData) {
-	$screens = get_request('screens', array());
+	$screens = getRequest('screens', array());
 	$export = new CConfigurationExport(array('screens' => $screens));
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
@@ -167,7 +167,7 @@ elseif (isset($_REQUEST['save'])) {
 		$messageFailed = _('Cannot add screen');
 
 		if (isset($_REQUEST['templateid'])) {
-			$screen['templateid'] = get_request('templateid');
+			$screen['templateid'] = getRequest('templateid');
 			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
@@ -183,14 +183,15 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
+		uncheckTableRows();
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
-	$screenids = get_request('screens', array());
+	$screenids = getRequest('screens', array());
 	if (isset($_REQUEST['screenid'])) {
 		$screenids[] = $_REQUEST['screenid'];
 	}
@@ -232,10 +233,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 
 	if ($result) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
+		uncheckTableRows();
 	}
-
 	show_messages($result, _('Screen deleted'), _('Cannot delete screen'));
-	clearCookies($result);
 }
 
 /*
@@ -243,9 +243,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', null),
-		'screenid' => get_request('screenid', null),
-		'templateid' => get_request('templateid', null)
+		'form' => getRequest('form'),
+		'screenid' => getRequest('screenid'),
+		'templateid' => getRequest('templateid')
 	);
 
 	// screen
@@ -273,9 +273,9 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
-		$data['name'] = get_request('name', '');
-		$data['hsize'] = get_request('hsize', 1);
-		$data['vsize'] = get_request('vsize', 1);
+		$data['name'] = getRequest('name', '');
+		$data['hsize'] = getRequest('hsize', 1);
+		$data['vsize'] = getRequest('vsize', 1);
 	}
 
 	// render view
@@ -285,7 +285,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'templateid' => get_request('templateid', null)
+		'templateid' => getRequest('templateid')
 	);
 
 	$sortfield = getPageSortField('name');

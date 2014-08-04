@@ -91,6 +91,11 @@ class C20ImportFormatter extends CImportFormatter {
 
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
+						// set bulk default value
+						if (!isset($interface['bulk'])) {
+							$interface['bulk'] = SNMP_BULK_ENABLED;
+						}
+
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 					}
 				}

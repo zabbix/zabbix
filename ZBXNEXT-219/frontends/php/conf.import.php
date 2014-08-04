@@ -143,7 +143,6 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 
 if (isset($_REQUEST['rules'])) {
 	$requestRules = getRequest('rules', array());
-
 	// if form was submitted with some checkboxes unchecked, those values are not submitted
 	// so that we set missing values to false
 	foreach ($data['rules'] as $ruleName => $rule) {

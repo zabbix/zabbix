@@ -110,15 +110,15 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 }
 elseif (hasRequest('save')) {
 	$action = array(
-		'name' => get_request('name'),
-		'status' => get_request('status', ACTION_STATUS_DISABLED),
-		'esc_period' => get_request('esc_period', 0),
-		'def_shortdata' => get_request('def_shortdata', ''),
-		'def_longdata' => get_request('def_longdata', ''),
-		'recovery_msg' => get_request('recovery_msg', 0),
-		'r_shortdata' => get_request('r_shortdata', ''),
-		'r_longdata' => get_request('r_longdata', ''),
-		'operations' => get_request('operations', array())
+		'name' => getRequest('name'),
+		'status' => getRequest('status', ACTION_STATUS_DISABLED),
+		'esc_period' => getRequest('esc_period', 0),
+		'def_shortdata' => getRequest('def_shortdata', ''),
+		'def_longdata' => getRequest('def_longdata', ''),
+		'recovery_msg' => getRequest('recovery_msg', 0),
+		'r_shortdata' => getRequest('r_shortdata', ''),
+		'r_longdata' => getRequest('r_longdata', ''),
+		'operations' => getRequest('operations', array())
 	);
 
 	foreach ($action['operations'] as $num => $operation) {
@@ -173,18 +173,20 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	$result = API::Action()->delete(array(getRequest('actionid')));
 
-	show_messages($result, _('Action deleted'), _('Cannot delete action'));
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
-		clearCookies($result);
+		uncheckTableRows();
 	}
+	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
 	$newCondition = getRequest('new_condition');
@@ -255,7 +257,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 	$result = true;
 
 	if (API::Action()->validateOperationsIntegrity($new_operation)) {
-		$_REQUEST['operations'] = get_request('operations', array());
+		$_REQUEST['operations'] = getRequest('operations', array());
 
 		$uniqOperations = array(
 			OPERATION_TYPE_HOST_ADD => 0,
@@ -295,7 +297,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 elseif (isset($_REQUEST['edit_operationid'])) {
 	$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 	$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
-	$_REQUEST['operations'] = get_request('operations', array());
+	$_REQUEST['operations'] = getRequest('operations', array());
 
 	if (isset($_REQUEST['operations'][$edit_operationid])) {
 		$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
@@ -342,14 +344,19 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable action', 'Cannot disable actions', $updated);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
+	$result = API::Action()->delete($_REQUEST['g_actionid']);
 
-	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 
 /*
@@ -359,10 +366,10 @@ show_messages();
 
 if (hasRequest('form')) {
 	$data = array(
-		'form' => get_request('form'),
-		'actionid' => get_request('actionid'),
-		'new_condition' => get_request('new_condition', array()),
-		'new_operation' => get_request('new_operation', null)
+		'form' => getRequest('form'),
+		'actionid' => getRequest('actionid'),
+		'new_condition' => getRequest('new_condition', array()),
+		'new_operation' => getRequest('new_operation')
 	);
 
 	$action = null;
@@ -389,11 +396,11 @@ if (hasRequest('form')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {
-		$data['action']['name'] = get_request('name');
-		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
-		$data['action']['status'] = get_request('status', hasRequest('form_refresh') ? 1 : 0);
-		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
-		$data['action']['operations'] = get_request('operations', array());
+		$data['action']['name'] = getRequest('name');
+		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
+		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
+		$data['action']['recovery_msg'] = getRequest('recovery_msg', 0);
+		$data['action']['operations'] = getRequest('operations', array());
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
@@ -402,29 +409,29 @@ if (hasRequest('form')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
-			$data['action']['def_shortdata'] = get_request('def_shortdata');
-			$data['action']['def_longdata'] = get_request('def_longdata');
+			$data['action']['def_shortdata'] = getRequest('def_shortdata');
+			$data['action']['def_longdata'] = getRequest('def_longdata');
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
-				$data['action']['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-				$data['action']['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+				$data['action']['r_shortdata'] = getRequest('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+				$data['action']['r_longdata'] = getRequest('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 			}
 			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
-				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
-				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
+				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
+				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
 			}
 			elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
-				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
-				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+				$data['action']['def_shortdata'] = getRequest('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
+				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
 			}
 			else {
-				$data['action']['def_shortdata'] = get_request('def_shortdata');
-				$data['action']['def_longdata'] = get_request('def_longdata');
-				$data['action']['r_shortdata'] = get_request('r_shortdata');
-				$data['action']['r_longdata'] = get_request('r_longdata');
+				$data['action']['def_shortdata'] = getRequest('def_shortdata');
+				$data['action']['def_longdata'] = getRequest('def_longdata');
+				$data['action']['r_shortdata'] = getRequest('r_shortdata');
+				$data['action']['r_longdata'] = getRequest('r_longdata');
 			}
 		}
 	}
@@ -432,14 +439,16 @@ if (hasRequest('form')) {
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$data['action']['filter']['conditions'] = array(
 			array(
-				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-				'operator' => CONDITION_OPERATOR_EQUAL,
-				'value' => TRIGGER_VALUE_TRUE
-			),
-			array(
+				'formulaid' => 'A',
 				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 				'operator' => CONDITION_OPERATOR_NOT_IN,
 				'value' => ''
+			),
+			array(
+				'formulaid' => 'B',
+				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'value' => TRIGGER_VALUE_TRUE
 			)
 		);
 	}
