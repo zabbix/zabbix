@@ -458,6 +458,7 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
+		printf("Try '%s --help' for more information.\n", progname);
 		exit(EXIT_FAILURE);
 	}
 
