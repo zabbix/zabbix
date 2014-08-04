@@ -47,7 +47,7 @@ abstract class DbBackend {
 		if ($version['mandatory'] != ZABBIX_DB_VERSION) {
 			$this->setError(_s('The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator.',
 				$version['mandatory'], $version['optional'], ZABBIX_DB_VERSION));
-			return false;
+			//return false;
 		}
 
 		return true;

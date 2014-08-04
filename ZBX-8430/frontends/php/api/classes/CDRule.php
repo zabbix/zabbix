@@ -585,8 +585,8 @@ class CDRule extends CApiService {
 		$dbConditions = DBselect(
 			'SELECT c.conditionid,c.actionid'.
 			' FROM conditions c'.
-			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionInt('c.value', $druleIds).')'.
-				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND '.dbConditionInt('c.value', $checkIds).')'
+			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionString('c.value', $druleIds).')'.
+				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND '.dbConditionString('c.value', $checkIds).')'
 		);
 
 		while ($dbCondition = DBfetch($dbConditions)) {
