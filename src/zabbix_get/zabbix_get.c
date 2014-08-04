@@ -237,6 +237,9 @@ int	main(int argc, char **argv)
 		ret = FAIL;
 	}
 
+	if (FAIL == ret)
+		printf("Try '%s --help' for more information.\n", progname);
+
 	if (SUCCEED == ret)
 	{
 #if !defined(_WINDOWS)
@@ -250,6 +253,7 @@ int	main(int argc, char **argv)
 
 	zbx_free(host);
 	zbx_free(key);
+	zbx_free(source_ip);
 
 	return ret;
 }
