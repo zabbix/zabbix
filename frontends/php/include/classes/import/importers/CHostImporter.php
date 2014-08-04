@@ -21,9 +21,22 @@
 
 class CHostImporter extends CImporter {
 
+	/**
+	 * @var array		a list of host IDs which were created or updated to create an interface cache for those hosts
+	 */
+	protected $processedHostIds = array();
+
+	/**
+	 * Import hosts.
+	 *
+	 * @param array $hosts
+	 *
+	 * @throws Exception
+	 */
 	public function import(array $hosts) {
 		$hostsToCreate = array();
 		$hostsToUpdate = array();
+
 		foreach ($hosts as $host) {
 			// preserve host related templates to massAdd them later
 			if ($this->options['templateLinkage']['createMissing'] && !empty($host['templates'])) {
@@ -50,30 +63,28 @@ class CHostImporter extends CImporter {
 
 		$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
 
-		// a list of hostids which were created or updated to create an interface cache for those hosts
-		$processedHostIds = array();
 		// create/update hosts
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
-			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
+			foreach ($newHostIds['hostids'] as $hnum => $hostId) {
 				$hostHost = $hostsToCreate[$hnum]['host'];
-				$processedHostIds[$hostHost] = $hostid;
-				$this->referencer->addHostRef($hostHost, $hostid);
-				$this->referencer->addProcessedHost($hostHost);
+				$this->processedHostIds[$hostHost] = $hostId;
+
+				$this->referencer->addHostRef($hostHost, $hostId);
 
 				if (!empty($templateLinkage[$hostHost])) {
 					API::Template()->massAdd(array(
-						'hosts' => array('hostid' => $hostid),
+						'hosts' => array('hostid' => $hostId),
 						'templates' => $templateLinkage[$hostHost]
 					));
 				}
 			}
 		}
+
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
-				$this->referencer->addProcessedHost($host['host']);
-				$processedHostIds[$host['host']] = $host['hostid'];
+				$this->processedHostIds[$host['host']] = $host['hostid'];
 
 				if (!empty($templateLinkage[$host['host']])) {
 					API::Template()->massAdd(array(
@@ -86,13 +97,15 @@ class CHostImporter extends CImporter {
 
 		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $processedHostIds,
+			'hostids' => $this->processedHostIds,
 			'output' => API_OUTPUT_EXTEND
 		));
+
 		foreach ($hosts as $host) {
-			foreach ($host['interfaces'] as $interface) {
-				if (isset($processedHostIds[$host['host']])) {
-					$hostId = $processedHostIds[$host['host']];
+			if (isset($this->processedHostIds[$host['host']])) {
+				foreach ($host['interfaces'] as $interface) {
+					$hostId = $this->processedHostIds[$host['host']];
+
 					if (!isset($this->referencer->interfacesCache[$hostId])) {
 						$this->referencer->interfacesCache[$hostId] = array();
 					}
@@ -113,6 +126,15 @@ class CHostImporter extends CImporter {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get a list of created or updated host IDs.
+	 *
+	 * @return array
+	 */
+	public function getProcessedHostIds() {
+		return $this->processedHostIds;
 	}
 
 	/**
