@@ -144,7 +144,7 @@ out:
  *             interval    - [IN] the new data collection interval in seconds *
  *                                                                            *
  ******************************************************************************/
-void	extend_perf_counter_interval(PERF_COUNTER_DATA *counter, int interval)
+static void	extend_perf_counter_interval(PERF_COUNTER_DATA *counter, int interval)
 {
 	if (interval <= counter->interval)
 		return;
