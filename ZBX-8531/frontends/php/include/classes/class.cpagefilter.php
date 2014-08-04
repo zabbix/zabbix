@@ -395,15 +395,24 @@ class CPageFilter {
 
 		// select remembered selection
 		if (is_null($groupid) && $this->_profileIds['groupid']) {
-			// set group only if host is in group or hostid is not set
+			// set group only if host or template is in group or hostid is not set
+			$host = null;
+			$template = null;
 			if ($hostid) {
 				$host = API::Host()->get(array(
 					'output' => array('hostid'),
 					'hostids' => $hostid,
 					'groupids' => $this->_profileIds['groupid']
 				));
+				if (!$host) {
+					$template = API::Template()->get(array(
+						'output' => array('hostid'),
+						'templateids' => $hostid,
+						'groupids' => $this->_profileIds['groupid']
+					));
+				}
 			}
-			if (!$hostid || !empty($host)) {
+			if (!$hostid || $host || $template) {
 				$groupid = $this->_profileIds['groupid'];
 			}
 		}
