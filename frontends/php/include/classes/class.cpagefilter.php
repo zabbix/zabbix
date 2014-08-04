@@ -376,11 +376,11 @@ class CPageFilter {
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param int   $groupid
+	 * @param int   $groupId
 	 * @param array $options
-	 * @param int   $hostid
+	 * @param int   $hostId
 	 */
-	private function _initGroups($groupid, array $options, $hostid) {
+	private function _initGroups($groupId, array $options, $hostId) {
 		$def_options = array(
 			'output' => array('groupid', 'name')
 		);
@@ -394,48 +394,48 @@ class CPageFilter {
 		}
 
 		// select remembered selection
-		if (is_null($groupid) && $this->_profileIds['groupid']) {
+		if (is_null($groupId) && $this->_profileIds['groupid']) {
 			// set group only if host or template is in group or hostid is not set
 			$host = null;
 			$template = null;
-			if ($hostid) {
+			if ($hostId) {
 				$host = API::Host()->get(array(
 					'output' => array('hostid'),
-					'hostids' => $hostid,
+					'hostids' => $hostId,
 					'groupids' => $this->_profileIds['groupid']
 				));
 				if (!$host) {
 					$template = API::Template()->get(array(
 						'output' => array('hostid'),
-						'templateids' => $hostid,
+						'templateids' => $hostId,
 						'groupids' => $this->_profileIds['groupid']
 					));
 				}
 			}
-			if (!$hostid || $host || $template) {
-				$groupid = $this->_profileIds['groupid'];
+			if (!$hostId || $host || $template) {
+				$groupId = $this->_profileIds['groupid'];
 			}
 		}
 
 		// nonexisting or unset $groupid
-		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
+		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || is_null($groupId)) {
 			// for popup select first group in the list
 			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
 				reset($this->data['groups']);
-				$groupid = key($this->data['groups']);
+				$groupId = key($this->data['groups']);
 			}
 			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
 			else {
-				$groupid = 0;
+				$groupId = 0;
 			}
 		}
 
-		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
-		CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
+		CProfile::update($this->_profileIdx['groups'], $groupId, PROFILE_TYPE_ID);
+		CProfile::update(self::GROUP_LATEST_IDX, $groupId, PROFILE_TYPE_ID);
 
-		$this->isSelected['groupsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups'])) || $groupid > 0;
-		$this->isSelected['groupsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups']) && $groupid == 0;
-		$this->ids['groupid'] = $groupid;
+		$this->isSelected['groupsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups'])) || $groupId > 0;
+		$this->isSelected['groupsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups']) && $groupId == 0;
+		$this->ids['groupid'] = $groupId;
 	}
 
 	/**
