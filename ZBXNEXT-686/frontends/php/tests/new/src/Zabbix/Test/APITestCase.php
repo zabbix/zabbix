@@ -147,8 +147,46 @@ class APITestCase extends BaseAPITestCase {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
 			}
 
+			$this->processSqlAssertions($definition, $stepName);
+
 			// each step is one assertion
 			$this->addToAssertionCount(1);
+		}
+	}
+
+	protected function processSqlAssertions($definition, $stepName) {
+		if (isset($definition['sqlAssertions']) && is_array($definition['sqlAssertions'])) {
+			foreach ($definition['sqlAssertions'] as $assertion) {
+				if (!isset($assertion['sqlQuery'])) {
+					throw new \Exception('Each "sqlAssertions" member must have sqlQuery parameter');
+				}
+
+				if (!isset($assertion['singleScalarResult']) && !isset($assertion['rowResult'])) {
+					throw new \Exception('Each "sqlAssertions" member should contain "singleScalarResult" or "rowResult" parameter');
+				}
+
+				if (isset($assertion['singleScalarResult']) && isset($assertion['rowResult'])) {
+					throw new \Exception('Each "sqlAssertions" member can not have both "singleScalarResult" and "rowResult" parameters');
+				}
+
+				$pdo = $this->getPdo();
+
+				$result = $pdo->query($assertion['sqlQuery']);
+
+				if (isset($assertion['singleScalarResult'])) {
+					$value = $result->fetchColumn();
+
+					if ($value != $assertion['singleScalarResult']) {
+						throw new \Exception(
+							sprintf('Sql assertion "singleScalarResult" failed, step "%s", query "%s", expected "%s", got "%s"',
+								$stepName, $assertion['sqlQuery'],
+								$assertion['singleScalarResult'], $value
+							));
+					}
+
+					$this->addToAssertionCount(1);
+				}
+			}
 		}
 	}
 

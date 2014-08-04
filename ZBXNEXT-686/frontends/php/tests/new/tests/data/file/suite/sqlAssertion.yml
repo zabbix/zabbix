@@ -22,6 +22,14 @@ steps:
                     attempt_ip:
                     attempt_clock: 0
                     rows_per_page: 50
+        sqlAssertions:
+            -
+                sqlQuery: select count(*) from users
+                singleScalarResult: 1
+            -
+                sqlQuery: select * from users
+                rowResult:
+                    - { foo: bar }
     step2:
         request:
             method: user.create
