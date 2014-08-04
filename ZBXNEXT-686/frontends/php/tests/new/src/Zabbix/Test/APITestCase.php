@@ -4,6 +4,8 @@ namespace Zabbix\Test;
 
 use Respect\Validation\Exceptions\ValidationException;
 use Respect\Validation\Rules\AbstractRule;
+use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Yaml\Yaml;
 use Respect\Validation\Validator as v;
 
@@ -205,21 +207,35 @@ class APITestCase extends BaseAPITestCase {
 					}
 
 					if (count($expectation) != 0) {
+						$table = new TableHelper();
+
+						$table->addRows($expectation);
+
+						$output = new BufferedOutput();
+						$table->render($output);
+
 						throw new \Exception(
-							sprintf('Sql assertion for step "%s" failed for query "%s": the following rows are expected but not present in the result set: "%s"',
+							sprintf('Sql assertion for step "%s" failed for query "%s": the following rows are expected but not present in the result set:%s',
 								$stepName,
 								$assertion['sqlQuery'],
-								json_encode($expectation)
+								PHP_EOL.$output->fetch()
 							)
 						);
 					}
 
 					if (count($realResult) != 0) {
+						$table = new TableHelper();
+
+						$table->addRows($realResult);
+
+						$output = new BufferedOutput();
+						$table->render($output);
+
 						throw new \Exception(
-							sprintf('Sql assertion for step "%s" failed for query "%s": the following extra rows are present in a result set: "%s"',
+							sprintf('Sql assertion for step "%s" failed for query "%s": the following extra rows are present in a result set:%s',
 								$stepName,
 								$assertion['sqlQuery'],
-								json_encode($realResult)
+								PHP_EOL.$output->fetch()
 							)
 						);
 					}
