@@ -418,8 +418,6 @@ function calculateITServiceStatus($serviceId, $servicesLinks, &$services, $trigg
  *
  */
 function updateITServices() {
-	$rs = array();
-
 	$servicesLinks = array();
 	$services = array();
 	$rootServiceIds = array();
