@@ -1,0 +1,76 @@
+steps:
+    step1:
+        request:
+            method: user.get
+            params: []
+        expect: response
+        response:
+            _equals:
+                -
+                    userid: 1
+                    alias: Admin
+                    name:
+                    surname:
+                    url:
+                    autologin: 0
+                    autologout: 900
+                    lang: en_GB
+                    refresh: 30
+                    type: 3
+                    theme: default
+                    attempt_failed: 0
+                    attempt_ip:
+                    attempt_clock: 0
+                    rows_per_page: 50
+    step2:
+        request:
+            method: user.create
+            params:
+                alias: new_user
+                passwd: 123456
+                usrgrps: 1
+
+        expect: response
+        response:
+            _assert:
+                userids:
+                    _each: notEmpty|int
+    step3:
+        request:
+            method: user.get
+            params: []
+        expect: response
+        response:
+            _equals:
+                -
+                    userid: 1
+                    alias: Admin
+                    name:
+                    surname:
+                    url:
+                    autologin: 0
+                    autologout: 900
+                    lang: en_GB
+                    refresh: 30
+                    type: 3
+                    theme: default
+                    attempt_failed: 0
+                    attempt_ip:
+                    attempt_clock: 0
+                    rows_per_page: 50
+                -
+                    userid: @step2.response.result.userids[0]@
+                    alias: new_user
+                    name:
+                    surname:
+                    url:
+                    autologin: 0
+                    autologout: 900
+                    lang: en_GB
+                    refresh: 30
+                    type: 1
+                    theme: default
+                    attempt_failed: 0
+                    attempt_ip:
+                    attempt_clock: 0
+                    rows_per_page: 50

@@ -85,7 +85,13 @@ class APITestCase extends BaseAPITestCase {
 			$expectation = $definition['expect'];
 
 			if ($expectation == 'response' && !$apiResponse->isResponse()) {
-				throw new \Exception(sprintf('Expected plain response from api on step "%s", did not get one.', $stepName));
+				throw new \Exception(
+					sprintf('Expected plain response from api on step "%s", did not get one, got exception "%s" data "%s".',
+						$stepName,
+						$apiResponse->getMessage(),
+						$apiResponse->getData()
+					))
+				;
 			}
 
 			if ($expectation == 'exception' && !$apiResponse->isException()) {
