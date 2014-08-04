@@ -349,7 +349,7 @@ $conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
-$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted ui-corner-all'));
 
 /*
  * Operation tab
