@@ -919,11 +919,6 @@ class CTrigger extends CTriggerGeneral {
 			'value' => $triggerIds
 		));
 
-		// unlink triggers from IT services
-		foreach ($triggerIds as $triggerId) {
-			updateServices($triggerId, SERVICE_STATUS_OK);
-		}
-
 		DB::update('services', array(
 			'values' => array(
 				'triggerid' => null,
@@ -933,6 +928,8 @@ class CTrigger extends CTriggerGeneral {
 				'triggerid' => $triggerIds
 			)
 		));
+
+		updateITServices();
 
 		parent::deleteByIds($triggerIds);
 	}
@@ -1160,7 +1157,10 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		));
 
-		$descriptionChanged = $expressionChanged = false;
+		$descriptionChanged = false;
+		$expressionChanged = false;
+		$priorityChanged = false;
+
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
@@ -1266,9 +1266,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// update service status
 			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
-				$serviceStatus = ($dbTrigger['value'] == TRIGGER_VALUE_TRUE) ? $trigger['priority'] : 0;
-
-				updateServices($trigger['triggerid'], $serviceStatus);
+				$priorityChanged = true;
 			}
 
 			// restore the full expression to properly validate dependencies
@@ -1279,6 +1277,10 @@ class CTrigger extends CTriggerGeneral {
 					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
 		}
 		unset($trigger);
+
+		if ($priorityChanged) {
+			updateITServices();
+		}
 
 		foreach ($infos as $info) {
 			info($info);

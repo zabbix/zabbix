@@ -32,25 +32,47 @@
  * Comments:
  *		Don't forget to sync code with C!!!!
  */
-function get_service_status($serviceid, $algorithm, $triggerid = null, $status = 0) {
-	if (is_numeric($triggerid)) {
-		$status = ($serv_status = get_service_status_of_trigger($triggerid)) ? $serv_status : $status;
+function get_service_status($serviceid, $algorithm, $triggerid = 0, array $triggerInfo = null, array $calculatedStatuses = array()) {
+	if ($algorithm != SERVICE_ALGORITHM_MAX && $algorithm != SERVICE_ALGORITHM_MIN) {
+		return 0;
 	}
 
-	if ($algorithm == SERVICE_ALGORITHM_MAX || $algorithm == SERVICE_ALGORITHM_MIN) {
-		$sort_order = ($algorithm == SERVICE_ALGORITHM_MAX) ? ' DESC' : '';
-
-		$result = DBselect(
-			'SELECT s.status'.
-			' FROM services s,services_links l'.
-			' WHERE l.serviceupid='.zbx_dbstr($serviceid).
-				' AND s.serviceid=l.servicedownid'.
-			' ORDER BY s.status'.$sort_order
-		);
-		if ($row = DBfetch($result)) {
-			$status = $row['status'];
+	if (0 != $triggerid) {
+		if ($triggerInfo['status'] == TRIGGER_STATUS_ENABLED && $triggerInfo['value'] == TRIGGER_VALUE_TRUE) {
+			return $triggerInfo['priority'];
+		}
+		else {
+			return 0;
 		}
 	}
+
+	$result = DBselect(
+		'SELECT s.serviceid,s.status'.
+		' FROM services s,services_links sl'.
+		' WHERE s.serviceid=sl.servicedownid'.
+			' AND sl.serviceupid='.zbx_dbstr($serviceid)
+	);
+
+	$status = 0;
+	$statuses = array();
+
+	while ($row = DBfetch($result)) {
+		$statuses[] = isset($calculatedStatuses[$row['serviceid']])
+			? $calculatedStatuses[$row['serviceid']]
+			: $row['status'];
+	}
+
+	if ($statuses) {
+		if ($algorithm == SERVICE_ALGORITHM_MAX) {
+			rsort($statuses);
+		}
+		else {
+			sort($statuses);
+		}
+
+		$status = $statuses[0];
+	}
+
 	return $status;
 }
 
@@ -340,126 +362,146 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	}
 }
 
-/**
- * Recalculates the status of the given service and it's parents.
+/*
+ * Calculates the current IT service status
  *
- * Note: this function does not update the status based on the status of the linked trigger,
- * the status is calculated only based on the status of the child services.
- *
- * @param $serviceid
- *
- * @return bool
  */
-function update_services_rec($serviceid) {
-	$result = DBselect(
-		'SELECT l.serviceupid,s.algorithm'.
-		' FROM services_links l,services s'.
-		' WHERE s.serviceid=l.serviceupid'.
-			' AND l.servicedownid='.zbx_dbstr($serviceid)
-	);
-	while ($row = DBfetch($result)) {
-		$serviceupid = $row['serviceupid'];
-		$algorithm = $row['algorithm'];
+function calculateITServiceStatus($serviceId, $servicesLinks, &$services, $triggers) {
+	$service = &$services[$serviceId];
 
-		if ($algorithm == SERVICE_ALGORITHM_MAX || $algorithm == SERVICE_ALGORITHM_MIN) {
-			$status = get_service_status($serviceupid, $algorithm);
-			add_service_alarm($serviceupid, $status, time());
-			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.zbx_dbstr($serviceupid));
-		}
-		elseif ($algorithm != SERVICE_ALGORITHM_NONE) {
-			error(_('Unknown calculation algorithm of service status').SPACE.'['.$algorithm.']');
-			return false;
+	if (isset($service['newStatus'])) {
+		// don't calculate a thread if it is already calculated
+		// it can be with soft links
+		return;
+	}
+
+	$newStatus = 0;
+
+	if ($service['triggerid'] != 0) {
+		if ($service['algorithm'] == SERVICE_ALGORITHM_MAX || $service['algorithm'] == SERVICE_ALGORITHM_MIN) {
+			$trigger = $triggers[$service['triggerid']];
+
+			if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['value'] == TRIGGER_VALUE_TRUE) {
+				$newStatus = $trigger['priority'];
+			}
 		}
 	}
+	else {
+		$statuses = array();
 
-	$result = DBselect('SELECT sl.serviceupid FROM services_links sl WHERE sl.servicedownid='.zbx_dbstr($serviceid));
-	while ($row = DBfetch($result)) {
-		$serviceupid = $row['serviceupid'];
-		update_services_rec($serviceupid); // ATTENTION: recursion!!!
+		if (isset($servicesLinks[$service['serviceid']])) {
+			foreach ($servicesLinks[$service['serviceid']] as $serviceId) {
+				calculateITServiceStatus($serviceId, $servicesLinks, $services, $triggers);
+				$statuses[] = $services[$serviceId]['newStatus'];
+			}
+		}
+
+		if ($service['algorithm'] == SERVICE_ALGORITHM_MAX || $service['algorithm'] == SERVICE_ALGORITHM_MIN) {
+			if ($statuses) {
+				if ($service['algorithm'] == SERVICE_ALGORITHM_MAX) {
+					rsort($statuses);
+				}
+				else {
+					sort($statuses);
+				}
+
+				$newStatus = $statuses[0];
+			}
+		}
 	}
-}
 
-/**
- * Retrieves the service linked to given trigger, sets it's status to $status and propagates the status change
- * to the parent services.
- *
- * @param string $triggerId
- * @param int    $status
- */
-function updateServices($triggerId, $status) {
-	DBexecute('UPDATE services SET status='.zbx_dbstr($status).' WHERE triggerid='.zbx_dbstr($triggerId));
-
-	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerId));
-
-	while ($row = DBfetch($result)) {
-		add_service_alarm($row['serviceid'], $status, time());
-		update_services_rec($row['serviceid']);
-	}
+	$service['newStatus'] = $newStatus;
 }
 
 /*
- * Function: update_services_status_all
- *
- * Description:
- * Cleaning parent nodes from triggers, updating ALL services status.
- *
- * Comments: !!! Don't forget sync code with C !!!
+ * Updates the status of all IT services
  *
  */
-function update_services_status_all() {
-	$result = DBselect(
-		'SELECT s.serviceid,s.algorithm,s.triggerid'.
-		' FROM services s'.
-		' WHERE s.serviceid NOT IN ('.
-			'SELECT DISTINCT sl.serviceupid'.
-			' FROM services_links sl'.
-		')'
-	);
+function updateITServices() {
+	$rs = array();
+
+	$servicesLinks = array();
+	$services = array();
+	$rootServiceIds = array();
+	$triggers = array();
+
+	// auxiliary arrays
+	$triggerIds = array();
+	$servicesLinksDown = array();
+
+	$result = DBselect('SELECT sl.serviceupid,sl.servicedownid FROM services_links sl');
+
 	while ($row = DBfetch($result)) {
-		$status = get_service_status($row['serviceid'], $row['algorithm'], $row['triggerid']);
-		DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$row['serviceid']);
-		add_service_alarm($row['serviceid'], $status, time());
+		$servicesLinks[$row['serviceupid']][] = $row['servicedownid'];
+		$servicesLinksDown[$row['servicedownid']] = true;
 	}
 
-	$result = DBselect(
-		'SELECT MAX(sl.servicedownid) AS serviceid,sl.serviceupid'.
-		' FROM services_links sl'.
-		' WHERE sl.servicedownid NOT IN ('.
-			'SELECT DISTINCT sl.serviceupid FROM services_links sl'.
-		')'.
-		' GROUP BY sl.serviceupid'
-	);
+	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid,s.status FROM services s ORDER BY s.serviceid');
+
 	while ($row = DBfetch($result)) {
-		update_services_rec($row['serviceid']);
-	}
-}
+		$services[$row['serviceid']] = array(
+			'serviceid' => $row['serviceid'],
+			'algorithm' => $row['algorithm'],
+			'triggerid' => $row['triggerid'],
+			'status' => $row['status']
+		);
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function latest_service_alarm($serviceid, $status) {
-	$result = DBselect(
-		'SELECT sa.servicealarmid,sa.value'.
-		' FROM service_alarms sa'.
-		' WHERE sa.serviceid='.zbx_dbstr($serviceid).
-		' ORDER BY sa.servicealarmid DESC', 1
-	);
-	$row = DBfetch($result);
-	return ($row && $row['value'] == $status);
-}
+		if (!isset($servicesLinksDown[$row['serviceid']])) {
+			$rootServiceIds[] = $row['serviceid'];
+		}
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function add_service_alarm($serviceid, $status, $clock) {
-	if (latest_service_alarm($serviceid, $status)) {
-		return true;
+		if ($row['triggerid'] != 0) {
+			$triggerIds[$row['triggerid']] = true;
+		}
 	}
-	return DBexecute('INSERT INTO service_alarms (servicealarmid,serviceid,clock,value) VALUES ('.get_dbid('service_alarms', 'servicealarmid').','.zbx_dbstr($serviceid).','.zbx_dbstr($clock).','.zbx_dbstr($status).')');
+
+	if ($triggerIds) {
+		$result = DBselect(
+			'SELECT t.triggerid,t.priority,t.status,t.value'.
+			' FROM triggers t'.
+			' WHERE '.dbConditionInt('t.triggerid', array_keys($triggerIds))
+		);
+
+		while ($row = DBfetch($result)) {
+			$triggers[$row['triggerid']] = array(
+				'priority' => $row['priority'],
+				'status' => $row['status'],
+				'value' => $row['value']
+			);
+		}
+	}
+
+	// clearing auxiliary variables
+	unset($triggerIds, $servicesLinksDown);
+
+	// calculating data
+	foreach ($rootServiceIds as $rootServiceId) {
+		calculateITServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
+	}
+
+	// updating changed data
+	$updates = array();
+	$inserts = array();
+	$clock = time();
+
+	foreach ($services as $service) {
+		if ($service['newStatus'] != $service['status']) {
+			$updates[] = array(
+				'values' => array('status' => $service['newStatus']),
+				'where' =>  array('serviceid' => $service['serviceid'])
+			);
+			$inserts[] = array(
+				'serviceid' => $service['serviceid'],
+				'clock' => $clock,
+				'value' => $service['newStatus']
+			);
+		}
+	}
+
+	if ($updates) {
+		DB::update('services', $updates);
+		DB::insert('service_alarms', $inserts);
+	}
 }
 
 /**
