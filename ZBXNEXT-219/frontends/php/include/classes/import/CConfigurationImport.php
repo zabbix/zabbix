@@ -1916,32 +1916,16 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['discoveryRules'])) {
 			$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
 
-			if ($this->formattedData['discoveryRules']) {
-				foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
-					foreach ($discoveryRules as &$discoveryRule) {
-						if ($discoveryRule['trigger_prototypes']) {
-							foreach ($discoveryRule['trigger_prototypes'] as &$triggerPrototype) {
-								$result = $this->triggerExpression->parse($triggerPrototype['expression']);
-								if (!$result) {
-									throw new Exception($this->triggerExpression->error);
-								}
-
-								$enum = 0;
-								foreach ($result->getTokens() as $token) {
-									if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-										$triggerPrototype['parsedExpressions'][$enum]['host'] =  $token['data']['host'];
-										$triggerPrototype['parsedExpressions'][$enum]['item'] =  $token['data']['item'];
-										$enum++;
-									}
-								}
-							}
-							unset($triggerPrototype);
-						}
+			foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
+				foreach ($discoveryRules as &$discoveryRule) {
+					foreach ($discoveryRule['trigger_prototypes'] as &$triggerPrototype) {
+						$triggerPrototype['parsedExpressions'] = $this->parseTriggerExpression($triggerPrototype['expression']);
 					}
-					unset($discoveryRule);
+					unset($triggerPrototype);
 				}
-				unset($discoveryRules);
+				unset($discoveryRule);
 			}
+			unset($discoveryRules);
 		}
 
 		return $this->formattedData['discoveryRules'];
@@ -1956,27 +1940,40 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['triggers'])) {
 			$this->formattedData['triggers'] = $this->formatter->getTriggers();
 
-			if ($this->formattedData['triggers']) {
-				foreach ($this->formattedData['triggers'] as &$trigger) {
-					$result = $this->triggerExpression->parse($trigger['expression']);
-					if (!$result) {
-						throw new Exception($this->triggerExpression->error);
-					}
-
-					$enum = 0;
-					foreach ($result->getTokens() as $token) {
-						if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-							$trigger['parsedExpressions'][$enum]['host'] =  $token['data']['host'];
-							$trigger['parsedExpressions'][$enum]['item'] =  $token['data']['item'];
-							$enum++;
-						}
-					}
-				}
-				unset($trigger);
+			foreach ($this->formattedData['triggers'] as &$trigger) {
+				$trigger['parsedExpressions'] = $this->parseTriggerExpression($trigger['expression']);
 			}
+			unset($trigger);
 		}
 
 		return $this->formattedData['triggers'];
+	}
+
+	/**
+	 * Parses a trigger expression and returns an array of used hosts and items.
+	 *
+	 * @param string $expression
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	protected function parseTriggerExpression($expression) {
+		$expressions = array();
+
+		$result = $this->triggerExpression->parse($expression);
+		if (!$result) {
+			throw new Exception($this->triggerExpression->error);
+		}
+
+		foreach ($result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) as $token) {
+			$expressions[] = array(
+				'host' => $token['data']['host'],
+				'item' => $token['data']['item'],
+			);
+		}
+
+		return $expressions;
 	}
 
 	/**
