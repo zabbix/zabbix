@@ -186,6 +186,53 @@ class APITestCase extends BaseAPITestCase {
 
 					$this->addToAssertionCount(1);
 				}
+				elseif (isset($assertion['rowResult'])) {
+					$expectation = $this->expandStepVariables($assertion['rowResult']);
+
+					$realResult = array();
+
+					while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+						$realResult[] = $row;
+					}
+
+					foreach ($expectation as $key => $expectedRow) {
+						foreach ($realResult as $resultKey => $resultRow) {
+							if ($resultRow == $expectedRow) {
+								unset($expectation[$key]);
+								unset($realResult[$resultKey]);
+							}
+						}
+					}
+
+					if (count($expectation) != 0) {
+						throw new \Exception(
+							sprintf('Sql assertion for step "%s" failed for query "%s": the following rows are expected but not present in the result set: "%s"',
+								$stepName,
+								$assertion['sqlQuery'],
+								json_encode($expectation)
+							)
+						);
+					}
+
+					if (count($realResult) != 0) {
+						throw new \Exception(
+							sprintf('Sql assertion for step "%s" failed for query "%s": the following extra rows are present in a result set: "%s"',
+								$stepName,
+								$assertion['sqlQuery'],
+								json_encode($realResult)
+							)
+						);
+					}
+
+					$this->addToAssertionCount(1);
+				}
+				else {
+					throw new \Exception(
+						sprintf('Hm. Do not know what to do with sql assertions in step "%s", probably unfinished case?',
+							$stepName
+						)
+					);
+				}
 			}
 		}
 	}
