@@ -594,7 +594,9 @@ $verticalAlignRadioButton = array(
 	new CRadioButton('valign', VALIGN_BOTTOM, null, 'valign_'.VALIGN_BOTTOM, $valign == VALIGN_BOTTOM),
 	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
 );
-$screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton, 'jqueryinputset'));
+$screenFormList->addRow(
+	_('Vertical align'), new CDiv($verticalAlignRadioButton, 'jqueryinputset'), false, null, 'nowrap'
+);
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
