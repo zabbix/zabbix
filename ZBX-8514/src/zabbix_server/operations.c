@@ -264,8 +264,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						"select distinct h.hostid"
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
-							" and h.status in (" ZBX_FS_UI64
-							"," ZBX_FS_UI64 ")"
+							" and h.status in (%d,%d)"
 							" and i.ip=ds.ip"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
