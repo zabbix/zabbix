@@ -353,55 +353,90 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	}
 }
 
-/*
- * Calculates the current IT service status
+/**
+ * Calculates the current IT service status based on it's child services.
  *
+ * The new statuses are written to the $services array in the "newStatus" property.
+ *
+ * @param string $rootServiceId     id of the service to start calculation from
+ * @param array $servicesLinks      array with service IDs as keys and arrays of child service IDs as values
+ * @param array $services           array of services with IDs as keys
+ * @param array $triggers           array of triggers with trigger IDs as keys
  */
-function calculateITServiceStatus($serviceId, $servicesLinks, &$services, $triggers) {
-	$service = &$services[$serviceId];
+function calculateITServiceStatus($rootServiceId, array $servicesLinks, array &$services, array $triggers) {
+	$service = &$services[$rootServiceId];
 
+	// don't calculate a thread if it is already calculated
+	// it can be with soft links
 	if (isset($service['newStatus'])) {
-		// don't calculate a thread if it is already calculated
-		// it can be with soft links
 		return;
 	}
 
-	$newStatus = 0;
+	$newStatus = SERVICE_STATUS_OK;
 
-	if ($service['triggerid'] != 0) {
-		if ($service['algorithm'] == SERVICE_ALGORITHM_MAX || $service['algorithm'] == SERVICE_ALGORITHM_MIN) {
-			$trigger = $triggers[$service['triggerid']];
+	// services with disabled SLA calculation are considered to be in OK state
+	if ($service['algorithm'] == SERVICE_ALGORITHM_NONE) {
+		$service['newStatus'] = $newStatus;
 
-			if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['value'] == TRIGGER_VALUE_TRUE) {
-				$newStatus = $trigger['priority'];
-			}
-		}
+		return;
 	}
-	else {
-		$statuses = array();
 
-		if (isset($servicesLinks[$service['serviceid']])) {
-			foreach ($servicesLinks[$service['serviceid']] as $serviceId) {
-				calculateITServiceStatus($serviceId, $servicesLinks, $services, $triggers);
-				$statuses[] = $services[$serviceId]['newStatus'];
-			}
-		}
+	// leaf service with a trigger
+	if ($service['triggerid'] != 0) {
+		$trigger = $triggers[$service['triggerid']];
+		$service['newStatus'] = calculateItServiceStatusByTrigger($trigger['status'], $trigger['value'], $trigger['priority']);
 
-		if ($service['algorithm'] == SERVICE_ALGORITHM_MAX || $service['algorithm'] == SERVICE_ALGORITHM_MIN) {
-			if ($statuses) {
-				if ($service['algorithm'] == SERVICE_ALGORITHM_MAX) {
-					rsort($statuses);
-				}
-				else {
-					sort($statuses);
-				}
+		return;
+	}
 
-				$newStatus = $statuses[0];
-			}
-		}
+	// services with no trigger and no children are considered to be in OK state
+	if (!isset($servicesLinks[$rootServiceId])) {
+		$service['newStatus'] = $newStatus;
+
+		return;
+	}
+
+	// calculate status depending on children status
+	$statuses = array();
+	foreach ($servicesLinks[$rootServiceId] as $rootServiceId) {
+		calculateITServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
+		$statuses[] = $services[$rootServiceId]['newStatus'];
+	}
+
+	$maxSeverity = max($statuses);
+
+	// always return the maximum status of child services
+	if ($service['algorithm'] == SERVICE_ALGORITHM_MAX && $maxSeverity != SERVICE_STATUS_OK) {
+		$newStatus = $maxSeverity;
+	}
+	elseif (min($statuses) != SERVICE_STATUS_OK) {
+		$newStatus = $maxSeverity;
 	}
 
 	$service['newStatus'] = $newStatus;
+}
+
+/**
+ * Checks the status of the trigger and returns the corresponding service status.
+ *
+ * @param int $triggerStatus
+ * @param int $triggerValue
+ * @param int $triggerPriority
+ *
+ * @return int
+ */
+function calculateItServiceStatusByTrigger($triggerStatus, $triggerValue, $triggerPriority) {
+	$okStatus = SERVICE_STATUS_OK;
+
+	if ($triggerStatus == TRIGGER_STATUS_DISABLED) {
+		return $okStatus;
+	}
+
+	if ($triggerValue == TRIGGER_VALUE_FALSE) {
+		return $okStatus;
+	}
+
+	return $triggerPriority;
 }
 
 /*
