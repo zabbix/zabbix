@@ -1125,7 +1125,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$descriptionChanged = false;
 		$expressionChanged = false;
-		$priorityChanged = false;
+		$changedPriorityTriggerIds = array();
 
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
@@ -1232,7 +1232,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// update service status
 			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
-				$priorityChanged = true;
+				$changedPriorityTriggerIds[] = $trigger['triggerid'];
 			}
 
 			// restore the full expression to properly validate dependencies
@@ -1244,7 +1244,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		unset($trigger);
 
-		if ($priorityChanged && $this->usedInItServices($triggerIds)) {
+		if ($changedPriorityTriggerIds && $this->usedInItServices($changedPriorityTriggerIds)) {
 			updateItServices();
 		}
 
