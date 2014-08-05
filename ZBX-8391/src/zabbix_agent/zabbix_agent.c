@@ -165,6 +165,7 @@ int	main(int argc, char **argv)
 			case 'V':
 				version();
 #ifdef _AIX
+				printf("\n");
 				tl_version();
 #endif
 				exit(EXIT_SUCCESS);

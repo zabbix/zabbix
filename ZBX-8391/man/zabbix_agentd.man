@@ -29,7 +29,9 @@ Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
 .
 .IP "\fB\-p\fR, \fB\-\-print\fR"
-Print known items and exit. For each item either generic defaults are used, or specific defaults for testing are supplied. These defaults are listed in square brackets as item key parameters.
+Print known items and exit.
+For each item either generic defaults are used, or specific defaults for testing are supplied.
+These defaults are listed in square brackets as item key parameters.
 Returned values are enclosed in square brackets and prefixed with the type of the returned value, separated by a pipe character.
 For user parameters type is always \fBt\fR, as the agent can not determine all possible return values.
 Items, displayed as working, are not guaranteed to work from the Zabbix server or zabbix_get when querying a running agent daemon as permissions or environment may be different.
@@ -39,34 +41,33 @@ Returned value types are:
 d
 Number with a decimal part.
 .RE
-.RE
 .RS 4
 .TP 4
 m
-Not supported. This could be caused by querying an item that only works in the active mode like a log monitoring item or an item that requires multiple collected values.
+Not supported.
+This could be caused by querying an item that only works in the active mode like a log monitoring item or an item that requires multiple collected values.
 Permission issues or incorrect user parameters could also result in the not supported state.
-.RE
 .RE
 .RS 4
 .TP 4
 s
-Text. Maximum length not limited.
-.RE
+Text.
+Maximum length not limited.
 .RE
 .RS 4
 .TP 4
 t
-Text. Same as \fBs\fR.
-.RE
+Text.
+Same as \fBs\fR.
 .RE
 .RS 4
 .TP 4
 u
 Unsigned integer.
 .RE
-.RE
 .IP "\fB\-t\fR, \fB\-\-test\fR \fIitem\-key\fR"
-Test single item and exit. See \fB\-\-print\fR for output description.
+Test single item and exit.
+See \fB\-\-print\fR for output description.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
