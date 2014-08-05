@@ -1708,7 +1708,6 @@ class CTrigger extends CTriggerGeneral {
 			$dependencies = $this->get(array(
 				'triggerids' => $relationMap->getRelatedIds(),
 				'output' => $options['selectDependencies'],
-				'expandData' => true,
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
