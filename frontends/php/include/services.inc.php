@@ -318,43 +318,33 @@ function calculateItServiceStatus($rootServiceId, array $servicesLinks, array &$
 
 	$newStatus = SERVICE_STATUS_OK;
 
-	// services with disabled SLA calculation are considered to be in OK state
-	if ($service['algorithm'] == SERVICE_ALGORITHM_NONE) {
-		$service['newStatus'] = $newStatus;
-
-		return;
-	}
-
 	// leaf service with a trigger
 	if ($service['triggerid'] != 0) {
-		$trigger = $triggers[$service['triggerid']];
-		$service['newStatus'] = calculateItServiceStatusByTrigger($trigger['status'], $trigger['value'], $trigger['priority']);
-
-		return;
+		if ($service['algorithm'] != SERVICE_ALGORITHM_NONE) {
+			$trigger = $triggers[$service['triggerid']];
+			$newStatus = calculateItServiceStatusByTrigger($trigger['status'], $trigger['value'], $trigger['priority']);
+		}
 	}
+	elseif (isset($servicesLinks[$rootServiceId])) {
+		// calculate status depending on children status
+		$statuses = array();
 
-	// services with no trigger and no children are considered to be in OK state
-	if (!isset($servicesLinks[$rootServiceId])) {
-		$service['newStatus'] = $newStatus;
+		foreach ($servicesLinks[$rootServiceId] as $rootServiceId) {
+			calculateItServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
+			$statuses[] = $services[$rootServiceId]['newStatus'];
+		}
 
-		return;
-	}
+		if ($statuses && $service['algorithm'] != SERVICE_ALGORITHM_NONE) {
+			$maxSeverity = max($statuses);
 
-	// calculate status depending on children status
-	$statuses = array();
-	foreach ($servicesLinks[$rootServiceId] as $rootServiceId) {
-		calculateItServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
-		$statuses[] = $services[$rootServiceId]['newStatus'];
-	}
-
-	$maxSeverity = max($statuses);
-
-	// always return the maximum status of child services
-	if ($service['algorithm'] == SERVICE_ALGORITHM_MAX && $maxSeverity != SERVICE_STATUS_OK) {
-		$newStatus = $maxSeverity;
-	}
-	elseif (min($statuses) != SERVICE_STATUS_OK) {
-		$newStatus = $maxSeverity;
+			// always return the maximum status of child services
+			if ($service['algorithm'] == SERVICE_ALGORITHM_MAX && $maxSeverity != SERVICE_STATUS_OK) {
+				$newStatus = $maxSeverity;
+			}
+			elseif (min($statuses) != SERVICE_STATUS_OK) {
+				$newStatus = $maxSeverity;
+			}
+		}
 	}
 
 	$service['newStatus'] = $newStatus;
@@ -370,14 +360,8 @@ function calculateItServiceStatus($rootServiceId, array $servicesLinks, array &$
  * @return int
  */
 function calculateItServiceStatusByTrigger($triggerStatus, $triggerValue, $triggerPriority) {
-	$okStatus = SERVICE_STATUS_OK;
-
-	if ($triggerStatus == TRIGGER_STATUS_DISABLED) {
-		return $okStatus;
-	}
-
-	if ($triggerValue == TRIGGER_VALUE_FALSE) {
-		return $okStatus;
+	if ($triggerStatus == TRIGGER_STATUS_DISABLED || $triggerValue == TRIGGER_VALUE_FALSE) {
+		return SERVICE_STATUS_OK;
 	}
 
 	return $triggerPriority;
