@@ -984,6 +984,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_SHOW_VERSION:
 			version();
 #ifdef _AIX
+			printf("\n");
 			tl_version();
 #endif
 			exit(EXIT_SUCCESS);
