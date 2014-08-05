@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = new CTable(null, 'formElementTable');
-$rulesTable->setHeader(array(SPACE, _('Update existing'), _('Add missing')), 'bold');
+$rulesTable->setHeader(array(SPACE, _('Update existing'), _('Create new'), _('Delete missing')), 'bold');
 
 $titles = array(
 	'groups' => _('Groups'),
@@ -28,6 +29,7 @@ $titles = array(
 	'templates' => _('Templates'),
 	'templateScreens' => _('Template screens'),
 	'templateLinkage' => _('Template linkage'),
+	'applications' => _('Applications'),
 	'items' => _('Items'),
 	'discoveryRules' => _('Discovery rules'),
 	'triggers' => _('Triggers'),
@@ -38,7 +40,9 @@ $titles = array(
 );
 $rules = $this->get('rules');
 foreach ($titles as $key => $title) {
-	$cbExist = $cbMissed = SPACE;
+	$cbExist = null;
+	$cbMissed = null;
+	$cbDeleted = null;
 
 	if (isset($rules[$key]['updateExisting'])) {
 		$cbExist = new CCheckBox('rules['.$key.'][updateExisting]', $rules[$key]['updateExisting'], null, 1);
@@ -56,7 +60,17 @@ foreach ($titles as $key => $title) {
 		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
 	}
 
-	$rulesTable->addRow(array($title, new CCol($cbExist, 'center'), new CCol($cbMissed, 'center')));
+	if (isset($rules[$key]['deleteMissing'])) {
+		$cbDeleted = new CCheckBox('rules['.$key.'][deleteMissing]', $rules[$key]['deleteMissing'], null, 1);
+		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
+	}
+
+	$rulesTable->addRow(array(
+		$title,
+		new CCol($cbExist, 'center'),
+		new CCol($cbMissed, 'center'),
+		new CCol($cbDeleted, 'center')
+	));
 }
 
 // form list
