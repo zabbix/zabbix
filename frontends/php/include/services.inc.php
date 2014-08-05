@@ -19,62 +19,6 @@
 **/
 
 
-/*
- * Function: get_service_status
- *
- * Description:
- *     Retrieve true status
- *
- * Author:
- *     Aly
- *
- * Comments:
- *		Don't forget to sync code with C!!!!
- */
-function get_service_status($serviceid, $algorithm, $triggerid = 0, array $triggerInfo = null, array $calculatedStatuses = array()) {
-	if ($algorithm != SERVICE_ALGORITHM_MAX && $algorithm != SERVICE_ALGORITHM_MIN) {
-		return 0;
-	}
-
-	if (0 != $triggerid) {
-		if ($triggerInfo['status'] == TRIGGER_STATUS_ENABLED && $triggerInfo['value'] == TRIGGER_VALUE_TRUE) {
-			return $triggerInfo['priority'];
-		}
-		else {
-			return 0;
-		}
-	}
-
-	$result = DBselect(
-		'SELECT s.serviceid,s.status'.
-		' FROM services s,services_links sl'.
-		' WHERE s.serviceid=sl.servicedownid'.
-			' AND sl.serviceupid='.zbx_dbstr($serviceid)
-	);
-
-	$status = 0;
-	$statuses = array();
-
-	while ($row = DBfetch($result)) {
-		$statuses[] = isset($calculatedStatuses[$row['serviceid']])
-			? $calculatedStatuses[$row['serviceid']]
-			: $row['status'];
-	}
-
-	if ($statuses) {
-		if ($algorithm == SERVICE_ALGORITHM_MAX) {
-			rsort($statuses);
-		}
-		else {
-			sort($statuses);
-		}
-
-		$status = $statuses[0];
-	}
-
-	return $status;
-}
-
 function serviceAlgorythm($algorythm = null) {
 	$algorythms = array(
 		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
