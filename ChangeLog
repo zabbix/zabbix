@@ -1,6 +1,7 @@
 Changes for 2.3.3
 
 New features:
+...G...... [ZBX-8512] web.page.regexp fix. Problem cause - absence of newline in the end of http GET response (Arturs)
 A.F....... [ZBXNEXT-219] added ability to remove resources missing in XML file (Ivo)
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
