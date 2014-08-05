@@ -186,7 +186,7 @@ class CService extends CApiService {
 			$this->addTimes($serviceTimes);
 		}
 
-		updateITServices();
+		updateItServices();
 
 		return array('serviceids' => $serviceIds);
 	}
@@ -322,7 +322,7 @@ class CService extends CApiService {
 			$this->addTimes($serviceTimes);
 		}
 
-		updateITServices();
+		updateItServices();
 
 		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
 	}
@@ -357,7 +357,7 @@ class CService extends CApiService {
 
 		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
 
-		updateITServices();
+		updateItServices();
 
 		return array('serviceids' => $serviceIds);
 	}
