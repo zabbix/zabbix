@@ -31,9 +31,6 @@ extern unsigned char	process_type;
 
 #define HK_INITIAL_DELETE_QUEUE_SIZE	4096
 
-/* in minutes */
-#define STARTUP_IDLE_TIME	30
-
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4
 
@@ -785,10 +782,10 @@ void	main_housekeeper_loop(void)
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
 	double	sec;
 
-	zbx_setproctitle("%s [startup idle for %d minutes]",
-			get_process_type_string(process_type), STARTUP_IDLE_TIME);
+	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
+			HOUSEKEEPER_STARTUP_DELAY);
 
-	zbx_sleep_loop(STARTUP_IDLE_TIME * SEC_PER_MIN);
+	zbx_sleep_loop(HOUSEKEEPER_STARTUP_DELAY * SEC_PER_MIN);
 
 	for (;;)
 	{

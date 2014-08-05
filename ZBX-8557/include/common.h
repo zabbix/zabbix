@@ -636,6 +636,8 @@ zbx_script_t;
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
+#define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
+
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
