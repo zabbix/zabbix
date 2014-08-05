@@ -363,7 +363,8 @@ class CGraph extends CGraphGeneral {
 			$tmpGraph = $graph;
 			$tmpGraph['templateid'] = $graph['graphid'];
 
-			if (!$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid'])) {
+			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
+			if (!$tmpGraph['gitems']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s".', $tmpGraph['name'], $chdHost['host']));
 			}
 
@@ -442,14 +443,21 @@ class CGraph extends CGraphGeneral {
 						'graphids' => $chdGraph['graphid'],
 						'output' => API_OUTPUT_EXTEND,
 						'preservekeys' => true,
-						'expandData' => true,
 						'nopermissions' => true
+					));
+
+					$chdGraphItemItems = API::Item()->get(array(
+						'itemids' => zbx_objectValues($chdGraphItems, 'itemid'),
+						'output' => array('itemid', 'key_', 'hostid'),
+						'preservekeys' => true
 					));
 
 					if (count($chdGraphItems) == count($tmpGraph['gitems'])) {
 						foreach ($tmpGraph['gitems'] as $gitem) {
-							foreach ($chdGraphItems as $chdItem) {
-								if ($gitem['key_'] == $chdItem['key_'] && bccomp($chdHost['hostid'], $chdItem['hostid']) == 0) {
+							foreach ($chdGraphItems as $chdGraphItem) {
+								$chdGraphItemItem = $chdGraphItemItems[$chdGraphItem['itemid']];
+								if ($gitem['key_'] == $chdGraphItemItem['key_']
+										&& bccomp($chdHost['hostid'], $chdGraphItemItem['hostid']) == 0) {
 									continue 2;
 								}
 							}
