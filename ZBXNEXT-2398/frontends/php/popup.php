@@ -1287,8 +1287,7 @@ elseif ($srctbl == 'applications') {
 
 	$options = array(
 		'output' => array('applicationid', 'name'),
-		'hostids' => $hostid,
-		'expandData' => true
+		'hostids' => $hostid
 	);
 	if (is_null($hostid)) {
 		$options['groupids'] = $groupid;

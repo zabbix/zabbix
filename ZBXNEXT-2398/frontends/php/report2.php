@@ -195,7 +195,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$triggerOptions = array(
 		'output' => array('triggerid', 'description', 'expression', 'value'),
 		'expandDescription' => true,
-		'expandData' => true,
 		'monitored' => true,
 		'selectHosts' => API_OUTPUT_EXTEND, // rquired for getting visible host name
 		'filter' => array(),

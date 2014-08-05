@@ -576,8 +576,7 @@ class CConfigurationExport {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
-			'preservekeys' => true,
-			'expandData' => true
+			'preservekeys' => true
 		));
 
 		foreach($triggers as $trigger){
@@ -756,8 +755,7 @@ class CConfigurationExport {
 			'selectDependencies' => API_OUTPUT_EXTEND,
 			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
-			'preservekeys' => true,
-			'expandData' => true
+			'preservekeys' => true
 		));
 
 		foreach($triggers as $trigger){

@@ -67,7 +67,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $triggers = API::Trigger()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_EXTEND,
-	'expandData' => true,
 	'triggerids' => getRequest('triggerid')
 ));
 

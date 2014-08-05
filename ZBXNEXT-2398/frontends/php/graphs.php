@@ -170,8 +170,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	$graph['items'] = API::GraphItem()->get(array(
 		'graphids' => $_REQUEST['graphid'],
 		'sortfield' => 'gitemid',
-		'output' => API_OUTPUT_EXTEND,
-		'expandData' => true
+		'output' => API_OUTPUT_EXTEND
 	));
 
 	if($graph['templateid']) {

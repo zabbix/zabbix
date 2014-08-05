@@ -116,7 +116,6 @@ $triggers = API::Trigger()->get(array(
 	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
 	'selectHosts' => array('hostid', 'status'),
 	'expandDescription' => true,
-	'expandData' => true,
 	'preservekeys' => true,
 	'nopermissions' => true
 ));
@@ -124,7 +123,7 @@ $triggers = API::Trigger()->get(array(
 $hostIds = array();
 
 foreach ($triggers as $triggerId => $trigger) {
-	$hostIds[$trigger['hostid']] = $trigger['hostid'];
+	$hostIds[$trigger['hosts'][0]['hostid']] = $trigger['hosts'][0]['hostid'];
 
 	$triggerItems = array();
 
@@ -161,9 +160,9 @@ $hosts = API::Host()->get(array(
 $scripts = API::Script()->getScriptsByHosts($hostIds);
 
 foreach ($triggers as $trigger) {
-	$hostId = $trigger['hostid'];
+	$hostId = $trigger['hosts'][0]['hostid'];
 
-	$hostName = new CSpan($trigger['hostname'],
+	$hostName = new CSpan($trigger['hosts'][0]['hostname'],
 		'link_menu menu-host'.(($hosts[$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 	);
 
