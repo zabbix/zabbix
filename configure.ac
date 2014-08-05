@@ -910,6 +910,8 @@ openbsd*)
 	;;
 esac
 
+AC_DEFINE([ZABBIX_DAEMON], 1, [Define to 1 if you are using ZABBIX as daemon.])
+
 AC_MSG_CHECKING(for architecture)
 AC_MSG_RESULT([$ARCH ($host_os)])
 
