@@ -881,17 +881,19 @@ class CTrigger extends CTriggerGeneral {
 			'value' => $triggerIds
 		));
 
-		DB::update('services', array(
-			'values' => array(
-				'triggerid' => null,
-				'showsla' => SERVICE_SHOW_SLA_OFF
-			),
-			'where' => array(
-				'triggerid' => $triggerIds
-			)
-		));
+		if ($this->usedInItServices($triggerIds)) {
+			DB::update('services', array(
+				'values' => array(
+					'triggerid' => null,
+					'showsla' => SERVICE_SHOW_SLA_OFF
+				),
+				'where' => array(
+					'triggerid' => $triggerIds
+				)
+			));
 
-		updateItServices();
+			updateItServices();
+		}
 
 		parent::deleteByIds($triggerIds);
 	}
@@ -1110,8 +1112,10 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = zbx_toArray($triggers);
 		$infos = array();
 
+		$triggerIds = zbx_objectValues($triggers, 'triggerid');
+
 		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'selectDependencies' => array('triggerid'),
@@ -1240,7 +1244,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 		unset($trigger);
 
-		if ($priorityChanged) {
+		if ($priorityChanged && $this->usedInItServices($triggerIds)) {
 			updateItServices();
 		}
 
@@ -1937,5 +1941,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $triggers;
+	}
+
+	/**
+	 * Returns true if at least one of the given triggers is used in IT services.
+	 *
+	 * @param array $triggerIds
+	 *
+	 * @return bool
+	 */
+	protected function usedInItServices(array $triggerIds) {
+		$query = DBselect('SELECT serviceid FROM services WHERE '.dbConditionInt('triggerid', $triggerIds), 1);
+
+		return (DBfetch($query) != false);
 	}
 }
