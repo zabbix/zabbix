@@ -307,7 +307,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
  * @param array $services           array of services with IDs as keys
  * @param array $triggers           array of triggers with trigger IDs as keys
  */
-function calculateITServiceStatus($rootServiceId, array $servicesLinks, array &$services, array $triggers) {
+function calculateItServiceStatus($rootServiceId, array $servicesLinks, array &$services, array $triggers) {
 	$service = &$services[$rootServiceId];
 
 	// don't calculate a thread if it is already calculated
@@ -343,7 +343,7 @@ function calculateITServiceStatus($rootServiceId, array $servicesLinks, array &$
 	// calculate status depending on children status
 	$statuses = array();
 	foreach ($servicesLinks[$rootServiceId] as $rootServiceId) {
-		calculateITServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
+		calculateItServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
 		$statuses[] = $services[$rootServiceId]['newStatus'];
 	}
 
@@ -383,11 +383,10 @@ function calculateItServiceStatusByTrigger($triggerStatus, $triggerValue, $trigg
 	return $triggerPriority;
 }
 
-/*
+/**
  * Updates the status of all IT services
- *
  */
-function updateITServices() {
+function updateItServices() {
 	$servicesLinks = array();
 	$services = array();
 	$rootServiceIds = array();
@@ -444,7 +443,7 @@ function updateITServices() {
 
 	// calculating data
 	foreach ($rootServiceIds as $rootServiceId) {
-		calculateITServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
+		calculateItServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
 	}
 
 	// updating changed data

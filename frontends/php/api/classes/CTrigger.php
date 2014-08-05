@@ -891,7 +891,7 @@ class CTrigger extends CTriggerGeneral {
 			)
 		));
 
-		updateITServices();
+		updateItServices();
 
 		parent::deleteByIds($triggerIds);
 	}
@@ -1241,7 +1241,7 @@ class CTrigger extends CTriggerGeneral {
 		unset($trigger);
 
 		if ($priorityChanged) {
-			updateITServices();
+			updateItServices();
 		}
 
 		foreach ($infos as $info) {

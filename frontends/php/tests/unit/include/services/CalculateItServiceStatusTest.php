@@ -172,7 +172,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedStatuses
 	 */
 	public function test($services, $serviceLinks, $triggers, $expectedStatuses) {
-		calculateITServiceStatus(0, $serviceLinks, $services, $triggers);
+		calculateItServiceStatus(0, $serviceLinks, $services, $triggers);
 
 		foreach ($services as $serviceId => $service) {
 			$this->assertEquals($expectedStatuses[$serviceId], $service['newStatus']);
