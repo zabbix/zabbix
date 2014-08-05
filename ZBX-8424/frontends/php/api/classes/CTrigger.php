@@ -1823,22 +1823,20 @@ class CTrigger extends CTriggerGeneral {
 				'SELECT '.$outputFields.
 				' FROM events e'.
 					' JOIN ('.
-						'SELECT MAX(clock) AS clock,e2.objectid'.
+						'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
 						' FROM events e2'.
 						' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
 							' AND e2.object='.EVENT_OBJECT_TRIGGER.
 							' AND '.dbConditionInt('e2.objectid', $triggerids).
-							' GROUP BY e2.source,e2.object,e2.objectid'.
-						') e3 ON e3.objectid=e.objectid'.
-					' AND e3.clock=e.clock'.
-				' WHERE e3.objectid=e.objectid'.
-					' AND e3.clock=e.clock'.
-					' AND e.source='.EVENT_SOURCE_TRIGGERS.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
+						' GROUP BY e2.source,e2.object,e2.objectid'.
+					') e3 ON e3.source=e.source'.
+						' AND e3.object=e.object'.
+						' AND e3.objectid=e.objectid'.
+						' AND e3.clock=e.clock'
 			);
 
 			// in case there are multiple records with same 'clock' for one trigger, we'll get different 'ns'
-			$tmp = array();
+			$lastEvents = array();
 
 			while ($dbEvent = DBfetch($dbEvents)) {
 				$triggerId = $dbEvent['objectid'];
@@ -1854,13 +1852,13 @@ class CTrigger extends CTriggerGeneral {
 					}
 				}
 
-				$tmp[$triggerId][$ns] = $dbEvent;
+				$lastEvents[$triggerId][$ns] = $dbEvent;
 			}
 
-			foreach ($tmp as $triggerId => $ns) {
+			foreach ($lastEvents as $triggerId => $events) {
 				// find max 'ns' for each trigger and that will be the 'lastEvent'
-				$maxNs = max(array_keys($ns));
-				$result[$triggerId]['lastEvent'] = $ns[$maxNs];
+				$maxNs = max(array_keys($events));
+				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
 		}
 
