@@ -25,7 +25,9 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "zbxself.h"
-#include "../libs/zbxnix/control.h"
+#if defined(ZABBIX_DAEMON)
+#	include "../libs/zbxnix/control.h"
+#endif
 
 #ifndef _WINDOWS
 #	include "zbxmodules.h"
@@ -887,6 +889,7 @@ int	main(int argc, char **argv)
 			usage();
 			exit(EXIT_FAILURE);
 			break;
+#if defined(ZABBIX_DAEMON)
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
 			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
 			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task, get_process_type_by_name);
@@ -897,6 +900,7 @@ int	main(int argc, char **argv)
 			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task, get_process_type_by_name);
 			zbx_free(opt);
 			break;
+#endif
 #ifdef _WINDOWS
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
@@ -960,13 +964,13 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}
-
+#if defined(ZABBIX_DAEMON)
 	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&t.task)[0])
 	{
 		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 		exit(SUCCEED == zbx_sigusr_send(t.task) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
-
+#endif
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
 	exit(SUCCEED);

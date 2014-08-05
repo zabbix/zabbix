@@ -59,7 +59,6 @@ zabbix_proxy_LDADD += @PROXY_LIBS@
 zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
 
 zabbix_proxy_CFLAGS = \
-	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATADIR="\"@datadir@\"" \
 	-DLIBDIR="\"@libdir@\""

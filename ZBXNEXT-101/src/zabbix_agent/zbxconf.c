@@ -29,10 +29,6 @@
 #endif
 #include "comms.h"
 
-#if defined(ZABBIX_DAEMON)
-#	include "daemon.h"
-#endif
-
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;

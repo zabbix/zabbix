@@ -20,10 +20,6 @@
 #ifndef ZABBIX_ZBXSELF_H
 #define ZABBIX_ZBXSELF_H
 
-#if defined(_WINDOWS)
-#	error "This module allowed only for Unix OS"
-#endif
-
 #define ZBX_PROCESS_STATE_IDLE		0
 #define ZBX_PROCESS_STATE_BUSY		1
 #define ZBX_PROCESS_STATE_COUNT		2	/* number of process states */
@@ -65,17 +61,20 @@
 #define ZBX_AGGR_FUNC_MAX		2
 #define ZBX_AGGR_FUNC_MIN		3
 
-int	get_process_type_by_name(const char *proc_type_str);
-int	get_process_type_func(char *proc_type_str);
-int	get_process_type_forks(unsigned char process_type);
+int		get_process_type_by_name(const char *proc_type_str);
+int		get_process_type_func(char *proc_type_str);
+int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
-void	init_selfmon_collector(void);
-void	free_selfmon_collector(void);
-void	update_selfmon_counter(unsigned char state);
-void	collect_selfmon_stats(void);
-void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
-		unsigned char state, double *value);
-void	zbx_sleep_loop(int sleeptime);
-void	zbx_wakeup(void);
+
+#if defined(ZABBIX_DAEMON)
+void		init_selfmon_collector(void);
+void		free_selfmon_collector(void);
+void		update_selfmon_counter(unsigned char state);
+void		collect_selfmon_stats(void);
+void		get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
+			unsigned char state, double *value);
+void		zbx_sleep_loop(int sleeptime);
+void		zbx_wakeup(void);
+#endif
 
 #endif	/* ZABBIX_ZBXSELF_H */

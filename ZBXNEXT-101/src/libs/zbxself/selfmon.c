@@ -19,9 +19,10 @@
 
 #include "zbxself.h"
 #include "common.h"
-#include "mutexs.h"
-#include "ipc.h"
-#include "log.h"
+#if defined(ZABBIX_DAEMON)
+#	include "mutexs.h"
+#	include "ipc.h"
+#	include "log.h"
 
 #define MAX_HISTORY	60
 
@@ -49,6 +50,7 @@ static int			shm_id;
 #define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
 static ZBX_MUTEX	sm_lock;
+#endif
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;
@@ -235,6 +237,7 @@ int	get_process_type_by_name(const char *proc_type_str)
 	return FAIL;
 }
 
+#if defined(ZABBIX_DAEMON)
 /******************************************************************************
  *                                                                            *
  * Function: init_selfmon_collector                                           *
@@ -562,3 +565,4 @@ void	zbx_wakeup(void)
 {
 	sleep_remains = 0;
 }
+#endif
