@@ -604,19 +604,19 @@ class CItem extends CItemGeneral {
 	/**
 	 * Delete items.
 	 *
-	 * @param array $itemids
+	 * @param array $itemIds
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemids, $nopermissions = false) {
-		if (empty($itemids)) {
+	public function delete(array $itemIds, $noPermissions = false) {
+		if (empty($itemIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$itemids = array_keys(array_flip($itemids));
+		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get(array(
-			'itemids' => $itemids,
+			'itemids' => $itemIds,
 			'editable' => true,
 			'preservekeys' => true,
 			'output' => array('name', 'templateid'),
@@ -624,39 +624,39 @@ class CItem extends CItemGeneral {
 		));
 
 		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($itemids as $itemid) {
-				if (!isset($delItems[$itemid])) {
+		if (!$noPermissions) {
+			foreach ($itemIds as $itemId) {
+				if (!isset($delItems[$itemId])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delItems[$itemid]['templateid'] != 0) {
+				if ($delItems[$itemId]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
 				}
 			}
 		}
 
 		// first delete child items
-		$parentItemids = $itemids;
+		$parentItemIds = $itemIds;
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = array();
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemIds));
+			$parentItemIds = array();
 			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[] = $dbItem['itemid'];
-				$itemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$parentItemIds[] = $dbItem['itemid'];
+				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parentItemids));
+		} while (!empty($parentItemIds));
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = array();
 		$dbGraphs = DBselect(
 			'SELECT gi.graphid'.
 			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $itemids).
+			' WHERE '.dbConditionInt('gi.itemid', $itemIds).
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM graphs_items gii'.
 					' WHERE gii.graphid=gi.graphid'.
-						' AND '.dbConditionInt('gii.itemid', $itemids, true).
+						' AND '.dbConditionInt('gii.itemid', $itemIds, true).
 				')'
 		);
 		while ($dbGraph = DBfetch($dbGraphs)) {
@@ -671,10 +671,10 @@ class CItem extends CItemGeneral {
 		}
 
 		// check if any graphs are referencing this item
-		$this->checkGraphReference($itemids);
+		$this->checkGraphReference($itemIds);
 
 		$triggers = API::Trigger()->get(array(
-			'itemids' => $itemids,
+			'itemids' => $itemIds,
 			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -686,15 +686,28 @@ class CItem extends CItemGeneral {
 			}
 		}
 
+		$triggerPrototypes = API::TriggerPrototype()->get(array(
+			'itemids' => $itemIds,
+			'output' => array('triggerid'),
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if (!empty($triggerPrototypes)) {
+			$result = API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype.'));
+			}
+		}
+
 		DB::delete('screens_items', array(
-			'resourceid' => $itemids,
+			'resourceid' => $itemIds,
 			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)
 		));
-		DB::delete('items', array('itemid' => $itemids));
+		DB::delete('items', array('itemid' => $itemIds));
 		DB::delete('profiles', array(
 			'idx' => 'web.favorite.graphids',
 			'source' => 'itemid',
-			'value_id' => $itemids
+			'value_id' => $itemIds
 		));
 
 		$itemDataTables = array(
@@ -707,12 +720,12 @@ class CItem extends CItemGeneral {
 			'history'
 		);
 		$insert = array();
-		foreach ($itemids as $itemid) {
+		foreach ($itemIds as $itemId) {
 			foreach ($itemDataTables as $table) {
 				$insert[] = array(
 					'tablename' => $table,
 					'field' => 'itemid',
-					'value' => $itemid
+					'value' => $itemId
 				);
 			}
 		}
@@ -724,7 +737,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $itemids);
+		return array('itemids' => $itemIds);
 	}
 
 	public function syncTemplates($data) {
