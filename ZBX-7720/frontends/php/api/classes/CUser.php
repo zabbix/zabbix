@@ -235,7 +235,10 @@ class CUser extends CApiService {
 
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$themeValidator = new CSetValidator(array('values' => $themes));
+		$themeValidator = new CLimitedSetValidator(array(
+				'values' => $themes
+			)
+		);
 		$alias = array();
 
 		foreach ($users as &$user) {

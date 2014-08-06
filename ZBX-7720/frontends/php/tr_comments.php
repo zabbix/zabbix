@@ -96,7 +96,7 @@ $triggerEditable = API::Trigger()->get(array(
 ));
 
 $data = array(
-	'triggerid' => get_request('triggerid'),
+	'triggerid' => getRequest('triggerid'),
 	'trigger' => $trigger,
 	'isTriggerEditable' => !empty($triggerEditable),
 	'isCommentExist' => !empty($trigger['comments'])

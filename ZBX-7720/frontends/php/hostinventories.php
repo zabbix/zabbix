@@ -138,7 +138,7 @@ else {
 		'groups' => array(
 			'real_hosts' => true
 		),
-		'groupid' => getRequest('groupid', null)
+		'groupid' => getRequest('groupid')
 	));
 
 	/*
