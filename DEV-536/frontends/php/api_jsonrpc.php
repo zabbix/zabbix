@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once dirname(__FILE__).'/include/func.inc.php';
-require_once dirname(__FILE__) . '/include/classes/class.chttp_request.php';
+require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 $allowed_content = array(
 	'application/json-rpc' => 'json-rpc',
