@@ -272,6 +272,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	/* checking a host name validity */
 	for (i = 0; i < hosts->values_num; i++)
 	{
+		char	*ch_error;
+
 		host = (zbx_lld_host_t *)hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
@@ -282,11 +284,13 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			continue;
 
 		/* host name is valid? */
-		if (SUCCEED == zbx_check_hostname(host->host))
+		if (SUCCEED == zbx_check_hostname(host->host, &ch_error))
 			continue;
 
-		*error = zbx_strdcatf(*error, "Cannot %s host: invalid host name \"%s\".\n",
-				(0 != host->hostid ? "update" : "create"), host->host);
+		*error = zbx_strdcatf(*error, "Cannot %s host \"%s\": %s.\n",
+				(0 != host->hostid ? "update" : "create"), host->host, ch_error);
+
+		zbx_free(ch_error);
 
 		if (0 != host->hostid)
 		{
