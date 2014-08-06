@@ -804,6 +804,15 @@ function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
 
+/**
+ * Returns true if the value is an empty string, empty array or null.
+ *
+ * @deprecated use strict comparison instead
+ *
+ * @param $value
+ *
+ * @return bool
+ */
 function zbx_empty($value) {
 	if ($value === null) {
 		return true;
