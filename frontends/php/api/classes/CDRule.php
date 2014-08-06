@@ -531,28 +531,29 @@ class CDRule extends CApiService {
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
 			$newChecks = array();
+			$oldChecks = array();
 
-			foreach ($dRule['dchecks'] as $cnum => $check) {
-				if (!isset($check['druleid'])) {
-					$check['druleid'] = $dRule['druleid'];
-					unset($check['dcheckid']);
+			foreach ($dRule['dchecks'] as $check) {
+				$check['druleid'] = $dRule['druleid'];
 
+				if (!isset($check['dcheckid'])) {
 					$newChecks[] = array_merge($defaultValues, $check);
-
-					unset($dRule['dchecks'][$cnum]);
+				}
+				else {
+					$oldChecks[] = $check;
 				}
 			}
 
 			$delDCheckIds = array_diff(
 				zbx_objectValues($dbChecks, 'dcheckid'),
-				zbx_objectValues($dRule['dchecks'], 'dcheckid')
+				zbx_objectValues($oldChecks, 'dcheckid')
 			);
 
 			if ($delDCheckIds) {
 				$this->deleteActionConditions($delDCheckIds);
 			}
 
-			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
+			DB::replace('dchecks', $dbChecks, array_merge($oldChecks, $newChecks));
 		}
 
 		DB::update('drules', $dRulesUpdate);
@@ -571,28 +572,31 @@ class CDRule extends CApiService {
 		$this->validateDelete($druleIds);
 
 		$actionIds = array();
+		$conditionIds = array();
 
-		$dbActions = DBselect(
-			'SELECT DISTINCT actionid'.
-			' FROM conditions'.
-			' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('value', $druleIds).
-			' ORDER BY actionid'
+		$dbConditions = DBselect(
+			'SELECT c.conditionid, c.actionid'.
+			' FROM conditions c'.
+			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionInt('c.value', $druleIds).')'.
+				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND c.value IN'.
+					' (SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $druleIds).')'.
+				')'
 		);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionIds[] = $dbAction['actionid'];
+
+		while ($dbCondition = DBfetch($dbConditions)) {
+			$conditionIds[] = $dbCondition['conditionid'];
+			$actionIds[] = $dbCondition['actionid'];
 		}
 
 		if ($actionIds) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionIds),
+				'where' => array('actionid' => array_unique($actionIds)),
 			));
+		}
 
-			DB::delete('conditions', array(
-				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => $druleIds
-			));
+		if ($conditionIds) {
+			DB::delete('conditions', array('conditionid' => $conditionIds));
 		}
 
 		$result = DB::delete('drules', array('druleid' => $druleIds));

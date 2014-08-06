@@ -855,12 +855,6 @@ class CTrigger extends CTriggerGeneral {
 			'value_id' => $triggerIds
 		));
 
-		DB::delete('events', array(
-			'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-			'objectid' => $triggerIds,
-			'object' => EVENT_OBJECT_TRIGGER
-		));
-
 		DB::delete('sysmaps_elements', array(
 			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
@@ -1193,15 +1187,6 @@ class CTrigger extends CTriggerGeneral {
 						$cTrigIds[] = $cTrig['triggerid'];
 					}
 					$this->deleteByIds($cTrigIds);
-				}
-
-				// if the trigger contains templates, delete any events that may exist
-				if ($this->expressionHasTemplates($expressionData)) {
-					DB::delete('events', array(
-						'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-						'object' => EVENT_OBJECT_TRIGGER,
-						'objectid' => $trigger['triggerid']
-					));
 				}
 
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
@@ -1769,6 +1754,7 @@ class CTrigger extends CTriggerGeneral {
 				$pkFieldId = $this->pk('events');
 				$outputFields = array(
 					'objectid' => $this->fieldId('objectid', 'e'),
+					'ns' => $this->fieldId('ns', 'e'),
 					$pkFieldId => $this->fieldId($pkFieldId, 'e')
 				);
 
@@ -1784,29 +1770,47 @@ class CTrigger extends CTriggerGeneral {
 				$outputFields = 'e.*';
 			}
 
+			// due to performance issues, avoid using 'ORDER BY' for outter SELECT
 			$dbEvents = DBselect(
 				'SELECT '.$outputFields.
-				' FROM ('.
-					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
-					' FROM events e2'.
-					' WHERE e2.object='.EVENT_OBJECT_TRIGGER.
-						' AND e2.source='.EVENT_SOURCE_TRIGGERS.
-						' AND '.dbConditionInt('e2.objectid', $triggerids).
-					' GROUP BY e2.objectid'.
-				') e2, events e'.
-				' WHERE e.objectid=e2.objectid'.
-					' AND e.clock=e2.clock'.
-					' AND e.eventid=e2.eventid'
+				' FROM events e'.
+					' JOIN ('.
+						'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
+						' FROM events e2'.
+						' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
+							' AND e2.object='.EVENT_OBJECT_TRIGGER.
+							' AND '.dbConditionInt('e2.objectid', $triggerids).
+						' GROUP BY e2.source,e2.object,e2.objectid'.
+					') e3 ON e3.source=e.source'.
+						' AND e3.object=e.object'.
+						' AND e3.objectid=e.objectid'.
+						' AND e3.clock=e.clock'
 			);
+
+			// in case there are multiple records with same 'clock' for one trigger, we'll get different 'ns'
+			$lastEvents = array();
 
 			while ($dbEvent = DBfetch($dbEvents)) {
 				$triggerId = $dbEvent['objectid'];
+				$ns = $dbEvent['ns'];
 
-				if (is_array($options['selectLastEvent']) && !in_array('objectid', $options['selectLastEvent'])) {
-					unset($dbEvent['objectid']);
+				// unset fields, that were not requested
+				if (is_array($options['selectLastEvent'])) {
+					if (!in_array('objectid', $options['selectLastEvent'])) {
+						unset($dbEvent['objectid']);
+					}
+					if (!in_array('ns', $options['selectLastEvent'])) {
+						unset($dbEvent['ns']);
+					}
 				}
 
-				$result[$triggerId]['lastEvent'] = $dbEvent;
+				$lastEvents[$triggerId][$ns] = $dbEvent;
+			}
+
+			foreach ($lastEvents as $triggerId => $events) {
+				// find max 'ns' for each trigger and that will be the 'lastEvent'
+				$maxNs = max(array_keys($events));
+				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
 		}
 
