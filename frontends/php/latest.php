@@ -45,6 +45,7 @@ $fields = array(
 	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
@@ -113,6 +114,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.application', getRequest('application', ''), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', array()), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', array()), PROFILE_TYPE_STR);
 }
@@ -121,18 +123,22 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.latest.filter.select');
 	CProfile::delete('web.latest.filter.show_without_data');
 	CProfile::delete('web.latest.filter.show_details');
+	CProfile::delete('web.latest.filter.application');
 	CProfile::deleteIdx('web.latest.filter.groupids');
 	CProfile::deleteIdx('web.latest.filter.hostids');
 	DBend();
 }
 
-$filterSelect = CProfile::get('web.latest.filter.select', '');
-$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
-$filterShowDetails = CProfile::get('web.latest.filter.show_details');
-$filterGroupIds = CProfile::getArray('web.latest.filter.groupids', array());
-$filterHostIds = CProfile::getArray('web.latest.filter.hostids', array());
+$filter = array(
+	'select' => CProfile::get('web.latest.filter.select', ''),
+	'showWithoutData' => CProfile::get('web.latest.filter.show_without_data', 1),
+	'showDetails' => CProfile::get('web.latest.filter.show_details'),
+	'application' => CProfile::get('web.latest.filter.application'),
+	'groupids' => CProfile::getArray('web.latest.filter.groupids', array()),
+	'hostids' => CProfile::getArray('web.latest.filter.hostids', array())
+);
 
-$singleHostSelected = (count($filterHostIds) == 1);
+$singleHostSelected = (count($filter['hostids']) == 1);
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('host', 'name', 'lastclock'));
 
@@ -144,18 +150,18 @@ $applications = $items = $hostScripts = array();
 // groups and hosts used in the filter
 $filterGroups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name'),
-	'groupids' => $filterGroupIds
+	'groupids' => $filter['groupids']
 ));
 
 $filterHosts = API::Host()->get(array(
 	'output' => array('hostid', 'name'),
-	'hostids' => $filterHostIds
+	'hostids' => $filter['hostids']
 ));
 
 $hosts = API::Host()->get(array(
 	'output' => array('name', 'hostid', 'status'),
-	'hostids' => ($filterHostIds) ? $filterHostIds : null,
-	'groupids' => ($filterGroupIds) ? $filterGroupIds : null,
+	'hostids' => ($filter['hostids']) ? $filter['hostids'] : null,
+	'groupids' => ($filter['groupids']) ? $filter['groupids'] : null,
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'with_monitored_items' => true,
 	'preservekeys' => true
@@ -196,7 +202,7 @@ if ($items) {
 
 	// filter items by name
 	foreach ($items as $key => $item) {
-		if (!zbx_empty($filterSelect)) {
+		if (($filter['select'] !== '')) {
 			$haystack = mb_strtolower($item['name_expanded']);
 			$needle = mb_strtolower($filterSelect);
 
@@ -211,7 +217,7 @@ if ($items) {
 		$history = Manager::History()->getLast($items, 2, ZBX_HISTORY_PERIOD);
 
 		// filter items without history
-		if (!$filterShowWithoutData) {
+		if (!$filter['showWithoutData']) {
 			foreach ($items as $key => $item) {
 				if (!isset($history[$item['itemid']])) {
 					unset($items[$key]);
@@ -282,7 +288,7 @@ if ($items) {
 	}
 }
 
-if ($filterShowDetails) {
+if ($filter['showDetails']) {
 	$config = select_config();
 }
 
@@ -338,9 +344,18 @@ $filterForm->addRow(_('Hosts'), new CMultiSelect(array(
 		'buttonClass' => 'input filter-multiselect-select-button'
 	)
 )));
-$filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filterSelect, 20));
-$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
+// application
+$filterForm->addRow(_('Filter by application'), array(
+	new CTextBox('application', $filter['application'], 40),
+	new CButton('application_name', _('Select'),
+		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
+		'&dstfrm='.$filterForm->getName().'");',
+		'filter-button'
+	)
+));
+$filterForm->addRow(_('Filter by name'), new CTextBox('select', $filter['select'], 20));
+$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
@@ -375,7 +390,7 @@ $lastValueHeader->setAttribute('title', _('Last value'));
 $lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
 $lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
-if ($filterShowDetails) {
+if ($filter['showDetails']) {
 	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
 	$intervalHeader->setAttribute('title', _('Interval'));
 
@@ -485,7 +500,7 @@ foreach ($items as $key => $item){
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
 
-	if ($filterShowDetails) {
+	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
@@ -586,7 +601,7 @@ foreach ($applications as $appid => $dbApp) {
 		new CCol(array(
 				bold($dbApp['name']),
 				' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			), null, $filterShowDetails ? 10 : 5)
+			), null, $filter['showDetails'] ? 10 : 5)
 	), 'odd_row');
 
 	// add toggle sub rows
@@ -664,7 +679,7 @@ foreach ($items as $item) {
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
 
 	$host = $hosts[$item['hostid']];
-	if ($filterShowDetails) {
+	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
@@ -759,7 +774,7 @@ foreach ($hosts as $hostId => $dbHost) {
 				bold('- '.('other').' -'),
 				' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
 			),
-			null, $filterShowDetails ? 10 : 5
+			null, $filter['showDetails'] ? 10 : 5
 		)
 	), 'odd_row');
 
