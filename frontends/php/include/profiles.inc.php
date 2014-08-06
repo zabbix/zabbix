@@ -244,8 +244,8 @@ class CProfile {
 		return DBexecute(
 			'UPDATE profiles SET '.
 				$valueType.'='.zbx_dbstr($value).','.
-				' type='.$type.
-			' WHERE userid='.self::$userDetails['userid'].
+				' type='.zbx_dbstr($type).
+			' WHERE userid='.zbx_dbstr(self::$userDetails['userid']).
 				' AND idx='.zbx_dbstr($idx).
 				$sqlIdx2
 		);
@@ -478,7 +478,7 @@ function addUserHistory($title, $url) {
 	$history5 = DBfetch(DBSelect(
 		'SELECT uh.title5,uh.url5'.
 		' FROM user_history uh'.
-		' WHERE uh.userid='.$userId
+		' WHERE uh.userid='.zbx_dbstr($userId)
 	));
 
 	if ($history5) {
@@ -487,7 +487,7 @@ function addUserHistory($title, $url) {
 				return true;
 			}
 			else {
-				$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
+				$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.zbx_dbstr($userId);
 			}
 		}
 		else {
@@ -502,7 +502,7 @@ function addUserHistory($title, $url) {
 						' url4=url5,'.
 						' title5='.zbx_dbstr($title).','.
 						' url5='.zbx_dbstr($url).
-					' WHERE userid='.$userId;
+					' WHERE userid='.zbx_dbstr($userId);
 		}
 	}
 	else {

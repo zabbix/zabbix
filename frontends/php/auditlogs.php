@@ -155,7 +155,7 @@ while ($audit = DBfetch($dbAudit)) {
 		$audit['details'] = DBfetchArray(DBselect(
 			'SELECT ad.table_name,ad.field_name,ad.oldvalue,ad.newvalue'.
 			' FROM auditlog_details ad'.
-			' WHERE ad.auditid='.$audit['auditid']
+			' WHERE ad.auditid='.zbx_dbstr($audit['auditid'])
 		));
 	}
 	$data['actions'][$audit['auditid']] = $audit;
