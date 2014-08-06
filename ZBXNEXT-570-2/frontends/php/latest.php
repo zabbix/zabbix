@@ -359,7 +359,7 @@ else {
 	$hostHeader->addClass('latest-host');
 	$hostHeader->setAttribute('title', _('Host'));
 
-	$hostColumn = SPACE;
+	$hostColumn = '';
 }
 
 $nameHeader = make_sorting_header(_('Name'), 'name');
@@ -403,7 +403,7 @@ if ($filterShowDetails) {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(SPACE, 'latest-actions'),
+		new CCol(null, 'latest-actions'),
 		$infoHeader
 	));
 }
@@ -415,7 +415,7 @@ else {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(SPACE, 'latest-actions')
+		new CCol(null, 'latest-actions')
 	));
 }
 
@@ -493,7 +493,7 @@ foreach ($items as $key => $item){
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info = new CDiv(null, 'status_icon iconerror');
 			$info->setHint($item['error'], 'on');
 		}
 		else {
@@ -509,7 +509,7 @@ foreach ($items as $key => $item){
 		}
 
 		$row = new CRow(array(
-			SPACE,
+			'',
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -530,7 +530,7 @@ foreach ($items as $key => $item){
 	}
 	else {
 		$row = new CRow(array(
-			SPACE,
+			'',
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -562,7 +562,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
+	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
@@ -585,7 +585,7 @@ foreach ($applications as $appid => $dbApp) {
 		$hostName,
 		new CCol(array(
 				bold($dbApp['name']),
-				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
+				' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
 			), null, $filterShowDetails ? 10 : 5)
 	), 'odd_row');
 
@@ -672,7 +672,7 @@ foreach ($items as $item) {
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info = new CDiv(null, 'status_icon iconerror');
 			$info->setHint($item['error'], 'on');
 		}
 		else {
@@ -688,7 +688,7 @@ foreach ($items as $item) {
 		}
 
 		$row = new CRow(array(
-			SPACE,
+			'',
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -709,7 +709,7 @@ foreach ($items as $item) {
 	}
 	else {
 		$row = new CRow(array(
-			SPACE,
+			'',
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -733,7 +733,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
+	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
@@ -757,7 +757,7 @@ foreach ($hosts as $hostId => $dbHost) {
 		new CCol(
 			array(
 				bold('- '.('other').' -'),
-				SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
+				' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
 			),
 			null, $filterShowDetails ? 10 : 5
 		)
