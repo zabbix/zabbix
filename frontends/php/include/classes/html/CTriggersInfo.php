@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../triggers.inc.php';
+require_once dirname(__FILE__) . '/../triggers.inc.php';
 
 class CTriggersInfo extends CTable {
 

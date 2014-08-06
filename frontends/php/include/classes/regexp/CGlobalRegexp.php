@@ -26,7 +26,7 @@
  *
  * @throws Exception
  */
-class GlobalRegExp {
+class CGlobalRegexp {
 
 	const ERROR_REGEXP_EMPTY = 1;
 	const ERROR_REGEXP_NOT_EXISTS = 2;

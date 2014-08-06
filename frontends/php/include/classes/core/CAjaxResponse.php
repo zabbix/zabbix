@@ -22,7 +22,7 @@
 /**
  * Class for standard ajax response generation.
  */
-class AjaxResponse {
+class CAjaxResponse {
 
 	private $_result = true;
 	private $_data = array();
