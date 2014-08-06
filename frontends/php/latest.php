@@ -113,8 +113,8 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
-	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids'), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids'), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', array()), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', array()), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -129,8 +129,8 @@ elseif (hasRequest('filter_rst')) {
 $filterSelect = CProfile::get('web.latest.filter.select', '');
 $filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
 $filterShowDetails = CProfile::get('web.latest.filter.show_details');
-$filterGroupIds = CProfile::getArray('web.latest.filter.groupids', null);
-$filterHostIds = CProfile::getArray('web.latest.filter.hostids', null);
+$filterGroupIds = CProfile::getArray('web.latest.filter.groupids', array());
+$filterHostIds = CProfile::getArray('web.latest.filter.hostids', array());
 
 $singleHostSelected = (count($filterHostIds) == 1);
 
@@ -141,9 +141,15 @@ $sortOrder = getPageSortOrder();
 
 $applications = $items = $hostScripts = array();
 
-$groups = API::HostGroup()->get(array(
+// groups and hosts used in the filter
+$filterGroups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name'),
 	'groupids' => $filterGroupIds
+));
+
+$filterHosts = API::Host()->get(array(
+	'output' => array('hostid', 'name'),
+	'hostids' => $filterHostIds
 ));
 
 $hosts = API::Host()->get(array(
@@ -282,8 +288,7 @@ if ($filterShowDetails) {
 
 // multiselect hosts
 $multiSelectHostData = array();
-foreach ($filterHostIds as $hostId) {
-	$host = $hosts[$hostId];
+foreach ($filterHosts as $host) {
 	$multiSelectHostData[] = array(
 		'id' => $host['hostid'],
 		'name' => $host['name']
@@ -292,7 +297,7 @@ foreach ($filterHostIds as $hostId) {
 
 // multiselect host groups
 $multiSelectHostGroupData = array();
-foreach ($groups as $group) {
+foreach ($filterGroups as $group) {
 	$multiSelectHostGroupData[] = array(
 		'id' => $group['groupid'],
 		'name' => $group['name']
