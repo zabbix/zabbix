@@ -20,7 +20,7 @@ A.F.....S. [ZBXNEXT-1133] added support for custom expressions in action conditi
 A......... [ZBX-8459] made possible CORS AJAX requests for JSON API (Andrejs)
 
 Bug fixes:
-...G...... [ZBX-8512] web.page.regexp fix. Problem cause - absence of newline in the end of http GET response (Arturs)
+...G...... [ZBX-8512] fixed processing of web.page.regexp without a newline character in the end of http GET response (Arturs)
 ..F....... [ZBX-8471] fixed removing slides from slideshows in cases when some slides have been deleted (Krists)
 ..F....... [ZBX-8509] fixed item custom multiplier formula default value to be "1" and not become unset in some cases (Krists)
 A.F....... [ZBX-8430] fixed cascade removal of action conditions when deleting related discovery rule and checks (Andrejs)
@@ -288,7 +288,7 @@ A.......S. [ZBX-8473] improved performance of deleting triggers by API and serve
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-8512] web.page.regexp fix. Problem cause - absence of newline in the end of http GET response (Arturs)
+...G...... [ZBX-8512] fixed processing of web.page.regexp without a newline character in the end of http GET response (Arturs)
 A......... [ZBX-8424] fixed finding last event for triggers (Ivo)
 .......PS. [ZBX-8424] changed range limit when looking up eventids to the upper bound of a 64bit integer (Juris)
 A......... [ZBX-8493] fixed usergroup.massadd API call to not create duplicate entries in "rights" table (Krists)
