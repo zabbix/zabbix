@@ -133,28 +133,18 @@ if (hasRequest('filter_set')) {
 	}
 
 	// update host inventory filter
-	$i = 0;
+	$inventoryFields = array();
+	$inventoryValues = array();
 	foreach (getRequest('inventory', array()) as $field) {
 		if ($field['value'] === '') {
 			continue;
 		}
 
-		CProfile::update('web.tr_status.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
-		CProfile::update('web.tr_status.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
-
-		$i++;
+		$inventoryFields[] = $field['field'];
+		$inventoryValues[] = $field['value'];
 	}
-
-	// delete remaining old values
-	$idx2 = array();
-	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
-		$idx2[] = $i;
-
-		$i++;
-	}
-
-	CProfile::delete('web.tr_status.filter.inventory.field', $idx2);
-	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
+	CProfile::updateArray('web.tr_status.filter.inventory.field', $inventoryFields, PROFILE_TYPE_STR);
+	CProfile::updateArray('web.tr_status.filter.inventory.value', $inventoryValues, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -199,14 +189,12 @@ $filter = array(
 	'application' => CProfile::get('web.tr_status.filter.application', ''),
 	'inventory' => array()
 );
-$i = 0;
-while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+
+foreach (CProfile::getArray('web.tr_status.filter.inventory.field', array()) as $i => $field) {
 	$filter['inventory'][] = array(
-		'field' => CProfile::get('web.tr_status.filter.inventory.field', null, $i),
+		'field' => $field,
 		'value' => CProfile::get('web.tr_status.filter.inventory.value', null, $i)
 	);
-
-	$i++;
 }
 
 /*
