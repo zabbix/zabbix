@@ -1224,7 +1224,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
+			$icon = new CImg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$icon->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$icon->setHint($dependencyTable, '', false);
 
@@ -1244,7 +1244,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+			$icon = new CImg('images/general/arrow_up2.png', 'DEP_UP');
 			$icon->setAttribute('style', 'vertical-align: middle; border: none;');
 			$icon->setHint($dependencyTable, '', false);
 
