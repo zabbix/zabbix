@@ -262,7 +262,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
 						'MAX(value_max) AS max,MAX(clock) AS clock'.
 					' FROM trends'.
-					' WHERE itemid='.$this->items[$i]['itemid'].
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
 						' AND clock>='.zbx_dbstr($from_time).
 						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
@@ -455,7 +455,7 @@ class CLineGraphDraw extends CGraphDraw {
 				' ORDER BY tr.priority'
 			);
 			while (($trigger = DBfetch($db_triggers)) && $cnt < $max) {
-				$db_fnc_cnt = DBselect('SELECT COUNT(*) AS cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
+				$db_fnc_cnt = DBselect('SELECT COUNT(*) AS cnt FROM functions f WHERE f.triggerid='.zbx_dbstr($trigger['triggerid']));
 				$fnc_cnt = DBfetch($db_fnc_cnt);
 
 				if ($fnc_cnt['cnt'] != 1) {
