@@ -160,6 +160,27 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 					3 => TRIGGER_SEVERITY_AVERAGE,
 				)
 			),
+
+			// a service branch with a disabled service in the middle
+			array(
+				array(
+					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
+					1 => array('algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0),
+					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
+				),
+				array(
+					0 => array(1),
+					1 => array(2)
+				),
+				array(
+					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
+				),
+				array(
+					0 => SERVICE_STATUS_OK,
+					1 => SERVICE_STATUS_OK,
+					2 => TRIGGER_SEVERITY_AVERAGE,
+				)
+			),
 		);
 	}
 
