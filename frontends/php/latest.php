@@ -113,25 +113,8 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
-
-	foreach (array('groupids', 'hostids') as $key) {
-		$i = 0;
-		foreach (getRequest($key, array()) as $id) {
-			CProfile::update('web.latest.filter.'.$key, $id, PROFILE_TYPE_STR, $i);
-
-			$i++;
-		}
-
-		// delete remaining old values
-		$idx2 = array();
-		while (CProfile::get('web.latest.filter.'.$key, null, $i) !== null) {
-			$idx2[] = $i;
-
-			$i++;
-		}
-
-		CProfile::delete('web.latest.filter.'.$key, $idx2);
-	}
+	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids'), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids'), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -146,22 +129,8 @@ elseif (hasRequest('filter_rst')) {
 $filterSelect = CProfile::get('web.latest.filter.select', '');
 $filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
 $filterShowDetails = CProfile::get('web.latest.filter.show_details');
-
-$i = 0;
-$filterHostIds = array();
-while (CProfile::get('web.latest.filter.hostids', null, $i) !== null) {
-	$filterHostIds[] = CProfile::get('web.latest.filter.hostids', null, $i);
-
-	$i++;
-}
-
-$i = 0;
-$filterGroupIds = array();
-while (CProfile::get('web.latest.filter.groupids', null, $i) !== null) {
-	$filterGroupIds[] = CProfile::get('web.latest.filter.groupids', null, $i);
-
-	$i++;
-}
+$filterGroupIds = CProfile::getArray('web.latest.filter.groupids', null);
+$filterHostIds = CProfile::getArray('web.latest.filter.hostids', null);
 
 $singleHostSelected = (count($filterHostIds) == 1);
 
