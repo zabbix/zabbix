@@ -919,20 +919,19 @@ class CTrigger extends CTriggerGeneral {
 			'value' => $triggerIds
 		));
 
-		// unlink triggers from IT services
-		foreach ($triggerIds as $triggerId) {
-			updateServices($triggerId, SERVICE_STATUS_OK);
-		}
+		if ($this->usedInItServices($triggerIds)) {
+			DB::update('services', array(
+				'values' => array(
+					'triggerid' => null,
+					'showsla' => SERVICE_SHOW_SLA_OFF
+				),
+				'where' => array(
+					'triggerid' => $triggerIds
+				)
+			));
 
-		DB::update('services', array(
-			'values' => array(
-				'triggerid' => null,
-				'showsla' => SERVICE_SHOW_SLA_OFF
-			),
-			'where' => array(
-				'triggerid' => $triggerIds
-			)
-		));
+			updateItServices();
+		}
 
 		parent::deleteByIds($triggerIds);
 	}
@@ -1151,8 +1150,10 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = zbx_toArray($triggers);
 		$infos = array();
 
+		$triggerIds = zbx_objectValues($triggers, 'triggerid');
+
 		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'selectDependencies' => API_OUTPUT_REFER,
@@ -1160,7 +1161,10 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		));
 
-		$descriptionChanged = $expressionChanged = false;
+		$descriptionChanged = false;
+		$expressionChanged = false;
+		$changedPriorityTriggerIds = array();
+
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
@@ -1266,9 +1270,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// update service status
 			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
-				$serviceStatus = ($dbTrigger['value'] == TRIGGER_VALUE_TRUE) ? $trigger['priority'] : 0;
-
-				updateServices($trigger['triggerid'], $serviceStatus);
+				$changedPriorityTriggerIds[] = $trigger['triggerid'];
 			}
 
 			// restore the full expression to properly validate dependencies
@@ -1279,6 +1281,10 @@ class CTrigger extends CTriggerGeneral {
 					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
 		}
 		unset($trigger);
+
+		if ($changedPriorityTriggerIds && $this->usedInItServices($changedPriorityTriggerIds)) {
+			updateItServices();
+		}
 
 		foreach ($infos as $info) {
 			info($info);
@@ -2015,5 +2021,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $triggers;
+	}
+
+	/**
+	 * Returns true if at least one of the given triggers is used in IT services.
+	 *
+	 * @param array $triggerIds
+	 *
+	 * @return bool
+	 */
+	protected function usedInItServices(array $triggerIds) {
+		$query = DBselect('SELECT serviceid FROM services WHERE '.dbConditionInt('triggerid', $triggerIds), 1);
+
+		return (DBfetch($query) != false);
 	}
 }
