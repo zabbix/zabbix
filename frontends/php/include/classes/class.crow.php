@@ -28,10 +28,6 @@ class CRow extends CTag {
 		$this->attr('id', $id);
 	}
 
-	public function setAlign($value) {
-		return $this->attributes['align'] = $value;
-	}
-
 	public function addItem($item) {
 		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
 			parent::addItem($item);
@@ -48,12 +44,6 @@ class CRow extends CTag {
 		}
 		elseif (!is_null($item)) {
 			parent::addItem(new CCol($item));
-		}
-	}
-
-	public function setWidth($value) {
-		if (is_string($value)) {
-			$this->setAttribute('width', $value);
 		}
 	}
 }
