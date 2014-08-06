@@ -108,9 +108,12 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		if (FAIL == zbx_check_hostname(host))
+		char	*ch_error;
+
+		if (FAIL == zbx_check_hostname(host, &ch_error))
 		{
-			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\"", host);
+			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
+			zbx_free(ch_error);
 			return ret;
 		}
 

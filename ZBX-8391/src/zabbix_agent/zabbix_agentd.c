@@ -420,15 +420,19 @@ static void	set_defaults(void)
  ******************************************************************************/
 static void	zbx_validate_config(void)
 {
+	char	*ch_error;
+
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAME,
+				ch_error);
+		zbx_free(ch_error);
 		exit(EXIT_FAILURE);
 	}
 

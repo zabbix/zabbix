@@ -89,7 +89,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
 	$statusLink = 'media_types.php?go='.(($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
-		'&mediatypeids'.SQUAREBRACKETS.'='.$mediaType['mediatypeid'];
+		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		? new CLink(_('Enabled'), $statusLink, 'enabled')

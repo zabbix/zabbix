@@ -175,11 +175,11 @@ $serviceTimeTable = new CTable(null, 'formElementTable');
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	// downtime since
 	if (isset($_REQUEST['new_service_time']['from'])) {
-		$fromYear = get_request('new_service_time_from_year');
-		$fromMonth = get_request('new_service_time_from_month');
-		$fromDay = get_request('new_service_time_from_day');
-		$fromHours = get_request('new_service_time_from_hour');
-		$fromMinutes = get_request('new_service_time_from_minute');
+		$fromYear = getRequest('new_service_time_from_year');
+		$fromMonth = getRequest('new_service_time_from_month');
+		$fromDay = getRequest('new_service_time_from_day');
+		$fromHours = getRequest('new_service_time_from_hour');
+		$fromMinutes = getRequest('new_service_time_from_minute');
 		$fromDate = array(
 			'y' => $fromYear,
 			'm' => $fromMonth,
@@ -198,11 +198,11 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 
 	// downtime till
 	if (isset($_REQUEST['new_service_time']['to'])) {
-		$toYear = get_request('new_service_time_to_year');
-		$toMonth = get_request('new_service_time_to_month');
-		$toDay = get_request('new_service_time_to_day');
-		$toHours = get_request('new_service_time_to_hour');
-		$toMinutes = get_request('new_service_time_to_minute');
+		$toYear = getRequest('new_service_time_to_year');
+		$toMonth = getRequest('new_service_time_to_month');
+		$toDay = getRequest('new_service_time_to_day');
+		$toHours = getRequest('new_service_time_to_hour');
+		$toMinutes = getRequest('new_service_time_to_minute');
 		$toDate = array(
 			'y' => $toYear,
 			'm' => $toMonth,

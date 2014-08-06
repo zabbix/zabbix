@@ -61,7 +61,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
 
@@ -177,8 +177,8 @@ $data['pageFilter'] = new CPageFilter(array(
 		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
-	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null)
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
 ));
 
 $data['groupid'] = $data['pageFilter']->groupid;
