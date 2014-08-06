@@ -596,13 +596,13 @@ class CSetupWizard extends CForm {
 			$this->DISABLE_NEXT_BUTTON = true;
 		}
 		elseif ($this->getStep() == 2) {
-			$this->setConfig('DB_TYPE', get_request('type', $this->getConfig('DB_TYPE')));
-			$this->setConfig('DB_SERVER', get_request('server', $this->getConfig('DB_SERVER', 'localhost')));
-			$this->setConfig('DB_PORT', get_request('port', $this->getConfig('DB_PORT', '0')));
-			$this->setConfig('DB_DATABASE', get_request('database', $this->getConfig('DB_DATABASE', 'zabbix')));
-			$this->setConfig('DB_USER', get_request('user', $this->getConfig('DB_USER', 'root')));
-			$this->setConfig('DB_PASSWORD', get_request('password', $this->getConfig('DB_PASSWORD', '')));
-			$this->setConfig('DB_SCHEMA', get_request('schema', $this->getConfig('DB_SCHEMA', '')));
+			$this->setConfig('DB_TYPE', getRequest('type', $this->getConfig('DB_TYPE')));
+			$this->setConfig('DB_SERVER', getRequest('server', $this->getConfig('DB_SERVER', 'localhost')));
+			$this->setConfig('DB_PORT', getRequest('port', $this->getConfig('DB_PORT', '0')));
+			$this->setConfig('DB_DATABASE', getRequest('database', $this->getConfig('DB_DATABASE', 'zabbix')));
+			$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
+			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
+			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
 
 			if (isset($_REQUEST['retry'])) {
 				if (!$this->checkConnection()) {
@@ -620,9 +620,9 @@ class CSetupWizard extends CForm {
 			}
 		}
 		elseif ($this->getStep() == 3) {
-			$this->setConfig('ZBX_SERVER', get_request('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')));
-			$this->setConfig('ZBX_SERVER_PORT', get_request('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051')));
-			$this->setConfig('ZBX_SERVER_NAME', get_request('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
+			$this->setConfig('ZBX_SERVER', getRequest('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')));
+			$this->setConfig('ZBX_SERVER_PORT', getRequest('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051')));
+			$this->setConfig('ZBX_SERVER_NAME', getRequest('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 			if (isset($_REQUEST['next'][$this->getStep()])) {
 				$this->doNext();
 			}

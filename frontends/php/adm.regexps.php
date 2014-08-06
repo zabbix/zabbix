@@ -55,7 +55,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
-	$ajaxData = get_request('ajaxdata', array());
+	$ajaxData = getRequest('ajaxdata', array());
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
 		$result = array(
@@ -97,7 +97,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
  * Permissions
  */
 if (isset($_REQUEST['regexpid'])) {
-	$regExp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.zbx_dbstr(get_request('regexpid'))));
+	$regExp = DBfetch(DBSelect('SELECT re.regexpid FROM regexps re WHERE re.regexpid='.zbx_dbstr(getRequest('regexpid'))));
 	if (empty($regExp)) {
 		access_deny();
 	}
@@ -128,7 +128,7 @@ elseif (isset($_REQUEST['save'])) {
 		'name' => $_REQUEST['name'],
 		'test_string' => $_REQUEST['test_string']
 	);
-	$expressions = get_request('expressions', array());
+	$expressions = getRequest('expressions', array());
 
 	DBstart();
 
@@ -154,12 +154,15 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
-		$regExpIds = get_request('regexpid', array());
+		$regExpIds = getRequest('regexpid', array());
 
 		if (isset($_REQUEST['regexpids'])) {
 			$regExpIds = $_REQUEST['regexpids'];
@@ -189,11 +192,14 @@ elseif (isset($_REQUEST['go'])) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result,
 			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
-		clearCookies($result);
 	}
 }
 
@@ -226,8 +232,8 @@ $regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $regExpF
 
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form_refresh' => get_request('form_refresh'),
-		'regexpid' => get_request('regexpid')
+		'form_refresh' => getRequest('form_refresh'),
+		'regexpid' => getRequest('regexpid')
 	);
 
 	if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
@@ -249,9 +255,9 @@ if (isset($_REQUEST['form'])) {
 		$data['expressions'] = DBfetchArray($dbExpressions);
 	}
 	else {
-		$data['name'] = get_request('name', '');
-		$data['test_string'] = get_request('test_string', '');
-		$data['expressions'] = get_request('expressions', array());
+		$data['name'] = getRequest('name', '');
+		$data['test_string'] = getRequest('test_string', '');
+		$data['expressions'] = getRequest('expressions', array());
 	}
 
 	$regExpForm = new CView('administration.general.regularexpressions.edit', $data);

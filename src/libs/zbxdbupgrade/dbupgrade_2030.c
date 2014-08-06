@@ -1192,6 +1192,20 @@ static int	DBpatch_2030115(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030116(void)
+{
+	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2030117(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -1313,5 +1327,7 @@ DBPATCH_ADD(2030112, 0, 1)
 DBPATCH_ADD(2030113, 0, 0)
 DBPATCH_ADD(2030114, 0, 0)
 DBPATCH_ADD(2030115, 0, 0)
+DBPATCH_ADD(2030116, 0, 1)
+DBPATCH_ADD(2030117, 0, 1)
 
 DBPATCH_END()

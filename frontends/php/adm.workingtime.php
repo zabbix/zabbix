@@ -77,10 +77,10 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 
 if ($data['form_refresh']) {
-	$data['config']['work_period'] = get_request('work_period');
+	$data['config']['work_period'] = getRequest('work_period');
 }
 else {
 	$data['config'] = select_config(false);

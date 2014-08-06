@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-24 22:02+0300\n"
-"PO-Revision-Date: 2014-06-04 12:06+0300\n"
+"POT-Creation-Date: 2014-07-26 00:54+0300\n"
+"PO-Revision-Date: 2014-07-03 09:09+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401876378.0\n"
+"X-POOTLE-MTIME: 1404371377.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -587,7 +587,7 @@ msgstr "Kontrole sumaryczne nie wymagają, by na monitorowanym hoście działał
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:51
 #: include/views/administration.users.list.php:54 popup.php:579 users.php:44
 msgid "Alias"
-msgstr "Alias"
+msgstr "Alias (Login)"
 
 #: include/views/configuration.sysmap.constructor.php:56
 msgid "Align icons"
@@ -1234,7 +1234,7 @@ msgstr "Obciążenie CPU. Obciążenie procesora, cpu i tryb są opcjonalne. Je�
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Użycie CPU. Procentowe obciążenie procesora. cpu, typ i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie all. Jeżeli typ jest pusty, przyjęty będzie user. Jeżeli tryb jest pusty, przyjęte będzie avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:523
@@ -1253,7 +1253,7 @@ msgstr "Oblicza sumę kontrolną podanego pliku. Suma kontrolna jest obliczana p
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Oblicz przestrzeń dyskową dla podanego wolumenu. Przestrzeń w KB. Jeżeli tryb jest pusty, przyjęte będzie total. W przypadku zamontowanych wolumenów, zwrócona zostanie wolna przestrzeń dla lokalnego systemu plików. Przykład: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:106
 #: include/views/configuration.graph.edit.php:164
@@ -1320,7 +1320,7 @@ msgstr "Nie można dodać warunku akcji"
 msgid "Cannot add application"
 msgstr "Nie można dodać aplikacji"
 
-#: api/classes/CTrigger.php:1382
+#: api/classes/CTrigger.php:1367
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nie można utworzyć zależności szablonu od hosta."
 
@@ -1531,11 +1531,11 @@ msgstr "Nie można utworzyć prototypu hosta na wykrytym hoście \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Nie można utworzyć kolejnego połączenia do bazy."
 
-#: api/classes/CTrigger.php:1416
+#: api/classes/CTrigger.php:1401
 msgid "Cannot create circular dependencies."
 msgstr "Nie można utworzyć cyklicznych zależności."
 
-#: api/classes/CTrigger.php:1388
+#: api/classes/CTrigger.php:1373
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie można utworzyć zależności do tego samego wyzwalacza."
 
@@ -1589,7 +1589,7 @@ msgstr[0] "Nie można usunąć aplikacji"
 msgstr[1] "Nie można usunąć aplikacji"
 msgstr[2] "Nie można usunąć aplikacji"
 
-#: api/classes/CTrigger.php:1042
+#: api/classes/CTrigger.php:1036
 msgid "Cannot delete dependency"
 msgstr "Nie można usunąć zależności"
 
@@ -1766,7 +1766,7 @@ msgstr "Nie można usunąć pozycji użytych jako szablon"
 msgid "Cannot delete templated items."
 msgstr "Nie można usunąć pozycji użytych jako szablon."
 
-#: api/classes/CTrigger.php:1864 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1849 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nie można usunąć wyzwalacza użytego jako szablon \"%1$s:%2$s\"."
@@ -2144,7 +2144,7 @@ msgstr "Nie można sformatować drzewa."
 msgid "Cannot have empty visible template name."
 msgstr "Widoczna nazwa szablonu nie może być pusta."
 
-#: api/classes/CTrigger.php:1075 api/classes/CTrigger.php:1214
+#: api/classes/CTrigger.php:1069 api/classes/CTrigger.php:1199
 #: api/classes/CTriggerPrototype.php:678 api/classes/CTriggerPrototype.php:736
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2297,7 +2297,7 @@ msgstr "Nie można ustawić pól inwentarza dla wyłączonego inwentarza."
 #: include/func.inc.php:1425
 #, c-format
 msgid "Cannot sort by field \"%1$s\"."
-msgstr ""
+msgstr "Nie można sortować według pola \"%1$s\"."
 
 #: api/classes/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2704,12 +2704,12 @@ msgstr "Sprawdź czy usługa jest dostępna. 0 - usługa nie działa, 1 - usług
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Sprawdź, czy serwis jest dostępny. 0 - serwis nie działa, 1 - serwis działa. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Jeżeli port jest pusty, użyty zostanie domyślny port serwisu. Przykład: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:379
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "Sprawdź wydajność serwisu \"service\". 0 - serwis nie działa, sekundy - liczba sekund do podłączenia do serwisu. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Jeżeli port jest pusty, użyty zostanie domyślny port serwisu."
 
 #: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2731,7 +2731,7 @@ msgstr "Typ testu"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:375
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Sprawdź, czy możliwe jest połączenie TCP na numer portu. 0 - nie można się połączyć, 1 - można się połączyć. Adres IP jest opcjonalny. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Przykład: net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -3408,7 +3408,7 @@ msgstr "Utworzono: Pozycja \"%1$s\" w \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Utworzono: Prototyp pozycji \"%1$s\" w \"%2$s\"."
 
-#: api/classes/CTrigger.php:1109
+#: api/classes/CTrigger.php:1103
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Utworzono: Wyzwalacz \"%1$s\" w \"%2$s\"."
@@ -4681,7 +4681,7 @@ msgstr "Pierwszy wpis menu rozwijalnego \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Menu rozwijalne zapamiętuje wybrane \"%1$s\"."
 
-#: api/classes/CTrigger.php:1558
+#: api/classes/CTrigger.php:1543
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Powielone zależności w wyzwalaczu \"%1$s\""
@@ -4875,8 +4875,8 @@ msgstr "Pusty host."
 #: api/classes/CProxy.php:474 api/classes/CService.php:341
 #: api/classes/CService.php:376 api/classes/CService.php:442
 #: api/classes/CService.php:514 api/classes/CTemplate.php:577
-#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:917
-#: api/classes/CTrigger.php:1007 api/classes/CTriggerPrototype.php:578
+#: api/classes/CTrigger.php:837 api/classes/CTrigger.php:911
+#: api/classes/CTrigger.php:1001 api/classes/CTriggerPrototype.php:578
 #: api/classes/CUserGroup.php:628 api/classes/CUserMacro.php:347
 #: api/classes/CUserMacro.php:499 api/classes/CUser.php:528
 msgid "Empty input parameter."
@@ -5639,7 +5639,7 @@ msgstr "Niemiecki (de_DE)"
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:555
 msgid "Get content of web page. Default path is /"
-msgstr ""
+msgstr "Pobierz zawartość strony www. Domyślna ścieżka to /"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:515
@@ -5649,7 +5649,7 @@ msgstr "Pobierz zawartość podanego pliku."
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:563
 msgid "Get first occurrence of regexp in web page. Default path is /"
-msgstr ""
+msgstr "Pobierz pierwsze wystąpienie wyrażenia regularnego ze strony www. Domyślna ścieżka to /"
 
 #: include/page_header.php:194
 msgid "Get support"
@@ -5658,7 +5658,7 @@ msgstr "Uzyskaj pomoc"
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:559
 msgid "Get timing of loading full web page. Default path is /"
-msgstr ""
+msgstr "Pobierz czas ładowania pełnej strony www. Domyślna ścieżka to /"
 
 #: include/func.inc.php:680
 msgid "Giga"
@@ -7588,7 +7588,7 @@ msgstr "Błędna kolejność sorder dla usługi \"%1$s\"."
 #: include/func.inc.php:1430
 #, c-format
 msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
-msgstr ""
+msgstr "Niewłaściwy kierunek sortowania \"%1$s\", musi być albo \"%2$s\" albo \"%3$s\"."
 
 #: api/classes/CEvent.php:363
 msgid "Incorrect source value."
@@ -8718,7 +8718,7 @@ msgstr "Logowanie"
 
 #: include/views/general.login.php:80
 msgid "Login as Guest"
-msgstr "Zalogowany jako Gość"
+msgstr "Zaloguj jako Gość"
 
 #: api/classes/CUser.php:1075
 #, c-format
@@ -10212,8 +10212,8 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CService.php:1051 api/classes/CService.php:1066
 #: api/classes/CTemplateScreen.php:556 api/classes/CTemplateScreen.php:607
 #: api/classes/CTemplateScreen.php:659 api/classes/CTemplateScreen.php:665
-#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:936
-#: api/classes/CTrigger.php:957 api/classes/CTrigger.php:1843
+#: api/classes/CTrigger.php:593 api/classes/CTrigger.php:930
+#: api/classes/CTrigger.php:951 api/classes/CTrigger.php:1828
 #: api/classes/CTriggerPrototype.php:504 api/classes/CTriggerPrototype.php:592
 #: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
 #: api/classes/CUser.php:628 api/classes/CUser.php:807
@@ -10387,7 +10387,7 @@ msgstr "Nie zatw."
 msgid "Not Templated items"
 msgstr "Brak pozycji szablonowych"
 
-#: api/classes/CTrigger.php:1461
+#: api/classes/CTrigger.php:1446
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nie wszystkie szablony są połączone z \"%s\"."
@@ -10785,7 +10785,7 @@ msgstr "Tylko administrator Zabbixa może usuwać media użytkownika."
 
 #: api/classes/CDRule.php:254
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
-msgstr ""
+msgstr "Tylko kontrole agenta Zabbix, SNMPv1, SNMPv2 i SNMPv3 mogą być unikalne."
 
 #: include/blocks.inc.php:827
 msgid "Only items assigned to enabled hosts are counted"
@@ -12889,9 +12889,9 @@ msgstr "Wyświetl"
 #, c-format
 msgid "Show all (%1$s day)"
 msgid_plural "Show all (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Wyświetl wszystkie (%1$s dzień)"
+msgstr[1] "Wyświetl wszystkie (%1$s dni)"
+msgstr[2] "Wyświetl wszystkie (%1$s dni)"
 
 #: include/views/common.filter.trigger.php:143 latest.php:310
 msgid "Show details"
@@ -12972,9 +12972,9 @@ msgstr "Wyświetl wyzwalacze"
 #, c-format
 msgid "Show unacknowledged (%1$s day)"
 msgid_plural "Show unacknowledged (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Wyświetl niepotwierdzone (%1$s dzień)"
+msgstr[1] "Wyświetl niepotwierdzone (%1$s dni)"
+msgstr[2] "Wyświetl niepotwierdzone (%1$s dni)"
 
 #: include/views/configuration.item.edit.php:382
 #: include/views/configuration.item.massupdate.php:447
@@ -13979,7 +13979,7 @@ msgstr "Wyzwalacz \"%1$s\" zależy od wyzwalacza \"%2$s\", którego nie ma."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Pominięto wyzwalacz \"%1$s\" - reguła użytkownika."
 
-#: api/classes/CTrigger.php:1600
+#: api/classes/CTrigger.php:1585
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
@@ -13988,7 +13988,7 @@ msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
 msgid "Trigger added"
 msgstr "Dodano wyzwalacz"
 
-#: api/classes/CTrigger.php:1504
+#: api/classes/CTrigger.php:1489
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Wyzwalacz nie może zależeć od wyzwalacza, który z niego dziedziczy."
 
@@ -14705,7 +14705,7 @@ msgstr "Zaktualizowano: Pozycja \"%1$s\" w \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Zaktualizowano: Prototyp pozycji \"%1$s\" w \"%2$s\"."
 
-#: api/classes/CTrigger.php:1254
+#: api/classes/CTrigger.php:1239
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Zaktualizowano: Wyzwalacz \"%1$s\" w \"%2$s\"."
@@ -14935,7 +14935,7 @@ msgstr "Użytkownik o aliasie \"%s\" już istnieje."
 #: include/views/configuration.host.prototype.edit.php:276
 #: include/views/general.login.php:66 index.php:32
 msgid "Username"
-msgstr "Nazwa użytkownika"
+msgstr "Login"
 
 #: include/menu.inc.php:242
 #: include/views/administration.usergroups.edit.php:54

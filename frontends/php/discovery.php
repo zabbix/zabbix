@@ -37,7 +37,7 @@ check_fields($fields);
 validate_sort_and_sortorder('ip', ZBX_SORT_UP, array('ip'));
 
 // check discovery for existing if defined druleid
-if ($druleid = get_request('druleid')) {
+if ($druleid = getRequest('druleid')) {
 	$dbDRule = API::DRule()->get(array(
 			'druleids' => $druleid,
 			'countOutput' => true
@@ -52,16 +52,16 @@ if ($druleid = get_request('druleid')) {
  */
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
-	'druleid' => get_request('druleid', 0),
-	'sort' => get_request('sort'),
-	'sortorder' => get_request('sortorder'),
+	'druleid' => getRequest('druleid', 0),
+	'sort' => getRequest('sort'),
+	'sortorder' => getRequest('sortorder'),
 	'services' => array(),
 	'drules' => array()
 );
 
 $data['pageFilter'] = new CPageFilter(array(
 	'drules' => array('filter' => array('status' => DRULE_STATUS_ACTIVE)),
-	'druleid' => get_request('druleid', null)
+	'druleid' => getRequest('druleid')
 ));
 
 if ($data['pageFilter']->drulesSelected) {
