@@ -29,14 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once dirname(__FILE__).'/include/func.inc.php';
-require_once dirname(__FILE__).'/include/classes/class.chttp_request.php';
+require_once dirname(__FILE__) . '/include/classes/class.chttp_request.php';
 
 $allowed_content = array(
 	'application/json-rpc' => 'json-rpc',
 	'application/json' => 'json-rpc',
 	'application/jsonrequest' => 'json-rpc',
 );
-$http_request = new CHTTP_request();
+$http_request = new CHttpRequest();
 $content_type = $http_request->header('Content-Type');
 $content_type = explode(';', $content_type);
 $content_type = $content_type[0];

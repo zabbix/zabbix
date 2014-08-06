@@ -105,11 +105,11 @@ class GlobalRegexpTest extends PHPUnit_Framework_TestCase
 	public function testMatchExpressions ($expression, $successValues, $failValues)
 	{
 		foreach ($successValues as $successValue) {
-			$this->assertTrue(GlobalRegExp::matchExpression($expression, $successValue), 'Value: '.$successValue);
+			$this->assertTrue(CGlobalRegexp::matchExpression($expression, $successValue), 'Value: '.$successValue);
 		}
 
 		foreach ($failValues as $failValue) {
-			$this->assertNotTrue(GlobalRegExp::matchExpression($expression, $failValue), 'Value: '.$failValue);
+			$this->assertNotTrue(CGlobalRegexp::matchExpression($expression, $failValue), 'Value: '.$failValue);
 		}
 	}
 

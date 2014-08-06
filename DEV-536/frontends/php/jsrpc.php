@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
-	$http_request = new CHTTP_request();
+	$http_request = new CHttpRequest();
 	$json = new CJSON();
 	$data = $json->decode($http_request->body(), true);
 }
