@@ -619,24 +619,7 @@ function convert_units($options = array()) {
 		return trim($options['value'].' '.$options['units']);
 	}
 
-	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
-		switch ($options['units']) {
-			case 'Bps':
-			case 'B':
-				$step = 1024;
-				break;
-			case 'b':
-			case 'bps':
-			default:
-				$step = 1000;
-		}
-
-	if ($options['value'] < 0) {
-		$abs = bcmul($options['value'], '-1');
-	}
-	else {
-		$abs = $options['value'];
-	}
+	$abs = bcabs($options['value']);
 
 	if (bccomp($abs, 1) == -1) {
 		$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
@@ -646,59 +629,17 @@ function convert_units($options = array()) {
 		return trim($options['value'].' '.$options['units']);
 	}
 
-	// init intervals
-	static $digitUnits;
-	if (is_null($digitUnits)) {
-		$digitUnits = array();
-	}
 
-	if (!isset($digitUnits[$step])) {
-		$digitUnits[$step] = array(
-			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _x('K', 'Kilo short')),
-			array('pow' => 2, 'short' => _x('M', 'Mega short')),
-			array('pow' => 3, 'short' => _x('G', 'Giga short')),
-			array('pow' => 4, 'short' => _x('T', 'Tera short')),
-			array('pow' => 5, 'short' => _x('P', 'Peta short')),
-			array('pow' => 6, 'short' => _x('E', 'Exa short')),
-			array('pow' => 7, 'short' => _x('Z', 'Zetta short')),
-			array('pow' => 8, 'short' => _x('Y', 'Yotta short'))
-		);
+	$step = (isBinaryUnit($options['units'])) ? 1024 : 1000;
+	$power = ($options['pow'] !== false) ? $options['pow'] : detectPower($options['value'], $step);
 
-		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip milli & micro for values without units
-			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
-		}
-	}
+	$options['value'] = bcdiv(
+		sprintf('%.10f',$options['value']), sprintf('%.10f', bcpow($step, $power)), ZBX_PRECISION_10
+	);
 
+	$desc = ($power > 0) ? powerPrefix($power) : '';
 
-	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $options['value']);
-
-	if ($options['pow'] === false || $options['value'] == 0) {
-		foreach ($digitUnits[$step] as $dnum => $data) {
-			if (bccomp($abs, $data['value']) > -1) {
-				$valUnit = $data;
-			}
-			else {
-				break;
-			}
-		}
-	}
-	else {
-		foreach ($digitUnits[$step] as $data) {
-			if ($options['pow'] == $data['pow']) {
-				$valUnit = $data;
-				break;
-			}
-		}
-	}
-
-	$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
-		, ZBX_PRECISION_10);
-
-	$desc = $valUnit['short'];
-
-	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
+	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($options['value'],
 		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 
 	$options['value'] = rtrim($options['value'], '.');
@@ -711,6 +652,70 @@ function convert_units($options = array()) {
 	return trim(sprintf('%s %s%s', $options['length']
 		? sprintf('%.'.$options['length'].'f',$options['value'])
 		: $options['value'], $desc, $options['units']));
+}
+
+/**
+ * Returns true if the unit is binary.
+ *
+ * @param string $unit
+ *
+ * @return bool
+ */
+function isBinaryUnit($unit) {
+	return ($unit === 'B' || $unit === 'Bps');
+}
+
+/**
+ * Returns the prefix for the corresponding power
+ *
+ * @param int $power
+ *
+ * @return string
+ */
+function powerPrefix($power) {
+	$prefixes = array(
+		1 => _x('K', 'Kilo short'),
+		_x('M', 'Mega short'),
+		_x('G', 'Giga short'),
+		_x('T', 'Tera short'),
+		_x('P', 'Peta short'),
+		_x('E', 'Exa short'),
+		_x('Z', 'Zetta short'),
+		_x('Y', 'Yotta short')
+	);
+
+	return $prefixes[$power];
+}
+
+/**
+ * Returns the nearest power which will result in a number lower than $number with respect to the given $base.
+ *
+ * @param int $number
+ * @param int $base
+ *
+ * @return int
+ */
+function detectPower($number, $base) {
+	$number = bcabs($number);
+
+	static $powers = array();
+	if (!isset($powers[$base])) {
+		foreach (range(1, 9) as $power) {
+			$powers[$base][$power] = bcpow($base, $power, 9);
+		}
+	}
+
+	$result = 0;
+	foreach ($powers[$base] as $power => $powerValue) {
+		if (bccomp($number, $powerValue) > -1) {
+			$result = $power;
+		}
+		else {
+			break;
+		}
+	}
+
+	return $result;
 }
 
 /**
@@ -1683,6 +1688,17 @@ function bcceil($number) {
 	}
 
 	return $number == '-0' ? '0' : $number;
+}
+
+/**
+ * Returns the absolute value of the number.
+ *
+ * @param string $number
+ *
+ * @return string
+ */
+function bcabs($number) {
+	return ($number < 0) ? bcmul($number, '-1') : $number;
 }
 
 /**
