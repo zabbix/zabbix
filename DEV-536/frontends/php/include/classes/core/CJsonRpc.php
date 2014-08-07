@@ -19,7 +19,7 @@
 **/
 
 
-class CJSONrpc {
+class CJsonRpc {
 
 	const VERSION = '2.0';
 
