@@ -857,7 +857,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 	$newFunctions = array();
 	$functions = array();
 	$items = array();
-	$triggerFunctionValidator = new CTriggerFunctionValidator();
+	$triggerFunctionValidator = new CFunctionValidator();
 
 	foreach ($expressionData->expressions as $exprPart) {
 		if (isset($newFunctions[$exprPart['expression']])) {

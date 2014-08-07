@@ -19,7 +19,7 @@
 **/
 
 
-class GlobalRegexpTest extends PHPUnit_Framework_TestCase
+class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 {
 	public function dataProvider()
 	{
