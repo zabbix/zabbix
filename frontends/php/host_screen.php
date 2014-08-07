@@ -73,11 +73,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Display
  */
 $data = array(
-	'hostid' => get_request('hostid', 0),
+	'hostid' => getRequest('hostid', 0),
 	'fullscreen' => $_REQUEST['fullscreen'],
-	'screenid' => get_request('screenid', CProfile::get('web.hostscreen.screenid', null)),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'screenid' => getRequest('screenid', CProfile::get('web.hostscreen.screenid', null)),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 );
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 
