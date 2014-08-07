@@ -192,6 +192,8 @@ class ZBase {
 		return array(
 			$this->rootDir.'/include/classes/core',
 			$this->rootDir.'/include/classes/api',
+			$this->rootDir.'/include/classes/api/services',
+			$this->rootDir.'/include/classes/api/managers',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
 			$this->rootDir.'/include/classes/db',
@@ -233,10 +235,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/setup',
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
-			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/api/classes',
-			$this->rootDir.'/api/classes/managers',
-			$this->rootDir.'/api/rpc'
+			$this->rootDir.'/include/classes/pagefilter'
 		);
 	}
 
