@@ -586,6 +586,8 @@ function convert_units($options = array()) {
 
 	$options = zbx_array_merge($defOptions, $options);
 
+	$options['units'] = trim($options['units']);
+
 	// special processing for unix timestamps
 	if ($options['units'] == 'unixtime') {
 		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $options['value']);
@@ -622,11 +624,9 @@ function convert_units($options = array()) {
 			case 'Bps':
 			case 'B':
 				$step = 1024;
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
 				break;
 			case 'b':
 			case 'bps':
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
 			default:
 				$step = 1000;
 		}
@@ -655,14 +655,14 @@ function convert_units($options = array()) {
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
 			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
-			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
-			array('pow' => 3, 'short' => _x('G', 'Giga short'), 'long' => _('Giga')),
-			array('pow' => 4, 'short' => _x('T', 'Tera short'), 'long' => _('Tera')),
-			array('pow' => 5, 'short' => _x('P', 'Peta short'), 'long' => _('Peta')),
-			array('pow' => 6, 'short' => _x('E', 'Exa short'), 'long' => _('Exa')),
-			array('pow' => 7, 'short' => _x('Z', 'Zetta short'), 'long' => _('Zetta')),
-			array('pow' => 8, 'short' => _x('Y', 'Yotta short'), 'long' => _('Yotta'))
+			array('pow' => 1, 'short' => _x('K', 'Kilo short')),
+			array('pow' => 2, 'short' => _x('M', 'Mega short')),
+			array('pow' => 3, 'short' => _x('G', 'Giga short')),
+			array('pow' => 4, 'short' => _x('T', 'Tera short')),
+			array('pow' => 5, 'short' => _x('P', 'Peta short')),
+			array('pow' => 6, 'short' => _x('E', 'Exa short')),
+			array('pow' => 7, 'short' => _x('Z', 'Zetta short')),
+			array('pow' => 8, 'short' => _x('Y', 'Yotta short'))
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
@@ -693,19 +693,10 @@ function convert_units($options = array()) {
 		}
 	}
 
-	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) > 0) {
-		$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
-			, ZBX_PRECISION_10);
-	}
-	else {
-		$valUnit['value'] = 0;
-	}
+	$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
+		, ZBX_PRECISION_10);
 
-	switch ($options['convert']) {
-		case 0: $options['units'] = trim($options['units']);
-		case 1: $desc = $valUnit['short']; break;
-		case 2: $desc = $valUnit['long']; break;
-	}
+	$desc = $valUnit['short'];
 
 	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
 		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
