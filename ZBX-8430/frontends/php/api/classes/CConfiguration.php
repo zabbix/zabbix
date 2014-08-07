@@ -73,7 +73,14 @@ class CConfiguration extends CApiService {
 	 */
 	public function import($params) {
 		$importReader = CImportReaderFactory::getReader($params['format']);
-		$configurationImport = new CConfigurationImport($params['source'], $params['rules']);
+
+		$configurationImport = new CConfigurationImport(
+			$params['source'],
+			$params['rules'],
+			new CImportReferencer(),
+			new CImportedObjectContainer(),
+			new CTriggerExpression()
+		);
 		$configurationImport->setReader($importReader);
 
 		return $configurationImport->import();

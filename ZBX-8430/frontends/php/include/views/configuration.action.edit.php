@@ -1007,7 +1007,7 @@ if (!empty($this->data['new_operation'])) {
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 
-		$new_opcondition = get_request('new_opcondition', array());
+		$new_opcondition = getRequest('new_opcondition', array());
 		if (!is_array($new_opcondition)) {
 			$new_opcondition = array();
 		}

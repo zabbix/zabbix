@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$requestType = get_request('type', PAGE_TYPE_JSON);
+$requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
 	$http_request = new CHTTP_request();
 	$json = new CJSON();

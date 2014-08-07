@@ -42,8 +42,8 @@ check_fields($fields);
 $resize = false;
 if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 	$resize = true;
-	$width = get_request('width', 0);
-	$height = get_request('height', 0);
+	$width = getRequest('width', 0);
+	$height = getRequest('height', 0);
 }
 
 if (isset($_REQUEST['css'])) {
@@ -75,7 +75,7 @@ if (isset($_REQUEST['css'])) {
 	echo $css;
 }
 elseif (isset($_REQUEST['iconid'])) {
-	$iconid = get_request('iconid', 0);
+	$iconid = getRequest('iconid', 0);
 
 	if ($iconid > 0) {
 		$image = get_image_by_imageid($iconid);
@@ -93,7 +93,7 @@ elseif (isset($_REQUEST['iconid'])) {
 	imageOut($source);
 }
 elseif (isset($_REQUEST['imageid'])) {
-	$imageid = get_request('imageid', 0);
+	$imageid = getRequest('imageid', 0);
 
 	session_start();
 	if (isset($_SESSION['image_id'][$imageid])) {
