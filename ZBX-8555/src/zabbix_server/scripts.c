@@ -338,8 +338,12 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 							error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
-					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT);
+					if (NULL == result)
+						ret = zbx_execute_quiet(script->command, error, max_error_len,
+								CONFIG_TRAPPER_TIMEOUT);
+					else
+						ret = zbx_execute(script->command, result, error, max_error_len,
+								CONFIG_TRAPPER_TIMEOUT);
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option [%d]",
