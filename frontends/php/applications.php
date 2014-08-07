@@ -73,13 +73,13 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -115,12 +115,15 @@ if (isset($_REQUEST['save'])) {
 			_('Application').' ['.$_REQUEST['appname'].'] ['.$applicationId.']'
 		);
 		unset($_REQUEST['form']);
-		clearCookies($dbApplications, $_REQUEST['hostid']);
 	}
 
 	unset($_REQUEST['save']);
 
 	$result = DBend($dbApplications);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
@@ -148,13 +151,16 @@ elseif (isset($_REQUEST['delete'])) {
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 		show_messages($result, _('Application deleted'), _('Cannot delete application'));
-		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$result = true;
-	$applications = get_request('applications', array());
+	$applications = getRequest('applications', array());
 	$deleted = 0;
 
 	DBstart();
@@ -183,12 +189,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 		$deleted++;
 	}
 
-	$messageSuccess = _n('Application deleted', 'Applications deleted', $deleted);
-	$messageFailed = _n('Cannot delete application', 'Cannot delete applications', $deleted);
-
 	$result = DBend($result);
-	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $_REQUEST['hostid']);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result,
+		_n('Application deleted', 'Applications deleted', $deleted),
+		_n('Cannot delete application', 'Cannot delete applications', $deleted)
+	);
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	$result = true;
@@ -222,8 +231,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		? _n('Cannot enable item', 'Cannot enable items', $updated)
 		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
+	if ($result) {
+		uncheckTableRows($hostId);
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $hostId);
 }
 
 /*
@@ -231,10 +242,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'applicationid' => get_request('applicationid'),
-		'groupid' => get_request('groupid', 0),
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0)
+		'applicationid' => getRequest('applicationid'),
+		'groupid' => getRequest('groupid', 0),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0)
 	);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
@@ -245,8 +256,8 @@ if (isset($_REQUEST['form'])) {
 
 	}
 	else {
-		$data['appname'] = get_request('appname', '');
-		$data['hostid'] = get_request('hostid');
+		$data['appname'] = getRequest('appname', '');
+		$data['hostid'] = getRequest('hostid');
 	}
 
 	// render view
@@ -259,8 +270,8 @@ else {
 		'pageFilter' => new CPageFilter(array(
 			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
-			'hostid' => get_request('hostid'),
-			'groupid' => get_request('groupid')
+			'hostid' => getRequest('hostid'),
+			'groupid' => getRequest('groupid')
 		))
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;

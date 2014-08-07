@@ -61,7 +61,7 @@ $mapPainter = new CMapPainter($map, array(
 		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
 	),
 	'grid' => array(
-		'size' => get_request('grid', 0)
+		'size' => getRequest('grid', 0)
 	)
 ));
 
@@ -90,7 +90,7 @@ $y = imagesy($im);
 $json = new CJSON();
 
 if (isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])) {
-	$map['selements'] = get_request('selements', '[]');
+	$map['selements'] = getRequest('selements', '[]');
 	$map['selements'] = $json->decode($map['selements'], true);
 }
 else {
@@ -98,11 +98,11 @@ else {
 }
 
 if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
-	$map['links'] = get_request('links', '[]');
+	$map['links'] = getRequest('links', '[]');
 	$map['links'] = $json->decode($map['links'], true);
 }
 
-if (get_request('nocalculations', false)) {
+if (getRequest('nocalculations', false)) {
 	foreach ($map['selements'] as $selement) {
 		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
 			add_elementNames($map['selements']);
@@ -154,7 +154,7 @@ else {
 	add_triggerExpressions($map['selements']);
 
 	$areas = populateFromMapAreas($map);
-	$mapInfo = getSelementsInfo($map, array('severity_min' => get_request('severity_min')));
+	$mapInfo = getSelementsInfo($map, array('severity_min' => getRequest('severity_min')));
 	processAreasCoordinates($map, $areas, $mapInfo);
 	$allLinks = false;
 }
@@ -169,7 +169,7 @@ if (!isset($_REQUEST['noselements'])) {
 	drawMapSelements($im, $map, $mapInfo);
 }
 
-$expandMacros = get_request('expand_macros', true);
+$expandMacros = getRequest('expand_macros', true);
 drawMapLabels($im, $map, $mapInfo, $expandMacros);
 drawMapLinkLabels($im, $map, $mapInfo, $expandMacros);
 
@@ -179,7 +179,7 @@ if (!isset($_REQUEST['noselements']) && $map['markelements'] == 1) {
 
 show_messages();
 
-if (get_request('base64image')) {
+if (getRequest('base64image')) {
 	ob_start();
 	imagepng($im);
 	$imageSource = ob_get_contents();

@@ -94,8 +94,8 @@ $pageFilter = new CPageFilter(array(
 		'monitored_hosts' => true,
 		'with_monitored_triggers' => true
 	),
-	'hostid' => getRequest('hostid', null),
-	'groupid' => getRequest('groupid', null)
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;

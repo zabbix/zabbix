@@ -19,9 +19,9 @@
 **/
 
 
-$action = 'screenedit.php?form=update&screenid='.get_request('screenid');
+$action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
-	$action .= '&screenitemid='.get_request('screenitemid');
+	$action .= '&screenitemid='.getRequest('screenitemid');
 }
 
 // create screen form
@@ -60,20 +60,20 @@ if (isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])) {
 	$maxColumns		= $screenItem['max_columns'];
 }
 else {
-	$resourceType	= get_request('resourcetype', 0);
-	$resourceId		= get_request('resourceid', 0);
-	$width			= get_request('width', 500);
-	$height			= get_request('height', 100);
-	$colspan		= get_request('colspan', 1);
-	$rowspan		= get_request('rowspan', 1);
-	$elements		= get_request('elements', 25);
-	$valign			= get_request('valign', VALIGN_DEFAULT);
-	$halign			= get_request('halign', HALIGN_DEFAULT);
-	$style			= get_request('style', 0);
-	$url			= get_request('url', '');
-	$dynamic		= get_request('dynamic', SCREEN_SIMPLE_ITEM);
-	$sortTriggers	= get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
-	$application	= get_request('application', '');
+	$resourceType	= getRequest('resourcetype', 0);
+	$resourceId		= getRequest('resourceid', 0);
+	$width			= getRequest('width', 500);
+	$height			= getRequest('height', 100);
+	$colspan		= getRequest('colspan', 1);
+	$rowspan		= getRequest('rowspan', 1);
+	$elements		= getRequest('elements', 25);
+	$valign			= getRequest('valign', VALIGN_DEFAULT);
+	$halign			= getRequest('halign', HALIGN_DEFAULT);
+	$style			= getRequest('style', 0);
+	$url			= getRequest('url', '');
+	$dynamic		= getRequest('dynamic', SCREEN_SIMPLE_ITEM);
+	$sortTriggers	= getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
+	$application	= getRequest('application', '');
 	$maxColumns		= getRequest('max_columns', 3);
 }
 
@@ -578,7 +578,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
  * Screen item: Clock
  */
 elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
-	$caption = get_request('caption', '');
+	$caption = getRequest('caption', '');
 
 	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
 		$items = API::Item()->get(array(
