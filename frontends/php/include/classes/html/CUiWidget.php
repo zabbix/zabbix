@@ -19,7 +19,7 @@
 **/
 
 
-class CUIWidget extends CDiv {
+class CUiWidget extends CDiv {
 
 	/**
 	 * Widget id.

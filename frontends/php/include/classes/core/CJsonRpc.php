@@ -41,7 +41,7 @@ class CJsonRpc {
 	public function __construct(CApiClient $apiClient, $jsonData) {
 		$this->apiClient = $apiClient;
 
-		$this->json = new CJSON();
+		$this->json = new CJson();
 		$this->initErrors();
 
 		$this->_error = false;
