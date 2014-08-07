@@ -1,6 +1,7 @@
 Changes for 2.3.4
 
 New features:
+....I..PS. [ZBXNEXT-2359] made server and proxy refuse to start if StartPollersUnreachable=0, but other pollers are started (asaveljevs)
 ....I..PS. [ZBX-8557] implemented housekeeper 30 minutes startup delay (Arturs)
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
