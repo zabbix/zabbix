@@ -2429,10 +2429,10 @@ class CAction extends CApiService {
 			);
 		}
 		if (!API::Proxy()->isWritable($proxyIdsAll)) {
-//			self::exception(
-//				ZBX_API_ERROR_PARAMETERS,
-//				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-//			);
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
+			);
 		}
 	}
 }
