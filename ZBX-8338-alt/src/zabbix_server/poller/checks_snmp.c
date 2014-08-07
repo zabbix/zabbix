@@ -648,7 +648,7 @@ static int	zbx_snmp_print_oid(char *buffer, size_t buffer_len, const oid *objid,
 }
 
 static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len,
-		size_t root_string_len, size_t root_numeric_len, const oid *root_objid, size_t root_objid_len)
+		size_t root_string_len, size_t root_numeric_len)
 {
 	const char	*__function_name = "zbx_snmp_choose_index";
 
@@ -927,8 +927,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				}
 
 				if (SUCCEED != zbx_snmp_choose_index(snmp_oid, sizeof(snmp_oid), var->name,
-						var->name_length, root_string_len, root_numeric_len, rootOID,
-						rootOID_len))
+						var->name_length, root_string_len, root_numeric_len))
 				{
 					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_choose_index():"
 							" cannot choose appropriate index while walking for"
