@@ -5,6 +5,7 @@ New features:
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+A......... [ZBX-8430] fixed SQL errors in drule.delete API method (Andrejs)
 A.F....... [ZBX-8510] fixed possible deadlocks when updating IT services (Pavels, Sasha)
 
 --------------------------------------------------------------------------------
