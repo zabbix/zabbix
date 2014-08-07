@@ -290,7 +290,7 @@ exit:
  * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
  * Parameters: command       - [IN] command for execution                     *
- *             buffer        - [OUT] buffer for output, if NULL - ignored     *
+ *             buffer        - [OUT] buffer for output                        *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *             timeout       - [IN] command execution timeout                 *
@@ -320,11 +320,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	*error = '\0';
 
-	if (NULL != buffer)
-	{
-		*buffer = zbx_realloc(*buffer, buf_size);
-		**buffer = '\0';
-	}
+	*buffer = zbx_realloc(*buffer, buf_size);
+	**buffer = '\0';
 
 #ifdef _WINDOWS
 
@@ -395,8 +392,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	if (NULL != buffer)
-		ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
+	ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
 
 	if (TIMEOUT_ERROR != ret)
 	{
@@ -437,14 +433,11 @@ close:
 		int	rc = 0;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
 
-		if (NULL != buffer)
+		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
+				MAX_EXECUTE_OUTPUT_LEN > offset + rc)
 		{
-			while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
-					MAX_EXECUTE_OUTPUT_LEN > offset + rc)
-			{
-				tmp_buf[rc] = '\0';
-				zbx_strcpy_alloc(buffer, &buf_size, &offset, tmp_buf);
-			}
+			tmp_buf[rc] = '\0';
+			zbx_strcpy_alloc(buffer, &buf_size, &offset, tmp_buf);
 		}
 
 		close(fd);
