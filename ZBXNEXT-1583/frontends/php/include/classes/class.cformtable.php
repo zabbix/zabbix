@@ -42,7 +42,7 @@ class CFormTable extends CForm {
 		$this->setTitle($title);
 
 		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
-		$this->addVar($form_variable, get_request($form_variable, 1));
+		$this->addVar($form_variable, getRequest($form_variable, 1));
 
 		$this->bottom_items = new CCol(SPACE, 'form_row_last');
 		$this->bottom_items->setColSpan(2);
