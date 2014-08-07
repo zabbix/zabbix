@@ -22,7 +22,7 @@
 /**
  * A class for rendering a widget that can be collapsed or expanded.
  */
-class CCollapsibleUIWidget extends CUIWidget {
+class CCollapsibleUiWidget extends CUiWidget {
 
 	/**
 	 * Expand/collapse widget.
