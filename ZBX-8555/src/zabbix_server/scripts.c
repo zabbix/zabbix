@@ -339,7 +339,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 					if (NULL == result)
-						ret = zbx_execute_quiet(script->command, error, max_error_len,
+						ret = zbx_execute_silent(script->command, error, max_error_len,
 								CONFIG_TRAPPER_TIMEOUT);
 					else
 						ret = zbx_execute(script->command, result, error, max_error_len,

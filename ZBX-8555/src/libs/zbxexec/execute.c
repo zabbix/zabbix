@@ -24,8 +24,10 @@
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
 
+#ifndef _WINDOWS
 #define RUN_SILENT		(1 << 0)
-#define SET_GROUP_LEADER	(1 << 1)
+#define SET_AS_GROUP_LEADER	(1 << 1)
+#endif
 
 #ifdef _WINDOWS
 
@@ -121,30 +123,30 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_run                                                          *
+ * Function: zbx_exec                                                         *
  *                                                                            *
  * Purpose: substitute current process with shell running command provided in *
  *          parameters                                                        *
  *                                                                            *
- * Parameters: command - [in] actual command to in in shell                   *
- *             flags   - [in] run options. Possible flags:                    *
+ * Parameters: command - [IN] actual command to in in shell                   *
+ *             flags   - [IN] run options. Possible flags:                    *
  *                            RUN_SILENT       - silent standard output and   *
  *                                               error streams for new process*
- *                            SET_GROUP_LEADER - set new shell as process     *
+ *                            SET_GROUP_LEADER - set new process as process   *
  *                                               group leader                 *
  *                                                                            *
  * Author: Arturs Galapovs                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_run(const char* command, const int flags)
+static void	zbx_exec(const char* command, int flags)
 {
-	const char	*__function_name = "zbx_run";
+	const char	*__function_name = "zbx_exec";
 	extern char*	CONFIG_LOG_FILE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* set the process as a group leader, to be able to kill whole group at once */
-	if ((0 != (flags & SET_GROUP_LEADER)) && (-1 == setpgid(0, 0)))
+	if ((0 != (flags & SET_AS_GROUP_LEADER)) && (-1 == setpgid(0, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
 				__function_name, zbx_strerror(errno));
@@ -154,11 +156,7 @@ static void	zbx_run(const char* command, const int flags)
 	zabbix_log(LOG_LEVEL_DEBUG, "executing script: %s", command);
 
 	if (0 != (flags & RUN_SILENT))
-	{
-		/* XXX: Debug */
-		zabbix_log(LOG_LEVEL_ERR, "EPIC: RUN_SILENT flag is set!!!!");
 		redirect_std(NULL);
-	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -219,7 +217,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
 
-	zbx_run(command, SET_GROUP_LEADER);
+	zbx_exec(command, SET_AS_GROUP_LEADER);
 
 	exit(0); /* warning fix */
 }
@@ -295,6 +293,7 @@ exit:
  *             buffer        - [OUT] buffer for output, if NULL - ignored     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
+ *             timeout       - [IN] command execution timeout                 *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -576,7 +575,7 @@ int	zbx_execute_nowait(const char *command)
 		case 0:
 			/* this is the grand child process */
 
-			zbx_run(command, RUN_SILENT);
+			zbx_exec(command, RUN_SILENT);
 			break;
 		default:
 			/* this is the child process, exit to complete the double fork */
@@ -599,6 +598,7 @@ int	zbx_execute_nowait(const char *command)
  * Parameters: command       - [IN] command for execution                     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
+ *             timeout       - [IN] command execution timeout                 *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -606,100 +606,21 @@ int	zbx_execute_nowait(const char *command)
  * Author: Arturs Galapovs                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_quiet(const char *command, char *error, size_t max_error_len, int timeout)
+int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, int timeout)
 {
 	const char	*__function_name = "zbx_execute_quiet";
 	int		ret = FAIL;
-#ifdef _WINDOWS
-	char			*full_command;
-	STARTUPINFO		si;
-	PROCESS_INFORMATION	pi;
-	LPTSTR			wcommand;
-	HANDLE			job = NULL;
-#else
 	pid_t		pid;
-#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	*error = '\0';
-
-#ifdef _WINDOWS
-
-	full_command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
-	wcommand = zbx_utf8_to_unicode(full_command);
-
-	/* fill in process startup info structure */
-	memset(&si, 0, sizeof(si));
-	si.cb = sizeof(si);
-	si.hStdInput = NULL;
-	si.hStdOutput = NULL;
-	si.hStdError = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing [%s]", __function_name, full_command);
-
-	/* create a new job where the script will be executed */
-	if (NULL == (job = CreateJobObject(NULL, NULL)))
-	{
-		zbx_snprintf(error, max_error_len, "unable to create a job: %s", strerror_from_system(GetLastError()));
-		goto close;
-	}
-
-	/* create the new process */
-	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
-	{
-		zbx_snprintf(error, max_error_len, "unable to create process [%s]: %s",
-				cmd, strerror_from_system(GetLastError()));
-		goto close;
-	}
-
-	/* assign the new process to the created job */
-	if (0 == AssignProcessToJobObject(job, pi.hProcess))
-	{
-		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
-				cmd, strerror_from_system(GetLastError()));
-		if (0 == TerminateProcess(pi.hProcess, 0))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to terminate [%s]: %s",
-					cmd, strerror_from_system(GetLastError()));
-		}
-	}
-	else if (-1 == ResumeThread(pi.hThread))
-	{
-		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
-				cmd, strerror_from_system(GetLastError()));
-	}
-	else
-		ret = SUCCEED;
-
-	if (FAIL == ret)
-		goto close;
-
-	timeout *= 1000;
-	if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout)
-		ret = TIMEOUT_ERROR;
-
-close:
-	if (NULL != job)
-	{
-		/* terminate the child process and it's childs */
-		if (0 == TerminateJobObject(job, 0))
-			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
-		CloseHandle(job);
-	}
-
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
-	zbx_free(wcommand);
-	zbx_free(full_command);
-
-#else	/* not _WINDOWS */
 
 	if (-1 != (pid = zbx_fork()))
 	{
 		if (0 == pid) /* child */
 		{
-			zbx_run(command, RUN_SILENT | SET_GROUP_LEADER);
+			zbx_exec(command, RUN_SILENT | SET_AS_GROUP_LEADER);
 		}
 		else /* parent */
 		{
@@ -708,7 +629,10 @@ close:
 			if (-1 == zbx_waitpid(pid))
 			{
 				if(EINTR == errno)
+				{
 					ret = TIMEOUT_ERROR;
+					zbx_snprintf(error, max_error_len, "timeout while executing %s", command);
+				}
 				else
 					zbx_snprintf(error, max_error_len, "waitpid() failed: %s",
 							zbx_strerror(errno));
@@ -727,9 +651,6 @@ close:
 	}
 	else
 		zbx_snprintf(error, max_error_len, "fork() failed: %s", zbx_strerror(errno));
-#endif
-	if (TIMEOUT_ERROR == ret)
-		zbx_snprintf(error, max_error_len, "timeout while executing %s", command);
 
 	if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);

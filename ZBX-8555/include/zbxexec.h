@@ -22,7 +22,7 @@
 
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
 int	zbx_execute_nowait(const char *command);
-int	zbx_execute_quite(const char *command, char *error, size_t max_error_len, int timeout);
+int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, int timeout);
 
 
 #endif
