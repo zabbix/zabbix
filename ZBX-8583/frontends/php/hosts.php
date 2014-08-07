@@ -40,6 +40,20 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+var_dump(convert_units(array(
+	'value' => '0.00123456',
+	'units' => '',
+	'convert' => ITEM_CONVERT_WITH_UNITS,
+	'byteStep' => false,
+	'pow' => 1,
+	'ignoreMillisec' => false,
+	'length' => false
+)));
+
+//var_dump(sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', 100000000000));
+//die;
+//var_dump(sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']));
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),

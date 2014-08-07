@@ -579,7 +579,6 @@ function convert_units($options = array()) {
 		'value' => null,
 		'units' => null,
 		'convert' => ITEM_CONVERT_WITH_UNITS,
-		'byteStep' => false,
 		'pow' => false,
 		'ignoreMillisec' => false,
 		'length' => false
@@ -619,10 +618,6 @@ function convert_units($options = array()) {
 	}
 
 	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
-	if ($options['byteStep']) {
-		$step = 1024;
-	}
-	else {
 		switch ($options['units']) {
 			case 'Bps':
 			case 'B':
@@ -635,7 +630,6 @@ function convert_units($options = array()) {
 			default:
 				$step = 1000;
 		}
-	}
 
 	if ($options['value'] < 0) {
 		$abs = bcmul($options['value'], '-1');

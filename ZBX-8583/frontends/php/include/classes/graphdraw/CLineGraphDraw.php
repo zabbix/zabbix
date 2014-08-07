@@ -1574,7 +1574,6 @@ class CLineGraphDraw extends CGraphDraw {
 					$calcValues[] = convert_units(array(
 						'value' => $val,
 						'convert' => ITEM_CONVERT_NO_UNITS,
-						'byteStep' => $byteStep,
 						'pow' => $newPow
 					));
 				}
@@ -1582,7 +1581,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$calcValues[] = convert_units(array(
 					'value' => $maxY,
 					'convert' => ITEM_CONVERT_NO_UNITS,
-					'byteStep' => $byteStep,
 					'pow' => $newPow
 				));
 
@@ -1602,7 +1600,6 @@ class CLineGraphDraw extends CGraphDraw {
 					'value' => $val,
 					'units' => $units,
 					'convert' => ITEM_CONVERT_NO_UNITS,
-					'byteStep' => $byteStep,
 					'pow' => $newPow,
 					'ignoreMillisec' => $ignoreMillisec,
 					'length' => $maxLength
@@ -1634,7 +1631,6 @@ class CLineGraphDraw extends CGraphDraw {
 				'value' => $maxY,
 				'units' => $units,
 				'convert' => ITEM_CONVERT_NO_UNITS,
-				'byteStep' => $byteStep,
 				'pow' => $newPow,
 				'ignoreMillisec' => $ignoreMillisec,
 				'length' => $maxLength
