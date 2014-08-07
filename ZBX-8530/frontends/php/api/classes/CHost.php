@@ -833,9 +833,6 @@ class CHost extends CHostGeneral {
 				$host['inventory'] = $inventory;
 			}
 
-			API::HostInterface()->replaceHostInterfaces($host);
-			unset($host['interfaces']);
-
 			if (isset($host['macros'])) {
 				$macros[$host['hostid']] = $host['macros'];
 				unset($host['macros']);
@@ -1077,26 +1074,8 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Update interfaces
+		 * Update template linkage
 		 */
-		if (isset($updateInterfaces)) {
-			$hostInterfaces = API::HostInterface()->get(array(
-				'hostids' => $hostids,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-
-			$this->massRemove(array(
-				'hostids' => $hostids,
-				'interfaces' => $hostInterfaces
-			));
-			$this->massAdd(array(
-				'hosts' => $hosts,
-				'interfaces' => $updateInterfaces
-			));
-		}
-
 		if (isset($updateTemplatesClear)) {
 			$templateidsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
 
@@ -1108,9 +1087,7 @@ class CHost extends CHostGeneral {
 			$templateidsClear = array();
 		}
 
-		/*
-		 * Update template linkage
-		 */
+		// unlink templates
 		if (isset($updateTemplates)) {
 			$hostTemplates = API::Template()->get(array(
 				'hostids' => $hostids,
@@ -1133,11 +1110,27 @@ class CHost extends CHostGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template'));
 				}
 			}
+		}
 
+		/*
+		 * update interfaces
+		 */
+		if (isset($updateInterfaces)) {
+			foreach($hostids as $hostId) {
+				API::HostInterface()->replaceHostInterfaces(array(
+					'hostid' => $hostId,
+					'interfaces' => $updateInterfaces
+				));
+			}
+		}
+
+		// link new templates
+		if (isset($updateTemplates)) {
 			$result = $this->massAdd(array(
 				'hosts' => $hosts,
 				'templates' => $updateTemplates
 			));
+
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot link template'));
 			}
