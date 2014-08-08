@@ -350,6 +350,9 @@ $filterForm->addRow(_('Host groups'), new CMultiSelect(array(
 	'name' => 'groupids[]',
 	'objectName' => 'hostGroup',
 	'data' => $multiSelectHostGroupData,
+	'objectOptions' => array(
+		'real_hosts' => true
+	),
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=filter_groupid'.
 			'&srcfld1=groupid&writeonly=1',
@@ -362,6 +365,9 @@ $filterForm->addRow(_('Hosts'), new CMultiSelect(array(
 	'name' => 'hostids[]',
 	'objectName' => 'hosts',
 	'data' => $multiSelectHostData,
+	'objectOptions' => array(
+		'with_monitored_items' => true
+	),
 	'popup' => array(
 		'parameters' => 'srctbl=host_templates&dstfrm='.$filterForm->getName().'&dstfld1=filter_hostid'.
 			'&srcfld1=hostid&writeonly=1',
