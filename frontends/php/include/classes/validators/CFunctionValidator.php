@@ -19,7 +19,7 @@
 **/
 
 
-class CTriggerFunctionValidator extends CValidator {
+class CFunctionValidator extends CValidator {
 
 	/**
 	 * The array containing valid functions and parameters to them.

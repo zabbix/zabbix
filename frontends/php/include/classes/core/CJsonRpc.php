@@ -19,7 +19,7 @@
 **/
 
 
-class CJSONrpc {
+class CJsonRpc {
 
 	const VERSION = '2.0';
 
@@ -41,7 +41,7 @@ class CJSONrpc {
 	public function __construct(CApiClient $apiClient, $jsonData) {
 		$this->apiClient = $apiClient;
 
-		$this->json = new CJSON();
+		$this->json = new CJson();
 		$this->initErrors();
 
 		$this->_error = false;

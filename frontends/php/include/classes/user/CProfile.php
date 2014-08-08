@@ -1,6 +1,6 @@
 <?php
 /*
- ** Zabbix
+** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
