@@ -718,7 +718,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('name', 'value_type', 'flags'),
+			'output' => array('itemid', 'name', 'value_type', 'flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
 			'filter' => array(
@@ -740,6 +740,11 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				$graph = API::GraphItem()->get(array(
+					'itemids' => $item['itemid'],
+					'output' => array('itemid', 'graphid')
+				));
+				$graph = reset($graph);
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
 				);

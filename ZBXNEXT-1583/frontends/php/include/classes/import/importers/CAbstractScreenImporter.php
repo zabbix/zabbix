@@ -36,16 +36,19 @@ abstract class CAbstractScreenImporter extends CImporter {
 	protected function resolveScreenReferences(array $screen) {
 		if (!empty($screen['screenitems'])) {
 			foreach ($screen['screenitems'] as &$screenItem) {
-				$resource = $screenItem['resource'];
-				if (empty($resource)) {
-					$screenItem['resourceid'] = 0;
-					continue;
-				}
 				if ($screenItem['rowspan'] == 0) {
 					$screenItem['rowspan'] = 1;
 				}
 				if ($screenItem['colspan'] == 0) {
 					$screenItem['colspan'] = 1;
+				}
+				if (!isset($screenItem['max_columns'])) {
+					$screenItem['max_columns'] = SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT;
+				}
+				$resource = $screenItem['resource'];
+				if (empty($resource)) {
+					$screenItem['resourceid'] = 0;
+					continue;
 				}
 				switch ($screenItem['resourcetype']) {
 					case SCREEN_RESOURCE_HOSTS_INFO:
@@ -108,6 +111,30 @@ abstract class CAbstractScreenImporter extends CImporter {
 
 					default:
 						$screenItem['resourceid'] = 0;
+						break;
+
+					case SCREEN_RESOURCE_LLD_GRAPH:
+						$hostId = $this->referencer->resolveHostOrTemplate($resource['host']);
+						$graphPrototypeId = $this->referencer->resolveGraphPrototype($hostId, $resource['name']);
+
+						if (!$graphPrototypeId) {
+							throw new Exception(_s('Cannot find graph prototype "%1$s" used in screen "%2$s".',
+								$resource['name'], $screen['name']));
+						}
+
+						$screenItem['resourceid'] = $graphPrototypeId;
+						break;
+
+					case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+						$hostId = $this->referencer->resolveHostOrTemplate($resource['host']);
+						$itemPrototypeId = $this->referencer->resolveItemPrototype($hostId, $resource['key']);
+
+						if (!$itemPrototypeId) {
+							throw new Exception(_s('Cannot find item prototype "%1$s" used in screen "%2$s".',
+								$resource['host'].':'.$resource['key'], $screen['name']));
+						}
+
+						$screenItem['resourceid'] = $itemPrototypeId;
 						break;
 				}
 
