@@ -582,6 +582,11 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
+		DB::delete('screens_items', array(
+			'resourceid' => $graphids,
+			'resourcetype' => SCREEN_RESOURCE_LLD_GRAPH
+		));
+
 		DB::delete('graphs', array('graphid' => $graphids));
 
 		foreach ($delGraphs as $graph) {
