@@ -148,12 +148,12 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 	$id = 0;
 
 	$graphPrototypes = API::GraphPrototype()->get(array(
+		'output' => array('name'),
 		'graphids' => $resourceId,
-		'selectHosts' => array('hostid', 'name', 'status'),
-		'output' => API_OUTPUT_EXTEND
+		'selectHosts' => array('name')
 	));
 
-	if (!empty($graphPrototypes)) {
+	if ($graphPrototypes) {
 		$id = $resourceId;
 		$graphPrototype = reset($graphPrototypes);
 
@@ -244,9 +244,9 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 	$id = 0;
 
 	$items = API::ItemPrototype()->get(array(
+		'output' => array('hostid', 'key_', 'name'),
 		'itemids' => $resourceId,
-		'selectHosts' => array('name'),
-		'output' => array('itemid', 'hostid', 'key_', 'name')
+		'selectHosts' => array('name')
 	));
 
 	if ($items) {
@@ -663,7 +663,15 @@ else {
 	$screenFormList->addVar('url', '');
 }
 
-if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_URL, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH))) {
+$resourcesWithWidthAndHeight = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if (in_array($resourceType, $resourcesWithWidthAndHeight)) {
 	$screenFormList->addRow(_('Width'), new CNumericBox('width', $width, 5));
 	$screenFormList->addRow(_('Height'), new CNumericBox('height', $height, 5));
 }
@@ -672,8 +680,17 @@ else {
 	$screenFormList->addVar('height', 100);
 }
 
-if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_MAP, SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_URL, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH))) {
-	$hightAlignRadioButton = array(
+$resourcesWithHAlign = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_MAP,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if (in_array($resourceType, $resourcesWithHAlign)) {
+	$hAlignRadioButton = array(
 		new CRadioButton('halign', HALIGN_LEFT, null, 'halign_'.HALIGN_LEFT, $halign == HALIGN_LEFT),
 		new CLabel(_('Left'), 'halign_'.HALIGN_LEFT),
 		new CRadioButton('halign', HALIGN_CENTER, null, 'halign_'.HALIGN_CENTER, $halign == HALIGN_CENTER),
@@ -681,7 +698,7 @@ if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_
 		new CRadioButton('halign', HALIGN_RIGHT, null, 'halign_'.HALIGN_RIGHT, $halign == HALIGN_RIGHT),
 		new CLabel(_('Right'), 'halign_'.HALIGN_RIGHT)
 	);
-	$screenFormList->addRow(_('Horizontal align'), new CDiv($hightAlignRadioButton, 'jqueryinputset'));
+	$screenFormList->addRow(_('Horizontal align'), new CDiv($hAlignRadioButton, 'jqueryinputset'));
 }
 else {
 	$screenFormList->addVar('halign', 0);
@@ -699,12 +716,16 @@ $screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton,
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
-$showDynamic = in_array($resourceType, array(
-	SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-));
-
 // dynamic addon
-if ($this->data['screen']['templateid'] == 0 && $showDynamic) {
+$resourcesWithDynamic = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_PLAIN_TEXT,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourcesWithDynamic)) {
 	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
 }
 
