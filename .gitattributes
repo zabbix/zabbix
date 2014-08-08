@@ -268,6 +268,8 @@ frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/helpers/CConditionHelperTest.php -text
 frontends/php/tests/unit/include/classes/validators/CActionCondValidatorTest.php -text
 frontends/php/tests/unit/include/func/ConvertUnitsTest.php -text
+frontends/php/tests/unit/include/func/ConvertUnitsWithPrefixTest.php -text
+frontends/php/tests/unit/include/func/ConvertUnitsWithoutPrefixTest.php -text
 frontends/php/tests/unit/include/func/DetectPowerTest.php -text
 frontends/php/tests/unit/include/services/CalculateItServiceStatusByTriggerTest.php -text
 man/zabbix_agentd.man -text

@@ -19,38 +19,32 @@
 **/
 
 
-class DetectPowerTest extends PHPUnit_Framework_TestCase {
+class ConvertUnitsWithoutPrefixTest extends PHPUnit_Framework_TestCase {
 
 	public function provider() {
 		return array(
-			array(0, 0),
-			array(1, 0),
-			array(1000, 1),
-			array(1001, 1),
-			array(1999, 1),
-			array(1000000, 2),
-			array('1000000000000000000000000000', 8),
+			array('0', '0'),
+			array('0.015', '0.02'),
+			array('0.00123456', '0.001235'),
+			array('1000000', '1000000'),
+			array('9999999999999999.555', '9999999999999999.56'),
+			array('9999999999999999.55', '9999999999999999.55'),
+			array('1.5500', '1.55'),
 
-			array(-1, 0),
-			array(-1000, 1),
-			array(-1001, 1),
-			array(-1999, 1),
-			array(-1000000, 2),
-			array('-1000000000000000000000000000', 8),
-
-			array(1024 * 1024, 2, 1024)
+			array('10', '10 %', '%'),
+			array('-10', '-10 %', '%')
 		);
 	}
 
 	/**
 	 * @dataProvider provider
 	 *
-	 * @param $number
+	 * @param int $value
 	 * @param $expectedResult
-	 * @param $base
+	 * @param string $unit
 	 */
-	public function test($number, $expectedResult, $base = 1000) {
-		$this->assertEquals($expectedResult, detectPower($number, $base));
+	public function test($value, $expectedResult, $unit = '') {
+		$this->assertEquals($expectedResult, convertUnitsWithoutPrefix($value, $unit));
 	}
 
 }

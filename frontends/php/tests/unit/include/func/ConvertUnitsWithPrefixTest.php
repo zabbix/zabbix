@@ -19,38 +19,45 @@
 **/
 
 
-class DetectPowerTest extends PHPUnit_Framework_TestCase {
+class ConvertUnitsWithPrefixTest extends PHPUnit_Framework_TestCase {
 
 	public function provider() {
 		return array(
-			array(0, 0),
-			array(1, 0),
-			array(1000, 1),
-			array(1001, 1),
-			array(1999, 1),
-			array(1000000, 2),
-			array('1000000000000000000000000000', 8),
+			array('0', '0'),
+			array('0.00005', '0.0001'),
+			array('0.00005', '0.0001'),
+			array('0.00005', '0.00010'),
+			array('1.235', '1.24'),
+			array('1.235', '1.24'),
+			array('9999999999999999.555', '10 P'),
 
-			array(-1, 0),
-			array(-1000, 1),
-			array(-1001, 1),
-			array(-1999, 1),
-			array(-1000000, 2),
-			array('-1000000000000000000000000000', 8),
+			array('1.235', '1.24', '', false, 2),
+			array('1.235', '1.24000', '', false, 5),
 
-			array(1024 * 1024, 2, 1024)
+			array('1000000', '1 M'),
+
+			array('1000000', '1000 KA', 'A', 1),
+			array('1000000', '1.00 MA', 'A', false, 2),
+
+			array(1024 * 1024, '1 MB', 'B'),
+			array(1024 * 1024, '1024 KB', 'B', 1),
+			array(1024 * 1024, '1.00 MB', 'B', false, 2),
+
+			array('-1000000', '-1 MA', 'A')
 		);
 	}
 
 	/**
 	 * @dataProvider provider
 	 *
-	 * @param $number
+	 * @param $value
 	 * @param $expectedResult
-	 * @param $base
+	 * @param string $unit
+	 * @param $power
+	 * @param $scale
 	 */
-	public function test($number, $expectedResult, $base = 1000) {
-		$this->assertEquals($expectedResult, detectPower($number, $base));
+	public function test($value, $expectedResult, $unit = '', $power = false, $scale = false) {
+		$this->assertEquals($expectedResult, convertUnitsWithPrefix($value, $unit, $power, $scale));
 	}
 
 }
