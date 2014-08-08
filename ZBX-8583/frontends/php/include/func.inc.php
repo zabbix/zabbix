@@ -1736,14 +1736,6 @@ function bcabs($number) {
 	return ($number < 0) ? bcmul($number, '-1') : $number;
 }
 
-function bcround($number, $precision = 0) {
-	if ($number[0] != '-') {
-		return bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-	}
-
-	return bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-}
-
 /**
  * Converts number to letter representation.
  * From A to Z, then from AA to ZZ etc.
