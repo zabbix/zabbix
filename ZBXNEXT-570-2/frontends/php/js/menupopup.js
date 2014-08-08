@@ -237,7 +237,7 @@ function getMenuPopupHost(options) {
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+			url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
 		};
 
 		// triggers
