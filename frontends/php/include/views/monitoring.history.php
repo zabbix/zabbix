@@ -27,7 +27,11 @@ $header = array('left' => count($this->data['items']).SPACE._('ITEMS'), 'right' 
 $headerPlaintext = array();
 
 if (count($this->data['items']) == 1) {
-	$header['left'] = array(new CLink($this->data['item']['hostname'], 'latest.php?hostid='.$this->data['item']['hostid']), NAME_DELIMITER, $this->data['item']['name_expanded']);
+	$header['left'] = array(
+		new CLink($this->data['item']['hostname'], 'latest.php?filter_set=1&hostids[]='.$this->data['item']['hostid']),
+		NAME_DELIMITER,
+		$this->data['item']['name_expanded']
+	);
 	$headerPlaintext[] = $this->data['item']['hostname'].NAME_DELIMITER.$this->data['item']['name_expanded'];
 
 	if ($this->data['action'] == 'showgraph') {

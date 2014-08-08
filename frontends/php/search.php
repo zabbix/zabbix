@@ -217,7 +217,7 @@ foreach ($hosts as $hnum => $host) {
 		$hostCell,
 		$hostip,
 		$hostdns,
-		new CLink(_('Latest data'), 'latest.php?'.$link),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$group['groupid'].'&hostids[]='.$hostid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
@@ -324,7 +324,7 @@ foreach ($hostGroups as $hnum => $group) {
 
 	$table->addRow(array(
 		$hgroup_link,
-		new CLink(_('Latest data'), 'latest.php?'.$link),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
