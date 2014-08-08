@@ -19,7 +19,7 @@
 **/
 
 
-class CJSscript extends CObject {
+class CJsScript extends CObject {
 
 	public function __construct($item = null) {
 		$this->items = array();

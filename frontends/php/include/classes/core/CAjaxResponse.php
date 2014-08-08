@@ -22,7 +22,7 @@
 /**
  * Class for standard ajax response generation.
  */
-class AjaxResponse {
+class CAjaxResponse {
 
 	private $_result = true;
 	private $_data = array();
@@ -64,7 +64,7 @@ class AjaxResponse {
 	 * @return void
 	 */
 	public function send() {
-		$json = new CJSON();
+		$json = new CJson();
 
 		if ($this->_result) {
 			echo $json->encode(array('result' => true, 'data' => $this->_data));
