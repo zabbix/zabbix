@@ -603,55 +603,90 @@ function convert_units($options = array()) {
 		return convertUnitsS($options['value'], $options['ignoreMillisec']);
 	}
 
-	// any other unit
-	// black list of units that should have no multiplier prefix (K, M, G etc) applied
-	$blackList = array('%', 'ms', 'rpm', 'RPM');
+	// these specific units and empty units should be converted without using a multiplier, such as K or M.
+	if (in_array($options['units'], array('%', 'ms', 'rpm', 'RPM'))
+			|| (zbx_empty($options['units']) && ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
 
-	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
-			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-			$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-		}
-		$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
-		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
-		$options['value'] = rtrim($options['value'], '.');
-
-		return trim($options['value'].' '.$options['units']);
+		return convertUnitsWithoutPrefix($options['value'], $options['units']);
 	}
 
-	$abs = bcabs($options['value']);
+	// convert the value using a power multiplier
+	return convertUnitsWithPrefix($options['value'], $options['units'], $options['pow'], $options['length']);
+}
 
-	if (bccomp($abs, 1) == -1) {
-		$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
-		$options['value'] = ($options['length'] && $options['value'] != 0)
-			? sprintf('%.'.$options['length'].'f',$options['value']) : $options['value'];
+/**
+ * Format a value without using a power prefix, such as K or M.
+ *
+ * @param $value
+ * @param $unit
+ *
+ * @return string
+ */
+function convertUnitsWithoutPrefix($value, $unit) {
+	if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
+		$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	}
+	else {
+		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
+	}
+	$value = trimDecimal($value);
 
-		return trim($options['value'].' '.$options['units']);
+	return $value.(($unit !== '') ? ' '.$unit : '');
+}
+
+/**
+ * Format a value using a power prefix.
+ *
+ * @param string $value
+ * @param string $units
+ * @param int|bool $power           force the value to a specific power
+ * @param int|bool $length          pad the scale with zeroes to the given length
+ *
+ * @return string
+ */
+function convertUnitsWithPrefix($value, $units, $power = false, $length = false) {
+	// if the value is small enough - round it and return
+	if (bccomp(bcabs($value), 1) == -1) {
+		$value = round($value, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+		$value = ($length && $value != 0) ? sprintf('%.'.$length.'f', $value) : $value;
+
+		return trim($value.' '.$units);
 	}
 
+	// convert the value to the required power
+	$step = (isBinaryUnit($units)) ? 1024 : 1000;
+	$power = ($power !== false) ? $power : detectPower($value, $step);
 
-	$step = (isBinaryUnit($options['units'])) ? 1024 : 1000;
-	$power = ($options['pow'] !== false) ? $options['pow'] : detectPower($options['value'], $step);
-
-	$options['value'] = bcdiv(
-		sprintf('%.10f',$options['value']), sprintf('%.10f', bcpow($step, $power)), ZBX_PRECISION_10
+	$value = bcdiv(
+		sprintf('%.10f', $value), sprintf('%.10f', bcpow($step, $power)), ZBX_PRECISION_10
 	);
 
-	$desc = ($power > 0) ? powerPrefix($power) : '';
+	$powerPrefix = ($power > 0) ? powerPrefix($power) : '';
 
-	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($options['value'],
-		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-
-	$options['value'] = rtrim($options['value'], '.');
+	$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	$value = trimDecimal($value);
 
 	// fix negative zero
-	if (bccomp($options['value'], 0) == 0) {
-		$options['value'] = 0;
+	if (bccomp($value, 0) == 0) {
+		$value = 0;
 	}
 
-	return trim(sprintf('%s %s%s', $options['length']
-		? sprintf('%.'.$options['length'].'f',$options['value'])
-		: $options['value'], $desc, $options['units']));
+	if ($length) {
+		$value = sprintf('%.'.$length.'f', $value);
+	}
+
+	return trim(sprintf('%s %s%s', $value, $powerPrefix, $units));
+}
+
+/**
+ * Trim the trailing zeroes and decimal point.
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function trimDecimal($value) {
+	return rtrim(preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $value), '.');
 }
 
 /**
@@ -700,7 +735,7 @@ function detectPower($number, $base) {
 
 	static $powers = array();
 	if (!isset($powers[$base])) {
-		foreach (range(1, 9) as $power) {
+		foreach (range(1, 8) as $power) {
 			$powers[$base][$power] = bcpow($base, $power, 9);
 		}
 	}
@@ -1699,6 +1734,14 @@ function bcceil($number) {
  */
 function bcabs($number) {
 	return ($number < 0) ? bcmul($number, '-1') : $number;
+}
+
+function bcround($number, $precision = 0) {
+	if ($number[0] != '-') {
+		return bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+	}
+
+	return bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
 }
 
 /**

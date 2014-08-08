@@ -40,16 +40,6 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-var_dump(convert_units(array(
-	'value' => '0.00123456',
-	'units' => '',
-	'convert' => ITEM_CONVERT_WITH_UNITS,
-	'byteStep' => false,
-	'pow' => 1,
-	'ignoreMillisec' => false,
-	'length' => false
-)));
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
