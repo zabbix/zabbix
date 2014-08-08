@@ -740,7 +740,7 @@ if (isset($data['insert'])) {
 				$expressionData = reset($triggerExpression->expressions);
 
 				// validate trigger function
-				$triggerFunctionValidator = new CTriggerFunctionValidator();
+				$triggerFunctionValidator = new CFunctionValidator();
 				$isValid = $triggerFunctionValidator->validate(array(
 					'function' => $expressionData['function'],
 					'functionName' => $expressionData['functionName'],
