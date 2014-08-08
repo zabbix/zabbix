@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'itemid' =>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -41,15 +41,18 @@ $fields = array(
 );
 check_fields($fields);
 
+$itemIds = getRequest('itemids');
+$multipleItems = (count($itemIds) > 1);
+
 /*
  * Permissions
  */
-$dbItems = API::Item()->get(array(
-	'output' => array('itemid'),
-	'itemids' => $_REQUEST['itemid'],
-	'webitems' => true,
+$itemCount = API::Item()->get(array(
+	'countOutput' => true,
+	'itemids' => $itemIds,
+	'webitems' => true
 ));
-if (!$dbItems) {
+if ($itemCount != count($itemIds)) {
 	access_deny();
 }
 
@@ -80,7 +83,11 @@ if (isset($_REQUEST['height'])) {
 if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
-$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
+
+foreach ($itemIds as $itemId) {
+	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, ($multipleItems) ? CALC_FNC_AVG : CALC_FNC_ALL);
+}
+
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
