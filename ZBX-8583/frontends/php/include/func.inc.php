@@ -623,11 +623,11 @@ function convert_units($options = array()) {
  * @return string
  */
 function convertUnitsWithoutPrefix($value, $unit) {
-	if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-		$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	if (abs($value) >= 0.01) {
+		$value = round($value, 2);
 	}
 	else {
-		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
+		$value = sprintf('%.6f', $value);
 	}
 	$value = trimDecimal($value);
 
@@ -647,7 +647,7 @@ function convertUnitsWithoutPrefix($value, $unit) {
 function convertUnitsWithPrefix($value, $units, $power = false, $length = false) {
 	// if the value is small enough - round it and return
 	if (bccomp(bcabs($value), 1) == -1) {
-		$value = round($value, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+		$value = round($value, 4);
 		$value = ($length && $value != 0) ? sprintf('%.'.$length.'f', $value) : $value;
 
 		return trim($value.' '.$units);
@@ -663,7 +663,7 @@ function convertUnitsWithPrefix($value, $units, $power = false, $length = false)
 
 	$powerPrefix = ($power > 0) ? powerPrefix($power) : '';
 
-	$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	$value = round($value, 2);
 	$value = trimDecimal($value);
 
 	// fix negative zero
