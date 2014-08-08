@@ -373,7 +373,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypes
-	 * @param arary $dbHostPrototypes	array of existing host prototypes with hostids as keys
+	 * @param array $dbHostPrototypes	array of existing host prototypes with hostids as keys
 	 *
 	 * @return void
 	 */
@@ -1065,7 +1065,7 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the given host prototypes are not inherited from a template.
 	 *
-	 * @throws APIException 	if at least one host prototype is iherited
+	 * @throws APIException 	if at least one host prototype is inherited
 	 *
 	 * @param array $hostPrototypeIds
 	 */

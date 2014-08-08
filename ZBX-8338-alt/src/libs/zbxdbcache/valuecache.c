@@ -260,7 +260,7 @@ static void	row2value_ui64(history_value_t *value, DB_ROW row)
 	ZBX_STR2UINT64(value->ui64, row[0]);
 }
 
-/* timestmap, logeventid, severity, source, value */
+/* timestamp, logeventid, severity, source, value */
 static void	row2value_log(history_value_t *value, DB_ROW row)
 {
 	value->log = zbx_malloc(NULL, sizeof(zbx_log_value_t));
@@ -1839,7 +1839,7 @@ out:
  *             timestamp - [IN] the requested period end timestamp            *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
  *           updates cache from database if necessary.                        *
@@ -1920,7 +1920,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  *             timestamp - [IN] the target timestamp                          *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested number of values is cached *
  *           and updates cache from database if necessary.                    *
@@ -2006,7 +2006,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  *             ts        - [IN] the timestamp                                 *
  *                                                                            *
  * Return value:  >=0    - the number of values read from database            *
- *                FAIL   - an error occured while trying to cache values      *
+ *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
  *           updates cache from database if necessary.                        *
@@ -2503,7 +2503,7 @@ void	zbx_vc_destroy(void)
  *                                                                            *
  * Parameters: itemid     - [IN] the item id                                  *
  *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
- *             timestamp  - [IN] the value timestmap                          *
+ *             timestamp  - [IN] the value timestamp                          *
  *             value      - [IN] the value to add                             *
  *                                                                            *
  * Return value:  SUCCEED - the item value was added successfully             *

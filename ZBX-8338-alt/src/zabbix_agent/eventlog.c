@@ -169,7 +169,7 @@ static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 	do
 	{
 		if (0 != (sz = len))
-			dll_name = zbx_realloc(dll_name, sz);
+			dll_name = zbx_realloc(dll_name, sz * sizeof(wchar_t));
 
 		len = ExpandEnvironmentStrings(szFileName, dll_name, sz);
 	}

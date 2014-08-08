@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:09+0300\n"
+"POT-Creation-Date: 2014-07-24 21:56+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -123,11 +123,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[整批知悉]----"
 
-#: include/triggers.inc.php:2261 include/triggers.inc.php:2262
-#: include/triggers.inc.php:2263 include/triggers.inc.php:2265
-#: include/triggers.inc.php:2267 include/triggers.inc.php:2270
-#: include/triggers.inc.php:2273 include/triggers.inc.php:2274
-#: include/triggers.inc.php:2285
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
+#: include/triggers.inc.php:2264 include/triggers.inc.php:2266
+#: include/triggers.inc.php:2268 include/triggers.inc.php:2271
+#: include/triggers.inc.php:2274 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2286
 msgid "0 or 1"
 msgstr "0 或 1"
 
@@ -177,7 +177,7 @@ msgstr ""
 msgid "ALARM ACKNOWLEDGES"
 msgstr "警報知悉"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -985,7 +985,7 @@ msgstr "底部"
 msgid "Brighten"
 msgstr "轉亮"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
@@ -1326,7 +1326,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "無法新增圖片"
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
 msgstr "無法新增圖片."
 
@@ -1525,7 +1525,7 @@ msgstr "無法創建圖示對應"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "無法創建同名為\"%s\"的圖示對應."
 
-#: include/classes/import/CXmlImport18.php:815
+#: include/classes/import/CXmlImport18.php:816
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "無法創建拓墣圖 \"%s\"."
@@ -1538,7 +1538,7 @@ msgstr ""
 msgid "Cannot create new element"
 msgstr "無法創建新組件"
 
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:1705
 msgid "Cannot create screen."
 msgstr "無法創建篩選."
 
@@ -1911,38 +1911,38 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1661
+#: include/classes/import/CXmlImport18.php:509
+#: include/classes/import/CXmlImport18.php:1662
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選 \"%2$s\"中的圖形\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:722
+#: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:485
+#: include/classes/import/CXmlImport18.php:486
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:733
+#: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:497
+#: include/classes/import/CXmlImport18.php:498
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1966,7 +1966,7 @@ msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1997,14 +1997,14 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1674
+#: include/classes/import/CXmlImport18.php:522
+#: include/classes/import/CXmlImport18.php:1675
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的項目\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:711
+#: include/classes/import/CXmlImport18.php:712
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
@@ -2014,7 +2014,7 @@ msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:532
+#: include/classes/import/CXmlImport18.php:533
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2024,7 +2024,7 @@ msgstr "無法找到用在篩選\"%2$s\"中的拓墣圖\"%1$s\"."
 msgid "Cannot find objects with name"
 msgstr "無法找到有名稱的物件"
 
-#: include/classes/import/CXmlImport18.php:543
+#: include/classes/import/CXmlImport18.php:544
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2035,8 +2035,8 @@ msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:744
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:745
+#: include/classes/import/CXmlImport18.php:788
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2392,7 +2392,7 @@ msgstr "無法更新圖示對應"
 msgid "Cannot update image"
 msgstr "無法更新圖片"
 
-#: include/classes/import/CXmlImport18.php:638
+#: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
 msgstr "無法更新圖片."
 
@@ -2425,7 +2425,7 @@ msgstr "無法更新巨集"
 msgid "Cannot update maintenance"
 msgstr "無法更新維修"
 
-#: include/classes/import/CXmlImport18.php:806
+#: include/classes/import/CXmlImport18.php:807
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "無法更新拓拓墣圖\"%s\"."
@@ -2459,7 +2459,7 @@ msgstr "無法更新正規表示式"
 msgid "Cannot update screen"
 msgstr "無法更新篩選"
 
-#: include/classes/import/CXmlImport18.php:1696
+#: include/classes/import/CXmlImport18.php:1697
 msgid "Cannot update screen."
 msgstr "無法更新篩選."
 
@@ -2564,7 +2564,7 @@ msgid "Change password"
 msgstr "修改密碼"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "字元"
@@ -2665,11 +2665,11 @@ msgstr "檢查必需是唯一的"
 msgid "Child"
 msgstr "子"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "中文 (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "中文 (zh_TW)"
 
@@ -3406,7 +3406,7 @@ msgstr "自訂尺寸"
 msgid "Custom slides"
 msgstr "自訂簡報片"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
@@ -3432,8 +3432,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "方案細節"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
+#: include/maps.inc.php:946
 msgid "DISABLED"
 msgstr "關閉"
 
@@ -4116,11 +4116,11 @@ msgstr "禁止"
 msgid "Dependencies"
 msgstr "相依關係"
 
-#: include/triggers.inc.php:1418 tr_status.php:612
+#: include/triggers.inc.php:1419 tr_status.php:612
 msgid "Dependent"
 msgstr "相依"
 
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1399
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:596
@@ -4330,8 +4330,8 @@ msgstr "停用所選的觸發器?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1645
-#: include/triggers.inc.php:2494 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1646
+#: include/triggers.inc.php:2495 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4613,7 +4613,7 @@ msgstr "持續時間"
 msgid "Duration (sec)"
 msgstr "持續時間(秒)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "荷蘭(nl_NL)"
 
@@ -4886,7 +4886,7 @@ msgstr "啟用所選的觸發器?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2491
+#: include/items.inc.php:206 include/triggers.inc.php:2492
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4907,11 +4907,11 @@ msgstr "啟用所選的觸發器?"
 msgid "Enabled"
 msgstr "已啟用"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "英語 (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "英語(en_US)"
 
@@ -4968,7 +4968,7 @@ msgstr "事件知悉已停用"
 msgid "Event details"
 msgstr "事件細節"
 
-#: include/triggers.inc.php:1643
+#: include/triggers.inc.php:1644
 msgid "Event generation"
 msgstr "事件產出"
 
@@ -5071,7 +5071,7 @@ msgstr "匯出所選的"
 msgid "Export to CSV"
 msgstr "匯出到CSV"
 
-#: include/triggers.inc.php:1642
+#: include/triggers.inc.php:1643
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5301,7 +5301,7 @@ msgstr ""
 msgid "Finish"
 msgstr "完成"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
@@ -5340,7 +5340,7 @@ msgstr "公式"
 msgid "Fourth"
 msgstr "第四"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "法語 (fr_FR)"
 
@@ -5434,7 +5434,7 @@ msgstr "一般"
 msgid "Generated in %s sec"
 msgstr "產生於%s秒"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "德語 (de_DE)"
 
@@ -5466,7 +5466,7 @@ msgstr ""
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1775 tr_testexpr.php:35
+#: include/triggers.inc.php:1776 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "此表示式不是巨集"
 
@@ -5569,8 +5569,8 @@ msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "圖形 \"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1553
-#: include/classes/import/CXmlImport18.php:1557
+#: include/classes/import/CXmlImport18.php:1554
+#: include/classes/import/CXmlImport18.php:1558
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "略過圖形\"%1$s\"-用戶規則."
@@ -5698,7 +5698,7 @@ msgstr "圖形已複製"
 msgid "Graphs deleted"
 msgstr "圖形已删除"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "希臘(el_GR)"
 
@@ -5999,8 +5999,8 @@ msgstr "横向對齊"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1287
-#: include/triggers.inc.php:1639
+#: include/setup.inc.php:365 include/triggers.inc.php:1288
+#: include/triggers.inc.php:1640
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6041,7 +6041,7 @@ msgstr "主機 \"%1$s\" 已存在."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "主機\"%1$s\"是以系統代理程式\"%2$s\"來監控的."
 
-#: include/classes/import/CXmlImport18.php:926
+#: include/classes/import/CXmlImport18.php:927
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "主機 \"%s\" 有 \"useipmi\" 參數已檢驗,  但是沒有 \"ipmi_ip\" 參數! 使用主機IP位址為IPMI介面的位址."
@@ -6386,7 +6386,7 @@ msgstr "時"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
@@ -6661,7 +6661,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "假如您認為這個訊息是錯的, 請諮詢您的管理者關於如何取得需要的許可權."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:968
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7049,7 +7049,7 @@ msgstr "不正確的彈性間隔\"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在項目\"%1$s\"中不正確的彈性間隔. 彈性間隔必須是一個字串."
 
-#: include/triggers.inc.php:629 include/triggers.inc.php:1776
+#: include/triggers.inc.php:629 include/triggers.inc.php:1777
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "使用了不正確的方程式"
@@ -7132,7 +7132,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "不正確的項目予軸值."
 
-#: api/classes/CTrigger.php:725 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:725 include/triggers.inc.php:1041
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "提供不正確的項目鍵值\"%1$s\"給\"%2$s\"上的觸發器表示式."
@@ -7369,7 +7369,7 @@ msgstr "不正確的觸發器表示式"
 msgid "Incorrect trigger expression."
 msgstr "不正確的觸發器表示式."
 
-#: include/triggers.inc.php:1143
+#: include/triggers.inc.php:1144
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "不正確的觸發器表示式. 主機 \"%1$s\"不存在或您不能存取此主機."
@@ -7456,17 +7456,17 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "不正確的工作時間."
 
-#: include/classes/import/CXmlImport18.php:1585
+#: include/classes/import/CXmlImport18.php:1586
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y max項目."
 
-#: include/classes/import/CXmlImport18.php:1572
+#: include/classes/import/CXmlImport18.php:1573
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y min項目."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "印尼語 (id_ID)"
 
@@ -7716,7 +7716,7 @@ msgstr "不可能於HTTP認證中登出."
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
@@ -7749,7 +7749,7 @@ msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1520
+#: include/classes/import/CXmlImport18.php:1521
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "項目 \"%1$s\"不存在."
@@ -7759,8 +7759,8 @@ msgstr "項目 \"%1$s\"不存在."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 
-#: include/classes/import/CXmlImport18.php:1271
-#: include/classes/import/CXmlImport18.php:1275
+#: include/classes/import/CXmlImport18.php:1272
+#: include/classes/import/CXmlImport18.php:1276
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略過項目\"%1$s\"-用戶規則."
@@ -7995,7 +7995,7 @@ msgstr "一月"
 msgid "January"
 msgstr "一月"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "日語 (ja_JP)"
 
@@ -8054,7 +8054,7 @@ msgstr "關鍵字"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "韓語 (ko_KR)"
 
@@ -8089,7 +8089,7 @@ msgstr "LDAP登入成功"
 msgid "LDAP login was not successful"
 msgstr "LDAP登入並不成功"
 
-#: include/classes/screens/CScreenClock.php:70
+#: include/classes/screens/CScreenClock.php:81
 msgid "LOCAL"
 msgstr "LOCAL"
 
@@ -8212,7 +8212,7 @@ msgstr "最新報警"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "拉脱維亞語(lv_LV)"
 
@@ -8334,7 +8334,7 @@ msgstr "清單是空的"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -8365,7 +8365,7 @@ msgid "Location longitude"
 msgstr "位置經度"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "日誌"
@@ -8488,7 +8488,7 @@ msgstr "Mac位址A"
 msgid "MAC address B"
 msgstr "Mac位址B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:760
 msgid "MAINTENANCE"
 msgstr "維修"
 
@@ -8561,7 +8561,7 @@ msgstr "巨集"
 msgid "Macros updated"
 msgstr "巨集已更新"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -8644,7 +8644,7 @@ msgstr "手動登出"
 msgid "Map"
 msgstr "拓墣圖"
 
-#: include/classes/import/CXmlImport18.php:666
+#: include/classes/import/CXmlImport18.php:667
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "略過拓墣圖\"%1$s\"-用戶規則."
@@ -8654,12 +8654,12 @@ msgstr "略過拓墣圖\"%1$s\"-用戶規則."
 msgid "Map \"%s\""
 msgstr "拓墣圖\"%s\""
 
-#: include/classes/import/CXmlImport18.php:818
+#: include/classes/import/CXmlImport18.php:819
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "拓墣圖\"%s\"已創建."
 
-#: include/classes/import/CXmlImport18.php:809
+#: include/classes/import/CXmlImport18.php:810
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "拓墣圖\"%s\"已更新."
@@ -9058,8 +9058,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "缺少圖形的\"名稱\"欄位"
 
-#: include/classes/import/CXmlImport18.php:1576
-#: include/classes/import/CXmlImport18.php:1589
+#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1590
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主機 \"%2$s\"缺少了項目\"%1$s\"."
@@ -9168,7 +9168,7 @@ msgstr "移動"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1644
+#: include/triggers.inc.php:1645
 msgid "Multiple PROBLEM events"
 msgstr "多重問題(PROBLEM)事件"
 
@@ -9189,7 +9189,7 @@ msgstr "網絡結構"
 msgid "NNTP"
 msgstr "NNTP"
 
-#: include/classes/screens/CScreenClock.php:59
+#: include/classes/screens/CScreenClock.php:70
 msgid "NO DATA"
 msgstr "無資料"
 
@@ -9388,7 +9388,7 @@ msgid "Next"
 msgstr "次"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2436 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9425,12 +9425,12 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1566
+#: include/classes/import/CXmlImport18.php:1567
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymax_type\"."
 
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1563
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymin_type\"."
@@ -9816,27 +9816,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1547
+#: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "不具圖形 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:961
+#: include/classes/import/CXmlImport18.php:962
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "不具主機 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:1511
+#: include/classes/import/CXmlImport18.php:1512
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "無項目\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1142
+#: include/classes/import/CXmlImport18.php:1143
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "沒有模板\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1422
+#: include/classes/import/CXmlImport18.php:1423
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "不具觸發器 \"%s\"的許可權."
@@ -9845,17 +9845,17 @@ msgstr "不具觸發器 \"%s\"的許可權."
 msgid "No permissions"
 msgstr "沒有許可權"
 
-#: include/classes/import/CXmlImport18.php:1022
+#: include/classes/import/CXmlImport18.php:1023
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "不具群組 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:659
+#: include/classes/import/CXmlImport18.php:660
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "不具拓墣圖\"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:452
+#: include/classes/import/CXmlImport18.php:453
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
@@ -10024,7 +10024,7 @@ msgstr "沒有含觸發器ID\"%1$s\"的觸發器."
 msgid "No triggers defined."
 msgstr "沒有已定義的觸發器."
 
-#: include/triggers.inc.php:1250
+#: include/triggers.inc.php:1251
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10064,7 +10064,7 @@ msgstr ""
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
 #: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1636
+#: include/page_header.php:324 include/triggers.inc.php:1637
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10130,7 +10130,7 @@ msgid "None"
 msgstr "無"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1643 popup.php:1509
+#: include/triggers.inc.php:1644 popup.php:1509
 msgid "Normal"
 msgstr "正常"
 
@@ -10368,14 +10368,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr ""
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "數字的 (浮點)"
 
-#: include/triggers.inc.php:2236 include/triggers.inc.php:2252
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2266
-#: include/triggers.inc.php:2271 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2237 include/triggers.inc.php:2253
+#: include/triggers.inc.php:2257 include/triggers.inc.php:2267
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2276
 msgid "Numeric (integer 64bit)"
 msgstr "數字的(64位元整數)"
 
@@ -10391,8 +10391,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
+#: include/maps.inc.php:956 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10415,7 +10415,7 @@ msgstr "OOP路由器"
 msgid "OOB subnet mask"
 msgstr "OOB子網遮罩"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -10907,7 +10907,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "問題"
@@ -11060,7 +11060,7 @@ msgstr "許可權"
 msgid "Permissions can be assigned for user groups only."
 msgstr "許可權只能被指派予用戶群組"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "波斯語 (fa_IR)"
 
@@ -11105,7 +11105,7 @@ msgstr "請輸入確認文字."
 msgid "Please select two elements"
 msgstr "請選擇兩組件"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "波蘭(pl_PL)"
 
@@ -11141,11 +11141,11 @@ msgstr "主機介面的埠不能是空白."
 msgid "Port range"
 msgstr "埠範圍"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "波蘭語 (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -11248,7 +11248,7 @@ msgstr "優先權層級"
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "問題"
@@ -11274,8 +11274,8 @@ msgstr "問題, 如果所有的下層都有問題"
 msgid "Problem, if at least one child has a problem"
 msgstr "問題, 如果至少一個下層有一個問題"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
+#: include/maps.inc.php:900 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "問題"
 
@@ -11797,7 +11797,7 @@ msgstr ""
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -11863,7 +11863,7 @@ msgstr "於主機上執行遠程命令"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "俄語 (ru_RU)"
 
@@ -11888,7 +11888,7 @@ msgstr "篩選"
 msgid "SEARCH"
 msgstr "搜尋"
 
-#: include/classes/screens/CScreenClock.php:64
+#: include/classes/screens/CScreenClock.php:75
 msgid "SERVER"
 msgstr "伺服器"
 
@@ -12137,8 +12137,8 @@ msgstr ""
 msgid "Screen"
 msgstr "篩選"
 
-#: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1707
+#: include/classes/import/CXmlImport18.php:578
+#: include/classes/import/CXmlImport18.php:1708
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "篩選 \"%1$s\" 已新增."
@@ -12177,15 +12177,15 @@ msgstr ""
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1638
-#: include/classes/import/CXmlImport18.php:1642
+#: include/classes/import/CXmlImport18.php:461
+#: include/classes/import/CXmlImport18.php:1639
+#: include/classes/import/CXmlImport18.php:1643
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "略過篩選\"%1$s\"-用戶規則."
 
-#: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1699
+#: include/classes/import/CXmlImport18.php:575
+#: include/classes/import/CXmlImport18.php:1700
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "篩選\"%1$s\"已更新."
@@ -12556,7 +12556,7 @@ msgstr "連線期已中斷, 請重連."
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1642 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -12795,7 +12795,7 @@ msgstr "簡報片展示"
 msgid "Slides"
 msgstr "簡報片"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -12867,7 +12867,7 @@ msgstr "依欄位\"%1$s\"排序是不允許的."
 msgid "Source"
 msgstr "來源 "
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "西班牙語 (es_ES)"
 
@@ -13099,7 +13099,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -13350,7 +13350,7 @@ msgid "Test string"
 msgstr "測試字串"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2241 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "文字"
@@ -13634,7 +13634,7 @@ msgstr "趨勢"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1640
+#: include/maps.inc.php:26 include/triggers.inc.php:1641
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13658,8 +13658,8 @@ msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1429
-#: include/classes/import/CXmlImport18.php:1433
+#: include/classes/import/CXmlImport18.php:1430
+#: include/classes/import/CXmlImport18.php:1434
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略過觸發器\"%1$s\"-用戶規則."
@@ -13835,7 +13835,7 @@ msgstr "觸發器值"
 
 #: hosts.php:810 hosts.php:902 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1262
+#: include/triggers.inc.php:1263
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:483
@@ -13904,7 +13904,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14048,7 +14048,7 @@ msgstr "用戶基本資料"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "烏克蘭語 (uk_UA)"
 
@@ -14064,7 +14064,7 @@ msgstr "不能選擇組態."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
 msgid "Unacknowledged"
 msgstr "未知悉的"
 
@@ -14122,7 +14122,7 @@ msgstr "單位"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/triggers.inc.php:2492 include/triggers.inc.php:2498
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14144,11 +14144,11 @@ msgstr ""
 msgid "Unknown function."
 msgstr "未知的方程式."
 
-#: include/triggers.inc.php:1774 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1775 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主機項目, 在所選的主機中沒有這樣的項目"
 
-#: include/triggers.inc.php:1773 tr_testexpr.php:33
+#: include/triggers.inc.php:1774 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "未知的主機, 在系統中沒有出現這樣的主機."
 
@@ -14918,7 +14918,7 @@ msgstr "垂直的"
 msgid "Vertical align"
 msgstr "縱向對齊"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15212,23 +15212,23 @@ msgstr "X"
 msgid "X label"
 msgstr "X標示"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "XML檔含有錯誤 %1$s:"
 
-#: include/classes/import/CXmlImport18.php:405
-#: include/classes/import/CXmlImport18.php:408
-#: include/classes/import/CXmlImport18.php:411
+#: include/classes/import/CXmlImport18.php:406
+#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:412
 msgid "XML file contains errors"
 msgstr "XML檔含有錯誤"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML檔含有極嚴重錯誤 %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML檔含有警告 %1$s:"
@@ -15305,7 +15305,7 @@ msgstr "每年"
 #: events.php:839 include/blocks.inc.php:750
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2436
-#: include/triggers.inc.php:1646
+#: include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"

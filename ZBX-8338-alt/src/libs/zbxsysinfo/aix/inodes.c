@@ -23,10 +23,18 @@
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
-#	define ZBX_STATFS	statvfs
+#	ifdef HAVE_SYS_STATVFS64
+#		define ZBX_STATFS	statvfs64
+#	else
+#		define ZBX_STATFS	statvfs
+#	endif
 #	define ZBX_FFREE	f_favail
 #else
-#	define ZBX_STATFS	statfs
+#	ifdef HAVE_SYS_STATFS64
+#		define ZBX_STATFS	statfs64
+#	else
+#		define ZBX_STATFS	statfs
+#	endif
 #	define ZBX_FFREE	f_ffree
 #endif
 	char			*fsname, *mode;

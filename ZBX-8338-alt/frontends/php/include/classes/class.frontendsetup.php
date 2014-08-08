@@ -294,7 +294,7 @@ class FrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpMbstring() {
-		$current = mbstrings_available();
+		$current = extension_loaded('mbstring');
 
 		return array(
 			'name' => _('PHP mbstring'),

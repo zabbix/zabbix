@@ -352,7 +352,7 @@ out:
  *             ret       - [OUT] the operation result code                    *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
- *               found, did not have data or any error occured. In the last   *
+ *               found, did not have data or any error occurred. In the last  *
  *               case the error message will be stored in agent result.       *
  *                                                                            *
  * Comments: There are three possible cases:                                  *

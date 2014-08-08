@@ -1099,7 +1099,7 @@ elseif ($srctbl == 'triggers') {
 			)
 		));
 
-		// made to save memmory usage
+		// made to save memory usage
 		if ($multiselect) {
 			$jsTriggers[$trigger['triggerid']] = array(
 				'id' => $trigger['triggerid'],

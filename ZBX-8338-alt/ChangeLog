@@ -1,3 +1,64 @@
+Changes for 2.2.6rc1
+
+New features:
+A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
+A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
+..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
+..F....... [ZBX-8216] fixed screen import error (Andrejs)
+A.F....... [ZBX-8510] fixed possible deadlocks when updating IT services (Pavels, Sasha)
+...G...... [ZBX-8512] fixed processing of web.page.regexp without a newline character in the end of http GET response (Arturs)
+A......... [ZBX-8424] fixed finding last event for triggers (Ivo)
+.......PS. [ZBX-8424] changed range limit when looking up eventids to the upper bound of a 64bit integer (Juris)
+A......... [ZBX-8493] fixed usergroup.massadd API call to not create duplicate entries in "rights" table (Krists)
+..F....... [ZBX-8492] fixed maintenance periods without hosts/hostgroups to be accessible by both admins and superadmins (Krists)
+A.F....... [ZBX-8428] fixed item.get API call to return values for "lastvalue", "lastclock", "lastns", "prevvalue" only for last 24 hours (Krists)
+..F....... [ZBX-8371] fixed issue when maintenance items with their hosts/host groups removed are not accessible in configuration (Krists)
+..F....... [ZBX-8366] fixed table header display in Monitoring -> Overview for IE11 (Andrejs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5
+
+2.2.5rc1 was released as 2.2.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.5rc1
+
+New features:
+..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
+
+Bug fixes:
+.........T [ZBX-8405] fixed typos in item descriptions for JMX Tomcat, FreeBSD, HP-UX, Linux and OpenBSD templates (Richlv)
+........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
+........S. [ZBX-8359] changed servers timer processes title line to display amount of hosts that have changed maintenance status; active maintenance period count is no longer displayed (Juris)
+...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
+.......PS. [ZBX-8422] removed php mutex locking from server code because of not being used and incompatible licensing issues (wiper)
+A......... [ZBX-8394] corrected misspelled "template" variables in API (Ivo)
+...G...... [ZBX-8248] fixed vfs.file.regexp, vfs.file.regmatch and web.page.regexp to handle carriage returns properly (Juris)
+..F....... [ZBX-8285] fixed widget "History of events" and frontend messaging to use visible host names (Krists)
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
+..F....... [ZBX-8354] removed period in caption for "Distribution of values for multiple periods" bar report (Andrejs)
+.......PS. [ZBX-8092] fixed items being polled at the same time after host becomes enabled (asaveljevs)
+.......PS. [ZBX-8324] fixed there being too many expressions in a list in a SQL query (asaveljevs)
+...G...... [ZBX-8373] fixed the argument to system.cpu.num[] being ignored on HP-UX (asaveljevs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4
+
+2.2.4rc4 was released as 2.2.4 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4rc4
+
+New features:
+A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+...G...... [ZBX-8213] fixed possible crash when processing eventlog on Windows 2000,2003,XP (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.4rc3
 
 Bug fixes:
@@ -600,7 +661,7 @@ A.F....... [ZBX-6952] fixed XSS vulnerability in user themes, thanks to Lincoln 
 ...G...... [ZBX-6902] reverting Solaris system.swap.size calculation from "swap -s" (used in 2.0.7, 2.0.8) to "swap -l"-like algorithm (as in 2.0.6) (Andris)
 ...GI..PS. [ZBX-6955] fixed library order in linking, fixed compiler warnings, improved performance of zbx_snprintf_alloc() function (Andris)
 ........S. [ZBX-6981] fixed SQL error during lld trigger creation (wiper)
-A......... [ZBX-6866] fixed beeing able to add graph items from other hosts for templated graphs (Ivo)
+A......... [ZBX-6866] fixed being able to add graph items from other hosts for templated graphs (Ivo)
 ..F....... [ZBX-6854] fixed javascript error on pages with checkboxes, but without main checkbox (Vitalij)
 ..F....... [ZBX-6873] fixed errors in page switching after executing an action (Ivo)
 
@@ -633,7 +694,7 @@ A.F.I..... [ZBXNEXT-1569] implemented user name and surname displaying in acknow
 Bug fixes:
 ...G...PS. [ZBX-6916] added space delimeter support in configuration file (igors)
 ..F....... [ZBX-6930] 'Unlink and clear' link bug fix, now it displayed (Vitalij)
-..F....... [ZBX-6878] fixed history screen log bug for two items, parametr itemid renamed to itemids (Vitalij)
+..F....... [ZBX-6878] fixed history screen log bug for two items, parameter itemid renamed to itemids (Vitalij)
 ..F....... [ZBX-6903] fixed template name trim (Eduard, Sasha)
 A.F....... [ZBX-6899] specified source parameter in SQL from events table (Vitalij)
 ..F....... [ZBX-6893] fixed prototype name error ($1 -> {#FSNAME}) on adding new prototype in the graph prototype form in the item prototype selection template (Vitalij)
@@ -995,6 +1056,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 ........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
@@ -1414,6 +1476,7 @@ Changes for 2.0.4rc1
 
 New features:
 A.F....... [ZBX-1357] added initial Portuguese (Portugal) translation (Richlv)
+..F....... [ZBXNEXT-1398] changed vertical labels in Monitoring -> Overview from PNG images to text (Eduard)
 ..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
@@ -2018,7 +2081,7 @@ A......... [ZBX-4784] fixed inherited triggers being updated on any host update 
 A.F....... [ZBX-4790] fixed *ERROR*s in trigger expressions in items.php; fixed undefined variables when filtering without host (Toms)
 ..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)
 A.F....... [ZBX-3991] forbid passive proxy interfaces with ip 0.0.0.0 (Vedmak)
-..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
+..F....... [ZBX-3152] fixed global messages being shown even if all severities are unchecked (Vedmak)
 ....I..... [ZBXNEXT-397] removed records from "ids" table to prevent SQL errors while adding a new item (Sasha)
 ..F....... [ZBX-4811] added 'filter' and 'lifetime' fields to discovery rules export (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
@@ -2556,6 +2619,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)

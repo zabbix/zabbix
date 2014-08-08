@@ -53,7 +53,7 @@ static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
-static PHP_MUTEX		sqlite_access;
+static ZBX_MUTEX		sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -501,18 +501,18 @@ out:
 }
 
 #if defined(HAVE_SQLITE3)
-void	zbx_create_sqlite3_mutex(const char *dbname)
+void	zbx_create_sqlite3_mutex(void)
 {
-	if (PHP_MUTEX_OK != php_sem_get(&sqlite_access, dbname))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sqlite_access, ZBX_MUTEX_SQLITE3))
 	{
 		zbx_error("cannot create mutex for SQLite3");
 		exit(EXIT_FAILURE);
 	}
 }
 
-void	zbx_remove_sqlite3_mutex()
+void	zbx_remove_sqlite3_mutex(void)
 {
-	php_sem_remove(&sqlite_access);
+	zbx_mutex_destroy(&sqlite_access);
 }
 #endif	/* HAVE_SQLITE3 */
 
@@ -532,17 +532,17 @@ void	zbx_db_init(const char *dbname, const char *const db_schema)
 			exit(EXIT_FAILURE);
 		}
 
-		zbx_create_sqlite3_mutex(dbname);
+		zbx_create_sqlite3_mutex();
 
 		zbx_db_execute("%s", db_schema);
 		zbx_db_close();
 	}
 	else
-		zbx_create_sqlite3_mutex(dbname);
+		zbx_create_sqlite3_mutex();
 #endif	/* HAVE_SQLITE3 */
 }
 
-void	zbx_db_close()
+void	zbx_db_close(void)
 {
 #if defined(HAVE_IBM_DB2)
 	if (ibm_db2.hdbc)
@@ -616,7 +616,7 @@ void	zbx_db_close()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_begin()
+int	zbx_db_begin(void)
 {
 	int	rc = ZBX_DB_OK;
 
@@ -640,11 +640,7 @@ int	zbx_db_begin()
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
-	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
-		assert(0);
-	}
+	zbx_mutex_lock(&sqlite_access);
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
@@ -663,7 +659,7 @@ int	zbx_db_begin()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_commit()
+int	zbx_db_commit(void)
 {
 	int	rc = ZBX_DB_OK;
 
@@ -697,7 +693,7 @@ int	zbx_db_commit()
 	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
-	php_sem_release(&sqlite_access);
+	zbx_mutex_unlock(&sqlite_access);
 #endif
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
@@ -715,7 +711,7 @@ int	zbx_db_commit()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_rollback()
+int	zbx_db_rollback(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
 
@@ -748,7 +744,7 @@ int	zbx_db_rollback()
 	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
-	php_sem_release(&sqlite_access);
+	zbx_mutex_unlock(&sqlite_access);
 #endif
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
@@ -759,12 +755,12 @@ int	zbx_db_rollback()
 	return rc;
 }
 
-int	zbx_db_txn_level()
+int	zbx_db_txn_level(void)
 {
 	return txn_level;
 }
 
-int	zbx_db_txn_error()
+int	zbx_db_txn_error(void)
 {
 	return txn_error;
 }
@@ -1088,11 +1084,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
-		exit(EXIT_FAILURE);
-	}
+	if (0 == txn_level)
+		zbx_mutex_lock(&sqlite_access);
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
@@ -1123,7 +1116,7 @@ lbl_exec:
 		ret = sqlite3_changes(conn);
 
 	if (0 == txn_level)
-		php_sem_release(&sqlite_access);
+		zbx_mutex_unlock(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
@@ -1426,11 +1419,8 @@ error:
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
-		exit(EXIT_FAILURE);
-	}
+	if (0 == txn_level)
+		zbx_mutex_lock(&sqlite_access);
 
 	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
 	result->curow = 0;
@@ -1461,7 +1451,7 @@ lbl_get_table:
 	}
 
 	if (0 == txn_level)
-		php_sem_release(&sqlite_access);
+		zbx_mutex_unlock(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
 	if (0 != CONFIG_LOG_SLOW_QUERIES)

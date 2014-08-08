@@ -133,7 +133,7 @@
 					td.width(slideTableColumnWidths[i]);
 				});
 
-				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
+				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixels to right
 				if (SF || IE8) {
 					// move back draggable element to proper position
 					ui.css('left', (ui.offset().left - 4) + 'px');

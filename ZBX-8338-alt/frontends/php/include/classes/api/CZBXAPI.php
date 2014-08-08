@@ -959,7 +959,7 @@ class CZBXAPI {
 	 *
 	 * @param array $array
 	 * @param CPartialValidatorInterface $validator
-	 * @parma array $fullArray
+	 * @param array $fullArray
 	 */
 	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
 		if (!$validator->validatePartial($array, $fullArray)) {

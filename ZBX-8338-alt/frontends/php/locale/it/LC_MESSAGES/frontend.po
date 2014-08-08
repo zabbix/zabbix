@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:10+0300\n"
+"POT-Creation-Date: 2014-07-24 21:56+0300\n"
 "PO-Revision-Date: 2014-06-12 09:00+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -127,11 +127,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ACKNOWLEDGE MASSIVO]----"
 
-#: include/triggers.inc.php:2261 include/triggers.inc.php:2262
-#: include/triggers.inc.php:2263 include/triggers.inc.php:2265
-#: include/triggers.inc.php:2267 include/triggers.inc.php:2270
-#: include/triggers.inc.php:2273 include/triggers.inc.php:2274
-#: include/triggers.inc.php:2285
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
+#: include/triggers.inc.php:2264 include/triggers.inc.php:2266
+#: include/triggers.inc.php:2268 include/triggers.inc.php:2271
+#: include/triggers.inc.php:2274 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2286
 msgid "0 or 1"
 msgstr "0 o 1"
 
@@ -181,7 +181,7 @@ msgstr "AES"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ALLARMI CON ACKNOWLEDGE"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -993,7 +993,7 @@ msgstr "In basso"
 msgid "Brighten"
 msgstr "Illumina"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulgaro (bg_BG)"
 
@@ -1334,7 +1334,7 @@ msgstr "Impossibile aggiungere prototipo host"
 msgid "Cannot add image"
 msgstr "Impossibile aggiungere l'immagine"
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
 msgstr "Impossibile aggiungere l'immagine"
 
@@ -1533,7 +1533,7 @@ msgstr "Impossibile creare mappa icone"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Impossibile creare mappe icone con nome identico \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:815
+#: include/classes/import/CXmlImport18.php:816
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Impossibile creare mappa \"%s\"."
@@ -1546,7 +1546,7 @@ msgstr "Impossibile creare nuova applicazione, uno scenario web è già assegnat
 msgid "Cannot create new element"
 msgstr "Impossibile creare nuovo elemento"
 
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:1705
 msgid "Cannot create screen."
 msgstr "Impossibile creare schermata."
 
@@ -1942,38 +1942,38 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Impossibile abilitare scenario web"
 msgstr[1] "Impossibile abilitare scenari web"
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare immagine di sfondo \"%1$s\" utilizzata nella mappa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1661
+#: include/classes/import/CXmlImport18.php:509
+#: include/classes/import/CXmlImport18.php:1662
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare grafico \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:722
+#: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella mappa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:485
+#: include/classes/import/CXmlImport18.php:486
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:733
+#: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare host \"%1$s\" utilizzato nella mappa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:497
+#: include/classes/import/CXmlImport18.php:498
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1997,7 +1997,7 @@ msgstr "Impossibile trovare interfaccia host su \"%1$s\" per la chiave item \"%2
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Non è possibile trovare host o template \"%1$s\" utilizzati nel grafico \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2028,14 +2028,14 @@ msgstr "Impossibile trovare l'item \"%1$s\" su \"%2$s\" utilizzato come valore M
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Impossibile trovare l'item \"%1$s\" su \"%2$s\" utilizzato come valore MIN per l'asse Y sul grafico prototipo \"%3$s\" originato dalla regola di discovery \"%4$s\" su \"%5$s\"."
 
-#: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1674
+#: include/classes/import/CXmlImport18.php:522
+#: include/classes/import/CXmlImport18.php:1675
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare item \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:711
+#: include/classes/import/CXmlImport18.php:712
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa esportata \"%2$s\"."
@@ -2045,7 +2045,7 @@ msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa esportata \"%2
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:532
+#: include/classes/import/CXmlImport18.php:533
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2055,7 +2055,7 @@ msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella schermata \"%2$s\"."
 msgid "Cannot find objects with name"
 msgstr "Impossibile trovare oggetti con nome"
 
-#: include/classes/import/CXmlImport18.php:543
+#: include/classes/import/CXmlImport18.php:544
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2066,8 +2066,8 @@ msgstr "Impossibile trovare schermata \"%1$s\" utilizzata nella schermata \"%2$s
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Impossibile trovare template \"%1$s\" per prototipo host \"%2$s\" della regola di discovery \"%3$s\" su \"%4$s\"."
 
-#: include/classes/import/CXmlImport18.php:744
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:745
+#: include/classes/import/CXmlImport18.php:788
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2425,7 +2425,7 @@ msgstr "Impossibile aggiornare la mappa icone"
 msgid "Cannot update image"
 msgstr "Impossibile aggiornare immagine"
 
-#: include/classes/import/CXmlImport18.php:638
+#: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
 msgstr "Impossibile aggiornare immagine."
 
@@ -2458,7 +2458,7 @@ msgstr "Impossibile aggiornare le macro"
 msgid "Cannot update maintenance"
 msgstr "Impossibile aggiornare la manutenzione"
 
-#: include/classes/import/CXmlImport18.php:806
+#: include/classes/import/CXmlImport18.php:807
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Impossibile aggiornare la mappa \"%s\"."
@@ -2492,7 +2492,7 @@ msgstr "Impossibile aggiornare l'espressione regolare"
 msgid "Cannot update screen"
 msgstr "Impossibile aggiornare la schermata"
 
-#: include/classes/import/CXmlImport18.php:1696
+#: include/classes/import/CXmlImport18.php:1697
 msgid "Cannot update screen."
 msgstr "Impossibile aggiornare la schermata."
 
@@ -2597,7 +2597,7 @@ msgid "Change password"
 msgstr "Cambia password"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Carattere"
@@ -2698,11 +2698,11 @@ msgstr "I controlli devono essere univoci."
 msgid "Child"
 msgstr "Derivato"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Cinese (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Cinese (zh_TW)"
 
@@ -3439,7 +3439,7 @@ msgstr "Dimensione personalizzata"
 msgid "Custom slides"
 msgstr "Diapositive personalizzate"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Czech (cs_CZ)"
 
@@ -3465,8 +3465,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETTAGLI DELLO SCENARIO"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
+#: include/maps.inc.php:946
 msgid "DISABLED"
 msgstr "DISABILITATO"
 
@@ -4150,11 +4150,11 @@ msgstr "Nega"
 msgid "Dependencies"
 msgstr "Dipendenze"
 
-#: include/triggers.inc.php:1418 tr_status.php:612
+#: include/triggers.inc.php:1419 tr_status.php:612
 msgid "Dependent"
 msgstr "Subordinato"
 
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1399
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:596
@@ -4364,8 +4364,8 @@ msgstr "Disabilitare trigger selezionati?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1645
-#: include/triggers.inc.php:2494 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1646
+#: include/triggers.inc.php:2495 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4649,7 +4649,7 @@ msgstr "Durata"
 msgid "Duration (sec)"
 msgstr "Durata (sec)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Olandese (nl_NL)"
 
@@ -4922,7 +4922,7 @@ msgstr "Abilitare trigger selezionati?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2491
+#: include/items.inc.php:206 include/triggers.inc.php:2492
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4943,11 +4943,11 @@ msgstr "Abilitare trigger selezionati?"
 msgid "Enabled"
 msgstr "Abilitato"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "Inglese (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "Inglese (en_US)"
 
@@ -5004,7 +5004,7 @@ msgstr "Aggiunta acknowledge eventi disabilitata"
 msgid "Event details"
 msgstr "Dettagli evento"
 
-#: include/triggers.inc.php:1643
+#: include/triggers.inc.php:1644
 msgid "Event generation"
 msgstr "Generazione evento"
 
@@ -5107,7 +5107,7 @@ msgstr "Esporta selezionati"
 msgid "Export to CSV"
 msgstr "Esporta in CSV"
 
-#: include/triggers.inc.php:1642
+#: include/triggers.inc.php:1643
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5337,7 +5337,7 @@ msgstr "Cerca stringa in un file. Stringa corrispondente"
 msgid "Finish"
 msgstr "Termina"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Finlandese (fi_FI)"
 
@@ -5376,7 +5376,7 @@ msgstr "Formula"
 msgid "Fourth"
 msgstr "Quarto"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Francese (fr_FR)"
 
@@ -5470,7 +5470,7 @@ msgstr "Generale"
 msgid "Generated in %s sec"
 msgstr "Generato in %s sec"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Tedesco (de_DE)"
 
@@ -5502,7 +5502,7 @@ msgstr "Ottieni il tempo di caricamento di tutta la pagina WEB. Il percorso di d
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1775 tr_testexpr.php:35
+#: include/triggers.inc.php:1776 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "L'espressione fornita non è una macro"
 
@@ -5605,8 +5605,8 @@ msgstr "Il grafico \"%1$s\" non può ereditare. Non sono presenti gli item richi
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Il grafico \"%1$s\" non esiste nel template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1553
-#: include/classes/import/CXmlImport18.php:1557
+#: include/classes/import/CXmlImport18.php:1554
+#: include/classes/import/CXmlImport18.php:1558
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Grafico \"%1$s\" saltato - regola utente."
@@ -5734,7 +5734,7 @@ msgstr "Grafici copiati"
 msgid "Graphs deleted"
 msgstr "Grafici rimossi"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Greco (el_GR)"
 
@@ -6035,8 +6035,8 @@ msgstr "Allinea in orizzontale"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1287
-#: include/triggers.inc.php:1639
+#: include/setup.inc.php:365 include/triggers.inc.php:1288
+#: include/triggers.inc.php:1640
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6077,7 +6077,7 @@ msgstr "L'host \"%1$s\" esiste già."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "L'host \"%1$s\" è monitorato dal proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:926
+#: include/classes/import/CXmlImport18.php:927
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "L'host \"%s\" ha il parametro \"usepmi\" abilitato, ma non ha alcun parametro \"ipmi_ip\"! Indirizzo IP dell'host in uso come indirizzo per l'interfaccia IPMI."
@@ -6426,7 +6426,7 @@ msgstr "Ore"
 msgid "Housekeeping"
 msgstr "Housekeeping"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Ungherese (hu_HU)"
 
@@ -6701,7 +6701,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo amministratore per ricevere i permessi necessari.Se pensi che questo messaggio sia sbagliato, per favore contatta il tuo amministratore per ricevere i permessi necessari."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:968
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7089,7 +7089,7 @@ msgstr "Intervallo flessibile \"%1$s\" errato."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervallo flessibile errato nell'item \"%1$s\". L'intervallo flessibile deve essere una stringa."
 
-#: include/triggers.inc.php:629 include/triggers.inc.php:1776
+#: include/triggers.inc.php:629 include/triggers.inc.php:1777
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Funzione errata utilizzata"
@@ -7172,7 +7172,7 @@ msgstr "ID item \"%1$s\" non corretto per elemento schermata."
 msgid "Incorrect item for axis value."
 msgstr "Item errato per il valore dell'asse."
 
-#: api/classes/CTrigger.php:725 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:725 include/triggers.inc.php:1041
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Fornita chiave item \"%1$s\" errata per l'espressione del trigger in \"%2$s\"."
@@ -7409,7 +7409,7 @@ msgstr "Espressione trigger errata"
 msgid "Incorrect trigger expression."
 msgstr "Espressione trigger errata."
 
-#: include/triggers.inc.php:1143
+#: include/triggers.inc.php:1144
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Espressione trigger errata. L'host \"%1$s\" non esiste o non hai accesso a questo host."
@@ -7496,17 +7496,17 @@ msgstr "Valore errato utilizzato per lo stato proxy \"%1$s\"."
 msgid "Incorrect working time."
 msgstr "Orario di lavoro errato."
 
-#: include/classes/import/CXmlImport18.php:1585
+#: include/classes/import/CXmlImport18.php:1586
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Item max y errato per il grafico \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1572
+#: include/classes/import/CXmlImport18.php:1573
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Item min y errato per il grafico \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Indonesiano (id_ID)"
 
@@ -7756,7 +7756,7 @@ msgstr "Impossibile far logout da autenticazione HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Impossibile cercare per password utente."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Italiano (it_IT)"
 
@@ -7789,7 +7789,7 @@ msgstr "L'item \"%1$s\" non può popolare un campo numero \"%2$d\" mancante nell
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "L'item \"%1$s\" non esiste nel template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1520
+#: include/classes/import/CXmlImport18.php:1521
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "L'item \"%1$s\" non esiste."
@@ -7799,8 +7799,8 @@ msgstr "L'item \"%1$s\" non esiste."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" su \"%2$s\": l'applicazione \"%3$s\" non esiste."
 
-#: include/classes/import/CXmlImport18.php:1271
-#: include/classes/import/CXmlImport18.php:1275
+#: include/classes/import/CXmlImport18.php:1272
+#: include/classes/import/CXmlImport18.php:1276
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" saltato - regola utente."
@@ -8039,7 +8039,7 @@ msgstr "Gen"
 msgid "January"
 msgstr "Gennaio"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Giapponese (ja_JP)"
 
@@ -8098,7 +8098,7 @@ msgstr "Parola chiave"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Coreano (ko_KR)"
 
@@ -8133,7 +8133,7 @@ msgstr "Login LDAP riuscito"
 msgid "LDAP login was not successful"
 msgstr "Il login LDAP è fallito"
 
-#: include/classes/screens/CScreenClock.php:70
+#: include/classes/screens/CScreenClock.php:81
 msgid "LOCAL"
 msgstr "LOCALE"
 
@@ -8257,7 +8257,7 @@ msgstr "Ultimi eventi"
 msgid "Latest values"
 msgstr "Ultimi valori"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Lettone (lv_LV)"
 
@@ -8379,7 +8379,7 @@ msgstr "La lista è vuota"
 msgid "List of network interfaces. Text value."
 msgstr "Lista interfaccia di rete. Valore testo."
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituano (lt_LT)"
 
@@ -8410,7 +8410,7 @@ msgid "Location longitude"
 msgstr "Longitudine della posizione"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -8533,7 +8533,7 @@ msgstr "MAC address A"
 msgid "MAC address B"
 msgstr "MAC address B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:760
 msgid "MAINTENANCE"
 msgstr "MANUTENZIONE"
 
@@ -8606,7 +8606,7 @@ msgstr "Macro"
 msgid "Macros updated"
 msgstr "Macro aggiornate"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -8689,7 +8689,7 @@ msgstr "Logout manuale"
 msgid "Map"
 msgstr "Mappa"
 
-#: include/classes/import/CXmlImport18.php:666
+#: include/classes/import/CXmlImport18.php:667
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Mappa \"%1$s\" saltata - regola utente."
@@ -8699,12 +8699,12 @@ msgstr "Mappa \"%1$s\" saltata - regola utente."
 msgid "Map \"%s\""
 msgstr "Mappa \"%s\""
 
-#: include/classes/import/CXmlImport18.php:818
+#: include/classes/import/CXmlImport18.php:819
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Mappa \"%s\" creata."
 
-#: include/classes/import/CXmlImport18.php:809
+#: include/classes/import/CXmlImport18.php:810
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Mappa \"%s\" aggiornata."
@@ -9109,8 +9109,8 @@ msgstr "Campo \"name\" mancante per il prototipo grafico."
 msgid "Missing \"name\" field for graph."
 msgstr "Campo \"nome\" mancante per il grafico."
 
-#: include/classes/import/CXmlImport18.php:1576
-#: include/classes/import/CXmlImport18.php:1589
+#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1590
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Item \"%1$s\" mancante per l'host \"%2$s\"."
@@ -9219,7 +9219,7 @@ msgstr "Sposta"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1644
+#: include/triggers.inc.php:1645
 msgid "Multiple PROBLEM events"
 msgstr "Eventi PROBLEMA multipli"
 
@@ -9240,7 +9240,7 @@ msgstr "MAPPE DI RETE"
 msgid "NNTP"
 msgstr "NNTP"
 
-#: include/classes/screens/CScreenClock.php:59
+#: include/classes/screens/CScreenClock.php:70
 msgid "NO DATA"
 msgstr "NESSUN DATO"
 
@@ -9439,7 +9439,7 @@ msgid "Next"
 msgstr "Successivo"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2436 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9476,12 +9476,12 @@ msgstr "Nessun \"%1$s\" fornito per il template schermata."
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "Nessun \"%2$s\" fornito per il prototipo host \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1566
+#: include/classes/import/CXmlImport18.php:1567
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Nessun campo \"ymax_type\" per il grafico \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1563
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Nessun campo \"ymin_type\" per il grafico \"%s\"."
@@ -9867,27 +9867,27 @@ msgstr "Nessuna operazione definita."
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1547
+#: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Nessun permesso per il grafico \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:961
+#: include/classes/import/CXmlImport18.php:962
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Nessun permesso per l'host \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1511
+#: include/classes/import/CXmlImport18.php:1512
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Nessun permesso per l'item \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1142
+#: include/classes/import/CXmlImport18.php:1143
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Nessun permesso per il template \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1422
+#: include/classes/import/CXmlImport18.php:1423
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Nessun permesso per il trigger \"%s\"."
@@ -9896,17 +9896,17 @@ msgstr "Nessun permesso per il trigger \"%s\"."
 msgid "No permissions"
 msgstr "Nessun permesso"
 
-#: include/classes/import/CXmlImport18.php:1022
+#: include/classes/import/CXmlImport18.php:1023
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Nessun permesso per il gruppo \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:659
+#: include/classes/import/CXmlImport18.php:660
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Nessun permesso per la mappa \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:452
+#: include/classes/import/CXmlImport18.php:453
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Nessun permesso per la schermata \"%1$s\"."
@@ -10075,7 +10075,7 @@ msgstr "Nessun trigger con triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Nessun trigger definito."
 
-#: include/triggers.inc.php:1250
+#: include/triggers.inc.php:1251
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10115,7 +10115,7 @@ msgstr "Nessun Web Scenario trovato."
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
 #: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1636
+#: include/page_header.php:324 include/triggers.inc.php:1637
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10181,7 +10181,7 @@ msgid "None"
 msgstr "Nessuno"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1643 popup.php:1509
+#: include/triggers.inc.php:1644 popup.php:1509
 msgid "Normal"
 msgstr "Normale"
 
@@ -10419,14 +10419,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "Numero di macchine virtuali su VMware hypervisor, <url> - servizio VMware URL, <uuid> - VMware hypervisor nome host"
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numerico (float)"
 
-#: include/triggers.inc.php:2236 include/triggers.inc.php:2252
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2266
-#: include/triggers.inc.php:2271 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2237 include/triggers.inc.php:2253
+#: include/triggers.inc.php:2257 include/triggers.inc.php:2267
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2276
 msgid "Numeric (integer 64bit)"
 msgstr "Numerico (intero 64bit)"
 
@@ -10442,8 +10442,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
+#: include/maps.inc.php:956 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10466,7 +10466,7 @@ msgstr "Router OOB"
 msgid "OOB subnet mask"
 msgstr "Maschera sottorete OOB"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -10958,7 +10958,7 @@ msgstr "Estensione PHP xmlwriter assente."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLEMA"
@@ -11111,7 +11111,7 @@ msgstr "Permessi"
 msgid "Permissions can be assigned for user groups only."
 msgstr "I permessi possono esser assegnati solo per i gruppi utente."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Persiano (fa_IR)"
 
@@ -11156,7 +11156,7 @@ msgstr "Per favore invia testo di conferma."
 msgid "Please select two elements"
 msgstr "Per favore seleziona due elementi"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Polacco (pl_PL)"
 
@@ -11192,11 +11192,11 @@ msgstr "La porta non può esser vuota per l'interfaccia host."
 msgid "Port range"
 msgstr "Range porte"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Portoghese (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr "Portoghese (pt_PT)"
 
@@ -11299,7 +11299,7 @@ msgstr "Livello privilegi"
 msgid "Probably php-ldap module is missing."
 msgstr "Probabilmente il modulo php-ldap è mancante."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problema"
@@ -11325,8 +11325,8 @@ msgstr "Problema, se tutti i figli hanno problemi"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problema, se almeno un servizio derivato ha un problema"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
+#: include/maps.inc.php:900 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemi"
 
@@ -11849,7 +11849,7 @@ msgstr "Restituisce la percentuale di pacchetti ICMP ping persi."
 msgid "Right"
 msgstr "Destra"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr "Rumeno (ro_RO)"
 
@@ -11915,7 +11915,7 @@ msgstr "Esegui comandi remoti sugli host"
 msgid "Run specified command on the host."
 msgstr "Esegue comando specificato sull'host."
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Russo (ru_RU)"
 
@@ -11940,7 +11940,7 @@ msgstr "SCHERMATE"
 msgid "SEARCH"
 msgstr "CERCA"
 
-#: include/classes/screens/CScreenClock.php:64
+#: include/classes/screens/CScreenClock.php:75
 msgid "SERVER"
 msgstr "SERVER"
 
@@ -12189,8 +12189,8 @@ msgstr "Controllo pianificato"
 msgid "Screen"
 msgstr "Schermata"
 
-#: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1707
+#: include/classes/import/CXmlImport18.php:578
+#: include/classes/import/CXmlImport18.php:1708
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Schermata \"%1$s\" aggiunta."
@@ -12229,15 +12229,15 @@ msgstr "Schermata \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s non è 
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr "Schermata \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s è troppo grande."
 
-#: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1638
-#: include/classes/import/CXmlImport18.php:1642
+#: include/classes/import/CXmlImport18.php:461
+#: include/classes/import/CXmlImport18.php:1639
+#: include/classes/import/CXmlImport18.php:1643
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Schermata \"%1$s\" saltata - regola utente."
 
-#: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1699
+#: include/classes/import/CXmlImport18.php:575
+#: include/classes/import/CXmlImport18.php:1700
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Schermata \"%1$s\" aggiornata."
@@ -12608,7 +12608,7 @@ msgstr "Sessione terminata, rieffettua il login, per favore."
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1642 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -12847,7 +12847,7 @@ msgstr "Presentazioni"
 msgid "Slides"
 msgstr "Diapositive"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Slovacco (sk_SK)"
 
@@ -12919,7 +12919,7 @@ msgstr "L'ordinamento per campo \"%1$s\" non è permesso."
 msgid "Source"
 msgstr "Sorgente"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Spagnolo (es_ES)"
 
@@ -13151,7 +13151,7 @@ msgstr "Swap out. Se il tipo e' \"count\" - restituisce swapouts. Se il tipo e' 
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Spazio Swap. Numero di Byte. Se swap assente viene considerato tutto. Se \"mode\" assente viene considerata la \"free\"."
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Svedese (sv_SE)"
 
@@ -13402,7 +13402,7 @@ msgid "Test string"
 msgstr "Stringa di test"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2241 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Testo"
@@ -13689,7 +13689,7 @@ msgstr "Trend"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1640
+#: include/maps.inc.php:26 include/triggers.inc.php:1641
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13713,8 +13713,8 @@ msgstr "Il trigger \"%1$s\" esiste già su \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Il trigger \"%1$s\" dipende dal trigger \"%2$s\", il quale non esiste."
 
-#: include/classes/import/CXmlImport18.php:1429
-#: include/classes/import/CXmlImport18.php:1433
+#: include/classes/import/CXmlImport18.php:1430
+#: include/classes/import/CXmlImport18.php:1434
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" saltato - regola utente."
@@ -13894,7 +13894,7 @@ msgstr "Valore trigger"
 
 #: hosts.php:810 hosts.php:902 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1262
+#: include/triggers.inc.php:1263
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:483
@@ -13963,7 +13963,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr "Turco (tr_TR)"
 
@@ -14107,7 +14107,7 @@ msgstr "PROFILO UTENTE"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraino (uk_UA)"
 
@@ -14123,7 +14123,7 @@ msgstr "Impossibile selezionare configurazione."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Impossibile caricare il file in quanto \"file_uploads\" è disabilitato."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
 msgid "Unacknowledged"
 msgstr "Senza acknowledge"
 
@@ -14181,7 +14181,7 @@ msgstr "Unità"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/triggers.inc.php:2492 include/triggers.inc.php:2498
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14203,11 +14203,11 @@ msgstr "Errore sconosciuto"
 msgid "Unknown function."
 msgstr "Funzione sconosciuta."
 
-#: include/triggers.inc.php:1774 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1775 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host sconosciuto, nessun item di questo tipo nell'host selezionato"
 
-#: include/triggers.inc.php:1773 tr_testexpr.php:33
+#: include/triggers.inc.php:1774 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Host sconosciuto, nessun host di questo tipo presente nel sistema"
 
@@ -14979,7 +14979,7 @@ msgstr "Verticale"
 msgid "Vertical align"
 msgstr "Allineamento verticale"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnamita (vi_VN)"
 
@@ -15275,23 +15275,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Etichetta X"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "Il file XML contiene un errore %1$s:"
 
-#: include/classes/import/CXmlImport18.php:405
-#: include/classes/import/CXmlImport18.php:408
-#: include/classes/import/CXmlImport18.php:411
+#: include/classes/import/CXmlImport18.php:406
+#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:412
 msgid "XML file contains errors"
 msgstr "Il file XML contiene errori"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "Il file XML contiene un errore fatale %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "Il file XML contiene un avvertimento %1$s:"
@@ -15368,7 +15368,7 @@ msgstr "Per anni"
 #: events.php:839 include/blocks.inc.php:750
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2436
-#: include/triggers.inc.php:1646
+#: include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"

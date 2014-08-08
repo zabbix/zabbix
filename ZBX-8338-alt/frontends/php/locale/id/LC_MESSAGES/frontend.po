@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:09+0300\n"
+"POT-Creation-Date: 2014-07-24 21:56+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -120,11 +120,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[PEMBERITAHUAN DALAM JUMLAH BESAR]----"
 
-#: include/triggers.inc.php:2261 include/triggers.inc.php:2262
-#: include/triggers.inc.php:2263 include/triggers.inc.php:2265
-#: include/triggers.inc.php:2267 include/triggers.inc.php:2270
-#: include/triggers.inc.php:2273 include/triggers.inc.php:2274
-#: include/triggers.inc.php:2285
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
+#: include/triggers.inc.php:2264 include/triggers.inc.php:2266
+#: include/triggers.inc.php:2268 include/triggers.inc.php:2271
+#: include/triggers.inc.php:2274 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2286
 msgid "0 or 1"
 msgstr "0 atau 1"
 
@@ -174,7 +174,7 @@ msgstr ""
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ALARM PEMBERITAHUAN"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -982,7 +982,7 @@ msgstr "Bawah"
 msgid "Brighten"
 msgstr "Lebih terang"
 
-#: include/locales.inc.php:52
+#: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
@@ -1323,7 +1323,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Tidak dapat menambah gambar"
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
 msgstr "Tidak dapat menambah gambar."
 
@@ -1522,7 +1522,7 @@ msgstr "Tidak dapat membuat ikon peta"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Tidak dapat membuat ikon pemetaan dengan nama yang mirip \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:815
+#: include/classes/import/CXmlImport18.php:816
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Tidak dapat membuat peta \"%s\"."
@@ -1535,7 +1535,7 @@ msgstr ""
 msgid "Cannot create new element"
 msgstr "Tidak dapat membuat elemen baru"
 
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:1705
 msgid "Cannot create screen."
 msgstr "Tidak dapat membuat layar."
 
@@ -1908,38 +1908,38 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
-#: include/classes/import/CXmlImport18.php:675
+#: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan gambar latar \"%1$s\" used in map \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1661
+#: include/classes/import/CXmlImport18.php:509
+#: include/classes/import/CXmlImport18.php:1662
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grrafik \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:722
+#: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan di peta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:485
+#: include/classes/import/CXmlImport18.php:486
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:733
+#: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan di peta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:497
+#: include/classes/import/CXmlImport18.php:498
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1963,7 +1963,7 @@ msgstr "Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1994,14 +1994,14 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1674
+#: include/classes/import/CXmlImport18.php:522
+#: include/classes/import/CXmlImport18.php:1675
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan item \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:711
+#: include/classes/import/CXmlImport18.php:712
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
@@ -2011,7 +2011,7 @@ msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" ya
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:532
+#: include/classes/import/CXmlImport18.php:533
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -2021,7 +2021,7 @@ msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada layar \"%2$s\"."
 msgid "Cannot find objects with name"
 msgstr "Tidak dapat menemukan objek dengan nama"
 
-#: include/classes/import/CXmlImport18.php:543
+#: include/classes/import/CXmlImport18.php:544
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
@@ -2032,8 +2032,8 @@ msgstr "Tidak dapat menemukan layar \"%1$s\" yang digunakan pada layar \"%2$s\".
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:744
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:745
+#: include/classes/import/CXmlImport18.php:788
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2389,7 +2389,7 @@ msgstr "Tidak dapat perbarui icon map"
 msgid "Cannot update image"
 msgstr "Tidak dapat perbarui gambar"
 
-#: include/classes/import/CXmlImport18.php:638
+#: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
 msgstr "Tidak dapat perbarui gambar."
 
@@ -2422,7 +2422,7 @@ msgstr "Tidak dapat perbarui macro"
 msgid "Cannot update maintenance"
 msgstr "Tidak dapat perbarui pemeliharaan"
 
-#: include/classes/import/CXmlImport18.php:806
+#: include/classes/import/CXmlImport18.php:807
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Tidak dapat perbarui map \"%s\"."
@@ -2456,7 +2456,7 @@ msgstr "Tidak dapat perbarui ekspresi regular"
 msgid "Cannot update screen"
 msgstr "Tidak dapat perbarui layar"
 
-#: include/classes/import/CXmlImport18.php:1696
+#: include/classes/import/CXmlImport18.php:1697
 msgid "Cannot update screen."
 msgstr "Tidak dapat perbarui layar."
 
@@ -2561,7 +2561,7 @@ msgid "Change password"
 msgstr "Ubah password"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Karakter"
@@ -2662,11 +2662,11 @@ msgstr "Pemeriksaan harus unik."
 msgid "Child"
 msgstr "Anak"
 
-#: include/locales.inc.php:53
+#: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
 msgstr "Chinese (zh_CN)"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
 msgstr "Chinese (zh_TW)"
 
@@ -3402,7 +3402,7 @@ msgstr "Custom ukuran"
 msgid "Custom slides"
 msgstr "Custom slides"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
 msgstr "Czech (cs_CZ)"
 
@@ -3428,8 +3428,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAIL SKRENARIO"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
+#: include/maps.inc.php:946
 msgid "DISABLED"
 msgstr "NON-AKTIFKAN"
 
@@ -4112,11 +4112,11 @@ msgstr "Tolak"
 msgid "Dependencies"
 msgstr "Dependensi"
 
-#: include/triggers.inc.php:1418 tr_status.php:612
+#: include/triggers.inc.php:1419 tr_status.php:612
 msgid "Dependent"
 msgstr "Tergantung"
 
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1399
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:596
@@ -4326,8 +4326,8 @@ msgstr "Non-aktifkan trigger yang dipilih?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1645
-#: include/triggers.inc.php:2494 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1646
+#: include/triggers.inc.php:2495 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4609,7 +4609,7 @@ msgstr "Durasi"
 msgid "Duration (sec)"
 msgstr "Durasi (dtk)"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
 msgstr "Dutch (nl_NL)"
 
@@ -4882,7 +4882,7 @@ msgstr "Aktifkan trigger yang dipilih?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2491
+#: include/items.inc.php:206 include/triggers.inc.php:2492
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4903,11 +4903,11 @@ msgstr "Aktifkan trigger yang dipilih?"
 msgid "Enabled"
 msgstr "Aktif"
 
-#: include/locales.inc.php:50
+#: include/locales.inc.php:55
 msgid "English (en_GB)"
 msgstr "English (en_GB)"
 
-#: include/locales.inc.php:51
+#: include/locales.inc.php:56
 msgid "English (en_US)"
 msgstr "English (en_US)"
 
@@ -4964,7 +4964,7 @@ msgstr "Permberitahuan event dimatikan"
 msgid "Event details"
 msgstr "Detail event"
 
-#: include/triggers.inc.php:1643
+#: include/triggers.inc.php:1644
 msgid "Event generation"
 msgstr "Pembuatan event"
 
@@ -5067,7 +5067,7 @@ msgstr "Ekspor yang dipilih"
 msgid "Export to CSV"
 msgstr "Ekspor ke CSV"
 
-#: include/triggers.inc.php:1642
+#: include/triggers.inc.php:1643
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5297,7 +5297,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Selesai"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:62
 msgid "Finnish (fi_FI)"
 msgstr "Finnish (fi_FI)"
 
@@ -5336,7 +5336,7 @@ msgstr "Rumus"
 msgid "Fourth"
 msgstr "Keempat"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "French (fr_FR)"
 
@@ -5430,7 +5430,7 @@ msgstr "Umum"
 msgid "Generated in %s sec"
 msgstr "Pembuatan dalam %s det"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
@@ -5462,7 +5462,7 @@ msgstr ""
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1775 tr_testexpr.php:35
+#: include/triggers.inc.php:1776 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Ekspresi yang diberikan bukan sebuah macro"
 
@@ -5565,8 +5565,8 @@ msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pad
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Grafik \"%1$s\" tidak ada pada template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1553
-#: include/classes/import/CXmlImport18.php:1557
+#: include/classes/import/CXmlImport18.php:1554
+#: include/classes/import/CXmlImport18.php:1558
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Grafik \"%1$s\" diabaikan - aturan user."
@@ -5694,7 +5694,7 @@ msgstr "Grafik telah disalin"
 msgid "Graphs deleted"
 msgstr "Grafik telah dihapus"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:65
 msgid "Greek (el_GR)"
 msgstr "Greek (el_GR)"
 
@@ -5995,8 +5995,8 @@ msgstr "Luruskan horisontal"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1287
-#: include/triggers.inc.php:1639
+#: include/setup.inc.php:365 include/triggers.inc.php:1288
+#: include/triggers.inc.php:1640
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6037,7 +6037,7 @@ msgstr "Host \"%1$s\" sudah ada."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" dipantau dengan proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:926
+#: include/classes/import/CXmlImport18.php:927
 #, fuzzy, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
@@ -6382,7 +6382,7 @@ msgstr "Jam"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:66
 msgid "Hungarian (hu_HU)"
 msgstr "Hungarian (hu_HU)"
 
@@ -6657,7 +6657,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:968
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7045,7 +7045,7 @@ msgstr "Kesalahan interval flexible \"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string."
 
-#: include/triggers.inc.php:629 include/triggers.inc.php:1776
+#: include/triggers.inc.php:629 include/triggers.inc.php:1777
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Kesalahan fungsi telah digunakan"
@@ -7128,7 +7128,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "Kesalahan item untuk nilai axis."
 
-#: api/classes/CTrigger.php:725 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:725 include/triggers.inc.php:1041
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\"."
@@ -7365,7 +7365,7 @@ msgstr "Kesalahan ekspresi trigger"
 msgid "Incorrect trigger expression."
 msgstr "Kesalahan ekspresi trigger."
 
-#: include/triggers.inc.php:1143
+#: include/triggers.inc.php:1144
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
@@ -7452,17 +7452,17 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "Kesalahan waktu kerja."
 
-#: include/classes/import/CXmlImport18.php:1585
+#: include/classes/import/CXmlImport18.php:1586
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Kesalahan item y max untuk grafik \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1572
+#: include/classes/import/CXmlImport18.php:1573
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Kesalahan item y min untuk grafik \"%1$s\"."
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:67
 msgid "Indonesian (id_ID)"
 msgstr "Indonesian (id_ID)"
 
@@ -7712,7 +7712,7 @@ msgstr "Tidak memungkinkan untuk logout melalui otentikasi HTTP."
 msgid "It is not possible to search by user password."
 msgstr "Tidak memungkinkan untuk mencari dengan password user."
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:68
 msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
@@ -7745,7 +7745,7 @@ msgstr "Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilan
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" tidak ada di template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1520
+#: include/classes/import/CXmlImport18.php:1521
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Item \"%1$s\" tidak ada."
@@ -7755,8 +7755,8 @@ msgstr "Item \"%1$s\" tidak ada."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" pada \"%2$s\": aplikasi \"%3$s\" tidak ada."
 
-#: include/classes/import/CXmlImport18.php:1271
-#: include/classes/import/CXmlImport18.php:1275
+#: include/classes/import/CXmlImport18.php:1272
+#: include/classes/import/CXmlImport18.php:1276
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" diabaikan - aturan user."
@@ -7991,7 +7991,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Januari"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:70
 msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
@@ -8050,7 +8050,7 @@ msgstr "Kata kunci"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
 msgstr "Korean (ko_KR)"
 
@@ -8085,7 +8085,7 @@ msgstr "Login LDAP berhasil"
 msgid "LDAP login was not successful"
 msgstr "Login LDAP gagal"
 
-#: include/classes/screens/CScreenClock.php:70
+#: include/classes/screens/CScreenClock.php:81
 msgid "LOCAL"
 msgstr "LOKAL"
 
@@ -8208,7 +8208,7 @@ msgstr "Event terakhir"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:71
 msgid "Latvian (lv_LV)"
 msgstr "Latvian (lv_LV)"
 
@@ -8330,7 +8330,7 @@ msgstr "Daftar kosong"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:72
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -8361,7 +8361,7 @@ msgid "Location longitude"
 msgstr "Longitude lokasi"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -8484,7 +8484,7 @@ msgstr "Alamat MAC A"
 msgid "MAC address B"
 msgstr "Alamat MAC B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:760
 msgid "MAINTENANCE"
 msgstr "PEMELIHARAAN"
 
@@ -8557,7 +8557,7 @@ msgstr "Makro"
 msgid "Macros updated"
 msgstr "Makro diperbarui"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -8640,7 +8640,7 @@ msgstr "Manual Logout"
 msgid "Map"
 msgstr "Peta"
 
-#: include/classes/import/CXmlImport18.php:666
+#: include/classes/import/CXmlImport18.php:667
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Peta \"%1$s\" diabaikan - aturan user."
@@ -8650,12 +8650,12 @@ msgstr "Peta \"%1$s\" diabaikan - aturan user."
 msgid "Map \"%s\""
 msgstr "Peta \"%s\""
 
-#: include/classes/import/CXmlImport18.php:818
+#: include/classes/import/CXmlImport18.php:819
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Peta \"%s\" dibuat."
 
-#: include/classes/import/CXmlImport18.php:809
+#: include/classes/import/CXmlImport18.php:810
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Peta \"%s\" diperbarui."
@@ -9054,8 +9054,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "Hilangnya field \"nama\" untuk grafik."
 
-#: include/classes/import/CXmlImport18.php:1576
-#: include/classes/import/CXmlImport18.php:1589
+#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1590
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Hilangnya item \"%1$s\" untuk host \"%2$s\"."
@@ -9164,7 +9164,7 @@ msgstr "Pindah"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1644
+#: include/triggers.inc.php:1645
 msgid "Multiple PROBLEM events"
 msgstr "Beberapa MASALAH event"
 
@@ -9185,7 +9185,7 @@ msgstr "PETA JARINGAN"
 msgid "NNTP"
 msgstr "NNTP"
 
-#: include/classes/screens/CScreenClock.php:59
+#: include/classes/screens/CScreenClock.php:70
 msgid "NO DATA"
 msgstr "TIDAK ADA DATA"
 
@@ -9384,7 +9384,7 @@ msgid "Next"
 msgstr "Lanjut"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2436 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9421,12 +9421,12 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1566
+#: include/classes/import/CXmlImport18.php:1567
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymax_type\" untuk grafik \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1563
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymix_type\" untuk grafik \"%s\"."
@@ -9812,27 +9812,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1547
+#: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Tidak ada izin untuk grafik \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:961
+#: include/classes/import/CXmlImport18.php:962
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Tidak ada izin untuk host \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1511
+#: include/classes/import/CXmlImport18.php:1512
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Tidak ada izin untuk item \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1142
+#: include/classes/import/CXmlImport18.php:1143
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Tidak ada permission untuk template \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1422
+#: include/classes/import/CXmlImport18.php:1423
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Tidak ada izin untuk trigger \"%s\"."
@@ -9841,17 +9841,17 @@ msgstr "Tidak ada izin untuk trigger \"%s\"."
 msgid "No permissions"
 msgstr "Tidak ada izin"
 
-#: include/classes/import/CXmlImport18.php:1022
+#: include/classes/import/CXmlImport18.php:1023
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Tidak ada izin untuk grup \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:659
+#: include/classes/import/CXmlImport18.php:660
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Tidak ada izin untuk peta \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:452
+#: include/classes/import/CXmlImport18.php:453
 #, c-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Tidak ada izin untuk layar \"%1$s\"."
@@ -10020,7 +10020,7 @@ msgstr "Tidak ada trigger dengan triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Tidak ada trigger yang didefinisikan."
 
-#: include/triggers.inc.php:1250
+#: include/triggers.inc.php:1251
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10060,7 +10060,7 @@ msgstr ""
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
 #: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1636
+#: include/page_header.php:324 include/triggers.inc.php:1637
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10126,7 +10126,7 @@ msgid "None"
 msgstr "Tidak ada"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1643 popup.php:1509
+#: include/triggers.inc.php:1644 popup.php:1509
 msgid "Normal"
 msgstr "Normal"
 
@@ -10364,14 +10364,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr ""
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numerik (float)"
 
-#: include/triggers.inc.php:2236 include/triggers.inc.php:2252
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2266
-#: include/triggers.inc.php:2271 include/triggers.inc.php:2275
+#: include/triggers.inc.php:2237 include/triggers.inc.php:2253
+#: include/triggers.inc.php:2257 include/triggers.inc.php:2267
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2276
 msgid "Numeric (integer 64bit)"
 msgstr "Numerik (integer 64bit)"
 
@@ -10387,8 +10387,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
+#: include/maps.inc.php:956 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10411,7 +10411,7 @@ msgstr "Router OOB"
 msgid "OOB subnet mask"
 msgstr "Subnet mask OOB"
 
-#: include/triggers.inc.php:1700
+#: include/triggers.inc.php:1701
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -10903,7 +10903,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "MASALAH"
@@ -11056,7 +11056,7 @@ msgstr "Izin"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Perizinan dapat diberikan hanya untuk grup user."
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:73
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
@@ -11101,7 +11101,7 @@ msgstr "Silahkan masukkan teks konfirmasi."
 msgid "Please select two elements"
 msgstr "Silahkan pilih dua elemen"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:74
 msgid "Polish (pl_PL)"
 msgstr "Polish (pl_PL)"
 
@@ -11137,11 +11137,11 @@ msgstr "Port tidak boleh kosong untuk interface host."
 msgid "Port range"
 msgstr "Range port"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:75
 msgid "Portuguese (pt_BR)"
 msgstr "Portuguese (pt_BR)"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:76
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -11244,7 +11244,7 @@ msgstr "Tingkatan hak"
 msgid "Probably php-ldap module is missing."
 msgstr "Kemungkinan modul php-ldap hilang."
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Masalah"
@@ -11270,8 +11270,8 @@ msgstr "Masalah, jika semua turunan memiliki masalah"
 msgid "Problem, if at least one child has a problem"
 msgstr "Masalah, jika setidaknya satu turunan memiliki masalah"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
+#: include/maps.inc.php:900 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Masalah"
 
@@ -11793,7 +11793,7 @@ msgstr ""
 msgid "Right"
 msgstr "Kanan"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:77
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -11859,7 +11859,7 @@ msgstr "Jalankan perintah jarak jauh pada host"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
@@ -11884,7 +11884,7 @@ msgstr "LAYAR"
 msgid "SEARCH"
 msgstr "CARI"
 
-#: include/classes/screens/CScreenClock.php:64
+#: include/classes/screens/CScreenClock.php:75
 msgid "SERVER"
 msgstr "SERVER"
 
@@ -12133,8 +12133,8 @@ msgstr ""
 msgid "Screen"
 msgstr "Layar"
 
-#: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1707
+#: include/classes/import/CXmlImport18.php:578
+#: include/classes/import/CXmlImport18.php:1708
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Layar \"%1$s\" ditambah."
@@ -12173,15 +12173,15 @@ msgstr ""
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1638
-#: include/classes/import/CXmlImport18.php:1642
+#: include/classes/import/CXmlImport18.php:461
+#: include/classes/import/CXmlImport18.php:1639
+#: include/classes/import/CXmlImport18.php:1643
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Layar \"%1$s\" diabaikan - aturan user."
 
-#: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1699
+#: include/classes/import/CXmlImport18.php:575
+#: include/classes/import/CXmlImport18.php:1700
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Layar \"%1$s\" diperbarui."
@@ -12552,7 +12552,7 @@ msgstr "Sesi dimatikan, mohon login kembali."
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1642 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -12791,7 +12791,7 @@ msgstr "Slide show"
 msgid "Slides"
 msgstr "Slide"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
@@ -12863,7 +12863,7 @@ msgstr "Urut berdasarkan field \"%1$s\" tidak boleh."
 msgid "Source"
 msgstr "Sumber"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
 msgstr "Spanish (es_ES)"
 
@@ -13095,7 +13095,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
@@ -13346,7 +13346,7 @@ msgid "Test string"
 msgstr "Tes string"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2241 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Teks"
@@ -13630,7 +13630,7 @@ msgstr "Tren"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1640
+#: include/maps.inc.php:26 include/triggers.inc.php:1641
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13654,8 +13654,8 @@ msgstr "Trigger \"%1$s\" sudah ada pada \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger \"%1$s\" tergantung pada trigger \"%2$s\", yang tidak ada."
 
-#: include/classes/import/CXmlImport18.php:1429
-#: include/classes/import/CXmlImport18.php:1433
+#: include/classes/import/CXmlImport18.php:1430
+#: include/classes/import/CXmlImport18.php:1434
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" diabaikan - aturan user."
@@ -13831,7 +13831,7 @@ msgstr "Nilai trigger"
 
 #: hosts.php:810 hosts.php:902 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1262
+#: include/triggers.inc.php:1263
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:483
@@ -13900,7 +13900,7 @@ msgstr "Sel"
 msgid "Tuesday"
 msgstr "Selasa"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:82
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14044,7 +14044,7 @@ msgstr "PROFIL USER"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
@@ -14060,7 +14060,7 @@ msgstr "Tidak dapat memilih konfigurasi."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
 msgid "Unacknowledged"
 msgstr "Bukan pemberitahuan"
 
@@ -14118,7 +14118,7 @@ msgstr "Unit"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
-#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/triggers.inc.php:2492 include/triggers.inc.php:2498
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14140,11 +14140,11 @@ msgstr ""
 msgid "Unknown function."
 msgstr "Fungsi yang tidak dikenal."
 
-#: include/triggers.inc.php:1774 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1775 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilih"
 
-#: include/triggers.inc.php:1773 tr_testexpr.php:33
+#: include/triggers.inc.php:1774 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Host tidak dikenal, tidak ada host yang hadir dalam sistem"
 
@@ -14914,7 +14914,7 @@ msgstr "Vertikal"
 msgid "Vertical align"
 msgstr "Meluruskan vertikal"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15208,23 +15208,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Label X"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, c-format
 msgid "XML file contains error %1$s:"
 msgstr "File XML mengandung error %1$s:"
 
-#: include/classes/import/CXmlImport18.php:405
-#: include/classes/import/CXmlImport18.php:408
-#: include/classes/import/CXmlImport18.php:411
+#: include/classes/import/CXmlImport18.php:406
+#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:412
 msgid "XML file contains errors"
 msgstr "File XML mengandung error"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, c-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "File XML mengandung error fatal %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "XML file contains warning %1$s:"
 msgstr "File XML mengandung peringatan %1$s:"
@@ -15301,7 +15301,7 @@ msgstr "Tahunan"
 #: events.php:839 include/blocks.inc.php:750
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2436
-#: include/triggers.inc.php:1646
+#: include/triggers.inc.php:1647
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"

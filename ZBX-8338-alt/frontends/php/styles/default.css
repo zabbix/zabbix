@@ -238,7 +238,7 @@ ul.favorites li { line-height: 16px; vertical-align: top; list-style: url("../im
 ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
 ul.favorites li a { line-height: 18px; vertical-align: top; }
 
-/* frondend messages */
+/* frontend messages */
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
