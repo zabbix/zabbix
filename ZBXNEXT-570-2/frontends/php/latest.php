@@ -133,11 +133,12 @@ $filter = array(
 	'select' => CProfile::get('web.latest.filter.select', ''),
 	'showWithoutData' => CProfile::get('web.latest.filter.show_without_data', 1),
 	'showDetails' => CProfile::get('web.latest.filter.show_details'),
-	'application' => CProfile::get('web.latest.filter.application'),
-	'groupids' => CProfile::getArray('web.latest.filter.groupids', array()),
-	'hostids' => CProfile::getArray('web.latest.filter.hostids', array())
+	'application' => CProfile::get('web.latest.filter.application', ''),
+	'groupids' => CProfile::getArray('web.latest.filter.groupids'),
+	'hostids' => CProfile::getArray('web.latest.filter.hostids')
 );
 
+// we'll need to hide the host column if only one host is selected
 $singleHostSelected = (count($filter['hostids']) == 1);
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('host', 'name', 'lastclock'));
@@ -147,27 +148,24 @@ $sortOrder = getPageSortOrder();
 
 $applications = $items = $hostScripts = array();
 
-// groups and hosts used in the filter
-$filterGroups = API::HostGroup()->get(array(
-	'output' => array('groupid', 'name'),
-	'groupids' => $filter['groupids']
-));
-
-$filterHosts = API::Host()->get(array(
-	'output' => array('hostid', 'name'),
-	'hostids' => $filter['hostids']
-));
-
-$hosts = API::Host()->get(array(
-	'output' => array('name', 'hostid', 'status'),
-	'hostids' => ($filter['hostids']) ? $filter['hostids'] : null,
-	'groupids' => ($filter['groupids']) ? $filter['groupids'] : null,
-	'selectGraphs' => API_OUTPUT_COUNT,
-	'with_monitored_items' => true,
-	'preservekeys' => true
-));
+// we'll only display the values if the filter is set
+$filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
+if ($filterSet) {
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid', 'status'),
+		'hostids' => $filter['hostids'],
+		'groupids' => $filter['groupids'],
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'with_monitored_items' => true,
+		'preservekeys' => true
+	));
+}
+else {
+	$hosts = array();
+}
 
 if ($hosts) {
+
 	foreach ($hosts as &$host) {
 		$host['item_cnt'] = 0;
 	}
@@ -177,22 +175,45 @@ if ($hosts) {
 		$sortFields = ($sortField === 'host') ? array(array('field' => 'name', 'order' => $sortOrder)) : array('name');
 		CArrayHelper::sort($hosts, $sortFields);
 	}
-}
 
-// get items
-if ($hosts) {
+	$hostIds = array_keys($hosts);
+
+	$applications = null;
+
+	// if an application filter is set, fetch the applications and then use them to filter items
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $hostIds,
+			'search' => array('name' => $filter['application']),
+			'preservekeys' => true
+		));
+	}
+
 	$items = API::Item()->get(array(
 		'hostids' => array_keys($hosts),
 		'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
 			'error', 'trends', 'history', 'delay', 'key_', 'flags'),
 		'selectApplications' => array('applicationid'),
 		'selectItemDiscovery' => array('ts_delete'),
+		'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
 		'webitems' => true,
 		'filter' => array(
 			'status' => array(ITEM_STATUS_ACTIVE)
 		),
 		'preservekeys' => true
 	));
+
+	// if the applications haven't been loaded when filtering, load them based on the retrieved items to avoid
+	// fetching applications from hosts that may not be displayed
+	if ($applications === null) {
+		$applications = API::Application()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
+			'search' => array('name' => $filter['application']),
+			'preservekeys' => true
+		));
+	}
 }
 
 if ($items) {
@@ -204,7 +225,7 @@ if ($items) {
 	foreach ($items as $key => $item) {
 		if (($filter['select'] !== '')) {
 			$haystack = mb_strtolower($item['name_expanded']);
-			$needle = mb_strtolower($filterSelect);
+			$needle = mb_strtolower($filter['select']);
 
 			if (mb_strpos($haystack, $needle) === false) {
 				unset($items[$key]);
@@ -227,8 +248,6 @@ if ($items) {
 	}
 
 	if ($items) {
-		$hostIds = array_keys(array_flip(zbx_objectValues($items, 'hostid')));
-
 		// add item last update date for sorting
 		foreach ($items as &$item) {
 			if (isset($history[$item['itemid']])) {
@@ -248,13 +267,6 @@ if ($items) {
 			$sortFields = array('name_expanded', 'itemid');
 		}
 		CArrayHelper::sort($items, $sortFields);
-
-		// get applications
-		$applications = API::Application()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'hostids' => $hostIds,
-			'preservekeys' => true
-		));
 
 		if ($applications) {
 			foreach ($applications as &$application) {
@@ -294,20 +306,34 @@ if ($filter['showDetails']) {
 
 // multiselect hosts
 $multiSelectHostData = array();
-foreach ($filterHosts as $host) {
-	$multiSelectHostData[] = array(
-		'id' => $host['hostid'],
-		'name' => $host['name']
-	);
+if ($filter['hostids']) {
+	$filterHosts = API::Host()->get(array(
+		'output' => array('hostid', 'name'),
+		'hostids' => $filter['hostids']
+	));
+
+	foreach ($filterHosts as $host) {
+		$multiSelectHostData[] = array(
+			'id' => $host['hostid'],
+			'name' => $host['name']
+		);
+	}
 }
 
 // multiselect host groups
 $multiSelectHostGroupData = array();
-foreach ($filterGroups as $group) {
-	$multiSelectHostGroupData[] = array(
-		'id' => $group['groupid'],
-		'name' => $group['name']
-	);
+if ($filter['groupids'] !== null) {
+	$filterGroups = API::HostGroup()->get(array(
+		'output' => array('groupid', 'name'),
+		'groupids' => $filter['groupids']
+	));
+
+	foreach ($filterGroups as $group) {
+		$multiSelectHostGroupData[] = array(
+			'id' => $group['groupid'],
+			'name' => $group['name']
+		);
+	}
 }
 
 /*
@@ -363,7 +389,7 @@ $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table
-$table = new CTableInfo(_('No values found.'));
+$table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
 
 if ($singleHostSelected) {
 	$hostHeader = null;
@@ -559,9 +585,11 @@ foreach ($items as $key => $item){
 	foreach ($item['applications'] as $itemApplication) {
 		$applicationId = $itemApplication['applicationid'];
 
-		$applications[$applicationId]['item_cnt']++;
-		// objects may have different properties, so it's better to use a copy of it
-		$tab_rows[$applicationId][] = clone $row;
+		if (isset($applications[$applicationId])) {
+			$applications[$applicationId]['item_cnt']++;
+			// objects may have different properties, so it's better to use a copy of it
+			$tab_rows[$applicationId][] = clone $row;
+		}
 	}
 
 	// remove items with applications from the collection
