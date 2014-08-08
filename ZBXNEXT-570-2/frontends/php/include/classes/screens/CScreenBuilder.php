@@ -259,6 +259,22 @@ class CScreenBuilder {
 				return new CScreenHostTriggers($options);
 
 			case SCREEN_RESOURCE_HISTORY:
+				// TODO: pass the items from the outside instead of retrieving them by ids
+				if (isset($options['itemids'])) {
+					$items = API::Item()->get(array(
+						'itemids' => $options['itemids'],
+						'webitems' => true,
+						'selectHosts' => array('name'),
+						'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
+						'preservekeys' => true
+					));
+
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+
+					$options['items'] = $items;
+					unset($options['itemids']);
+				}
+
 				return new CScreenHistory($options);
 
 			case SCREEN_RESOURCE_CHART:

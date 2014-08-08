@@ -22,13 +22,6 @@
 class CScreenHistory extends CScreenBase {
 
 	/**
-	 * Item ids
-	 *
-	 * @var array
-	 */
-	public $itemids;
-
-	/**
 	 * Search string
 	 *
 	 * @var string
@@ -64,23 +57,14 @@ class CScreenHistory extends CScreenBase {
 	public $items;
 
 	/**
-	 * Item data
-	 *
-	 * @var array
-	 */
-	public $item;
-
-	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
-	 * @param array		$options['itemids']
 	 * @param string	$options['filter']
 	 * @param int		$options['filterTask']
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
 	 * @param array		$options['items']
-	 * @param array		$options['item']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
@@ -88,29 +72,13 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->itemids = isset($options['itemids']) ? $options['itemids'] : null;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
 
 		// optional
 		$this->items = isset($options['items']) ? $options['items'] : null;
-		$this->item = isset($options['item']) ? $options['item'] : null;
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
-
-		if (empty($this->items)) {
-			$this->items = API::Item()->get(array(
-				'itemids' => $this->itemids,
-				'webitems' => true,
-				'selectHosts' => array('name'),
-				'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
-				'preservekeys' => true
-			));
-
-			$this->items = CMacrosResolverHelper::resolveItemNames($this->items);
-
-			$this->item = reset($this->items);
-		}
 	}
 
 	/**
@@ -122,6 +90,8 @@ class CScreenHistory extends CScreenBase {
 		$output = array();
 
 		$stime = zbxDateToTime($this->timeline['stime']);
+		$itemIds = zbx_objectValues($this->items, 'itemid');
+		$firstItem = reset($this->items);
 
 		$iv_string = array(
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -134,8 +104,8 @@ class CScreenHistory extends CScreenBase {
 
 		if ($this->action == 'showvalues' || $this->action == 'showlatest') {
 			$options = array(
-				'history' => $this->item['value_type'],
-				'itemids' => array_keys($this->items),
+				'history' => $firstItem['value_type'],
+				'itemids' => $itemIds,
 				'output' => API_OUTPUT_EXTEND,
 				'sortorder' => ZBX_SORT_DOWN
 			);
@@ -151,10 +121,10 @@ class CScreenHistory extends CScreenBase {
 			}
 
 			// text log
-			if (isset($iv_string[$this->item['value_type']])) {
+			if (isset($iv_string[$firstItem['value_type']])) {
 				$isManyItems = (count($this->items) > 1);
-				$useLogItem = ($this->item['value_type'] == ITEM_VALUE_TYPE_LOG);
-				$useEventLogItem = (strpos($this->item['key_'], 'eventlog[') === 0);
+				$useLogItem = ($firstItem['value_type'] == ITEM_VALUE_TYPE_LOG);
+				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
 				if (empty($this->plaintext)) {
 					$historyTable = new CTableInfo(_('No values found.'));
@@ -242,8 +212,8 @@ class CScreenHistory extends CScreenBase {
 						if (is_null($color)) {
 							$min_color = 0x98;
 							$max_color = 0xF8;
-							$int_color = ($max_color - $min_color) / count($this->itemids);
-							$int_color *= array_search($data['itemid'], $this->itemids);
+							$int_color = ($max_color - $min_color) / count($itemIds);
+							$int_color *= array_search($data['itemid'], $itemIds);
 							$int_color += $min_color;
 							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
 						}
@@ -307,10 +277,10 @@ class CScreenHistory extends CScreenBase {
 			}
 		}
 
-		if ($this->action == 'showgraph' && !isset($iv_string[$this->item['value_type']])) {
+		if ($this->action == 'showgraph' && !isset($iv_string[$firstItem['value_type']])) {
 			$this->dataId = 'historyGraph';
 			$containerId = 'graph_cont1';
-			$src = 'chart.php?itemid='.$this->item['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'].$this->getProfileUrlParams();
+			$src = 'chart.php?itemid='.$firstItem['itemid'].'&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'].$this->getProfileUrlParams();
 
 			$output[] = new CDiv(null, 'center', $containerId);
 		}
@@ -319,7 +289,7 @@ class CScreenHistory extends CScreenBase {
 		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph'))) {
 			$graphDims = getGraphDims();
 
-			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($this->item['itemid']));
+			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($firstItem['itemid']));
 
 			$timeControlData = array(
 				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
@@ -357,7 +327,7 @@ class CScreenHistory extends CScreenBase {
 		else {
 			if ($this->mode != SCREEN_MODE_JS) {
 				$flickerfreeData = array(
-					'itemids' => $this->itemids,
+					'itemids' => $itemIds,
 					'action' => $this->action,
 					'filter' => $this->filter,
 					'filterTask' => $this->filterTask,
