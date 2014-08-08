@@ -975,6 +975,6 @@ class CScreenItem extends CApiService {
 	 * @return bool
 	 */
 	protected function isValidMaxColumns($maxColumns) {
-		return $maxColumns >= SCREEN_SURROGATE_MIN_COLUMNS and $maxColumns <= SCREEN_SURROGATE_MAX_COLUMNS;
+		return $maxColumns >= SCREEN_SURROGATE_MAX_COLUMNS_MIN and $maxColumns <= SCREEN_SURROGATE_MAX_COLUMNS_MAX;
 	}
 }
