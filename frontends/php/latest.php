@@ -351,8 +351,8 @@ $filterForm->addRow(_('Host groups'), new CMultiSelect(array(
 	'objectName' => 'hostGroup',
 	'data' => $multiSelectHostGroupData,
 	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=filter_groupid'.
-			'&srcfld1=groupid&writeonly=1',
+		'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
+			'&srcfld1=groupid&multiselect=1',
 		'width' => 450,
 		'height' => 450,
 		'buttonClass' => 'input filter-button'
@@ -363,8 +363,8 @@ $filterForm->addRow(_('Hosts'), new CMultiSelect(array(
 	'objectName' => 'hosts',
 	'data' => $multiSelectHostData,
 	'popup' => array(
-		'parameters' => 'srctbl=host_templates&dstfrm='.$filterForm->getName().'&dstfld1=filter_hostid'.
-			'&srcfld1=hostid&writeonly=1',
+		'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_'.
+			'&srcfld1=hostid&real_hosts=1&multiselect=1',
 		'width' => 450,
 		'height' => 450,
 		'buttonClass' => 'input filter-multiselect-select-button'
