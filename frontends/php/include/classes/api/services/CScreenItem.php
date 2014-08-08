@@ -456,11 +456,6 @@ class CScreenItem extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
 			}
 
-			if (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH))
-					&& !$this->isValidMaxColumns($screenItem['max_columns'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect max columns provided for screen item.'));
-			}
-
 			if (!isset($screenItem['resourceid'])) {
 				$screenItem['resourceid'] = null;
 			}
@@ -472,9 +467,12 @@ class CScreenItem extends CApiService {
 				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 				case SCREEN_RESOURCE_DATA_OVERVIEW:
-					if (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
+					$overviewResources = array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
+					if (in_array($screenItem['resourcetype'], $overviewResources)) {
 						if (!$screenItem['resourceid']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No host group ID provided for screen element.'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _(
+								'No host group ID provided for screen element.'
+							));
 						}
 					}
 
@@ -499,7 +497,14 @@ class CScreenItem extends CApiService {
 
 				case SCREEN_RESOURCE_LLD_GRAPH:
 					if (!$screenItem['resourceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No graph prototype ID provided for screen element.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _(
+							'No graph prototype ID provided for screen element.'
+						));
+					}
+					elseif (!$this->isValidMaxColumns($screenItem['max_columns'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _(
+							'Incorrect max columns provided for screen element.'
+						));
 					}
 
 					$graphPrototypeIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -507,7 +512,14 @@ class CScreenItem extends CApiService {
 
 				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 					if (!$screenItem['resourceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No item prototype ID provided for screen element.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _(
+							'No item prototype ID provided for screen element.'
+						));
+					}
+					elseif (!$this->isValidMaxColumns($screenItem['max_columns'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _(
+							'Incorrect max columns provided for screen element.'
+						));
 					}
 
 					$itemPrototypeIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -565,16 +577,10 @@ class CScreenItem extends CApiService {
 					case SCREEN_RESOURCE_HOST_TRIGGERS:
 					case SCREEN_RESOURCE_PLAIN_TEXT:
 						if ($screenItem['elements'] < 1 || $screenItem['elements'] > 100) {
-							self::exception(
-								ZBX_API_ERROR_PARAMETERS,
-								_s(
-									'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-									$screenItem['elements'],
-									'elements',
-									1,
-									100
-								)
-							);
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+								$screenItem['elements'], 'elements', 1, 100
+							));
 						}
 						break;
 				}
@@ -592,10 +598,9 @@ class CScreenItem extends CApiService {
 
 			foreach ($hostGroupsIds as $hostGroupsId) {
 				if (!isset($dbHostGroups[$hostGroupsId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect host group ID "%1$s" provided for screen element.', $hostGroupsId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect host group ID "%1$s" provided for screen element.', $hostGroupsId
+					));
 				}
 			}
 		}
@@ -611,10 +616,9 @@ class CScreenItem extends CApiService {
 
 			foreach ($hostIds as $hostId) {
 				if (!isset($dbHosts[$hostId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect host ID "%1$s" provided for screen element.', $hostId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect host ID "%1$s" provided for screen element.', $hostId
+					));
 				}
 			}
 		}
@@ -630,29 +634,27 @@ class CScreenItem extends CApiService {
 
 			foreach ($graphIds as $graphId) {
 				if (!isset($dbGraphs[$graphId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect graph ID "%1$s" provided for screen element.', $graphId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect graph ID "%1$s" provided for screen element.', $graphId
+					));
 				}
 			}
 		}
 
-		// check graphs
+		// check graph prototypes
 		if ($graphPrototypeIds) {
 			$dbGraphPrototypes = API::GraphPrototype()->get(array(
-					'graphids' => $graphPrototypeIds,
-					'output' => array('graphid'),
-					'editable' => true,
-					'preservekeys' => true
-				));
+				'graphids' => $graphPrototypeIds,
+				'output' => array('graphid'),
+				'editable' => true,
+				'preservekeys' => true
+			));
 
 			foreach ($graphPrototypeIds as $graphPrototypeId) {
 				if (!isset($dbGraphPrototypes[$graphPrototypeId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect graph ID "%1$s" provided for screen element.', $graphPrototypeId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect graph prototype ID "%1$s" provided for screen element.', $graphPrototypeId
+					));
 				}
 			}
 		}
@@ -669,10 +671,9 @@ class CScreenItem extends CApiService {
 
 			foreach ($itemIds as $itemId) {
 				if (!isset($dbItems[$itemId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect item ID "%1$s" provided for screen element.', $itemId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect item ID "%1$s" provided for screen element.', $itemId
+					));
 				}
 			}
 		}
@@ -683,16 +684,14 @@ class CScreenItem extends CApiService {
 				'itemids' => $itemPrototypeIds,
 				'output' => array('itemid'),
 				'editable' => true,
-				'preservekeys' => true,
-				'webitems' => true
+				'preservekeys' => true
 			));
 
 			foreach ($itemPrototypeIds as $itemPrototypeId) {
 				if (!isset($dbItemPrototypes[$itemPrototypeId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect item ID "%1$s" provided for screen element.', $itemPrototypeId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect item prototype ID "%1$s" provided for screen element.', $itemPrototypeId
+					));
 				}
 			}
 		}
@@ -708,10 +707,9 @@ class CScreenItem extends CApiService {
 
 			foreach ($mapIds as $mapId) {
 				if (!isset($dbMaps[$mapId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect map ID "%1$s" provided for screen element.', $mapId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect map ID "%1$s" provided for screen element.', $mapId
+					));
 				}
 			}
 		}
@@ -740,10 +738,9 @@ class CScreenItem extends CApiService {
 
 			foreach ($screenIds as $screenId) {
 				if (!isset($dbScreens[$screenId])) {
-					self::exception(
-						ZBX_API_ERROR_PERMISSIONS,
-						_s('Incorrect screen ID "%1$s" provided for screen element.', $screenId)
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s(
+						'Incorrect screen ID "%1$s" provided for screen element.', $screenId
+					));
 				}
 			}
 		}
@@ -970,11 +967,14 @@ class CScreenItem extends CApiService {
 	}
 
 	/**
+	 * Checks if value of $maxColumns valid in respect to SCREEN_SURROGATE_MAX_COLUMNS_MIN and
+	 * SCREEN_SURROGATE_MAX_COLUMNS_MIN constants. Returns true if valid, false otherwise.
+	 *
 	 * @param integer $maxColumns
 	 *
 	 * @return bool
 	 */
 	protected function isValidMaxColumns($maxColumns) {
-		return $maxColumns >= SCREEN_SURROGATE_MAX_COLUMNS_MIN and $maxColumns <= SCREEN_SURROGATE_MAX_COLUMNS_MAX;
+		return ($maxColumns >= SCREEN_SURROGATE_MAX_COLUMNS_MIN && $maxColumns <= SCREEN_SURROGATE_MAX_COLUMNS_MAX);
 	}
 }
