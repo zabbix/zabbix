@@ -242,7 +242,6 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('groupid', 'name'),
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'real_hosts' => isset($data['real_hosts']) ? $data['real_hosts'] : null,
 					'filter' => isset($data['filter']) ? $data['filter'] : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
 				));
@@ -269,7 +268,6 @@ switch ($data['method']) {
 				$hosts = API::Host()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
-					'with_monitored_items' => isset($data['with_monitored_items']) ? $data['with_monitored_items'] : null,
 					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => $config['search_limit']
