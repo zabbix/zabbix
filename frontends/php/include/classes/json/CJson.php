@@ -32,7 +32,7 @@
 **
 ** @license http://opensource.org/licenses/bsd-license.php BSD
 **/
-class CJSON {
+class CJson {
 
 	/**
 	 *
@@ -347,10 +347,10 @@ class CJSON {
 							// characters U-00200000 - U-03FFFFFF, mask 111110XX
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 							$char = pack('C*', $ord_var_c,
-										 ord($var{$c + 1}),
-										 ord($var{$c + 2}),
-										 ord($var{$c + 3}),
-										 ord($var{$c + 4}));
+										ord($var{$c + 1}),
+										ord($var{$c + 2}),
+										ord($var{$c + 3}),
+										ord($var{$c + 4}));
 							$c += 4;
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
@@ -359,11 +359,11 @@ class CJSON {
 							// characters U-04000000 - U-7FFFFFFF, mask 1111110X
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 							$char = pack('C*', $ord_var_c,
-										 ord($var{$c + 1}),
-										 ord($var{$c + 2}),
-										 ord($var{$c + 3}),
-										 ord($var{$c + 4}),
-										 ord($var{$c + 5}));
+										ord($var{$c + 1}),
+										ord($var{$c + 2}),
+										ord($var{$c + 3}),
+										ord($var{$c + 4}),
+										ord($var{$c + 5}));
 							$c += 5;
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
@@ -528,7 +528,7 @@ class CJSON {
 								break;
 							case ($ord_chrs_c & 0xE0) == 0xC0:
 								// characters U-00000080 - U-000007FF, mask 110XXXXX
-								//see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
+								// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 2);
 								++$c;
 								break;
@@ -822,11 +822,6 @@ class CJSON {
 		), '', $str);
 		// eliminate extraneous space
 		return trim($str);
-	}
-
-	protected function _exception($code, $info = array()) {
-		$class = get_class($this);
-		SDI(array($class, $code, (array) $info));
 	}
 
 	//***************************************************************************
