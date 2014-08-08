@@ -2281,7 +2281,7 @@ function imageOut(&$image, $format = null) {
 			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
-			$json = new CJSON();
+			$json = new CJson();
 			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:

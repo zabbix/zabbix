@@ -19,33 +19,32 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../blocks.inc.php';
+class ConvertUnitsWithoutPrefixTest extends PHPUnit_Framework_TestCase {
 
-class CScreenSystemStatus extends CScreenBase {
+	public function provider() {
+		return array(
+			array('0', '0'),
+			array('0.015', '0.02'),
+			array('0.00123456', '0.001235'),
+			array('1000000', '1000000'),
+			array('9999999999999999.555', '9999999999999999.56'),
+			array('9999999999999999.55', '9999999999999999.55'),
+			array('1.5500', '1.55'),
+
+			array('10', '10 %', '%'),
+			array('-10', '-10 %', '%')
+		);
+	}
 
 	/**
-	 * Process screen.
+	 * @dataProvider provider
 	 *
-	 * @return CDiv (screen inside container)
+	 * @param int $value
+	 * @param $expectedResult
+	 * @param string $unit
 	 */
-	public function get() {
-		global $page;
-
-		// rewrite page file
-		$page['file'] = $this->pageFile;
-
-		$item = new CUiWidget('hat_syssum', make_system_status(array(
-			'groupids' => null,
-			'hostids' => null,
-			'maintenance' => null,
-			'severity' => null,
-			'limit' => null,
-			'extAck' => 0,
-			'screenid' => $this->screenid
-		)));
-		$item->setHeader(_('Status of Zabbix'), SPACE);
-		$item->setFooter(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)));
-
-		return $this->getOutput($item);
+	public function test($value, $expectedResult, $unit = '') {
+		$this->assertEquals($expectedResult, convertUnitsWithoutPrefix($value, $unit));
 	}
+
 }

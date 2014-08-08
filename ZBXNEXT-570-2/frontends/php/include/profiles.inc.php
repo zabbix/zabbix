@@ -19,6 +19,7 @@
 **/
 
 
+/************ CONFIG **************/
 function select_config($cache = true) {
 	global $page;
 	static $config;

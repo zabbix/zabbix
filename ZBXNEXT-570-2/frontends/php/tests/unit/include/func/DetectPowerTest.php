@@ -19,33 +19,38 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../blocks.inc.php';
+class DetectPowerTest extends PHPUnit_Framework_TestCase {
 
-class CScreenSystemStatus extends CScreenBase {
+	public function provider() {
+		return array(
+			array(0, 0),
+			array(1, 0),
+			array(1000, 1),
+			array(1001, 1),
+			array(1999, 1),
+			array(1000000, 2),
+			array('1000000000000000000000000000', 8),
+
+			array(-1, 0),
+			array(-1000, 1),
+			array(-1001, 1),
+			array(-1999, 1),
+			array(-1000000, 2),
+			array('-1000000000000000000000000000', 8),
+
+			array(1024 * 1024, 2, 1024)
+		);
+	}
 
 	/**
-	 * Process screen.
+	 * @dataProvider provider
 	 *
-	 * @return CDiv (screen inside container)
+	 * @param $number
+	 * @param $expectedResult
+	 * @param $base
 	 */
-	public function get() {
-		global $page;
-
-		// rewrite page file
-		$page['file'] = $this->pageFile;
-
-		$item = new CUiWidget('hat_syssum', make_system_status(array(
-			'groupids' => null,
-			'hostids' => null,
-			'maintenance' => null,
-			'severity' => null,
-			'limit' => null,
-			'extAck' => 0,
-			'screenid' => $this->screenid
-		)));
-		$item->setHeader(_('Status of Zabbix'), SPACE);
-		$item->setFooter(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)));
-
-		return $this->getOutput($item);
+	public function test($number, $expectedResult, $base = 1000) {
+		$this->assertEquals($expectedResult, detectPower($number, $base));
 	}
+
 }

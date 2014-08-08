@@ -23,7 +23,7 @@
  * Class to operate with frontend setup information.
  * Currently only setup requirements are checked.
  */
-class FrontendSetup {
+class CFrontendSetup {
 
 	const MIN_PHP_VERSION = '5.3.0';
 	const MIN_PHP_MEMORY_LIMIT = 134217728; // 128*1024*1024
