@@ -72,6 +72,11 @@ $graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 
+// set a generic title for graphs with many items
+if ($multipleItems) {
+	$graph->setHeader(_('Item values'));
+}
+
 if (isset($_REQUEST['from'])) {
 	$graph->setFrom($_REQUEST['from']);
 }
