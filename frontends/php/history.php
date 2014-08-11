@@ -51,6 +51,7 @@ $fields = array(
 	'cmbitemlist' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'plaintext' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
+	'graphtype' =>      array(T_ZBX_INT, O_OPT, null,   IN(array(GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED)), null),
 	// ajax
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
@@ -152,7 +153,8 @@ $data = array(
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),
-	'fullscreen' => $_REQUEST['fullscreen']
+	'fullscreen' => $_REQUEST['fullscreen'],
+	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL)
 );
 
 // render view

@@ -159,7 +159,8 @@ $screen = CScreenBuilder::getScreen(array(
 	'filter' => getRequest('filter'),
 	'filter_task' => getRequest('filter_task'),
 	'mark_color' => getRequest('mark_color'),
-	'plaintext' => $this->data['plaintext']
+	'plaintext' => $this->data['plaintext'],
+	'graphtype' => $this->data['graphtype']
 ));
 
 // append plaintext to widget

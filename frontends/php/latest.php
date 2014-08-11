@@ -388,6 +388,9 @@ $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
+$form = new CForm('GET', 'history.php?action=showgraph');
+$form->setName('items');
+
 // table
 $table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
 
@@ -416,6 +419,11 @@ $lastValueHeader->setAttribute('title', _('Last value'));
 $lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
 $lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
+$checkAllCheckbox = new CCol(
+	new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');"),
+	'latest-checkbox'
+);
+
 if ($filter['showDetails']) {
 	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
 	$intervalHeader->setAttribute('title', _('Interval'));
@@ -435,6 +443,7 @@ if ($filter['showDetails']) {
 	$table->addClass('latest-details');
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		$checkAllCheckbox,
 		$hostHeader,
 		$nameHeader,
 		$intervalHeader,
@@ -451,6 +460,7 @@ if ($filter['showDetails']) {
 else {
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		$checkAllCheckbox,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
@@ -513,6 +523,8 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
+	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
+
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
 			? UNKNOWN_VALUE
@@ -522,6 +534,7 @@ foreach ($items as $key => $item){
 		$actions = $showLink
 			? UNKNOWN_VALUE
 			: new CLink(_('History'), 'history.php?action=showvalues&itemids[]='.$item['itemid']);
+		$checkbox->setEnabled(false);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
@@ -533,7 +546,7 @@ foreach ($items as $key => $item){
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		// info
-		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 			$info = new CDiv(null, 'status_icon iconerror');
 			$info->setHint($item['error'], 'on');
 		}
@@ -551,6 +564,7 @@ foreach ($items as $key => $item){
 
 		$row = new CRow(array(
 			'',
+			$checkbox,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -572,6 +586,7 @@ foreach ($items as $key => $item){
 	else {
 		$row = new CRow(array(
 			'',
+			$checkbox,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -625,6 +640,7 @@ foreach ($applications as $appid => $dbApp) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
+		'',
 		$hostName,
 		new CCol(array(
 				bold($dbApp['name']),
@@ -693,6 +709,8 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
+	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
+
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
 			? UNKNOWN_VALUE
@@ -702,6 +720,7 @@ foreach ($items as $item) {
 		$actions = $showLink
 			? UNKNOWN_VALUE
 			: new CLink(_('History'), 'history.php?action=showvalues&itemids[]='.$item['itemid']);
+		$checkbox->setEnabled(false);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
@@ -714,7 +733,7 @@ foreach ($items as $item) {
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		// info
-		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 			$info = new CDiv(null, 'status_icon iconerror');
 			$info->setHint($item['error'], 'on');
 		}
@@ -732,6 +751,7 @@ foreach ($items as $item) {
 
 		$row = new CRow(array(
 			'',
+			$checkbox,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -753,6 +773,7 @@ foreach ($items as $item) {
 	else {
 		$row = new CRow(array(
 			'',
+			$checkbox,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -796,6 +817,7 @@ foreach ($hosts as $hostId => $dbHost) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
+		'',
 		$hostName,
 		new CCol(
 			array(
@@ -817,7 +839,18 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$latestWidget->addItem($table);
+zbx_add_post_js('chkbxRange.pageGoName = "itemids";');
+
+$goBox = new CComboBox('graphtype', null, null, array(
+	GRAPH_TYPE_NORMAL => _('Display graph'),
+	GRAPH_TYPE_STACKED => _('Display stacked graph')
+));
+$goBox->setAttribute('id', 'go');
+$goButton = new CSubmit('goButton', _('Go').' (0)');
+
+$form->addItem(array($table, get_table_header(array($goBox, $goButton))));
+
+$latestWidget->addItem($form);
 $latestWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
