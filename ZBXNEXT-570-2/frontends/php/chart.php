@@ -86,7 +86,9 @@ if (isset($_REQUEST['border'])) {
 }
 
 foreach ($itemIds as $itemId) {
-	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, ($multipleItems) ? CALC_FNC_AVG : CALC_FNC_ALL);
+	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, ($multipleItems) ? CALC_FNC_AVG : CALC_FNC_ALL,
+		rgb2hex(get_next_color(1))
+	);
 }
 
 $graph->draw();
