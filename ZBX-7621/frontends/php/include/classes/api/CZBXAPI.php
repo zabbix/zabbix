@@ -674,14 +674,16 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Deletes the object with the given PKs with respect to relative objects.
+	 * Deletes the object with the given IDs with respect to relative objects.
 	 *
 	 * The method must be extended to handle relative objects.
 	 *
-	 * @param array $pks
+	 * @param array $ids
 	 */
-	protected function deleteByPks(array $pks) {
-		DB::delete($this->tableName(), array($this->pk() => $pks));
+	protected function deleteByIds(array $ids) {
+		DB::delete($this->tableName(), array(
+			$this->pk() => $ids
+		));
 	}
 
 	/**
@@ -767,7 +769,7 @@ class CZBXAPI {
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $messageRequired);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, array($idField)));
 			}
 
 			$this->checkValidator($object[$idField], $idValidator);
@@ -957,7 +959,7 @@ class CZBXAPI {
 	 *
 	 * @param array $array
 	 * @param CPartialValidatorInterface $validator
-	 * @parma array $fullArray
+	 * @param array $fullArray
 	 */
 	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
 		if (!$validator->validatePartial($array, $fullArray)) {

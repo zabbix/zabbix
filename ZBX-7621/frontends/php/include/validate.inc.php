@@ -56,6 +56,7 @@ function IN($array, $var = '') {
 	if (is_array($array)) {
 		$array = implode(',', $array);
 	}
+
 	return 'str_in_array({'.$var.'},array('.$array.'))&&';
 }
 
@@ -284,7 +285,7 @@ function unset_all() {
 }
 
 function check_type(&$field, $flags, &$var, $type, $caption = null) {
-	if (is_null($caption)) {
+	if ($caption === null) {
 		$caption = $field;
 	}
 
@@ -298,62 +299,101 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		return $err;
 	}
 
+	$error = false;
+	$message = '';
+
 	if ($type == T_ZBX_IP) {
 		if (!validate_ip($var, $arr)) {
-			info(_s('Field "%1$s" is not IP.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			$error = true;
+			$message = _s('Field "%1$s" is not IP.', $caption);
 		}
-
-		return ZBX_VALID_OK;
 	}
-
-	if ($type == T_ZBX_IP_RANGE) {
+	elseif ($type == T_ZBX_IP_RANGE) {
 		if (!validate_ip_range($var)) {
-			info(_s('Field "%1$s" is not IP range.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			$error = true;
+			$message = _s('Field "%1$s" is not IP range.', $caption);
 		}
-
-		return ZBX_VALID_OK;
 	}
-
-	if ($type == T_ZBX_INT_RANGE) {
+	elseif ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
-			info(_s('Field "%1$s" is not integer list or range.', $caption));
-
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			$error = true;
+			$message = _s('Field "%1$s" is not integer list or range.', $caption);
 		}
-
-		return ZBX_VALID_OK;
 	}
-
-	if ($type == T_ZBX_INT && !zbx_is_int($var)) {
-		info(_s('Field "%1$s" is not integer.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+	elseif ($type == T_ZBX_INT) {
+		if (!zbx_is_int($var)) {
+			$error = true;
+			$message = _s('Field "%1$s" is not integer.', $caption);
+		}
 	}
+	elseif ($type == T_ZBX_DBL) {
+		$decimalValidator = new CDecimalValidator(array(
+			'maxPrecision' => 16,
+			'maxScale' => 4,
+			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
+			'messagePrecision' => _(
+				'Value "%2$s" of "%1$s" is too long: it cannot have more than %3$s digits before the decimal point '.
+				'and more than %4$s digits after the decimal point.'
+			),
+			'messageNatural' => _(
+				'Value "%2$s" of "%1$s" has too many digits before the decimal point: '.
+				'it cannot have more than %3$s digits.'
+			),
+			'messageScale' => _(
+				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
+				'it cannot have more than %3$s digits.'
+			)
+		));
+		$decimalValidator->setObjectName($caption);
 
-	if ($type == T_ZBX_DBL && !is_numeric($var)) {
-		info(_s('Field "%1$s" is not decimal number.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if (!$decimalValidator->validate($var)) {
+			$error = true;
+			$message = $decimalValidator->getError();
+		}
 	}
+	elseif ($type == T_ZBX_DBL_BIG) {
+		$decimalValidator = new CDecimalValidator(array(
+			'maxScale' => 4,
+			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
+			'messageScale' => _(
+				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
+				'it cannot have more than %3$s digits.'
+			)
+		));
+		$decimalValidator->setObjectName($caption);
 
-	if ($type == T_ZBX_STR && !is_string($var)) {
-		info(_s('Field "%1$s" is not string.', $caption));
-
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if (!$decimalValidator->validate($var)) {
+			$error = true;
+			$message = $decimalValidator->getError();
+		}
 	}
-
-	if ($type == T_ZBX_CLR) {
+	elseif ($type == T_ZBX_STR) {
+		if (!is_string($var)) {
+			$error = true;
+			$message = _s('Field "%1$s" is not string.', $caption);
+		}
+	}
+	elseif ($type == T_ZBX_CLR) {
 		$colorValidator = new CColorValidator();
 
 		if (!$colorValidator->validate($var)) {
 			$var = 'FFFFFF';
-			info(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
 
-			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+			$error = true;
+			$message = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption);
+		}
+	}
+
+	if ($error) {
+		if ($flags & P_SYS) {
+			error($message);
+
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info($message);
+
+			return ZBX_VALID_WARNING;
 		}
 	}
 

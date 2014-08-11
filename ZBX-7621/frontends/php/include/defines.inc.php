@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.2.2rc2');
-define('ZABBIX_API_VERSION', '2.2.2');
+define('ZABBIX_VERSION',     '2.2.6rc1');
+define('ZABBIX_API_VERSION', '2.2.6');
 define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -32,6 +32,10 @@ define('ZBX_MIN_PERIOD',		3600); // 1 hour
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+
+// the maximum period to display history data for the latest data and item overview pages in seconds
+// by default set to 86400 seconds (24 hours)
+define('ZBX_HISTORY_PERIOD', 86400);
 
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -95,6 +99,10 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
+define('ZBX_STANDALONE_MAX_IDS', '9223372036854775807');
+define('ZBX_DM_MAX_HISTORY_IDS', '100000000000000');
+define('ZBX_DM_MAX_CONFIG_IDS', '100000000000');
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_XML',					2);
@@ -122,6 +130,7 @@ define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
+define('T_ZBX_DBL_BIG',		9);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
@@ -536,7 +545,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
-// alignes
+// alignments
 define('HALIGN_DEFAULT',	0);
 define('HALIGN_CENTER',		0);
 define('HALIGN_LEFT',		1);
@@ -548,7 +557,7 @@ define('VALIGN_TOP',		1);
 define('VALIGN_BOTTOM',		2);
 
 // info module style
-define('STYLE_HORISONTAL',	0);
+define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
 // view style [Overview]
@@ -785,7 +794,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 	() # match empty and only empty part
 )');
 define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
-(?<param>( # name parameter group used in recursion
+(?P<param>( # name parameter group used in recursion
 	\[ # match opening bracket
 		(
 			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
@@ -836,6 +845,14 @@ define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
 define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
+
+// XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);

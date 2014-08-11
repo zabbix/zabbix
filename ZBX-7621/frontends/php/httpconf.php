@@ -269,6 +269,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
 
+	DBstart();
+
 	foreach ($groupHttpTestId as $id) {
 		if (!($httpTestData = get_httptest_by_httptestid($id))) {
 			continue;
@@ -296,12 +298,17 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable web scenario', 'Cannot enable web scenarios', $updated)
 		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
 
+	$result = DBend($result);
+
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
+
+	DBstart();
+
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
 			continue;
@@ -316,6 +323,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 				'] Host ['.$host['host'].'] history cleared');
 		}
 	}
+
+	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('History cleared'), null);
 	clearCookies($goResult, $_REQUEST['hostid']);

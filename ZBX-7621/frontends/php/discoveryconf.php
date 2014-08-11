@@ -65,8 +65,12 @@ $_REQUEST['dchecks'] = get_request('dchecks', array());
 if (isset($_REQUEST['druleid'])) {
 	$dbDRule = API::DRule()->get(array(
 		'druleids' => get_request('druleid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectDChecks' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
+		'selectDChecks' => array(
+			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+			'snmpv3_contextname'
+		),
 		'editable' => true
 	));
 	if (empty($dbDRule)) {
@@ -170,6 +174,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
 
+	DBstart();
+
 	foreach (getRequest('g_druleid') as $druleId) {
 		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
 
@@ -186,6 +192,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$messageFailed = $enable
 		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+	$result = DBend($result);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
@@ -260,29 +268,35 @@ else {
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => getPageSortField('name'),
-		'selectDChecks' => API_OUTPUT_EXTEND,
+		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
+		'selectDChecks' => array('type'),
 		'editable' => true
 	));
-	if (!empty($data['drules'])) {
-		foreach ($data['drules'] as $druleid => $drule) {
+
+	if ($data['drules']) {
+		foreach ($data['drules'] as $key => $drule) {
 			// checks
 			$checks = array();
+
 			foreach ($drule['dchecks'] as $check) {
 				$checks[$check['type']] = discovery_check_type2str($check['type']);
 			}
+
 			order_result($checks);
-			$data['drules'][$druleid]['checks'] = $checks;
+
+			$data['drules'][$key]['checks'] = $checks;
 
 			// description
-			$data['drules'][$druleid]['description'] = array();
-			if (!empty($drule['proxy_hostid'])) {
+			$data['drules'][$key]['description'] = array();
+
+			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
-				array_push($data['drules'][$druleid]['description'], $proxy['host'].NAME_DELIMITER);
+
+				array_push($data['drules'][$key]['description'], $proxy['host'].NAME_DELIMITER);
 			}
 		}
-		order_result($data['drules'], getPageSortOrder());
+
+		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
 	}
 
 	// get paging

@@ -94,8 +94,16 @@ class DB {
 
 		if (is_null(self::$nodeId)) {
 			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
+			if (self::$nodeId == 0) {
+				self::$minNodeId = 0;
+				self::$maxNodeId = ZBX_STANDALONE_MAX_IDS;
+			}
+			else {
+				self::$minNodeId = bcadd(
+					bcmul(self::$nodeId, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0
+				);
+				self::$maxNodeId = bcadd(self::$minNodeId, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
+			}
 		}
 	}
 
@@ -159,7 +167,7 @@ class DB {
 
 	/**
 	 * Refresh id record for given table.
-	 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
+	 * Record is deleted and then created again with value of maximum id from table or minimum allowed.
 	 *
 	 * @throw APIException
 	 * @static
@@ -185,8 +193,7 @@ class DB {
 
 		$sql = 'SELECT MAX('.$id_name.') AS id'.
 				' FROM '.$table.
-				' WHERE '.$id_name.'>='.self::$minNodeId.
-				' AND '.$id_name.'<='.self::$maxNodeId;
+				' WHERE '.$id_name.' BETWEEN '.self::$minNodeId.' AND '.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
 		$nextid = ($row && $row['id']) ? $row['id'] : self::$minNodeId;
@@ -468,11 +475,9 @@ class DB {
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
-		$fields = array_keys(reset($values));
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
-			$fields[] = $tableSchema['key'];
 		}
 
 		$newValues = array();
@@ -486,6 +491,8 @@ class DB {
 			self::checkValueTypes($table, $row);
 			$newValues[] = $row;
 		}
+
+		$fields = array_keys(reset($newValues));
 
 		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
 
@@ -532,14 +539,14 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
 			}
 
-			// where condition proccess
+			// where condition processing
 			$sqlWhere = array();
 			foreach ($row['where'] as $field => $values) {
 				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
 					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 				}
 				$values = zbx_toArray($values);
-				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
+				sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
 
 				$sqlWhere[] = dbConditionString($field, $values);
 			}

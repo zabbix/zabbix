@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <stddef.h>
+
 #include "common.h"
 #include "log.h"
 
@@ -163,12 +165,14 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 					}
 				}
 			}
+
 			hs->num_slots = inc_slots;
 
 			/* recalculate new slot */
 			slot = hash % hs->num_slots;
 		}
-		if (NULL == (entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T) + size - 1)))
+
+		if (NULL == (entry = hs->mem_malloc_func(NULL, offsetof(ZBX_HASHSET_ENTRY_T, data) + size)))
 			return NULL;
 
 		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);

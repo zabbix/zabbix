@@ -36,7 +36,6 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum
 {
@@ -60,6 +59,8 @@ typedef enum
 	GRAPH_ITEM_AGGREGATED = 1
 }
 zbx_graph_item_type;
+
+struct	_DC_TRIGGER;
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -102,7 +103,6 @@ zbx_graph_item_type;
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
-#define ITEM_LASTVALUE_LEN		255
 #define ITEM_ERROR_LEN			128
 #define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
 #define ITEM_TRAPPER_HOSTS_LEN		255
@@ -136,11 +136,6 @@ zbx_graph_item_type;
 #	define ITEM_PARAM_LEN		65535
 #	define ITEM_DESCRIPTION_LEN	65535
 #endif
-
-#define FUNCTION_FUNCTION_LEN		12
-#define FUNCTION_FUNCTION_LEN_MAX	(FUNCTION_FUNCTION_LEN + 1)
-#define FUNCTION_PARAMETER_LEN		255
-#define FUNCTION_PARAMETER_LEN_MAX	(FUNCTION_PARAMETER_LEN + 1)
 
 #define HISTORY_STR_VALUE_LEN		255
 #ifdef HAVE_IBM_DB2
@@ -427,9 +422,9 @@ const char	*__DBnode(const char *field_name, int nodeid, int op);
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
-void	DBinit();
+void	DBinit(void);
 
-void	DBclose();
+void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
@@ -490,15 +485,15 @@ typedef struct
 }
 ZBX_GRAPH_ITEMS;
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	process_triggers(zbx_vector_ptr_t *triggers);
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
+
+int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
-
-#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
@@ -520,25 +515,26 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
-void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
+
+int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
+int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
+
+void	zbx_create_itservices_lock();
+void	zbx_destroy_itservices_lock();
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
+void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char **values, const int num);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
-const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
-
-double	multiply_item_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
@@ -564,9 +560,6 @@ int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 
-void	zbx_create_services_lock();
-void	zbx_destroy_services_lock();
-
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
@@ -574,8 +567,43 @@ void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 int	get_nodeid_by_id(zbx_uint64_t id);
 
 #ifdef HAVE_POSTGRESQL
-size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	DBbytea_unescape(u_char *io);
+#	define DBbytea_escape	zbx_db_bytea_escape
+size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
+
+/* bulk insert support */
+
+/* database field value */
+typedef union
+{
+	int		i32;
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_db_value_t;
+
+/* database bulk insert data */
+typedef struct
+{
+	/* the target table */
+	const ZBX_TABLE		*table;
+	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
+	zbx_vector_ptr_t	fields;
+	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
+	zbx_vector_ptr_t	rows;
+	/* index of autoincrement field */
+	int			autoincrement;
+}
+zbx_db_insert_t;
+
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+		int fields_num);
+void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
+int	zbx_db_insert_execute(zbx_db_insert_t *self);
+void	zbx_db_insert_clean(zbx_db_insert_t *self);
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 
 #endif

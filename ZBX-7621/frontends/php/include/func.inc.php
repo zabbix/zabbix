@@ -178,7 +178,7 @@ function dowHrMinToStr($value, $display24Hours = false) {
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }
 
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occurred
 function dowHrMinToSec($dow, $hr, $min) {
 	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
 		return false;
@@ -203,7 +203,7 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Retun 'Never' if 0.
+// Convert timestamp to string representation. Return 'Never' if 0.
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
@@ -615,7 +615,7 @@ function convert_units($options = array()) {
 	}
 
 	// any other unit
-	// black list wich do not require units metrics..
+	// black list of units that should have no multiplier prefix (K, M, G etc) applied
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
@@ -684,7 +684,7 @@ function convert_units($options = array()) {
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip mili & micro for values without units
+			// skip milli & micro for values without units
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -811,7 +811,7 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parametr as integer either
+// accepts parameter as integer either
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1640,7 +1640,7 @@ function array_equal(array $a, array $b, $strict=false) {
  * @param string $sort
  * @param string $sortorder
  *
- * @retur void
+ * @return void
  */
 function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
 	global $page;
@@ -2167,9 +2167,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 		$page['type'] = PAGE_TYPE_HTML;
 	}
 
-	$message = array();
-	$width = 0;
-	$height= 0;
+	$imageMessages = array();
 
 	if (!$bool && !is_null($errmsg)) {
 		$msg = _('ERROR').': '.$errmsg;
@@ -2181,13 +2179,11 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	if (isset($msg)) {
 		switch ($page['type']) {
 			case PAGE_TYPE_IMAGE:
-				array_push($message, array(
+				// save all of the messages in an array to display them later in an image
+				$imageMessages[] = array(
 					'text' => $msg,
-					'color' => (!$bool) ? array('R' => 255, 'G' => 0, 'B' => 0) : array('R' => 34, 'G' => 51, 'B' => 68),
-					'font' => 2
-				));
-				$width = max($width, imagefontwidth(2) * zbx_strlen($msg) + 1);
-				$height += imagefontheight(2) + 1;
+					'color' => (!$bool) ? array('R' => 255, 'G' => 0, 'B' => 0) : array('R' => 34, 'G' => 51, 'B' => 68)
+				);
 				break;
 			case PAGE_TYPE_XML:
 				echo htmlspecialchars($msg)."\n";
@@ -2218,24 +2214,20 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 	if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 		if ($page['type'] == PAGE_TYPE_IMAGE) {
-			$msg_font = 2;
 			foreach ($ZBX_MESSAGES as $msg) {
+				// save all of the messages in an array to display them later in an image
 				if ($msg['type'] == 'error') {
-					array_push($message, array(
+					$imageMessages[] = array(
 						'text' => $msg['message'],
-						'color' => array('R' => 255, 'G' => 55, 'B' => 55),
-						'font' => $msg_font
-					));
+						'color' => array('R' => 255, 'G' => 55, 'B' => 55)
+					);
 				}
 				else {
-					array_push($message, array(
+					$imageMessages[] = array(
 						'text' => $msg['message'],
-						'color' => array('R' => 155, 'G' => 155, 'B' => 55),
-						'font' => $msg_font
-					));
+						'color' => array('R' => 155, 'G' => 155, 'B' => 55)
+					);
 				}
-				$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
-				$height += imagefontheight($msg_font) + 1;
 			}
 		}
 		elseif ($page['type'] == PAGE_TYPE_XML) {
@@ -2269,24 +2261,39 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 		$ZBX_MESSAGES = null;
 	}
 
-	if ($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0) {
-		$width += 2;
-		$height += 2;
-		$canvas = imagecreate($width, $height);
-		imagefilledrectangle($canvas, 0, 0, $width, $height, imagecolorallocate($canvas, 255, 255, 255));
+	// draw an image with the messages
+	if ($page['type'] == PAGE_TYPE_IMAGE && count($imageMessages) > 0) {
+		$imageFontSize = 8;
 
-		foreach ($message as $id => $msg) {
-			$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0);
-			$message[$id]['h'] = imagefontheight($msg['font']);
-			imagestring(
-				$canvas,
-				$msg['font'],
-				1,
-				$message[$id]['y'],
-				$msg['text'],
-				imagecolorallocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
+		// calculate the size of the text
+		$imageWidth = 0;
+		$imageHeight = 0;
+		foreach ($imageMessages as &$msg) {
+			$size = imageTextSize($imageFontSize, 0, $msg['text']);
+			$msg['height'] = $size['height'] - $size['baseline'];
+
+			// calculate the total size of the image
+			$imageWidth = max($imageWidth, $size['width']);
+			$imageHeight += $size['height'] + 1;
+		}
+		unset($msg);
+
+		// additional padding
+		$imageWidth += 2;
+		$imageHeight += 2;
+
+		// create the image
+		$canvas = imagecreate($imageWidth, $imageHeight);
+		imagefilledrectangle($canvas, 0, 0, $imageWidth, $imageHeight, imagecolorallocate($canvas, 255, 255, 255));
+
+		// draw each message
+		$y = 1;
+		foreach ($imageMessages as $msg) {
+			$y += $msg['height'];
+			imageText($canvas, $imageFontSize, 0, 1, $y,
+				imagecolorallocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B']),
+				$msg['text']
 			);
-			$previd = $id;
 		}
 		imageOut($canvas);
 		imagedestroy($canvas);
@@ -2432,13 +2439,15 @@ function get_status() {
 	$dbTriggers = DBselect(
 		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
 			' FROM triggers t'.
-			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-			' INNER JOIN items i ON f.itemid=i.itemid'.
-			' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-			' GROUP BY t.status,t.value');
+			' WHERE NOT EXISTS ('.
+				'SELECT f.functionid FROM functions f'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' JOIN hosts h ON i.hostid=h.hostid'.
+					' WHERE f.triggerid=t.triggerid AND (i.status<>'.ITEM_STATUS_ACTIVE.' OR h.status<>'.HOST_STATUS_MONITORED.')'.
+				')'.
+			' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+			' GROUP BY t.status,t.value'
+		);
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
@@ -2538,7 +2547,8 @@ function get_status() {
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
 				' AND i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0'
+				' AND i.delay<>0'.
+				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 
@@ -2612,16 +2622,25 @@ function encode_log($data) {
 			: $data;
 }
 
-function no_errors() {
+/**
+ * Check if we have error messages to display.
+ *
+ * @global array $ZBX_MESSAGES
+ *
+ * @return bool
+ */
+function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	foreach ($ZBX_MESSAGES as $message) {
-		if ($message['type'] == 'error') {
-			return false;
+	if ($ZBX_MESSAGES !== null) {
+		foreach ($ZBX_MESSAGES as $message) {
+			if ($message['type'] === 'error') {
+				return true;
+			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 /**

@@ -20,7 +20,6 @@
 #include "common.h"
 
 #include "db.h"
-#include "zbxdb.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"

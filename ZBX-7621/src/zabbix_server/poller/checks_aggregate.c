@@ -331,16 +331,13 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	zbx_vector_uint64_t		itemids;
 	history_value_t			value, item_result;
 	zbx_history_record_t		group_value;
-	int				ret = FAIL, now, *errorcodes = NULL, i, count;
+	int				ret = FAIL, now, *errcodes = NULL, i, count;
 	DC_ITEM				*items = NULL;
 	zbx_vector_history_record_t	values, group_values;
 	unsigned int			seconds;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
 			__function_name, grp_func, groups, itemkey, item_func, param);
-
-	memset(&value, 0, sizeof(value));
-	zbx_history_record_vector_create(&group_values);
 
 	now = time(NULL);
 
@@ -349,14 +346,17 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	if (0 == itemids.values_num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]", itemkey, groups));
-		goto out;
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key \"%s\" in group(s) \"%s\".", itemkey, groups));
+		goto clean1;
 	}
 
-	items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
-	errorcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
+	memset(&value, 0, sizeof(value));
+	zbx_history_record_vector_create(&group_values);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errorcodes, itemids.values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
+
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	if (ZBX_VALUE_FUNC_LAST == item_func)
 	{
@@ -368,14 +368,20 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		if (FAIL == is_uint_suffix(param, &seconds))
 		{
 			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
-			goto out;
+			goto clean2;
 		}
 		count = 0;
 	}
 
 	for (i = 0; i < itemids.values_num; i++)
 	{
-		if (SUCCEED != errorcodes[i])
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type)
@@ -407,7 +413,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	if (0 == group_values.values_num)
 	{
 		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) \"%s\"", itemkey, groups));
-		goto out;
+		goto clean2;
 	}
 
 	evaluate_history_func(&group_values, item->value_type, grp_func, &value);
@@ -418,11 +424,14 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		SET_UI64_RESULT(res, value.ui64);
 
 	ret = SUCCEED;
-out:
-	zbx_history_record_vector_destroy(&group_values, item->value_type);
-	zbx_vector_uint64_destroy(&itemids);
-	zbx_free(errorcodes);
+clean2:
+	DCconfig_clean_items(items, errcodes, itemids.values_num);
+
+	zbx_free(errcodes);
 	zbx_free(items);
+	zbx_history_record_vector_destroy(&group_values, item->value_type);
+clean1:
+	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

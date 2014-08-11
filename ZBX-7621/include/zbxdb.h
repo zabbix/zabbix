@@ -158,17 +158,17 @@
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
-void	zbx_create_sqlite3_mutex(const char *dbname);
-void	zbx_remove_sqlite3_mutex();
+void	zbx_create_sqlite3_mutex(void);
+void	zbx_remove_sqlite3_mutex(void);
 #endif
-void	zbx_db_init(char *dbname);
-void    zbx_db_close();
+void	zbx_db_init(const char *dbname, const char *const db_schema);
+void    zbx_db_close(void);
 
-int	zbx_db_begin();
-int	zbx_db_commit();
-int	zbx_db_rollback();
-int	zbx_db_txn_level();
-int	zbx_db_txn_error();
+int	zbx_db_begin(void);
+int	zbx_db_commit(void);
+int	zbx_db_rollback(void);
+int	zbx_db_txn_level(void);
+int	zbx_db_txn_error(void);
 
 #ifdef HAVE_ORACLE
 int		zbx_db_statement_prepare(const char *sql);
@@ -181,5 +181,10 @@ DB_RESULT	zbx_db_select_n(const char *query, int n);
 
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 int		zbx_db_is_null(const char *field);
+
+char		*zbx_db_dyn_escape_string(const char *src);
+char		*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len);
+#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
+char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 #endif

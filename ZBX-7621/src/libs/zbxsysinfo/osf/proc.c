@@ -32,7 +32,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	proc;
 
 	struct dirent	*entries;
-	struct stat		buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
 
@@ -82,7 +82,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(filename, "/proc/");
 		zbx_strlcat(filename, entries->d_name, MAX_STRING_LEN);
 
-		if (0 == stat(filename, &buf))
+		if (0 == zbx_stat(filename, &buf))
 		{
 			proc = open(filename, O_RDONLY);
 			if (-1 == proc)
@@ -154,7 +154,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	proc;
 
 	struct  dirent	*entries;
-	struct  stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
 
@@ -200,7 +200,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(filename, "/proc/");
 		zbx_strlcat(filename, entries->d_name,MAX_STRING_LEN);
 
-		if (0 == stat(filename,&buf))
+		if (0 == zbx_stat(filename, &buf))
 		{
 			proc = open(filename, O_RDONLY);
 			if (-1 == proc)

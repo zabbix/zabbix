@@ -23,7 +23,7 @@ class CHostsInfo extends CTable {
 
 	public $style;
 
-	public function __construct($groupid = 0, $style = STYLE_HORISONTAL) {
+	public function __construct($groupid = 0, $style = STYLE_HORIZONTAL) {
 		$this->nodeid = id2nodeid($groupid);
 		$this->groupid = $groupid;
 		$this->style = null;
@@ -33,7 +33,7 @@ class CHostsInfo extends CTable {
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL) {
+		if ($value != STYLE_HORIZONTAL && $value != STYLE_VERTICAL) {
 			return $this->error('Incorrect value for SetOrientation "'.$value.'".');
 		}
 		$this->style = $value;
@@ -52,7 +52,7 @@ class CHostsInfo extends CTable {
 		));
 		$hostIds = array_keys($hosts);
 
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid != 0) {
 			$cond_from = ',hosts_groups hg';
 			$cond_where = ' AND hg.hostid=h.hostid AND hg.groupid='.zbx_dbstr($this->groupid);
 		}
@@ -107,7 +107,7 @@ class CHostsInfo extends CTable {
 			$header_str .= '('.$node['name'].')'.SPACE;
 		}
 
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid != 0) {
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 		}
@@ -116,7 +116,7 @@ class CHostsInfo extends CTable {
 		}
 
 		$header = new CCol($header_str, 'header');
-		if ($this->style == STYLE_HORISONTAL) {
+		if ($this->style == STYLE_HORIZONTAL) {
 			$header->setColspan(4);
 		}
 
@@ -127,7 +127,7 @@ class CHostsInfo extends CTable {
 		$uncn = new CCol($uncn.'  '._('Unknown'), 'uncn');
 		$total = new CCol($total.'  '._('Total'), 'total');
 
-		if ($this->style == STYLE_HORISONTAL) {
+		if ($this->style == STYLE_HORIZONTAL) {
 			$this->addRow(array($avail, $notav, $uncn, $total));
 		}
 		else {

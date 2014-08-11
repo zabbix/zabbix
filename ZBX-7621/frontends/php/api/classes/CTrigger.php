@@ -446,19 +446,11 @@ class CTrigger extends CTriggerGeneral {
 			return $result;
 		}
 
-		$triggers = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
+		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
 
 		// return count for post SQL filtered result sets
 		if (!is_null($options['countOutput'])) {
-			return count($triggers);
-		}
-
-		foreach ($triggers as $trigger) {
-			if (!isset($result[$trigger['triggerid']])) {
-				$result[$trigger['triggerid']] = array();
-			}
-
-			$result[$trigger['triggerid']] += $trigger;
+			return count($result);
 		}
 
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
@@ -479,6 +471,7 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
+
 		// expandComment
 		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
@@ -819,47 +812,52 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Delete triggers
+	 * Delete triggers.
 	 *
-	 * @param array $triggerids array with trigger ids
+	 * @param array $triggerIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($triggerids, $nopermissions = false) {
-		$triggerids = zbx_toArray($triggerids);
+	public function delete($triggerIds, $nopermissions = false) {
+		$triggerIds = zbx_toArray($triggerIds);
 
-		$this->validateDelete($triggerids, $nopermissions);
+		$this->validateDelete($triggerIds, $nopermissions);
 
 		// get child triggers
-		$parentTriggerids = $triggerids;
+		$parentTriggerIds = $triggerIds;
+
 		do {
-			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.dbConditionInt('templateid', $parentTriggerids));
-			$parentTriggerids = array();
+			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.dbConditionInt('templateid', $parentTriggerIds));
+			$parentTriggerIds = array();
+
 			while ($dbTrigger = DBfetch($dbItems)) {
-				$parentTriggerids[] = $dbTrigger['triggerid'];
-				$triggerids[] = $dbTrigger['triggerid'];
+				$parentTriggerIds[] = $dbTrigger['triggerid'];
+				$triggerIds[] = $dbTrigger['triggerid'];
 			}
-		} while (!empty($parentTriggerids));
+		} while ($parentTriggerIds);
 
 		// select all triggers which are deleted (including children)
 		$delTriggers = $this->get(array(
-			'triggerids' => $triggerids,
+			'triggerids' => $triggerIds,
 			'output' => array('triggerid', 'description', 'expression'),
 			'nopermissions' => true,
 			'selectHosts' => array('name')
 		));
+
 		// TODO: REMOVE info
 		foreach ($delTriggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
 					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
 					$trigger['description'], null, null, null);
 		}
 
 		// execute delete
-		$this->deleteByPks($triggerids);
+		$this->deleteByIds($triggerIds);
 
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	/**
@@ -883,50 +881,59 @@ class CTrigger extends CTriggerGeneral {
 		}
 	}
 
-	protected function deleteByPks(array $pks) {
+	/**
+	 * Delete trigger by ids.
+	 *
+	 * @param array $triggerIds
+	 */
+	protected function deleteByIds(array $triggerIds) {
 		// others idx should be deleted as well if they arise at some point
 		DB::delete('profiles', array(
 			'idx' => 'web.events.filter.triggerid',
-			'value_id' => $pks
-		));
-
-		DB::delete('events', array(
-			'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-			'objectid' => $pks,
-			'object' => EVENT_OBJECT_TRIGGER
+			'value_id' => $triggerIds
 		));
 
 		DB::delete('sysmaps_elements', array(
-			'elementid' => $pks,
+			'elementid' => $triggerIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
 		));
 
 		// disable actions
-		$actionids = array();
+		$actionIds = array();
+
 		$dbActions = DBselect(
 			'SELECT DISTINCT actionid'.
 			' FROM conditions'.
 			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.dbConditionString('value', $pks)
+				' AND '.dbConditionString('value', $triggerIds)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
+			$actionIds[$dbAction['actionid']] = $dbAction['actionid'];
 		}
 
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionids));
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionIds));
 
 		// delete action conditions
 		DB::delete('conditions', array(
 			'conditiontype' => CONDITION_TYPE_TRIGGER,
-			'value' => $pks
+			'value' => $triggerIds
 		));
 
-		// update linked services
-		foreach ($pks as $triggerId) {
-			update_services($triggerId, SERVICE_STATUS_OK);
+		if ($this->usedInItServices($triggerIds)) {
+			DB::update('services', array(
+				'values' => array(
+					'triggerid' => null,
+					'showsla' => SERVICE_SHOW_SLA_OFF
+				),
+				'where' => array(
+					'triggerid' => $triggerIds
+				)
+			));
+
+			updateItServices();
 		}
 
-		parent::deleteByPks($pks);
+		parent::deleteByIds($triggerIds);
 	}
 
 	/**
@@ -1143,8 +1150,10 @@ class CTrigger extends CTriggerGeneral {
 		$triggers = zbx_toArray($triggers);
 		$infos = array();
 
+		$triggerIds = zbx_objectValues($triggers, 'triggerid');
+
 		$dbTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'selectDependencies' => API_OUTPUT_REFER,
@@ -1152,7 +1161,10 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		));
 
-		$descriptionChanged = $expressionChanged = false;
+		$descriptionChanged = false;
+		$expressionChanged = false;
+		$changedPriorityTriggerIds = array();
+
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
@@ -1182,7 +1194,7 @@ class CTrigger extends CTriggerGeneral {
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression();
 				$oldExpressionData->parse($oldExpression);
-				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
+				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($expressionData->getHosts());
 				$proceed = true;
@@ -1216,16 +1228,7 @@ class CTrigger extends CTriggerGeneral {
 						}
 						$cTrigIds[] = $cTrig['triggerid'];
 					}
-					$this->deleteByPks($cTrigIds);
-				}
-
-				// if the trigger contains templates, delete any events that may exist
-				if ($this->expressionHasTemplates($expressionData)) {
-					DB::delete('events', array(
-						'source' => array(EVENT_SOURCE_INTERNAL, EVENT_SOURCE_TRIGGERS),
-						'object' => EVENT_OBJECT_TRIGGER,
-						'objectid' => $trigger['triggerid']
-					));
+					$this->deleteByIds($cTrigIds);
 				}
 
 				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
@@ -1267,8 +1270,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// update service status
 			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
-				$serviceStatus = ($dbTrigger['value'] == TRIGGER_VALUE_TRUE) ? $trigger['priority'] : 0;
-				update_services($trigger['triggerid'], $serviceStatus);
+				$changedPriorityTriggerIds[] = $trigger['triggerid'];
 			}
 
 			// restore the full expression to properly validate dependencies
@@ -1279,6 +1281,10 @@ class CTrigger extends CTriggerGeneral {
 					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
 		}
 		unset($trigger);
+
+		if ($changedPriorityTriggerIds && $this->usedInItServices($changedPriorityTriggerIds)) {
+			updateItServices();
+		}
 
 		foreach ($infos as $info) {
 			info($info);
@@ -1422,7 +1428,7 @@ class CTrigger extends CTriggerGeneral {
 					' WHERE '.dbConditionInt('td.triggerid_down', $downTriggerIds)
 				);
 
-				// combine db dependencies with thouse to be added
+				// combine db dependencies with those to be added
 				$upTriggersIds = array();
 				while ($row = DBfetch($res)) {
 					$upTriggersIds[] = $row['triggerid_up'];
@@ -1795,18 +1801,70 @@ class CTrigger extends CTriggerGeneral {
 		// adding last event
 		if ($options['selectLastEvent'] !== null) {
 			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'sortfield' => array('clock', 'eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
+				$result[$triggerId]['lastEvent'] = array();
+			}
 
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			if (is_array($options['selectLastEvent'])) {
+				$pkFieldId = $this->pk('events');
+				$outputFields = array(
+					'objectid' => $this->fieldId('objectid', 'e'),
+					'ns' => $this->fieldId('ns', 'e'),
+					$pkFieldId => $this->fieldId($pkFieldId, 'e')
+				);
+
+				foreach ($options['selectLastEvent'] as $field) {
+					if ($this->hasField($field, 'events')) {
+						$outputFields[$field] = $this->fieldId($field, 'e');
+					}
+				}
+
+				$outputFields = implode(',', $outputFields);
+			}
+			else {
+				$outputFields = 'e.*';
+			}
+
+			// due to performance issues, avoid using 'ORDER BY' for outter SELECT
+			$dbEvents = DBselect(
+				'SELECT '.$outputFields.
+				' FROM events e'.
+					' JOIN ('.
+						'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
+						' FROM events e2'.
+						' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
+							' AND e2.object='.EVENT_OBJECT_TRIGGER.
+							' AND '.dbConditionInt('e2.objectid', $triggerids).
+						' GROUP BY e2.source,e2.object,e2.objectid'.
+					') e3 ON e3.source=e.source'.
+						' AND e3.object=e.object'.
+						' AND e3.objectid=e.objectid'.
+						' AND e3.clock=e.clock'
+			);
+
+			// in case there are multiple records with same 'clock' for one trigger, we'll get different 'ns'
+			$lastEvents = array();
+
+			while ($dbEvent = DBfetch($dbEvents)) {
+				$triggerId = $dbEvent['objectid'];
+				$ns = $dbEvent['ns'];
+
+				// unset fields, that were not requested
+				if (is_array($options['selectLastEvent'])) {
+					if (!in_array('objectid', $options['selectLastEvent'])) {
+						unset($dbEvent['objectid']);
+					}
+					if (!in_array('ns', $options['selectLastEvent'])) {
+						unset($dbEvent['ns']);
+					}
+				}
+
+				$lastEvents[$triggerId][$ns] = $dbEvent;
+			}
+
+			foreach ($lastEvents as $triggerId => $events) {
+				// find max 'ns' for each trigger and that will be the 'lastEvent'
+				$maxNs = max(array_keys($events));
+				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
 		}
 
@@ -1963,5 +2021,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $triggers;
+	}
+
+	/**
+	 * Returns true if at least one of the given triggers is used in IT services.
+	 *
+	 * @param array $triggerIds
+	 *
+	 * @return bool
+	 */
+	protected function usedInItServices(array $triggerIds) {
+		$query = DBselect('SELECT serviceid FROM services WHERE '.dbConditionInt('triggerid', $triggerIds), 1);
+
+		return (DBfetch($query) != false);
 	}
 }

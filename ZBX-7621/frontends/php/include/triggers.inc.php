@@ -103,18 +103,6 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
-// retrieve trigger's priority for services
-function get_service_status_of_trigger($triggerid) {
-	$sql = 'SELECT t.triggerid,t.priority'.
-			' FROM triggers t'.
-			' WHERE t.triggerid='.zbx_dbstr($triggerid).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.value='.TRIGGER_VALUE_TRUE;
-	$rows = DBfetch(DBselect($sql, 1));
-
-	return !empty($rows['priority']) ? $rows['priority'] : 0;
-}
-
 /**
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
@@ -459,7 +447,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		$dependencies = array();
 		foreach ($dbSrcTriggers as $srcTrigger) {
 			if ($srcTrigger['dependencies']) {
-				// get coresponding created trigger id
+				// get corresponding created trigger id
 				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
 
 
@@ -675,11 +663,12 @@ function construct_expression($itemid, $expressions) {
 }
 
 /********************************************************************************
- *																				*
- * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10	*
- *																				*
- * Comments: !!! Don't forget sync code with C !!!								*
- *																				*
+ *                                                                              *
+ * Purpose: Translate {10}>10 to something like                                 *
+ * localhost:system.cpu.load.last(0)>10                                         *
+ *                                                                              *
+ * Comments: !!! Don't forget sync code with C !!!                              *
+ *                                                                              *
  *******************************************************************************/
 function explode_exp($expressionCompressed, $html = false, $resolveMacro = false, $sourceHost = null, $destinationHost = null) {
 	$expressionExpanded = $html ? array() : '';
@@ -993,9 +982,9 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs.
  *
- * Fro example: localhost:procload.last(0)>10 will translated to {12}>10 and created database representation.
+ * For example: localhost:system.cpu.load.last(0)>10 will be translated to {12}>10 and created database representation.
  *
- * @throws Exception if error occureed
+ * @throws Exception if error occurred
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid
@@ -2242,14 +2231,14 @@ function get_item_function_info($expr) {
 
 	$type_of_value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
 		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 	);
 
 	$function_info = array(
-		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'band' =>		array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2314,7 +2303,7 @@ function get_item_function_info($expr) {
 				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
-					'key_' => array($exprPart['item']),
+					'key_' => array($exprPart['item'])
 				),
 				'webitems' => true
 			));
@@ -2324,7 +2313,7 @@ function get_item_function_info($expr) {
 					'output' => array('value_type'),
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
 					'filter' => array(
-						'key_' => array($exprPart['item']),
+						'key_' => array($exprPart['item'])
 					)
 				));
 
@@ -2340,7 +2329,7 @@ function get_item_function_info($expr) {
 				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
 				$result['type'] = $result['type'][$itemFound['value_type']];
 
-				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
+				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
@@ -2515,4 +2504,40 @@ function triggerIndicatorStyle($status, $state = null) {
 	}
 
 	return 'unknown';
+}
+
+/**
+ * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ *
+ * Keep in sync with orderItemsByStatus().
+ *
+ * @param array  $triggers
+ * @param string $sortorder
+ */
+function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($triggers as $key => $trigger) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+		}
+		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedTriggers = array();
+	foreach ($sort as $key => $val) {
+		$sortedTriggers[$key] = $triggers[$key];
+	}
+	$triggers = $sortedTriggers;
 }

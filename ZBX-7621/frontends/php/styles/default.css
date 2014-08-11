@@ -238,11 +238,13 @@ ul.favorites li { line-height: 16px; vertical-align: top; list-style: url("../im
 ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
 ul.favorites li a { line-height: 18px; vertical-align: top; }
 
-/* frondend messages */
+/* frontend messages */
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
-ul.messages li.error { color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; }
+ul.messages li.error {
+	color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; word-break: normal;
+}
 
 /* column */
 .column { margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
@@ -452,6 +454,7 @@ table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
+table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; margin-left: 3px; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -507,7 +510,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
-.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; }
+.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; float: left; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
@@ -551,6 +554,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
+.multiselect-wrapper .select-popup { margin-left: 10px; }
+
 /* menu popup */
 .menuPopup {
 	width: 170px; border: 1px solid #7E9AB4; text-align: left; position: absolute; z-index: 1000; display: none; white-space: pre-wrap;
@@ -565,3 +570,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* tabs */
 .tabs { visibility: hidden; }
+
+/* modal window */
+.ui-widget-overlay { z-index: 1000; }
+.ui-dialog { z-index: 1001; opacity: 1; }

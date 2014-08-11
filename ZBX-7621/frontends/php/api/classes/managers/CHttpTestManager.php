@@ -153,6 +153,7 @@ class CHttpTestManager {
 			));
 
 			$checkItemsUpdate = $updateFields = array();
+			$itemids = array();
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.
@@ -309,12 +310,12 @@ class CHttpTestManager {
 	 * @return bool
 	 */
 	public function inherit(array $httpTests, array $hostIds = array()) {
-		$hostsTemaplatesMap = $this->getChildHostsFromHttpTests($httpTests, $hostIds);
-		if (empty($hostsTemaplatesMap)) {
+		$hostsTemplatesMap = $this->getChildHostsFromHttpTests($httpTests, $hostIds);
+		if (empty($hostsTemplatesMap)) {
 			return true;
 		}
 
-		$preparedHttpTests = $this->prepareInheritedHttpTests($httpTests, $hostsTemaplatesMap);
+		$preparedHttpTests = $this->prepareInheritedHttpTests($httpTests, $hostsTemplatesMap);
 		$inheritedHttpTests = $this->save($preparedHttpTests);
 		$this->inherit($inheritedHttpTests);
 
@@ -332,7 +333,7 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = array()) {
-		$hostsTemaplatesMap = array();
+		$hostsTemplatesMap = array();
 
 		$sqlWhere = $hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '';
 		$dbCursor = DBselect(
@@ -342,10 +343,10 @@ class CHttpTestManager {
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
-			$hostsTemaplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
+			$hostsTemplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
 		}
 
-		return $hostsTemaplatesMap;
+		return $hostsTemplatesMap;
 	}
 
 	/**
@@ -353,20 +354,20 @@ class CHttpTestManager {
 	 * Using passed parameters decide if new http tests must be created on host or existing ones must be updated.
 	 *
 	 * @param array $httpTests which we need to inherit
-	 * @param array $hostsTemaplatesMap
+	 * @param array $hostsTemplatesMap
 	 *
 	 * @throws Exception
 	 * @return array with http tests, existing apps have 'httptestid' key.
 	 */
-	protected function prepareInheritedHttpTests(array $httpTests, array $hostsTemaplatesMap) {
-		$hostHttpTests = $this->getHttpTestsMapsByHostIds(array_keys($hostsTemaplatesMap));
+	protected function prepareInheritedHttpTests(array $httpTests, array $hostsTemplatesMap) {
+		$hostHttpTests = $this->getHttpTestsMapsByHostIds(array_keys($hostsTemplatesMap));
 
 		$result = array();
 		foreach ($httpTests as $httpTest) {
 			$httpTestId = $httpTest['httptestid'];
 			foreach ($hostHttpTests as $hostId => $hostHttpTest) {
 				// if http test template is not linked to host we skip it
-				if ($hostsTemaplatesMap[$hostId] != $httpTest['hostid']) {
+				if ($hostsTemplatesMap[$hostId] != $httpTest['hostid']) {
 					continue;
 				}
 
@@ -1058,8 +1059,17 @@ class CHttpTestManager {
 		$history = Manager::History()->getLast($httpItems);
 
 		$data = array();
+
 		foreach ($httpItems as $httpItem) {
 			if (isset($history[$httpItem['itemid']])) {
+				if (!isset($data[$httpItem['httptestid']])) {
+					$data[$httpItem['httptestid']] = array(
+						'lastcheck' => null,
+						'lastfailedstep' => null,
+						'error' => null
+					);
+				}
+
 				$itemHistory = $history[$httpItem['itemid']][0];
 
 				if ($httpItem['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {

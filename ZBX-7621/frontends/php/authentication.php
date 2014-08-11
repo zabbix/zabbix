@@ -161,7 +161,7 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	if (isset($_REQUEST['save'])) {
-		// get groups wich use this authentication method
+		// get groups that use this authentication method
 		$result = DBfetch(DBselect(
 			'SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL
 		));
@@ -211,22 +211,10 @@ $data = array(
 );
 
 // get tab title
-switch ($config['authentication_type']) {
-	case ZBX_AUTH_INTERNAL:
-		$data['title'] = _('Zabbix internal authentication');
-		break;
-	case ZBX_AUTH_LDAP:
-		$data['title'] = _('LDAP authentication');
-		break;
-	case ZBX_AUTH_HTTP:
-		$data['title'] = _('HTTP authentication');
-		break;
-	default:
-		$data['title'] = '';
-}
+$data['title'] = authentication2str($config['authentication_type']);
 
 // get user list
-if (get_user_auth(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
+if (getUserGuiAccess(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['user_list'] = DBfetchArray(DBselect(
 		'SELECT u.alias,u.userid'.
 		' FROM users u'.
