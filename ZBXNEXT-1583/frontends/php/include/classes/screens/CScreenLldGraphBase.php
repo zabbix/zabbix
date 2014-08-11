@@ -58,7 +58,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 */
 	protected function makeSurrogateScreen() {
 		$surrogateScreen = array(
-			'screenid' => 'z' . $this->screenitem['resourceid'],
+			'screenid' => $this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'],
 			'name' => uniqid('SURROGATE_SCREEN_'),
 			'dynamic' => $this->screenitem['dynamic'],
 			'hsize' => 0,
