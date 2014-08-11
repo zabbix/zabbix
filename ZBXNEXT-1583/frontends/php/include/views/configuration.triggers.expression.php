@@ -49,7 +49,7 @@ $item = array(
 if (!empty($this->data['parent_discoveryid'])) {
 	$item[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
-		'&srctbl=prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
+		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
 		'formlist'
 	);
 }
