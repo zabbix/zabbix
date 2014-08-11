@@ -165,6 +165,7 @@ void	load_perf_counters(const char **lines)
 	const char	**pline;
 	char		*error = NULL;
 	LPTSTR		wcounterPath;
+	int		period;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
@@ -202,7 +203,15 @@ void	load_perf_counters(const char **lines)
 			goto pc_fail;
 		}
 
-		if (NULL == add_perf_counter(name, counterpath, atoi(interval), &error))
+		period = atoi(interval);
+
+		if (1 > period || MAX_COLLECTOR_PERIOD < period)
+		{
+			error = zbx_strdup(NULL, "Interval out of range.");
+			goto pc_fail;
+		}
+
+		if (NULL == add_perf_counter(name, counterpath, period, &error))
 		{
 			if (NULL == error)
 				error = zbx_strdup(error, "Failed to add new performance counter.");
