@@ -38,8 +38,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'itemid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
+	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'),
 	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
 	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
 	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
