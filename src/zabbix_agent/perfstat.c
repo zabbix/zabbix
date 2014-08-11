@@ -23,6 +23,7 @@
 #include "alias.h"
 #include "log.h"
 #include "mutexs.h"
+#include "sysinfo.h"
 
 static ZBX_PERF_STAT_DATA	ppsd;
 static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
@@ -66,12 +67,6 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 	if (SUCCEED != perf_collector_started())
 	{
 		*error = zbx_strdup(*error, "Performance collector is not started.");
-		goto out;
-	}
-
-	if (1 > interval || 15 * SEC_PER_MIN < interval)
-	{
-		*error = zbx_dsprintf(*error, "Interval out of range.", interval);
 		goto out;
 	}
 
@@ -130,6 +125,8 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 out:
 	UNLOCK_PERFCOUNTERS;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, NULL == cptr ? "FAIL" : "SUCCEED");
+
 	return cptr;
 }
 
@@ -140,8 +137,8 @@ out:
  * Purpose: extends the performance counter buffer to store the new data      *
  *          interval                                                          *
  *                                                                            *
- * Parameters: result      - [IN] the performance counter                     *
- *             interval    - [IN] the new data collection interval in seconds *
+ * Parameters: result    - [IN] the performance counter                       *
+ *             interval  - [IN] the new data collection interval in seconds   *
  *                                                                            *
  ******************************************************************************/
 static void	extend_perf_counter_interval(PERF_COUNTER_DATA *counter, int interval)

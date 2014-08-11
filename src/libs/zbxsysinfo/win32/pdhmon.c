@@ -94,6 +94,12 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
+	if (1 > interval || MAX_COLLECTOR_PERIOD < interval)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interval out of range."));
+		goto out;
+	}
+
 	if (FAIL == check_counter_path(counterpath))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid performance counter path."));
