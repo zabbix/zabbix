@@ -193,3 +193,42 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
 
 	return $httpTests;
 }
+/**
+ * Copies web scenarios from given host ID to destination host.
+ *
+ * @param string $srcHostId		source host ID
+ * @param string $dstHostId		destination host ID
+ *
+ * @return bool
+ */
+function copyHttpTests($srcHostId, $dstHostId) {
+	$httpTestsToClone = API::HttpTest()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'hostids' => $srcHostId,
+		'selectSteps' => API_OUTPUT_EXTEND,
+		'inherited' => false
+	));
+
+	if (!$httpTestsToClone) {
+		return true;
+	}
+
+	foreach ($httpTestsToClone as &$httpTest) {
+		$httpTest['hostid'] = $dstHostId;
+
+		if ($httpTest['applicationid']) {
+			$appIds = get_same_applications_for_host(array($httpTest['applicationid']), $dstHostId);
+			$httpTest['applicationid'] = reset($appIds);
+		}
+
+		unset($httpTest['httptestid']);
+
+		foreach($httpTest['steps'] as &$httpStep) {
+			unset($httpStep['httpstepid']);
+		}
+		unset($httpStep);
+	}
+	unset($httpTest);
+
+	return API::HttpTest()->create($httpTestsToClone);
+}
