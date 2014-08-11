@@ -23,7 +23,10 @@ require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 
 $historyWidget = new CWidget();
 
-$header = array('left' => count($this->data['items']).SPACE._('ITEMS'), 'right' => array());
+$header = array(
+	'left' => _n('%1$s ITEM', '%1$s ITEMS', count($this->data['items'])),
+	'right' => array()
+);
 $headerPlaintext = array();
 
 if (count($this->data['items']) == 1) {
@@ -46,7 +49,7 @@ if (count($this->data['items']) == 1) {
 	}
 }
 
-$header['right'][] = SPACE;
+$header['right'][] = ' ';
 $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
 
 // don't display the action form if we view multiple items on a graph
@@ -73,10 +76,10 @@ if (count($this->data['items']) == 1 || $this->data['action'] !== 'showgraph') {
 	$actionForm->addItem($actionComboBox);
 
 	if ($this->data['action'] != 'showgraph') {
-		$actionForm->addItem(array(SPACE, new CSubmit('plaintext', _('As plain text'))));
+		$actionForm->addItem(array(' ', new CSubmit('plaintext', _('As plain text'))));
 	}
 
-	array_unshift($header['right'], $actionForm, SPACE);
+	array_unshift($header['right'], $actionForm, ' ');
 }
 
 // create filter
@@ -135,7 +138,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 			$colorComboBox->addItem(MARK_COLOR_GREEN, _('as Green'));
 			$colorComboBox->addItem(MARK_COLOR_BLUE, _('as Blue'));
 
-			$tasks[] = SPACE;
+			$tasks[] = ' ';
 			$tasks[] = $colorComboBox;
 		}
 
@@ -176,14 +179,12 @@ if ($this->data['plaintext']) {
 	$plaintextSpan->addItem($pre);
 	$historyWidget->addItem($plaintextSpan);
 }
-
-// append graph to widget
 else {
 	$right = new CTable();
 	$right->addRow($header['right']);
 
 	$historyWidget->addPageHeader($header['left'], $right);
-	$historyWidget->addItem(SPACE);
+	$historyWidget->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
