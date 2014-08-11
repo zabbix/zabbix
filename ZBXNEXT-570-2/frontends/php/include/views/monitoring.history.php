@@ -49,33 +49,35 @@ if (count($this->data['items']) == 1) {
 $header['right'][] = SPACE;
 $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
 
-// append action form to header
-$actionForm = new CForm('get');
-$actionForm->addVar('itemids', getRequest('itemids'));
+// don't display the action form if we view multiple items on a graph
+if (count($this->data['items']) == 1 || $this->data['action'] !== 'showgraph') {
+	$actionForm = new CForm('get');
+	$actionForm->addVar('itemids', getRequest('itemids'));
 
-if (isset($_REQUEST['filter_task'])) {
-	$actionForm->addVar('filter_task', $_REQUEST['filter_task']);
-}
-if (isset($_REQUEST['filter'])) {
-	$actionForm->addVar('filter', $_REQUEST['filter']);
-}
-if (isset($_REQUEST['mark_color'])) {
-	$actionForm->addVar('mark_color', $_REQUEST['mark_color']);
-}
+	if (isset($_REQUEST['filter_task'])) {
+		$actionForm->addVar('filter_task', $_REQUEST['filter_task']);
+	}
+	if (isset($_REQUEST['filter'])) {
+		$actionForm->addVar('filter', $_REQUEST['filter']);
+	}
+	if (isset($_REQUEST['mark_color'])) {
+		$actionForm->addVar('mark_color', $_REQUEST['mark_color']);
+	}
 
-$actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
-if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
-	$actionComboBox->addItem('showgraph', _('Graph'));
-}
-$actionComboBox->addItem('showvalues', _('Values'));
-$actionComboBox->addItem('showlatest', _('500 latest values'));
-$actionForm->addItem($actionComboBox);
+	$actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
+	if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
+		$actionComboBox->addItem('showgraph', _('Graph'));
+	}
+	$actionComboBox->addItem('showvalues', _('Values'));
+	$actionComboBox->addItem('showlatest', _('500 latest values'));
+	$actionForm->addItem($actionComboBox);
 
-if ($this->data['action'] != 'showgraph') {
-	$actionForm->addItem(array(SPACE, new CSubmit('plaintext', _('As plain text'))));
-}
+	if ($this->data['action'] != 'showgraph') {
+		$actionForm->addItem(array(SPACE, new CSubmit('plaintext', _('As plain text'))));
+	}
 
-array_unshift($header['right'], $actionForm, SPACE);
+	array_unshift($header['right'], $actionForm, SPACE);
+}
 
 // create filter
 if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlatest') {
