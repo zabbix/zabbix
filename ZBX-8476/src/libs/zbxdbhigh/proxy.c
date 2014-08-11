@@ -2352,7 +2352,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp, const zbx_uin
 				}
 			}
 			else
-				av->ts.ns = -1;
+				av->ts.ns = proxy_timediff.ns;
 		}
 		else
 			zbx_timespec(&av->ts);

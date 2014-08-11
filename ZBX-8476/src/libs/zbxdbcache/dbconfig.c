@@ -1100,7 +1100,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_type, old_poller_type, status;
+	unsigned char		old_poller_type, status, type;
 	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
@@ -1127,6 +1127,7 @@ static void	DCsync_items(DB_RESULT result)
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UCHAR(status, row[2]);
+		ZBX_STR2UCHAR(type, row[3]);
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
@@ -1198,7 +1199,6 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
-			old_type = 0xff;
 			old_poller_type = ZBX_NO_POLLER;
 			old_nextcheck = 0;
 		}
@@ -1207,7 +1207,6 @@ static void	DCsync_items(DB_RESULT result)
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
 
-			old_type = item->type;
 			old_poller_type = item->poller_type;
 			old_nextcheck = item->nextcheck;
 
@@ -1228,7 +1227,6 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		item->status = status;
-		ZBX_STR2UCHAR(item->type, row[3]);
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1266,7 +1264,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(host->proxy_hostid, item->type, item->key);
+			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -1276,19 +1274,19 @@ static void	DCsync_items(DB_RESULT result)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (0 == found || 0 != key_changed || old_type != item->type ||
+			if (0 == found || 0 != key_changed || item->type != type ||
 					(ITEM_STATE_NORMAL == item->state &&
-					(delay != item->delay || 0 != delay_flex_changed)))
+					(item->delay != delay || 0 != delay_flex_changed)))
 			{
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, config->config->refresh_unsupported, NULL, now);
+					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), type,
+							config->config->refresh_unsupported, NULL, now);
 				}
 				else
 				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, delay, row[16], now);
+					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), type,
+							delay, row[16], now);
 				}
 			}
 		}
@@ -1296,6 +1294,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->poller_type = ZBX_NO_POLLER;
 
 		item->delay = delay;
+		item->type = type;
 
 		/* numeric items */
 
