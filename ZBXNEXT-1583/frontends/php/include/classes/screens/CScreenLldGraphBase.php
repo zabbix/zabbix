@@ -34,14 +34,21 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return CDiv
 	 */
 	public function get() {
-		$this->surrogateScreen = $this->makeSurrogateScreen();
+		if ($this->mode == SCREEN_MODE_EDIT || $this->mustShowPreview()) {
+			$output = $this->getOutput($this->getPreview());
+		}
+		else {
+			$this->surrogateScreen = $this->makeSurrogateScreen();
 
-		$this->addSurrogateScreenItems();
-		$this->calculateSurrogateScreenSizes();
+			$this->addSurrogateScreenItems();
+			$this->calculateSurrogateScreenSizes();
 
-		$screenBuilder = $this->makeSurrogateScreenBuilder();
+			$screenBuilder = $this->makeSurrogateScreenBuilder();
 
-		return $this->getOutput($screenBuilder->show(), true);
+			$output = $this->getOutput($screenBuilder->show(), true);
+		}
+
+		return $output;
 	}
 
 	/**
@@ -142,6 +149,15 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	}
 
 	/**
+	 * @param array $screenItems
+	 */
+	protected function addItemsToSurrogateScreen(array $screenItems) {
+		foreach ($screenItems as $screenItem) {
+			$this->surrogateScreen['screenitems'][] = $screenItem;
+		}
+	}
+
+	/**
 	 * @return integer
 	 */
 	abstract protected function getHostIdFromScreenItemResource();
@@ -150,4 +166,14 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return void
 	 */
 	abstract protected function addSurrogateScreenItems();
+
+	/**
+	 * @return boolean
+	 */
+	abstract protected function mustShowPreview();
+
+	/**
+	 * @return CTag
+	 */
+	abstract protected function getPreview();
 }
