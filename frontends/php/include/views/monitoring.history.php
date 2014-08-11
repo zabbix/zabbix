@@ -27,17 +27,20 @@ $header = array('left' => count($this->data['items']).SPACE._('ITEMS'), 'right' 
 $headerPlaintext = array();
 
 if (count($this->data['items']) == 1) {
+	$item = reset($this->data['items']);
+	$host = reset($item['hosts']);
+
 	$header['left'] = array(
-		new CLink($this->data['item']['hostname'], 'latest.php?filter_set=1&hostids[]='.$this->data['item']['hostid']),
+		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
-		$this->data['item']['name_expanded']
+		$item['name_expanded']
 	);
-	$headerPlaintext[] = $this->data['item']['hostname'].NAME_DELIMITER.$this->data['item']['name_expanded'];
+	$headerPlaintext[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
 	if ($this->data['action'] == 'showgraph') {
 		$header['right'][] = get_icon('favourite', array(
 			'fav' => 'web.favorite.graphids',
-			'elid' => $this->data['item']['itemid'],
+			'elid' => $item['itemid'],
 			'elname' => 'itemid'
 		));
 	}
@@ -48,7 +51,7 @@ $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['f
 
 // append action form to header
 $actionForm = new CForm('get');
-$actionForm->addVar('itemid', $_REQUEST['itemid']);
+$actionForm->addVar('itemids', getRequest('itemids'));
 
 if (isset($_REQUEST['filter_task'])) {
 	$actionForm->addVar('filter_task', $_REQUEST['filter_task']);
@@ -61,7 +64,7 @@ if (isset($_REQUEST['mark_color'])) {
 }
 
 $actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
-if (isset($this->data['iv_numeric'][$this->data['item']['value_type']])) {
+if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
 	$actionComboBox->addItem('showgraph', _('Graph'));
 }
 $actionComboBox->addItem('showvalues', _('Values'));
@@ -76,13 +79,15 @@ array_unshift($header['right'], $actionForm, SPACE);
 
 // create filter
 if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlatest') {
-	if (isset($this->data['iv_string'][$this->data['item']['value_type']])) {
+	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm = new CFormTable(null, null, 'get');
 		$filterForm->setTableClass('formtable old-filter');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 		$filterForm->addVar('action', $this->data['action']);
-		$filterForm->addVar('itemid', zbx_toHash($_REQUEST['itemid']));
+		foreach (getRequest('itemids') as $itemId) {
+			$filterForm->addVar('itemids[]', $itemId, 'filter_itemids_'.$itemId);
+		}
 
 		$itemListbox = new CListBox('cmbitemlist[]');
 		$itemsData = array();
@@ -103,11 +108,11 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 		}
 
 		$addItemButton = new CButton('add_log', _('Add'), "return PopUp('popup.php?multiselect=1&real_hosts=1".
-				'&reference=itemid&srctbl=items&value_types[]='.$this->data['item']['value_type']."&srcfld1=itemid');");
+				'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
-			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'), "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
+			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'));
 		}
 
 		$filterForm->addRow(_('Items list'), array($itemListbox, BR(), $addItemButton, $deleteItemButton));
@@ -178,7 +183,7 @@ else {
 	$historyWidget->addPageHeader($header['left'], $right);
 	$historyWidget->addItem(SPACE);
 
-	if (isset($this->data['iv_string'][$this->data['item']['value_type']])) {
+	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 

@@ -38,7 +38,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'itemid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'!isset({favobj})'),
+	'itemid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
 	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
 	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
 	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
@@ -120,20 +121,19 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 $_REQUEST['action'] = getRequest('action', 'showgraph');
-$_REQUEST['itemid'] = array_unique(zbx_toArray($_REQUEST['itemid']));
 
 /*
  * Display
  */
 $items = API::Item()->get(array(
-	'itemids' => $_REQUEST['itemid'],
+	'itemids' => getRequest('itemids'),
 	'webitems' => true,
 	'selectHosts' => array('name'),
 	'output' => array('itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'),
 	'preservekeys' => true
 ));
 
-foreach ($_REQUEST['itemid'] as $itemid) {
+foreach (getRequest('itemids') as $itemid) {
 	if (!isset($items[$itemid])) {
 		access_deny();
 	}
@@ -142,13 +142,11 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 $items = CMacrosResolverHelper::resolveItemNames($items);
 
 $item = reset($items);
-$host = reset($item['hosts']);
-$item['hostname'] = $host['name'];
 
 $data = array(
-	'itemids' => getRequest('itemid'),
+	'itemids' => getRequest('itemids'),
 	'items' => $items,
-	'item' => $item,
+	'value_type' => $item['value_type'],
 	'action' => getRequest('action'),
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
