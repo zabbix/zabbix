@@ -358,8 +358,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				continue;
 
 			*error = zbx_strdcatf(*error, "Cannot %s host:"
-						" host with the same name \"%s\" already exists.\n",
-						(0 != host->hostid ? "update" : "create"), host->host);
+					" host with the same name \"%s\" already exists.\n",
+					(0 != host->hostid ? "update" : "create"), host->host);
 
 			if (0 != host->hostid)
 			{
@@ -486,7 +486,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 					continue;
 
-				if (0 == strcmp(host->host, row[0]))
+				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST)) &&
+						0 == strcmp(host->host, row[0]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
 							" host with the same name \"%s\" already exists.\n",
@@ -504,7 +505,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 				}
 
-				if (0 == strcmp(host->name, row[1]))
+				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME)) &&
+						0 == strcmp(host->name, row[1]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
 							" host with the same visible name \"%s\" already exists.\n",
@@ -1129,6 +1131,9 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 				group = (zbx_lld_group_t *)groups->values[i];
 
 				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+					continue;
+
+				if (0 != group->groupid && 0 == group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME)
 					continue;
 
 				if (0 == strcmp(group->name, row[0]))
