@@ -63,7 +63,7 @@ class CScreenSimpleGraph extends CScreenBase {
 
 		$timeControlData['src'] = zbx_empty($resourceid)
 			? 'chart3.php?'
-			: 'chart.php?itemid='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
+			: 'chart.php?itemids[]='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'];
 
 		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
 			? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
