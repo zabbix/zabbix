@@ -197,7 +197,37 @@ else {
 	$historyWidget->addItem($historyTable);
 
 	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
-		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
+		// time bar
+		$filter = array(
+			new CDiv(null, null, 'scrollbar_cntr')
+		);
+
+		// display the graph type filter for graphs with multiple items
+		if ($this->data['action'] === 'showgraph' && count($this->data['items']) > 1) {
+			$filterTable = new CTable('', 'filter');
+
+			$graphType = array(
+				new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, null, 'graphtype_'.GRAPH_TYPE_NORMAL,
+					($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
+				),
+				new CLabel(_('Normal'), 'graphtype_'.GRAPH_TYPE_NORMAL),
+				new CRadioButton('graphtype', GRAPH_TYPE_STACKED, null, 'graphtype_'.GRAPH_TYPE_STACKED,
+					($this->data['graphtype'] == GRAPH_TYPE_STACKED)
+				),
+				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
+			);
+			$filterTable->addRow(array(array(_('Graph type'), new CSpan($graphType, 'jqueryinputset'))));
+
+			$filterForm = new CForm('GET');
+			$filterForm->setAttribute('name', 'zbx_filter');
+			$filterForm->setAttribute('id', 'zbx_filter');
+			$filterForm->addVar('itemids', $this->data['itemids']);
+			$filterForm->addItem($filterTable);
+
+			$filter[] = $filterForm;
+		}
+
+		$historyWidget->addFlicker($filter, CProfile::get('web.history.filter.state', 1));
 
 		CScreenBuilder::insertScreenStandardJs(array(
 			'timeline' => $screen->timeline,

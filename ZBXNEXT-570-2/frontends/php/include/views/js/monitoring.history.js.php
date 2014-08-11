@@ -38,5 +38,9 @@
 				}
 			});
 		});
+
+		$('input[name="graphtype"]').change(function() {
+			$(this).parents('form').submit();
+		})
 	});
 </script>
