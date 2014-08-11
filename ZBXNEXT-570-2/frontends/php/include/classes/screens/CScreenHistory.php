@@ -22,6 +22,17 @@
 class CScreenHistory extends CScreenBase {
 
 	/**
+	 * Type of graph to display.
+	 *
+	 * Supported values:
+	 * - GRAPH_TYPE_NORMAL
+	 * - GRAPH_TYPE_STACKED
+	 *
+	 * @var int
+	 */
+	protected $graphType;
+
+	/**
 	 * Search string
 	 *
 	 * @var string
@@ -75,6 +86,7 @@ class CScreenHistory extends CScreenBase {
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
+		$this->graphType = isset($options['graphtype']) ? $options['graphtype'] : GRAPH_TYPE_NORMAL;
 
 		// optional
 		$this->items = isset($options['items']) ? $options['items'] : null;
@@ -285,6 +297,7 @@ class CScreenHistory extends CScreenBase {
 			$url->setArgument('period', $this->timeline['period']);
 			$url->setArgument('time', $this->timeline['stime']);
 			$url->setArgument('itemids', $itemIds);
+			$url->setArgument('type', $this->graphType);
 
 			$src = $url->getUrl().$this->getProfileUrlParams();
 

@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
+	'type' =>           array(T_ZBX_INT, O_OPT, null,   IN(array(GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED)), null),
 	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -67,7 +68,7 @@ $timeline = CScreenBase::calculateTime(array(
 	'stime' => getRequest('stime')
 ));
 
-$graph = new CLineGraphDraw();
+$graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 
