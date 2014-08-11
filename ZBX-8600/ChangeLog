@@ -6,6 +6,7 @@ New features:
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8600] fixed SQL errors in proxy configuration synchronization (Sasha)
 .......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
 ..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
 A......... [ZBX-8430] fixed SQL errors in drule.delete API method (Andrejs)
