@@ -339,6 +339,7 @@ class testMetrics extends CZabbixTest {
 			array('system.hw.cpu[]',						TYPE_ANY,	'/MHz/',			-1,	-1),
 			array('system.hw.macaddr[]',					TYPE_ANY,	'/eth[0-9]/',		-1,	-1),
 			array('system.sw.packages[]',					TYPE_ANY,	'/php/',			-1,	-1),
+			array('wmi.get[root\\cimv2,select Caption from Win32_OperatingSystem]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
 		);
 	}
 

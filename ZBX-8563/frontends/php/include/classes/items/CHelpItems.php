@@ -303,6 +303,10 @@ class CHelpItems {
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
 					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+				),
+				array(
+					'key' => 'wmi.get[<namespace>,<query>]',
+					'description' => _('Execute WMI query and return the first selected object.')
 				)
 			),
 			ITEM_TYPE_ZABBIX_ACTIVE => array(
@@ -561,6 +565,10 @@ class CHelpItems {
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
 					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
+				),
+				array(
+					'key' => 'wmi.get[<namespace>,<query>]',
+					'description' => _('Execute WMI query and return the first selected object.')
 				)
 			),
 			ITEM_TYPE_AGGREGATE => array(
