@@ -167,6 +167,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
 			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+			'&only_hostid='.$this->data['screen']['templateid'].
 			'&templated_hosts=1&writeonly=1", 800, 450);',
 			'formlist'
 		);
