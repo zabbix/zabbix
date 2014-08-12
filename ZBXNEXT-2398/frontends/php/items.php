@@ -334,12 +334,12 @@ if (!hasRequest('form') && hasRequest('filter_hostid') && getRequest('filter_hos
 
 	if (!isset($host)) {
 		$host = API::Host()->get(array(
-			'filter' => array('hostid' => $filterHostId),
+			'hostids' => $filterHostId,
 			'output' => array('hostid')
 		));
 		if (empty($host)) {
 			$host = API::Template()->get(array(
-				'filter' => array('hostid' => $filterHostId),
+				'templateids' => $filterHostId,
 				'output' => array('templateid')
 			));
 		}
