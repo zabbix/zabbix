@@ -1134,13 +1134,13 @@ out:
  ******************************************************************************/
 int	ip_in_list(char *list, char *ip)
 {
-	const char	*__function_name = "ip_in_list";
-	int		i[4], j[5], ret = FAIL;
-	char		*start = NULL, *comma = NULL, *dash = NULL;
+	int	i[4], j[5];
+	int	ret = FAIL;
+	char	*start = NULL, *comma = NULL, *dash = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(list:%s,ip:%s)", __function_name, list, ip);
+	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
 
-	if (4 != sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]))
+	if (sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
 	{
 #if defined(HAVE_IPV6)
 		ret = ip6_in_list(list, ip);
@@ -1148,24 +1148,31 @@ int	ip_in_list(char *list, char *ip)
 		goto out;
 	}
 
-	for (start = list; '\0' != *start;)
+	for (start = list; start[0] != '\0';)
 	{
 		if (NULL != (comma = strchr(start, ',')))
-			*comma = '\0';
+		{
+			comma[0] = '\0';
+		}
 
 		if (NULL != (dash = strchr(start, '-')))
 		{
-			*dash = '\0';
-
-			if (1 != sscanf(dash + 1, "%d", &j[4]))
+			dash[0] = '\0';
+			if (sscanf(dash + 1, "%d", &j[4]) != 1)
+			{
 				goto next;
+			}
 		}
 
-		if (4 != sscanf(start, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]))
+		if (sscanf(start, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) != 4)
+		{
 			goto next;
+		}
 
-		if (NULL == dash)
+		if (dash == NULL)
+		{
 			j[4] = j[3];
+		}
 
 		if (i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] >= j[3] && i[3] <= j[4])
 		{
@@ -1173,29 +1180,37 @@ int	ip_in_list(char *list, char *ip)
 			break;
 		}
 next:
-		if (NULL != dash)
+		if (dash != NULL)
 		{
 			dash[0] = '-';
 			dash = NULL;
 		}
 
-		if (NULL != comma)
+		if (comma != NULL)
 		{
 			comma[0] = ',';
 			start = comma + 1;
 			comma = NULL;
 		}
 		else
+		{
 			break;
+		}
 	}
+
 out:
-	if (NULL != dash)
+	if (dash != NULL)
+	{
 		dash[0] = '-';
+	}
 
-	if (NULL != comma)
+	if (comma != NULL)
+	{
 		comma[0] = ',';
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of ip_in_list():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
