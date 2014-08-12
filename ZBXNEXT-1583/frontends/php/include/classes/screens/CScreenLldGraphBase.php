@@ -57,17 +57,14 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return array
 	 */
 	protected function makeSurrogateScreen() {
-		$surrogateScreen = array(
+		return array(
 			'screenid' => $this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'],
-			'name' => uniqid('SURROGATE_SCREEN_'),
 			'dynamic' => $this->screenitem['dynamic'],
 			'hsize' => 0,
 			'vsize' => 0,
 			'templateid' => 0,
 			'screenitems' => array()
 		);
-
-		return $surrogateScreen;
 	}
 
 	/**
@@ -77,7 +74,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 		$screenItemCount = count($this->surrogateScreen['screenitems']);
 		$maxColumns = $this->screenitem['max_columns'];
 
-		$this->surrogateScreen['hsize'] = $screenItemCount >= $maxColumns ? $maxColumns : $screenItemCount;
+		$this->surrogateScreen['hsize'] = ($screenItemCount >= $maxColumns) ? $maxColumns : $screenItemCount;
 		$this->surrogateScreen['vsize'] = floor($screenItemCount / $maxColumns) + 1;
 
 		foreach ($this->surrogateScreen['screenitems'] as $key => &$screenItem) {
@@ -97,7 +94,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			? SCREEN_MODE_SLIDESHOW
 			: SCREEN_MODE_PREVIEW;
 
-		$screenBuilder = new CScreenBuilder(array(
+		return new CScreenBuilder(array(
 			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => $mode,
 			'timestamp' => $this->timestamp,
@@ -108,11 +105,11 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'hostid' => $this->hostid,
 			'updateProfile' => false
 		));
-
-		return $screenBuilder;
 	}
 
 	/**
+	 * Returns template for screen item with specified type.
+	 *
 	 * @param integer $resourceType    Resource type, one of SCREEN_RESOURCE_* constants.
 	 *
 	 * @return array
@@ -135,7 +132,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * Returns host ID that for which simple graphs must be shown - either hosts derived from
 	 * item prototype or, if this screen item has dynamic mode enabled, currently selected host ID.
 	 *
-	 * @return integer
+	 * @return string
 	 */
 	protected function getCurrentHostId() {
 		if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM) && $this->hostid) {
@@ -158,21 +155,37 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	}
 
 	/**
+	 * Returns ID of host for which created graphs or items have to be selected.
+	 *
+	 * @abstract
+	 *
 	 * @return integer
 	 */
 	abstract protected function getHostIdFromScreenItemResource();
 
 	/**
+	 * Adds items to surrogate screen.
+	 *
+	 * @abstract
+	 *
 	 * @return void
 	 */
 	abstract protected function addSurrogateScreenItems();
 
 	/**
+	 * Returns whether a preview should be shown instead of surrogate screen with graphs.
+	 *
+	 * @abstract
+	 *
 	 * @return boolean
 	 */
 	abstract protected function mustShowPreview();
 
 	/**
+	 * Returns content for preview.
+	 *
+	 * @abstract
+	 *
 	 * @return CTag
 	 */
 	abstract protected function getPreview();
