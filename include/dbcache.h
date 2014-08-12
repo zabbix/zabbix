@@ -170,7 +170,9 @@ typedef struct _DC_TRIGGER
 	zbx_uint64_t	triggerid;
 	char		*description;
 	char		*expression_orig;
-	char		*expression;		// temporary value, allocated during processing and freed right after
+	/* temporary value, allocated during processing and freed right after */
+	char		*expression;
+
 	char		*error;
 	char		*new_error;
 	zbx_timespec_t	timespec;
