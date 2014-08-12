@@ -32,7 +32,7 @@ class CJsonExportWriter extends CExportWriter {
 	 * @return string
 	 */
 	public function write(array $array) {
-		$json = new CJSON();
+		$json = new CJson();
 		return $json->encode($array);
 	}
 }

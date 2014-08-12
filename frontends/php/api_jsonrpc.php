@@ -29,14 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once dirname(__FILE__).'/include/func.inc.php';
-require_once dirname(__FILE__).'/include/classes/class.chttp_request.php';
+require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 $allowed_content = array(
 	'application/json-rpc' => 'json-rpc',
 	'application/json' => 'json-rpc',
 	'application/jsonrequest' => 'json-rpc',
 );
-$http_request = new CHTTP_request();
+$http_request = new CHttpRequest();
 $content_type = $http_request->header('Content-Type');
 $content_type = explode(';', $content_type);
 $content_type = $content_type[0];
@@ -59,7 +59,7 @@ try {
 	// unset wrappers so that calls between methods would be made directly to the services
 	API::setWrapper();
 
-	$jsonRpc = new CJSONrpc($apiClient, $data);
+	$jsonRpc = new CJsonRpc($apiClient, $data);
 	echo $jsonRpc->execute();
 }
 catch (Exception $e) {

@@ -22,7 +22,7 @@
 /**
  * Access the HTTP Request
  */
-class CHTTP_request {
+class CHttpRequest {
 
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
