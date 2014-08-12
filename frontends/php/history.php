@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
-$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime', 'action');
+$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'stime', 'action');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -40,10 +40,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'),
 	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'left' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
 	'filter_task' =>	array(T_ZBX_STR, O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null),
 	'filter' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
