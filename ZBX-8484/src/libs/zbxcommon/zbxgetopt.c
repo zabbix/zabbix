@@ -221,7 +221,7 @@ static void exchange (char **argv)
    argument, it follows the zbx_option name in the same ARGV-element, separated
    from the zbx_option name by a `=', or else the in next ARGV-element.
    When `getopt' finds a long-named zbx_option, it returns 0 if that zbx_option's
-   `flag' field is nonzero, the value of the zbx_option's `val' field
+   `flag' field is non-zero, the value of the zbx_option's `val' field
    if the `flag' field is zero.
 
    LONGOPTS is a vector of `struct zbx_option' terminated by an
@@ -231,7 +231,7 @@ static void exchange (char **argv)
    It is only valid when a long-named zbx_option has been found by the most
    recent call.
 
-   If LONG_ONLY is nonzero, '-' as well as '--' can introduce
+   If LONG_ONLY is non-zero, '-' as well as '--' can introduce
    long-named options.  */
 
 static int zbx_getopt_internal (int argc, char **argv, const char *optstring,

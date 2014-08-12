@@ -119,7 +119,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Actions
  */
-$_REQUEST['action'] = get_request('action', 'showgraph');
+$_REQUEST['action'] = getRequest('action', 'showgraph');
 $_REQUEST['itemid'] = array_unique(zbx_toArray($_REQUEST['itemid']));
 
 /*
@@ -146,12 +146,12 @@ $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
 
 $data = array(
-	'itemids' => get_request('itemid'),
+	'itemids' => getRequest('itemid'),
 	'items' => $items,
 	'item' => $item,
-	'action' => get_request('action'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime'),
+	'action' => getRequest('action'),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),
