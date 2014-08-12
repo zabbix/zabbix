@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
-$srctbl = get_request('srctbl', ''); // source table name
+$srctbl = getRequest('srctbl', ''); // source table name
 
 // set page title
 switch ($srctbl) {
@@ -212,48 +212,48 @@ for ($i = 2; $i <= $srcfldCount; $i++) {
 check_fields($fields);
 
 // validate permissions
-if (get_request('only_hostid')) {
+if (getRequest('only_hostid')) {
 	if (!API::Host()->isReadable(array($_REQUEST['only_hostid']))) {
 		access_deny();
 	}
 }
 else {
-	if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])) ||
-			get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid'])) ||
+			getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 		access_deny();
 	}
 }
-if (get_request('parent_discoveryid') && !API::DiscoveryRule()->isReadable(array($_REQUEST['parent_discoveryid']))) {
+if (getRequest('parent_discoveryid') && !API::DiscoveryRule()->isReadable(array($_REQUEST['parent_discoveryid']))) {
 	access_deny();
 }
 
-$dstfrm = get_request('dstfrm', ''); // destination form
-$dstfld1 = get_request('dstfld1', ''); // output field on destination form
-$dstfld2 = get_request('dstfld2', ''); // second output field on destination form
-$dstfld3 = get_request('dstfld3', ''); // third output field on destination form
-$srcfld1 = get_request('srcfld1', ''); // source table field [can be different from fields of source table]
-$srcfld2 = get_request('srcfld2', null); // second source table field [can be different from fields of source table]
-$srcfld3 = get_request('srcfld3', null); //  source table field [can be different from fields of source table]
-$multiselect = get_request('multiselect', 0); // if create popup with checkboxes
-$dstact = get_request('dstact', '');
-$writeonly = get_request('writeonly');
-$withApplications = get_request('with_applications', 0);
-$withGraphs = get_request('with_graphs', 0);
-$withItems = get_request('with_items', 0);
-$noempty = get_request('noempty'); // display/hide "Empty" button
+$dstfrm = getRequest('dstfrm', ''); // destination form
+$dstfld1 = getRequest('dstfld1', ''); // output field on destination form
+$dstfld2 = getRequest('dstfld2', ''); // second output field on destination form
+$dstfld3 = getRequest('dstfld3', ''); // third output field on destination form
+$srcfld1 = getRequest('srcfld1', ''); // source table field [can be different from fields of source table]
+$srcfld2 = getRequest('srcfld2'); // second source table field [can be different from fields of source table]
+$srcfld3 = getRequest('srcfld3'); //  source table field [can be different from fields of source table]
+$multiselect = getRequest('multiselect', 0); // if create popup with checkboxes
+$dstact = getRequest('dstact', '');
+$writeonly = getRequest('writeonly');
+$withApplications = getRequest('with_applications', 0);
+$withGraphs = getRequest('with_graphs', 0);
+$withItems = getRequest('with_items', 0);
+$noempty = getRequest('noempty'); // display/hide "Empty" button
 $excludeids = zbx_toHash(getRequest('excludeids', array()));
-$reference = get_request('reference', get_request('srcfld1', 'unknown'));
-$realHosts = get_request('real_hosts', 0);
-$monitoredHosts = get_request('monitored_hosts', 0);
-$templatedHosts = get_request('templated_hosts', 0);
-$withSimpleGraphItems = get_request('with_simple_graph_items', 0);
-$withTriggers = get_request('with_triggers', 0);
-$withMonitoredTriggers = get_request('with_monitored_triggers', 0);
-$submitParent = get_request('submitParent', 0);
-$normalOnly = get_request('normal_only');
-$group = get_request('group', '');
-$host = get_request('host', '');
-$onlyHostid = get_request('only_hostid', null);
+$reference = getRequest('reference', getRequest('srcfld1', 'unknown'));
+$realHosts = getRequest('real_hosts', 0);
+$monitoredHosts = getRequest('monitored_hosts', 0);
+$templatedHosts = getRequest('templated_hosts', 0);
+$withSimpleGraphItems = getRequest('with_simple_graph_items', 0);
+$withTriggers = getRequest('with_triggers', 0);
+$withMonitoredTriggers = getRequest('with_monitored_triggers', 0);
+$submitParent = getRequest('submitParent', 0);
+$normalOnly = getRequest('normal_only');
+$group = getRequest('group', '');
+$host = getRequest('host', '');
+$onlyHostid = getRequest('only_hostid');
 
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
@@ -263,14 +263,14 @@ if (isset($onlyHostid)) {
 
 // value types
 $value_types = null;
-if (get_request('value_types')) {
-	$value_types = get_request('value_types');
+if (getRequest('value_types')) {
+	$value_types = getRequest('value_types');
 }
-elseif (get_request('numeric')) {
+elseif (getRequest('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
-clearCookies(true);
+uncheckTableRows();
 
 function get_window_opener($frame, $field, $value) {
 	if (empty($field)) {
@@ -306,8 +306,8 @@ $options = array(
 	'config' => array('select_latest' => true, 'deny_all' => true, 'popupDD' => true),
 	'groups' => array(),
 	'hosts' => array(),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null)
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid')
 );
 
 if (!is_null($writeonly)) {
@@ -429,8 +429,8 @@ if (hasRequest('excludeids')) {
 if (isset($onlyHostid)) {
 	$frmTitle->addVar('only_hostid', $onlyHostid);
 }
-if (get_request('screenid')) {
-	$frmTitle->addVar('screenid', get_request('screenid'));
+if (getRequest('screenid')) {
+	$frmTitle->addVar('screenid', getRequest('screenid'));
 }
 
 // adding param to a form, so that it would remain when page is refreshed
@@ -444,10 +444,10 @@ $frmTitle->addVar('submitParent', $submitParent);
 $frmTitle->addVar('noempty', $noempty);
 
 for ($i = 1; $i <= $dstfldCount; $i++) {
-	$frmTitle->addVar('dstfld'.$i, get_request('dstfld'.$i));
+	$frmTitle->addVar('dstfld'.$i, getRequest('dstfld'.$i));
 }
 for ($i = 1; $i <= $srcfldCount; $i++) {
-	$frmTitle->addVar('srcfld'.$i, get_request('srcfld'.$i));
+	$frmTitle->addVar('srcfld'.$i, getRequest('srcfld'.$i));
 }
 
 /*
@@ -474,7 +474,7 @@ else {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
 	}
 	if (str_in_array($srctbl, array('help_items'))) {
-		$itemtype = get_request('itemtype', 0);
+		$itemtype = getRequest('itemtype', 0);
 		$cmbTypes = new CComboBox('itemtype', $itemtype, 'javascript: submit();');
 
 		foreach ($allowed_item_types as $type) {
@@ -1127,8 +1127,8 @@ elseif ($srctbl == 'items') {
 		else {
 			$values = array();
 			for ($i = 1; $i <= $dstfldCount; $i++) {
-				$dstfld = get_request('dstfld'.$i);
-				$srcfld = get_request('srcfld'.$i);
+				$dstfld = getRequest('dstfld'.$i);
+				$srcfld = getRequest('srcfld'.$i);
 
 				if (!empty($dstfld) && !empty($item[$srcfld])) {
 					$values[$dstfld] = $item[$srcfld];
@@ -1206,7 +1206,7 @@ elseif ($srctbl == 'prototypes') {
 
 	$options = array(
 		'selectHosts' => array('name'),
-		'discoveryids' => get_request('parent_discoveryid'),
+		'discoveryids' => getRequest('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -1232,8 +1232,8 @@ elseif ($srctbl == 'prototypes') {
 		else {
 			$values = array();
 			for ($i = 1; $i <= $dstfldCount; $i++) {
-				$dstfld = get_request('dstfld'.$i);
-				$srcfld = get_request('srcfld'.$i);
+				$dstfld = getRequest('dstfld'.$i);
+				$srcfld = getRequest('srcfld'.$i);
 
 				if (!empty($dstfld) && !empty($item[$srcfld])) {
 					$values[$dstfld] = $item[$srcfld];

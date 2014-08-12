@@ -104,7 +104,7 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 		case ZBX_AUTH_LDAP:
 		case ZBX_AUTH_INTERNAL:
 			if (isset($_REQUEST['enter'])) {
-				$_REQUEST['autologin'] = get_request('autologin', 0);
+				$_REQUEST['autologin'] = getRequest('autologin', 0);
 			}
 
 			if ($messages = clear_messages()) {

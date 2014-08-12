@@ -83,7 +83,7 @@ class CScreenPlainText extends CScreenBase {
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_LOG:
-					$value = $this->screenitem['style'] ? new CJSscript($history['value']) : $history['value'];
+					$value = $this->screenitem['style'] ? new CJsScript($history['value']) : $history['value'];
 					break;
 				default:
 					$value = $history['value'];

@@ -94,8 +94,8 @@ $pageFilter = new CPageFilter(array(
 		'monitored_hosts' => true,
 		'with_monitored_triggers' => true
 	),
-	'hostid' => getRequest('hostid', null),
-	'groupid' => getRequest('groupid', null)
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
@@ -570,7 +570,7 @@ foreach ($triggers as $trigger) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 
@@ -591,7 +591,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 
