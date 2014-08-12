@@ -19,7 +19,7 @@
 **/
 
 
-class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
+class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
@@ -305,7 +305,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provider
 	 */
 	public function test_parse($functionName, $functionParamList, $valueType, $expectedResult) {
-		$triggerFunctionValidator = new CTriggerFunctionValidator();
+		$triggerFunctionValidator = new CFunctionValidator();
 
 		$result = $triggerFunctionValidator->validate(array(
 			'function' => '',

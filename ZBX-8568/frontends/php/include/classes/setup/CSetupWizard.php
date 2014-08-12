@@ -179,7 +179,7 @@ class CSetupWizard extends CForm {
 		$table = new CTable(null, 'requirements');
 		$table->setAlign('center');
 
-		$finalResult = FrontendSetup::CHECK_OK;
+		$finalResult = CFrontendSetup::CHECK_OK;
 
 		$table->addRow(array(
 			SPACE,
@@ -187,18 +187,18 @@ class CSetupWizard extends CForm {
 			new CCol(_('Required'), 'header')
 		));
 
-		$frontendSetup = new FrontendSetup();
+		$frontendSetup = new CFrontendSetup();
 		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
 			$result = null;
 
 			// OK
-			if ($req['result'] == FrontendSetup::CHECK_OK) {
+			if ($req['result'] == CFrontendSetup::CHECK_OK) {
 				$rowClass = '';
 				$result = new CSpan(_('OK'), 'ok');
 			}
 			// warning
-			elseif ($req['result'] == FrontendSetup::CHECK_WARNING) {
+			elseif ($req['result'] == CFrontendSetup::CHECK_WARNING) {
 				$rowClass = 'notice';
 				$result = new CSpan(_x('Warning', 'setup'), 'link_menu notice');
 				$result->setHint($req['error']);
@@ -224,7 +224,7 @@ class CSetupWizard extends CForm {
 		}
 
 		// fatal error
-		if ($finalResult == FrontendSetup::CHECK_FATAL) {
+		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
 			$this->DISABLE_NEXT_BUTTON = true;
 
 			$message = array(
@@ -239,7 +239,7 @@ class CSetupWizard extends CForm {
 			$message = array(new CSpan(_('OK'), 'ok'));
 
 			// add a warning message
-			if ($finalResult == FrontendSetup::CHECK_WARNING) {
+			if ($finalResult == CFrontendSetup::CHECK_WARNING) {
 				$message[] = BR();
 				$message[] = _('(with warnings)');
 			}
@@ -259,7 +259,7 @@ class CSetupWizard extends CForm {
 
 		$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
 
-		$frontendSetup = new FrontendSetup();
+		$frontendSetup = new CFrontendSetup();
 		$databases = $frontendSetup->getSupportedDatabases();
 
 		foreach ($databases as $id => $name) {
@@ -395,7 +395,7 @@ class CSetupWizard extends CForm {
 
 	function stage5() {
 		$dbType = $this->getConfig('DB_TYPE');
-		$frontendSetup = new FrontendSetup();
+		$frontendSetup = new CFrontendSetup();
 		$databases = $frontendSetup->getSupportedDatabases();
 
 		$table = new CTable(null, 'requirements');
