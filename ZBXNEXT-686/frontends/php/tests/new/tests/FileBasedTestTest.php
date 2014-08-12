@@ -11,7 +11,7 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testStepVariableSubstitution() {
-		$this->processFileTest('suite/variableSubstitution');
+		$this->processFileTest('dev/variableSubstitution');
 	}
 
 	/**
@@ -20,7 +20,7 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationIntegerKeys() {
-		$this->processFileTest('suite/validationIntegerKeys');
+		$this->processFileTest('dev/validationIntegerKeys');
 	}
 
 	/**
@@ -29,7 +29,7 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationRequired() {
-		$this->processFileTest('suite/validationRequired');
+		$this->processFileTest('dev/validationRequired');
 	}
 
 	/**
@@ -38,7 +38,7 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationLongHostnames() {
-		$this->processFileTest('suite/validationLongHostnames');
+		$this->processFileTest('dev/validationLongHostnames');
 	}
 
 	/**
@@ -47,14 +47,14 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationType() {
-		$this->processFileTest('suite/validationType');
+		$this->processFileTest('dev/validationType');
 	}
 
 	/**
 	 * @group suite
 	 */
 	public function testValidationSuccessSequence() {
-		$this->processFileTest('suite/validationSuccessSequence');
+		$this->processFileTest('dev/validationSuccessSequence');
 	}
 
 	/**
@@ -63,7 +63,7 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationFailSequence1() {
-		$this->processFileTest('suite/validationFailSequence1');
+		$this->processFileTest('dev/validationFailSequence1');
 	}
 
 	/**
@@ -72,21 +72,21 @@ class FileBasedTestTest extends APITestCase {
 	 * @group suite
 	 */
 	public function testValidationFailSequence2() {
-		$this->processFileTest('suite/validationFailSequence2');
+		$this->processFileTest('dev/validationFailSequence2');
 	}
 
 	/**
 	 * @group suite
 	 */
 	public function testValidationSuccess() {
-		$this->processFileTest('suite/validationSuccess');
+		$this->processFileTest('dev/validationSuccess');
 	}
 
 	/**
 	 * @group suite
 	 */
 	public function testValidationSuccessShortSyntax() {
-		$this->processFileTest('suite/validationSuccessShortSyntax');
+		$this->processFileTest('dev/validationSuccessShortSyntax');
 	}
 
 	/**
@@ -96,7 +96,7 @@ class FileBasedTestTest extends APITestCase {
 	{
 		$gateway = new MockAPIGateway();
 		$gateway->configure(array(
-			'file' => ZABBIX_NEW_TEST_DIR.'/tests/data/file/suite/fileBasedTestTestMock.yml'
+			'file' => ZABBIX_NEW_TEST_DIR.'/tests/mock/fileBasedTestTestMock.yml'
 		), $this->parsedConfig);
 
 		return $gateway;

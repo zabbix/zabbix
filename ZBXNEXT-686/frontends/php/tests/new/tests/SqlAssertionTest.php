@@ -11,6 +11,6 @@ class SqlAssertionTest extends APITestCase
 	 * @fixtures base_users
 	 */
 	public function testSqlAssertions() {
-		$this->processFileTest('suite/sqlAssertion');
+		$this->processFileTest('dev/sqlAssertion');
 	}
 }

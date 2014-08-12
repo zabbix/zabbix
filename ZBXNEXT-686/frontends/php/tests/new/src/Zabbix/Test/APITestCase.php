@@ -32,7 +32,7 @@ class APITestCase extends BaseAPITestCase {
 	 * @throws \Exception
 	 */
 	protected function processFileTest($name) {
-		$path = ZABBIX_NEW_TEST_DIR . '/tests/data/file/'.$name.'.yml';
+		$path = ZABBIX_NEW_TEST_DIR . '/tests/yaml/'.$name.'.yml';
 
 		if (!is_readable($path)) {
 			throw new \Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
