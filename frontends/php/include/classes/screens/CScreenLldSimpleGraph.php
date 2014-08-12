@@ -49,8 +49,6 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	 */
 	protected function getCreatedItemIds() {
 		if (!$this->createdItemIds) {
-			$itemPrototypeId = $this->screenitem['resourceid'];
-
 			$hostId = $this->getCurrentHostId();
 
 			// get all created (discovered) items for current host
@@ -62,10 +60,14 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 				'sortfield' => 'name'
 			));
 
-			// collect those item IDs where parent item is item prototype selected for this screen item as resource
-			foreach ($allCreatedItems as $item) {
-				if ($item['itemDiscovery']['parent_itemid'] == $itemPrototypeId) {
-					$this->createdItemIds[] = $item['itemid'];
+			$itemPrototypeId = $this->getItemPrototypeId();
+
+			if ($itemPrototypeId) {
+				// collect those item IDs where parent item is item prototype selected for this screen item as resource
+				foreach ($allCreatedItems as $item) {
+					if ($item['itemDiscovery']['parent_itemid'] == $itemPrototypeId) {
+						$this->createdItemIds[] = $item['itemid'];
+					}
 				}
 			}
 		}
@@ -127,10 +129,38 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * @return integer
+	 * Return item prototype ID of either item prototype selected in in configuration, or, if dynamic mode is enabled,
+	 * try to find item prototype with same key in selected host.
+	 *
+	 * @return string
 	 */
 	protected function getItemPrototypeId() {
-		return $this->screenitem['resourceid'];
+		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
+			$currentItemPrototype = API::ItemPrototype()->get(array(
+				'output' => array('name', 'key_'),
+				'itemids' => array($this->screenitem['resourceid'])
+			));
+			$currentItemPrototype = reset($currentItemPrototype);
+
+			$selectedHostItemPrototype = API::ItemPrototype()->get(array(
+				'output' => array('itemid'),
+				'hostids' => array($this->hostid),
+				'filter' => array('key_' => $currentItemPrototype['key_'])
+			));
+
+			if ($selectedHostItemPrototype) {
+				$selectedHostItemPrototype = reset($selectedHostItemPrototype);
+				$itemPrototypeId = $selectedHostItemPrototype['itemid'];
+			}
+			else {
+				$itemPrototypeId = null;
+			}
+		}
+		else {
+			$itemPrototypeId = $this->screenitem['resourceid'];
+		}
+
+		return $itemPrototypeId;
 	}
 
 	/**
