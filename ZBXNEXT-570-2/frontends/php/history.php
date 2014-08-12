@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
-$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'stime', 'action');
+$page['hist_arg'] = array('itemids', 'period', 'stime', 'action', 'graphtype');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
