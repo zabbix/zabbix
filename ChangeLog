@@ -6,6 +6,7 @@ New features:
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8600] fixed SQL errors in proxy configuration synchronization (Sasha)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
 ..F....... [ZBX-8484] fixed "Plain text" screen elements with "Show text as HTML" enabled trying to display the text as preformatted (Andrejs)
 .......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
