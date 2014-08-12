@@ -185,25 +185,25 @@ char		*opt = NULL;
 void zbx_co_uninitialize();
 #endif
 
-void	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+void	get_process_info_by_thread(int thread_num, unsigned char *process_type, int *process_num)
 {
 	int	server_count = 0;
 
-	if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	if (thread_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
 		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*process_num = thread_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	else if (thread_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
 		*process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*process_num = thread_num - server_count + CONFIG_PASSIVE_FORKS;
 
 	}
-	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	else if (thread_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
 		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*process_num = thread_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
 	{
