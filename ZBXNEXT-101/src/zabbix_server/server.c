@@ -632,15 +632,13 @@ int	main(int argc, char **argv)
 						strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
 					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
-							&task, get_process_type_by_name);
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),  &task);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
 						strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
 					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
-							&task, get_process_type_by_name);
+					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE), &task);
 				}
 				else
 				{

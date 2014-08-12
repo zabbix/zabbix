@@ -19,7 +19,7 @@
 
 #include "control.h"
 
-void	set_log_level_task(const char *opt, zbx_task_t *task, int (*get_process_type_func)(const char *))
+void	set_log_level_task(const char *opt, zbx_task_t *task)
 {
 	int	num = 0;
 
@@ -68,7 +68,7 @@ void	set_log_level_task(const char *opt, zbx_task_t *task, int (*get_process_typ
 			}
 		}
 
-		if (FAIL == (proc_type = get_process_type_func(proc_name)))
+		if (FAIL == (proc_type = get_process_type_by_name(proc_name)))
 		{
 			zbx_error("invalid log level control option: unknown process type");
 			exit(EXIT_FAILURE);
