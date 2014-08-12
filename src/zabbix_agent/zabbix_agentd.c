@@ -892,12 +892,12 @@ int	main(int argc, char **argv)
 #if defined(ZABBIX_DAEMON)
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
 			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
-			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task, get_process_type_by_name);
+			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task);
 			zbx_free(opt);
 			break;
 		case ZBX_TASK_LOG_LEVEL_DECREASE:
 			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
-			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task, get_process_type_by_name);
+			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task);
 			zbx_free(opt);
 			break;
 #endif
