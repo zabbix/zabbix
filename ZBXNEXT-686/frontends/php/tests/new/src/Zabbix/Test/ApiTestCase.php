@@ -6,7 +6,7 @@ use Symfony\Component\Yaml\Yaml;
 use Zabbix\Test\APIGateway\APIGatewayInterface;
 use Zabbix\Test\APIGateway\FileAPIGateway;
 
-class BaseAPITestCase extends \PHPUnit_Framework_TestCase {
+class ApiTestCase extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Current gateway config

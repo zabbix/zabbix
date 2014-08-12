@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Yaml\Yaml;
 use Respect\Validation\Validator as v;
 
-class APITestCase extends BaseAPITestCase {
+class FileApiTestCase extends ApiTestCase {
 
 	/**
 	 * Parsed step data.

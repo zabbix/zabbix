@@ -3,9 +3,9 @@
 namespace Zabbix\Tests\Suite;
 
 use Zabbix\Test\APIGateway\MockAPIGateway;
-use Zabbix\Test\APITestCase;
+use Zabbix\Test\FileApiTestCase;
 
-class FileBasedTestTest extends APITestCase {
+class FileBasedTestTest extends FileApiTestCase {
 	/**
 	 * General test; no assertions, just should not throw errors.
 	 * @group suite

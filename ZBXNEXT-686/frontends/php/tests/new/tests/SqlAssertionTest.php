@@ -2,9 +2,9 @@
 
 namespace Zabbix\Tests\Suite;
 
-use Zabbix\Test\APITestCase;
+use Zabbix\Test\FileApiTestCase;
 
-class SqlAssertionTest extends APITestCase
+class SqlAssertionTest extends FileApiTestCase
 {
 	/**
 	 * @group suite
