@@ -605,21 +605,22 @@ class CItem extends CItemGeneral {
 	 * Delete items.
 	 *
 	 * @param array $itemIds
+	 * @param bool  $noPermissions
 	 *
 	 * @return array
 	 */
 	public function delete(array $itemIds, $noPermissions = false) {
-		if (empty($itemIds)) {
+		if (!$itemIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get(array(
+			'output' => array('name', 'templateid'),
 			'itemids' => $itemIds,
 			'editable' => true,
 			'preservekeys' => true,
-			'output' => array('name', 'templateid'),
 			'selectHosts' => array('name')
 		));
 
@@ -644,7 +645,7 @@ class CItem extends CItemGeneral {
 				$parentItemIds[] = $dbItem['itemid'];
 				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parentItemIds));
+		} while ($parentItemIds);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = array();
@@ -663,7 +664,7 @@ class CItem extends CItemGeneral {
 			$delGraphs[$dbGraph['graphid']] = $dbGraph['graphid'];
 		}
 
-		if (!empty($delGraphs)) {
+		if ($delGraphs) {
 			$result = API::Graph()->delete($delGraphs, true);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph.'));
@@ -674,12 +675,12 @@ class CItem extends CItemGeneral {
 		$this->checkGraphReference($itemIds);
 
 		$triggers = API::Trigger()->get(array(
-			'itemids' => $itemIds,
 			'output' => array('triggerid'),
+			'itemids' => $itemIds,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($triggers)) {
+		if ($triggers) {
 			$result = API::Trigger()->delete(array_keys($triggers), true);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger.'));
@@ -687,12 +688,12 @@ class CItem extends CItemGeneral {
 		}
 
 		$triggerPrototypes = API::TriggerPrototype()->get(array(
-			'itemids' => $itemIds,
 			'output' => array('triggerid'),
+			'itemids' => $itemIds,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($triggerPrototypes)) {
+		if ($triggerPrototypes) {
 			$result = API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype.'));
