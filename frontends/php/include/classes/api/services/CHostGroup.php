@@ -69,7 +69,6 @@ class CHostGroup extends CApiService {
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'with_discovery_rules'		=> null,
 			'with_applications'			=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -308,18 +307,6 @@ class CHostGroup extends CApiService {
 						' AND i.itemid=gi.itemid'.
 						' AND gi.graphid=g.graphid'.
 						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
-		}
-
-		// with_discovery_rules
-		if (!is_null($options['with_discovery_rules'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_RULE.')'.
 					')';
 		}
 
