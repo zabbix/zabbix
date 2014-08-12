@@ -83,7 +83,7 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->filter = isset($options['filter']) ? $options['filter'] : null;
+		$this->filter = isset($options['filter']) ? $options['filter'] : '';
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
 		$this->graphType = isset($options['graphtype']) ? $options['graphtype'] : GRAPH_TYPE_NORMAL;
@@ -154,7 +154,7 @@ class CScreenHistory extends CScreenBase {
 					);
 				}
 
-				if (!zbx_empty($this->filter) && in_array($this->filterTask, array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))) {
+				if ($this->filter !== '' && in_array($this->filterTask, array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))) {
 					$options['search'] = array('value' => $this->filter);
 					if ($this->filterTask == FILTER_TASK_HIDE) {
 						$options['excludeSearch'] = 1;
@@ -172,7 +172,7 @@ class CScreenHistory extends CScreenBase {
 						$host = reset($item['hosts']);
 						$color = null;
 
-						if (isset($this->filter) && !zbx_empty($this->filter)) {
+						if ($this->filter !== '') {
 							$haystack = mb_strtolower($data['value']);
 							$needle = mb_strtolower($this->filter);
 							$pos = mb_strpos($haystack, $needle);
@@ -210,7 +210,7 @@ class CScreenHistory extends CScreenBase {
 
 							// if this is a eventLog item, showing additional info
 							if ($useEventLogItem) {
-								$row[] = zbx_empty($data['source']) ? '-' : $data['source'];
+								$row[] = ($data['source'] === '') ? '-' : $data['source'];
 								$row[] = ($data['severity'] == 0)
 								? '-'
 								: new CCol(get_item_logtype_description($data['severity']), get_item_logtype_style($data['severity']));
@@ -333,10 +333,10 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode == SCREEN_MODE_JS) {
 				$timeControlData['dynamic'] = 0;
 
-				return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');';
+				return 'timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');';
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');');
 			}
 		}
 
