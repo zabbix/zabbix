@@ -30,14 +30,14 @@ void	set_log_level_task(const char *opt, zbx_task_t *task, int (*get_process_typ
 	}
 	else if ('=' != *opt)
 	{
-		zbx_error("invalid runtime control option: %s", opt);
+		zbx_error("unknown log level control option: %s", opt);
 		exit(EXIT_FAILURE);
 	}
 	else if (0 != isdigit(*(++opt)))
 	{
 		if (FAIL == is_ushort(opt, &num))
 		{
-			zbx_error("invalid runtime control option (proccess number must have unsigned short value)");
+			zbx_error("invalid log level control option: proccess identifier must be unsigned short value");
 			exit(EXIT_FAILURE);
 		}
 
@@ -56,20 +56,21 @@ void	set_log_level_task(const char *opt, zbx_task_t *task, int (*get_process_typ
 			*ptr++ = '\0';
 			if (FAIL == is_ushort(ptr, &num))
 			{
-				zbx_error("invalid runtime control option (proccess number must have unsigned short value)");
+				zbx_error("invalid log level control option: proccess number must be unsigned short"
+						" value");
 				exit(EXIT_FAILURE);
 			}
 
 			if (0 == num)
 			{
-				zbx_error("invalid runtime control option (proccess number can't be zero)");
+				zbx_error("invalid log level control option: proccess number cannot be zero");
 				exit(EXIT_FAILURE);
 			}
 		}
 
 		if (FAIL == (proc_type = get_process_type_func(proc_name)))
 		{
-			zbx_error("invalid runtime control option (unknown process type): %s", proc_name);
+			zbx_error("invalid log level control option: unknown process type");
 			exit(EXIT_FAILURE);
 		}
 
