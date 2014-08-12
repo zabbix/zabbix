@@ -193,6 +193,7 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
 
 	return $httpTests;
 }
+
 /**
  * Copies web scenarios from given host ID to destination host.
  *
@@ -213,17 +214,32 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		return true;
 	}
 
+	// get destination application IDs
+	$srcApplicationIds = array();
+	foreach ($httpTestsToClone as $httpTest) {
+		if ($httpTest['applicationid'] > 0) {
+			$srcApplicationIds[] = $httpTest['applicationid'];
+		}
+	}
+
+	if ($srcApplicationIds) {
+		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
+	}
+
 	foreach ($httpTestsToClone as &$httpTest) {
 		$httpTest['hostid'] = $dstHostId;
 
-		if ($httpTest['applicationid']) {
-			$appIds = get_same_applications_for_host(array($httpTest['applicationid']), $dstHostId);
-			$httpTest['applicationid'] = reset($appIds);
+		if ($httpTest['applicationid'] > 0) {
+			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
+		}
+		else {
+			unset($httpTest['applicationid']);
 		}
 
 		unset($httpTest['httptestid']);
 
 		foreach($httpTest['steps'] as &$httpStep) {
+			unset($httpStep['httptestid']);
 			unset($httpStep['httpstepid']);
 		}
 		unset($httpStep);
