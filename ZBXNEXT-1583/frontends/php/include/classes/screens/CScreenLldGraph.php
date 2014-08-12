@@ -49,8 +49,6 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	 */
 	protected function getCreatedGraphIds() {
 		if (!$this->createdGraphIds) {
-			$graphPrototypeId = $this->getGraphPrototypeId();
-
 			$hostId = $this->getCurrentHostId();
 
 			// get all created (discovered) graphs for current graph host
@@ -62,10 +60,15 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				'sortfield' => 'name'
 			));
 
-			// collect those graph IDs where parent graph is graph prototype selected for this screen item as resource
-			foreach ($allCreatedGraphs as $graph) {
-				if ($graph['graphDiscovery']['parent_graphid'] == $graphPrototypeId) {
-					$this->createdGraphIds[] = $graph['graphid'];
+			// get graph prototype id to be cross checked with all graphs for current host
+			$graphPrototypeId = $this->getGraphPrototypeId();
+
+			if ($graphPrototypeId) {
+				// collect those graph IDs where parent graph is graph prototype selected for this screen item as resource
+				foreach ($allCreatedGraphs as $graph) {
+					if ($graph['graphDiscovery']['parent_graphid'] == $graphPrototypeId) {
+						$this->createdGraphIds[] = $graph['graphid'];
+					}
 				}
 			}
 		}
@@ -104,10 +107,38 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * @return mixed
+	 * Return graph prototype ID of either graph prototype selected in in configuration, or, if dynamic mode is enabled,
+	 * try to find graph prototype with same name in selected host.
+	 *
+	 * @return string
 	 */
 	protected function getGraphPrototypeId() {
-		return $this->screenitem['resourceid'];
+		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
+			$currentGraphPrototype = API::GraphPrototype()->get(array(
+				'output' => array('name'),
+				'graphids' => array($this->screenitem['resourceid'])
+			));
+			$currentGraphPrototype = reset($currentGraphPrototype);
+
+			$selectedHostGraphPrototype = API::GraphPrototype()->get(array(
+				'output' => array('graphid'),
+				'hostids' => array($this->hostid),
+				'filter' => array('name' => $currentGraphPrototype['name'])
+			));
+
+			if ($selectedHostGraphPrototype) {
+				$selectedHostGraphPrototype = reset($selectedHostGraphPrototype);
+				$graphPrototypeId = $selectedHostGraphPrototype['graphid'];
+			}
+			else {
+				$graphPrototypeId = null;
+			}
+		}
+		else {
+			$graphPrototypeId = $this->screenitem['resourceid'];
+		}
+
+		return $graphPrototypeId;
 	}
 
 	/**
