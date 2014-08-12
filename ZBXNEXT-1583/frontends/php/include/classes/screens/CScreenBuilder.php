@@ -310,7 +310,7 @@ class CScreenBuilder {
 		$screenTable->setAttribute('class',
 			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen_view' : 'screen_edit'
 		);
-		$screenTable->setAttribute('id', 'iframe');
+		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -567,7 +567,7 @@ class CScreenBuilder {
 	 * @param string $screenid
 	 */
 	public static function insertInitScreenJs($screenid) {
-		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
+		zbx_add_post_js('init_screen("'.$screenid.'", "'.self::makeScreenTableId($screenid).'", "'.$screenid.'");');
 	}
 
 	/**
@@ -601,5 +601,14 @@ class CScreenBuilder {
 		CScreenBuilder::insertScreenScrollJs($options);
 		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();
+	}
+
+	/**
+	 * @param integer $screenId
+	 *
+	 * @return string
+	 */
+	protected function makeScreenTableId($screenId) {
+		return 'screentable_' . $screenId;
 	}
 }
