@@ -72,9 +72,13 @@ $graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 
-// set a generic title for graphs with many items
+// change how the graph will be displayed if more than one item is selected
 if ($multipleItems) {
+	// set a default header
 	$graph->setHeader(_('Item values'));
+
+	// hide triggers
+	$graph->showTriggers(false);
 }
 
 if (isset($_REQUEST['from'])) {
