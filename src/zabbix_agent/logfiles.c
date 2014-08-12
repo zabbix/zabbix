@@ -1316,9 +1316,9 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 	}
 	else	/* logrt[] item */
 	{
-		char			*directory = NULL, *format = NULL;
-		int			reg_error;
-		regex_t			re;
+		char	*directory = NULL, *format = NULL;
+		int	reg_error;
+		regex_t	re;
 
 		/* split a filename into directory and file mask (regular expression) parts */
 		if (SUCCEED != split_filename(filename, &directory, &format, err_msg))
