@@ -170,7 +170,7 @@ typedef struct _DC_TRIGGER
 	zbx_uint64_t	triggerid;
 	char		*description;
 	char		*expression_orig;
-	char		*expression;
+	char		*expression;		// temporary value, allocated during processing and freed right after
 	char		*error;
 	char		*new_error;
 	zbx_timespec_t	timespec;
@@ -295,11 +295,12 @@ void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
 
-void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode, size_t num);
+void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
+		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
