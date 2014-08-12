@@ -608,7 +608,7 @@ class CScreenBuilder {
 	 *
 	 * @return string
 	 */
-	protected function makeScreenTableId($screenId) {
+	protected static function makeScreenTableId($screenId) {
 		return 'screentable_' . $screenId;
 	}
 }
