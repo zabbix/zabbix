@@ -332,75 +332,67 @@ var chkbxRange = {
 		cookie.eraseArray(this.cookieName);
 	},
 
+	/**
+	 * Mark selected checkboxes and update the "Go" dropdown.
+	 */
 	setGo: function() {
-		if (!is_null(this.pageGoName)) {
-			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
-				var chkboxes = this.chkboxes[this.pageGoName];
-				var selectedCheckboxes = {};
-				for (var i = 0; i < chkboxes.length; i++) {
-					if (typeof(chkboxes[i]) !== 'undefined') {
-						var box = chkboxes[i];
-						var objName = box.name.split('[')[0];
-						var objId = box.name.split('[')[1];
-						objId = objId.substring(0, objId.lastIndexOf(']'));
-						var crow = getParent(box, 'tr');
-
-						if (box.checked) {
-							if (!is_null(crow)) {
-								var origClass = crow.getAttribute('origClass');
-								if (is_null(origClass)) {
-									crow.setAttribute('origClass', crow.className);
-								}
-								crow.className = 'selected';
-							}
-							if (objName == this.pageGoName) {
-								this.selectedIds[objId] = objId;
-								selectedCheckboxes[objId] = objId;
-							}
-						}
-						// since there can be multiple checkboxes with the same ID,
-						// don't unselect an object if another its checkbox has been checked
-						else if (typeof selectedCheckboxes[objId] === 'undefined') {
-							if (!is_null(crow)) {
-								var origClass = crow.getAttribute('origClass');
-
-								if (!is_null(origClass)) {
-									crow.className = origClass;
-									crow.removeAttribute('origClass');
-								}
-							}
-							if (objName == this.pageGoName) {
-								delete(this.selectedIds[objId]);
-							}
-						}
-					}
-				}
-
-			}
-
-			var countChecked = 0;
-			for (var key in this.selectedIds) {
-				if (!empty(this.selectedIds[key])) {
-					countChecked++;
-				}
-			}
-
-			if (!is_null(this.goButton)) {
-				var tmp_val = this.goButton.value.split(' ');
-				this.goButton.value = tmp_val[0] + ' (' + countChecked + ')';
-			}
-
-			cookie.createJSON(this.cookieName, this.selectedIds);
-
-			if (jQuery('#go').length) {
-				jQuery('#go')[0].disabled = (countChecked == 0);
-			}
-			if (jQuery('#goButton').length) {
-				jQuery('#goButton')[0].disabled = (countChecked == 0);
-			}
-
-			this.pageGoCount = countChecked;
+		if (this.pageGoName == null) {
+			return;
 		}
+
+		if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
+			var chkboxes = this.chkboxes[this.pageGoName];
+			var selectedCheckboxes = {};
+			for (var i = 0; i < chkboxes.length; i++) {
+				if (typeof(chkboxes[i]) !== 'undefined') {
+					var box = chkboxes[i];
+					var objName = box.name.split('[')[0];
+					var objId = box.name.split('[')[1];
+					objId = objId.substring(0, objId.lastIndexOf(']'));
+
+					if (objName != this.pageGoName) {
+						continue;
+					}
+
+					if (box.checked) {
+						this.selectedIds[objId] = objId;
+						selectedCheckboxes[objId] = objId;
+					}
+					// since there can be multiple checkboxes with the same ID,
+					// don't unselect an object if another its checkbox has been checked
+					else if (typeof selectedCheckboxes[objId] === 'undefined') {
+						delete(this.selectedIds[objId]);
+					}
+
+					// mark the table rows as selected
+					jQuery(box).closest('tr').toggleClass('selected', box.checked);
+				}
+			}
+
+		}
+
+		var countChecked = 0;
+		for (var key in this.selectedIds) {
+			if (!empty(this.selectedIds[key])) {
+				countChecked++;
+			}
+		}
+
+		if (!is_null(this.goButton)) {
+			var tmp_val = this.goButton.value.split(' ');
+			this.goButton.value = tmp_val[0] + ' (' + countChecked + ')';
+		}
+
+		cookie.createJSON(this.cookieName, this.selectedIds);
+
+		if (jQuery('#go').length) {
+			jQuery('#go')[0].disabled = (countChecked == 0);
+		}
+		if (jQuery('#goButton').length) {
+			jQuery('#goButton')[0].disabled = (countChecked == 0);
+		}
+
+		this.pageGoCount = countChecked;
 	},
 
 	submitGo: function(e) {
@@ -414,7 +406,7 @@ var chkbxRange = {
 			return false;
 		}
 
-		var form = getParent(this.goButton, 'form');
+		var form = this.goButton.closest('form');
 		for (var key in this.selectedIds) {
 			if (!empty(this.selectedIds[key])) {
 				create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
