@@ -218,14 +218,14 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&templated=1&writeonly=1&numeric=1", 800, 450);', 'formlist'
+				'&writeonly=1&numeric=1", 800, 450);', 'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&templated=0&numeric=1", 800, 450);',
+				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&numeric=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -265,7 +265,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&templated=1&writeonly=1&numeric=1", 800, 450);',
+				'&writeonly=1&numeric=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -273,7 +273,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&templated=0&numeric=1", 800, 450);',
+				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&numeric=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -350,8 +350,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
-				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&writeonly=1&templated=0", 800, 450);',
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption&real_hosts=1'.
+				'&writeonly=1", 800, 450);',
 			'formlist'
 		);
 	}

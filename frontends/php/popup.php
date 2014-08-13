@@ -143,7 +143,7 @@ $allowedSrcFields = array(
 	'items'					=> '"itemid", "name"',
 	'graphs'				=> '"graphid", "name"',
 	'graph_prototypes'		=> '"graphid", "name"',
-	'item_prototypes'		=> '"itemid", "name"',
+	'item_prototypes'		=> '"itemid", "name", "flags"',
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
 	'help_items'			=> '"key"',
@@ -475,26 +475,30 @@ if (isset($onlyHostid)) {
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
 else {
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'templates',
-									'item_prototypes', 'hosts', 'host_templates'))) {
-		if ($srctbl !== 'item_prototypes' || !$parentDiscoveryId) {
-			$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
-		}
+	// show Group dropdown in header for these specified sources
+	$showGroupCmbBox = array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes',
+		'templates', 'hosts', 'host_templates'
+	);
+	if (str_in_array($srctbl, $showGroupCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
+		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
 	}
-	if (str_in_array($srctbl, array('help_items'))) {
-		$itemtype = getRequest('itemtype', 0);
-		$cmbTypes = new CComboBox('itemtype', $itemtype, 'javascript: submit();');
+
+	// show Type dropdown in header for help items
+	if ($srctbl === 'help_items') {
+		$itemType = getRequest('itemtype', 0);
+		$cmbTypes = new CComboBox('itemtype', $itemType, 'javascript: submit();');
 
 		foreach ($allowed_item_types as $type) {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
+
 		$frmTitle->addItem(array(_('Type'), SPACE, $cmbTypes));
 	}
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes',
-									'item_prototypes'))) {
-		if ($srctbl !== 'item_prototypes' || !$parentDiscoveryId) {
-			$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
-		}
+
+	// show Host dropdown in header for these specified sources
+	$showHostCmbBox = array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes');
+	if (str_in_array($srctbl, $showHostCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
+		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
 	}
 }
 
@@ -945,12 +949,12 @@ elseif ($srctbl == 'host_groups') {
 /*
  * Help items
  */
-elseif ($srctbl == 'help_items') {
+elseif ($srctbl === 'help_items') {
 	$table = new CTableInfo(_('No item keys found.'));
 	$table->setHeader(array(_('Key'), _('Name')));
 
 	$helpItems = new CHelpItems();
-	foreach ($helpItems->getByType($itemtype) as $helpItem) {
+	foreach ($helpItems->getByType($itemType) as $helpItem) {
 		$action = get_window_opener($dstfrm, $dstfld1, $helpItem[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($helpItem['key'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
@@ -1088,7 +1092,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	$table = new CTableInfo($itemPrototypesPopup ? _('No item prototypes found.') : _('No items found.'));
 	$header = array(
 		$pageFilter->hostsAll ? _('Host') : null,
-		$multiselect ? new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');") : null,
+		$multiselect
+			? new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');")
+			: null,
 		_('Name'),
 		_('Key'),
 		_('Type'),
@@ -1097,32 +1103,27 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	);
 	$table->setHeader($header);
 
+	$options = array(
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status', 'state'),
+		'selectHosts' => array('name')
+	);
+
 	if ($parentDiscoveryId) {
-		$options = array(
-			'selectHosts' => array('name'),
-			'discoveryids' => array($parentDiscoveryId),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		);
+		$options['discoveryids'] = array($parentDiscoveryId);
 	}
 	else {
-		$options = array(
-			'hostids' => $hostid,
-			'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'status', 'state'),
-			'selectHosts' => array('hostid', 'name')
-		);
-		if (!is_null($normalOnly)) {
-			$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-		}
-		if (!is_null($writeonly)) {
-			$options['editable'] = true;
-		}
-		if (!is_null($templated) && $templated == 1) {
-			$options['templated'] = $templated;
-		}
+		$options['hostids'] = $hostid;
 	}
 
-	if (!is_null($value_types)) {
+	if ($templated == 1) {
+		$options['templated'] = true;
+	}
+
+	if ($writeonly !== null) {
+		$options['editable'] = true;
+	}
+
+	if ($value_types !== null) {
 		$options['filter']['value_type'] = $value_types;
 	}
 
@@ -1131,8 +1132,14 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	}
 	else {
 		$options['webitems'] = true;
+
+		if ($normalOnly !== null) {
+			$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+
 		$items = API::Item()->get($options);
 	}
+
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 	order_result($items, 'name_expanded');
 
@@ -1162,8 +1169,10 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 			}
 
 			// if we need to submit parent window
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.($submitParent ? 'true' : 'false').'); return false;';
+			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.
+				($submitParent ? 'true' : 'false').'); return false;';
 		}
+
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
@@ -1173,7 +1182,10 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
+			new CSpan(
+				itemIndicator($item['status'], $item['state']),
+				itemIndicatorStyle($item['status'], $item['state'])
+			)
 		));
 
 		// made to save memory usage
@@ -1182,6 +1194,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 				'itemid' => $item['itemid'],
 				'name' => $item['name'],
 				'key_' => $item['key_'],
+				'flags' => $item['flags'],
 				'type' => $item['type'],
 				'value_type' => $item['value_type'],
 				'host' => $item['hostname']
@@ -1190,7 +1203,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).');');
+		$button = new CButton('select', _('Select'),
+			"javascript: addSelectedValues('items', ".zbx_jsvalue($reference).');'
+		);
 		$table->setFooter(new CCol($button, 'right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($jsItems, true).';');
@@ -1285,7 +1300,9 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	$table = new CTableInfo($graphPrototypesPopup ? _('No graph prototypes found.') : _('No graphs found.'));
 	if ($multiselect) {
 		$header = array(
-			array(new CCheckBox('all_graphs', null, "javascript: checkAll('".$form->getName()."', 'all_graphs', 'graphs');"), _('Description')),
+			array(new CCheckBox('all_graphs', null,
+				"javascript: checkAll('".$form->getName()."', 'all_graphs', 'graphs');"), _('Description')
+			),
 			_('Graph type')
 		);
 	}
@@ -1300,9 +1317,9 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 
 	if ($pageFilter->hostsSelected) {
 		$options = array(
-			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'hostids' => $hostid,
+			'selectHosts' => array('name'),
 			'preservekeys' => true
 		);
 
@@ -1315,7 +1332,8 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 
 		if ($graphPrototypesPopup) {
 			$graphs = API::GraphPrototype()->get($options);
-		} else {
+		}
+		else {
 			$graphs = API::Graph()->get($options);
 		}
 		order_result($graphs, 'name');
@@ -1338,12 +1356,16 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 				$dstfld1 => $graph[$srcfld1],
 				$dstfld2 => $graph[$srcfld2]
 			);
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
+			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).');'.
+				' close_window(); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$description = new CCol(array(new CCheckBox('graphs['.zbx_jsValue($graph[$srcfld1]).']', null, null, $graph['graphid']), $description));
+			$description = new CCol(array(
+				new CCheckBox('graphs['.zbx_jsValue($graph[$srcfld1]).']', null, null, $graph['graphid']),
+				$description
+			));
 		}
 
 		switch ($graph['graphtype']) {
@@ -1368,7 +1390,9 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).');');
+		$button = new CButton('select', _('Select'),
+			"javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).');'
+		);
 		$table->setFooter(new CCol($button, 'right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($graphs, true).';');
