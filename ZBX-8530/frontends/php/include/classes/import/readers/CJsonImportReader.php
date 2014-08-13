@@ -29,7 +29,7 @@ class CJsonImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string) {
-		$json = new CJSON;
+		$json = new CJson;
 		return $json->decode($string, true);
 	}
 }

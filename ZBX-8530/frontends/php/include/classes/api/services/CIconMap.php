@@ -417,15 +417,15 @@ class CIconMap extends CApiService {
 				}
 
 				try {
-					GlobalRegExp::isValid($mapping['expression']);
+					CGlobalRegexp::isValid($mapping['expression']);
 				}
 				catch (Exception $e) {
 					switch ($e->getCode()) {
-						case GlobalRegExp::ERROR_REGEXP_EMPTY:
+						case CGlobalRegexp::ERROR_REGEXP_EMPTY:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Icon map "%s" cannot have mapping with empty expression.', $iconMap['name']));
 							break;
-						case GlobalRegExp::ERROR_REGEXP_NOT_EXISTS:
+						case CGlobalRegexp::ERROR_REGEXP_NOT_EXISTS:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Icon map "%s" cannot have mapping with global expression that does not exist.', $iconMap['name']));
 							break;
