@@ -140,8 +140,8 @@ static int housekeeping_history(int now)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int		records, start, sleeptime;
-	double		sec;
+	int	records, start, sleeptime;
+	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

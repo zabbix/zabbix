@@ -103,21 +103,15 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
-		else if (EINTR == zbx_sock_last_error())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Listener %d has been interrupted by the signal."
-					" Repeating connection", process_num);
-			continue;
-		}
 
-		if (SUCCEED == ret)
+		if (SUCCEED == ret || EINTR == zbx_sock_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_tcp_strerror());
 
 		if (local_request_failed++ > 1000)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Too many consecutive errors on accept() call.");
+			zabbix_log(LOG_LEVEL_WARNING, "too many failures to accept an icoming connection");
 			local_request_failed = 0;
 		}
 

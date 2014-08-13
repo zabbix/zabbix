@@ -780,8 +780,8 @@ static int	housekeeping_events(int now)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int		now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
-	double		sec;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
+	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
