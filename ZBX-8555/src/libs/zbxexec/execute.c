@@ -24,11 +24,6 @@
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
 
-#ifndef _WINDOWS
-#define RUN_SILENT		(1 << 0)
-#define SET_AS_GROUP_LEADER	(1 << 1)
-#endif
-
 #ifdef _WINDOWS
 
 /******************************************************************************
@@ -121,6 +116,9 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 #else	/* not _WINDOWS */
 
+#define ZBX_EXEC_SILENT		(1 << 0)
+#define ZBX_EXEC_GROUP_LEADER	(1 << 1)
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_exec                                                         *
@@ -128,25 +126,26 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  * Purpose: substitute current process with shell running command provided in *
  *          parameters                                                        *
  *                                                                            *
- * Parameters: command - [IN] actual command to in in shell                   *
+ * Parameters: command - [IN] actual command to run in shell                  *
  *             flags   - [IN] run options. Possible flags:                    *
- *                            RUN_SILENT       - silent standard output and   *
- *                                               error streams for new process*
- *                            SET_GROUP_LEADER - set new process as process   *
- *                                               group leader                 *
+ *                            ZBX_EXEC_SILENT - silent standard output and    *
+ *                                              error streams for new process *
+ *                            ZBX_EXEC_GROUP_LEADER - set new process as the  *
+ *                                                    process group leader    *
  *                                                                            *
  * Author: Arturs Galapovs                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_exec(const char* command, int flags)
+static void	zbx_exec(const char *command, int flags)
 {
-	const char	*__function_name = "zbx_exec";
-	extern char*	CONFIG_LOG_FILE;
+	const char		*__function_name = "zbx_exec";
+
+	extern const char	*CONFIG_LOG_FILE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* set the process as a group leader, to be able to kill whole group at once */
-	if ((0 != (flags & SET_AS_GROUP_LEADER)) && (-1 == setpgid(0, 0)))
+	if (0 != (flags & ZBX_EXEC_GROUP_LEADER) && -1 == setpgid(0, 0))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
 				__function_name, zbx_strerror(errno));
@@ -155,16 +154,16 @@ static void	zbx_exec(const char* command, int flags)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing script: %s", command);
 
-	if (0 != (flags & RUN_SILENT))
+	if (0 != (flags & ZBX_EXEC_SILENT))
 		redirect_std(NULL);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
-	/* execl return, therefore - failed */
-	if (0 != (flags & RUN_SILENT))
+	/* execl() returned, therefore - failed */
+	if (0 != (flags & ZBX_EXEC_SILENT))
 		redirect_std(CONFIG_LOG_FILE);
 
-	zabbix_log(LOG_LEVEL_ERR, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
+	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
 
 	exit(EXIT_FAILURE);
 }
@@ -213,13 +212,14 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	}
 
 	/* child process */
+
 	close(fd[0]);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
 
-	zbx_exec(command, SET_AS_GROUP_LEADER);
+	zbx_exec(command, ZBX_EXEC_GROUP_LEADER);
 
-	exit(0); /* warning fix */
+	exit(0);	/* control never reaches here, zbx_exec() always exits */
 }
 
 /******************************************************************************
@@ -317,7 +317,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	pid_t					pid;
 	int					fd;
 #endif
-
 	*error = '\0';
 
 	*buffer = zbx_realloc(*buffer, buf_size);
@@ -409,9 +408,12 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 close:
 	if (NULL != job)
 	{
-		/* terminate the child process and it's childs */
+		/* terminate the child process and its children */
 		if (0 == TerminateJobObject(job, 0))
-			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s",
+					cmd, strerror_from_system(GetLastError()));
+		}
 		CloseHandle(job);
 	}
 
@@ -430,7 +432,7 @@ close:
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
-		int	rc = 0;
+		int	rc;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
 
 		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
@@ -568,7 +570,7 @@ int	zbx_execute_nowait(const char *command)
 		case 0:
 			/* this is the grand child process */
 
-			zbx_exec(command, RUN_SILENT);
+			zbx_exec(command, ZBX_EXEC_SILENT);
 			break;
 		default:
 			/* this is the child process, exit to complete the double fork */
@@ -584,7 +586,7 @@ int	zbx_execute_nowait(const char *command)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_execute_quiet                                                *
+ * Function: zbx_execute_silent                                               *
  *                                                                            *
  * Purpose: this function executes a script while ignoring any script output  *
  *                                                                            *
@@ -601,7 +603,8 @@ int	zbx_execute_nowait(const char *command)
  ******************************************************************************/
 int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, int timeout)
 {
-	const char	*__function_name = "zbx_execute_quiet";
+	const char	*__function_name = "zbx_execute_silent";
+
 	int		ret = FAIL;
 	pid_t		pid;
 
@@ -611,42 +614,44 @@ int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, i
 
 	if (-1 != (pid = zbx_fork()))
 	{
-		if (0 == pid) /* child */
+		if (0 == pid)	/* child process */
 		{
-			zbx_exec(command, RUN_SILENT | SET_AS_GROUP_LEADER);
+			zbx_exec(command, ZBX_EXEC_SILENT | ZBX_EXEC_GROUP_LEADER);
+
+			exit(0);	/* control never reaches here, zbx_exec() always exits */
 		}
-		else /* parent */
+
+		/* parent process */
+
+		alarm(timeout);
+
+		if (-1 == zbx_waitpid(pid))
 		{
-			alarm(timeout);
-
-			if (-1 == zbx_waitpid(pid))
-			{
-				if(EINTR == errno)
-				{
-					ret = TIMEOUT_ERROR;
-					zbx_snprintf(error, max_error_len, "timeout while executing %s", command);
-				}
-				else
-					zbx_snprintf(error, max_error_len, "waitpid() failed: %s",
-							zbx_strerror(errno));
-
-				if (-1 == kill(-pid, SIGTERM))
-					zabbix_log(LOG_LEVEL_ERR, "kill() failed to send signal(%d) to process "
-							" with pid=%d: %s", SIGTERM, pid, zbx_strerror(errno));
-
-				zbx_waitpid(pid);
-			}
+			if (EINTR == errno)
+				ret = TIMEOUT_ERROR;
 			else
-				ret = SUCCEED;
+				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
 
-			alarm(0);
+			/* kill the whole process group, pid must be the leader */
+			if (-1 == kill(-pid, SIGTERM))
+				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s]: %s", command, zbx_strerror(errno));
+
+			zbx_waitpid(pid);
 		}
+		else
+			ret = SUCCEED;
+
+		alarm(0);
 	}
 	else
 		zbx_snprintf(error, max_error_len, "fork() failed: %s", zbx_strerror(errno));
 
-	if ('\0' != *error)
-		zabbix_log(LOG_LEVEL_ERR, "%s", error);
+	if (TIMEOUT_ERROR == ret)
+		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+	else if ('\0' != *error)
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
