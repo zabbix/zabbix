@@ -81,8 +81,7 @@ foreach ($this->data['applications'] as $application) {
 			'applications.php?'.
 				'form=update'.
 				'&applicationid='.$application['applicationid'].
-				'&hostid='.$application['hostid'].
-				'&groupid='.$this->data['groupid']
+				'&hostid='.$application['hostid']
 		);
 	}
 

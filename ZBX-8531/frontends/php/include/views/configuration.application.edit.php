@@ -51,15 +51,15 @@ if (!empty($this->data['applicationid'])) {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_params(array('config', 'hostid', 'groupid', 'form', 'applicationid'))),
-			new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid'))
+			new CButtonDelete(_('Delete application?'), url_params(array('config', 'hostid', 'form', 'applicationid'))),
+			new CButtonCancel(url_param('config').url_param('hostid'))
 		)
 	));
 }
 else {
 	$applicationForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
-		new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid'))
+		new CButtonCancel(url_param('config').url_param('hostid'))
 	));
 }
 

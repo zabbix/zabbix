@@ -260,7 +260,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'applicationid' => getRequest('applicationid'),
-		'groupid' => getRequest('groupid', 0),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0)
 	);
@@ -285,7 +284,6 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'groupid' => $pageFilter->groupid,
 		'hostid' => $pageFilter->hostid
 	);
 
