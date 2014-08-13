@@ -50,8 +50,6 @@ $applicationWidget->addHeaderRowNumber();
 // create form
 $applicationForm = new CForm();
 $applicationForm->setName('applicationForm');
-$applicationForm->addVar('groupid', $this->data['groupid']);
-$applicationForm->addVar('hostid', $this->data['hostid']);
 
 // create table
 $applicationTable = new CTableInfo(_('No applications found.'));
