@@ -82,7 +82,7 @@ $_REQUEST['go'] = getRequest('go', 'none');
 
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
-	$ajaxResponse = new AjaxResponse;
+	$ajaxResponse = new CAjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
 		$ajaxData = getRequest('ajaxdata', array());
