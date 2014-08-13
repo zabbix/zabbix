@@ -439,22 +439,15 @@ class CGraph extends CGraphGeneral {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist.'));
 					}
 
-					$chdGraphItems = API::GraphItem()->get(array(
-						'graphids' => $chdGraph['graphid'],
-						'output' => API_OUTPUT_EXTEND,
-						'preservekeys' => true,
-						'nopermissions' => true
-					));
-
 					$chdGraphItemItems = API::Item()->get(array(
-						'itemids' => zbx_objectValues($chdGraphItems, 'itemid'),
+						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
 						'output' => array('itemid', 'key_', 'hostid'),
 						'preservekeys' => true
 					));
 
-					if (count($chdGraphItems) == count($tmpGraph['gitems'])) {
+					if (count($chdGraph['gitems']) == count($tmpGraph['gitems'])) {
 						foreach ($tmpGraph['gitems'] as $gitem) {
-							foreach ($chdGraphItems as $chdGraphItem) {
+							foreach ($chdGraph['gitems'] as $chdGraphItem) {
 								$chdGraphItemItem = $chdGraphItemItems[$chdGraphItem['itemid']];
 								if ($gitem['key_'] == $chdGraphItemItem['key_']
 										&& bccomp($chdHost['hostid'], $chdGraphItemItem['hostid']) == 0) {
