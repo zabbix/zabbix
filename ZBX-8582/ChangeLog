@@ -1,9 +1,18 @@
 Changes for 2.3.4
 
 New features:
+....I..PS. [ZBXNEXT-2359] made server and proxy refuse to start if StartPollersUnreachable=0, but other pollers are started (asaveljevs)
+....I..PS. [ZBX-8557] implemented housekeeper 30 minutes startup delay (Arturs)
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8600] fixed SQL errors in proxy configuration synchronization (Sasha)
+A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
+..F....... [ZBX-8484] fixed "Plain text" screen elements with "Show text as HTML" enabled trying to display the text as preformatted (Andrejs)
+.......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
+.......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
+..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
+A......... [ZBX-8430] fixed SQL errors in drule.delete API method (Andrejs)
 A.F....... [ZBX-8510] fixed possible deadlocks when updating IT services (Pavels, Sasha)
 
 --------------------------------------------------------------------------------
@@ -290,6 +299,10 @@ A.......S. [ZBX-8473] improved performance of deleting triggers by API and serve
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
+.......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
+.......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
+..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
 ..F....... [ZBX-8216] fixed screen import error (Andrejs)
 A.F....... [ZBX-8510] fixed possible deadlocks when updating IT services (Pavels, Sasha)
 ...G...... [ZBX-8512] fixed processing of web.page.regexp without a newline character in the end of http GET response (Arturs)
