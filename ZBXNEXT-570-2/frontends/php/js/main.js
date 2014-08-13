@@ -167,6 +167,7 @@ var chkbxRange = {
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
 		this.cookieName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+		this.resetOtherPageCookies();
 		this.selectedIds = cookie.readJSON(this.cookieName);
 
 		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
@@ -184,6 +185,18 @@ var chkbxRange = {
 		}
 
 		this.setGo();
+	},
+
+	/**
+	 * Reset all selections on other pages.
+	 */
+	resetOtherPageCookies: function() {
+		for(var key in cookie.cookies) {
+			var cookiePair = key.split('=');
+			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf(this.cookieName) == -1) {
+				cookie.erase(key);
+			}
+		}
 	},
 
 	implement: function(obj) {
