@@ -486,6 +486,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 					continue;
 
+				/* only new hosts or hosts with a new host name will be validated */
 				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST)) &&
 						0 == strcmp(host->host, row[0]))
 				{
@@ -505,6 +506,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 				}
 
+				/* only new hosts or hosts with a new visible host name will be validated */
 				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME)) &&
 						0 == strcmp(host->name, row[1]))
 				{
@@ -1133,7 +1135,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 					continue;
 
-				if (0 != group->groupid && 0 == group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME)
+				/* only new groups or groups with a new group name will be validated */
+				if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 					continue;
 
 				if (0 == strcmp(group->name, row[0]))
