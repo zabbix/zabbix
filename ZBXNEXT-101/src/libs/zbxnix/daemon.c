@@ -35,7 +35,53 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern void	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
+extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: common_worker_sigusr_handler                                     *
+ *                                                                            *
+ * Purpose: common SIGUSR1 handler for worker processes                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	common_worker_sigusr_handler(zbx_task_t task)
+{
+	switch (((unsigned char *)&task)[0])
+	{
+		case ZBX_TASK_LOG_LEVEL_INCREASE:
+			if (SUCCEED != set_debug_level_up())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+						" maximum level has been already set");
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to \"%s\"",
+						get_debug_level_string());
+			}
+			break;
+		case ZBX_TASK_LOG_LEVEL_DECREASE:
+			if (SUCCEED != set_debug_level_down())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+						" minimum level has been already set");
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to \"%s\"",
+						get_debug_level_string());
+			}
+			break;
+		default:
+			{
+				extern void	zbx_sigusr_handler(zbx_task_t task);
+
+				zbx_sigusr_handler(task);
+			}
+			break;
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -61,9 +107,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		extern void	zbx_sigusr_handler(zbx_task_t task);
-
-		zbx_sigusr_handler(task);
+		common_worker_sigusr_handler(task);
 	}
 	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 	{
@@ -82,67 +126,44 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
 			if (NULL != threads && -1 != sigqueue(threads[0], SIGUSR1, s))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
-						" the configuration syncer");
-			}
+				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to the configuration syncer");
 			else
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-						zbx_strerror(errno));
-			}
+				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 		}
 	}
 	else if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&task)[0] ||
 		ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&task)[0])
 	{
 		union sigval	s;
-		int 		i;
+		int 		i, found = 0;
 
 		s.ZBX_SIVAL_INT = task;
 
-		if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
-			0 == ((unsigned short *)&task)[1])
+		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1])
 		{
 			for (i = 0; i < threads_num; i++)
 			{
+				if (0 != ((unsigned short *)&task)[1] && ((unsigned short *)&task)[1] != threads[i])
+					continue;
+
+				found = 1;
+
 				if (-1 != sigqueue(threads[i], SIGUSR1, s))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
-								" (pid: %d)", threads[i]);
+					zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
+							threads[i]);
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-							zbx_strerror(errno));
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 				}
 			}
-		}
-		else if (((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1]) &&
-			0 != ((unsigned short *)&task)[1])
-		{
-			for (i = 0; i < threads_num; i++)
+
+			if (0 != ((unsigned short *)&task)[1] && 0 == found)
 			{
-				if (((unsigned short *)&task)[1] == threads[i])
-				{
-					if (-1 != sigqueue(threads[i], SIGUSR1, s))
-					{
-						zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
-								" (pid: %d)", threads[i]);
-						break;
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-								zbx_strerror(errno));
-						break;
-					}
-				}
-				else if (i == (threads_num - 1))
-				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process with PID"
-							" \"%d\" does not exist", ((unsigned short *)&task)[1]);
-				}
+				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
+						" worker process", (int)((unsigned short *)&task)[1]);
+
 			}
 		}
 		else
@@ -152,59 +173,46 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			for (i = 0; i < threads_num; i++)
 			{
-				get_process_info_by_thread(i+1, &process_type, &process_num);
+				if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+					break;
 
-				if (((unsigned char *)&task)[1] == process_type && 0 == ((unsigned short *)&task)[1])
+				if (((unsigned char *)&task)[1] != process_type)
 				{
-					found = 1;
+					/* check if we have already checked processes of target type */
+					if (1 == found)
+						break;
 
-					if (-1 != sigqueue(threads[i], SIGUSR1, s))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "the signal is redirected to"
-								" [%s, #%d] process (pid: %d)",
-								get_process_type_string(process_type),
-								process_num, threads[i]);
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-								zbx_strerror(errno));
-					}
+					continue;
 				}
-				else if (((unsigned char *)&task)[1] == process_type &&
-					((unsigned short *)&task)[1] == process_num)
-				{
-					found = 1;
 
-					if (-1 != sigqueue(threads[i], SIGUSR1, s))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "the signal is redirected to"
-								" [%s, #%d] process (pid: %d)",
-								get_process_type_string(process_type),
-								process_num, threads[i]);
-						break;
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-								zbx_strerror(errno));
-						break;
-					}
+				if (0 != ((unsigned short *)&task)[1] && ((unsigned short *)&task)[1] != process_num)
+					continue;
+
+				found = 1;
+
+				if (-1 != sigqueue(threads[i], SIGUSR1, s))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
+							" pid:%d", get_process_type_string(process_type), threads[i]);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 				}
 			}
 
-			if (found == 0)
+			if (0 == found)
 			{
 				if (0 == ((unsigned short *)&task)[1])
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process [%s]"
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: \"%s\" process"
 							" does not exist",
 							get_process_type_string(((unsigned char *)&task)[1]));
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal. process"
-							" [%s, #%d] does not exist",
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+							" \"%s #%d\" process does not exist",
 							get_process_type_string(((unsigned char *)&task)[1]),
 							((unsigned short *)&task)[1]);
 				}
@@ -232,7 +240,7 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_daemon_signal_handlers                                   *
+ * Function: set_daemon_signal_handlers                                       *
  *                                                                            *
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
@@ -260,7 +268,8 @@ static void	set_daemon_signal_handlers()
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root - allow root permission for application             *
- *             user - user on the system to which to drop the privileges      *
+ *             user       - user on the system to which to drop the           *
+ *                          privileges                                        *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

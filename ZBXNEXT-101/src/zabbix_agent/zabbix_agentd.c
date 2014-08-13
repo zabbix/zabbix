@@ -185,7 +185,7 @@ char		*opt = NULL;
 void zbx_co_uninitialize();
 #endif
 
-void	get_process_info_by_thread(int thread_num, unsigned char *process_type, int *process_num)
+int	get_process_info_by_thread(int thread_num, unsigned char *process_type, int *process_num)
 {
 	int	server_count = 0;
 
@@ -207,9 +207,10 @@ void	get_process_info_by_thread(int thread_num, unsigned char *process_type, int
 	}
 	else
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
+
+	return SUCCEED;
 }
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
@@ -685,7 +686,11 @@ int	MAIN_ZABBIX_ENTRY()
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 
-		get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num);
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
 
 		thread_args->server_num = i + 1;
 		thread_args->args = NULL;
@@ -822,37 +827,6 @@ void	zbx_on_exit(void)
 #if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
 void	zbx_sigusr_handler(zbx_task_t task)
 {
-	switch (((unsigned char *)&task)[0])
-	{
-		case ZBX_TASK_LOG_LEVEL_INCREASE:
-			if (SUCCEED != set_debug_level_up())
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level for \"%s #%d\" process:"
-						" maximal level has been already set",
-						get_process_type_string(process_type), process_num);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\""
-						" process", get_debug_level_string(), get_process_type_string(process_type), process_num);
-			}
-			break;
-		case ZBX_TASK_LOG_LEVEL_DECREASE:
-			if (SUCCEED != set_debug_level_down())
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level for \"%s #%d\" process:"
-						" minimal level has been already set",
-						get_process_type_string(process_type), process_num);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level \"%s\" is set for \"%s #%d\""
-						" process", get_debug_level_string(), get_process_type_string(process_type), process_num);
-			}
-			break;
-		default:
-			break;
-	}
 }
 #endif
 

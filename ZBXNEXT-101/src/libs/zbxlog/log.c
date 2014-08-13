@@ -46,7 +46,7 @@ const char	*get_debug_level_string()
 	switch (log_level)
 	{
 		case LOG_LEVEL_EMPTY:
-			return "0 - no debug";
+			return "0 - none";
 		case LOG_LEVEL_CRIT:
 			return "1 - critical";
 		case LOG_LEVEL_ERR:
@@ -469,7 +469,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  ******************************************************************************/
 char *zbx_strerror(int errnum)
 {
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
@@ -481,7 +482,8 @@ char *strerror_from_system(unsigned long error)
 #ifdef _WINDOWS
 	size_t		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
@@ -509,9 +511,10 @@ char	*strerror_from_module(unsigned long error, LPCTSTR module)
 {
 	size_t		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! not thread-safe for Win32 */
 	char		*strings[2];
 	HMODULE		hmodule;
+	/* !!! Attention: static !!! not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	memset(strings, 0, sizeof(char *) * 2);
 	*utf8_string = '\0';
