@@ -841,8 +841,6 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-zbx_add_post_js('chkbxRange.pageGoName = "itemids";');
-
 $goBox = new CComboBox('graphtype', GRAPH_TYPE_STACKED, null, array(
 	GRAPH_TYPE_STACKED => _('Display stacked graph'),
 	GRAPH_TYPE_NORMAL => _('Display graph')
