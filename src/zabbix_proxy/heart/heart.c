@@ -89,9 +89,9 @@ static int	send_heartbeat(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(heart_thread, args)
 {
-	int		start, sleeptime = 0, res;
-	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
+	int	start, sleeptime = 0, res;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

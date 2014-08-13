@@ -203,8 +203,8 @@ exit:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(watchdog_thread, args)
 {
-	int		now, nextsync = 0, action;
-	double		sec;
+	int	now, nextsync = 0, action;
+	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
