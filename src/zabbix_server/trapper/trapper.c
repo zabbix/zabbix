@@ -682,11 +682,10 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
-		else if (EINTR == zbx_sock_last_error())
+		else if (EINTR != zbx_sock_last_error())
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Trapper #%d has been interrupted by the signal. Repeating connection", process_num);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
+					zbx_tcp_strerror());
 		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
 	}
 }
