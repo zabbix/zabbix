@@ -137,7 +137,7 @@ var cookie = {
 			list_part = this.read(name + '_' + part);
 			part++;
 		}
-		var range = list.split(',');
+		var range = (list != '') ? list.split(',') : [];
 		return range;
 	},
 

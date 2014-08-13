@@ -181,7 +181,9 @@ function checkAll(form_name, chkMain, shkName) {
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
 
-	chkbxRange.checkAll(shkName, value);
+	chkbxRange.checkObjectAll(shkName, value);
+	chkbxRange.update(shkName);
+	chkbxRange.saveCookies(shkName);
 
 	return true;
 }
