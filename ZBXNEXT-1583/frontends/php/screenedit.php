@@ -68,7 +68,8 @@ $fields = array(
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
 	'max_columns' =>	array(T_ZBX_INT, O_OPT, null,
-		BETWEEN(SCREEN_SURROGATE_MAX_COLUMNS_MIN, SCREEN_SURROGATE_MAX_COLUMNS_MAX), null, _('Max columns')),
+		BETWEEN(SCREEN_SURROGATE_MAX_COLUMNS_MIN, SCREEN_SURROGATE_MAX_COLUMNS_MAX), null, _('Max columns')
+	),
 	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Column span')),
 	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Row span')),
 	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')),
