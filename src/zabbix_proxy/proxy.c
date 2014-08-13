@@ -207,7 +207,12 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 {
 	int	server_count = 0;
 
-	if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
+	if (0 == server_num)
+	{
+		/* fail if the main process is queried */
+		return FAIL;
+	}
+	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
 		*process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
