@@ -570,7 +570,7 @@ foreach ($triggers as $trigger) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 
@@ -591,7 +591,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 

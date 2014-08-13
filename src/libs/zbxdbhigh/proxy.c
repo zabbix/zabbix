@@ -108,9 +108,12 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		if (FAIL == zbx_check_hostname(host))
+		char	*ch_error;
+
+		if (FAIL == zbx_check_hostname(host, &ch_error))
 		{
-			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\"", host);
+			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
+			zbx_free(ch_error);
 			return ret;
 		}
 
@@ -813,7 +816,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	DBfree_result(result);
 
 	/* these tables have unique indices, need special preparation to avoid conflicts during inserts/updates */
-	if (0 == strcmp("hosts_templates", table->table))
+	if (0 == strcmp("globalmacro", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "macro");
+	}
+	else if (0 == strcmp("hosts_templates", table->table))
 	{
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "templateid");
@@ -827,6 +835,16 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	{
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "key_");
+	}
+	else if (0 == strcmp("drules", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
+	}
+	else if (0 == strcmp("regexps", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
 	}
 	else if (0 == strcmp("httptest", table->table))
 	{
@@ -944,8 +962,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_uint64_clear(del);
 		}
 
-		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
-		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indices */
+		/* special preprocessing for 'globalmacro', 'hostmacro', 'items', 'drules', 'regexps' and 'httptest' */
+		/* tables to eliminate conflicts */
+		/* in the 'macro', 'hostid,macro', 'hostid,key_', 'name', 'name' and 'hostid,name' unique indices */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
