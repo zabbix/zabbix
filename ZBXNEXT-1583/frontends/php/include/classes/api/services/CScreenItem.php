@@ -156,16 +156,16 @@ class CScreenItem extends CApiService {
 		$screenIds = array_keys(array_flip(zbx_objectValues($screenItems, 'screenid')));
 
 		$dbScreens = API::Screen()->get(array(
-			'screenids' => $screenIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 
 		if (count($dbScreens) < count($screenIds)) {
 			$dbTemplateScreens = API::TemplateScreen()->get(array(
-				'screenids' => $screenIds,
 				'output' => array('screenid', 'hsize', 'vsize', 'name'),
+				'screenids' => $screenIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -176,8 +176,8 @@ class CScreenItem extends CApiService {
 		}
 
 		$dbScreenItems = $this->get(array(
-			'screenids' => $screenIds,
 			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'),
+			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -247,15 +247,15 @@ class CScreenItem extends CApiService {
 		$screenItemIds = array_keys($screenItems);
 
 		$dbScreens = API::Screen()->get(array(
-			'screenitemids' => $screenItemIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 
 		$dbTemplateScreens = API::TemplateScreen()->get(array(
-			'screenitemids' => $screenItemIds,
 			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -265,8 +265,8 @@ class CScreenItem extends CApiService {
 		}
 
 		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemIds,
 			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid'),
+			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -305,8 +305,8 @@ class CScreenItem extends CApiService {
 		}
 
 		$dbScreenItems = $this->get(array(
-			'screenids' => zbx_objectValues($screenItems, 'screenid'),
 			'output' => array('screenitemid', 'screenid', 'x', 'y'),
+			'screenids' => zbx_objectValues($screenItems, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -590,8 +590,8 @@ class CScreenItem extends CApiService {
 		// check host groups
 		if ($hostGroupsIds) {
 			$dbHostGroups = API::HostGroup()->get(array(
-				'groupids' => $hostGroupsIds,
 				'output' => array('groupid'),
+				'groupids' => $hostGroupsIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -608,8 +608,8 @@ class CScreenItem extends CApiService {
 		// check hosts
 		if ($hostIds) {
 			$dbHosts = API::Host()->get(array(
-				'hostids' => $hostIds,
 				'output' => array('hostid'),
+				'hostids' => $hostIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -626,8 +626,8 @@ class CScreenItem extends CApiService {
 		// check graphs
 		if ($graphIds) {
 			$dbGraphs = API::Graph()->get(array(
-				'graphids' => $graphIds,
 				'output' => array('graphid'),
+				'graphids' => $graphIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -644,8 +644,8 @@ class CScreenItem extends CApiService {
 		// check graph prototypes
 		if ($graphPrototypeIds) {
 			$dbGraphPrototypes = API::GraphPrototype()->get(array(
-				'graphids' => $graphPrototypeIds,
 				'output' => array('graphid'),
+				'graphids' => $graphPrototypeIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -662,8 +662,8 @@ class CScreenItem extends CApiService {
 		// check items
 		if ($itemIds) {
 			$dbItems = API::Item()->get(array(
-				'itemids' => $itemIds,
 				'output' => array('itemid'),
+				'itemids' => $itemIds,
 				'editable' => true,
 				'preservekeys' => true,
 				'webitems' => true
@@ -681,8 +681,8 @@ class CScreenItem extends CApiService {
 		// check item prototypes
 		if ($itemPrototypeIds) {
 			$dbItemPrototypes = API::ItemPrototype()->get(array(
-				'itemids' => $itemPrototypeIds,
 				'output' => array('itemid'),
+				'itemids' => $itemPrototypeIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -699,8 +699,8 @@ class CScreenItem extends CApiService {
 		// check maps
 		if ($mapIds) {
 			$dbMaps = API::Map()->get(array(
-				'sysmapids' => $mapIds,
 				'output' => array('sysmapid'),
+				'sysmapids' => $mapIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -717,16 +717,16 @@ class CScreenItem extends CApiService {
 		// check screens
 		if ($screenIds) {
 			$dbScreens = API::Screen()->get(array(
-				'screenids' => $screenIds,
 				'output' => array('screenid'),
+				'screenids' => $screenIds,
 				'editable' => true,
 				'preservekeys' => true
 			));
 
 			if (count($dbScreens) < count($screenIds)) {
 				$dbTemplateScreens = API::TemplateScreen()->get(array(
-					'screenids' => $screenIds,
 					'output' => array('screenid'),
+					'screenids' => $screenIds,
 					'editable' => true,
 					'preservekeys' => true
 				));
