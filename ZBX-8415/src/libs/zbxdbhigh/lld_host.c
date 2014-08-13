@@ -290,11 +290,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->hostid)
 		{
-			/* return an original host name and drop the correspond flag */
-			zbx_free(host->host);
-			host->host = host->host_orig;
-			host->host_orig = NULL;
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+			lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 		}
 		else
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -325,11 +322,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->hostid)
 		{
-			/* return an original visible host name and drop the correspond flag */
-			zbx_free(host->name);
-			host->name = host->name_orig;
-			host->name_orig = NULL;
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+			lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 		}
 		else
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -363,11 +357,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 			if (0 != host->hostid)
 			{
-				/* return an original host name and drop the correspond flag */
-				zbx_free(host->host);
-				host->host = host->host_orig;
-				host->host_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+				lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+						ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 			}
 			else
 				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -402,11 +393,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 			if (0 != host->hostid)
 			{
-				/* return an original visible host name and drop the correspond flag */
-				zbx_free(host->name);
-				host->name = host->name_orig;
-				host->name_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+				lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+						ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 			}
 			else
 				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -486,9 +474,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 					continue;
 
-				/* only new hosts or hosts with changed host name will be validated */
-				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST)) &&
-						0 == strcmp(host->host, row[0]))
+				if (0 == strcmp(host->host, row[0]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
 							" host with the same name \"%s\" already exists.\n",
@@ -496,19 +482,14 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 					if (0 != host->hostid)
 					{
-						/* return an original host name and drop the correspond flag */
-						zbx_free(host->host);
-						host->host = host->host_orig;
-						host->host_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+						lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+								ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 					}
 					else
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 				}
 
-				/* only new hosts or hosts with changed visible name will be validated */
-				if ((0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME)) &&
-						0 == strcmp(host->name, row[1]))
+				if (0 == strcmp(host->name, row[1]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
 							" host with the same visible name \"%s\" already exists.\n",
@@ -516,11 +497,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 					if (0 != host->hostid)
 					{
-						/* return an original visible host name and drop the correspond flag */
-						zbx_free(host->name);
-						host->name = host->name_orig;
-						host->name_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+						lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+								ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 					}
 					else
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -1042,11 +1020,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 		if (0 != group->groupid)
 		{
-			/* return an original group name and drop the correspond flag */
-			zbx_free(group->name);
-			group->name = group->name_orig;
-			group->name_orig = NULL;
-			group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+			lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+					ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 		}
 		else
 			group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1080,11 +1055,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 			if (0 != group->groupid)
 			{
-				/* return an original group name and drop the correspond flag */
-				zbx_free(group->name);
-				group->name = group->name_orig;
-				group->name_orig = NULL;
-				group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+				lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+						ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 			}
 			else
 				group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1135,10 +1107,6 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 					continue;
 
-				/* only new groups or groups with changed group name will be validated */
-				if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-					continue;
-
 				if (0 == strcmp(group->name, row[0]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s group:"
@@ -1147,11 +1115,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 					if (0 != group->groupid)
 					{
-						/* return an original group name and drop the correspond flag */
-						zbx_free(group->name);
-						group->name = group->name_orig;
-						group->name_orig = NULL;
-						group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+						lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+								ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 					}
 					else
 						group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
