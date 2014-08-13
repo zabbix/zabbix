@@ -524,6 +524,7 @@ foreach ($items as $key => $item){
 	);
 
 	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
+	$checkbox->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -710,6 +711,7 @@ foreach ($items as $item) {
 	);
 
 	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
+	$checkbox->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
