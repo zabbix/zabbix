@@ -705,7 +705,7 @@ else {
 	$screenFormList->addVar('halign', 0);
 }
 
-$verticalAlignRadioButton = array(
+$vAlignRadioButton = array(
 	new CRadioButton('valign', VALIGN_TOP, null, 'valign_'.VALIGN_TOP, $valign == VALIGN_TOP),
 	new CLabel(_('Top'), 'valign_'.VALIGN_TOP),
 	new CRadioButton('valign', VALIGN_MIDDLE, null, 'valign_'.VALIGN_MIDDLE, $valign == VALIGN_MIDDLE),
@@ -713,7 +713,7 @@ $verticalAlignRadioButton = array(
 	new CRadioButton('valign', VALIGN_BOTTOM, null, 'valign_'.VALIGN_BOTTOM, $valign == VALIGN_BOTTOM),
 	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
 );
-$screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton, 'jqueryinputset'));
+$screenFormList->addRow(_('Vertical align'), new CDiv($vAlignRadioButton, 'jqueryinputset'));
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
