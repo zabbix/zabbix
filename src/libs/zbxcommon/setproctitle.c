@@ -196,7 +196,7 @@ void	setproctitle_set_status(const char *status)
 	{
 		size_t	msg_size;
 
-		msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
+		msg_size = zbx_strlcpy(ps_buf, status, ps_buf_size);
 
 		if (prev_msg_size > msg_size)
 			memset(ps_buf + msg_size + 1, '\0', ps_buf_size - msg_size - 1);
@@ -223,7 +223,7 @@ void	setproctitle_set_status(const char *status)
 			ps_buf_size -= start_pos + 2;	/* space after "argv[copy_first]: " for status message */
 
 			memset(ps_buf, '\0', ps_buf_size);
-			prev_msg_size = MIN(zbx_strlcpy(ps_buf, status, ps_buf_size), ps_buf_size);
+			prev_msg_size = zbx_strlcpy(ps_buf, status, ps_buf_size);
 
 			initialized = 1;
 		}
