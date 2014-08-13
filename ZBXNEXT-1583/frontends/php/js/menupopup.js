@@ -43,7 +43,7 @@ function getMenuPopupFavouriteGraphs(options) {
 			t('Favourite simple graphs'),
 			options.simpleGraphs,
 			'itemid',
-			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
+			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1'
 				+ '&with_simple_graph_items=1&real_hosts=1'
 		);
 	}

@@ -170,7 +170,7 @@
 		var size = jQuery('#itemsTable tr.sortable').length;
 
 		for (var i = 0; i < size; i++) {
-			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
+			var nameLink = 'PopUp("popup.php?writeonly=1&numeric=1&dstfrm=graphForm'
 				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name'
 				+ (jQuery('#items_' + i + '_flags').val() == <?php echo ZBX_FLAG_DISCOVERY_PROTOTYPE; ?>
 					? '&srctbl=item_prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
