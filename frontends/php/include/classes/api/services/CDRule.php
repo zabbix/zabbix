@@ -564,23 +564,29 @@ class CDRule extends CApiService {
 	/**
 	 * Delete drules.
 	 *
-	 * @param array $druleIds
+	 * @param array $dRuleIds
 	 *
 	 * @return array
 	 */
-	public function delete(array $druleIds) {
-		$this->validateDelete($druleIds);
+	public function delete(array $dRuleIds) {
+		$this->validateDelete($dRuleIds);
 
 		$actionIds = array();
 		$conditionIds = array();
 
+		$dCheckIds = array();
+
+		$dbChecks = DBselect('SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $dRuleIds));
+
+		while ($dbCheck = DBfetch($dbChecks)) {
+			$dCheckIds[] = $dbCheck['dcheckid'];
+		}
+
 		$dbConditions = DBselect(
-			'SELECT c.conditionid, c.actionid'.
+			'SELECT c.conditionid,c.actionid'.
 			' FROM conditions c'.
-			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionInt('c.value', $druleIds).')'.
-				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND c.value IN'.
-					' (SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $druleIds).')'.
-				')'
+			' WHERE (c.conditiontype='.CONDITION_TYPE_DRULE.' AND '.dbConditionString('c.value', $dRuleIds).')'.
+				' OR (c.conditiontype='.CONDITION_TYPE_DCHECK.' AND '.dbConditionString('c.value', $dCheckIds).')'
 		);
 
 		while ($dbCondition = DBfetch($dbConditions)) {
@@ -591,7 +597,7 @@ class CDRule extends CApiService {
 		if ($actionIds) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => array_unique($actionIds)),
+				'where' => array('actionid' => array_unique($actionIds))
 			));
 		}
 
@@ -599,14 +605,14 @@ class CDRule extends CApiService {
 			DB::delete('conditions', array('conditionid' => $conditionIds));
 		}
 
-		$result = DB::delete('drules', array('druleid' => $druleIds));
+		$result = DB::delete('drules', array('druleid' => $dRuleIds));
 		if ($result) {
-			foreach ($druleIds as $druleId) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.']');
+			foreach ($dRuleIds as $dRuleId) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$dRuleId.']');
 			}
 		}
 
-		return array('druleids' => $druleIds);
+		return array('druleids' => $dRuleIds);
 	}
 
 	/**
