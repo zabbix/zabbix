@@ -76,6 +76,7 @@ zabbix_server_LDADD += @SERVER_LIBS@
 zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = \
+	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATADIR="\"@datadir@\"" \
 	-DLIBDIR="\"@libdir@\"" \

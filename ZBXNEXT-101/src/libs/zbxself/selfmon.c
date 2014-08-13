@@ -19,12 +19,13 @@
 
 #include "zbxself.h"
 #include "common.h"
-#if defined(ZABBIX_DAEMON)
+
+#ifndef _WINDOWS
 #	include "mutexs.h"
 #	include "ipc.h"
 #	include "log.h"
 
-#define MAX_HISTORY	60
+#	define MAX_HISTORY	60
 
 typedef struct
 {
@@ -46,8 +47,8 @@ zbx_selfmon_collector_t;
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
-#define	LOCK_SM		zbx_mutex_lock(&sm_lock)
-#define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
+#	define	LOCK_SM		zbx_mutex_lock(&sm_lock)
+#	define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
 static ZBX_MUTEX	sm_lock;
 #endif
@@ -237,7 +238,7 @@ int	get_process_type_by_name(const char *proc_type_str)
 	return FAIL;
 }
 
-#if defined(ZABBIX_DAEMON)
+#ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *
  * Function: init_selfmon_collector                                           *
