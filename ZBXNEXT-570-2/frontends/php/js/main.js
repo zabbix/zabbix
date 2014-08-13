@@ -336,6 +336,7 @@ var chkbxRange = {
 		if (!is_null(this.pageGoName)) {
 			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
 				var chkboxes = this.chkboxes[this.pageGoName];
+				var selectedCheckboxes = {};
 				for (var i = 0; i < chkboxes.length; i++) {
 					if (typeof(chkboxes[i]) !== 'undefined') {
 						var box = chkboxes[i];
@@ -354,9 +355,12 @@ var chkbxRange = {
 							}
 							if (objName == this.pageGoName) {
 								this.selectedIds[objId] = objId;
+								selectedCheckboxes[objId] = objId;
 							}
 						}
-						else {
+						// since there can be multiple checkboxes with the same ID,
+						// don't unselect an object if another its checkbox has been checked
+						else if (typeof selectedCheckboxes[objId] === 'undefined') {
 							if (!is_null(crow)) {
 								var origClass = crow.getAttribute('origClass');
 
