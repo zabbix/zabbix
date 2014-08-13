@@ -378,32 +378,38 @@ class CPageFilter {
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param int   $groupId
+	 * @param string   $groupId
 	 * @param array $options
-	 * @param int   $hostId
+	 * @param string   $hostId
 	 */
 	private function _initGroups($groupId, array $options, $hostId) {
-		$def_options = array(
-			'output' => array('groupid', 'name')
+		$defaultOptions = array(
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true,
+			'sortfield' => array('name')
 		);
-		$options = zbx_array_merge($def_options, $options);
-		$groups = API::HostGroup()->get($options);
-		order_result($groups, 'name');
-
-		$this->data['groups'] = array();
-		foreach ($groups as $group) {
-			$this->data['groups'][$group['groupid']] = $group;
-		}
+		$options = zbx_array_merge($defaultOptions, $options);
+		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
 		if (is_null($groupId) && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
+			$host = null;
+			$template = null;
 			if ($hostId) {
 				$host = API::Host()->get(array(
 					'output' => array('hostid'),
 					'hostids' => $hostId,
 					'groupids' => $this->_profileIds['groupid']
 				));
+				if (!$host) {
+					$template = API::Template()->get(array(
+						'output' => array('hostid'),
+						'templateids' => $hostId,
+						'groupids' => $this->_profileIds['groupid']
+					));
+				}
+
 			}
 			if (!$hostId || $host || $template) {
 				$groupId = $this->_profileIds['groupid'];
@@ -411,9 +417,9 @@ class CPageFilter {
 		}
 
 		// nonexisting or unset $groupid
-		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || is_null($groupId)) {
+		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || $groupId === null) {
 			// for popup select first group in the list
-			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
+			if ($this->config['popupDD'] && $this->data['groups']) {
 				reset($this->data['groups']);
 				$groupId = key($this->data['groups']);
 			}
