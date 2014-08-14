@@ -66,7 +66,7 @@ int		get_process_type_func(char *proc_type_str);
 int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
 
-#if defined(ZABBIX_DAEMON)
+#ifndef _WINDOWS
 void		init_selfmon_collector(void);
 void		free_selfmon_collector(void);
 void		update_selfmon_counter(unsigned char state);
