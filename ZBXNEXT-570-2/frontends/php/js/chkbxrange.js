@@ -25,8 +25,8 @@ var chkbxRange = {
 	startbox:		null,	// start checkbox obj
 	chkboxes:		{},		// ckbx list
 	prefix:			null,	// prefix for cookie name
-	pageGoName:		null,	// which checkboxes should be counted by Go button
-	selectedIds:	{},		// ids of selected checkboxes
+	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
+	selectedIds:	{},		// ids of selected objects
 	goButton:		null,
 	cookieName:		null,
 
@@ -66,6 +66,11 @@ var chkbxRange = {
 	},
 
 	implement: function(obj) {
+		// skip the "select all" checkbox
+		if (obj.name.indexOf('all_') > -1) {
+			return;
+		}
+
 		var objName = this.getObjectFromName(obj.name);
 
 		if (typeof(this.chkboxes[objName]) === 'undefined') {
@@ -93,10 +98,6 @@ var chkbxRange = {
 		var checkbox = Event.element(e);
 
 		PageRefresh.restart();
-
-		if (checkbox.name.indexOf('all_') > -1) {
-			return;
-		}
 
 		var object = this.getObjectFromName(checkbox.name);
 		var objectId = this.getObjectIdFromName(checkbox.name);
