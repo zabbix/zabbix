@@ -305,7 +305,7 @@ var chkbxRange = {
 			return false;
 		}
 
-		var form = this.goButton.closest('form');
+		var form = jQuery('#goButton').closest('form');
 		for (var key in this.selectedIds) {
 			if (!empty(this.selectedIds[key])) {
 				create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
