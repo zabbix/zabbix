@@ -951,6 +951,11 @@ define('COPY_TYPE_TO_HOST', 0);
 define('COPY_TYPE_TO_TEMPLATE', 2);
 define('COPY_TYPE_TO_HOST_GROUP', 1);
 
+define('HISTORY_GRAPH', 'showgraph');
+define('HISTORY_BATCH_GRAPH', 'batchgraph');
+define('HISTORY_VALUES', 'showvalues');
+define('HISTORY_LATEST', 'showlatest');
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 

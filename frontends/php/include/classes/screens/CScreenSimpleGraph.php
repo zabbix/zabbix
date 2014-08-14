@@ -51,7 +51,7 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
-			$this->action = 'history.php?action=showgraph&itemids[]='.$resourceid.'&period='.$this->timeline['period'].
+			$this->action = 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$resourceid.'&period='.$this->timeline['period'].
 					'&stime='.$this->timeline['stimeNow'].$this->getProfileUrlParams();
 		}
 
@@ -87,7 +87,7 @@ class CScreenSimpleGraph extends CScreenBase {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'history.php?action=showgraph&itemids[]='.$resourceid.'&period='.$this->timeline['period'].
+				$item = new CLink(null, 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$resourceid.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow']);
 			}
 			$item->setAttribute('id', $containerid);
