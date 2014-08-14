@@ -107,10 +107,10 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * Return graph prototype ID of either graph prototype selected in in configuration, or, if dynamic mode is enabled,
+	 * Return graph prototype ID of either graph prototype selected in configuration, or, if dynamic mode is enabled,
 	 * try to find graph prototype with same name in selected host.
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	protected function getGraphPrototypeId() {
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
