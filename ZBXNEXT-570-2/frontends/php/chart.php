@@ -38,12 +38,12 @@ $fields = array(
 	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
-	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
+	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'batch' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 );
 check_fields($fields);
 
 $itemIds = getRequest('itemids');
-$multipleItems = (count($itemIds) > 1);
 
 /*
  * Permissions
@@ -73,7 +73,7 @@ $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 
 // change how the graph will be displayed if more than one item is selected
-if ($multipleItems) {
+if (getRequest('batch')) {
 	// set a default header
 	$graph->setHeader(_('Item values'));
 
@@ -95,7 +95,7 @@ if (isset($_REQUEST['border'])) {
 }
 
 foreach ($itemIds as $itemId) {
-	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, ($multipleItems) ? CALC_FNC_AVG : CALC_FNC_ALL,
+	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
 		rgb2hex(get_next_color(1))
 	);
 }
