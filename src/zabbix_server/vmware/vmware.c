@@ -2849,6 +2849,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	}
 #undef STAT_INTERVAL
 #endif
+	return SUCCEED;
 }
 
 /******************************************************************************
