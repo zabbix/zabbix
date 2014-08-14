@@ -606,6 +606,9 @@ int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, i
 	const char	*__function_name = "zbx_execute_silent";
 
 	int		ret = FAIL;
+#ifdef _WINDOWS
+	zabbix_log(LOG_LEVEL_WARNING, "%s() implementation is missing for Windows!", __function_name);
+#else
 	pid_t		pid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -650,7 +653,7 @@ int	zbx_execute_silent(const char *command, char *error, size_t max_error_len, i
 		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
