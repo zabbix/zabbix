@@ -106,7 +106,7 @@
 
 	/**
 	 * Validate IP mask. IP/bits.
-	 * bits range for IPv4: 16 - 32
+	 * bits range for IPv4: 16 - 30
 	 * bits range for IPv6: 112 - 128
 	 *
 	 * @param string $ip_range
@@ -123,7 +123,7 @@
 		$bits = $parts[1];
 
 		if (validate_ipv4($ip, $arr)) {
-			return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
+			return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 30;
 		}
 		elseif (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
 			return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
