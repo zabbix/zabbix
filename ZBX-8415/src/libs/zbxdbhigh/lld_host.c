@@ -61,7 +61,7 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		0x40	/* interfaces which should be deleted */
-	unsigned char	flags;
+	zbx_uint64_t	flags;
 }
 zbx_lld_interface_t;
 
@@ -101,7 +101,7 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_PROXY | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER |	\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS)
-	unsigned char		flags;
+	zbx_uint64_t		flags;
 	char			inventory_mode;
 }
 zbx_lld_host_t;
@@ -149,7 +149,7 @@ typedef struct
 #define ZBX_FLAG_LLD_GROUP_DISCOVERED		0x01	/* groups which should be updated or added */
 #define ZBX_FLAG_LLD_GROUP_UPDATE_NAME		0x02	/* groups.name field should be updated */
 #define ZBX_FLAG_LLD_GROUP_UPDATE		ZBX_FLAG_LLD_GROUP_UPDATE_NAME
-	unsigned char		flags;
+	zbx_uint64_t		flags;
 }
 zbx_lld_group_t;
 
