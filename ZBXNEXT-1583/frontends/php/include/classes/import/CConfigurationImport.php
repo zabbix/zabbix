@@ -212,8 +212,6 @@ class CConfigurationImport {
 		$macrosRefs = array();
 		$proxyRefs = array();
 		$hostPrototypesRefs = array();
-		$graphPrototypesRefs = array();
-		$itemPrototypesRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -448,21 +446,13 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$hostsRefs[$resource['host']] = $resource['host'];
 							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							$graphPrototypesRefs[$resource['host']][$resource['name']] = $resource['name'];
-							break;
-
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							$itemPrototypesRefs[$resource['host']][$resource['key']] = $resource['key'];
-							break;
-
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$hostsRefs[$resource['host']] = $resource['host'];
 							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
@@ -490,21 +480,13 @@ class CConfigurationImport {
 
 						switch ($screenItem['resourcetype']) {
 							case SCREEN_RESOURCE_GRAPH:
+							case SCREEN_RESOURCE_LLD_GRAPH:
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
 
-							case SCREEN_RESOURCE_LLD_GRAPH:
-								$hostsRefs[$resource['host']] = $resource['host'];
-								$graphPrototypesRefs[$resource['host']][$resource['name']] = $resource['name'];
-								break;
-
-							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-								$hostsRefs[$resource['host']] = $resource['host'];
-								$itemPrototypesRefs[$resource['host']][$resource['key']] = $resource['key'];
-								break;
-
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
@@ -530,8 +512,6 @@ class CConfigurationImport {
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
 		$this->referencer->addHostPrototypes($hostPrototypesRefs);
-		$this->referencer->addGraphPrototypes($graphPrototypesRefs);
-		$this->referencer->addItemPrototypes($itemPrototypesRefs);
 	}
 
 	/**
@@ -1121,6 +1101,7 @@ class CConfigurationImport {
 		}
 		if ($graphsToCreate) {
 			API::GraphPrototype()->create($graphsToCreate);
+			$this->referencer->refreshGraphs();
 		}
 		if ($graphsToUpdate) {
 			API::GraphPrototype()->update($graphsToUpdate);
