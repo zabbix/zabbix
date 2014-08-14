@@ -852,13 +852,9 @@ class CConfigurationExport {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
@@ -874,7 +870,6 @@ class CConfigurationExport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							// fall through
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
@@ -905,13 +900,9 @@ class CConfigurationExport {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];
 							break;
@@ -927,7 +918,6 @@ class CConfigurationExport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							// fall through
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
 							break;
