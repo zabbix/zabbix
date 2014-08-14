@@ -560,7 +560,6 @@ if ($srctbl == 'usrgrp') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($userGroups, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "usrgrps";');
 
 	$form->addItem($table);
 	$form->show();
@@ -628,7 +627,6 @@ elseif ($srctbl == 'users') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($users, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "users";');
 
 	$form->addItem($table);
 	$form->show();
@@ -643,8 +641,8 @@ elseif ($srctbl == 'templates') {
 	$form->setAttribute('id', 'templates');
 
 	$table = new CTableInfo(_('No templates found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('allTemplates', null,
-		"javascript: checkAll('".$form->getName()."', 'allTemplates', 'templates');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_templates', null,
+		"javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');") : null), _('Name')
 	));
 
 	$options = array(
@@ -671,7 +669,7 @@ elseif ($srctbl == 'templates') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('templates['.zbx_jsValue('templateid').']', null, null, $template['templateid']);
+			$checkBox = new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']);
 		}
 
 		// check for existing
@@ -703,7 +701,6 @@ elseif ($srctbl == 'templates') {
 	}
 
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
-	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
 	$form->addItem($table);
 	$form->show();
@@ -718,8 +715,8 @@ elseif ($srctbl == 'hosts') {
 	$form->setAttribute('id', 'hosts');
 
 	$table = new CTableInfo(_('No hosts found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('allHosts', null,
-		"javascript: checkAll('".$form->getName()."', 'allHosts', 'hosts');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
+		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
 	));
 
 	$options = array(
@@ -746,7 +743,7 @@ elseif ($srctbl == 'hosts') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hosts['.zbx_jsValue('hostid').']', null, null, $host['hostid']);
+			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']);
 		}
 
 		// check for existing
@@ -778,7 +775,6 @@ elseif ($srctbl == 'hosts') {
 	}
 
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
-	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 	$form->addItem($table);
 	$form->show();
@@ -793,8 +789,8 @@ elseif ($srctbl == 'host_templates') {
 	$form->setAttribute('id', 'hosts');
 
 	$table = new CTableInfo(_('No hosts found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('allHosts', null,
-		"javascript: checkAll('".$form->getName()."', 'allHosts', 'hosts');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
+		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
 	));
 
 	$options = array(
@@ -822,7 +818,7 @@ elseif ($srctbl == 'host_templates') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hosts['.zbx_jsValue('hostid').']', null, null, $host['hostid']);
+			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']);
 		}
 
 		// check for existing
@@ -854,7 +850,6 @@ elseif ($srctbl == 'host_templates') {
 	}
 
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
-	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 	$form->addItem($table);
 	$form->show();
@@ -869,8 +864,8 @@ elseif ($srctbl == 'host_groups') {
 	$form->setAttribute('id', 'hostGroups');
 
 	$table = new CTableInfo(_('No host groups found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('allHostGroups', null,
-		"javascript: checkAll('".$form->getName()."', 'allHostGroups', 'hostGroups');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_hostgroups', null,
+		"javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');") : null), _('Name')
 	));
 
 	$options = array(
@@ -893,7 +888,7 @@ elseif ($srctbl == 'host_groups') {
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hostGroups['.zbx_jsValue('groupid').']', null, null, $hostgroup['groupid']);
+			$checkBox = new CCheckBox('hostGroups['.$hostgroup['groupid'].']', null, null, $hostgroup['groupid']);
 		}
 
 		// check for existing
@@ -925,7 +920,6 @@ elseif ($srctbl == 'host_groups') {
 	}
 
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
-	zbx_add_post_js('chkbxRange.pageGoName = "hostGroups";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1058,7 +1052,6 @@ elseif ($srctbl == 'triggers') {
 
 		insert_js('var popupReference = '.zbx_jsValue($jsTriggers, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1169,7 +1162,6 @@ elseif ($srctbl == 'items') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($jsItems, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "items";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1266,8 +1258,6 @@ elseif ($srctbl == 'prototypes') {
 	}
 	unset($items);
 
-	zbx_add_post_js('chkbxRange.pageGoName = "items";');
-
 	$form->addItem($table);
 	$form->show();
 }
@@ -1281,8 +1271,8 @@ elseif ($srctbl == 'applications') {
 	$form->setAttribute('id', 'applications');
 
 	$table = new CTableInfo(_('No applications found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('allApplications', null,
-		"javascript: checkAll('".$form->getName()."', 'allApplications', 'applications');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_applications', null,
+		"javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');") : null), _('Name')
 	));
 
 	$options = array(
@@ -1337,7 +1327,6 @@ elseif ($srctbl == 'applications') {
 	}
 
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
-	zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1438,7 +1427,6 @@ elseif ($srctbl == 'graphs') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($graphs, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "graphs";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1506,7 +1494,6 @@ elseif ($srctbl == 'sysmaps') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($sysmaps, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "sysmaps";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1569,7 +1556,6 @@ elseif ($srctbl == 'slides') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($slideshows, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "slides";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1630,7 +1616,6 @@ elseif ($srctbl == 'screens') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($screens, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 	$form->addItem($table);
 	$form->show();
@@ -1816,7 +1801,6 @@ elseif ($srctbl == 'scripts') {
 		$table->setFooter(new CCol($button, 'right'));
 		insert_js('var popupReference = '.zbx_jsvalue($scripts, true).';');
 	}
-	zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
 	$form->addItem($table);
 	$form->show();
