@@ -22,7 +22,7 @@
 #include "perfmon.h"
 #include "log.h"
 
-static PERF_COUNTER_ID	*PerfCounterList = NULL;
+ZBX_THREAD_LOCAL static PERF_COUNTER_ID	*PerfCounterList = NULL;
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
 {
