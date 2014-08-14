@@ -6,6 +6,7 @@ New features:
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8455] improved synchronization between perfromance collector and agent threads (wiper)
 ...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
 ...G...PS. [ZBX-8601] fixed bad performance of the proxy configuration synchronization (Sasha)
 .......PS. [ZBX-8600] fixed SQL errors in proxy configuration synchronization (Sasha)
