@@ -604,11 +604,13 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * @param integer $screenId
+	 * Creates a string for screen table ID attribute.
+	 *
+	 * @param string $screenId
 	 *
 	 * @return string
 	 */
 	protected static function makeScreenTableId($screenId) {
-		return 'screentable_' . $screenId;
+		return 'screentable_'.$screenId;
 	}
 }
