@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[2.2.5rc1])
+AC_INIT([Zabbix],[2.2.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -51,7 +51,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
   mtent.h fcntl.h sys/param.h arpa/inet.h \
-  sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
+  sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
   sys/socket.h sys/loadavg.h arpa/inet.h \
   sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
@@ -344,6 +344,25 @@ AC_TRY_COMPILE(
 	statvfs64("/", &s);
 ],
 AC_DEFINE(HAVE_SYS_STATVFS64, 1, [Define to 1 if struct 'statvfs64' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for struct statfs64 in sys/statfs.h)
+AC_TRY_COMPILE(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STATFS_H
+#	include <sys/statfs.h>
+#endif
+],
+[
+	struct statfs64	s;
+	s.f_bsize = s.f_blocks = s.f_bfree = s.f_bavail = 0;
+	statfs64("/", &s);
+],
+AC_DEFINE(HAVE_SYS_STATFS64, 1, [Define to 1 if struct 'statfs64' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 

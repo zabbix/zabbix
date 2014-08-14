@@ -523,16 +523,11 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 
-	if ($pageFilter->groupsSelected) {
-		if ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		else {
-			$options['groupids'] = array_keys($pageFilter->groups);
-		}
+	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
+		$options['groupids'] = $pageFilter->groupid;
 	}
 	else {
-		$options['groupids'] = array();
+		$options['groupids'] = $config['dropdown_first_entry'] ? null : array();
 	}
 
 	$data['maintenances'] = API::Maintenance()->get($options);

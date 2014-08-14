@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-30 02:42+0300\n"
+"POT-Creation-Date: 2014-07-24 21:56+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -3470,8 +3470,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAILS VAN SCENARIO"
 
-#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
-#: include/maps.inc.php:935
+#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
+#: include/maps.inc.php:946
 msgid "DISABLED"
 msgstr "UITGESCHAKELD"
 
@@ -6706,7 +6706,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen.Als u denkt dat dit bericht foutis, neem dan contact op met uw beheerders over het verkrijgen van de nodige toestemmingen."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:957
+#: include/maps.inc.php:968
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -8139,7 +8139,7 @@ msgstr "LDAP login succesvol"
 msgid "LDAP login was not successful"
 msgstr "LDAP login was niet succesvol"
 
-#: include/classes/screens/CScreenClock.php:70
+#: include/classes/screens/CScreenClock.php:81
 msgid "LOCAL"
 msgstr "LOCAL"
 
@@ -8543,7 +8543,7 @@ msgstr "MAC adres A"
 msgid "MAC address B"
 msgstr "MAC adres B"
 
-#: include/maps.inc.php:749
+#: include/maps.inc.php:760
 msgid "MAINTENANCE"
 msgstr "ONDERHOUD"
 
@@ -8616,7 +8616,7 @@ msgstr "Macros"
 msgid "Macros updated"
 msgstr "Macros zijn bijgewerkt"
 
-#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
+#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9250,7 +9250,7 @@ msgstr "NETWERK MAPPEN"
 msgid "NNTP"
 msgstr ""
 
-#: include/classes/screens/CScreenClock.php:59
+#: include/classes/screens/CScreenClock.php:70
 msgid "NO DATA"
 msgstr ""
 
@@ -10452,8 +10452,8 @@ msgstr ""
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
-#: include/maps.inc.php:945 include/setup.inc.php:198
+#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
+#: include/maps.inc.php:956 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10968,7 +10968,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr ""
@@ -11309,7 +11309,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr ""
@@ -11335,8 +11335,8 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
-#: include/maps.inc.php:889 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
+#: include/maps.inc.php:900 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemen"
 
@@ -11950,7 +11950,7 @@ msgstr ""
 msgid "SEARCH"
 msgstr ""
 
-#: include/classes/screens/CScreenClock.php:64
+#: include/classes/screens/CScreenClock.php:75
 msgid "SERVER"
 msgstr ""
 
@@ -14133,7 +14133,7 @@ msgstr "Kan de configuratie niet selecteren."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
 msgid "Unacknowledged"
 msgstr "Niet bevestigd"
 
