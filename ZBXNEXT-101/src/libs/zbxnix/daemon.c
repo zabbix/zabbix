@@ -37,6 +37,7 @@ extern int	threads_num;
 
 extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
 
+extern void	zbx_sigusr_handler(zbx_task_t task);
 
 /******************************************************************************
  *                                                                            *
@@ -74,11 +75,7 @@ static void	common_worker_sigusr_handler(zbx_task_t task)
 			}
 			break;
 		default:
-			{
-				extern void	zbx_sigusr_handler(zbx_task_t task);
-
-				zbx_sigusr_handler(task);
-			}
+			zbx_sigusr_handler(task);
 			break;
 	}
 }
