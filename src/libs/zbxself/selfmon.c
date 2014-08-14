@@ -235,7 +235,7 @@ int	get_process_type_by_name(const char *proc_type_str)
 			return i;
 	}
 
-	return FAIL;
+	return ZBX_PROCESS_TYPE_UNKNOWN;
 }
 
 #ifndef _WINDOWS
