@@ -25,7 +25,8 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "zbxself.h"
-#if defined(ZABBIX_DAEMON)
+
+#ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
 #endif
 
@@ -236,9 +237,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				opt = zbx_strdup(opt, zbx_optarg);
 
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
+				{
 					t->task = ZBX_TASK_LOG_LEVEL_INCREASE;
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE, strlen(ZBX_LOG_LEVEL_DECREASE)))
+				}
+				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
+						strlen(ZBX_LOG_LEVEL_DECREASE)))
+				{
 					t->task = ZBX_TASK_LOG_LEVEL_DECREASE;
+				}
 				else
 				{
 					zbx_error("invalid runtime control option: %s", zbx_optarg);
@@ -829,7 +835,7 @@ void	zbx_on_exit(void)
 	exit(SUCCEED);
 }
 
-#if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
+#if defined(HAVE_SIGQUEUE)
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 }
@@ -868,7 +874,7 @@ int	main(int argc, char **argv)
 			usage();
 			exit(EXIT_FAILURE);
 			break;
-#if defined(ZABBIX_DAEMON)
+#ifndef _WINDOWS
 		case ZBX_TASK_LOG_LEVEL_INCREASE:
 			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
 			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task);
@@ -879,8 +885,7 @@ int	main(int argc, char **argv)
 			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task);
 			zbx_free(opt);
 			break;
-#endif
-#ifdef _WINDOWS
+#else
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
@@ -943,7 +948,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}
-#if defined(ZABBIX_DAEMON)
+#ifndef _WINDOWS
 	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&t.task)[0])
 	{
 		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
