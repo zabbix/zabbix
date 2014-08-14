@@ -968,6 +968,7 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 #ifdef _WINDOWS
+const OSVERSIONINFOEX	*zbx_win_getversion();
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
@@ -1006,7 +1007,7 @@ typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char
 		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
 
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
-int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, const char *encoding,
 		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key);

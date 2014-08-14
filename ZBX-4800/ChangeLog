@@ -1,12 +1,54 @@
+Changes for 2.0.13rc1
+
+New features:
+A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
+..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
+........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
+...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
+.......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
+.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
+...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12
+
+2.0.12rc3 was released as 2.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc3
+
+Bug fixes:
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc2
+
+Bug fixes:
+...G...... [ZBX-7856] fixed zbx_stat() not working with directories in Windows (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.12rc1
 
 New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-4675] added error checks to avoid partial configuration loading (dimir)
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
@@ -382,6 +424,7 @@ Changes for 2.0.4rc1
 
 New features:
 A.F....... [ZBX-1357] added initial Portuguese (Portugal) translation (Richlv)
+..F....... [ZBXNEXT-1398] changed vertical labels in Monitoring -> Overview from PNG images to text (Eduard)
 ..F....... [ZBXNEXT-1398] implemented flickerfree screen shadowing for old screen data (Eduard)
 A.F....... [ZBX-1357] added initial Indonesian translation (Richlv)
 ..F....... [ZBXNEXT-1393] fixed global scripts font (Eduard)
@@ -986,7 +1029,7 @@ A......... [ZBX-4784] fixed inherited triggers being updated on any host update 
 A.F....... [ZBX-4790] fixed *ERROR*s in trigger expressions in items.php; fixed undefined variables when filtering without host (Toms)
 ..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)
 A.F....... [ZBX-3991] forbid passive proxy interfaces with ip 0.0.0.0 (Vedmak)
-..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
+..F....... [ZBX-3152] fixed global messages being shown even if all severities are unchecked (Vedmak)
 ....I..... [ZBXNEXT-397] removed records from "ids" table to prevent SQL errors while adding a new item (Sasha)
 ..F....... [ZBX-4811] added 'filter' and 'lifetime' fields to discovery rules export (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
@@ -1524,6 +1567,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20

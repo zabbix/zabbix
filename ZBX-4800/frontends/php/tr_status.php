@@ -376,7 +376,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			),
 			'nopermissions' => true
 		);
-		// get all unacknowledged events, if trigger has unacknowledged even => it has events
+		// get all unacknowledged events, if trigger has unacknowledged event => it has events
 		$event_counts = API::Event()->get($options);
 		foreach ($event_counts as $event_count) {
 			$triggers[$event_count['objectid']]['hasEvents'] = true;

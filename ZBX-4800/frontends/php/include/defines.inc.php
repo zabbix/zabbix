@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.12rc1');
-define('ZABBIX_API_VERSION',	'2.0.12');
+define('ZABBIX_VERSION',		'2.0.13rc1');
+define('ZABBIX_API_VERSION',	'2.0.13');
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO', '2014');
@@ -834,6 +834,14 @@ define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
 define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
+
+// XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);

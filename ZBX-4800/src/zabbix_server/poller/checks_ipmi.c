@@ -366,12 +366,20 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		goto out;
 	}
 
+	if (0 == ipmi_is_sensor_scanning_enabled(states) || 0 != ipmi_is_initial_update_in_progress(states))
+	{
+		h->err = zbx_strdup(h->err, "sensor data is not available");
+		h->ret = NOTSUPPORTED;
+		h->done = 1;
+		goto out;
+	}
+
 	s = get_ipmi_sensor(h, sensor);
 
 	if (NULL == s)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_dsprintf(h->err, "fatal error");
+		h->err = zbx_strdup(h->err, "fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		goto out;
@@ -381,7 +389,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	{
 		case IPMI_NO_VALUES_PRESENT:
 		case IPMI_RAW_VALUE_PRESENT:
-			h->err = zbx_dsprintf(h->err, "no value present for threshold sensor");
+			h->err = zbx_strdup(h->err, "no value present for threshold sensor");
 			h->ret = NOTSUPPORTED;
 			break;
 		case IPMI_BOTH_VALUES_PRESENT:
@@ -447,7 +455,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			}
 			break;
 		default:
-			h->err = zbx_dsprintf(h->err, "discrete sensor is not supported");
+			h->err = zbx_strdup(h->err, "discrete sensor is not supported");
 			h->ret = NOTSUPPORTED;
 			goto out;
 	}
@@ -488,7 +496,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 	if (NULL == c)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_dsprintf(h->err, "fatal error");
+		h->err = zbx_strdup(h->err, "fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		goto out;
@@ -497,7 +505,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 	if (c->num_values == 0)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_dsprintf(h->err, "no value present for control");
+		h->err = zbx_strdup(h->err, "no value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		goto out;
@@ -543,7 +551,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 	if (NULL == c)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_dsprintf(h->err, "fatal error");
+		h->err = zbx_strdup(h->err, "fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		return;
@@ -566,7 +574,7 @@ static void	read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 
 	if (0 == ipmi_control_is_readable(c->control))
 	{
-		h->err = zbx_dsprintf(h->err, "control is not readable");
+		h->err = zbx_strdup(h->err, "control is not readable");
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -603,7 +611,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 	if (c->num_values == 0)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		h->err = zbx_dsprintf(h->err, "no value present for control");
+		h->err = zbx_strdup(h->err, "no value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		goto out;
@@ -611,7 +619,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 
 	if (0 == ipmi_control_is_settable(c->control))
 	{
-		h->err = zbx_dsprintf(h->err, "control is not settable");
+		h->err = zbx_strdup(h->err, "control is not settable");
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2014-03-24 16:00+0300\n"
-"Last-Translator: Heilig <oleg.ivanivskyi@zabbix>\n"
+"POT-Creation-Date: 2014-06-30 02:40+0300\n"
+"PO-Revision-Date: 2014-06-08 10:44+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 1 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 2 : 3);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395669612.0\n"
+"X-POOTLE-MTIME: 1402217042.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1172,7 +1172,7 @@ msgstr "Не вдалося додати вузел мережі"
 msgid "Cannot add image"
 msgstr "Не вдалося додати картинку"
 
-#: include/classes/import/CXmlImport18.php:632
+#: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
 msgstr "Не вдалось додати картинку."
 
@@ -1264,7 +1264,7 @@ msgstr "Не вдалося додати перетворення значенн
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Не вдалося змінити аутентифікацію"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1344,7 +1344,7 @@ msgstr "Не вдалося створити призначення іконок
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не вдалося створити призначення іконок з ідентичним ім'ям \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:816
+#: include/classes/import/CXmlImport18.php:817
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не вдалося створити карту мережі \"%s\"."
@@ -1353,7 +1353,7 @@ msgstr "Не вдалося створити карту мережі \"%s\"."
 msgid "Cannot create new element"
 msgstr "Не вдалося створити новий елемент"
 
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1710
 msgid "Cannot create screen."
 msgstr "Не вдалось додати комплексний екран."
 
@@ -1570,38 +1570,38 @@ msgstr "Не вдалося дезактивувати метод повідом
 msgid "Cannot enable media type"
 msgstr "Не вдалося активувати метод повідомлень"
 
-#: include/classes/import/CXmlImport18.php:676
+#: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти фонове зображення \"%1$s\" використовуване в карті мережі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:506
-#: include/classes/import/CXmlImport18.php:1666
+#: include/classes/import/CXmlImport18.php:507
+#: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти графік \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:723
+#: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалося знайти групу \"%1$s\" використовувану в карті мережі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:483
+#: include/classes/import/CXmlImport18.php:484
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти групу \"%1$s\" використовувану в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:734
+#: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалося знайти вузел мережі \"%1$s\" використовуваний в карті мережі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:495
+#: include/classes/import/CXmlImport18.php:496
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1620,7 +1620,7 @@ msgstr "Не вдалося знайти інтерфейс вузла мере�
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Не вдалося знайти вузел мережі чи шаблон \"%1$s\" використовуваний на графіку \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:767
+#: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1631,14 +1631,14 @@ msgstr "Не вдалось знайти іконку \"%1$s\" використ�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти призначення іконок \"%1$s\" використовуване в карті мережі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:519
-#: include/classes/import/CXmlImport18.php:1679
+#: include/classes/import/CXmlImport18.php:520
+#: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти елемент даних \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:712
+#: include/classes/import/CXmlImport18.php:713
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не вдалося знайти карту мережі \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
@@ -1648,7 +1648,7 @@ msgstr "Не вдалося знайти карту мережі \"%1$s\" вик
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти карту мережі \"%1$s\" використовувану в карті мережі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:530
+#: include/classes/import/CXmlImport18.php:531
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -1658,14 +1658,14 @@ msgstr "Не вдалося знайти карту мережі \"%1$s\" вик
 msgid "Cannot find objects with name"
 msgstr "Не вдалося знайти об'єкти з іменем"
 
-#: include/classes/import/CXmlImport18.php:541
+#: include/classes/import/CXmlImport18.php:542
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти комплексний екран \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:745
-#: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/CXmlImport18.php:746
+#: include/classes/import/CXmlImport18.php:789
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, php-format
@@ -1724,7 +1724,7 @@ msgstr "Не вдалося приєднати шаблон"
 
 #: api/classes/CUser.php:985
 msgid "Cannot login."
-msgstr ""
+msgstr "Не вдалося увійти в систему."
 
 #: api/classes/CUser.php:910
 msgid "Cannot logout."
@@ -1945,7 +1945,7 @@ msgstr "Не вдалося оновити призначення іконок"
 msgid "Cannot update image"
 msgstr "Не вдалося оновити картинку"
 
-#: include/classes/import/CXmlImport18.php:639
+#: include/classes/import/CXmlImport18.php:640
 msgid "Cannot update image."
 msgstr "Не вдалось оновити фонове зображення."
 
@@ -1969,7 +1969,7 @@ msgstr "Не вдалося оновити макроси"
 msgid "Cannot update maintenance"
 msgstr "Не вдалося оновити період сервісу"
 
-#: include/classes/import/CXmlImport18.php:807
+#: include/classes/import/CXmlImport18.php:808
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не вдалося оновити карту мережі \"%s\"."
@@ -2002,7 +2002,7 @@ msgstr "Не вдалося оновити сценарій"
 msgid "Cannot update screen"
 msgstr "Не вдалося оновити комплексний екран"
 
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1702
 msgid "Cannot update screen."
 msgstr "Не вдалось оновити комплексний екран."
 
@@ -4809,8 +4809,8 @@ msgstr "Графік \"%1$s\" не може бути успадковано. Н�
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Графік \"%1$s\" не існує в шаблоні \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1558
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1563
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Графік \"%1$s\" пропущено - правило користувача."
@@ -4843,7 +4843,7 @@ msgstr "Назва графіку"
 #: api/classes/CGraphPrototype.php:881
 #, php-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип графіка \"%1$s\" містить прототипи елементів даних із декількох правил виявлення."
 
 #: api/classes/CGraphPrototype.php:887
 #, php-format
@@ -5213,7 +5213,7 @@ msgstr "Вузел мережі \"%1$s\" під спостереженням ч�
 msgid "Host \"%s\" already exists."
 msgstr "Вузел мережі \"%s\" вже існує."
 
-#: include/classes/import/CXmlImport18.php:927
+#: include/classes/import/CXmlImport18.php:928
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "У вузла мережі \"%s\" вибрано параметр \"useipmi\", але не вказано параметр \"ipmi_ip\"! Буде використано IP адреса вузла мережі, як адреса для IPMI інтерфейсу."
@@ -6370,12 +6370,12 @@ msgstr "Значення \"%s\" є некоректним для setMessage()."
 msgid "Incorrect working time."
 msgstr "Некоректний робочий час."
 
-#: include/classes/import/CXmlImport18.php:1590
+#: include/classes/import/CXmlImport18.php:1591
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Некоректний елемент даних для Y макс. у графіка \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1578
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Некоректний елемент даних для Y мін. у графіка \"%1$s\"."
@@ -6584,7 +6584,7 @@ msgstr "Елемент даних \"%1$s\" не може заповнювати 
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Елемент даних \"%1$s\" не існує в шаблоні \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1525
+#: include/classes/import/CXmlImport18.php:1526
 #, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" не існує."
@@ -6594,8 +6594,8 @@ msgstr "Елемент даних \"%1$s\" не існує."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" в \"%2$s\": група елементів даних \"%3$s\" не існує."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1274
+#: include/classes/import/CXmlImport18.php:1278
 #, php-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент даних \"%1$s\" пропущено - правило користувача."
@@ -6873,7 +6873,7 @@ msgstr "LDAP аутентифікація"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP аутентифікацію змінено"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7218,7 +7218,7 @@ msgstr "Ім'я користувача \"%1$s\" не співпадає з ім�
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Некоректне ім'я користувача або пароль!"
 
 #: api/classes/CUser.php:875 api/classes/CUser.php:893
 #: api/classes/CUser.php:940
@@ -7411,7 +7411,7 @@ msgstr "Примусовий вихід"
 msgid "Map"
 msgstr "Карта мережі"
 
-#: include/classes/import/CXmlImport18.php:667
+#: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Карту мережі \"%1$s\" пропущено - правило користувача."
@@ -7421,12 +7421,12 @@ msgstr "Карту мережі \"%1$s\" пропущено - правило к�
 msgid "Map \"%s\""
 msgstr "Карта мережі \"%s\""
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, php-format
 msgid "Map \"%s\" created."
 msgstr "Карту мережі \"%s\" створено."
 
-#: include/classes/import/CXmlImport18.php:810
+#: include/classes/import/CXmlImport18.php:811
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr "Карту мережі \"%s\" оновлено."
@@ -7770,8 +7770,8 @@ msgstr "Відсутнє поле \"itemid\" для елемента даних.
 msgid "Missing \"name\" field for graph."
 msgstr "Відсутнє поле \"name\" для графіку."
 
-#: include/classes/import/CXmlImport18.php:1581
-#: include/classes/import/CXmlImport18.php:1594
+#: include/classes/import/CXmlImport18.php:1582
+#: include/classes/import/CXmlImport18.php:1595
 #, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Відсутній елемент даних \"%1$s\" для вузла мережі \"%2$s\"."
@@ -8059,12 +8059,12 @@ msgstr "Наступна перевірка"
 msgid "No"
 msgstr "Ні"
 
-#: include/classes/import/CXmlImport18.php:1571
+#: include/classes/import/CXmlImport18.php:1572
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Немає поля \"ymax_type\" для графіка \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1567
+#: include/classes/import/CXmlImport18.php:1568
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Немає поля \"ymin_type\" для графіка \"%s\"."
@@ -8409,27 +8409,27 @@ msgstr "Операцій не визначено."
 
 #: include/classes/import/CConfigurationImport.php:823
 #: include/classes/import/CConfigurationImport.php:903
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, php-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Немає прав доступу до графіка \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:962
+#: include/classes/import/CXmlImport18.php:963
 #, php-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Немає прав доступу до вузла мережі \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1516
+#: include/classes/import/CXmlImport18.php:1517
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Немає прав доступу до елемента даних \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1145
+#: include/classes/import/CXmlImport18.php:1146
 #, php-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Немає прав доступу до шаблону \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1427
+#: include/classes/import/CXmlImport18.php:1428
 #, php-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Немає прав доступу до тригера \"%s\"."
@@ -8442,17 +8442,17 @@ msgstr "Немає прав доступу"
 msgid "No permissions defined."
 msgstr "Прав доступу не визначено."
 
-#: include/classes/import/CXmlImport18.php:1023
+#: include/classes/import/CXmlImport18.php:1024
 #, php-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Немає прав доступу до групи \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:660
+#: include/classes/import/CXmlImport18.php:661
 #, php-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Немає прав доступу до карти мережі \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:450
+#: include/classes/import/CXmlImport18.php:451
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Немає прав доступу до комплексного екрану \"%1$s\"."
@@ -10560,8 +10560,8 @@ msgstr "Заплановано"
 msgid "Screen"
 msgstr "Комплексний екран"
 
-#: include/classes/import/CXmlImport18.php:575
-#: include/classes/import/CXmlImport18.php:1712
+#: include/classes/import/CXmlImport18.php:576
+#: include/classes/import/CXmlImport18.php:1713
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr "Комплексний екран \"%1$s\" додано."
@@ -10576,15 +10576,15 @@ msgstr "Комплексний екран \"%1$s\" вже існує в шабл
 msgid "Screen \"%1$s\" already exists."
 msgstr "Комплексний екран \"%1$s\" вже існує."
 
-#: include/classes/import/CXmlImport18.php:458
-#: include/classes/import/CXmlImport18.php:1643
-#: include/classes/import/CXmlImport18.php:1647
+#: include/classes/import/CXmlImport18.php:459
+#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1648
 #, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Комплексний екран \"%1$s\" пропущено - правило користувача."
 
-#: include/classes/import/CXmlImport18.php:572
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:573
+#: include/classes/import/CXmlImport18.php:1705
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексний екран \"%1$s\" оновлено."
@@ -11946,8 +11946,8 @@ msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" залежить від тригера \"%2$s\", який не існує."
 
-#: include/classes/import/CXmlImport18.php:1434
-#: include/classes/import/CXmlImport18.php:1438
+#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1439
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропущено - правило користувача."
@@ -12023,12 +12023,12 @@ msgstr "Прототип тригера"
 #: api/classes/CTriggerPrototype.php:1106
 #, php-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип тригера \"%1$s\" містить прототипи елементів даних з декількох правил виявлення."
 
 #: api/classes/CTriggerPrototype.php:1112
 #, php-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Прототип тригера \"%1$s\" повинен містити принаймні один прототип елемента даних."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
@@ -13160,23 +13160,23 @@ msgstr "X"
 msgid "X label"
 msgstr "Підпис вісі X"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, php-format
 msgid "XML file contains error %1$s:"
 msgstr "XML файл містить помилку %1$s:"
 
-#: include/classes/import/CXmlImport18.php:403
-#: include/classes/import/CXmlImport18.php:406
-#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:404
+#: include/classes/import/CXmlImport18.php:407
+#: include/classes/import/CXmlImport18.php:410
 msgid "XML file contains errors"
 msgstr "XML файл містить помилки"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, php-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML файл містить фатальну помилку %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, php-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML файл містить попередження %1$s:"
@@ -13685,7 +13685,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "некоректний синтаксис біля \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13693,7 +13693,7 @@ msgstr "є"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "ключ пустий"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13921,7 +13921,7 @@ msgstr "тригер"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "несподіваний кінець ключа"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

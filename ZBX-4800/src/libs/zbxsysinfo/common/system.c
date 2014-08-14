@@ -108,7 +108,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 }
 
 #ifdef _WINDOWS
-static void	get_50_version(char **os, size_t *os_alloc, size_t *os_offset, OSVERSIONINFOEX *vi)
+static void	get_50_version(char **os, size_t *os_alloc, size_t *os_offset, const OSVERSIONINFOEX *vi)
 {
 	zbx_strcpy_alloc(os, os_alloc, os_offset, " Microsoft Windows 2000");
 
@@ -126,7 +126,7 @@ static void	get_50_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 
 }
 
-static void	get_51_version(char **os, size_t *os_alloc, size_t *os_offset, OSVERSIONINFOEX *vi)
+static void	get_51_version(char **os, size_t *os_alloc, size_t *os_offset, const OSVERSIONINFOEX *vi)
 {
 	zbx_strcpy_alloc(os, os_alloc, os_offset, " Microsoft Windows XP");
 
@@ -142,7 +142,8 @@ static void	get_51_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 		zbx_strcpy_alloc(os, os_alloc, os_offset, " Professional");
 }
 
-static void	get_52_version(char **os, size_t *os_alloc, size_t *os_offset, OSVERSIONINFOEX *vi, SYSTEM_INFO *si)
+static void	get_52_version(char **os, size_t *os_alloc, size_t *os_offset, const OSVERSIONINFOEX *vi,
+		const SYSTEM_INFO *si)
 {
 	zbx_strcpy_alloc(os, os_alloc, os_offset, " Microsoft Windows");
 
@@ -170,7 +171,8 @@ static void	get_52_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 	}
 }
 
-static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVERSIONINFOEX *vi, SYSTEM_INFO *si)
+static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, const OSVERSIONINFOEX *vi,
+		const SYSTEM_INFO *si)
 {
 	typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 
@@ -192,6 +194,9 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 			case 2:
 				zbx_strcpy_alloc(os, os_alloc, os_offset, " 8");
 				break;
+			case 3:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " 8.1");
+				break;
 		}
 	}
 	else
@@ -206,6 +211,9 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 				break;
 			case 2:
 				zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2012");
+				break;
+			case 3:
+				zbx_strcpy_alloc(os, os_alloc, os_offset, " Server 2012 R2");
 				break;
 		}
 	}
@@ -272,7 +280,7 @@ static void	get_6x_version(char **os, size_t *os_alloc, size_t *os_offset, OSVER
 	}
 }
 
-static void	get_cpu_type(char **os, size_t *os_alloc, size_t *os_offset, SYSTEM_INFO *si)
+static void	get_cpu_type(char **os, size_t *os_alloc, size_t *os_offset, const SYSTEM_INFO *si)
 {
 	switch (si->wProcessorArchitecture)
 	{
@@ -287,6 +295,135 @@ static void	get_cpu_type(char **os, size_t *os_alloc, size_t *os_offset, SYSTEM_
 			break;
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: read_registry_value                                              *
+ *                                                                            *
+ * Purpose: read value from Windows registry                                  *
+ *                                                                            *
+ ******************************************************************************/
+static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
+{
+	DWORD	szData;
+	wchar_t	*value = NULL;
+
+	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
+	{
+		value = zbx_malloc(NULL, szData);
+		if (ERROR_SUCCESS != RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)value, &szData))
+			zbx_free(value);
+	}
+
+	return value;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_win_getversion                                               *
+ *                                                                            *
+ * Purpose: get Windows version information                                   *
+ *                                                                            *
+ ******************************************************************************/
+const OSVERSIONINFOEX		*zbx_win_getversion()
+{
+#	define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+#	define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
+#	define ZBX_REGVALUE_CURRENTBUILDNUMBER	"CurrentBuildNumber"
+#	define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
+
+#	define ZBX_REGKEY_PRODUCT		"System\\CurrentControlSet\\Control\\ProductOptions"
+#	define ZBX_REGVALUE_PRODUCTTYPE		"ProductType"
+
+	static OSVERSIONINFOEX	vi = {sizeof(OSVERSIONINFOEX)};
+
+	OSVERSIONINFOEX		*pvi = NULL;
+	HKEY			h_key_registry = NULL;
+	wchar_t			*key_value = NULL, *ptr;
+
+	if (0 != vi.dwMajorVersion)
+		return &vi;
+
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_VERSION), 0, KEY_READ, &h_key_registry))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_VERSION);
+		goto out;
+	}
+
+	if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTVERSION))))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTVERSION);
+		goto out;
+	}
+
+	if (NULL != (ptr = wcschr(key_value, TEXT('.'))))
+	{
+		*ptr++ = L'\0';
+		vi.dwMinorVersion = _wtoi(ptr);
+	}
+
+	vi.dwMajorVersion = _wtoi(key_value);
+
+	zbx_free(key_value);
+
+	if (6 > vi.dwMajorVersion || 2 > vi.dwMinorVersion)
+	{
+		GetVersionEx((OSVERSIONINFO *)&vi);
+	}
+	else
+	{
+		if (NULL != (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CSDVERSION))))
+		{
+			wcscpy_s(vi.szCSDVersion, sizeof(vi.szCSDVersion) / sizeof(*vi.szCSDVersion), key_value);
+
+			zbx_free(key_value);
+		}
+
+		if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILDNUMBER))))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'",
+					ZBX_REGVALUE_CURRENTBUILDNUMBER);
+			goto out;
+		}
+
+		vi.dwBuildNumber = _wtoi(key_value);
+		zbx_free(key_value);
+
+		RegCloseKey(h_key_registry);
+		h_key_registry = NULL;
+
+		if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_PRODUCT), 0, KEY_READ,
+				&h_key_registry))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_PRODUCT);
+			goto out;
+		}
+
+		if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_PRODUCTTYPE))))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_PRODUCTTYPE);
+			goto out;
+		}
+
+		if (0 == wcscmp(key_value, L"WinNT"))
+			vi.wProductType = 1;
+		else if (0 == wcscmp(key_value, L"LenmanNT"))
+			vi.wProductType = 2;
+		else if (0 == wcscmp(key_value, L"ServerNT"))
+			vi.wProductType = 3;
+
+		zbx_free(key_value);
+
+		vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+	}
+
+	pvi = &vi;
+out:
+	if (NULL != h_key_registry)
+		RegCloseKey(h_key_registry);
+
+	return pvi;
+}
 #endif
 
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -294,13 +431,13 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 #ifdef _WINDOWS
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 
-	DWORD		dwSize = 256;
-	TCHAR		computer_name[256];
-	SYSTEM_INFO	si;
-	OSVERSIONINFOEX	vi;
-	char		*os = NULL, *utf8;
-	size_t		os_alloc = 256, os_offset = 0;
-	PGNSI		pGNSI;
+	DWORD			dwSize = 256;
+	TCHAR			computer_name[256];
+	SYSTEM_INFO		si;
+	const OSVERSIONINFOEX	*vi;
+	char			*os = NULL, *utf8;
+	size_t			os_alloc = 256, os_offset = 0;
+	PGNSI			pGNSI;
 
 	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
 	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
@@ -309,11 +446,12 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		*computer_name = '\0';
 
 	memset(&si, 0, sizeof(si));
-	memset(&vi, 0, sizeof(vi));
 
-	vi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	if (TRUE != GetVersionEx((OSVERSIONINFO *)&vi))
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL != (pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo")))
 		pGNSI(&si);
@@ -332,35 +470,35 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 
 	zbx_snprintf_alloc(&os, &os_alloc, &os_offset, " %d.%d.%d",
-			vi.dwMajorVersion, vi.dwMinorVersion, vi.dwBuildNumber);
+			vi->dwMajorVersion, vi->dwMinorVersion, vi->dwBuildNumber);
 
-	if (VER_PLATFORM_WIN32_NT == vi.dwPlatformId)
+	if (VER_PLATFORM_WIN32_NT == vi->dwPlatformId)
 	{
-		switch (vi.dwMajorVersion)
+		switch (vi->dwMajorVersion)
 		{
 			case 5:
-				switch (vi.dwMinorVersion)
+				switch (vi->dwMinorVersion)
 				{
 					case 0:
-						get_50_version(&os, &os_alloc, &os_offset, &vi);
+						get_50_version(&os, &os_alloc, &os_offset, vi);
 						break;
 					case 1:
-						get_51_version(&os, &os_alloc, &os_offset, &vi);
+						get_51_version(&os, &os_alloc, &os_offset, vi);
 						break;
 					case 2:
-						get_52_version(&os, &os_alloc, &os_offset, &vi, &si);
+						get_52_version(&os, &os_alloc, &os_offset, vi, &si);
 						break;
 				}
 				break;
 			case 6:
-				get_6x_version(&os, &os_alloc, &os_offset, &vi, &si);
+				get_6x_version(&os, &os_alloc, &os_offset, vi, &si);
 				break;
 		}
 	}
 
-	if ('\0' != *vi.szCSDVersion)
+	if ('\0' != *vi->szCSDVersion)
 	{
-		utf8 = zbx_unicode_to_utf8(vi.szCSDVersion);
+		utf8 = zbx_unicode_to_utf8(vi->szCSDVersion);
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, " %s", utf8);
 		zbx_free(utf8);
 	}

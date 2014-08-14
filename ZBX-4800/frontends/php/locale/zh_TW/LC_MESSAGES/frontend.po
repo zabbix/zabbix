@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 15:56+0200\n"
+"POT-Creation-Date: 2014-06-30 02:40+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1156,7 +1156,7 @@ msgstr "無法新增主機"
 msgid "Cannot add image"
 msgstr "無法新增圖片"
 
-#: include/classes/import/CXmlImport18.php:632
+#: include/classes/import/CXmlImport18.php:633
 msgid "Cannot add image."
 msgstr "無法新增圖片."
 
@@ -1328,7 +1328,7 @@ msgstr "無法創建圖示對應"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "無法創建同名為\"%s\"的圖示對應."
 
-#: include/classes/import/CXmlImport18.php:816
+#: include/classes/import/CXmlImport18.php:817
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "無法創建拓墣圖 \"%s\"."
@@ -1337,7 +1337,7 @@ msgstr "無法創建拓墣圖 \"%s\"."
 msgid "Cannot create new element"
 msgstr "無法創建新組件"
 
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1710
 msgid "Cannot create screen."
 msgstr "無法創建篩選."
 
@@ -1551,38 +1551,38 @@ msgstr "無法關閉示警媒介類型"
 msgid "Cannot enable media type"
 msgstr "無法刪除示警媒介類型"
 
-#: include/classes/import/CXmlImport18.php:676
+#: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:506
-#: include/classes/import/CXmlImport18.php:1666
+#: include/classes/import/CXmlImport18.php:507
+#: include/classes/import/CXmlImport18.php:1667
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選 \"%2$s\"中的圖形\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:723
+#: include/classes/import/CXmlImport18.php:724
 #: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:483
+#: include/classes/import/CXmlImport18.php:484
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:734
+#: include/classes/import/CXmlImport18.php:735
 #: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:495
+#: include/classes/import/CXmlImport18.php:496
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
@@ -1601,7 +1601,7 @@ msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:767
+#: include/classes/import/CXmlImport18.php:768
 #: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1612,14 +1612,14 @@ msgstr "無法找到用在拓墣圖 \"%2$s\"中的圖示\"%1$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖 \"%2$s\"中的圖示對應\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:519
-#: include/classes/import/CXmlImport18.php:1679
+#: include/classes/import/CXmlImport18.php:520
+#: include/classes/import/CXmlImport18.php:1680
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的項目\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:712
+#: include/classes/import/CXmlImport18.php:713
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
@@ -1629,7 +1629,7 @@ msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:530
+#: include/classes/import/CXmlImport18.php:531
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
@@ -1639,14 +1639,14 @@ msgstr "無法找到用在篩選\"%2$s\"中的拓墣圖\"%1$s\"."
 msgid "Cannot find objects with name"
 msgstr "無法找到有名稱的物件"
 
-#: include/classes/import/CXmlImport18.php:541
+#: include/classes/import/CXmlImport18.php:542
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:745
-#: include/classes/import/CXmlImport18.php:788
+#: include/classes/import/CXmlImport18.php:746
+#: include/classes/import/CXmlImport18.php:789
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, php-format
@@ -1920,7 +1920,7 @@ msgstr "無法更新圖示對應"
 msgid "Cannot update image"
 msgstr "無法更新圖片"
 
-#: include/classes/import/CXmlImport18.php:639
+#: include/classes/import/CXmlImport18.php:640
 msgid "Cannot update image."
 msgstr "無法更新圖片."
 
@@ -1944,7 +1944,7 @@ msgstr "無法更新巨集"
 msgid "Cannot update maintenance"
 msgstr "無法更新維修"
 
-#: include/classes/import/CXmlImport18.php:807
+#: include/classes/import/CXmlImport18.php:808
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "無法更新拓拓墣圖\"%s\"."
@@ -1977,7 +1977,7 @@ msgstr "無法更新方案"
 msgid "Cannot update screen"
 msgstr "無法更新篩選"
 
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1702
 msgid "Cannot update screen."
 msgstr "無法更新篩選."
 
@@ -4781,8 +4781,8 @@ msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "圖形 \"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1558
-#: include/classes/import/CXmlImport18.php:1562
+#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1563
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "略過圖形\"%1$s\"-用戶規則."
@@ -5185,7 +5185,7 @@ msgstr "主機\"%1$s\"是以系統代理程式\"%2$s\"來監控的."
 msgid "Host \"%s\" already exists."
 msgstr "主機 \"%s\" 已存在."
 
-#: include/classes/import/CXmlImport18.php:927
+#: include/classes/import/CXmlImport18.php:928
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "主機 \"%s\" 有 \"useipmi\" 參數已檢驗,  但是沒有 \"ipmi_ip\" 參數! 使用主機IP位址為IPMI介面的位址."
@@ -6342,12 +6342,12 @@ msgstr "不正確的值於setMessage(): \"%s\"."
 msgid "Incorrect working time."
 msgstr "不正確的工作時間."
 
-#: include/classes/import/CXmlImport18.php:1590
+#: include/classes/import/CXmlImport18.php:1591
 #, php-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y max項目."
 
-#: include/classes/import/CXmlImport18.php:1577
+#: include/classes/import/CXmlImport18.php:1578
 #, php-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y min項目."
@@ -6556,7 +6556,7 @@ msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1525
+#: include/classes/import/CXmlImport18.php:1526
 #, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "項目 \"%1$s\"不存在."
@@ -6566,8 +6566,8 @@ msgstr "項目 \"%1$s\"不存在."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1274
+#: include/classes/import/CXmlImport18.php:1278
 #, php-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略過項目\"%1$s\"-用戶規則."
@@ -7380,7 +7380,7 @@ msgstr "手動登出"
 msgid "Map"
 msgstr "拓墣圖"
 
-#: include/classes/import/CXmlImport18.php:667
+#: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "略過拓墣圖\"%1$s\"-用戶規則."
@@ -7390,12 +7390,12 @@ msgstr "略過拓墣圖\"%1$s\"-用戶規則."
 msgid "Map \"%s\""
 msgstr "拓墣圖\"%s\""
 
-#: include/classes/import/CXmlImport18.php:819
+#: include/classes/import/CXmlImport18.php:820
 #, php-format
 msgid "Map \"%s\" created."
 msgstr "拓墣圖\"%s\"已創建."
 
-#: include/classes/import/CXmlImport18.php:810
+#: include/classes/import/CXmlImport18.php:811
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr "拓墣圖\"%s\"已更新."
@@ -7730,8 +7730,8 @@ msgstr "缺少項目的\"itemid\"欄位"
 msgid "Missing \"name\" field for graph."
 msgstr "缺少圖形的\"名稱\"欄位"
 
-#: include/classes/import/CXmlImport18.php:1581
-#: include/classes/import/CXmlImport18.php:1594
+#: include/classes/import/CXmlImport18.php:1582
+#: include/classes/import/CXmlImport18.php:1595
 #, php-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主機 \"%2$s\"缺少了項目\"%1$s\"."
@@ -8019,12 +8019,12 @@ msgstr "下個檢查"
 msgid "No"
 msgstr "不"
 
-#: include/classes/import/CXmlImport18.php:1571
+#: include/classes/import/CXmlImport18.php:1572
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymax_type\"."
 
-#: include/classes/import/CXmlImport18.php:1567
+#: include/classes/import/CXmlImport18.php:1568
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymin_type\"."
@@ -8369,27 +8369,27 @@ msgstr "沒有已定義的操作."
 
 #: include/classes/import/CConfigurationImport.php:823
 #: include/classes/import/CConfigurationImport.php:903
-#: include/classes/import/CXmlImport18.php:1552
+#: include/classes/import/CXmlImport18.php:1553
 #, php-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "不具圖形 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:962
+#: include/classes/import/CXmlImport18.php:963
 #, php-format
 msgid "No permission for host \"%1$s\"."
 msgstr "不具主機 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:1516
+#: include/classes/import/CXmlImport18.php:1517
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr "無項目\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1145
+#: include/classes/import/CXmlImport18.php:1146
 #, php-format
 msgid "No permission for template \"%1$s\"."
 msgstr "沒有模板\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1427
+#: include/classes/import/CXmlImport18.php:1428
 #, php-format
 msgid "No permission for trigger \"%s\"."
 msgstr "不具觸發器 \"%s\"的許可權."
@@ -8402,17 +8402,17 @@ msgstr "沒有許可權"
 msgid "No permissions defined."
 msgstr "沒有許可權已定義."
 
-#: include/classes/import/CXmlImport18.php:1023
+#: include/classes/import/CXmlImport18.php:1024
 #, php-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "不具群組 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:660
+#: include/classes/import/CXmlImport18.php:661
 #, php-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "不具拓墣圖\"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:450
+#: include/classes/import/CXmlImport18.php:451
 #, php-format
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
@@ -10517,8 +10517,8 @@ msgstr "排程"
 msgid "Screen"
 msgstr "篩選"
 
-#: include/classes/import/CXmlImport18.php:575
-#: include/classes/import/CXmlImport18.php:1712
+#: include/classes/import/CXmlImport18.php:576
+#: include/classes/import/CXmlImport18.php:1713
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr "篩選 \"%1$s\" 已新增."
@@ -10533,15 +10533,15 @@ msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
 msgid "Screen \"%1$s\" already exists."
 msgstr "篩選\"%1$s\"已存在."
 
-#: include/classes/import/CXmlImport18.php:458
-#: include/classes/import/CXmlImport18.php:1643
-#: include/classes/import/CXmlImport18.php:1647
+#: include/classes/import/CXmlImport18.php:459
+#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1648
 #, php-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "略過篩選\"%1$s\"-用戶規則."
 
-#: include/classes/import/CXmlImport18.php:572
-#: include/classes/import/CXmlImport18.php:1704
+#: include/classes/import/CXmlImport18.php:573
+#: include/classes/import/CXmlImport18.php:1705
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr "篩選\"%1$s\"已更新."
@@ -11894,8 +11894,8 @@ msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1434
-#: include/classes/import/CXmlImport18.php:1438
+#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1439
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略過觸發器\"%1$s\"-用戶規則."
@@ -13102,23 +13102,23 @@ msgstr "X"
 msgid "X label"
 msgstr "X標示"
 
-#: include/classes/import/readers/CXmlImportReader.php:48
+#: include/classes/import/readers/CXmlImportReader.php:49
 #, php-format
 msgid "XML file contains error %1$s:"
 msgstr "XML檔含有錯誤 %1$s:"
 
-#: include/classes/import/CXmlImport18.php:403
-#: include/classes/import/CXmlImport18.php:406
-#: include/classes/import/CXmlImport18.php:409
+#: include/classes/import/CXmlImport18.php:404
+#: include/classes/import/CXmlImport18.php:407
+#: include/classes/import/CXmlImport18.php:410
 msgid "XML file contains errors"
 msgstr "XML檔含有錯誤"
 
-#: include/classes/import/readers/CXmlImportReader.php:51
+#: include/classes/import/readers/CXmlImportReader.php:52
 #, php-format
 msgid "XML file contains fatal error %1$s:"
 msgstr "XML檔含有極嚴重錯誤 %1$s:"
 
-#: include/classes/import/readers/CXmlImportReader.php:45
+#: include/classes/import/readers/CXmlImportReader.php:46
 #, php-format
 msgid "XML file contains warning %1$s:"
 msgstr "XML檔含有警告 %1$s:"

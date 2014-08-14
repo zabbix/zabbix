@@ -78,12 +78,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	const char	*__function_name = "process_ping";
 
 	FILE		*f;
-	char		*c, *c2, params[64];
+	char		*c, params[64];
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	size_t		offset;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	int 		i, ret = NOTSUPPORTED;
+	int 		i, ret = NOTSUPPORTED, index;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -137,7 +137,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		fping_existence |= FPING6_EXISTS;
 #endif	/* HAVE_IPV6 */
 
-	offset = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
+	offset = zbx_snprintf(params, sizeof(params), "-C%d", count);
 	if (0 != interval)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -p%d", interval);
 	if (0 != size)
@@ -258,6 +258,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	else
 	{
+		for (i = 0; i < hosts_count; i++)
+		{
+			hosts[i].status = zbx_malloc(NULL, count);
+			memset(hosts[i].status, 0, count);
+		}
+
 		do
 		{
 			zbx_rtrim(tmp, "\n");
@@ -291,33 +297,58 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			c += 3;
 
+			/* The were two issues with processing only the fping's final status line:  */
+			/*   1) pinging broadcast addresses could have resulted in responses from   */
+			/*      different hosts, which were counted as the target host responses;   */
+			/*   2) there is a bug in fping (v3.8 at least) where pinging broadcast     */
+			/*      address will result in no individual responses, but the final       */
+			/*      status line might contain a bogus value.                            */
+			/* Because of the above issues we must monitor the individual responses     */
+			/* and mark the valid ones.                                                 */
+			if ('[' == *c)
+			{
+				/* Fping appends response source address in format '[<- 10.3.0.10]' */
+				/* if it does not match the target address. Ignore such responses.  */
+				if (NULL != strstr(c + 1, "[<-"))
+					continue;
+
+				/* get the index of individual ping response */
+				index = atoi(c + 1);
+
+				if (0 > index || index >= count)
+					continue;
+
+				host->status[index] = 1;
+
+				continue;
+			}
+
+			/* process status line for a host */
+			index = 0;
 			do
 			{
-				if (NULL != (c2 = strchr(c, ' ')))
-					*c2 = '\0';
-
-				if (0 != strcmp(c, "-"))
+				if (1 == host->status[index])
 				{
 					sec = atof(c) / 1000; /* convert ms to seconds */
 
-					if (host->rcv == 0 || host->min > sec)
+					if (0 == host->rcv || host->min > sec)
 						host->min = sec;
-					if (host->rcv == 0 || host->max < sec)
+					if (0 == host->rcv || host->max < sec)
 						host->max = sec;
 					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
 					host->rcv++;
 				}
-
-				host->cnt++;
-
-				if (NULL != c2)
-					*c2++ = ' ';
 			}
-			while (NULL != (c = c2));
+			while (++index < count && NULL != (c = strchr(c + 1, ' ')));
+
+			host->cnt = count;
 
 			ret = SUCCEED;
 		}
 		while (NULL != fgets(tmp, sizeof(tmp), f));
+
+		for (i = 0; i < hosts_count; i++)
+			zbx_free(hosts[i].status);
 	}
 	pclose(f);
 

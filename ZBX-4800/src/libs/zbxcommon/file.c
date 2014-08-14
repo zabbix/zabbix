@@ -21,35 +21,6 @@
 #include "log.h"
 
 #if defined(_WINDOWS)
-int	__zbx_stat(const char *path, zbx_stat_t *buf)
-{
-	int	ret, fd;
-	wchar_t	*wpath;
-
-	wpath = zbx_utf8_to_unicode(path);
-
-	if (-1 == (ret = _wstat64(wpath, buf)))
-		goto out;
-
-	if (0 != buf->st_size)
-		goto out;
-
-	/* In the case of symlinks _wstat64 returns zero file size.   */
-	/* Try to work around it by opening the file and using fstat. */
-
-	ret = -1;
-
-	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
-	{
-		ret = _fstat64(fd, buf);
-		_close(fd);
-	}
-out:
-	zbx_free(wpath);
-
-	return ret;
-}
-
 int	__zbx_open(const char *pathname, int flags)
 {
 	int	ret;
@@ -233,7 +204,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, const char *encoding,
 		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key)
@@ -296,6 +267,9 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
+			if (p_end > p)
+				*incomplete = 1;
+
 			if (BUF_SIZE > nbytes)
 			{
 				/* Buffer is not full (no more data available) and there is no "newline" in it. */
@@ -328,7 +302,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
 							" (showing only the first 64 characters). Only the first 64 kB"
 							" will be analyzed, the rest will be ignored while Zabbix agent"
-							" is running", value);
+							" is running.", value);
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 					send_err = SUCCEED;
@@ -356,7 +330,6 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 				{
 					/* It is a middle part of a long record. Ignore it. We have already */
 					/* checked the first part against the regexp. */
-
 					*lastlogsize = (size_t)offset + (size_t)nbytes;
 				}
 			}
@@ -365,6 +338,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 		{
 			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
+			*incomplete = 0;
 
 			for (;;)
 			{
@@ -420,6 +394,9 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
+					if (p_end > p)
+						*incomplete = 1;
+
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
 						ret = FAIL;
@@ -428,6 +405,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 					else
 						break;
 				}
+				else
+					*incomplete = 0;
 			}
 		}
 	}
