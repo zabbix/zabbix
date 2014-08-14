@@ -129,7 +129,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * Return item prototype ID of either item prototype selected in in configuration, or, if dynamic mode is enabled,
+	 * Return item prototype ID of either item prototype selected in configuration, or, if dynamic mode is enabled,
 	 * try to find item prototype with same key in selected host.
 	 *
 	 * @return string
@@ -178,7 +178,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * Return item prototype used by this screen element
+	 * Return item prototype used by this screen element.
 	 *
 	 * @return array
 	 */

@@ -135,7 +135,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return string
 	 */
 	protected function getCurrentHostId() {
-		if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM) && $this->hostid) {
+		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 			$hostId = $this->hostid;
 		}
 		else {
@@ -177,7 +177,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 *
 	 * @abstract
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	abstract protected function mustShowPreview();
 
@@ -186,7 +186,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 *
 	 * @abstract
 	 *
-	 * @return CTag
+	 * @return CImg
 	 */
 	abstract protected function getPreview();
 }
