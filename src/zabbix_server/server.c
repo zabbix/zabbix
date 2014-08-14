@@ -607,7 +607,9 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
+				{
 					((char *)&task)[0] = ZBX_TASK_CONFIG_CACHE_RELOAD;
+				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
@@ -794,7 +796,6 @@ int	MAIN_ZABBIX_ENTRY()
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
-
 
 		thread_args.server_num = i + 1;
 		thread_args.args = NULL;
