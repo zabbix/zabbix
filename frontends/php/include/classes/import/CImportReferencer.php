@@ -37,8 +37,6 @@ class CImportReferencer {
 	protected $valueMaps = array();
 	protected $triggers = array();
 	protected $graphs = array();
-	protected $graphPrototypes = array();
-	protected $itemPrototypes = array();
 	protected $iconMaps = array();
 	protected $maps = array();
 	protected $screens = array();
@@ -61,8 +59,6 @@ class CImportReferencer {
 	protected $macrosRefs;
 	protected $proxiesRefs;
 	protected $hostPrototypesRefs;
-	protected $graphPrototypesRefs;
-	protected $itemPrototypesRefs;
 
 
 	/**
@@ -169,22 +165,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get item prototype id by host id and item key_.
-	 *
-	 * @param string $hostId
-	 * @param string $key
-	 *
-	 * @return string|bool
-	 */
-	public function resolveItemPrototype($hostId, $key) {
-		if ($this->itemPrototypesRefs === null) {
-			$this->selectItemPrototypes();
-		}
-
-		return isset($this->itemPrototypesRefs[$hostId][$key]) ? $this->itemPrototypesRefs[$hostId][$key] : false;
-	}
-
-	/**
 	 * Get value map id by vale map name.
 	 *
 	 * @param string $name
@@ -229,22 +209,6 @@ class CImportReferencer {
 		}
 
 		return isset($this->graphsRefs[$hostId][$name]) ? $this->graphsRefs[$hostId][$name] : false;
-	}
-
-	/**
-	 * Get graph prototype ID by host ID and graph prototype name.
-	 *
-	 * @param string $hostId
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveGraphPrototype($hostId, $name) {
-		if ($this->graphPrototypesRefs === null) {
-			$this->selectGraphPrototypes();
-		}
-
-		return isset($this->graphPrototypesRefs[$hostId][$name]) ? $this->graphPrototypesRefs[$hostId][$name] : false;
 	}
 
 	/**
@@ -453,22 +417,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add item prototype keys that need association with a database item prototype id.
-	 * Input array has format:
-	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
-	 *
-	 * @param array $itemPrototypes
-	 */
-	public function addItemPrototypes(array $itemPrototypes) {
-		foreach ($itemPrototypes as $host => $keys) {
-			if (!isset($this->itemPrototypes[$host])) {
-				$this->itemPrototypes[$host] = array();
-			}
-			$this->itemPrototypes[$host] = array_unique(array_merge($this->itemPrototypes[$host], $keys));
-		}
-	}
-
-	/**
 	 * Add item key association with item id.
 	 *
 	 * @param string $hostId
@@ -517,22 +465,6 @@ class CImportReferencer {
 				$this->graphs[$host] = array();
 			}
 			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
-		}
-	}
-
-	/**
-	 * Add graph prototype names that need association with a database graph prototype ID.
-	 * Input array has format:
-	 * array('hostname1' => array('graphname1', 'graphname2'), 'hostname2' => array('graphname1'), ...)
-	 *
-	 * @param array $graphPrototypes
-	 */
-	public function addGraphPrototypes(array $graphPrototypes) {
-		foreach ($graphPrototypes as $host => $hostGraphPrototypes) {
-			if (!isset($this->graphPrototypes[$host])) {
-				$this->graphPrototypes[$host] = array();
-			}
-			$this->graphPrototypes[$host] = array_unique(array_merge($this->graphPrototypes[$host], $hostGraphPrototypes));
 		}
 	}
 
@@ -786,33 +718,9 @@ class CImportReferencer {
 			}
 
 			if ($sqlWhere) {
-				$dbitems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbItem = DBfetch($dbitems)) {
+				$dbItems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
+				while ($dbItem = DBfetch($dbItems)) {
 					$this->itemsRefs[$dbItem['hostid']][$dbItem['key_']] = $dbItem['itemid'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Select item prototype ids for previously added item prototype keys.
-	 */
-	protected function selectItemPrototypes() {
-		if (!empty($this->itemPrototypes)) {
-			$this->itemPrototypesRefs = array();
-
-			$sqlWhere = array();
-			foreach ($this->itemPrototypes as $host => $keys) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
-				}
-			}
-
-			if ($sqlWhere) {
-				$dbItemPrototypes = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbItemPrototype = DBfetch($dbItemPrototypes)) {
-					$this->itemPrototypesRefs[$dbItemPrototype['hostid']][$dbItemPrototype['key_']] = $dbItemPrototype['itemid'];
 				}
 			}
 		}
@@ -823,13 +731,6 @@ class CImportReferencer {
 	 */
 	public function refreshItems() {
 		$this->itemsRefs = null;
-	}
-
-	/**
-	 * Unset item prototype refs to make referencer select them from db again.
-	 */
-	public function refreshItemPrototypes() {
-		$this->itemPrototypesRefs = array();
 	}
 
 	/**
@@ -897,11 +798,7 @@ class CImportReferencer {
 				'selectHosts' => array('hostid'),
 				'filter' => array(
 					'name' => $graphNames,
-					'flags' => array(
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					)
+					'flags' => null
 				),
 				'editable' => true
 			));
@@ -909,38 +806,6 @@ class CImportReferencer {
 			foreach ($dbGraphs as $dbGraph) {
 				foreach ($dbGraph['hosts'] as $host) {
 					$this->graphsRefs[$host['hostid']][$dbGraph['name']] = $dbGraph['graphid'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Select graph IDs for previously added graph names.
-	 */
-	protected function selectGraphPrototypes() {
-		if ($this->graphPrototypes) {
-			$this->graphPrototypesRefs = array();
-
-			$graphPrototypeNames = array();
-
-			foreach ($this->graphPrototypes as $graphPrototypes) {
-				foreach ($graphPrototypes as $graphPrototype) {
-					$graphPrototypeNames[$graphPrototype] = $graphPrototype;
-				}
-			}
-
-			$dbGraphPrototypes = API::GraphPrototype()->get(array(
-					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid'),
-					'filter' => array(
-						'name' => $graphPrototypeNames
-					),
-					'editable' => true
-				));
-
-			foreach ($dbGraphPrototypes as $dbGraphPrototype) {
-				foreach ($dbGraphPrototype['hosts'] as $host) {
-					$this->graphPrototypesRefs[$host['hostid']][$dbGraphPrototype['name']] = $dbGraphPrototype['graphid'];
 				}
 			}
 		}
@@ -958,13 +823,6 @@ class CImportReferencer {
 	 */
 	public function refreshGraphs() {
 		$this->graphsRefs = null;
-	}
-
-	/**
-	 * Unset graph prototype refs to make referencer select them from DB again.
-	 */
-	public function refreshGraphPrototypes() {
-		$this->graphPrototypesRefs = null;
 	}
 
 	/**

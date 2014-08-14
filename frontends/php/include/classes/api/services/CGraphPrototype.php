@@ -745,14 +745,15 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				$graph = API::GraphItem()->get(array(
-					'itemids' => $item['itemid'],
-					'output' => array('itemid', 'graphid')
-				));
-				$graph = reset($graph);
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+				foreach ($dbGraphs as $dbGraph) {
+					$itemIdsInGraphItems = zbx_objectValues($dbGraph['gitems'], 'itemid');
+					if (in_array($item['itemid'], $itemIdsInGraphItems)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+							$item['name'], $dbGraph['name']
+						));
+					}
+				}
 			}
 		}
 	}

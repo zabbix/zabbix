@@ -845,8 +845,6 @@ class CConfigurationExport {
 		$hostIds = array();
 		$graphIds = array();
 		$itemIds = array();
-		$graphPrototypeIds = array();
-		$itemPrototypeIds = array();
 
 		// gather element ids that must be substituted
 		foreach ($exportScreens as $screen) {
@@ -870,10 +868,12 @@ class CConfigurationExport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$graphIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 							// fall through
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -886,14 +886,6 @@ class CConfigurationExport {
 						case SCREEN_RESOURCE_SCREEN:
 							$screenIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
-
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$graphPrototypeIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							$itemPrototypeIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
 					}
 				}
 			}
@@ -905,8 +897,6 @@ class CConfigurationExport {
 		$hosts = $this->getHostsReferences($hostIds);
 		$graphs = $this->getGraphsReferences($graphIds);
 		$items = $this->getItemsReferences($itemIds);
-		$graphPrototypes = $this->getGraphPrototypesReferences($graphPrototypeIds);
-		$itemPrototypes = $this->getItemPrototypesReferences($itemPrototypeIds);
 
 		foreach ($exportScreens as &$screen) {
 			unset($screen['screenid']);
@@ -931,10 +921,12 @@ class CConfigurationExport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 							// fall through
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
@@ -946,14 +938,6 @@ class CConfigurationExport {
 
 						case SCREEN_RESOURCE_SCREEN:
 							$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$screenItem['resourceid'] = $graphPrototypes[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							$screenItem['resourceid'] = $itemPrototypes[$screenItem['resourceid']];
 							break;
 					}
 				}
@@ -1174,7 +1158,8 @@ class CConfigurationExport {
 			'graphids' => $graphIds,
 			'selectHosts' => array('host'),
 			'output' => array('name'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($graphs as $id => $graph) {
@@ -1182,67 +1167,6 @@ class CConfigurationExport {
 
 			$ids[$id] = array(
 				'name' => $graph['name'],
-				'host' => $host['host']
-			);
-		}
-
-		return $ids;
-	}
-
-
-	/**
-	 * Get graph prototype references by graph ids.
-	 *
-	 * @param array $graphPrototypeIds
-	 *
-	 * @return array
-	 */
-	protected function getGraphPrototypesReferences(array $graphPrototypeIds) {
-		$ids = array();
-
-		$graphPrototypes = API::GraphPrototype()->get(array(
-			'graphids' => $graphPrototypeIds,
-			'selectHosts' => array('host'),
-			'output' => array('name'),
-			'preservekeys' => true
-		));
-
-		foreach ($graphPrototypes as $id => $graphPrototype) {
-			$host = reset($graphPrototype['hosts']);
-
-			$ids[$id] = array(
-				'name' => $graphPrototype['name'],
-				'host' => $host['host']
-			);
-		}
-
-		return $ids;
-	}
-
-	/**
-	 * Get item prototype references by graph ids.
-	 *
-	 * @param array $itemPrototypeIds
-	 *
-	 * @return array
-	 */
-	protected function getItemPrototypesReferences(array $itemPrototypeIds) {
-		$ids = array();
-
-		$itemPrototypes = API::Item()->get(array(
-			'itemids' => $itemPrototypeIds,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'webitems' => true,
-			'preservekeys' => true,
-			'filter' => array('flags' => null)
-		));
-
-		foreach ($itemPrototypes as $id => $itemPrototype) {
-			$host = reset($itemPrototype['hosts']);
-
-			$ids[$id] = array(
-				'key' => $itemPrototype['key_'],
 				'host' => $host['host']
 			);
 		}
