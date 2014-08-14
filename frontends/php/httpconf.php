@@ -73,7 +73,7 @@ $fields = array(
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
+$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
@@ -101,7 +101,7 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 
 /*
@@ -141,6 +141,10 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
@@ -149,7 +153,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
-	$dbResult = true;
+	$result = true;
 
 	DBstart();
 
@@ -157,10 +161,10 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 
 	$httpTest = get_httptest_by_httptestid($httptestId);
 	if ($httpTest) {
-		$dbResult = delete_history_by_httptestid($httptestId);
-		if ($dbResult) {
+		$result = delete_history_by_httptestid($httptestId);
+		if ($result) {
 
-			$dbResult = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+			$result = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
 
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
@@ -172,10 +176,9 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 		}
 	}
 
-	$dbResult = DBend($dbResult);
+	$result = DBend($result);
 
-	show_messages($dbResult, _('History cleared'), _('Cannot clear history'));
-	clearCookies($dbResult, getRequest('hostid'));
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['save'])) {
 
@@ -216,7 +219,7 @@ elseif (isset($_REQUEST['save'])) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => get_request('applicationid'),
+			'applicationid' => getRequest('applicationid'),
 			'delay' => $_REQUEST['delay'],
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
@@ -288,7 +291,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result, $_REQUEST['hostid']);
+				uncheckTableRows(getRequest('hostid'));
 			}
 		}
 		else {
@@ -297,7 +300,7 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 			else {
-				clearCookies($result, $_REQUEST['hostid']);
+				uncheckTableRows(getRequest('hostid'));
 			}
 			$httpTestId = reset($result['httptestids']);
 		}
@@ -360,8 +363,11 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$result = true;
@@ -389,14 +395,19 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
-	$goResult = API::HttpTest()->delete($_REQUEST['group_httptestid']);
+	$result = API::HttpTest()->delete($_REQUEST['group_httptestid']);
 
-	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
 }
 
 show_messages();
@@ -407,7 +418,7 @@ show_messages();
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'hostid' => getRequest('hostid', 0),
-		'httptestid' => getRequest('httptestid', null),
+		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'templates' => array()
@@ -432,7 +443,7 @@ if (isset($_REQUEST['form'])) {
 						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid'],
 						'highlight underline weight_normal'
 					);
-					$data['templates'][] = SPACE.RARR.SPACE;
+					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
 			}

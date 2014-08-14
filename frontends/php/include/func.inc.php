@@ -72,21 +72,7 @@ function hasRequest($name) {
  * @return mixed
  */
 function getRequest($name, $def = null) {
-	return hasRequest($name) ? $_REQUEST[$name] : $def;
-}
-
-/**
- * Check request, if exist request - return request value, else return default value.
- *
- * @deprecated function, use getRequest() instead
- *
- * @param string	$name
- * @param mixed		$def
- *
- * @return mixed
- */
-function get_request($name, $def = null) {
-	return getRequest($name, $def);
+	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
 
 function countRequest($str = null) {
@@ -1415,27 +1401,36 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
+function validate_sort_and_sortorder($defaultSort = null, $defaultSortOrder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
-	$_REQUEST['sort'] = getPageSortField($sort);
-	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
+	$sortKey = 'sort';
+	$sortOrderKey = 'sortorder';
 
-	if (!is_null($_REQUEST['sort'])) {
-		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
-			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
-			invalid_url();
-		}
+	if (hasRequest($sortKey) && $allowedColumns && !in_array(getRequest($sortKey), $allowedColumns)) {
+		error(_s('Cannot sort by field "%1$s".', getRequest($sortKey)));
+		invalid_url();
+	}
 
-		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN
-			));
-			invalid_url();
-		}
+	if (hasRequest($sortOrderKey) && !in_array(getRequest($sortOrderKey), array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+		error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+			getRequest($sortOrderKey), ZBX_SORT_UP, ZBX_SORT_DOWN
+		));
+		invalid_url();
+	}
 
-		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
-		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
+	$profileSortFieldIndex = 'web.'.$page['file'].'.sort';
+	$profileSortOrderIndex = 'web.'.$page['file'].'.sortorder';
+
+	$currentSortField = getPageSortField($defaultSort);
+	$currentSortOrder = getPageSortOrder($defaultSortOrder);
+
+	if ($currentSortField) {
+		CProfile::update($profileSortOrderIndex, $currentSortOrder, PROFILE_TYPE_STR);
+		CProfile::update($profileSortFieldIndex, $currentSortField, PROFILE_TYPE_STR);
+
+		$_REQUEST[$sortKey] = $currentSortField;
+		$_REQUEST[$sortOrderKey] = $currentSortOrder;
 	}
 }
 
@@ -1494,10 +1489,10 @@ function make_sorting_header($obj, $tabfield) {
  *
  * @return string
  */
-function getPageSortField($default = null) {
+function  getPageSortField($default = null) {
 	global $page;
 
-	$sort = get_request('sort', CProfile::get('web.'.$page['file'].'.sort'));
+	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort'));
 
 	return ($sort) ? $sort : $default;
 }
@@ -1512,7 +1507,7 @@ function getPageSortField($default = null) {
 function getPageSortOrder($default = ZBX_SORT_UP) {
 	global $page;
 
-	$sortorder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
+	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
 
 	return ($sortorder) ? $sortorder : $default;
 }
@@ -1528,7 +1523,7 @@ function getPageSortOrder($default = ZBX_SORT_UP) {
 function getPageNumber() {
 	global $page;
 
-	$pageNumber = get_request('page');
+	$pageNumber = getRequest('page');
 	if (!$pageNumber) {
 		$lastPage = CProfile::get('web.paging.lastpage');
 		$pageNumber = ($lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
@@ -2277,7 +2272,7 @@ function imageOut(&$image, $format = null) {
 			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
-			$json = new CJSON();
+			$json = new CJson();
 			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:
@@ -2321,15 +2316,12 @@ function checkRequiredKeys(array $array, array $keys) {
 }
 
 /**
- * Clear page cookies on action.
+ * Clears table rows selection's cookies.
  *
- * @param bool   $clear
- * @param string $id	parent id, is used as cookie prefix
+ * @param string $id	parent id, is used as cookie suffix
  */
-function clearCookies($clear = false, $id = null) {
-	if ($clear) {
-		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
-	}
+function uncheckTableRows($cookieId = null) {
+	insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($cookieId ? '_'.$cookieId : '').'")');
 }
 
 /**

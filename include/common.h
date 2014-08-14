@@ -93,7 +93,7 @@ const char	*zbx_result_string(int result);
 #define MAX_ID_LEN		21
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
-#define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
@@ -151,6 +151,9 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
+
+#define SNMP_BULK_DISABLED	0
+#define SNMP_BULK_ENABLED	1
 
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00
 #define ZBX_FLAG_DISCOVERY_RULE		0x01
@@ -633,6 +636,8 @@ zbx_script_t;
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
+#define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
+
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
@@ -876,7 +881,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
-size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
+void	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
@@ -997,7 +1002,7 @@ int	MAIN_ZABBIX_ENTRY();
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
-int	zbx_check_hostname(const char *hostname);
+int	zbx_check_hostname(const char *hostname, char **error);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);
