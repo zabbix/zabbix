@@ -46,7 +46,7 @@ $fields = array(
 	'mark_color' =>		array(T_ZBX_STR, O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
 	'cmbitemlist' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'plaintext' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"showgraph","showvalues","showlatest","batchgraph"'), null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'","'.HISTORY_LATEST.'","'.HISTORY_BATCH_GRAPH.'"'), null),
 	'graphtype' =>      array(T_ZBX_INT, O_OPT, null,   IN(array(GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED)), null),
 	// ajax
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
@@ -116,7 +116,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Actions
  */
-$_REQUEST['action'] = getRequest('action', 'showgraph');
+$_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 
 /*
  * Display

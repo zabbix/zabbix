@@ -114,17 +114,17 @@ class CScreenHistory extends CScreenBase {
 			ITEM_VALUE_TYPE_UINT64 => 1
 		);
 
-		if ($this->action == 'showvalues' || $this->action == 'showlatest') {
+		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
 			$options = array(
 				'history' => $firstItem['value_type'],
 				'itemids' => $itemIds,
 				'output' => API_OUTPUT_EXTEND,
 				'sortorder' => ZBX_SORT_DOWN
 			);
-			if ($this->action == 'showlatest') {
+			if ($this->action == HISTORY_LATEST) {
 				$options['limit'] = 500;
 			}
-			elseif ($this->action == 'showvalues') {
+			elseif ($this->action == HISTORY_VALUES) {
 				$config = select_config();
 
 				$options['time_from'] = $stime - 10; // some seconds to allow script to execute
@@ -290,7 +290,7 @@ class CScreenHistory extends CScreenBase {
 		}
 
 		// time control
-		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph', 'batchgraph'))) {
+		if (!$this->plaintext && str_in_array($this->action, array(HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH))) {
 			$graphDims = getGraphDims();
 
 			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($firstItem['itemid']));
@@ -302,7 +302,7 @@ class CScreenHistory extends CScreenBase {
 				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 			);
 
-			if (($this->action == 'showgraph' || $this->action == 'batchgraph') && !isset($iv_string[$firstItem['value_type']])) {
+			if (($this->action == HISTORY_GRAPH || $this->action == HISTORY_BATCH_GRAPH) && !isset($iv_string[$firstItem['value_type']])) {
 				$containerId = 'graph_cont1';
 				$output[] = new CDiv(null, 'center', $containerId);
 
@@ -336,7 +336,7 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode != SCREEN_MODE_JS) {
 				$flickerfreeData = array(
 					'itemids' => $itemIds,
-					'action' => ($this->action === 'batchgraph') ? 'showgraph' : $this->action,
+					'action' => ($this->action == HISTORY_BATCH_GRAPH) ? HISTORY_GRAPH : $this->action,
 					'filter' => $this->filter,
 					'filterTask' => $this->filterTask,
 					'markColor' => $this->markColor
@@ -361,7 +361,7 @@ class CScreenHistory extends CScreenBase {
 		$url->setArgument('itemids', $itemIds);
 		$url->setArgument('type', $this->graphType);
 
-		if ($this->action === 'batchgraph') {
+		if ($this->action == HISTORY_BATCH_GRAPH) {
 			$url->setArgument('batch', 1);
 		}
 

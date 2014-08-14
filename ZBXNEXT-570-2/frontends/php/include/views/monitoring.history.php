@@ -29,7 +29,7 @@ $header = array(
 );
 $headerPlaintext = array();
 
-if ($this->data['action'] !== 'batchgraph') {
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$item = reset($this->data['items']);
 	$host = reset($item['hosts']);
 
@@ -40,7 +40,7 @@ if ($this->data['action'] !== 'batchgraph') {
 	);
 	$headerPlaintext[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
-	if ($this->data['action'] == 'showgraph') {
+	if ($this->data['action'] == HISTORY_GRAPH) {
 		$header['right'][] = get_icon('favourite', array(
 			'fav' => 'web.favorite.graphids',
 			'elid' => $item['itemid'],
@@ -53,7 +53,7 @@ $header['right'][] = ' ';
 $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
 
 // don't display the action form if we view multiple items on a graph
-if ($this->data['action'] !== 'batchgraph') {
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$actionForm = new CForm('get');
 	$actionForm->addVar('itemids', getRequest('itemids'));
 
@@ -69,13 +69,13 @@ if ($this->data['action'] !== 'batchgraph') {
 
 	$actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
 	if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
-		$actionComboBox->addItem('showgraph', _('Graph'));
+		$actionComboBox->addItem(HISTORY_GRAPH, _('Graph'));
 	}
-	$actionComboBox->addItem('showvalues', _('Values'));
-	$actionComboBox->addItem('showlatest', _('500 latest values'));
+	$actionComboBox->addItem(HISTORY_VALUES, _('Values'));
+	$actionComboBox->addItem(HISTORY_LATEST, _('500 latest values'));
 	$actionForm->addItem($actionComboBox);
 
-	if ($this->data['action'] != 'showgraph') {
+	if ($this->data['action'] != HISTORY_GRAPH) {
 		$actionForm->addItem(array(' ', new CSubmit('plaintext', _('As plain text'))));
 	}
 
@@ -83,7 +83,7 @@ if ($this->data['action'] !== 'batchgraph') {
 }
 
 // create filter
-if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlatest') {
+if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm = new CFormTable(null, null, 'get');
 		$filterForm->setTableClass('formtable old-filter');
@@ -154,7 +154,7 @@ $screen = CScreenBuilder::getScreen(array(
 	'items' => $this->data['items'],
 	'profileIdx' => 'web.item.graph',
 	'profileIdx2' => reset($this->data['itemids']),
-	'updateProfile' => ($this->data['action'] === 'batchgraph') ? false : true,
+	'updateProfile' => ($this->data['action'] != HISTORY_BATCH_GRAPH),
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => getRequest('filter'),
@@ -197,14 +197,14 @@ else {
 
 	$historyWidget->addItem($historyTable);
 
-	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph' || $this->data['action'] === 'batchgraph') {
+	if (in_array($this->data['action'], array(HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH))) {
 		// time bar
 		$filter = array(
 			new CDiv(null, null, 'scrollbar_cntr')
 		);
 
 		// display the graph type filter for graphs with multiple items
-		if ($this->data['action'] === 'batchgraph') {
+		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 			$filterTable = new CTable('', 'filter');
 
 			$graphType = array(
