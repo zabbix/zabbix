@@ -289,43 +289,32 @@ class CScreenHistory extends CScreenBase {
 			}
 		}
 
-		if ($this->action == 'showgraph' && !isset($iv_string[$firstItem['value_type']])) {
-			$this->dataId = 'historyGraph';
-			$containerId = 'graph_cont1';
-
-			$url = new CUrl('chart.php');
-			$url->setArgument('period', $this->timeline['period']);
-			$url->setArgument('stime', $this->timeline['stime']);
-			$url->setArgument('itemids', $itemIds);
-			$url->setArgument('type', $this->graphType);
-
-			$src = $url->getUrl().$this->getProfileUrlParams();
-
-			$output[] = new CDiv(null, 'center', $containerId);
-		}
-
 		// time control
-		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph'))) {
+		if (!$this->plaintext && str_in_array($this->action, array('showvalues', 'showgraph', 'batchgraph'))) {
 			$graphDims = getGraphDims();
 
 			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($firstItem['itemid']));
+
+			$this->dataId = 'historyGraph';
 
 			$timeControlData = array(
 				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
 				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 			);
 
-			if (!empty($this->dataId)) {
+			if (($this->action == 'showgraph' || $this->action == 'batchgraph') && !isset($iv_string[$firstItem['value_type']])) {
+				$containerId = 'graph_cont1';
+				$output[] = new CDiv(null, 'center', $containerId);
+
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerId;
-				$timeControlData['src'] = $src;
+				$timeControlData['src'] = $this->getGraphUrl($itemIds);
 				$timeControlData['objDims'] = $graphDims;
 				$timeControlData['loadSBox'] = 1;
 				$timeControlData['loadImage'] = 1;
 				$timeControlData['dynamic'] = 1;
 			}
 			else {
-				$this->dataId = 'historyGraph';
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['mainObject'] = 1;
 			}
@@ -347,7 +336,7 @@ class CScreenHistory extends CScreenBase {
 			if ($this->mode != SCREEN_MODE_JS) {
 				$flickerfreeData = array(
 					'itemids' => $itemIds,
-					'action' => $this->action,
+					'action' => ($this->action === 'batchgraph') ? 'showgraph' : $this->action,
 					'filter' => $this->filter,
 					'filterTask' => $this->filterTask,
 					'markColor' => $this->markColor
@@ -356,5 +345,26 @@ class CScreenHistory extends CScreenBase {
 				return $this->getOutput($output, true, $flickerfreeData);
 			}
 		}
+	}
+
+	/**
+	 * Return the URL for the graph.
+	 *
+	 * @param array $itemIds
+	 *
+	 * @return string
+	 */
+	protected function getGraphUrl(array $itemIds) {
+		$url = new CUrl('chart.php');
+		$url->setArgument('period', $this->timeline['period']);
+		$url->setArgument('stime', $this->timeline['stime']);
+		$url->setArgument('itemids', $itemIds);
+		$url->setArgument('type', $this->graphType);
+
+		if ($this->action === 'batchgraph') {
+			$url->setArgument('batch', 1);
+		}
+
+		return $url->getUrl().$this->getProfileUrlParams();
 	}
 }

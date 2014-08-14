@@ -29,9 +29,7 @@ $header = array(
 );
 $headerPlaintext = array();
 
-$singleItem = (count($this->data['items']) == 1);
-
-if ($singleItem) {
+if ($this->data['action'] !== 'batchgraph') {
 	$item = reset($this->data['items']);
 	$host = reset($item['hosts']);
 
@@ -55,7 +53,7 @@ $header['right'][] = ' ';
 $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
 
 // don't display the action form if we view multiple items on a graph
-if ($singleItem || $this->data['action'] !== 'showgraph') {
+if ($this->data['action'] !== 'batchgraph') {
 	$actionForm = new CForm('get');
 	$actionForm->addVar('itemids', getRequest('itemids'));
 
@@ -156,7 +154,7 @@ $screen = CScreenBuilder::getScreen(array(
 	'items' => $this->data['items'],
 	'profileIdx' => 'web.item.graph',
 	'profileIdx2' => reset($this->data['itemids']),
-	'updateProfile' => ($singleItem) ? true : false,
+	'updateProfile' => ($this->data['action'] === 'batchgraph') ? false : true,
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => getRequest('filter'),
@@ -199,14 +197,14 @@ else {
 
 	$historyWidget->addItem($historyTable);
 
-	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph') {
+	if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showgraph' || $this->data['action'] === 'batchgraph') {
 		// time bar
 		$filter = array(
 			new CDiv(null, null, 'scrollbar_cntr')
 		);
 
 		// display the graph type filter for graphs with multiple items
-		if ($this->data['action'] === 'showgraph' && count($this->data['items']) > 1) {
+		if ($this->data['action'] === 'batchgraph') {
 			$filterTable = new CTable('', 'filter');
 
 			$graphType = array(
@@ -224,6 +222,7 @@ else {
 			$filterForm = new CForm('GET');
 			$filterForm->setAttribute('name', 'zbx_filter');
 			$filterForm->setAttribute('id', 'zbx_filter');
+			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
 			$filterForm->addItem($filterTable);
 

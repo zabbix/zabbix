@@ -388,8 +388,9 @@ $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
-$form = new CForm('GET', 'history.php?action=showgraph');
+$form = new CForm('GET', 'history.php');
 $form->setName('items');
+$form->addVar('action', 'batchgraph');
 
 // table
 $table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
