@@ -19,12 +19,12 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.4');
-define('ZABBIX_API_VERSION', '2.3.4');
-define('ZABBIX_DB_VERSION',	 2030117);
+define('ZABBIX_VERSION',		'2.3.4');
+define('ZABBIX_API_VERSION',	'2.3.4');
+define('ZABBIX_DB_VERSION',		2030118);
 
-define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2014');
+define('ZABBIX_COPYRIGHT_FROM',	'2001');
+define('ZABBIX_COPYRIGHT_TO',	'2014');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
