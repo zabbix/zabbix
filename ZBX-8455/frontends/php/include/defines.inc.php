@@ -19,9 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.2');
-define('ZABBIX_API_VERSION', '2.3.2');
-define('ZABBIX_DB_VERSION',	 2030109);
+define('ZABBIX_VERSION',     '2.3.4');
+define('ZABBIX_API_VERSION', '2.3.4');
+define('ZABBIX_DB_VERSION',	 2030117);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -255,6 +255,9 @@ define('INTERFACE_TYPE_AGENT',		1);
 define('INTERFACE_TYPE_SNMP',		2);
 define('INTERFACE_TYPE_IPMI',		3);
 define('INTERFACE_TYPE_JMX',		4);
+
+define('SNMP_BULK_DISABLED',	0);
+define('SNMP_BULK_ENABLED',		1);
 
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);
@@ -756,10 +759,11 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
-define('SBR',	"<br/>\n");
+/**
+ * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
+ */
 define('SPACE',	'&nbsp;');
-define('RARR',	'&rArr;');
-define('SQUAREBRACKETS', '%5B%5D');
+
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
 

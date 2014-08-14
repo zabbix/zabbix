@@ -30,6 +30,9 @@
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
 static ZBX_MUTEX	cpustats_lock;
+#else
+#	define LOCK_CPUSTATS
+#	define UNLOCK_CPUSTATS
 #endif
 
 #ifdef HAVE_KSTAT_H
@@ -696,5 +699,37 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	return SYSINFO_RET_OK;
 }
-
 #endif	/* not _WINDOWS */
+
+int	get_cpu_statuses(zbx_vector_uint64_t *vector)
+{
+	int				i;
+#ifndef _WINDOWS
+	int				index;
+	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+#endif
+	ZBX_CPUS_STAT_DATA		*pcpus;
+
+	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
+		return FAIL;
+
+	LOCK_CPUSTATS;
+
+	for (i = 0; i < pcpus->count; i++)
+	{
+#ifndef _WINDOWS
+		cpu = get_cpustat_by_num(pcpus, i + 1);
+
+		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
+			index -= MAX_COLLECTOR_HISTORY;
+
+		zbx_vector_uint64_append(vector, cpu->h_status[index]);
+#else
+		zbx_vector_uint64_append(vector, pcpus->cpu_counter[i + 1]->status);
+#endif
+	}
+
+	UNLOCK_CPUSTATS;
+
+	return SUCCEED;
+}

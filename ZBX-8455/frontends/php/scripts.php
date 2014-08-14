@@ -58,14 +58,14 @@ $fields = array(
 );
 check_fields($fields);
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
  */
-if ($scriptId = get_request('scriptid')) {
+if ($scriptId = getRequest('scriptid')) {
 	$scripts = API::Script()->get(array(
 		'scriptids' => $scriptId,
 		'output' => array('scriptid')
@@ -83,8 +83,8 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
-	$confirmation = get_request('confirmation', '');
-	$enableConfirmation = get_request('enableConfirmation', false);
+	$confirmation = getRequest('confirmation', '');
+	$enableConfirmation = getRequest('enableConfirmation', false);
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
 
 	if (empty($_REQUEST['hgstype'])) {
@@ -109,7 +109,7 @@ elseif (isset($_REQUEST['save'])) {
 			'usrgrpid' => $_REQUEST['usrgrpid'],
 			'groupid' => $_REQUEST['groupid'],
 			'host_access' => getRequest('host_access'),
-			'confirmation' => get_request('confirmation', '')
+			'confirmation' => getRequest('confirmation', '')
 		);
 
 		DBstart();
@@ -138,12 +138,15 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
-	$scriptId = get_request('scriptid', 0);
+	$scriptId = getRequest('scriptid', 0);
 
 	DBstart();
 
@@ -155,8 +158,11 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
@@ -173,8 +179,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
 
 /*
@@ -182,24 +191,24 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0),
-		'scriptid' => get_request('scriptid')
+		'form' => getRequest('form', 1),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'scriptid' => getRequest('scriptid')
 	);
 
 	if (!$data['scriptid'] || isset($_REQUEST['form_refresh'])) {
-		$data['name'] = get_request('name', '');
-		$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
-		$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
-		$data['command'] = get_request('command', '');
-		$data['commandipmi'] = get_request('commandipmi', '');
-		$data['description'] = get_request('description', '');
-		$data['usrgrpid'] = get_request('usrgrpid', 0);
-		$data['groupid'] = get_request('groupid', 0);
+		$data['name'] = getRequest('name', '');
+		$data['type'] = getRequest('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+		$data['execute_on'] = getRequest('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
+		$data['command'] = getRequest('command', '');
+		$data['commandipmi'] = getRequest('commandipmi', '');
+		$data['description'] = getRequest('description', '');
+		$data['usrgrpid'] = getRequest('usrgrpid', 0);
+		$data['groupid'] = getRequest('groupid', 0);
 		$data['host_access'] = getRequest('host_access', 0);
-		$data['confirmation'] = get_request('confirmation', '');
-		$data['enableConfirmation'] = get_request('enableConfirmation', false);
-		$data['hgstype'] = get_request('hgstype', 0);
+		$data['confirmation'] = getRequest('confirmation', '');
+		$data['enableConfirmation'] = getRequest('enableConfirmation', false);
+		$data['hgstype'] = getRequest('hgstype', 0);
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(

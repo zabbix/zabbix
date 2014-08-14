@@ -20,6 +20,12 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
+#if defined(_WINDOWS)
+#	define ZBX_THREAD_LOCAL __declspec(thread)
+#else
+#	define ZBX_THREAD_LOCAL
+#endif
+
 #define	ZBX_FS_DBL		"%lf"
 #define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
 

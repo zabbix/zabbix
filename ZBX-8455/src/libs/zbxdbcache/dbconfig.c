@@ -333,9 +333,10 @@ typedef struct
 	const char	*ip;
 	const char	*dns;
 	const char	*port;
-	unsigned char	useip;
 	unsigned char	type;
 	unsigned char	main;
+	unsigned char	useip;
+	unsigned char	bulk;
 	unsigned char	max_snmp_succeed;
 	unsigned char	min_snmp_fail;
 }
@@ -443,14 +444,84 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_item_processed_by_server                                      *
+ *                                                                            *
+ * Parameters: type - [IN] item type [ITEM_TYPE_* flag]                       *
+ *             key  - [IN] item key                                           *
+ *                                                                            *
+ * Return value: SUCCEED when an item should be processed by server           *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ * Comments: list of the items, always processed by server                    *
+ *           ,------------------+--------------------------------------,      *
+ *           | type             | key                                  |      *
+ *           +------------------+--------------------------------------+      *
+ *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
+ *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
+ *           | Zabbix aggregate | *                                    |      *
+ *           | Calculated       | *                                    |      *
+ *           '------------------+--------------------------------------'      *
+ *                                                                            *
+ ******************************************************************************/
+int	is_item_processed_by_server(unsigned char type, const char *key)
+{
+	int	ret = FAIL;
+
+	switch (type)
+	{
+		case ITEM_TYPE_AGGREGATE:
+		case ITEM_TYPE_CALCULATED:
+			ret = SUCCEED;
+			break;
+
+		case ITEM_TYPE_INTERNAL:
+			if (0 == strncmp(key, "zabbix[", 7))
+			{
+				AGENT_REQUEST	request;
+				char		*arg1, *arg2, *arg3;
+
+				init_request(&request);
+
+				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
+					goto clean;
+
+				arg1 = get_rparam(&request, 0);
+
+				if (0 == strcmp(arg1, "host"))
+				{
+					arg2 = get_rparam(&request, 1);
+					arg3 = get_rparam(&request, 2);
+
+					if (0 != strcmp(arg3, "maintenance") || '\0' != *arg2)
+						goto clean;
+				}
+				else if (0 == strcmp(arg1, "proxy"))
+				{
+					arg3 = get_rparam(&request, 2);
+
+					if (0 != strcmp(arg3, "lastaccess"))
+						goto clean;
+				}
+				else
+					goto clean;
+
+				ret = SUCCEED;
+clean:
+				free_request(&request);
+			}
+			break;
+	}
+
+	return ret;
+}
+
 static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		unsigned char item_type, const char *key, unsigned char flags)
 {
-	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
-				ITEM_TYPE_CALCULATED != item_type))
-	{
+	if (0 != proxy_hostid && SUCCEED != is_item_processed_by_server(item_type, key))
 		return ZBX_NO_POLLER;
-	}
 
 	switch (item_type)
 	{
@@ -512,8 +583,21 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  ******************************************************************************/
 static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	if (ITEM_TYPE_JMX == item->type || SUCCEED == is_snmp_type(item->type))
+	if (ITEM_TYPE_JMX == item->type)
 		return item->interfaceid;
+
+	if (SUCCEED == is_snmp_type(item->type))
+	{
+		ZBX_DC_INTERFACE	*interface;
+
+		if (NULL == (interface = zbx_hashset_search(&config->interfaces, &item->interfaceid)) ||
+				SNMP_BULK_ENABLED != interface->bulk)
+		{
+			return item->itemid;
+		}
+
+		return item->interfaceid;
+	}
 
 	if (ITEM_TYPE_SIMPLE == item->type)
 	{
@@ -1068,6 +1152,541 @@ static void	DCsync_hosts(DB_RESULT result)
 		zbx_strpool_release(host->name);
 
 		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_host_inventory(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_host_inventory";
+
+	DB_ROW			row;
+
+	ZBX_DC_HOST_INVENTORY	*host_inventory;
+
+	int			found;
+	zbx_uint64_t		hostid;
+	zbx_vector_uint64_t	ids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->host_inventories.num_data + 32);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		/* array of selected hosts */
+		zbx_vector_uint64_append(&ids, hostid);
+
+		host_inventory = DCfind_id(&config->host_inventories, hostid, sizeof(ZBX_DC_HOST_INVENTORY), &found);
+
+		/* store new information in host_inventory structure */
+
+		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
+	}
+
+	/* remove deleted or disabled hosts from buffer */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->host_inventories, &iter);
+
+	while (NULL != (host_inventory = zbx_hashset_iter_next(&iter)))
+	{
+		hostid = host_inventory->hostid;
+
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		/* host_inventories */
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_htmpls(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_htmpls";
+
+	DB_ROW			row;
+
+	ZBX_DC_HTMPL		*htmpl = NULL;
+
+	int			found;
+	zbx_uint64_t		_hostid = 0, hostid, templateid;
+	zbx_vector_uint64_t	ids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->htmpls.num_data + 32);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+
+		if (_hostid != hostid || 0 == _hostid)
+		{
+			_hostid = hostid;
+
+			/* array of selected hosts */
+			zbx_vector_uint64_append(&ids, hostid);
+
+			htmpl = DCfind_id(&config->htmpls, hostid, sizeof(ZBX_DC_HTMPL), &found);
+
+			if (0 == found)
+			{
+				zbx_vector_uint64_create_ext(&htmpl->templateids,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+			}
+			else
+				zbx_vector_uint64_clear(&htmpl->templateids);
+		}
+
+		zbx_vector_uint64_append(&htmpl->templateids, templateid);
+	}
+
+	/* remove deleted hosts from buffer */
+
+	zbx_hashset_iter_reset(&config->htmpls, &iter);
+
+	while (NULL != (htmpl = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, htmpl->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_vector_uint64_destroy(&htmpl->templateids);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_gmacros(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_gmacros";
+
+	DB_ROW			row;
+
+	ZBX_DC_GMACRO		*gmacro;
+	ZBX_DC_GMACRO_M		*gmacro_m, gmacro_m_local;
+
+	int			found, update_index;
+	zbx_uint64_t		globalmacroid;
+	zbx_vector_uint64_t	ids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->gmacros.num_data + 32);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(globalmacroid, row[0]);
+
+		/* array of selected globalmacros */
+		zbx_vector_uint64_append(&ids, globalmacroid);
+
+		gmacro = DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
+
+		/* see whether we should and can update gmacros_m index at this point */
+
+		update_index = 0;
+
+		if (0 == found || 0 != strcmp(gmacro->macro, row[1]))
+		{
+			if (1 == found)
+			{
+				gmacro_m_local.macro = gmacro->macro;
+				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
+
+				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
+				{
+					zbx_strpool_release(gmacro_m->macro);
+					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
+				}
+			}
+
+			gmacro_m_local.macro = row[1];
+			gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
+
+			if (NULL != gmacro_m)
+				gmacro_m->gmacro_ptr = gmacro;
+			else
+				update_index = 1;
+		}
+
+		/* store new information in macro structure */
+
+		DCstrpool_replace(found, &gmacro->macro, row[1]);
+		DCstrpool_replace(found, &gmacro->value, row[2]);
+
+		/* update gmacros_m index using new data, if not done already */
+
+		if (1 == update_index)
+		{
+			gmacro_m_local.macro = zbx_strpool_acquire(gmacro->macro);
+			gmacro_m_local.gmacro_ptr = gmacro;
+			zbx_hashset_insert(&config->gmacros_m, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
+		}
+	}
+
+	/* remove deleted globalmacros from buffer */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->gmacros, &iter);
+
+	while (NULL != (gmacro = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, gmacro->globalmacroid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		gmacro_m_local.macro = gmacro->macro;
+		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
+
+		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
+		{
+			zbx_strpool_release(gmacro_m->macro);
+			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
+		}
+
+		zbx_strpool_release(gmacro->macro);
+		zbx_strpool_release(gmacro->value);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_hmacros(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_hmacros";
+
+	DB_ROW			row;
+
+	ZBX_DC_HMACRO		*hmacro;
+	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
+
+	int			found, update_index;
+	zbx_uint64_t		hostmacroid, hostid;
+	zbx_vector_uint64_t	ids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->hmacros.num_data + 32);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostmacroid, row[0]);
+		ZBX_STR2UINT64(hostid, row[1]);
+
+		/* array of selected hostmacros */
+		zbx_vector_uint64_append(&ids, hostmacroid);
+
+		hmacro = DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
+
+		/* see whether we should and can update hmacros_hm index at this point */
+
+		update_index = 0;
+
+		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, row[2]))
+		{
+			if (1 == found)
+			{
+				hmacro_hm_local.hostid = hmacro->hostid;
+				hmacro_hm_local.macro = hmacro->macro;
+				hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
+
+				if (hmacro == hmacro_hm->hmacro_ptr)
+				{
+					zbx_strpool_release(hmacro_hm->macro);
+					zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
+				}
+			}
+
+			hmacro_hm_local.hostid = hostid;
+			hmacro_hm_local.macro = row[2];
+			hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
+
+			if (NULL != hmacro_hm)
+				hmacro_hm->hmacro_ptr = hmacro;
+			else
+				update_index = 1;
+		}
+
+		/* store new information in macro structure */
+
+		hmacro->hostid = hostid;
+		DCstrpool_replace(found, &hmacro->macro, row[2]);
+		DCstrpool_replace(found, &hmacro->value, row[3]);
+
+		/* update hmacros_hm index using new data, if not done already */
+
+		if (1 == update_index)
+		{
+			hmacro_hm_local.hostid = hmacro->hostid;
+			hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
+			hmacro_hm_local.hmacro_ptr = hmacro;
+			zbx_hashset_insert(&config->hmacros_hm, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
+		}
+	}
+
+	/* remove deleted hostmacros from buffer */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->hmacros, &iter);
+
+	while (NULL != (hmacro = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, hmacro->hostmacroid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		hmacro_hm_local.hostid = hmacro->hostid;
+		hmacro_hm_local.macro = hmacro->macro;
+		hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
+
+		if (hmacro == hmacro_hm->hmacro_ptr)
+		{
+			zbx_strpool_release(hmacro_hm->macro);
+			zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
+		}
+
+		zbx_strpool_release(hmacro->macro);
+		zbx_strpool_release(hmacro->value);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_interfaces(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_interfaces";
+
+	DB_ROW			row;
+
+	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
+	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
+
+	int			found, update_index;
+	zbx_uint64_t		interfaceid, hostid;
+	unsigned char		type, main_, useip;
+	unsigned char		bulk, reset_snmp_stats;
+	zbx_vector_uint64_t	ids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	/* clear interface_snmpaddrs list */
+
+	zbx_hashset_iter_reset(&config->interface_snmpaddrs, &iter);
+
+	while (NULL != (interface_snmpaddr = zbx_hashset_iter_next(&iter)))
+	{
+		zbx_strpool_release(interface_snmpaddr->addr);
+		zbx_vector_uint64_destroy(&interface_snmpaddr->interfaceids);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->interfaces.num_data + 32);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(interfaceid, row[0]);
+		ZBX_STR2UINT64(hostid, row[1]);
+		ZBX_STR2UCHAR(type, row[2]);
+		ZBX_STR2UCHAR(main_, row[3]);
+		ZBX_STR2UCHAR(useip, row[4]);
+		ZBX_STR2UCHAR(bulk, row[8]);
+
+		/* array of selected interfaces */
+		zbx_vector_uint64_append(&ids, interfaceid);
+
+		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
+
+		/* see whether we should and can update interfaces_ht index at this point */
+
+		update_index = 0;
+
+		if (0 == found || interface->hostid != hostid || interface->type != type || interface->main != main_)
+		{
+			if (1 == found && 1 == interface->main)
+			{
+				interface_ht_local.hostid = interface->hostid;
+				interface_ht_local.type = interface->type;
+				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
+					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
+			}
+
+			if (1 == main_)
+			{
+				interface_ht_local.hostid = hostid;
+				interface_ht_local.type = type;
+				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+
+				if (NULL != interface_ht)
+					interface_ht->interface_ptr = interface;
+				else
+					update_index = 1;
+			}
+		}
+
+		/* store new information in interface structure */
+
+		reset_snmp_stats = (0 == found || interface->hostid != hostid || interface->type != type ||
+				interface->useip != useip || interface->bulk != bulk);
+
+		interface->hostid = hostid;
+		interface->type = type;
+		interface->main = main_;
+		interface->useip = useip;
+		interface->bulk = bulk;
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
+
+		/* update interfaces_ht index using new data, if not done already */
+
+		if (1 == update_index)
+		{
+			interface_ht_local.hostid = interface->hostid;
+			interface_ht_local.type = interface->type;
+			interface_ht_local.interface_ptr = interface;
+			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
+		}
+
+		/* update interface_snmpaddrs for SNMP traps or reset bulk request statistics */
+
+		if (INTERFACE_TYPE_SNMP == interface->type)
+		{
+			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
+
+			if ('\0' != *interface_snmpaddr_local.addr)
+			{
+				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs,
+						&interface_snmpaddr_local)))
+				{
+					zbx_strpool_acquire(interface_snmpaddr_local.addr);
+
+					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
+							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
+					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
+							__config_mem_malloc_func,
+							__config_mem_realloc_func,
+							__config_mem_free_func);
+				}
+
+				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
+			}
+
+			if (1 == reset_snmp_stats)
+			{
+				interface->max_snmp_succeed = 0;
+				interface->min_snmp_fail = MAX_SNMP_ITEMS + 1;
+			}
+		}
+	}
+
+	/* remove deleted interfaces from buffer and resolve macros for ip and dns fields */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->interfaces, &iter);
+
+	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			/* remove from buffer */
+
+			if (1 == interface->main)
+			{
+				interface_ht_local.hostid = interface->hostid;
+				interface_ht_local.type = interface->type;
+				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
+					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
+			}
+
+			zbx_strpool_release(interface->ip);
+			zbx_strpool_release(interface->dns);
+			zbx_strpool_release(interface->port);
+
+			zbx_hashset_iter_remove(&iter);
+		}
+		else if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
+		{
+			/* macros are not supported for the main agent interface, resolve for other interfaces */
+
+			int	macros;
+			char	*addr;
+			DC_HOST	host;
+
+			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
+			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+
+			if (0 != macros)
+			{
+				DCget_host_by_hostid(&host, interface->hostid);
+
+				if (0 != (macros & 0x01))
+				{
+					addr = zbx_strdup(NULL, interface->ip);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->ip, addr);
+					zbx_free(addr);
+				}
+
+				if (0 != (macros & 0x02))
+				{
+					addr = zbx_strdup(NULL, interface->dns);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->dns, addr);
+					zbx_free(addr);
+				}
+			}
+		}
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -2050,541 +2669,6 @@ static void	DCsync_functions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_host_inventory(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_host_inventory";
-
-	DB_ROW			row;
-
-	ZBX_DC_HOST_INVENTORY	*host_inventory;
-
-	int			found;
-	zbx_uint64_t		hostid;
-	zbx_vector_uint64_t	ids;
-	zbx_hashset_iter_t	iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->host_inventories.num_data + 32);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-
-		/* array of selected hosts */
-		zbx_vector_uint64_append(&ids, hostid);
-
-		host_inventory = DCfind_id(&config->host_inventories, hostid, sizeof(ZBX_DC_HOST_INVENTORY), &found);
-
-		/* store new information in host_inventory structure */
-
-		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
-	}
-
-	/* remove deleted or disabled hosts from buffer */
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_hashset_iter_reset(&config->host_inventories, &iter);
-
-	while (NULL != (host_inventory = zbx_hashset_iter_next(&iter)))
-	{
-		hostid = host_inventory->hostid;
-
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		/* host_inventories */
-
-		zbx_hashset_iter_remove(&iter);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static void	DCsync_htmpls(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_htmpls";
-
-	DB_ROW			row;
-
-	ZBX_DC_HTMPL		*htmpl = NULL;
-
-	int			found;
-	zbx_uint64_t		_hostid = 0, hostid, templateid;
-	zbx_vector_uint64_t	ids;
-	zbx_hashset_iter_t	iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->htmpls.num_data + 32);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(templateid, row[1]);
-
-		if (_hostid != hostid || 0 == _hostid)
-		{
-			_hostid = hostid;
-
-			/* array of selected hosts */
-			zbx_vector_uint64_append(&ids, hostid);
-
-			htmpl = DCfind_id(&config->htmpls, hostid, sizeof(ZBX_DC_HTMPL), &found);
-
-			if (0 == found)
-			{
-				zbx_vector_uint64_create_ext(&htmpl->templateids,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
-			}
-			else
-				zbx_vector_uint64_clear(&htmpl->templateids);
-		}
-
-		zbx_vector_uint64_append(&htmpl->templateids, templateid);
-	}
-
-	/* remove deleted hosts from buffer */
-
-	zbx_hashset_iter_reset(&config->htmpls, &iter);
-
-	while (NULL != (htmpl = zbx_hashset_iter_next(&iter)))
-	{
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, htmpl->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		zbx_vector_uint64_destroy(&htmpl->templateids);
-
-		zbx_hashset_iter_remove(&iter);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static void	DCsync_gmacros(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_gmacros";
-
-	DB_ROW			row;
-
-	ZBX_DC_GMACRO		*gmacro;
-	ZBX_DC_GMACRO_M		*gmacro_m, gmacro_m_local;
-
-	int			found, update_index;
-	zbx_uint64_t		globalmacroid;
-	zbx_vector_uint64_t	ids;
-	zbx_hashset_iter_t	iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->gmacros.num_data + 32);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(globalmacroid, row[0]);
-
-		/* array of selected globalmacros */
-		zbx_vector_uint64_append(&ids, globalmacroid);
-
-		gmacro = DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
-
-		/* see whether we should and can update gmacros_m index at this point */
-
-		update_index = 0;
-
-		if (0 == found || 0 != strcmp(gmacro->macro, row[1]))
-		{
-			if (1 == found)
-			{
-				gmacro_m_local.macro = gmacro->macro;
-				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
-
-				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
-				{
-					zbx_strpool_release(gmacro_m->macro);
-					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
-				}
-			}
-
-			gmacro_m_local.macro = row[1];
-			gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
-
-			if (NULL != gmacro_m)
-				gmacro_m->gmacro_ptr = gmacro;
-			else
-				update_index = 1;
-		}
-
-		/* store new information in macro structure */
-
-		DCstrpool_replace(found, &gmacro->macro, row[1]);
-		DCstrpool_replace(found, &gmacro->value, row[2]);
-
-		/* update gmacros_m index using new data, if not done already */
-
-		if (1 == update_index)
-		{
-			gmacro_m_local.macro = zbx_strpool_acquire(gmacro->macro);
-			gmacro_m_local.gmacro_ptr = gmacro;
-			zbx_hashset_insert(&config->gmacros_m, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
-		}
-	}
-
-	/* remove deleted globalmacros from buffer */
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_hashset_iter_reset(&config->gmacros, &iter);
-
-	while (NULL != (gmacro = zbx_hashset_iter_next(&iter)))
-	{
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, gmacro->globalmacroid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		gmacro_m_local.macro = gmacro->macro;
-		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
-
-		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
-		{
-			zbx_strpool_release(gmacro_m->macro);
-			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
-		}
-
-		zbx_strpool_release(gmacro->macro);
-		zbx_strpool_release(gmacro->value);
-
-		zbx_hashset_iter_remove(&iter);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static void	DCsync_hmacros(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_hmacros";
-
-	DB_ROW			row;
-
-	ZBX_DC_HMACRO		*hmacro;
-	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
-
-	int			found, update_index;
-	zbx_uint64_t		hostmacroid, hostid;
-	zbx_vector_uint64_t	ids;
-	zbx_hashset_iter_t	iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->hmacros.num_data + 32);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostmacroid, row[0]);
-		ZBX_STR2UINT64(hostid, row[1]);
-
-		/* array of selected hostmacros */
-		zbx_vector_uint64_append(&ids, hostmacroid);
-
-		hmacro = DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
-
-		/* see whether we should and can update hmacros_hm index at this point */
-
-		update_index = 0;
-
-		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, row[2]))
-		{
-			if (1 == found)
-			{
-				hmacro_hm_local.hostid = hmacro->hostid;
-				hmacro_hm_local.macro = hmacro->macro;
-				hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
-
-				if (hmacro == hmacro_hm->hmacro_ptr)
-				{
-					zbx_strpool_release(hmacro_hm->macro);
-					zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
-				}
-			}
-
-			hmacro_hm_local.hostid = hostid;
-			hmacro_hm_local.macro = row[2];
-			hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
-
-			if (NULL != hmacro_hm)
-				hmacro_hm->hmacro_ptr = hmacro;
-			else
-				update_index = 1;
-		}
-
-		/* store new information in macro structure */
-
-		hmacro->hostid = hostid;
-		DCstrpool_replace(found, &hmacro->macro, row[2]);
-		DCstrpool_replace(found, &hmacro->value, row[3]);
-
-		/* update hmacros_hm index using new data, if not done already */
-
-		if (1 == update_index)
-		{
-			hmacro_hm_local.hostid = hmacro->hostid;
-			hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
-			hmacro_hm_local.hmacro_ptr = hmacro;
-			zbx_hashset_insert(&config->hmacros_hm, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
-		}
-	}
-
-	/* remove deleted hostmacros from buffer */
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_hashset_iter_reset(&config->hmacros, &iter);
-
-	while (NULL != (hmacro = zbx_hashset_iter_next(&iter)))
-	{
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, hmacro->hostmacroid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		hmacro_hm_local.hostid = hmacro->hostid;
-		hmacro_hm_local.macro = hmacro->macro;
-		hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
-
-		if (hmacro == hmacro_hm->hmacro_ptr)
-		{
-			zbx_strpool_release(hmacro_hm->macro);
-			zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
-		}
-
-		zbx_strpool_release(hmacro->macro);
-		zbx_strpool_release(hmacro->value);
-
-		zbx_hashset_iter_remove(&iter);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static void	DCsync_interfaces(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_interfaces";
-
-	DB_ROW			row;
-
-	ZBX_DC_INTERFACE	*interface;
-	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
-
-	int			found, update_index;
-	zbx_uint64_t		interfaceid, hostid;
-	unsigned char		type, main_, useip;
-	unsigned char		reset_snmp_stats;
-	zbx_vector_uint64_t	ids;
-	zbx_hashset_iter_t	iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* clear interface_snmpaddrs list */
-
-	zbx_hashset_iter_reset(&config->interface_snmpaddrs, &iter);
-
-	while (NULL != (interface_snmpaddr = zbx_hashset_iter_next(&iter)))
-	{
-		zbx_strpool_release(interface_snmpaddr->addr);
-		zbx_vector_uint64_destroy(&interface_snmpaddr->interfaceids);
-		zbx_hashset_iter_remove(&iter);
-	}
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_reserve(&ids, config->interfaces.num_data + 32);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(interfaceid, row[0]);
-		ZBX_STR2UINT64(hostid, row[1]);
-		type = (unsigned char)atoi(row[2]);
-		main_ = (unsigned char)atoi(row[3]);
-		useip = (unsigned char)atoi(row[4]);
-
-		/* array of selected interfaces */
-		zbx_vector_uint64_append(&ids, interfaceid);
-
-		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
-
-		/* see whether we should and can update interfaces_ht index at this point */
-
-		update_index = 0;
-
-		if (0 == found || interface->hostid != hostid || interface->type != type || interface->main != main_)
-		{
-			if (1 == found && 1 == interface->main)
-			{
-				interface_ht_local.hostid = interface->hostid;
-				interface_ht_local.type = interface->type;
-				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
-
-				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
-				{
-					/* see ZBX-4045 for NULL check in the conditional */
-					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
-				}
-			}
-
-			if (1 == main_)
-			{
-				interface_ht_local.hostid = hostid;
-				interface_ht_local.type = type;
-				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
-
-				if (NULL != interface_ht)
-					interface_ht->interface_ptr = interface;
-				else
-					update_index = 1;
-			}
-		}
-
-		/* store new information in interface structure */
-
-		if (0 == found || interface->hostid != hostid || interface->type != type || interface->useip != useip)
-			reset_snmp_stats = 1;
-		else
-			reset_snmp_stats = 0;
-
-		interface->hostid = hostid;
-		interface->type = type;
-		interface->main = main_;
-		interface->useip = useip;
-		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
-		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
-		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
-
-		/* update interfaces_ht index using new data, if not done already */
-
-		if (1 == update_index)
-		{
-			interface_ht_local.hostid = interface->hostid;
-			interface_ht_local.type = interface->type;
-			interface_ht_local.interface_ptr = interface;
-			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
-		}
-
-		/* update interface_snmpaddrs for SNMP traps or reset bulk request statistics */
-
-		if (INTERFACE_TYPE_SNMP == interface->type)
-		{
-			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
-
-			if ('\0' != *interface_snmpaddr_local.addr)
-			{
-				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs,
-						&interface_snmpaddr_local)))
-				{
-					zbx_strpool_acquire(interface_snmpaddr_local.addr);
-
-					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
-							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
-					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
-							__config_mem_malloc_func,
-							__config_mem_realloc_func,
-							__config_mem_free_func);
-				}
-
-				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
-			}
-
-			if (1 == reset_snmp_stats)
-			{
-				interface->max_snmp_succeed = 0;
-				interface->min_snmp_fail = MAX_SNMP_ITEMS + 1;
-			}
-		}
-	}
-
-	/* remove deleted interfaces from buffer and resolve macros for ip and dns fields */
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_hashset_iter_reset(&config->interfaces, &iter);
-
-	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
-	{
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		{
-			/* remove from buffer */
-
-			if (1 == interface->main)
-			{
-				interface_ht_local.hostid = interface->hostid;
-				interface_ht_local.type = interface->type;
-				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
-
-				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
-				{
-					/* see ZBX-4045 for NULL check in the conditional */
-					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
-				}
-			}
-
-			zbx_strpool_release(interface->ip);
-			zbx_strpool_release(interface->dns);
-			zbx_strpool_release(interface->port);
-
-			zbx_hashset_iter_remove(&iter);
-		}
-		else if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
-		{
-			/* macros are not supported for the main agent interface, resolve for other interfaces */
-
-			int	macros;
-			char	*addr;
-			DC_HOST	host;
-
-			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
-			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
-
-			if (0 != macros)
-			{
-				DCget_host_by_hostid(&host, interface->hostid);
-
-				if (0 != (macros & 0x01))
-				{
-					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-					DCstrpool_replace(1, &interface->ip, addr);
-					zbx_free(addr);
-				}
-
-				if (0 != (macros & 0x02))
-				{
-					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-					DCstrpool_replace(1, &interface->dns, addr);
-					zbx_free(addr);
-				}
-			}
-		}
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_expressions                                               *
@@ -2711,21 +2795,21 @@ void	DCsync_configuration(void)
 
 	DB_RESULT		conf_result = NULL;
 	DB_RESULT		host_result = NULL;
-	DB_RESULT		item_result = NULL;
-	DB_RESULT		trig_result = NULL;
-	DB_RESULT		tdep_result = NULL;
-	DB_RESULT		func_result = NULL;
 	DB_RESULT		hi_result = NULL;
 	DB_RESULT		htmpl_result = NULL;
 	DB_RESULT		gmacro_result = NULL;
 	DB_RESULT		hmacro_result = NULL;
 	DB_RESULT		if_result = NULL;
+	DB_RESULT		item_result = NULL;
+	DB_RESULT		trig_result = NULL;
+	DB_RESULT		tdep_result = NULL;
+	DB_RESULT		func_result = NULL;
 	DB_RESULT		expr_result = NULL;
 
 	int			i;
-	double			sec, csec, hsec, isec, tsec, dsec, fsec, hisec, htsec, gmsec, hmsec, ifsec, expr_sec,
-				csec2, hsec2, isec2, tsec2, dsec2, fsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2,
-				expr_sec2, total2;
+	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
+				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
+				expr_sec2, total, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2753,6 +2837,52 @@ void	DCsync_configuration(void)
 		goto out;
 	}
 	hsec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (hi_result = DBselect(
+			"select hostid,inventory_mode"
+			" from host_inventory")))
+	{
+		goto out;
+	}
+	hisec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (htmpl_result = DBselect(
+			"select hostid,templateid"
+			" from hosts_templates"
+			" order by hostid,templateid")))
+	{
+		goto out;
+	}
+	htsec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (gmacro_result = DBselect(
+			"select globalmacroid,macro,value"
+			" from globalmacro")))
+	{
+		goto out;
+	}
+	gmsec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (hmacro_result = DBselect(
+			"select hostmacroid,hostid,macro,value"
+			" from hostmacro")))
+	{
+		goto out;
+	}
+	hmsec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (if_result = DBselect(
+			"select interfaceid,hostid,type,main,useip,ip,dns,port,bulk"
+			" from interface")))
+	{
+		goto out;
+	}
+	ifsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (NULL == (item_result = DBselect(
@@ -2818,52 +2948,6 @@ void	DCsync_configuration(void)
 	fsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (NULL == (hi_result = DBselect(
-			"select hostid,inventory_mode"
-			" from host_inventory")))
-	{
-		goto out;
-	}
-	hisec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (NULL == (htmpl_result = DBselect(
-			"select hostid,templateid"
-			" from hosts_templates"
-			" order by hostid,templateid")))
-	{
-		goto out;
-	}
-	htsec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (NULL == (gmacro_result = DBselect(
-			"select globalmacroid,macro,value"
-			" from globalmacro")))
-	{
-		goto out;
-	}
-	gmsec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (NULL == (hmacro_result = DBselect(
-			"select hostmacroid,hostid,macro,value"
-			" from hostmacro")))
-	{
-		goto out;
-	}
-	hmsec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (NULL == (if_result = DBselect(
-			"select interfaceid,hostid,type,main,useip,ip,dns,port"
-			" from interface")))
-	{
-		goto out;
-	}
-	ifsec = zbx_time() - sec;
-
-	sec = zbx_time();
 	if (NULL == (expr_result = DBselect(
 			"select r.name,e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 			" from regexps r,expressions e"
@@ -2882,22 +2966,6 @@ void	DCsync_configuration(void)
 	sec = zbx_time();
 	DCsync_hosts(host_result);
 	hsec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_items(item_result);	/* relies on host status, must be after DCsync_hosts() */
-	isec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_triggers(trig_result);
-	tsec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_trigdeps(tdep_result);
-	dsec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_functions(func_result);
-	fsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_host_inventory(hi_result);
@@ -2920,24 +2988,33 @@ void	DCsync_configuration(void)
 	ifsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
+	DCsync_items(item_result);	/* relies on hosts and interfaces, must be after DCsync_{hosts,interfaces}() */
+	isec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_triggers(trig_result);
+	tsec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_trigdeps(tdep_result);
+	dsec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_functions(func_result);
+	fsec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 	DCsync_expressions(expr_result);
 	expr_sec2 = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
 
-	total2 = csec2 + hsec2 + isec2 + tsec2 + dsec2 + fsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + expr_sec2;
+	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec;
+	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 + expr_sec2;
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			hsec, hsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
-			isec, isec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
-			tsec, tsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
-			dsec, dsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
-			fsec, fsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			hisec, hisec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
@@ -2948,12 +3025,18 @@ void	DCsync_configuration(void)
 			hmsec, hmsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			ifsec, ifsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			isec, isec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			tsec, tsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			dsec, dsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			fsec, fsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			expr_sec, expr_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total      : " ZBX_FS_DBL " sec.", __function_name,
-			csec + hsec + isec + tsec + dsec + fsec + hisec + htsec + gmsec + hmsec + ifsec + expr_sec +
-			total2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
 			config->proxies.num_data, config->proxies.num_slots);
@@ -2963,6 +3046,26 @@ void	DCsync_configuration(void)
 			config->hosts_h.num_data, config->hosts_h.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
+			config->host_inventories.num_data, config->host_inventories.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
+			config->htmpls.num_data, config->htmpls.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
+			config->gmacros.num_data, config->gmacros.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __function_name,
+			config->gmacros_m.num_data, config->gmacros_m.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __function_name,
+			config->hmacros.num_data, config->hmacros.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __function_name,
+			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
+			config->interfaces.num_data, config->interfaces.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
+			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
+			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
+			config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __function_name,
@@ -3004,24 +3107,6 @@ void	DCsync_configuration(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
 				i, config->time_triggers[i].values_num, config->time_triggers[i].values_alloc);
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
-			config->htmpls.num_data, config->htmpls.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
-			config->gmacros.num_data, config->gmacros.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __function_name,
-			config->gmacros_m.num_data, config->gmacros_m.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __function_name,
-			config->hmacros.num_data, config->hmacros.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __function_name,
-			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
-			config->interfaces.num_data, config->interfaces.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
-			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
-			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
-			config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
 			config->expressions.num_data, config->expressions.num_slots);
 
@@ -3050,15 +3135,15 @@ void	DCsync_configuration(void)
 out:
 	DBfree_result(conf_result);
 	DBfree_result(host_result);
-	DBfree_result(item_result);
-	DBfree_result(trig_result);
-	DBfree_result(tdep_result);
-	DBfree_result(func_result);
 	DBfree_result(hi_result);
 	DBfree_result(htmpl_result);
 	DBfree_result(gmacro_result);
 	DBfree_result(hmacro_result);
 	DBfree_result(if_result);
+	DBfree_result(item_result);
+	DBfree_result(trig_result);
+	DBfree_result(tdep_result);
+	DBfree_result(func_result);
 	DBfree_result(expr_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -3529,6 +3614,39 @@ void	DCload_config()
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: in_maintenance_without_data_collection                           *
+ *                                                                            *
+ * Parameters: maintenance_status - [IN] maintenance status                   *
+ *                                       HOST_MAINTENANCE_STATUS_* flag       *
+ *             maintenance_type   - [IN] maintenance type                     *
+ *                                       MAINTENANCE_TYPE_* flag              *
+ *             type               - [IN] item type                            *
+ *                                       ITEM_TYPE_* flag                     *
+ *                                                                            *
+ * Return value: SUCCEED if host in maintenance without data collection       *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+#define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
+		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
+				dc_host->maintenance_type, dc_item->type)
+int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
+		unsigned char type)
+{
+	if (HOST_MAINTENANCE_STATUS_ON != maintenance_status)
+		return FAIL;
+
+	if (MAINTENANCE_TYPE_NODATA != maintenance_type)
+		return FAIL;
+
+	if (ITEM_TYPE_INTERNAL == type)
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
@@ -4339,8 +4457,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 					ITEM_STATUS_ACTIVE == dc_item->status &&
 					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 					HOST_STATUS_MONITORED == dc_host->status &&
-					!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
+					SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
 			{
 				found = 1;
 				break;
@@ -4384,7 +4501,8 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
+	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) &&
+			SNMP_BULK_ENABLED == dc_interface->bulk)
 	{
 		if (dc_interface->max_snmp_succeed < max_snmp_succeed)
 			dc_interface->max_snmp_succeed = (unsigned char)max_snmp_succeed;
@@ -4396,53 +4514,45 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 	UNLOCK_CACHE;
 }
 
-static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, int *max_snmp_succeed,
-		int *min_snmp_fail)
+static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int *bulk)
 {
-	int			ret = FAIL;
+	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
+	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
+	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
+
+	int			num;
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
-	{
-		*max_snmp_succeed = dc_interface->max_snmp_succeed;
-		*min_snmp_fail = dc_interface->min_snmp_fail;
+	dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid);
 
-		ret = SUCCEED;
-	}
+	if (NULL != bulk)
+		*bulk = (NULL == dc_interface ? SNMP_BULK_DISABLED : dc_interface->bulk);
 
-	return ret;
+	if (NULL == dc_interface || SNMP_BULK_ENABLED != dc_interface->bulk)
+		return 1;
+
+	if (1 >= dc_interface->max_snmp_succeed || MAX_SNMP_ITEMS + 1 != dc_interface->min_snmp_fail)
+		num = dc_interface->max_snmp_succeed + 1;
+	else
+		num = dc_interface->max_snmp_succeed * 3 / 2;
+
+	if (num < dc_interface->min_snmp_fail)
+		return num;
+
+	return dc_interface->min_snmp_fail - 1;
 }
 
-int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail)
+int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
 {
 	int	ret;
 
 	LOCK_CACHE;
 
-	ret = DCconfig_get_interface_snmp_stats_nolock(interfaceid, max_snmp_succeed, min_snmp_fail);
+	ret = DCconfig_get_suggested_snmp_vars_nolock(interfaceid, bulk);
 
 	UNLOCK_CACHE;
 
 	return ret;
-}
-
-int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
-{
-	int	num;
-
-	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
-	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
-	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
-
-	if (1 >= max_snmp_succeed || MAX_SNMP_ITEMS + 1 != min_snmp_fail)
-		num = max_snmp_succeed + 1;
-	else
-		num = max_snmp_succeed * 3 / 2;
-
-	if (num < min_snmp_fail)
-		return num;
-
-	return min_snmp_fail - 1;
 }
 
 /******************************************************************************
@@ -4616,8 +4726,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
 			old_nextcheck = dc_item->nextcheck;
 			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -4685,13 +4794,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
 					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
 			{
-				int	max_snmp_succeed, min_snmp_fail;
-
-				if (SUCCEED == DCconfig_get_interface_snmp_stats_nolock(dc_item->interfaceid,
-						&max_snmp_succeed, &min_snmp_fail))
-				{
-					max_items = DCconfig_get_suggested_snmp_vars(max_snmp_succeed, min_snmp_fail);
-				}
+				max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
 			}
 		}
 	}
@@ -4779,12 +4882,6 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 	if (HOST_STATUS_MONITORED != dc_host->status)
 		goto unlock;
 
-	if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-			MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
-	{
-		goto unlock;
-	}
-
 	if (NULL == (dc_interface_snmpitem = zbx_hashset_search(&config->interface_snmpitems, &interfaceid)))
 		goto unlock;
 
@@ -4796,6 +4893,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
 
 		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
@@ -5894,7 +5994,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_ITEM	*item;
+	const ZBX_DC_ITEM	*dc_item;
 	int			now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
@@ -5904,31 +6004,28 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*dc_host;
 
-		if (ITEM_STATUS_ACTIVE != item->status)
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (HOST_STATUS_MONITORED != host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_ON == host->maintenance_status &&
-				MAINTENANCE_TYPE_NODATA == host->maintenance_type)
-		{
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
-		}
 
-		switch (item->type)
+		switch (dc_item->type)
 		{
 			case ITEM_TYPE_ZABBIX_ACTIVE:
-				if (0 == strncmp(item->key, "log[", 4) ||
-						0 == strncmp(item->key, "logrt[", 6) ||
-						0 == strncmp(item->key, "eventlog[", 9))
+				if (0 == strncmp(dc_item->key, "log[", 4) ||
+						0 == strncmp(dc_item->key, "logrt[", 6) ||
+						0 == strncmp(dc_item->key, "eventlog[", 9))
 				{
 					continue;
 				}
@@ -5942,37 +6039,37 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (HOST_AVAILABLE_TRUE != host->available)
+				if (HOST_AVAILABLE_TRUE != dc_host->available)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (HOST_AVAILABLE_TRUE != host->snmp_available)
+				if (HOST_AVAILABLE_TRUE != dc_host->snmp_available)
 					continue;
 				break;
 			case ITEM_TYPE_IPMI:
-				if (HOST_AVAILABLE_TRUE != host->ipmi_available)
+				if (HOST_AVAILABLE_TRUE != dc_host->ipmi_available)
 					continue;
 				break;
 			case ITEM_TYPE_JMX:
-				if (HOST_AVAILABLE_TRUE != host->jmx_available)
+				if (HOST_AVAILABLE_TRUE != dc_host->jmx_available)
 					continue;
 				break;
 			default:
 				continue;
 		}
 
-		if ((-1 != from && from > now - item->nextcheck) || (-1 != to && now - item->nextcheck >= to))
+		if ((-1 != from && from > now - dc_item->nextcheck) || (-1 != to && now - dc_item->nextcheck >= to))
 			continue;
 
 		if (NULL != queue)
 		{
 			queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
-			queue_item->itemid = item->itemid;
-			queue_item->type = item->type;
-			queue_item->nextcheck = item->nextcheck;
-			queue_item->proxy_hostid = host->proxy_hostid;
+			queue_item->itemid = dc_item->itemid;
+			queue_item->type = dc_item->type;
+			queue_item->nextcheck = dc_item->nextcheck;
+			queue_item->proxy_hostid = dc_host->proxy_hostid;
 
 			zbx_vector_ptr_append(queue, queue_item);
 		}
@@ -5997,26 +6094,26 @@ int	DCget_item_count()
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_ITEM	*item;
+	const ZBX_DC_ITEM	*dc_item;
 
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*dc_host;
 
-		if (ITEM_STATUS_ACTIVE != item->status)
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
+		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
 			continue;
 
-		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (HOST_STATUS_MONITORED != host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		count++;
@@ -6040,26 +6137,26 @@ int	DCget_item_unsupported_count()
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_ITEM	*item;
+	const ZBX_DC_ITEM	*dc_item;
 
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*dc_host;
 
-		if (ITEM_STATUS_ACTIVE != item->status || ITEM_STATE_NOTSUPPORTED != item->state)
+		if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_STATE_NOTSUPPORTED != dc_item->state)
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
+		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
 			continue;
 
-		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (HOST_STATUS_MONITORED != host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		count++;
@@ -6149,15 +6246,15 @@ int	DCget_host_count()
 {
 	int			nhosts = 0;
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_HOST	*host;
+	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 
-	while (NULL != (host = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_host = zbx_hashset_iter_next(&iter)))
 	{
-		if (HOST_STATUS_MONITORED == host->status)
+		if (HOST_STATUS_MONITORED == dc_host->status)
 			nhosts++;
 	}
 
@@ -6179,26 +6276,26 @@ double	DCget_required_performance()
 {
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_ITEM	*item;
+	const ZBX_DC_ITEM	*dc_item;
 
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
-	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 	{
-		const ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*dc_host;
 
-		if (ITEM_STATUS_ACTIVE != item->status || 0 == item->delay)
+		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->delay)
 			continue;
 
-		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (HOST_STATUS_MONITORED != host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		nvps += 1.0 / item->delay;
+		nvps += 1.0 / dc_item->delay;
 	}
 
 	UNLOCK_CACHE;
@@ -6218,19 +6315,19 @@ double	DCget_required_performance()
  ******************************************************************************/
 void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids)
 {
-	ZBX_DC_FUNCTION		*function;
-	ZBX_DC_ITEM		*item;
+	ZBX_DC_FUNCTION		*dc_function;
+	ZBX_DC_ITEM		*dc_item;
 	int			i;
 
 	LOCK_CACHE;
 
 	for (i = 0; i < functionids->values_num; i++)
 	{
-		if (NULL == (function = zbx_hashset_search(&config->functions, &functionids->values[i])))
+		if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionids->values[i])))
 			continue;
 
-		if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
-			zbx_vector_uint64_append(hostids, item->hostid);
+		if (NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
 	}
 
 	UNLOCK_CACHE;
@@ -6322,25 +6419,25 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  ******************************************************************************/
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
-	ZBX_DC_ITEM	*item;
-	ZBX_DC_HOST	*host;
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
 	int		ret = FAIL;
 
 	LOCK_CACHE;
 
-	if (NULL == (item = zbx_hashset_search(&config->items, &itemid)))
+	if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
 		goto unlock;
 
-	if (ITEM_STATUS_ACTIVE != item->status)
+	if (ITEM_STATUS_ACTIVE != dc_item->status)
 		goto unlock;
 
-	if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		goto unlock;
 
-	if (HOST_STATUS_MONITORED != host->status)
+	if (HOST_STATUS_MONITORED != dc_host->status)
 		goto unlock;
 
-	*seconds = MAX(item->data_expected_from, host->data_expected_from);
+	*seconds = MAX(dc_item->data_expected_from, dc_host->data_expected_from);
 
 	ret = SUCCEED;
 unlock:
