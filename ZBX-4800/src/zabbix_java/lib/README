@@ -10,7 +10,7 @@ $ cd android-libcore
 $ git tag | less
 $ git checkout android-4.3_r3.1
 
-### compile the library using JDK 1.5 so that it runs on older versions of Java and package it
+### compile the library using JDK 1.6 so that it runs on older versions of Java and package it
 
 $ cd json/src/main/java
 $ javac org/json/*.java
