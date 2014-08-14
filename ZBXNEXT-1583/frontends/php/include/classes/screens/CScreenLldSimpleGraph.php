@@ -88,7 +88,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 			$screenItem = $screenItemTemplate;
 
 			$screenItem['resourceid'] = $itemId;
-			$screenItem['screenitemid'] = $this->screenitem['screenitemid'].'_'.$itemId;
+			$screenItem['screenitemid'] = $itemId;
 			$screenItem['url'] = $this->screenitem['url'];
 
 			$screenItems[] = $screenItem;
