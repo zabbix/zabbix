@@ -29,7 +29,9 @@ $header = array(
 );
 $headerPlaintext = array();
 
-if (count($this->data['items']) == 1) {
+$singleItem = (count($this->data['items']) == 1);
+
+if ($singleItem) {
 	$item = reset($this->data['items']);
 	$host = reset($item['hosts']);
 
@@ -53,7 +55,7 @@ $header['right'][] = ' ';
 $header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
 
 // don't display the action form if we view multiple items on a graph
-if (count($this->data['items']) == 1 || $this->data['action'] !== 'showgraph') {
+if ($singleItem || $this->data['action'] !== 'showgraph') {
 	$actionForm = new CForm('get');
 	$actionForm->addVar('itemids', getRequest('itemids'));
 
@@ -154,6 +156,7 @@ $screen = CScreenBuilder::getScreen(array(
 	'items' => $this->data['items'],
 	'profileIdx' => 'web.item.graph',
 	'profileIdx2' => reset($this->data['itemids']),
+	'updateProfile' => ($singleItem) ? true : false,
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => getRequest('filter'),
