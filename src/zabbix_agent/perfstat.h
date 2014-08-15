@@ -27,7 +27,6 @@
 #include "perfmon.h"
 
 #define UNSUPPORTED_REFRESH_PERIOD		600
-#define USE_DEFAULT_INTERVAL			0
 
 typedef struct
 {
@@ -39,7 +38,7 @@ ZBX_PERF_STAT_DATA;
 
 extern ZBX_PERF_STAT_DATA	ppsd;
 
-PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval);
+PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error);
 void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
 double	compute_average_value(PERF_COUNTER_DATA *counter, int interval);
@@ -48,5 +47,9 @@ int	init_perf_collector(int multithreaded);
 void	free_perf_collector();
 int	perf_collector_started();
 void	collect_perfstat();
+
+int	get_perf_counter_value_by_name(const char *name, double *value, char **error);
+int	get_perf_counter_value_by_path(const char *counterpath, int interval, double *value, char **error);
+int	get_perf_counter_value(PERF_COUNTER_DATA *counter, int interval, double *value, char **error);
 
 #endif
