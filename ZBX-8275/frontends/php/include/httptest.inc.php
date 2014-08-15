@@ -245,5 +245,5 @@ function copyHttpTests($srcHostId, $dstHostId) {
 	}
 	unset($httpTest);
 
-	return API::HttpTest()->create($httpTestsToClone);
+	return (bool) API::HttpTest()->create($httpTestsToClone);
 }
