@@ -5,6 +5,7 @@ A.......S. [ZBX-8473] improved performance of deleting triggers by API and serve
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir,Sasha)
 ...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
 .......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
