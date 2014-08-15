@@ -453,7 +453,8 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 
 	if (ZBX_TCP_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No prompt: %s", zbx_tcp_strerror()));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No prompt: %s",
+				strerror_from_system(zbx_sock_last_error())));
 		goto fail;
 	}
 
