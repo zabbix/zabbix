@@ -147,14 +147,26 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 	}
 }
 
+// for batch graphs don't remember the time selection in the profiles
+if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
+	$profileIdx = false;
+	$profileIdx2 = false;
+	$updateProfile = false;
+}
+else {
+	$profileIdx = 'web.item.graph';
+	$profileIdx2 = reset($this->data['itemids']);
+	$updateProfile = ($this->data['action'] != HISTORY_BATCH_GRAPH);
+}
+
 // create history screen
 $screen = CScreenBuilder::getScreen(array(
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
-	'profileIdx' => 'web.item.graph',
-	'profileIdx2' => reset($this->data['itemids']),
-	'updateProfile' => ($this->data['action'] != HISTORY_BATCH_GRAPH),
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2,
+	'updateProfile' => $updateProfile,
 	'period' => $this->data['period'],
 	'stime' => $this->data['stime'],
 	'filter' => getRequest('filter'),
