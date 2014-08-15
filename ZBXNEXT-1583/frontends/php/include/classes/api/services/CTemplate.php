@@ -614,9 +614,6 @@ class CTemplate extends CHostGeneral {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
-		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.dbConditionInt('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
-
 		// delete host from maps
 		if (!empty($templateids)) {
 			DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids));
