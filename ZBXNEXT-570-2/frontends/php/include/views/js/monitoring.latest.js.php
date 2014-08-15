@@ -118,5 +118,9 @@
 				toggle_open_state: openState
 			});
 		});
+
+		$('#filter_set, #filter_rst').click(function() {
+			chkbxRange.clearSelectedOnFilterChange();
+		});
 	});
 </script>
