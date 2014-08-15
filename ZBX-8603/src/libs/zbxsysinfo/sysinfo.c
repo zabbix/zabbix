@@ -616,7 +616,10 @@ notsupported:
 	free_request(&request);
 
 	if (NOTSUPPORTED == ret)
+	{
+		UNSET_MSG_RESULT(result);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
+	}
 
 	return ret;
 }

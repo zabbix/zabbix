@@ -732,7 +732,7 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 	if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 		return;
 
-	/* only new graphs or graphs with a new data will be validated */
+	/* only new graphs or graphs with changed data will be validated */
 	if (0 != graph->graphid && 0 == (graph->flags & flag))
 		return;
 
@@ -795,7 +795,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
 
-		/* only new graphs or graphs with a new name will be validated */
+		/* only new graphs or graphs with changed name will be validated */
 		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			continue;
 

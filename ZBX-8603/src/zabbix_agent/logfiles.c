@@ -1305,6 +1305,11 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
 					"a logrt[] item. Error: %s", format, err_buf);
 			ret = FAIL;
+#ifdef _WINDOWS
+			/* the Windows gnuregex implementation does not correctly clean up */
+			/* allocated memory after regcomp() failure                        */
+			regfree(&re);
+#endif
 			goto clean1;
 		}
 
@@ -1704,14 +1709,15 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
 		unsigned short port, const char *hostname, const char *key)
 {
-	int		ret, nbytes;
-	const char	*cr, *lf, *p_end;
-	char		*p_start, *p, *p_nl, *p_next, *item_value = NULL;
-	size_t		szbyte;
-	zbx_offset_t	offset;
-	static char	*buf = NULL;
-	int		send_err;
-	zbx_uint64_t	lastlogsize1;
+	ZBX_THREAD_LOCAL static char	*buf = NULL;
+
+	int				ret, nbytes;
+	const char			*cr, *lf, *p_end;
+	char				*p_start, *p, *p_nl, *p_next, *item_value = NULL;
+	size_t				szbyte;
+	zbx_offset_t			offset;
+	int				send_err;
+	zbx_uint64_t			lastlogsize1;
 
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
 						/* up to 64 k characters to the Zabbix server a 256 kB buffer might */
