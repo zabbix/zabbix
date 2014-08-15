@@ -1220,6 +1220,7 @@ static void	DCsync_items(DB_RESULT result)
 		if (0 == found)
 		{
 			item->triggers = NULL;
+			item->nextcheck = 0;
 			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[20]);
 			item->db_state = item->state;
@@ -1227,10 +1228,8 @@ static void	DCsync_items(DB_RESULT result)
 			item->mtime = atoi(row[32]);
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
-
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
-			old_nextcheck = 0;
 		}
 		else
 		{
@@ -1238,7 +1237,6 @@ static void	DCsync_items(DB_RESULT result)
 				item->data_expected_from = now;
 
 			old_poller_type = item->poller_type;
-			old_nextcheck = item->nextcheck;
 
 			if (NULL != item->triggers)
 			{
@@ -1257,6 +1255,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		item->status = status;
+		old_nextcheck = item->nextcheck;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1305,7 +1304,7 @@ static void	DCsync_items(DB_RESULT result)
 			}
 
 			if (SUCCEED == is_counted_in_item_queue(type, item->key) &&
-					(0 == found || 0 != key_changed || item->type != type ||
+					(0 == item->nextcheck || 0 != key_changed || item->type != type ||
 					(ITEM_STATE_NORMAL == item->state &&
 					(item->delay != delay || 0 != delay_flex_changed))))
 			{
@@ -1323,7 +1322,10 @@ static void	DCsync_items(DB_RESULT result)
 			}
 		}
 		else
+		{
 			item->poller_type = ZBX_NO_POLLER;
+			item->nextcheck = 0;
+		}
 
 		item->delay = delay;
 		item->type = type;
@@ -5038,7 +5040,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
+		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->nextcheck)
 			continue;
 
 		dc_item->state = states[i];
