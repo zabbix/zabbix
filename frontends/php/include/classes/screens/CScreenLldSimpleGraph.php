@@ -54,11 +54,10 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 
 			// get all created (discovered) items for current host
 			$allCreatedItems = API::Item()->get(array(
-				'output' => array('itemid'),
+				'output' => array('name'),
 				'hostids' => array($hostId),
 				'selectItemDiscovery' => array('itemid', 'parent_itemid'),
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-				'sortfield' => 'name'
 			));
 
 			$itemPrototypeId = $this->getItemPrototypeId();
@@ -67,9 +66,11 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 				// collect those item IDs where parent item is item prototype selected for this screen item as resource
 				foreach ($allCreatedItems as $item) {
 					if ($item['itemDiscovery']['parent_itemid'] == $itemPrototypeId) {
-						$this->createdItemIds[] = $item['itemid'];
+						$this->createdItemIds[$item['itemid']] = $item['name'];
 					}
 				}
+				natsort($this->createdItemIds);
+				$this->createdItemIds = array_keys($this->createdItemIds);
 			}
 		}
 
