@@ -203,7 +203,7 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
  * @return bool
  */
 function copyHttpTests($srcHostId, $dstHostId) {
-	$httpTestsToClone = API::HttpTest()->get(array(
+	$dbHttpTests = API::HttpTest()->get(array(
 		'output' => array('name', 'applicationid', 'nextcheck', 'delay', 'status', 'variables', 'agent',
 			'authentication', 'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries',
 			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
@@ -215,15 +215,15 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		'inherited' => false
 	));
 
-	if (!$httpTestsToClone) {
+	if (!$dbHttpTests) {
 		return true;
 	}
 
 	// get destination application IDs
 	$srcApplicationIds = array();
-	foreach ($httpTestsToClone as $httpTest) {
-		if ($httpTest['applicationid'] > 0) {
-			$srcApplicationIds[] = $httpTest['applicationid'];
+	foreach ($dbHttpTests as $dbHttpTest) {
+		if ($dbHttpTest['applicationid'] != 0) {
+			$srcApplicationIds[] = $dbHttpTest['applicationid'];
 		}
 	}
 
@@ -231,19 +231,19 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
 	}
 
-	foreach ($httpTestsToClone as &$httpTest) {
-		$httpTest['hostid'] = $dstHostId;
+	foreach ($dbHttpTests as &$dbHttpTest) {
+		$dbHttpTest['hostid'] = $dstHostId;
 
-		if ($httpTest['applicationid'] > 0) {
-			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
+		if (isset($dstApplicationIds[$dbHttpTest['applicationid']])) {
+			$dbHttpTest['applicationid'] = $dstApplicationIds[$dbHttpTest['applicationid']];
 		}
 		else {
-			unset($httpTest['applicationid']);
+			unset($dbHttpTest['applicationid']);
 		}
 
-		unset($httpTest['httptestid']);
+		unset($dbHttpTest['httptestid']);
 	}
-	unset($httpTest);
+	unset($dbHttpTest);
 
-	return (bool) API::HttpTest()->create($httpTestsToClone);
+	return (bool) API::HttpTest()->create($dbHttpTests);
 }
