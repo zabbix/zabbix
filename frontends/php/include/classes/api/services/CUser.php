@@ -464,7 +464,11 @@ class CUser extends CApiService {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($user['userid']).' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
+				DBexecute(
+					'DELETE FROM users_groups'.
+					' WHERE userid='.zbx_dbstr($user['userid']).
+						' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true)
+				);
 
 				// getting the list of groups user is currently in
 				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
@@ -1065,7 +1069,9 @@ class CUser extends CApiService {
 
 		// start session
 		$sessionid = md5(time().$password.$name.rand(0, 10000000));
-		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userInfo['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
+		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status)'.
+			' VALUES ('.zbx_dbstr($sessionid).','.zbx_dbstr($userInfo['userid']).','.time().','.ZBX_SESSION_ACTIVE.')'
+		);
 
 		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login "%s".', $name));
 
@@ -1120,10 +1126,19 @@ class CUser extends CApiService {
 			}
 
 			if ($userInfo['autologout'] > 0) {
-				DBexecute('DELETE FROM sessions WHERE userid='.zbx_dbstr($userInfo['userid']).' AND lastaccess<'.(time() - $userInfo['autologout']));
+				DBexecute(
+					'DELETE FROM sessions'.
+					' WHERE userid='.zbx_dbstr($userInfo['userid']).
+						' AND lastaccess<'.(time() - $userInfo['autologout'])
+				);
 			}
 
-			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.zbx_dbstr($userInfo['userid']).' AND sessionid='.zbx_dbstr($sessionid));
+			DBexecute(
+				'UPDATE sessions'.
+				' SET lastaccess='.time().
+				' WHERE userid='.zbx_dbstr($userInfo['userid']).
+					' AND sessionid='.zbx_dbstr($sessionid)
+			);
 		}
 
 		$dbAccess = DBfetch(DBselect(
