@@ -632,6 +632,28 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$listBox->addItems($prototypeList);
 		$hostList->addRow(_('Host prototypes'), $listBox);
 	}
+
+	// web scenarios
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('httptestid', 'name'),
+		'hostids' => getRequest('hostid'),
+		'inherited' => false
+	));
+
+	if ($httpTests) {
+		$httpTestList = array();
+
+		foreach ($httpTests as $httpTest) {
+			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
+		}
+
+		order_result($httpTestList);
+
+		$listBox = new CListBox('httpTests', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($httpTestList);
+		$hostList->addRow(_('Web scenarios'), $listBox);
+	}
 }
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
