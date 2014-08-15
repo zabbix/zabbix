@@ -1927,6 +1927,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$rowNum++;
 
+			// legends for stacked graphs are written in reverse order so that the order of items
+			// matches the order of lines on the graphs
 			if ($this->type == GRAPH_TYPE_STACKED) {
 				$i--;
 			}

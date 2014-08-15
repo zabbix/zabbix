@@ -48,14 +48,19 @@ $itemIds = getRequest('itemids');
 /*
  * Permissions
  */
-$itemCount = API::Item()->get(array(
-	'countOutput' => true,
+$items = API::Item()->get(array(
+	'output' => array('itemid', 'name'),
 	'itemids' => $itemIds,
-	'webitems' => true
+	'webitems' => true,
+	'preservekeys' => true
 ));
-if ($itemCount != count($itemIds)) {
-	access_deny();
+foreach ($itemIds as $itemId) {
+	if (!isset($items[$itemId])) {
+		access_deny();
+	}
 }
+
+CArrayHelper::sort($items, array('name'));
 
 /*
  * Display
@@ -94,8 +99,8 @@ if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
 
-foreach ($itemIds as $itemId) {
-	$graph->addItem($itemId, GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
+foreach ($items as $item) {
+	$graph->addItem($item['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL,
 		rgb2hex(get_next_color(1))
 	);
 }
