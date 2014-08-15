@@ -204,9 +204,14 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
  */
 function copyHttpTests($srcHostId, $dstHostId) {
 	$httpTestsToClone = API::HttpTest()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'applicationid', 'nextcheck', 'delay', 'status', 'variables', 'agent',
+			'authentication', 'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries',
+			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
+		),
 		'hostids' => $srcHostId,
-		'selectSteps' => API_OUTPUT_EXTEND,
+		'selectSteps' => array('name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes', 'variables',
+			'follow_redirects', 'retrieve_mode', 'headers'
+		),
 		'inherited' => false
 	));
 
@@ -237,12 +242,6 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		}
 
 		unset($httpTest['httptestid']);
-
-		foreach($httpTest['steps'] as &$httpStep) {
-			unset($httpStep['httptestid']);
-			unset($httpStep['httpstepid']);
-		}
-		unset($httpStep);
 	}
 	unset($httpTest);
 
