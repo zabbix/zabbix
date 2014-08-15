@@ -54,11 +54,10 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 			// get all created (discovered) graphs for current graph host
 			$allCreatedGraphs = API::Graph()->get(array(
-				'output' => array('graphid'),
+				'output' => array('name'),
 				'hostids' => array($hostId),
 				'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-				'sortfield' => 'name'
 			));
 
 			// get graph prototype id to be cross checked with all graphs for current host
@@ -68,9 +67,11 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				// collect those graph IDs where parent graph is graph prototype selected for this screen item as resource
 				foreach ($allCreatedGraphs as $graph) {
 					if ($graph['graphDiscovery']['parent_graphid'] == $graphPrototypeId) {
-						$this->createdGraphIds[] = $graph['graphid'];
+						$this->createdGraphIds[$graph['graphid']] = $graph['name'];
 					}
 				}
+				natsort($this->createdGraphIds);
+				$this->createdGraphIds = array_keys($this->createdGraphIds);
 			}
 		}
 
