@@ -35,11 +35,13 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	protected $graphPrototype = null;
 
 	/**
-	 * Adds graph items to surrogate screen.
+	 * Returns screen items for surrogate screen
+	 *
+	 * @return array
 	 */
-	protected function addSurrogateScreenItems() {
+	protected function getSurrogateScreenItems() {
 		$createdGraphIds = $this->getCreatedGraphIds();
-		$this->addGraphsToSurrogateScreen($createdGraphIds);
+		return $this->getGraphsForSurrogateScreen($createdGraphIds);
 	}
 
 	/**
@@ -50,23 +52,21 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	 */
 	protected function getCreatedGraphIds() {
 		if (!$this->createdGraphIds) {
-			$hostId = $this->getCurrentHostId();
+			$graphPrototype = $this->getGraphPrototype();
 
-			// get all created (discovered) graphs for current graph host
-			$allCreatedGraphs = API::Graph()->get(array(
-				'output' => array('name'),
-				'hostids' => array($hostId),
-				'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-			));
+			if ($graphPrototype) {
+				// Get all created (discovered) graphs for host of graph prototype.
+				$allCreatedGraphs = API::Graph()->get(array(
+					'output' => array('name'),
+					'hostids' => array($graphPrototype['discoveryRule']['hostid']),
+					'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+				));
 
-			// get graph prototype id to be cross checked with all graphs for current host
-			$graphPrototypeId = $this->getGraphPrototypeId();
-
-			if ($graphPrototypeId) {
-				// collect those graph IDs where parent graph is graph prototype selected for this screen item as resource
+				// Collect those graph IDs where parent graph is graph prototype selected for
+				// this screen item as resource.
 				foreach ($allCreatedGraphs as $graph) {
-					if ($graph['graphDiscovery']['parent_graphid'] == $graphPrototypeId) {
+					if ($graph['graphDiscovery']['parent_graphid'] == $graphPrototype['graphid']) {
 						$this->createdGraphIds[$graph['graphid']] = $graph['name'];
 					}
 				}
@@ -79,11 +79,13 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	}
 
 	/**
-	 * Makes and adds graph items to surrogate screen.
+	 * Makes graph screen items from given graph IDs.
 	 *
 	 * @param array $graphIds
+	 *
+	 * @return array
 	 */
-	protected function addGraphsToSurrogateScreen(array $graphIds) {
+	protected function getGraphsForSurrogateScreen(array $graphIds) {
 		$screenItemTemplate = $this->getScreenItemTemplate(SCREEN_RESOURCE_GRAPH);
 
 		$screenItems = array();
@@ -96,74 +98,58 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 			$screenItems[] = $screenItem;
 		}
 
-		$this->addItemsToSurrogateScreen($screenItems);
+		return $screenItems;
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	protected function getHostIdFromScreenItemResource() {
-		$graphPrototype = $this->getGraphPrototype();
-
-		return $graphPrototype['discoveryRule']['hostid'];
-	}
-
-	/**
-	 * Return graph prototype ID of either graph prototype selected in configuration, or, if dynamic mode is enabled,
-	 * try to find graph prototype with same name in selected host.
+	 * Resolves and retrieves effective graph prototype used in this screen item.
 	 *
 	 * @return mixed
 	 */
-	protected function getGraphPrototypeId() {
-		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
-			$currentGraphPrototype = API::GraphPrototype()->get(array(
-				'output' => array('name'),
-				'graphids' => array($this->screenitem['resourceid'])
-			));
-			$currentGraphPrototype = reset($currentGraphPrototype);
+	protected function getGraphPrototype() {
+		if ($this->graphPrototype === null) {
+			$options = array();
+			$screen = $this->getScreen(array('templateid'));
 
-			$selectedHostGraphPrototype = API::GraphPrototype()->get(array(
-				'output' => array('graphid'),
-				'hostids' => array($this->hostid),
-				'filter' => array('name' => $currentGraphPrototype['name'])
-			));
+			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $screen['templateid']) && $this->hostid) {
+				// This branch is taken if screen item is 1) dynamic or 2) in template screen. This means that real
+				// graph prototype must be looked up by "name" of graph prototype used as resource ID for this screen
+				// item and by current host - either from host selection dropdown or from URL when accessing host
+				// screen from Monitoring/Latest data.
+				$frontGraphPrototype = API::GraphPrototype()->get(array(
+					'output' => array('name'),
+					'graphids' => array($this->screenitem['resourceid'])
+				));
+				$frontGraphPrototype = reset($frontGraphPrototype);
 
-			if ($selectedHostGraphPrototype) {
-				$selectedHostGraphPrototype = reset($selectedHostGraphPrototype);
-				$graphPrototypeId = $selectedHostGraphPrototype['graphid'];
+				$options['hostids'] = array($this->hostid);
+				$options['filter'] = array('name' => $frontGraphPrototype['name']);
 			}
 			else {
-				$graphPrototypeId = null;
+				// Otherwise just use resource ID given to to this screen item.
+				$options['graphids'] = array($this->screenitem['resourceid']);
 			}
-		}
-		else {
-			$graphPrototypeId = $this->screenitem['resourceid'];
+
+			$defaultOptions = array(
+				'output' => array('graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'),
+				'selectDiscoveryRule' => array('hostid')
+			);
+			$options = zbx_array_merge($defaultOptions, $options);
+
+			$selectedGraphPrototype = API::GraphPrototype()->get($options);
+			$this->graphPrototype = reset($selectedGraphPrototype);
 		}
 
-		return $graphPrototypeId;
+		return $this->graphPrototype;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns output for preview of graph prototype.
+	 *
+	 * @return CTag
 	 */
-	protected function mustShowPreview() {
-		$createdGraphIds = $this->getCreatedGraphIds();
-
-		if ($createdGraphIds) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function getPreview() {
+	protected function getPreviewOutput() {
 		$graphPrototype = $this->getGraphPrototype();
-
-		unset($graphPrototype['graphid']);
 
 		switch ($graphPrototype['graphtype']) {
 			case GRAPH_TYPE_NORMAL:
@@ -190,8 +176,15 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				exit;
 		}
 
+		$graphPrototypeItems = API::GraphItem()->get(array(
+			'output' => array(
+				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc',  'drawtype', 'yaxisside', 'color'
+			),
+			'graphids' => array($graphPrototype['graphid'])
+		));
+
 		$queryParams = array(
-			'items' => $graphPrototype['gitems'],
+			'items' => $graphPrototypeItems,
 			'graphtype' => $graphPrototype['graphtype'],
 			'period' => 3600,
 			'legend' => $graphPrototype['show_legend'],
@@ -204,27 +197,17 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 		$url .= '?'.http_build_query($queryParams);
 
 		$img = new CImg($url);
+		$img->preload();
 
-		return $img;
+		return new CSpan($img);
 	}
 
 	/**
-	 * @return array
+	 * Returns content to be shown when there are no items for surrogate screen.
+	 *
+	 * @return CTag
 	 */
-	protected function getGraphPrototype() {
-		if (!$this->graphPrototype) {
-			$options = array(
-				'output' => array('name', 'graphtype', 'show_legend', 'show_3d'),
-				'graphids' => array($this->getGraphPrototypeId()),
-				'selectDiscoveryRule' => array('hostid'),
-				'selectGraphItems' => array(
-					'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc',  'drawtype', 'yaxisside', 'color'
-				)
-			);
-			$graphPrototype = API::GraphPrototype()->get($options);
-			$this->graphPrototype = reset($graphPrototype);
-		}
-
-		return $this->graphPrototype;
+	protected function getNoScreenItemsOutput() {
+		return new CTableInfo(_('No LLD created graphs found.'));
 	}
 }

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Base class for screen elements containing surrogate screen with graphs from sources generated from prototypes.
  */
@@ -31,41 +32,61 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	protected $surrogateScreen;
 
 	/**
-	 * Returns output for LLD graph.
+	 * Screen of this screen item.
+	 *
+	 * @var array
+	 */
+	protected $screen = null;
+
+	/**
+	 * Returns output of screen element.
 	 *
 	 * @return CDiv
 	 */
 	public function get() {
-		if ($this->mode == SCREEN_MODE_EDIT || $this->mustShowPreview()) {
-			$output = $this->getOutput($this->getPreview());
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$output = $this->getOutput($this->getPreviewOutput());
 		}
 		else {
-			$this->surrogateScreen = $this->makeSurrogateScreen();
+			$screenItems = $this->getSurrogateScreenItems();
 
-			$this->addSurrogateScreenItems();
-			$this->calculateSurrogateScreenSizes();
+			if ($screenItems) {
+				$this->createSurrogateScreen($screenItems);
 
-			$screenBuilder = $this->makeSurrogateScreenBuilder();
+				$this->calculateSurrogateScreenSizes();
 
-			$output = $this->getOutput($screenBuilder->show(), true);
+				$screenBuilder = $this->makeSurrogateScreenBuilder();
+
+				$output = $this->getOutput($screenBuilder->show(), true);
+			}
+			else {
+				$output = $this->getOutput($this->getNoScreenItemsOutput());
+			}
 		}
 
 		return $output;
 	}
 
 	/**
-	 * Makes new surrogate screen from data of this screen item.
+	 * Creates surrogate screen from data of this screen item.
 	 *
-	 * @return array
+	 * @param array $screenItems
 	 */
-	protected function makeSurrogateScreen() {
-		return array(
-			'screenid' => $this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'],
+	protected function createSurrogateScreen(array $screenItems = array()) {
+		$screenId = $this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'];
+
+		foreach ($screenItems as &$screenItem) {
+			$screenItem['screenid'] = $screenId;
+		}
+		unset($screenItem);
+
+		$this->surrogateScreen = array(
+			'screenid' => $screenId,
 			'dynamic' => $this->screenitem['dynamic'],
 			'hsize' => 0,
 			'vsize' => 0,
 			'templateid' => 0,
-			'screenitems' => array()
+			'screenitems' => $screenItems
 		);
 	}
 
@@ -92,13 +113,9 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return CScreenBuilder
 	 */
 	protected function makeSurrogateScreenBuilder() {
-		$mode = ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW)
-			? SCREEN_MODE_SLIDESHOW
-			: SCREEN_MODE_PREVIEW;
-
 		return new CScreenBuilder(array(
 			'isFlickerfree' => $this->isFlickerfree,
-			'mode' => $mode,
+			'mode' => $this->mode,
 			'timestamp' => $this->timestamp,
 			'screen' => $this->surrogateScreen,
 			'period' => $this->timeline['period'],
@@ -118,7 +135,6 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 */
 	protected function getScreenItemTemplate($resourceType) {
 		return array(
-			'screenid' => $this->surrogateScreen['screenid'],
 			'resourcetype' => $resourceType,
 			'rowspan' => $this->screenitem['rowspan'],
 			'colspan' => $this->screenitem['colspan'],
@@ -131,23 +147,6 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	}
 
 	/**
-	 * Returns host ID that for which simple graphs must be shown - either hosts derived from
-	 * item prototype or, if this screen item has dynamic mode enabled, currently selected host ID.
-	 *
-	 * @return string
-	 */
-	protected function getCurrentHostId() {
-		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
-			$hostId = $this->hostid;
-		}
-		else {
-			$hostId = $this->getHostIdFromScreenItemResource();
-		}
-
-		return $hostId;
-	}
-
-	/**
 	 * @param array $screenItems
 	 */
 	protected function addItemsToSurrogateScreen(array $screenItems) {
@@ -157,38 +156,55 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	}
 
 	/**
-	 * Returns ID of host for which created graphs or items have to be selected.
+	 * Returns screen in which current screen item is in.
 	 *
-	 * @abstract
+	 * @param array $output
 	 *
-	 * @return integer
+	 * @return array
 	 */
-	abstract protected function getHostIdFromScreenItemResource();
+	protected function getScreen(array $output = array('screenid', 'name')) {
+		if ($this->screen === null) {
+			$screen = API::Screen()->get(array(
+				'output' => $output,
+				'screenids' => array($this->screenitem['screenid'])
+			));
+
+			if (!$screen) {
+				$screen = API::TemplateScreen()->get(array(
+					'output' => $output,
+					'screenids' => array($this->screenitem['screenid'])
+				));
+			}
+
+			$this->screen = reset($screen);
+		}
+
+		return $this->screen;
+	}
 
 	/**
-	 * Adds items to surrogate screen.
+	 * Gathers and returns items for surrogate screen.
 	 *
 	 * @abstract
 	 *
-	 * @return void
+	 * @return array
 	 */
-	abstract protected function addSurrogateScreenItems();
+	abstract protected function getSurrogateScreenItems();
 
 	/**
-	 * Returns whether a preview should be shown instead of surrogate screen with graphs.
+	 * Returns content for preview of graph.
 	 *
 	 * @abstract
 	 *
-	 * @return bool
+	 * @return CTag
 	 */
-	abstract protected function mustShowPreview();
+	abstract protected function getPreviewOutput();
 
 	/**
-	 * Returns content for preview.
+	 * Returns content to be shown when there are no items for surrogate screen.
 	 *
-	 * @abstract
-	 *
-	 * @return CImg
+	 * @return CTag
 	 */
-	abstract protected function getPreview();
+	abstract protected function getNoScreenItemsOutput();
+
 }
