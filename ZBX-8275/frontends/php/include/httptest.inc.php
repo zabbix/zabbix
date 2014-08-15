@@ -203,10 +203,10 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
  * @return bool
  */
 function copyHttpTests($srcHostId, $dstHostId) {
-	$dbHttpTests = API::HttpTest()->get(array(
-		'output' => array('name', 'applicationid', 'nextcheck', 'delay', 'status', 'variables', 'agent',
-			'authentication', 'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries',
-			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('name', 'applicationid', 'delay', 'status', 'variables', 'agent', 'authentication',
+			'http_user', 'http_password', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
+			'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
 		),
 		'hostids' => $srcHostId,
 		'selectSteps' => array('name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes', 'variables',
@@ -215,15 +215,15 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		'inherited' => false
 	));
 
-	if (!$dbHttpTests) {
+	if (!$httpTests) {
 		return true;
 	}
 
 	// get destination application IDs
 	$srcApplicationIds = array();
-	foreach ($dbHttpTests as $dbHttpTest) {
-		if ($dbHttpTest['applicationid'] != 0) {
-			$srcApplicationIds[] = $dbHttpTest['applicationid'];
+	foreach ($httpTests as $httpTest) {
+		if ($httpTest['applicationid'] != 0) {
+			$srcApplicationIds[] = $httpTest['applicationid'];
 		}
 	}
 
@@ -231,19 +231,19 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
 	}
 
-	foreach ($dbHttpTests as &$dbHttpTest) {
-		$dbHttpTest['hostid'] = $dstHostId;
+	foreach ($httpTests as &$httpTest) {
+		$httpTest['hostid'] = $dstHostId;
 
-		if (isset($dstApplicationIds[$dbHttpTest['applicationid']])) {
-			$dbHttpTest['applicationid'] = $dstApplicationIds[$dbHttpTest['applicationid']];
+		if (isset($dstApplicationIds[$httpTest['applicationid']])) {
+			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
 		}
 		else {
-			unset($dbHttpTest['applicationid']);
+			unset($httpTest['applicationid']);
 		}
 
-		unset($dbHttpTest['httptestid']);
+		unset($httpTest['httptestid']);
 	}
-	unset($dbHttpTest);
+	unset($httpTest);
 
-	return (bool) API::HttpTest()->create($dbHttpTests);
+	return (bool) API::HttpTest()->create($httpTests);
 }
