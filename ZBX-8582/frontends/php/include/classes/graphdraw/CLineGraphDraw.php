@@ -455,7 +455,11 @@ class CLineGraphDraw extends CGraphDraw {
 				' ORDER BY tr.priority'
 			);
 			while (($trigger = DBfetch($db_triggers)) && $cnt < $max) {
-				$db_fnc_cnt = DBselect('SELECT COUNT(*) AS cnt FROM functions f WHERE f.triggerid='.zbx_dbstr($trigger['triggerid']));
+				$db_fnc_cnt = DBselect(
+					'SELECT COUNT(*) AS cnt'.
+					' FROM functions f'.
+					' WHERE f.triggerid='.zbx_dbstr($trigger['triggerid'])
+				);
 				$fnc_cnt = DBfetch($db_fnc_cnt);
 
 				if ($fnc_cnt['cnt'] != 1) {

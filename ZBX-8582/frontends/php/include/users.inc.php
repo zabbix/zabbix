@@ -178,7 +178,9 @@ function change_group_status($userGroupIds, $usersStatus) {
 
 	if ($grant) {
 		return DBexecute(
-			'UPDATE usrgrp SET users_status='.zbx_dbstr($usersStatus).' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+			'UPDATE usrgrp'.
+			' SET users_status='.zbx_dbstr($usersStatus).
+			' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 		);
 	}
 	else {

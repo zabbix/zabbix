@@ -1131,7 +1131,8 @@ class CHostPrototype extends CHostBase {
 
 		$sqlWhere = array();
 		foreach ($valuesByDiscoveryRuleId as $discoveryRuleId => $values) {
-			$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.'.$field, $values).')';
+			$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).
+				' AND '.dbConditionString('h.'.$field, $values).')';
 		}
 
 		if ($sqlWhere) {

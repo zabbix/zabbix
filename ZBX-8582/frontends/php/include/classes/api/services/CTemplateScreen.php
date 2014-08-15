@@ -676,7 +676,11 @@ class CTemplateScreen extends CScreen {
 		));
 
 		foreach ($dbExistingScreens as $dbExistingScreen) {
-			$dbTemplate = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($dbExistingScreen['templateid'])));
+			$dbTemplate = DBfetch(DBselect(
+				'SELECT h.name'.
+				' FROM hosts h'.
+				' WHERE h.hostid='.zbx_dbstr($dbExistingScreen['templateid'])
+			));
 
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
