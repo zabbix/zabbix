@@ -32,7 +32,7 @@ $form->addVar('regexpid', $this->data['regexpid']);
  * Expressions tab
  */
 $exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, null, 128);
+$nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $exprTab->addRow(_('Name'), $nameTextBox);
 

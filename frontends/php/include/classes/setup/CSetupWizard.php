@@ -284,7 +284,7 @@ class CSetupWizard extends CForm {
 					$server
 				));
 
-				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, 'no', false, false);
+				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false);
 				$port->attr('style', '');
 				$port->attr(
 					'onchange',
@@ -370,7 +370,7 @@ class CSetupWizard extends CForm {
 			'zbx_server_port',
 			$this->getConfig('ZBX_SERVER_PORT', '10051'),
 			20,
-			'no',
+			false,
 			false,
 			false
 		);

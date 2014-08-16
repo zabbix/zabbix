@@ -194,10 +194,6 @@ class CTag extends CObject {
 		}
 	}
 
-	public function removeAttr($name) {
-		$this->removeAttribute($name);
-	}
-
 	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
 	}

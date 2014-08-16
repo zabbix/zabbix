@@ -499,7 +499,7 @@ if (isset($_REQUEST['form'])) {
 		$data['http_user'] = getRequest('http_user', '');
 		$data['http_password'] = getRequest('http_password', '');
 		$data['http_proxy'] = getRequest('http_proxy', '');
-		$data['templated'] = getRequest('templated');
+		$data['templated'] = (bool) getRequest('templated');
 		$data['steps'] = getRequest('steps', array());
 		$data['headers'] = getRequest('headers');
 		$data['verify_peer'] = getRequest('verify_peer');
