@@ -45,7 +45,9 @@ class CTextArea extends CTag {
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
 		$this->attr('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
-		$this->setReadonly(!empty($options['readonly']));
+		if (isset($options['readonly'])) {
+			$this->setReadonly($options['readonly']);
+		}
 		$this->addItem($value);
 
 		// set width
@@ -65,7 +67,7 @@ class CTextArea extends CTag {
 		}
 	}
 
-	public function setReadonly($value = true) {
+	public function setReadonly($value) {
 		if ($value) {
 			$this->attr('readonly', 'readonly');
 		}

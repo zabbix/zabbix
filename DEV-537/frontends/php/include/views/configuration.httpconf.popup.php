@@ -83,8 +83,8 @@ else {
 	$httpPopupForm->addVar('steps_names', getRequest('steps_names'));
 
 	$httpPopupFormList = new CFormList('httpPopupFormList');
-	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, getRequest('templated'), 64));
-	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, 'no', null));
+	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64));
+	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')));
 	$httpPopupFormList->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')));
 

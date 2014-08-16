@@ -408,7 +408,7 @@ function valueComparisonFormForMultiplePeriods() {
 	$itemidVar = new CVar('itemid', $itemId, 'itemid');
 	$reportForm->addItem($itemidVar);
 
-	$txtCondVal = new CTextBox('item_name', $itemName, 50, 'yes');
+	$txtCondVal = new CTextBox('item_name', $itemName, 50, true);
 	$txtCondVal->setAttribute('id', 'item_name');
 
 	$btnSelect = new CButton('btn1', _('Select'),
