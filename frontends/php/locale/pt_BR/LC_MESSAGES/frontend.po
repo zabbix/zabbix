@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 14:00+0300\n"
-"PO-Revision-Date: 2014-06-12 21:16+0300\n"
+"POT-Creation-Date: 2014-08-17 14:10+0300\n"
+"PO-Revision-Date: 2014-08-16 19:09+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402600580.0\n"
+"X-POOTLE-MTIME: 1408208996.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -195,7 +195,7 @@ msgstr "<manual>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr "LOG DE AÇÕES"
+msgstr "REGISTRO DE AÇÕES"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -1226,7 +1226,7 @@ msgstr "Carga da(s) CPU(s). Carga de processamento. A cpu e o modo são opcionai
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Utilização da(s) CPU(s). Carga percentual do processador. O parâmetros <cpu>, <type> e <mode> são opcionais. Se <cpu> estiver ausente, serão consideradas todas. Se o <type> estiver ausente, será usado tipo usuário. Se o <modo> estiver ausente, avg1 é utilizado."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1245,7 +1245,7 @@ msgstr "Calcula a verificação integridade de um arquivo. A integridade do arqu
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Calcula o espaço em disco para determinado volume. O espaço em disco é calculado em KB. Se <mode> estiver ausente, será usado o total. No caso de um volume montado o espaço em disco não utilizado para o sistema de arquivos local é retornado. Exemplo: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:106
 #: include/views/configuration.graph.edit.php:164
@@ -1337,7 +1337,7 @@ msgstr "Não foi possível adicionar o protótipo de gráfico"
 
 #: hostgroups.php:115 usergrps.php:189
 msgid "Cannot add group"
-msgstr "Grupo não foi incluído"
+msgstr "Não foi possível adicionar grupo"
 
 #: include/classes/api/services/CTemplate.php:375
 #: include/classes/api/services/CTemplate.php:829
@@ -1567,7 +1567,7 @@ msgstr "Não foi possivel criar um novo elemento"
 
 #: include/classes/api/services/CTemplate.php:389
 msgid "Cannot create template."
-msgstr "Não foi possível criar o template"
+msgstr "Não foi possível criar o template."
 
 #: include/classes/api/services/CUser.php:1302
 #, c-format
@@ -2287,7 +2287,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 #: include/func.inc.php:1411
 #, c-format
 msgid "Cannot sort by field \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível ordenar pelo campo \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2698,12 +2698,12 @@ msgstr "Verifica se o serviço está disponível. 0 - serviço não está dispon
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:387
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Verifica se determinado serviço está disponível. 0 - serviço indisponível, 1 - serviço em execução. Se <IP> estiver ausente, é utilizado 127.0.0.1. Se <port number> estiver ausente, a porta padrão do serviço. Exemplo: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:383
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "Verifica a performance de um serviço. 0 - serviço indisponível, <sec> - número de segundos gasto para se conectar ao serviço. Se <IP> estiver ausente, 127.0.0.1 é usado. Se <port number> estiver ausente, a porta padrão do serviço."
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2725,7 +2725,7 @@ msgstr "Verificar tipo"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:379
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Verifica se é possível estabelecer uma conexão TCP com determinado número de porta. 0 - não é possível conectar, 1 - é possível. Se <IP> estiver ausente, 127.0.0.1 é usado. Exemplo: net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -2933,7 +2933,7 @@ msgstr "Condição"
 #: include/classes/api/services/CAction.php:2020
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "A condição \"%2$s\" não é utilizada na fórmula \"%3$s\" da ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
@@ -2943,7 +2943,7 @@ msgstr "A condição \"%2$s\" não é utilizada pela fórmula \"%3$s\" da regra 
 #: include/classes/api/services/CAction.php:2019
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "A condição \"%2$s\" utilizada na fórmula \"%3$s\" para a ação \"%1$s\" não foi definida."
 
 #: include/classes/api/services/CDiscoveryRule.php:858
 #, c-format
@@ -3888,7 +3888,7 @@ msgstr "Remover o histórico dos itens selecionados?"
 
 #: include/views/configuration.httpconf.list.php:144
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "Excluir o histórico dos cenários web selecionados?"
 
 #: include/views/administration.general.iconmap.edit.php:146
 msgid "Delete icon map?"
@@ -4109,7 +4109,7 @@ msgstr[1] "Excluir o mapeamento de valores selecionado? Ele é utilizado por %d 
 
 #: include/views/configuration.httpconf.list.php:148
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "Excluir os cenários web selecionados?"
 
 #: templates.php:665
 msgid "Delete selected with linked elements"
@@ -4450,7 +4450,7 @@ msgstr "Desativar triggers selecionadas?"
 
 #: include/views/configuration.httpconf.list.php:140
 msgid "Disable selected web scenarios?"
-msgstr ""
+msgstr "Desativar os cenários web selecionados?"
 
 #: auditlogs.php:146 dashboard.php:295 hosts.php:993
 #: include/discovery.inc.php:121 include/html.inc.php:336
@@ -4863,7 +4863,7 @@ msgstr "Cor nula."
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Condição de filtro vazia na fórmula ID da ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:886
 #, c-format
@@ -5080,7 +5080,7 @@ msgstr "Ativar triggers selecionadas?"
 
 #: include/views/configuration.httpconf.list.php:136
 msgid "Enable selected web scenarios?"
-msgstr ""
+msgstr "Ativar os cenários web selecionados?"
 
 #: auditlogs.php:143 dashboard.php:295 hosts.php:984
 #: include/discovery.inc.php:120 include/html.inc.php:332
@@ -5336,7 +5336,7 @@ msgstr "Texto Ez"
 #: jsLoader.php:128
 msgctxt "Friday short"
 msgid "F"
-msgstr "F"
+msgstr "S"
 
 #: include/views/js/adm.regexprs.edit.js.php:365
 #: include/views/js/adm.regexprs.edit.js.php:387
@@ -5679,7 +5679,7 @@ msgstr "Alemão (de_DE)"
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:559
 msgid "Get content of web page. Default path is /"
-msgstr ""
+msgstr "Recupera o conteúdo de uma página web. O caminho padrão é /"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:519
@@ -5689,7 +5689,7 @@ msgstr "Recebe o conteúdo de um arquivo."
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:567
 msgid "Get first occurrence of regexp in web page. Default path is /"
-msgstr ""
+msgstr "Recupera a primeira ocorrência de uma expressão regular em uma página web. O caminho padrão é /"
 
 #: include/page_header.php:194
 msgid "Get support"
@@ -5698,7 +5698,7 @@ msgstr "Suporte"
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:563
 msgid "Get timing of loading full web page. Default path is /"
-msgstr ""
+msgstr "Recupera o tempo de carga da página web completa. O caminho padrão é /"
 
 #: include/func.inc.php:666
 msgid "Giga"
@@ -7248,7 +7248,7 @@ msgstr "Protocolo de autenticação incorreto para o item \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:658
 msgid "Incorrect bulk value for interface."
-msgstr ""
+msgstr "Valor inválido para a interface."
 
 #: include/classes/api/services/CService.php:941
 #, c-format
@@ -7280,7 +7280,7 @@ msgstr "Caracteres inválidos no nome do template: \"%1$s\"."
 #: include/classes/api/services/CAction.php:2013
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
-msgstr ""
+msgstr "Condição inválida para a ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:852
 #, c-format
@@ -7290,7 +7290,7 @@ msgstr "Condições incorretas para a regra de descoberta \"%1$s\"."
 #: include/classes/api/services/CAction.php:2018
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
-msgstr ""
+msgstr "A expressão personalizada \"%2$s\" é inválida para a ação \"%1$s\": %3$s."
 
 #: include/classes/api/services/CDiscoveryRule.php:857
 #, c-format
@@ -7339,7 +7339,7 @@ msgstr "Upload de arquivo inválido."
 #: include/classes/api/services/CAction.php:2063
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "A condição de filtro no ID da fórmula é inválida a ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:887
 #, c-format
@@ -7354,7 +7354,7 @@ msgstr "O filtro de condição de macro utilizado pela regra de descoberta \"%1$
 #: include/classes/api/services/CAction.php:2067
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
-msgstr ""
+msgstr "O operador da condição de filtro é inválido para a ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:891
 #, c-format
@@ -7364,7 +7364,7 @@ msgstr "O operador do filtro de condição utilizado pela regra de descoberta \"
 #: include/classes/api/services/CAction.php:2055
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
-msgstr ""
+msgstr "O tipo da condição de filtro é inválido para a ação \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:838
 #, c-format
@@ -7615,7 +7615,7 @@ msgstr "ID de proxy inválido."
 #: adm.regexps.php:69 include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
-msgstr ""
+msgstr "A expressão regular \"%1$s\": \"%2$s\" é inválida"
 
 #: include/classes/api/services/CScreenItem.php:447
 msgid "Incorrect resource type provided for screen item."
@@ -7663,7 +7663,7 @@ msgstr "Ordem inválida para o serviço \"%1$s\"."
 #: include/func.inc.php:1416
 #, c-format
 msgid "Incorrect sort direction \"%1$s\", must be either \"%2$s\" or \"%3$s\"."
-msgstr ""
+msgstr "A ordenação \"%1$s\" é inválida, precisa ser \"%2$s\" ou \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:363
 msgid "Incorrect source value."
@@ -7757,7 +7757,7 @@ msgstr "Tipo inválido de asort_by_key."
 #: include/classes/api/services/CAction.php:2006
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
-msgstr ""
+msgstr "O tipo de calculo é inválido para a ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:845
 #, c-format
@@ -9617,7 +9617,7 @@ msgstr "Nome"
 #: include/views/administration.users.list.php:55 popup.php:580 users.php:45
 msgctxt "user first name"
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: include/classes/api/services/CHostPrototype.php:223
 #, c-format
@@ -9775,7 +9775,7 @@ msgstr "Sem \"%1$s\" encontrado para o cenário web."
 #: include/classes/api/services/CAction.php:2074
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Não foi encontrado \"%2$s\" para a condição de filtro da ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:895
 #, c-format
@@ -9790,7 +9790,7 @@ msgstr "Não foi encontrado \"%2$s\" para o protótipo de host \"%1$s\"."
 #: include/classes/api/services/CAction.php:2024
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Não foi informado \"%2$s\" para o filtro da ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:863
 #, c-format
@@ -11868,7 +11868,7 @@ msgstr "A expressão regular não existe."
 
 #: adm.regexps.php:68 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
-msgstr ""
+msgstr "A expressão regular precisa ser um texto"
 
 #: adm.regexps.php:139
 msgid "Regular expression updated"
@@ -12158,7 +12158,7 @@ msgstr "Retorna a disponibilidade de um tipo particular de verificações no hos
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
-msgstr ""
+msgstr "Retorna o status atual de manutenção do host."
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
@@ -13016,8 +13016,8 @@ msgstr "Mostrar"
 #, c-format
 msgid "Show all (%1$s day)"
 msgid_plural "Show all (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Exibir todos (%1$s dia)"
+msgstr[1] "Exibir todos (%1$s dias)"
 
 #: include/views/common.filter.trigger.php:143 latest.php:310
 msgid "Show details"
@@ -13100,8 +13100,8 @@ msgstr "Mostrar triggers"
 #, c-format
 msgid "Show unacknowledged (%1$s day)"
 msgid_plural "Show unacknowledged (%1$s days)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Exibir não reconhecidos (%1$s dia)"
+msgstr[1] "Exibir não reconhecidos (%1$s dias)"
 
 #: include/views/configuration.item.edit.php:382
 #: include/views/configuration.item.massupdate.php:447
@@ -13792,7 +13792,7 @@ msgstr "Texto"
 #: include/classes/api/clients/CLocalApiClient.php:79
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
-msgstr "O método \"%1$s.%2$s\" precisa ser invocado sem o parâmetro de autenticação."
+msgstr "O método \"%1$s.%2$s\" precisa ser invocado sem o parâmetro <auth>."
 
 #: include/classes/api/services/CScreenItem.php:870
 #, c-format
@@ -14501,7 +14501,7 @@ msgstr "O parâmetro URL está vazio."
 #: include/classes/api/services/CMap.php:463
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr "Uma URL deve possuir tanto nome quanto url no mapa \"%s\"."
+msgstr "Uma URL deve possuir tanto o campo \"nome\" quanto \"url\" no mapa \"%s\"."
 
 #: include/views/configuration.sysmap.edit.php:180
 #: include/views/js/configuration.sysmaps.js.php:180 jsLoader.php:221
@@ -14721,7 +14721,7 @@ msgstr "O parâmetro \"%1$s\" não é suportado para o protótipo de grupo."
 #: include/classes/api/services/CAction.php:2075
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Parâmetro não suportado \"%2$s\" para uma condição de filtro na ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
@@ -14741,7 +14741,7 @@ msgstr "O parâmetro \"%2$s\" não é suportado no protótipo de host %1$s no in
 #: include/classes/api/services/CAction.php:2025
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "O parâmetro \"%2$s\" não é suportado para o filtro da ação \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:864
 #, c-format
@@ -14868,7 +14868,7 @@ msgstr "Uptime/Downtime"
 #: include/views/js/configuration.host.edit.js.php:12
 #: include/views/js/configuration.host.edit.js.php:365
 msgid "Use bulk requests"
-msgstr ""
+msgstr "Usar requisições em lote"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
@@ -15303,7 +15303,7 @@ msgstr "O valor \"%2$s\" de \"%1$s\" possui muitos dígitos antes do ponto decim
 #: include/validate.inc.php:328
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr "O valor \"%2$s\" de \"%1$s\" é muito grande: não é possível ter mais que %2$s dígitos antes do ponto decimal, nem mais de %4$s após."
+msgstr "O valor \"%2$s\" de \"%1$s\" é muito grande: não é possível ter mais que %3$s dígitos antes do ponto decimal, nem mais de %4$s após."
 
 #: include/classes/items/CHelpItems.php:895
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."

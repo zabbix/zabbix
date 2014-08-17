@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 14:00+0300\n"
-"PO-Revision-Date: 2014-07-04 19:18+0300\n"
+"POT-Creation-Date: 2014-08-17 14:10+0300\n"
+"PO-Revision-Date: 2014-08-02 09:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1404494330.0\n"
+"X-POOTLE-MTIME: 1406964738.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2975,17 +2975,17 @@ msgstr "Podmienka"
 #: include/classes/api/services/CAction.php:2020
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "Podmienka \"%2$s\" nie je použitá vo formule \"%3$s\" pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr "Podmienka \"%2$s\" nie je použitá vo formule \"%3$s\" pre zisťovacie pravidlo \"%1$s\"."
+msgstr "Podmienka \"%2$s\" použitá vo formule \"%3$s\" pre akciu \"%1$s\" nie je definovaná."
 
 #: include/classes/api/services/CAction.php:2019
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "Podmienka \"%2$s\" použitá vo formule \"%3$s\" pre akciu \"%1$s\" nie je definovaná."
 
 #: include/classes/api/services/CDiscoveryRule.php:858
 #, c-format
@@ -3932,7 +3932,7 @@ msgstr "Zmazať históriu označených položiek?"
 
 #: include/views/configuration.httpconf.list.php:144
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "Zmazať históriu označených scenárov?"
 
 #: include/views/administration.general.iconmap.edit.php:146
 msgid "Delete icon map?"
@@ -4153,7 +4153,7 @@ msgstr[2] "Zmazať označené mapovanie hodnôt? Je použité pre %d položiek!"
 
 #: include/views/configuration.httpconf.list.php:148
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "Zmazať označené scenáre?"
 
 #: templates.php:665
 msgid "Delete selected with linked elements"
@@ -4494,7 +4494,7 @@ msgstr "Zakázať označené spúšťače?"
 
 #: include/views/configuration.httpconf.list.php:140
 msgid "Disable selected web scenarios?"
-msgstr ""
+msgstr "Zakázať označené scenáre?"
 
 #: auditlogs.php:146 dashboard.php:295 hosts.php:993
 #: include/discovery.inc.php:121 include/html.inc.php:336
@@ -4909,7 +4909,7 @@ msgstr "Prázdna farba."
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Prázdna filtrovacia podmienka ID vzorca pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:886
 #, c-format
@@ -5126,7 +5126,7 @@ msgstr "Povoliť označené spúšťače?"
 
 #: include/views/configuration.httpconf.list.php:136
 msgid "Enable selected web scenarios?"
-msgstr ""
+msgstr "Povoliť označené scenáre?"
 
 #: auditlogs.php:143 dashboard.php:295 hosts.php:984
 #: include/discovery.inc.php:120 include/html.inc.php:332
@@ -7299,8 +7299,9 @@ msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre položku \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:658
+#, fuzzy
 msgid "Incorrect bulk value for interface."
-msgstr ""
+msgstr "Neplatná hromadná hodnota pre rozhranie."
 
 #: include/classes/api/services/CService.php:941
 #, c-format
@@ -7332,7 +7333,7 @@ msgstr "Nesprávne podmienky pre zisťovacie pravidlo \"%1$s\"."
 #: include/classes/api/services/CAction.php:2013
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
-msgstr ""
+msgstr "Nesprávne podmienky pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:852
 #, c-format
@@ -7342,7 +7343,7 @@ msgstr "Nesprávne podmienky pre zisťovacie pravidlo \"%1$s\"."
 #: include/classes/api/services/CAction.php:2018
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
-msgstr ""
+msgstr "Nesprávny vlastný výraz \"%2$s\" pre akciu \"%1$s\": %3$s."
 
 #: include/classes/api/services/CDiscoveryRule.php:857
 #, c-format
@@ -7391,7 +7392,7 @@ msgstr "Nahraný neplatný súbor."
 #: include/classes/api/services/CAction.php:2063
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna filtrovacia podmienka ID vzorca pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:887
 #, c-format
@@ -7406,7 +7407,7 @@ msgstr "Nesprávna filtrovacia podmienka makra pre zisťovacie pravidlo \"%1$s\"
 #: include/classes/api/services/CAction.php:2067
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna filtrovacia podmienka operátora pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:891
 #, c-format
@@ -7416,7 +7417,7 @@ msgstr "Nesprávna filtrovacia podmienka operátora pre zisťovacie pravidlo \"%
 #: include/classes/api/services/CAction.php:2055
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
-msgstr ""
+msgstr "Nesprávny typ filtrovacej podmienky pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:838
 #, c-format
@@ -7667,7 +7668,7 @@ msgstr "Neplatné proxyid."
 #: adm.regexps.php:69 include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
-msgstr ""
+msgstr "Nesprávny regulárny výraz \"%1$s\": \"%2$s\""
 
 #: include/classes/api/services/CScreenItem.php:447
 msgid "Incorrect resource type provided for screen item."
@@ -7808,7 +7809,7 @@ msgstr "Neplatný typ asort_by_key."
 #: include/classes/api/services/CAction.php:2006
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
-msgstr ""
+msgstr "Nesprávny typ kalkulácie pre akciu \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:845
 #, c-format
@@ -9668,7 +9669,7 @@ msgstr "Meno"
 #: include/views/administration.users.list.php:55 popup.php:580 users.php:45
 msgctxt "user first name"
 msgid "Name"
-msgstr ""
+msgstr "Meno"
 
 #: include/classes/api/services/CHostPrototype.php:223
 #, c-format
@@ -9826,7 +9827,7 @@ msgstr "Žiadne \"%1$s\" dané pre web scenár."
 #: include/classes/api/services/CAction.php:2074
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Žiadne \"%2$s\" dané pre filtrovaciu podmienku akcie \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:895
 #, c-format
@@ -9841,7 +9842,7 @@ msgstr "Žiadne \"%2$s\" dané pre prototyp hosta \"%1$s\"."
 #: include/classes/api/services/CAction.php:2024
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Žiadne \"%2$s\" dané pre filter akcie \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:863
 #, c-format
@@ -11916,7 +11917,7 @@ msgstr "Regulárny výraz neexistuje."
 
 #: adm.regexps.php:68 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
-msgstr ""
+msgstr "Regulárny výraz musí byť reťazec"
 
 #: adm.regexps.php:139
 msgid "Regular expression updated"
@@ -12206,7 +12207,7 @@ msgstr "Vráti dostupnosť konkrétneho typu kontroly na hostovi. Hodnoty polož
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
-msgstr ""
+msgstr "Vráti aktuálny stav odstávky pre hosta."
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
@@ -14772,7 +14773,7 @@ msgstr "Nepodporovaný parameter \"%1$s\" pre prototyp skupiny."
 #: include/classes/api/services/CAction.php:2075
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Nepodporovaný parameter \"%2$s\" pre filtrovaciu podmienku akcie \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
@@ -14792,12 +14793,12 @@ msgstr "Nepodporovaný parameter \"%2$s\" pre prototyp hosta %1$s inventár host
 #: include/classes/api/services/CAction.php:2025
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Nepodporovaný parameter \"%2$s\" pre filter akcie \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:864
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
-msgstr "Nepodporovaný parameter \"%2$s\" pre filter zisťovacieho pravidla \"%1$s\"."
+msgstr "Nepodporovaný parameter \"%2$s\" pre filter akcie \"%1$s\"."
 
 #: include/blocks.inc.php:1257
 msgctxt "discovery results in dashboard"
@@ -14918,8 +14919,9 @@ msgstr "Doba dostupnosti/nedostupnosti"
 
 #: include/views/js/configuration.host.edit.js.php:12
 #: include/views/js/configuration.host.edit.js.php:365
+#, fuzzy
 msgid "Use bulk requests"
-msgstr ""
+msgstr "Použiť hromadné požiadavky"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"

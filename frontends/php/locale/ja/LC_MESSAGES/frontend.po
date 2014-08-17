@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 14:00+0300\n"
-"PO-Revision-Date: 2014-06-20 05:36+0300\n"
+"POT-Creation-Date: 2014-08-17 14:10+0300\n"
+"PO-Revision-Date: 2014-08-08 05:46+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1403235375.0\n"
+"X-POOTLE-MTIME: 1407469580.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1211,7 +1211,7 @@ msgstr "CPU load。プロセッサのロードアベレージ。cpuとmodeの設
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "CPU utilisation。プロセッサの負荷状況をパーセント表示。cpu、type、modeの設定はオプション。cpuが指定されない場合はallが利用される。typeが指定されない場合はusersが利用される。modeが指定されない場合はavg1が利用される。"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1230,7 +1230,7 @@ msgstr "指定されたファイルのチェックサムを計算。チェック
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "指定されたボリュームのディスク容量を計算。ディスク容量はバイト単位。modeが指定されない場合はtotalが利用される。マウントされたボリュームが指定された場合にはローカルファイルシステムの未使用ディスク容量が返却される。 例：vfs.fs.size[/tmp,free]"
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:106
 #: include/views/configuration.graph.edit.php:164
@@ -2242,7 +2242,7 @@ msgstr "無効の状態のインベントリのフィールドは設定できま
 #: include/func.inc.php:1411
 #, c-format
 msgid "Cannot sort by field \"%1$s\"."
-msgstr ""
+msgstr "フィールド\"%1$s\"でソートできません。"
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2653,12 +2653,12 @@ msgstr "サービスが動作中かチェック。0 - サービス停止中、1 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:387
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "サービスが動作中かチェック。0 - サービス停止中、1 - サービス動作中。IPが指定されない場合は127.0.0.1が利用される。ポート番号が指定されない場合はサービスのデフォルトポート番号が利用される。 例: net.tcp.service[ftp,,45]"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:383
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "サービスのパフォーマンスチェック。0 - サービス停止中、秒数 - そのサービスへの接続にかかった秒数。IPが指定されない場合は127.0.0.1が利用される。ポート番号が指定されない場合はサービスのデフォルトポート番号が利用される。"
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2680,7 +2680,7 @@ msgstr "チェックのタイプ"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:379
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "そのポート番号に対してTCPコネクションを作成できるかチェック。0 - 接続不可、1 - 接続可。IPアドレスの指定はオプション。もしIPが指定されない場合は127.0.0.1が利用される。 例： net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -2888,7 +2888,7 @@ msgstr "アクションの実行条件"
 #: include/classes/api/services/CAction.php:2020
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"の条件\"%2$s\"は式\"%3$s\"内で利用されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
@@ -2898,7 +2898,7 @@ msgstr "ディスカバリルール\"%1$s\"の条件\"%2$s\"は式\"%3$s\"内で
 #: include/classes/api/services/CAction.php:2019
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "アクション\"%1$s\"の式\"%3$s\"内で利用されている条件\"%2$s\"は設定されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:858
 #, c-format
@@ -3843,7 +3843,7 @@ msgstr "選択したアイテムのヒストリを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:144
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリを削除しますか？"
 
 #: include/views/administration.general.iconmap.edit.php:146
 msgid "Delete icon map?"
@@ -4062,7 +4062,7 @@ msgstr[0] "選択した値のマッピングを削除しますか？この設定
 
 #: include/views/configuration.httpconf.list.php:148
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオを削除しますか？"
 
 #: templates.php:665
 msgid "Delete selected with linked elements"
@@ -4403,7 +4403,7 @@ msgstr "選択したトリガーを無効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:140
 msgid "Disable selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオを無効にしますか？"
 
 #: auditlogs.php:146 dashboard.php:295 hosts.php:993
 #: include/discovery.inc.php:121 include/html.inc.php:336
@@ -4814,7 +4814,7 @@ msgstr "色の設定が空白です。"
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件式IDが空白です。"
 
 #: include/classes/api/services/CDiscoveryRule.php:886
 #, c-format
@@ -5031,7 +5031,7 @@ msgstr "選択したトリガーを有効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:136
 msgid "Enable selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオを有効にしますか？"
 
 #: auditlogs.php:143 dashboard.php:295 hosts.php:984
 #: include/discovery.inc.php:120 include/html.inc.php:332
@@ -5630,7 +5630,7 @@ msgstr "ドイツ語 (de_DE)"
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:559
 msgid "Get content of web page. Default path is /"
-msgstr ""
+msgstr "Webページの取得するコンテンツ。デフォルトのパスは /"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:519
@@ -5640,7 +5640,7 @@ msgstr "指定したファイルのコンテンツ取得。"
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:567
 msgid "Get first occurrence of regexp in web page. Default path is /"
-msgstr ""
+msgstr "Webページ内にある正規表現の最初の出現箇所を取得。デフォルトのパスは /"
 
 #: include/page_header.php:194
 msgid "Get support"
@@ -5649,7 +5649,7 @@ msgstr "サポート"
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:563
 msgid "Get timing of loading full web page. Default path is /"
-msgstr ""
+msgstr "Webページ全体を取得するタイミングを取得。デフォルトのパスは /"
 
 #: include/func.inc.php:666
 msgid "Giga"
@@ -7193,7 +7193,7 @@ msgstr "アイテム\"%1$s\"の認証プロトコルが正しくありません�
 
 #: include/classes/api/services/CHostInterface.php:658
 msgid "Incorrect bulk value for interface."
-msgstr ""
+msgstr "インターフェースのbulkの値が正しくありません。"
 
 #: include/classes/api/services/CService.php:941
 #, c-format
@@ -7225,7 +7225,7 @@ msgstr "テンプレート名\"%1$s\"に利用されている文字列が正し�
 #: include/classes/api/services/CAction.php:2013
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"の条件式が正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:852
 #, c-format
@@ -7284,7 +7284,7 @@ msgstr "アップロードされたファイルが正しくありません。"
 #: include/classes/api/services/CAction.php:2063
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件式IDが正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:887
 #, c-format
@@ -7299,7 +7299,7 @@ msgstr "ディスカバリルール\"%1$s\"のフィルター条件マクロが�
 #: include/classes/api/services/CAction.php:2067
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件演算子が正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:891
 #, c-format
@@ -7309,7 +7309,7 @@ msgstr "ディスカバリルール\"%1$s\"のフィルター条件演算子が�
 #: include/classes/api/services/CAction.php:2055
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件タイプが正しくありません。"
 
 #: include/classes/api/services/CItemGeneral.php:838
 #, c-format
@@ -7701,7 +7701,7 @@ msgstr "asort_by_keyのタイプが正しくありません。"
 #: include/classes/api/services/CAction.php:2006
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"の計算のタイプが正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:845
 #, c-format
@@ -9543,7 +9543,7 @@ msgstr "名前"
 #: include/views/administration.users.list.php:55 popup.php:580 users.php:45
 msgctxt "user first name"
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: include/classes/api/services/CHostPrototype.php:223
 #, c-format
@@ -10826,7 +10826,7 @@ msgstr "特権管理者のみがユーザーのメディアを削除できます
 
 #: include/classes/api/services/CDRule.php:254
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
-msgstr ""
+msgstr "Zabbixエージェント、SNMPv1、SNMPv2、SNMPv3がユニークかどうかだけチェックします。"
 
 #: include/blocks.inc.php:827
 msgid "Only items assigned to enabled hosts are counted"
@@ -11789,7 +11789,7 @@ msgstr "正規表現は存在しません"
 
 #: adm.regexps.php:68 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
-msgstr ""
+msgstr "正規表現は文字列で設定してください"
 
 #: adm.regexps.php:139
 msgid "Regular expression updated"
@@ -12079,7 +12079,7 @@ msgstr "ホスト上の特定のチェック種別の稼働状況返却。この
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
-msgstr ""
+msgstr "ホストの現在のメンテナンス状態を返却。"
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
@@ -12935,7 +12935,7 @@ msgstr "表示"
 #, c-format
 msgid "Show all (%1$s day)"
 msgid_plural "Show all (%1$s days)"
-msgstr[0] ""
+msgstr[0] "すべて表示 (%1$s日)"
 
 #: include/views/common.filter.trigger.php:143 latest.php:310
 msgid "Show details"
@@ -13016,7 +13016,7 @@ msgstr "トリガーを表示"
 #, c-format
 msgid "Show unacknowledged (%1$s day)"
 msgid_plural "Show unacknowledged (%1$s days)"
-msgstr[0] ""
+msgstr[0] "未対応を表示 (%1$s日)"
 
 #: include/views/configuration.item.edit.php:382
 #: include/views/configuration.item.massupdate.php:447
@@ -14627,7 +14627,7 @@ msgstr "グループのプロトタイプではパラメータ\"%1$s\"は利用�
 #: include/classes/api/services/CAction.php:2075
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件ではパラメータ\"%2$s\"は利用できません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
@@ -14647,7 +14647,7 @@ msgstr "ホストのプロトタイプ%1$sのホストインベントリでは�
 #: include/classes/api/services/CAction.php:2025
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルターではパラメータ\"%2$s\"は利用できません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:864
 #, c-format
@@ -14774,7 +14774,7 @@ msgstr "アップタイム/ダウンタイム"
 #: include/views/js/configuration.host.edit.js.php:12
 #: include/views/js/configuration.host.edit.js.php:365
 msgid "Use bulk requests"
-msgstr ""
+msgstr "bulkリクエストを利用"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
@@ -15668,11 +15668,11 @@ msgstr "Yラベル"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d"
-msgstr ""
+msgstr "Y/m/d"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i"
-msgstr ""
+msgstr "Y/m/d H:i"
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
