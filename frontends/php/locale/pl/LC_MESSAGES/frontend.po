@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 14:00+0300\n"
-"PO-Revision-Date: 2014-07-03 09:09+0300\n"
+"POT-Creation-Date: 2014-08-17 14:10+0300\n"
+"PO-Revision-Date: 2014-08-13 08:14+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1404371377.0\n"
+"X-POOTLE-MTIME: 1407910493.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2974,7 +2974,7 @@ msgstr "Warunek"
 #: include/classes/api/services/CAction.php:2020
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "Warunek \"%2$s\" nie został użyty w formule \"%3$s\" dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
@@ -2984,7 +2984,7 @@ msgstr "Warunek \"%2$s\" nie został użyty w formule \"%3$s\" dla reguły wyszu
 #: include/classes/api/services/CAction.php:2019
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "Warunek \"%2$s\" użyty w formule \"%3$s\" dla akcji \"%1$s\" nie został zdefiniowany."
 
 #: include/classes/api/services/CDiscoveryRule.php:858
 #, c-format
@@ -3932,7 +3932,7 @@ msgstr "Usunąć historię wybranych pozycji?"
 
 #: include/views/configuration.httpconf.list.php:144
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "Usunąć historię wybranych scenariuszy sieci www?"
 
 #: include/views/administration.general.iconmap.edit.php:146
 msgid "Delete icon map?"
@@ -4153,7 +4153,7 @@ msgstr[2] "Usunąć wybrane mapowanie wartości? Jest wykorzystywane przez %d po
 
 #: include/views/configuration.httpconf.list.php:148
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "Usunąć wybrane scenariuszy sieci www?"
 
 #: templates.php:665
 msgid "Delete selected with linked elements"
@@ -4494,7 +4494,7 @@ msgstr "Wyłączyć wybrane wyzwalacze?"
 
 #: include/views/configuration.httpconf.list.php:140
 msgid "Disable selected web scenarios?"
-msgstr ""
+msgstr "Wyłączyć wybrane scenariusze sieci www?"
 
 #: auditlogs.php:146 dashboard.php:295 hosts.php:993
 #: include/discovery.inc.php:121 include/html.inc.php:336
@@ -4909,7 +4909,7 @@ msgstr "Pusty kolor."
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "ID formuły warunku filtra dla akcji \"%1$s\" jest puste."
 
 #: include/classes/api/services/CDiscoveryRule.php:886
 #, c-format
@@ -5126,7 +5126,7 @@ msgstr "Włączyć wybrane wyzwalacze?"
 
 #: include/views/configuration.httpconf.list.php:136
 msgid "Enable selected web scenarios?"
-msgstr ""
+msgstr "Włączyć wybrane scenariusze sieci www?"
 
 #: auditlogs.php:143 dashboard.php:295 hosts.php:984
 #: include/discovery.inc.php:120 include/html.inc.php:332
@@ -7300,7 +7300,7 @@ msgstr "Błędny protokół autoryzacji dla pozycji \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:658
 msgid "Incorrect bulk value for interface."
-msgstr ""
+msgstr "Błędna wartość zbiorcza dla interfejsu."
 
 #: include/classes/api/services/CService.php:941
 #, c-format
@@ -7332,7 +7332,7 @@ msgstr "Błędne znaki wykorzystane dla nazwy szablonu \"%1$s\"."
 #: include/classes/api/services/CAction.php:2013
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
-msgstr ""
+msgstr "Błędne warunki dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:852
 #, c-format
@@ -7342,7 +7342,7 @@ msgstr "Błędne warunki dla reguły wykrywania \"%1$s\"."
 #: include/classes/api/services/CAction.php:2018
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
-msgstr ""
+msgstr "Błędne wyrażenie użytkownika \"%2$s\" dla akcji \"%1$s\": %3$s."
 
 #: include/classes/api/services/CDiscoveryRule.php:857
 #, c-format
@@ -7391,7 +7391,7 @@ msgstr "Błędne ładowanie pliku."
 #: include/classes/api/services/CAction.php:2063
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Błędne ID formuły warunku filtra dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:887
 #, c-format
@@ -7406,7 +7406,7 @@ msgstr "Błędne makro warunku filtra dla reguły wykrywania \"%1$s\"."
 #: include/classes/api/services/CAction.php:2067
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
-msgstr ""
+msgstr "Błędny operator warunku filtra dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:891
 #, c-format
@@ -7416,7 +7416,7 @@ msgstr "Błędny operator warunku filtra dla reguły wykrywania \"%1$s\"."
 #: include/classes/api/services/CAction.php:2055
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
-msgstr ""
+msgstr "Błędny typ warunku filtra dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:838
 #, c-format
@@ -7667,7 +7667,7 @@ msgstr "Błędne proxyid."
 #: adm.regexps.php:69 include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
-msgstr ""
+msgstr "Błędne wyrażenie regularne \"%1$s\": \"%2$s\""
 
 #: include/classes/api/services/CScreenItem.php:447
 msgid "Incorrect resource type provided for screen item."
@@ -7808,7 +7808,7 @@ msgstr "Błędny typ asort_by_key."
 #: include/classes/api/services/CAction.php:2006
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
-msgstr ""
+msgstr "Błędny typ obliczenia dla akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:845
 #, c-format
@@ -9668,7 +9668,7 @@ msgstr "Nazwa"
 #: include/views/administration.users.list.php:55 popup.php:580 users.php:45
 msgctxt "user first name"
 msgid "Name"
-msgstr ""
+msgstr "Imię"
 
 #: include/classes/api/services/CHostPrototype.php:223
 #, c-format
@@ -9826,7 +9826,7 @@ msgstr "Nie podano \"%1$s\" dla scenariusza sieci www."
 #: include/classes/api/services/CAction.php:2074
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Nie podano \"%2$s\" dla warunku filtra akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:895
 #, c-format
@@ -9841,7 +9841,7 @@ msgstr "Nie podano \"%2$s\" dla prototypu hosta \"%1$s\"."
 #: include/classes/api/services/CAction.php:2024
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Nie podano \"%2$s\" dla filtra akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:863
 #, c-format
@@ -11916,7 +11916,7 @@ msgstr "Wyrażenie regularne nie istnieje."
 
 #: adm.regexps.php:68 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
-msgstr ""
+msgstr "Wyrażenie regularne musi być ciągiem znaków"
 
 #: adm.regexps.php:139
 msgid "Regular expression updated"
@@ -12206,7 +12206,7 @@ msgstr "Zwraca dostępność określonych typów kontroli na hoście. Wartość 
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
-msgstr ""
+msgstr "Zwraca bieżący stan obsługi dla hosta."
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
@@ -14773,7 +14773,7 @@ msgstr "Niewspierany parametr \"%1$s\" dla prototypu grupy."
 #: include/classes/api/services/CAction.php:2075
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Niewspierany parametr \"%2$s\" dla warunku filtra akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
@@ -14793,7 +14793,7 @@ msgstr "Niewspierany parametr \"%2$s\" dla prototypu hosta %1$s w inwentarzu hos
 #: include/classes/api/services/CAction.php:2025
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Niewspierany parametr \"%2$s\" dla filtra akcji \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:864
 #, c-format
@@ -14920,7 +14920,7 @@ msgstr "Czas dostępności/niedostępności"
 #: include/views/js/configuration.host.edit.js.php:12
 #: include/views/js/configuration.host.edit.js.php:365
 msgid "Use bulk requests"
-msgstr ""
+msgstr "Użyj żądań zbiorczych"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
