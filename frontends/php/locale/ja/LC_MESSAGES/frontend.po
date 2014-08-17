@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 11:45+0300\n"
-"PO-Revision-Date: 2014-06-20 05:33+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2014-08-17 13:49+0300\n"
+"PO-Revision-Date: 2014-07-31 05:39+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1403235215.0\n"
+"X-POOTLE-MTIME: 1406777987.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -13213,7 +13213,7 @@ msgstr "テンプレート"
 #: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
-msgstr "テンプレート\"%1$s\"はそでに存在します。"
+msgstr "テンプレート\"%1$s\"はすでに存在します。"
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, c-format
@@ -13333,7 +13333,7 @@ msgstr "認証のテスト"
 
 #: include/views/administration.script.edit.php:110
 msgid "Test confirmation"
-msgstr "テストの確認"
+msgstr "確認のテスト"
 
 #: tr_testexpr.php:125
 msgid "Test data"
@@ -15936,7 +15936,7 @@ msgstr "その他"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr "%1$s秒ごとに更新。"
+msgstr "%1$s秒ごとに更新"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
