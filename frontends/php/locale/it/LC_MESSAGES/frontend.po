@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 14:00+0300\n"
-"PO-Revision-Date: 2014-06-12 09:01+0300\n"
+"POT-Creation-Date: 2014-08-17 14:10+0300\n"
+"PO-Revision-Date: 2014-07-30 08:08+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402556484.0\n"
+"X-POOTLE-MTIME: 1406700499.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -78,8 +78,8 @@ msgstr[1] "%1s minuti"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s tentativo disponibile"
+msgstr[1] "%1$s tentativi disponibili"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
@@ -195,7 +195,7 @@ msgstr "<manuale>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "ACTION LOG"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -214,7 +214,7 @@ msgstr "E"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "AUDIT LOG"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -373,7 +373,7 @@ msgstr[1] "Azioni abilitate"
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 msgid "Action log"
-msgstr ""
+msgstr "Action log"
 
 #: include/views/configuration.action.edit.php:453
 msgid "Action operations"
@@ -629,13 +629,13 @@ msgstr "Quantita' di memoria in byte. Se non specificata verra' utilizzata quell
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
-msgstr ""
+msgstr "And"
 
 #: include/views/configuration.action.edit.php:119
 #: include/views/configuration.action.edit.php:987
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr ""
+msgstr "And/Or"
 
 #: include/views/common.filter.trigger.php:38
 #: include/views/common.filter.trigger.php:46
@@ -813,7 +813,7 @@ msgstr "Ritenzione dati Audit su disco (in giorni) \"%1$s\"."
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Audit log"
-msgstr ""
+msgstr "Audit log"
 
 #: include/func.inc.php:244
 msgid "Aug"
@@ -976,7 +976,7 @@ msgstr "DN base"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Basic"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
@@ -1225,7 +1225,7 @@ msgstr "CPU(s) load. Processor load. La \"cpu\" e il \"mode\" sono opzionali. Se
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "CPU (s) utilizzo. Carico del processore in percentuale. La cpu, \"type e mode\" sono opzionali. Se \"cpu\"  non specifita sono tutte utilizzate. Se \"type\" non specificato viene utilizzata la \"user\". Se \"mode\" non specificato e' utilizzato avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1244,7 +1244,7 @@ msgstr "Calcola check sum per il file indicato. Check sum del file calcolato con
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Calcolo spazio disco per un dato volume. Lo spazio disco e' in KB. Se \"mode\" assente viene utilizzato \"total\". In caso di volume montato, viene restituito lo spazio inutilizzato su disco per il file system locale. Esempio: vfs.fs.size [/ tmp, libero]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:106
 #: include/views/configuration.graph.edit.php:164
@@ -1341,7 +1341,7 @@ msgstr "Impossibile aggiungere il gruppo"
 #: include/classes/api/services/CTemplate.php:375
 #: include/classes/api/services/CTemplate.php:829
 msgid "Cannot add group."
-msgstr ""
+msgstr "Impossibile aggiungere il gruppo."
 
 #: hosts.php:390
 msgid "Cannot add host"
@@ -1566,7 +1566,7 @@ msgstr "Impossibile creare nuovo elemento"
 
 #: include/classes/api/services/CTemplate.php:389
 msgid "Cannot create template."
-msgstr ""
+msgstr "Impossibile creare template."
 
 #: include/classes/api/services/CUser.php:1302
 #, c-format
@@ -2128,7 +2128,7 @@ msgstr "Impossibile formattare albero."
 
 #: include/classes/api/services/CTemplate.php:794
 msgid "Cannot have empty visible template name."
-msgstr ""
+msgstr "Impossibile avere il nome template vuoto."
 
 #: include/classes/api/services/CTrigger.php:1068
 #: include/classes/api/services/CTrigger.php:1203
@@ -2172,7 +2172,7 @@ msgstr "Impossibile collegare template"
 #: include/classes/api/services/CTemplate.php:916
 #: include/classes/api/services/CTemplate.php:931
 msgid "Cannot link template."
-msgstr ""
+msgstr "Impossibile collegare template."
 
 #: include/classes/api/services/CUser.php:1025
 msgid "Cannot login."
@@ -2188,7 +2188,7 @@ msgstr "Impossibile aggiornare massivamente nome host."
 
 #: include/classes/api/services/CTemplate.php:1020
 msgid "Cannot mass update template name."
-msgstr ""
+msgstr "Impossibile aggiornare massivamente nome template."
 
 #: include/classes/api/services/CHost.php:952
 msgid "Cannot mass update visible host name."
@@ -2196,7 +2196,7 @@ msgstr "Impossibile aggiornare massivamente nome visibile host."
 
 #: include/classes/api/services/CTemplate.php:985
 msgid "Cannot mass update visible template name."
-msgstr ""
+msgstr "Impossibile aggiornare massivamente nome visibile del template."
 
 #: include/classes/api/services/CHostBase.php:57
 #, c-format
@@ -2233,7 +2233,7 @@ msgstr "Impossibile rimuovere tutti gli item, almeno un item deve rimanere."
 
 #: include/classes/api/services/CTemplate.php:842
 msgid "Cannot remove group."
-msgstr ""
+msgstr "Impossibile rimuovere gruppo."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -2285,7 +2285,7 @@ msgstr "Impossibile impostare campi inventario per un inventario disabilitato."
 #: include/func.inc.php:1411
 #, c-format
 msgid "Cannot sort by field \"%1$s\"."
-msgstr ""
+msgstr "Impossibile ordinare tramite il campo \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2335,7 +2335,7 @@ msgstr "Impossibile scollegare template"
 #: include/classes/api/services/CTemplate.php:878
 #: include/classes/api/services/CTemplate.php:901
 msgid "Cannot unlink template."
-msgstr ""
+msgstr "Impossibile scollegare template."
 
 #: include/classes/api/services/CHostGeneral.php:234
 #, c-format
@@ -2375,7 +2375,7 @@ msgstr "Impossibile aggiornare \"%1$s\" per il trigger \"%2$s\"."
 #: include/classes/api/services/CImage.php:553
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"imagetype\" per l'immagine \"%1$s\"."
 
 #: include/classes/api/services/CApplication.php:317
 #, c-format
@@ -2435,7 +2435,7 @@ msgstr "Impossibile aggiornare la modalità debug"
 
 #: tr_comments.php:82
 msgid "Cannot update description"
-msgstr ""
+msgstr "Impossibile aggiornare la descrizione"
 
 #: discoveryconf.php:145 host_discovery.php:289
 msgid "Cannot update discovery rule"
