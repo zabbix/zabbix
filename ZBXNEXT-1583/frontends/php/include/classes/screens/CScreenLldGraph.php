@@ -57,7 +57,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 			if ($graphPrototype) {
 				// Get all created (discovered) graphs for host of graph prototype.
 				$allCreatedGraphs = API::Graph()->get(array(
-					'output' => array('name'),
+					'output' => array('graphid', 'name'),
 					'hostids' => array($graphPrototype['discoveryRule']['hostid']),
 					'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
