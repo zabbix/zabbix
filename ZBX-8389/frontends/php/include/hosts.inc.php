@@ -22,7 +22,7 @@
 function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
 	zbx_value2array($groupids);
 
-	return DBexecute('UPDATE groups SET internal='.$internal.' WHERE '.dbConditionInt('groupid', $groupids));
+	return DBexecute('UPDATE groups SET internal='.zbx_dbstr($internal).' WHERE '.dbConditionInt('groupid', $groupids));
 }
 
 /**
@@ -549,7 +549,7 @@ function updateHostStatus($hostids, $status) {
 		'SELECT h.hostid,h.host,h.status'.
 		' FROM hosts h'.
 		' WHERE '.dbConditionInt('h.hostid', $hostids).
-			' AND h.status='.$oldStatus
+			' AND h.status='.zbx_dbstr($oldStatus)
 	);
 	while ($host = DBfetch($db_hosts)) {
 		$hostIds[] = $host['hostid'];
