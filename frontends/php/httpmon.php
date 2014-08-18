@@ -33,7 +33,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'fullscreen' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	IN('0,1'),	null),
 	'groupid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
-	'hostid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+	'hostid' =>			array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'hostname','name'"),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
 
@@ -47,7 +50,7 @@ if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_DOWN, array('hostname', 'name'));
+validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
 
 $options = array(
 	'groups' => array(

@@ -101,10 +101,13 @@ $fields = array(
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 

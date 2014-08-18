@@ -51,10 +51,13 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'output' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'ajaxaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
+	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 $_REQUEST['dchecks'] = getRequest('dchecks', array());

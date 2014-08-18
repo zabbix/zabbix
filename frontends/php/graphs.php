@@ -67,7 +67,10 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','graphtype'"),					null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 $percentVisible = getRequest('visible');
 if (!isset($percentVisible['percent_left'])) {
@@ -83,7 +86,7 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['items'] = getRequest('items', array());

@@ -1401,23 +1401,8 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @return void
  */
-function validate_sort_and_sortorder($defaultSort = null, $defaultSortOrder = ZBX_SORT_UP, array $allowedColumns = array()) {
+function validate_sort_and_sortorder($defaultSort, $defaultSortOrder) {
 	global $page;
-
-	$sortKey = 'sort';
-	$sortOrderKey = 'sortorder';
-
-	if (hasRequest($sortKey) && $allowedColumns && !in_array(getRequest($sortKey), $allowedColumns)) {
-		error(_s('Cannot sort by field "%1$s".', getRequest($sortKey)));
-		invalid_url();
-	}
-
-	if (hasRequest($sortOrderKey) && !in_array(getRequest($sortOrderKey), array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-			getRequest($sortOrderKey), ZBX_SORT_UP, ZBX_SORT_DOWN
-		));
-		invalid_url();
-	}
 
 	$profileSortFieldIndex = 'web.'.$page['file'].'.sort';
 	$profileSortOrderIndex = 'web.'.$page['file'].'.sortorder';
@@ -1429,8 +1414,8 @@ function validate_sort_and_sortorder($defaultSort = null, $defaultSortOrder = ZB
 		CProfile::update($profileSortOrderIndex, $currentSortOrder, PROFILE_TYPE_STR);
 		CProfile::update($profileSortFieldIndex, $currentSortField, PROFILE_TYPE_STR);
 
-		$_REQUEST[$sortKey] = $currentSortField;
-		$_REQUEST[$sortOrderKey] = $currentSortOrder;
+		$_REQUEST['sort'] = $currentSortField;
+		$_REQUEST['sortorder'] = $currentSortOrder;
 	}
 }
 

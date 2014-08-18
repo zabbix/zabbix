@@ -70,10 +70,13 @@ $fields = array(
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
 $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);

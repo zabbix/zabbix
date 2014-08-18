@@ -50,7 +50,10 @@ $fields = array(
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'host','name','lastclock'"),				null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
 
@@ -139,7 +142,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('host', 'name', 'lastclock'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $sortField = getPageSortField();
 $sortOrder = getPageSortOrder();
