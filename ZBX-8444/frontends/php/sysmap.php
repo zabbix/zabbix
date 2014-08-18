@@ -55,10 +55,10 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['favobj'])) {
-	$json = new CJSON();
+	$json = new CJson();
 
 	if ($_REQUEST['favobj'] == 'sysmap' && $_REQUEST['action'] == 'save') {
-		$sysmapid = get_request('sysmapid', 0);
+		$sysmapid = getRequest('sysmapid', 0);
 
 		@ob_start();
 
@@ -82,7 +82,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = API::Map()->update($sysmapUpdate);
 
 			if ($result !== false) {
-				echo 'if (Confirm("'._('Map is saved! Return?').'")) { location.href = "sysmaps.php"; }';
+				echo 'if (confirm('.CJs::encodeJson(_('Map is saved! Return?')).')) { location.href = "sysmaps.php"; }';
 			}
 			else {
 				throw new Exception(_('Map save operation failed.')."\n\r");

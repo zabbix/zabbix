@@ -35,7 +35,7 @@ $fields = array(
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// group
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
 	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -44,7 +44,7 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
@@ -151,22 +151,22 @@ if (hasRequest('form')) {
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
-		unset($_REQUEST['save']);
-
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
+
+		unset($_REQUEST['save']);
 	}
 	elseif (hasRequest('delete') && hasRequest('groupid')) {
 		$result = API::HostGroup()->delete(array(getRequest('groupid')));
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
-		unset($_REQUEST['delete']);
-
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-		clearCookies($result);
+
+		unset($_REQUEST['delete']);
 	}
 }
 /*
@@ -181,13 +181,14 @@ elseif (hasRequest('go')) {
 
 			$updated = count($groupIds);
 
+			if ($result) {
+				uncheckTableRows();
+			}
 			show_messages($result,
 				_n('Group deleted', 'Groups deleted', $updated),
 				_n('Cannot delete group', 'Cannot delete groups', $updated)
 			);
 		}
-
-		clearCookies($result);
 	}
 	elseif (getRequest('go') == 'activate' || getRequest('go') == 'disable') {
 		$enable = (getRequest('go') == 'activate');
@@ -200,7 +201,7 @@ elseif (hasRequest('go')) {
 			DBstart();
 
 			$hosts = API::Host()->get(array(
-				'output' => array('hostid', 'status'),
+				'output' => array('hostid', 'status', 'host'),
 				'groupids' => $groupIds,
 				'editable' => true
 			));
@@ -224,6 +225,10 @@ elseif (hasRequest('go')) {
 
 			$result = DBend($result);
 
+			if ($result) {
+				uncheckTableRows();
+			}
+
 			$updated = count($hosts);
 
 			$messageSuccess = $enable
@@ -234,7 +239,6 @@ elseif (hasRequest('go')) {
 				: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 			show_messages($result, $messageSuccess, $messageFailed);
-			clearCookies($result);
 		}
 	}
 }

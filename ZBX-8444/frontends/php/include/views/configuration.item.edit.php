@@ -315,42 +315,32 @@ $dataConfig = select_config();
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
 if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
-	$keepHistory[] = SPACE;
+	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$keepHistory[] = new CSpan(_x('Overridden by', 'item_form'));
-		$keepHistory[] = SPACE;
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
 		$link->setAttribute('target', '_blank');
-		$keepHistory[] =  $link;
-		$keepHistory[] = SPACE;
-		$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
+		$keepHistory[] = $link;
 	}
 	else {
-		$keepHistory[] = new CSpan(_('Overridden by global housekeeping settings').
-			'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
-		);
+		$keepHistory[] = _x('global housekeeping settings', 'item_form');
 	}
+	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')';
 }
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
 if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
-	$keepTrend[] = SPACE;
+	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$keepTrend[] = new CSpan(_x('Overridden by', 'item_form'));
-		$keepTrend[] = SPACE;
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
 		$link->setAttribute('target', '_blank');
-		$keepTrend[] =  $link;
-		$keepTrend[] = SPACE;
-		$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
+		$keepTrend[] = $link;
 	}
 	else {
-		$keepTrend[] = new CSpan(_('Overridden by global housekeeping settings').
-			'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
-		);
+		$keepTrend[] = _x('global housekeeping settings', 'item_form');
 	}
+	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')';
 }
 
 $itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');

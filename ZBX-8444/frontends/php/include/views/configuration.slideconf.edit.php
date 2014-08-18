@@ -53,7 +53,7 @@ $slideTable->setHeader(array(
 ));
 
 $i = 1;
-foreach ($this->data['slides'] as $step => $slides) {
+foreach ($this->data['slides'] as $key => $slides) {
 	$name = '';
 	if (!empty($slides['screenid'])) {
 		$screen = get_screen_by_screenid($slides['screenid']);
@@ -62,22 +62,22 @@ foreach ($this->data['slides'] as $step => $slides) {
 		}
 	}
 
-	$delay = new CNumericBox('slides['.$step.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
+	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
 	$delay->setAttribute('placeholder', _('default'));
 
-	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
-	$removeButton->setAttribute('remove_slide', $step);
+	$removeButton = new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
+	$removeButton->setAttribute('remove_slide', $key);
 
 	$row = new CRow(
 		array(
 			new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
-			new CSpan($i++.':', 'rowNum', 'current_slide_'.$step),
+			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton
 		),
 		'sortable',
-		'slides_'.$step
+		'slides_'.$key
 	);
 	$slideTable->addRow($row);
 }

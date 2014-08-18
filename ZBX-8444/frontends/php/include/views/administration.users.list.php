@@ -52,7 +52,7 @@ $usersTable = new CTableInfo(_('No users found.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 	make_sorting_header(_('Alias'), 'alias'),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_x('Name', 'user first name'), 'name'),
 	make_sorting_header(_('Surname'), 'surname'),
 	make_sorting_header(_('User type'), 'type'),
 	_('Groups'),
@@ -81,7 +81,7 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid'.SQUAREBRACKETS.'='.$userId, 'on')
+		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid[]='.$userId, 'on')
 		: new CSpan(_('Ok'), 'green');
 
 	// user groups

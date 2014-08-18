@@ -41,7 +41,12 @@ abstract class CAbstractScreenImporter extends CImporter {
 					$screenItem['resourceid'] = 0;
 					continue;
 				}
-
+				if ($screenItem['rowspan'] == 0) {
+					$screenItem['rowspan'] = 1;
+				}
+				if ($screenItem['colspan'] == 0) {
+					$screenItem['colspan'] = 1;
+				}
 				switch ($screenItem['resourcetype']) {
 					case SCREEN_RESOURCE_HOSTS_INFO:
 					case SCREEN_RESOURCE_TRIGGERS_INFO:
@@ -64,14 +69,15 @@ abstract class CAbstractScreenImporter extends CImporter {
 						break;
 
 					case SCREEN_RESOURCE_GRAPH:
-						$dbGraphs = API::Graph()->getObjects($resource);
-						if (empty($dbGraphs)) {
+						$hostId = $this->referencer->resolveHostOrTemplate($resource['host']);
+						$graphId = $this->referencer->resolveGraph($hostId, $resource['name']);
+
+						if (!$graphId) {
 							throw new Exception(_s('Cannot find graph "%1$s" used in screen "%2$s".',
 								$resource['name'], $screen['name']));
 						}
 
-						$tmp = reset($dbGraphs);
-						$screenItem['resourceid'] = $tmp['graphid'];
+						$screenItem['resourceid'] = $graphId;
 						break;
 
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:

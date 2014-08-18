@@ -1939,8 +1939,6 @@ static size_t	zbx_db_get_escape_string_len(const char *src)
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
-		if ('\r' == *s)
-			continue;
 #if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
 #elif defined(HAVE_POSTGRESQL)
@@ -1981,9 +1979,6 @@ static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
 
 	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if ('\r' == *s)
-			continue;
-
 #if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
 #elif defined(HAVE_POSTGRESQL)
@@ -2045,9 +2040,6 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
-		if ('\r' == *s)
-			continue;
-
 		/* only UTF-8 characters should reduce a variable max_src_len */
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
 			break;

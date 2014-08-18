@@ -45,7 +45,7 @@ $fields = array(
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
-	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, null,	null,	null),
 	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,	null),
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
