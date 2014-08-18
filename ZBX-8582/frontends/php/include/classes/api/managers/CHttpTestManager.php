@@ -279,7 +279,7 @@ class CHttpTestManager {
 		$httpTests = array();
 		$dbCursor = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
-				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid,'.
+				'ht.authentication,ht.http_user,ht.http_password,ht.http_proxy,ht.retries,ht.hostid,ht.templateid,'.
 				'ht.headers,ht.verify_peer,ht.verify_host,ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password'.
 			' FROM httptest ht'.
 			' WHERE ht.hostid='.zbx_dbstr($templateId)
