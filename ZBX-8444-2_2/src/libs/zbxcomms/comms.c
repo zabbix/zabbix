@@ -1080,10 +1080,10 @@ cleanup:
 
 char	*get_ip_by_socket(zbx_sock_t *s)
 {
-	ZBX_SOCKADDR	sa;
-	ZBX_SOCKLEN_T	sz = sizeof(sa);
-	static char	host[64];
-	char		*error_message = NULL;
+	ZBX_SOCKADDR			sa;
+	ZBX_SOCKLEN_T			sz = sizeof(sa);
+	ZBX_THREAD_LOCAL static char	host[64];
+	char				*error_message = NULL;
 
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
 	{
