@@ -168,13 +168,4 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 
 		return $this->itemPrototype;
 	}
-
-	/**
-	 * Returns content to be shown when there are no items for surrogate screen.
-	 *
-	 * @return CTag
-	 */
-	protected function getNoScreenItemsOutput() {
-		return new CTableInfo(_('No LLD created items found.'));
-	}
 }

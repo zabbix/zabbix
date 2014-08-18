@@ -201,13 +201,4 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 		return new CSpan($img);
 	}
-
-	/**
-	 * Returns content to be shown when there are no items for surrogate screen.
-	 *
-	 * @return CTag
-	 */
-	protected function getNoScreenItemsOutput() {
-		return new CTableInfo(_('No LLD created graphs found.'));
-	}
 }
