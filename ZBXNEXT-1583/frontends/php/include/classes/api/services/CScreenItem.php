@@ -501,11 +501,6 @@ class CScreenItem extends CApiService {
 							'No graph prototype ID provided for screen element.'
 						));
 					}
-					elseif (!$this->isValidMaxColumns($screenItem['max_columns'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _(
-							'Incorrect max columns provided for screen element.'
-						));
-					}
 
 					$graphPrototypeIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 					break;
@@ -514,11 +509,6 @@ class CScreenItem extends CApiService {
 					if (!$screenItem['resourceid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _(
 							'No item prototype ID provided for screen element.'
-						));
-					}
-					elseif (!$this->isValidMaxColumns($screenItem['max_columns'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _(
-							'Incorrect max columns provided for screen element.'
 						));
 					}
 
@@ -583,6 +573,19 @@ class CScreenItem extends CApiService {
 							));
 						}
 						break;
+				}
+			}
+
+			$dbScreenItem = isset($screenItem['screenitemid']) ? $dbScreenItems[$screenItem['screenitemid']] : null;
+
+			$lldResources = array(SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH);
+			if (in_array($screenItem['resourcetype'], $lldResources)) {
+				$set = isset($screenItem['max_columns']);
+				$valid = $set && $this->isValidMaxColumns($screenItem['max_columns']);
+
+				$error = $dbScreenItem ? ($set && !$valid) : (!$set || !$valid);
+				if ($error) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect max columns provided for screen element.'));
 				}
 			}
 		}
