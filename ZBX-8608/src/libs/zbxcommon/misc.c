@@ -687,7 +687,7 @@ int	is_ip6(const char *ip)
 
 	while ('\0' != *p)
 	{
-		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
+		if (0 != isxdigit(*p))
 		{
 			nums++;
 			is_nums = 1;
@@ -759,9 +759,10 @@ int	is_ip(const char *ip)
  ******************************************************************************/
 int	ip6_str2dig(const char *ip, unsigned short *groups)
 {
-	char	buf[5], *ptr;
-	int	c = 0, dc, pos = 0;
-	size_t	ip_len, j, len;
+	const char	*ptr;
+	char		buf[5];
+	int		c = 0, dc, pos = 0;
+	size_t		ip_len, j, len;
 
 	for (ptr = strchr(ip, ':'); NULL != ptr; ptr = strchr(ptr + 1, ':'))
 		c++;
@@ -776,12 +777,12 @@ int	ip6_str2dig(const char *ip, unsigned short *groups)
 
 	memset(groups, 0, sizeof(unsigned short) * 8);
 
-	dc  = 0;	/* double colon flag */
+	dc = 0;	/* double colon flag */
 	len = 0;
 
 	for (j = 0; j < ip_len; j++)
 	{
-		if (('0' <= ip[j] && ip[j] <= '9') || ('A' <= ip[j] && ip[j] <= 'F') || ('a' <= ip[j] && ip[j] <= 'f'))
+		if (0 != isxdigit(ip[j]))
 		{
 			if (len > 3)
 				return FAIL;
@@ -1061,7 +1062,7 @@ static int	ip4_in_list(char *list, const char *ip)
 			break;
 		}
 next:
-		if (dash != NULL)
+		if (NULL != dash)
 		{
 			*dash = '-';
 			dash = NULL;
@@ -1072,7 +1073,7 @@ next:
 			slash = NULL;
 		}
 
-		if (comma != NULL)
+		if (NULL != comma)
 		{
 			*comma = ',';
 			start = comma + 1;
@@ -1082,12 +1083,12 @@ next:
 			break;
 	}
 
-	if (dash != NULL)
+	if (NULL != dash)
 		*dash = '-';
-	else if (slash != NULL)
+	else if (NULL != slash)
 		*slash = '/';
 
-	if (comma != NULL)
+	if (NULL != comma)
 		*comma = ',';
 
 	return ret;
@@ -1585,7 +1586,7 @@ int	is_uhex(const char *str)
 
 	for (; '\0' != *str; str++)
 	{
-		if ((*str < '0' || *str > '9') && (*str < 'a' || *str > 'f') && (*str < 'A' || *str > 'F'))
+		if (0 == isxdigit(*str))
 			break;
 
 		res = SUCCEED;
