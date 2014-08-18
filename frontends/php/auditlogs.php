@@ -113,8 +113,8 @@ if ($data['action'] > -1) {
 if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
-$sqlWhere['from'] = ' AND a.clock>'.$from;
-$sqlWhere['till'] = ' AND a.clock<'.$till;
+$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr($from);
+$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr($till);
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
@@ -155,7 +155,7 @@ while ($audit = DBfetch($dbAudit)) {
 		$audit['details'] = DBfetchArray(DBselect(
 			'SELECT ad.table_name,ad.field_name,ad.oldvalue,ad.newvalue'.
 			' FROM auditlog_details ad'.
-			' WHERE ad.auditid='.$audit['auditid']
+			' WHERE ad.auditid='.zbx_dbstr($audit['auditid'])
 		));
 	}
 	$data['actions'][$audit['auditid']] = $audit;

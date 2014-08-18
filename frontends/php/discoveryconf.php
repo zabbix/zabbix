@@ -185,7 +185,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBStart();
 
 	foreach (getRequest('g_druleid') as $druleId) {
-		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
+		$result &= DBexecute('UPDATE drules SET status='.zbx_dbstr($status).' WHERE druleid='.zbx_dbstr($druleId));
 
 		if ($result) {
 			$druleData = get_discovery_rule_by_druleid($druleId);
