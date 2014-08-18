@@ -126,7 +126,7 @@ class CTemplateScreen extends CScreen {
 						' WHERE s.templateid=hgg.hostid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.$permission.
+							' AND MAX(r.permission)>='.zbx_dbstr($permission).
 						')';
 			}
 		}
@@ -676,7 +676,11 @@ class CTemplateScreen extends CScreen {
 		));
 
 		foreach ($dbExistingScreens as $dbExistingScreen) {
-			$dbTemplate = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$dbExistingScreen['templateid']));
+			$dbTemplate = DBfetch(DBselect(
+				'SELECT h.name'.
+				' FROM hosts h'.
+				' WHERE h.hostid='.zbx_dbstr($dbExistingScreen['templateid'])
+			));
 
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
