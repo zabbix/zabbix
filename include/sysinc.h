@@ -382,6 +382,9 @@
 #	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
 #		define curl_easy_escape(handle, string, length) curl_escape(string, length)
 #	endif
+#	if 0x071004 >= LIBCURL_VERSION_NUM	/* version 7.16.4 */
+#		define CURLOPT_KEYPASSWD	CURLOPT_SSLKEYPASSWD
+#	endif
 #	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
