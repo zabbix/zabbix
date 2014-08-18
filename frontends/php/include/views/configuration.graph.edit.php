@@ -145,7 +145,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
-					'&srctbl=prototypes'.
+					'&srctbl=item_prototypes'.
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1", 0, 0, "zbx_popup_item");',
@@ -203,7 +203,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
-					'&srctbl=prototypes'.
+					'&srctbl=item_prototypes'.
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1", 0, 0, "zbx_popup_item");',
@@ -253,7 +253,7 @@ if ($this->data['parent_discoveryid']) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
 		'link_menu'
 	);
 }

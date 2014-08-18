@@ -544,6 +544,11 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		// screen items
+		DB::delete('screens_items', array(
+			'resourceid' => $prototypeids,
+			'resourcetype' => array(SCREEN_RESOURCE_LLD_SIMPLE_GRAPH)
+		));
 
 // ITEM PROTOTYPES
 		DB::delete('items', array('itemid' => $prototypeids));
