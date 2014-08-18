@@ -166,7 +166,7 @@ if ($this->data['input_method'] == IM_TREE) {
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
 				);
-				$triggerCheckbox = new CCheckbox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
+				$triggerCheckbox = new CCheckBox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
 			}
 			else {
 				$triggerCheckbox = null;
