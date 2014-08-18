@@ -2888,18 +2888,18 @@ static void	init_trend_cache()
 	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
 		zbx_error("cannot create mutex for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
 	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, CONFIG_TRENDS_CACHE_SIZE,
-			"trend cache", "TrendCacheSize");
+			"trend cache", "TrendCacheSize", 0);
 	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
@@ -2975,7 +2975,7 @@ void	init_database_cache()
 
 	sz += sz_history;
 
-	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize");
+	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize", 0);
 
 	cache = (ZBX_DC_CACHE *)__history_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 
@@ -2995,7 +2995,7 @@ void	init_database_cache()
 	sz = zbx_mem_required_size(1, "history text cache", "HistoryTextCacheSize");
 
 	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, CONFIG_TEXT_CACHE_SIZE,
-			"history text cache", "HistoryTextCacheSize");
+			"history text cache", "HistoryTextCacheSize", 0);
 	CONFIG_TEXT_CACHE_SIZE -= sz;
 
 	cache->text = (char *)__history_text_mem_malloc_func(NULL, CONFIG_TEXT_CACHE_SIZE);
