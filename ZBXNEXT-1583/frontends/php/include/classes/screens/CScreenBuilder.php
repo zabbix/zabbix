@@ -231,16 +231,7 @@ class CScreenBuilder {
 				return new CScreenDataOverview($options);
 
 			case SCREEN_RESOURCE_URL:
-				if (isset($options['screen'])) {
-					$options['isTemplatedScreen'] = ($options['screen']['templateid']);
-				}
-				elseif (isset($options['screenid'])) {
-					$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
-						'screenids' => array($options['screenid']),
-						'output' => array()
-					));
-				}
-
+				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenUrl($options);
 
 			case SCREEN_RESOURCE_ACTIONS:
@@ -265,14 +256,37 @@ class CScreenBuilder {
 				return new CScreenChart($options);
 
 			case SCREEN_RESOURCE_LLD_GRAPH:
+				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldGraph($options);
 
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * Appends boolean option 'isTemplatedScreen' to ouput options.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	protected static function appendTemplatedScreenOption(array $options) {
+		if (isset($options['screen'])) {
+			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
+		}
+		elseif (isset($options['screenid'])) {
+			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
+				'screenids' => array($options['screenid']),
+				'output' => array()
+			));
+		}
+
+		return $options;
 	}
 
 	/**

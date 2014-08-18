@@ -35,7 +35,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	protected $graphPrototype = null;
 
 	/**
-	 * Returns screen items for surrogate screen
+	 * Returns screen items for surrogate screen.
 	 *
 	 * @return array
 	 */
@@ -104,36 +104,36 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	/**
 	 * Resolves and retrieves effective graph prototype used in this screen item.
 	 *
-	 * @return mixed
+	 * @return array|bool
 	 */
 	protected function getGraphPrototype() {
 		if ($this->graphPrototype === null) {
-			$options = array();
-			$screen = $this->getScreen(array('templateid'));
-
-			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $screen['templateid']) && $this->hostid) {
-				// This branch is taken if screen item is 1) dynamic or 2) in template screen. This means that real
-				// graph prototype must be looked up by "name" of graph prototype used as resource ID for this screen
-				// item and by current host - either from host selection dropdown or from URL when accessing host
-				// screen from Monitoring/Latest data.
-				$frontGraphPrototype = API::GraphPrototype()->get(array(
-					'output' => array('name'),
-					'graphids' => array($this->screenitem['resourceid'])
-				));
-				$frontGraphPrototype = reset($frontGraphPrototype);
-
-				$options['hostids'] = array($this->hostid);
-				$options['filter'] = array('name' => $frontGraphPrototype['name']);
-			}
-			else {
-				// Otherwise just use resource ID given to to this screen item.
-				$options['graphids'] = array($this->screenitem['resourceid']);
-			}
-
 			$defaultOptions = array(
 				'output' => array('graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'),
 				'selectDiscoveryRule' => array('hostid')
 			);
+
+			$options = array();
+
+			/*
+			 * If screen item is dynamic or is templated screen, real graph prototype is looked up by "name"
+			 * used as resource ID for this screen item and by current host.
+			 */
+			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
+				$currentGraphPrototype = API::GraphPrototype()->get(array(
+					'output' => array('name'),
+					'graphids' => array($this->screenitem['resourceid'])
+				));
+				$currentGraphPrototype = reset($currentGraphPrototype);
+
+				$options['hostids'] = array($this->hostid);
+				$options['filter'] = array('name' => $currentGraphPrototype['name']);
+			}
+			// otherwise just use resource ID given to this screen item.
+			else {
+				$options['graphids'] = array($this->screenitem['resourceid']);
+			}
+
 			$options = zbx_array_merge($defaultOptions, $options);
 
 			$selectedGraphPrototype = API::GraphPrototype()->get($options);

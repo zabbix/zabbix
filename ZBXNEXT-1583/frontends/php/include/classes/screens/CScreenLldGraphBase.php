@@ -156,33 +156,6 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	}
 
 	/**
-	 * Returns screen in which current screen item is in.
-	 *
-	 * @param array $output
-	 *
-	 * @return array
-	 */
-	protected function getScreen(array $output = array('screenid', 'name')) {
-		if ($this->screen === null) {
-			$screen = API::Screen()->get(array(
-				'output' => $output,
-				'screenids' => array($this->screenitem['screenid'])
-			));
-
-			if (!$screen) {
-				$screen = API::TemplateScreen()->get(array(
-					'output' => $output,
-					'screenids' => array($this->screenitem['screenid'])
-				));
-			}
-
-			$this->screen = reset($screen);
-		}
-
-		return $this->screen;
-	}
-
-	/**
 	 * Gathers and returns items for surrogate screen.
 	 *
 	 * @abstract
