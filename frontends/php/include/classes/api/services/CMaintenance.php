@@ -144,7 +144,7 @@ class CMaintenance extends CApiService {
 						' GROUP by mh.hostid'.
 						' HAVING MIN(r.permission) IS NULL'.
 							' OR MIN(r.permission)='.PERM_DENY.
-							' OR MAX(r.permission)<'.$permission.
+							' OR MAX(r.permission)<'.zbx_dbstr($permission).
 						')'.
 					' AND NOT EXISTS ('.
 						'SELECT NULL'.
@@ -156,7 +156,7 @@ class CMaintenance extends CApiService {
 						' GROUP by mg.groupid'.
 						' HAVING MIN(r.permission) IS NULL'.
 							' OR MIN(r.permission)='.PERM_DENY.
-							' OR MAX(r.permission)<'.$permission.
+							' OR MAX(r.permission)<'.zbx_dbstr($permission).
 						')';
 
 			if (!is_null($options['groupids'])) {

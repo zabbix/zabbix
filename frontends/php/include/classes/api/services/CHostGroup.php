@@ -108,7 +108,7 @@ class CHostGroup extends CApiService {
 					' AND '.dbConditionInt('r.groupid', $userGroups).
 				' GROUP BY r.id'.
 				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 

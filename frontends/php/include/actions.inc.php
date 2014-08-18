@@ -977,7 +977,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				' LEFT JOIN users u ON u.userid=a.userid'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 			' WHERE a.eventid='.zbx_dbstr($eventid).
-				(is_null($status)?'':' AND a.status='.$status).
+				(is_null($status)?'':' AND a.status='.zbx_dbstr($status)).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 			' ORDER BY a.alertid';
