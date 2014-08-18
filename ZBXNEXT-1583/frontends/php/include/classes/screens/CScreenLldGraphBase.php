@@ -39,9 +39,9 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	protected $screen = null;
 
 	/**
-	 * Returns output of screen element.
+	 * Returns output of screen element or null if there are no graphs/items for surrogate screen.
 	 *
-	 * @return CDiv
+	 * @return CDiv|null
 	 */
 	public function get() {
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -60,8 +60,9 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 				$output = $this->getOutput($screenBuilder->show(), true);
 			}
 			else {
-				$output = $this->getOutput($this->getNoScreenItemsOutput());
+				$output = null;
 			}
+
 		}
 
 		return $output;
@@ -172,12 +173,4 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return CTag
 	 */
 	abstract protected function getPreviewOutput();
-
-	/**
-	 * Returns content to be shown when there are no items for surrogate screen.
-	 *
-	 * @return CTag
-	 */
-	abstract protected function getNoScreenItemsOutput();
-
 }
