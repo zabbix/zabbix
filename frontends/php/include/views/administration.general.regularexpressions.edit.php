@@ -53,9 +53,9 @@ $exprForm->addRow(array(_('Expression type'), new CComboBox('typeNew', null, nul
 $exprForm->addRow(array(_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())), null, 'delimiterNewRow');
 $exprForm->addRow(array(_('Case sensitive'), new CCheckBox('case_sensitiveNew')));
 $exprFormFooter = array(
-	new Cbutton('saveExpression', _('Add'), null, 'link_menu'),
+	new CButton('saveExpression', _('Add'), null, 'link_menu'),
 	SPACE,
-	new Cbutton('cancelExpression', _('Cancel'), null, 'link_menu')
+	new CButton('cancelExpression', _('Cancel'), null, 'link_menu')
 );
 $exprTab->addRow(null, new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblock border_dotted'), true, 'exprForm');
 

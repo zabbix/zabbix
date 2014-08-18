@@ -43,7 +43,7 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('host', ZBX_SORT_UP, array('host'));
@@ -53,7 +53,7 @@ validate_sort_and_sortorder('host', ZBX_SORT_UP, array('host'));
  */
 if (isset($_REQUEST['proxyid'])) {
 	$dbProxy = API::Proxy()->get(array(
-		'proxyids' => get_request('proxyid'),
+		'proxyids' => getRequest('proxyid'),
 		'selectHosts' => array('hostid', 'host'),
 		'selectInterface' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
@@ -79,16 +79,16 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
 	$proxy = array(
-		'host' => get_request('host'),
-		'status' => get_request('status'),
-		'interface' => get_request('interface'),
+		'host' => getRequest('host'),
+		'status' => getRequest('status'),
+		'interface' => getRequest('interface'),
 		'description' => getRequest('description')
 	);
 
@@ -96,7 +96,7 @@ if (isset($_REQUEST['save'])) {
 
 	// skip discovered hosts
 	$proxy['hosts'] = API::Host()->get(array(
-		'hostids' => get_request('hosts', array()),
+		'hostids' => getRequest('hosts', array()),
 		'output' => array('hostid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
@@ -124,19 +124,20 @@ if (isset($_REQUEST['save'])) {
 	unset($_REQUEST['save']);
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete'])) {
 	$result = API::Proxy()->delete(array($_REQUEST['proxyid']));
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['proxyid']);
-		$proxy = reset($dbProxy);
+		uncheckTableRows();
 	}
-
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
-	clearCookies($result);
 
 	unset($_REQUEST['delete']);
 }
@@ -175,6 +176,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	$result = DBend($result && $hosts);
 
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	$messageSuccess = $enable
 		? _n('Host enabled', 'Hosts enabled', $updated)
 		: _n('Host disabled', 'Hosts disabled', $updated);
@@ -183,16 +188,17 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();
 
-	$goResult = API::Proxy()->delete(get_request('hosts'));
-	$goResult = DBend($goResult);
+	$result = API::Proxy()->delete(getRequest('hosts'));
+	$result = DBend($result);
 
-	show_messages($goResult, _('Proxy deleted'), _('Cannot delete proxy'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
 }
 
 /*
@@ -200,13 +206,13 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0) + 1,
-		'proxyid' => get_request('proxyid', 0),
-		'name' => get_request('host', ''),
-		'status' => get_request('status', HOST_STATUS_PROXY_ACTIVE),
-		'hosts' => get_request('hosts', array()),
-		'interface' => get_request('interface', array()),
+		'form' => getRequest('form', 1),
+		'form_refresh' => getRequest('form_refresh', 0) + 1,
+		'proxyid' => getRequest('proxyid', 0),
+		'name' => getRequest('host', ''),
+		'status' => getRequest('status', HOST_STATUS_PROXY_ACTIVE),
+		'hosts' => getRequest('hosts', array()),
+		'interface' => getRequest('interface', array()),
 		'proxy' => array(),
 		'description' => getRequest('description', '')
 	);

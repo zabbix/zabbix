@@ -116,8 +116,8 @@ function updateRegexp(array $regexp, array $expressions) {
 
 function validateRegexp($expressions) {
 	$validator = new CRegexValidator(array(
-		'messageType' => _('Regular expression must be a string'),
-		'messageInvalid' => _('Incorrect regular expression "%1$s": "%2$s"')
+		'messageInvalid' => _('Regular expression must be a string'),
+		'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
 	));
 
 	foreach ($expressions as $expression) {

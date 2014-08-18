@@ -91,6 +91,11 @@ class C20ImportFormatter extends CImportFormatter {
 
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
+						// set bulk default value
+						if (!isset($interface['bulk'])) {
+							$interface['bulk'] = SNMP_BULK_ENABLED;
+						}
+
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 					}
 				}
@@ -124,7 +129,6 @@ class C20ImportFormatter extends CImportFormatter {
 
 	public function getApplications() {
 		$applicationsData = array();
-
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['applications'])) {
@@ -167,6 +171,7 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 			}
 		}
+
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {

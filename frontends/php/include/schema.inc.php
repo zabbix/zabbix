@@ -57,7 +57,7 @@ return array(
 			'host' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'status' => array(
@@ -220,7 +220,7 @@ return array(
 			'name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'flags' => array(
@@ -971,6 +971,12 @@ return array(
 				'length' => 64,
 				'default' => '10050',
 			),
+			'bulk' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'valuemaps' => array(
@@ -1692,6 +1698,12 @@ return array(
 			'r_longdata' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
+			'formula' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '',
 			),
 		),

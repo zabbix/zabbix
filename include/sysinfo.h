@@ -129,6 +129,10 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_AVG15		2
 #define ZBX_AVG_COUNT		3
 
+#ifdef _WINDOWS
+#	define MAX_COLLECTOR_PERIOD	(15 * SEC_PER_MIN)
+#endif
+
 #define ZBX_CPU_STATE_USER	0
 #define ZBX_CPU_STATE_SYSTEM	1
 #define ZBX_CPU_STATE_NICE	2
@@ -189,7 +193,7 @@ void	free_result(AGENT_RESULT *result);
 void	init_request(AGENT_REQUEST *request);
 void	free_request(AGENT_REQUEST *request);
 
-int	parse_item_key(char *cmd, AGENT_REQUEST *request);
+int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 
 zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
 void		set_log_result_empty(AGENT_RESULT *result);
@@ -223,6 +227,7 @@ int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);

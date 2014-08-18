@@ -39,7 +39,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
 
@@ -54,11 +54,11 @@ $options = array(
 	'groups' => array(
 		'real_hosts' => 1,
 	),
-	'groupid' => get_request('groupid', null),
+	'groupid' => getRequest('groupid'),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['groupby'] = get_request('groupby', '');
+$_REQUEST['groupby'] = getRequest('groupby', '');
 $groupFieldTitle = '';
 
 $hostinvent_wdgt = new CWidget();

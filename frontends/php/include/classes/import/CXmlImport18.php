@@ -459,6 +459,12 @@ class CXmlImport18 {
 				if (!isset($screenitem['resourceid'])) {
 					$screenitem['resourceid'] = 0;
 				}
+				if ($screenitem['rowspan'] == 0) {
+					$screenitem['rowspan'] = 1;
+				}
+				if ($screenitem['colspan'] == 0) {
+					$screenitem['colspan'] = 1;
+				}
 				if (is_array($screenitem['resourceid'])) {
 					switch ($screenitem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
@@ -844,15 +850,24 @@ class CXmlImport18 {
 		);
 		$triggersForDependencies = array();
 
-		if (!empty($rules['hosts']['updateExisting'])
-				|| !empty($rules['hosts']['createMissing'])
-				|| !empty($rules['templates']['createMissing'])
-				|| !empty($rules['templates']['updateExisting'])
-		) {
+		if ($rules['hosts']['updateExisting']
+				|| $rules['hosts']['createMissing']
+				|| $rules['templates']['createMissing']
+				|| $rules['templates']['updateExisting']) {
 			$xpath = new DOMXPath(self::$xml);
 
 			$hosts = $xpath->query('hosts/host');
 
+			// stores parsed host and template IDs
+			$processedHostIds = array();
+
+			// stores converted trigger expressions for each host
+			$triggerExpressions = array();
+
+			// stores converted item keys for each host
+			$itemKeys = array();
+
+			// process hosts
 			foreach ($hosts as $host) {
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
@@ -878,16 +893,14 @@ class CXmlImport18 {
 				}
 
 				if (!$current_host
-						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['createMissing']))
-								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['createMissing'])))
-				) {
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !$rules['templates']['createMissing'])
+						|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !$rules['hosts']['createMissing']))) {
 					continue;
 				}
 
 				if ($current_host
-						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['updateExisting']))
-								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['updateExisting'])))
-				) {
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !$rules['templates']['updateExisting'])
+						|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !$rules['hosts']['updateExisting']))) {
 					continue;
 				}
 
@@ -903,12 +916,12 @@ class CXmlImport18 {
 				/**
 				 * @todo when new XML format will be introduced, this check should be changed to XML version check
 				 */
-				$old_version_input = $host_db['status'] != HOST_STATUS_TEMPLATE;
+				$oldVersionInput = ($host_db['status'] != HOST_STATUS_TEMPLATE);
 
 				$interfaces = array();
 
 				// rearranging host structure, so it would look more like 2.0 host
-				if ($old_version_input) {
+				if ($oldVersionInput) {
 					// the main interface is always "agent" type
 					if (!is_null($host_db['ip'])) {
 						$interfaces[] = array(
@@ -929,9 +942,7 @@ class CXmlImport18 {
 						if (($item_db['type'] == ITEM_TYPE_SNMPV1
 								|| $item_db['type'] == ITEM_TYPE_SNMPV2C
 								|| $item_db['type'] == ITEM_TYPE_SNMPV3)
-								&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])
-						) {
-
+								&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])) {
 							$interfaces[] = array(
 								'main' => $snmp_interface_ports_created ? INTERFACE_SECONDARY : INTERFACE_PRIMARY,
 								'type' => INTERFACE_TYPE_SNMP,
@@ -945,7 +956,6 @@ class CXmlImport18 {
 					}
 					unset($snmp_interface_ports_created); // it was a temporary variable
 
-
 					// we need to add ipmi interface if at least one ipmi item exists
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
@@ -953,7 +963,7 @@ class CXmlImport18 {
 							// when saving a host in 1.8, it's possible to set useipmi=1 and not to fill an IP address
 							// we were not really sure what to do with this host,
 							// and decided to take host IP address instead and show info message about this
-							if ($host_db['ipmi_ip'] == '') {
+							if ($host_db['ipmi_ip'] === '') {
 								$ipmi_ip = $host_db['ip'];
 								info(_s('Host "%s" has "useipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
 							}
@@ -979,7 +989,7 @@ class CXmlImport18 {
 					$options = array(
 						'filter' => array('host' => $host_db['host']),
 						'output' => API_OUTPUT_EXTEND,
-						'editable' => 1,
+						'editable' => true,
 						'selectInterfaces' => API_OUTPUT_EXTEND
 					);
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
@@ -996,19 +1006,21 @@ class CXmlImport18 {
 						$current_host = reset($current_host);
 					}
 
-					$currentMainInterfaces = array();
-					$currentInterfacesByType = array();
-
-					foreach ($current_host['interfaces'] as $currentInterface) {
-						if ($currentInterface['main'] == INTERFACE_PRIMARY) {
-							$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
-						}
-
-						$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
-					}
-
 					// checking if host already exists - then some of the interfaces may not need to be created
 					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
+						$currentMainInterfaces = array();
+						$currentInterfacesByType = array();
+
+						// group existing main interfaces by interface type into $currentMainInterfaces
+						// and group interfaces by type into $currentInterfacesByType
+						foreach ($current_host['interfaces'] as $currentInterface) {
+							if ($currentInterface['main'] == INTERFACE_PRIMARY) {
+								$currentMainInterfaces[$currentInterface['type']] = $currentInterface;
+							}
+
+							$currentInterfacesByType[$currentInterface['type']][] = $currentInterface;
+						}
+
 						// loop through all interfaces we got from XML
 						foreach ($interfaces as &$interfaceXml) {
 							$interfaceXmlType = $interfaceXml['type'];
@@ -1040,14 +1052,9 @@ class CXmlImport18 {
 
 						$host_db['interfaces'] = $interfaces;
 					}
-					$interfaces_created_with_host = true;
 				}
 				elseif ($host_db['status'] != HOST_STATUS_TEMPLATE) {
 					$host_db['interfaces'] = $interfaces;
-					$interfaces_created_with_host = true;
-				}
-				else {
-					$interfaces_created_with_host = false;
 				}
 
 // HOST GROUPS {{{
@@ -1093,7 +1100,6 @@ class CXmlImport18 {
 				}
 // }}} HOST GROUPS
 
-
 // MACROS
 				$macros = $xpath->query('macros/macro', $host);
 				if ($macros->length > 0) {
@@ -1105,7 +1111,7 @@ class CXmlImport18 {
 // }}} MACROS
 
 				// host inventory
-				if ($old_version_input) {
+				if ($oldVersionInput) {
 					if (!isset($host_db['inventory'])) {
 						$host_db['inventory'] = array();
 					}
@@ -1132,10 +1138,11 @@ class CXmlImport18 {
 						}
 					}
 
-					$host_db['inventory_mode'] = isset($host_db['inventory']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
+					$host_db['inventory_mode'] = isset($host_db['inventory'])
+						? HOST_INVENTORY_MANUAL
+						: HOST_INVENTORY_DISABLED;
 				}
 
-// HOSTS
 				if (isset($host_db['proxy_hostid'])) {
 					$proxy_exists = API::Proxy()->get(array(
 						'output' => array('proxyid'),
@@ -1146,7 +1153,7 @@ class CXmlImport18 {
 					}
 				}
 
-				if ($current_host && (!empty($rules['hosts']['updateExisting']) || !empty($rules['templates']['updateExisting']))) {
+				if ($current_host && ($rules['hosts']['updateExisting'] || $rules['templates']['updateExisting'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$host_db['templateid'] = $current_host['templateid'];
 						$result = API::Template()->update($host_db);
@@ -1157,72 +1164,306 @@ class CXmlImport18 {
 						$result = API::Host()->update($host_db);
 						$current_hostid = $current_host['hostid'];
 					}
-					if (!$result) {
-						throw new Exception();
-					}
 				}
-				if (!$current_host && (!empty($rules['hosts']['createMissing']) || !empty($rules['templates']['createMissing']))) {
 
+				if (!$current_host && ($rules['hosts']['createMissing'] || $rules['templates']['createMissing'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$result = API::Template()->create($host_db);
-						if (!$result) {
-							throw new Exception();
-						}
 						$current_hostid = reset($result['templateids']);
 					}
 					else {
 						$result = API::Host()->create($host_db);
-						if (!$result) {
-							throw new Exception();
-						}
 						$current_hostid = reset($result['hostids']);
 					}
 				}
-				$current_hostname = $host_db['host'];
 
-				if ($old_version_input) {
-					if (!$interfaces_created_with_host) {
-						// if host had another interfaces, we are not touching them: they remain as is
-						foreach ($interfaces as $i => $interface) {
-							// interface was not already created
-							if (!isset($interface['interfaceid'])) {
-								// creating interface
-								$interface['hostid'] = $current_hostid;
-								$ids = API::HostInterface()->create($interface);
-								if ($ids === false) {
-									throw new Exception();
+				// store parsed host IDs
+				$processedHostIds[$host_db['host']] = $current_hostid;
+			}
+
+			// gather triggers and convert old expressions
+			$triggersXML = array();
+
+			// cycle each host and gather trigger descriptions and expressions
+			foreach ($hosts as $host) {
+				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+				$current_hostid = isset($processedHostIds[$host_db['host']])
+					? $processedHostIds[$host_db['host']]
+					: false;
+
+				if ($current_hostid) {
+					$triggersXML[$current_hostid] = array();
+					$triggerExpressions[$host_db['host']] = array();
+
+					$oldVersionInput = ($host_db['status'] != HOST_STATUS_TEMPLATE);
+
+					$triggers = $xpath->query('triggers/trigger', $host);
+					foreach ($triggers as $trigger) {
+						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
+
+						$oldExpression = $trigger_db['expression'];
+						if (!isset($triggerExpressions[$host_db['host']][$trigger_db['description']])) {
+							$triggerExpressions[$host_db['host']][$trigger_db['description']] = array();
+						}
+
+						if ($oldVersionInput) {
+							$expressionPart = explode(':', $trigger_db['expression']);
+							$keyName = explode(',', $expressionPart[1], 2);
+
+							if (count($keyName) == 2) {
+								$keyValue = explode('.', $keyName[1], 2);
+								$key = $keyName[0].",".$keyValue[0];
+
+								if (in_array($keyName[0], self::$oldKeys)
+										|| in_array($keyName[0], self::$oldKeysPref)) {
+									$trigger_db['expression'] = str_replace($key, self::convertOldSimpleKey($key),
+										$trigger_db['expression']
+									);
 								}
-								$interfaces[$i]['interfaceid'] = reset($ids['interfaceids']);
 							}
 						}
-					}
-					else {
-						$options = array(
-							'hostids' => $current_hostid,
-							'output' => API_OUTPUT_EXTEND
+
+						// {HOSTNAME} is here for backward compatibility
+						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':',
+							$trigger_db['expression']
 						);
-						$interfaces = API::HostInterface()->get($options);
+						$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':',
+							$trigger_db['expression']
+						);
+						$trigger_db['expression'] = $triggerExpressionConverter->convert($trigger_db['expression']);
+
+						$triggersXML[$current_hostid][$trigger_db['description']][$trigger_db['expression']] = $trigger_db['expression'];
+
+						$triggerExpressions[$host_db['host']][$trigger_db['description']][$oldExpression] = $trigger_db['expression'];
 					}
+				}
+			}
 
-					// we must know interface ids to assign them to items
-					$agent_interface_id = null;
-					$ipmi_interface_id = null;
-					$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+			// delete missing triggers
+			if ($rules['triggers']['deleteMissing']) {
+				// select triggers from parsed hosts
+				$dbTriggers = API::Trigger()->get(array(
+					'output' => array('triggerid', 'description', 'expression'),
+					'expandExpression' => true,
+					'hostids' => $processedHostIds,
+					'selectHosts' => array('hostid'),
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'inherited' => false,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
 
-					foreach ($interfaces as $interface) {
-						switch ($interface['type']) {
-							case INTERFACE_TYPE_AGENT:
-								$agent_interface_id = $interface['interfaceid'];
-								break;
-							case INTERFACE_TYPE_IPMI:
-								$ipmi_interface_id = $interface['interfaceid'];
-								break;
-							case INTERFACE_TYPE_SNMP:
-								$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
-								break;
+				// find corresponding trigger ID by description and expression
+				$triggerIdsXML = array();
+				foreach ($dbTriggers as $dbTrigger) {
+					$hostId = reset($dbTrigger['hosts']);
+
+					if (isset($triggersXML[$hostId['hostid']][$dbTrigger['description']][$dbTrigger['expression']])) {
+						$triggerIdsXML[$dbTrigger['triggerid']] = $dbTrigger['triggerid'];
+					}
+				}
+
+				$triggersToDelete = array_diff_key($dbTriggers, $triggerIdsXML);
+				$triggerIdsToDelete = array();
+
+				// check that potentially deletable trigger belongs to same hosts that are in XML
+				// if some triggers belong to more hosts than current XML contains, don't delete them
+				foreach ($triggersToDelete as $triggerId => $trigger) {
+					$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
+
+					if (!array_diff_key($triggerHostIds, array_flip($processedHostIds))) {
+						$triggerIdsToDelete[] = $triggerId;
+					}
+				}
+
+				if ($triggerIdsToDelete) {
+					API::Trigger()->delete($triggerIdsToDelete);
+				}
+			}
+
+			// delete missing graphs
+			if ($rules['graphs']['deleteMissing']) {
+				$graphsXML = array();
+
+				// cycle each host and gather all graph names
+				foreach ($hosts as $host) {
+					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+					$current_hostid = isset($processedHostIds[$host_db['host']])
+						? $processedHostIds[$host_db['host']]
+						: false;
+
+					if ($current_hostid) {
+						$graphsXML[$current_hostid] = array();
+
+						$graphs = $xpath->query('graphs/graph', $host);
+
+						foreach ($graphs as $graph) {
+							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
+
+							$graphsXML[$current_hostid][$graph_db['name']] = $graph_db['name'];
 						}
 					}
 				}
+
+				// select graphs from already parsed hosts
+				$dbGraphs = API::Graph()->get(array(
+					'output' => array('graphid', 'name'),
+					'hostids' => $processedHostIds,
+					'selectHosts' => array('hostid'),
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'inherited' => false,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
+
+				$graphIdsXML = array();
+				foreach ($dbGraphs as $dbGraph) {
+					$hostId = reset($dbGraph['hosts']);
+
+					if (isset($graphsXML[$hostId['hostid']][$dbGraph['name']])) {
+						$graphIdsXML[$dbGraph['graphid']] = $dbGraph['graphid'];
+					}
+				}
+
+				$graphsToDelete = array_diff_key($dbGraphs, $graphIdsXML);
+				$graphsIdsToDelete = array();
+
+				// check that potentially deletable graph belongs to same hosts that are in XML
+				// if some graphs belong to more hosts than current XML contains, don't delete them
+				foreach ($graphsToDelete as $graphId => $graph) {
+					$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
+
+					if (!array_diff_key($graphHostIds, array_flip($processedHostIds))) {
+						$graphsIdsToDelete[] = $graphId;
+					}
+				}
+
+				if ($graphsIdsToDelete) {
+					API::Graph()->delete($graphsIdsToDelete);
+				}
+			}
+
+			// gather items and convert old keys
+			$itemsXML = array();
+
+			foreach ($hosts as $host) {
+				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+				$current_hostid = isset($processedHostIds[$host_db['host']])
+					? $processedHostIds[$host_db['host']]
+					: false;
+
+				if ($current_hostid) {
+					$itemsXML[$current_hostid] = array();
+					$itemKeys[$host_db['host']] = array();
+
+					$oldVersionInput = ($host_db['status'] != HOST_STATUS_TEMPLATE);
+
+					$items = $xpath->query('items/item', $host);
+
+					foreach ($items as $item) {
+						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+
+						if ($oldVersionInput) {
+							$oldKey = $item_db['key_'];
+							$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
+							$itemKeys[$host_db['host']][$oldKey] = $item_db['key_'];
+						}
+
+						$itemsXML[$current_hostid][$item_db['key_']] = $item_db['key_'];
+					}
+				}
+			}
+
+			// delete missing items
+			if ($rules['items']['deleteMissing']) {
+				$dbItems = API::Item()->get(array(
+					'output' => array('itemid', 'key_', 'hostid'),
+					'hostids' => $processedHostIds,
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'inherited' => false,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
+
+				$itemIdsXML = array();
+				foreach ($dbItems as $dbItem) {
+					if (isset($itemsXML[$dbItem['hostid']][$dbItem['key_']])) {
+						$itemIdsXML[$dbItem['itemid']] = $dbItem['itemid'];
+					}
+				}
+
+				$itemsToDelete = array_diff_key($dbItems, $itemIdsXML);
+
+				if ($itemsToDelete) {
+					API::Item()->delete(array_keys($itemsToDelete));
+				}
+			}
+
+			// delete missing applications
+			if ($rules['applications']['deleteMissing']) {
+				$applicationsXML = array();
+
+				foreach ($hosts as $host) {
+					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+					$current_hostid = isset($processedHostIds[$host_db['host']])
+						? $processedHostIds[$host_db['host']]
+						: false;
+
+					if ($current_hostid) {
+						$items = $xpath->query('items/item', $host);
+
+						foreach ($items as $item) {
+							$applications = $xpath->query('applications/application', $item);
+
+							foreach ($applications as $application) {
+								$applicationsXML[$current_hostid][$application->nodeValue] = $application->nodeValue;
+							}
+						}
+					}
+				}
+
+				$dbApplications = API::Application()->get(array(
+					'output' => array('applicationid', 'hostid', 'name'),
+					'hostids' => $processedHostIds,
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'inherited' => false
+				));
+
+				$applicationsIdsXML = array();
+				foreach ($dbApplications as $dbApplication) {
+					if (isset($applicationsXML[$dbApplication['hostid']][$dbApplication['name']])) {
+						$applicationsIdsXML[$dbApplication['applicationid']] = $dbApplication['applicationid'];
+					}
+				}
+
+				$applicationsToDelete = array_diff_key($dbApplications, $applicationsIdsXML);
+				if ($applicationsToDelete) {
+					API::Application()->delete(array_keys($applicationsToDelete));
+				}
+			}
+
+			// cycle each host again and create/update other objects
+			foreach ($hosts as $host) {
+				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+				if (!isset($host_db['status'])) {
+					$host_db['status'] = HOST_STATUS_TEMPLATE;
+				}
+
+				$current_hostid = isset($processedHostIds[$host_db['host']])
+					? $processedHostIds[$host_db['host']]
+					: false;
+
+				if (!$current_hostid) {
+					continue;
+				}
+
+				$oldVersionInput = ($host_db['status'] != HOST_STATUS_TEMPLATE);
 
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
@@ -1258,84 +1499,109 @@ class CXmlImport18 {
 // }}} TEMPLATES
 
 // ITEMS {{{
-				if (!empty($rules['items']['updateExisting']) || !empty($rules['items']['createMissing'])) {
+				if ($rules['items']['updateExisting']
+						|| $rules['items']['createMissing']
+						|| $rules['applications']['createMissing']) {
+					// applications are located under items in version 1.8,
+					// so we need to get item list in any of these cases
 					$items = $xpath->query('items/item', $host);
 
-					// if this is an export from 1.8, we need to make some adjustments to items
-					foreach ($items as $item) {
-						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-						$item_db['hostid'] = $current_hostid;
-
-						// item needs interfaces
-						if ($old_version_input) {
-							// 'snmp_port' column was renamed to 'port'
-							if ($item_db['snmp_port'] != 0) {
-								// zabbix agent items have no ports
-								$item_db['port'] = $item_db['snmp_port'];
-							}
-							unset($item_db['snmp_port']);
-
-							// assigning appropriate interface depending on item type
-							switch ($item_db['type']) {
-								// zabbix agent interface
-								case ITEM_TYPE_ZABBIX:
-								case ITEM_TYPE_SIMPLE:
-								case ITEM_TYPE_EXTERNAL:
-								case ITEM_TYPE_SSH:
-								case ITEM_TYPE_TELNET:
-									$item_db['interfaceid'] = $agent_interface_id;
-									break;
-								// snmp interface
-								case ITEM_TYPE_SNMPV1:
-								case ITEM_TYPE_SNMPV2C:
-								case ITEM_TYPE_SNMPV3:
-									// for an item with different port - different interface
-									$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
-									break;
-								case ITEM_TYPE_IPMI:
-									$item_db['interfaceid'] = $ipmi_interface_id;
-									break;
-								// no interfaces required for these item types
-								case ITEM_TYPE_HTTPTEST:
-								case ITEM_TYPE_CALCULATED:
-								case ITEM_TYPE_AGGREGATE:
-								case ITEM_TYPE_INTERNAL:
-								case ITEM_TYPE_ZABBIX_ACTIVE:
-								case ITEM_TYPE_TRAPPER:
-								case ITEM_TYPE_DB_MONITOR:
-									$item_db['interfaceid'] = null;
-									break;
-							}
-
-							$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
-						}
-
-						$current_item = API::Item()->get(array(
-							'filter' => array(
-								'hostid' => $item_db['hostid'],
-								'key_' => $item_db['key_']
-							),
-							'webitems' => true,
-							'editable' => true,
-							'output' => array('itemid')
+					if ($oldVersionInput) {
+						$interfaces = API::HostInterface()->get(array(
+							'hostids' => $current_hostid,
+							'output' => API_OUTPUT_EXTEND
 						));
-						$current_item = reset($current_item);
 
-						if (!$current_item && empty($rules['items']['createMissing'])) {
-							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue; // break if not update updateExisting
+						// we must know interface ids to assign them to items
+						$agent_interface_id = null;
+						$ipmi_interface_id = null;
+						$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+
+						foreach ($interfaces as $interface) {
+							switch ($interface['type']) {
+								case INTERFACE_TYPE_AGENT:
+									$agent_interface_id = $interface['interfaceid'];
+									break;
+								case INTERFACE_TYPE_IPMI:
+									$ipmi_interface_id = $interface['interfaceid'];
+									break;
+								case INTERFACE_TYPE_SNMP:
+									$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
+									break;
+							}
 						}
-						if ($current_item && empty($rules['items']['updateExisting'])) {
-							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue; // break if not update updateExisting
+					}
+
+					// if this is an export from 1.8, we need to make some adjustments to items
+					// cycle each XML item
+					foreach ($items as $item) {
+						if ($rules['items']['updateExisting'] || $rules['items']['createMissing']) {
+							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+							$item_db['hostid'] = $current_hostid;
+
+							// item needs interfaces
+							if ($oldVersionInput) {
+								// 'snmp_port' column was renamed to 'port'
+								if ($item_db['snmp_port'] != 0) {
+									// zabbix agent items have no ports
+									$item_db['port'] = $item_db['snmp_port'];
+								}
+								unset($item_db['snmp_port']);
+
+								// assigning appropriate interface depending on item type
+								switch ($item_db['type']) {
+									// zabbix agent interface
+									case ITEM_TYPE_ZABBIX:
+									case ITEM_TYPE_SIMPLE:
+									case ITEM_TYPE_EXTERNAL:
+									case ITEM_TYPE_SSH:
+									case ITEM_TYPE_TELNET:
+										$item_db['interfaceid'] = $agent_interface_id;
+										break;
+									// snmp interface
+									case ITEM_TYPE_SNMPV1:
+									case ITEM_TYPE_SNMPV2C:
+									case ITEM_TYPE_SNMPV3:
+										// for an item with different port - different interface
+										$item_db['interfaceid'] = $snmp_interfaces[$item_db['port']];
+										break;
+									case ITEM_TYPE_IPMI:
+										$item_db['interfaceid'] = $ipmi_interface_id;
+										break;
+									// no interfaces required for these item types
+									case ITEM_TYPE_HTTPTEST:
+									case ITEM_TYPE_CALCULATED:
+									case ITEM_TYPE_AGGREGATE:
+									case ITEM_TYPE_INTERNAL:
+									case ITEM_TYPE_ZABBIX_ACTIVE:
+									case ITEM_TYPE_TRAPPER:
+									case ITEM_TYPE_DB_MONITOR:
+										$item_db['interfaceid'] = null;
+										break;
+								}
+
+								$item_db['key_'] = $itemKeys[$host_db['host']][$item_db['key_']];
+							}
+
+							$current_item = API::Item()->get(array(
+								'filter' => array(
+									'hostid' => $item_db['hostid'],
+									'key_' => $item_db['key_']
+								),
+								'webitems' => true,
+								'editable' => true,
+								'output' => array('itemid')
+							));
+							$current_item = reset($current_item);
 						}
 
-
-// ITEM APPLICATIONS {{{
+						// create applications independently of create or update item options
+						// in case we update items, we need to assign items to applications,
+						// so we also gather application IDs independetly of selected application options
 						$applications = $xpath->query('applications/application', $item);
 
-						$item_applications = array();
-						$applications_to_add = array();
+						$itemApplications = array();
+						$applicationsToAdd = array();
 						$applicationsIds = array();
 
 						foreach ($applications as $application) {
@@ -1352,81 +1618,78 @@ class CXmlImport18 {
 							$applicationValue = reset($current_application);
 
 							if ($current_application) {
-								if (empty($item_applications)) {
-									$item_applications = $current_application;
-									$applicationsIds[] = $applicationValue['applicationid'];
+								if (!$itemApplications) {
+									$itemApplications = $current_application;
 								}
-								else {
-									if (!in_array($applicationValue['applicationid'], $applicationsIds)) {
-										$item_applications = array_merge($item_applications, $current_application);
-										$applicationsIds[] = $applicationValue['applicationid'];
-									}
+								elseif (!in_array($applicationValue['applicationid'], $applicationsIds)) {
+									$itemApplications = array_merge($itemApplications, $current_application);
 								}
+								$applicationsIds[] = $applicationValue['applicationid'];
 							}
 							else {
-								$applications_to_add[] = $application_db;
+								$applicationsToAdd[] = $application_db;
 							}
 						}
 
-						if (!empty($applications_to_add)) {
-							$result = API::Application()->create($applications_to_add);
-							if (!$result) {
-								throw new Exception();
-							}
+						if ($applicationsToAdd && $rules['applications']['createMissing']) {
+							$result = API::Application()->create($applicationsToAdd);
 
-							$options = array(
+							$newApplications = API::Application()->get(array(
 								'applicationids' => $result['applicationids'],
 								'output' => API_OUTPUT_EXTEND
-							);
-							$new_applications = API::Application()->get($options);
+							));
 
-							$item_applications = array_merge($item_applications, $new_applications);
+							$itemApplications = array_merge($itemApplications, $newApplications);
 						}
-// }}} ITEM APPLICATIONS
 
-						if ($current_item && !empty($rules['items']['updateExisting'])) {
-							$item_db['itemid'] = $current_item['itemid'];
-							$result = API::Item()->update($item_db);
-							if (!$result) {
-								throw new Exception();
+						if ($rules['items']['updateExisting'] || $rules['items']['createMissing']) {
+							// if item does not exist and there is no need to create it, skip item creation
+							if (!$current_item && !$rules['items']['createMissing']) {
+								info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
+								continue;
 							}
 
-							$current_item = API::Item()->get(array(
-								'itemids' => $result['itemids'],
-								'webitems' => true,
-								'output' => array('itemid')
-							));
-						}
-
-						if (!$current_item && !empty($rules['items']['createMissing'])) {
-							$result = API::Item()->create($item_db);
-							if (!$result) {
-								throw new Exception();
+							// if item exists, but there there is no need for update, skip item update
+							if ($current_item && !$rules['items']['updateExisting']) {
+								info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
+								continue;
 							}
 
-							$current_item = API::Item()->get(array(
-								'itemids' => $result['itemids'],
-								'webitems' => true,
-								'output' => array('itemid')
-							));
-						}
+							if ($current_item && $rules['items']['updateExisting']) {
+								$item_db['itemid'] = $current_item['itemid'];
+								$result = API::Item()->update($item_db);
 
-						if (!empty($item_applications)) {
-							$r = API::Application()->massAdd(array(
-								'applications' => $item_applications,
-								'items' => $current_item
-							));
-							if ($r === false) {
-								throw new Exception();
+								$current_item = API::Item()->get(array(
+									'itemids' => $result['itemids'],
+									'webitems' => true,
+									'output' => array('itemid')
+								));
+							}
+
+							if (!$current_item && $rules['items']['createMissing']) {
+								$result = API::Item()->create($item_db);
+
+								$current_item = API::Item()->get(array(
+									'itemids' => $result['itemids'],
+									'webitems' => true,
+									'output' => array('itemid')
+								));
+							}
+
+							// after items are created or updated, see to if items need to assigned to applications
+							if (isset($itemApplications) && $itemApplications) {
+								API::Application()->massAdd(array(
+									'applications' => $itemApplications,
+									'items' => $current_item
+								));
 							}
 						}
 					}
 				}
 // }}} ITEMS
 
-
 // TRIGGERS {{{
-				if (!empty($rules['triggers']['updateExisting']) || !empty($rules['triggers']['createMissing'])) {
+				if ($rules['triggers']['updateExisting'] || $rules['triggers']['createMissing']) {
 					$triggers = $xpath->query('triggers/trigger', $host);
 
 					$triggersToCreate = array();
@@ -1435,34 +1698,19 @@ class CXmlImport18 {
 					foreach ($triggers as $trigger) {
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
-						if ($old_version_input) {
-							$expressionPart = explode(':', $trigger_db['expression']);
-							$keyName = explode(',', $expressionPart[1], 2);
-
-							if (count($keyName) == 2) {
-								$keyValue = explode('.', $keyName[1], 2);
-								$key = $keyName[0].",".$keyValue[0];
-
-								if (in_array($keyName[0], self::$oldKeys) || in_array($keyName[0], self::$oldKeysPref)) {
-									$trigger_db['expression'] = str_replace($key, self::convertOldSimpleKey($key), $trigger_db['expression']);
-								}
-							}
-						}
-
-						// {HOSTNAME} is here for backward compatibility
-						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
-						$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+						$trigger_db['expression'] = $triggerExpressions[$host_db['host']][$trigger_db['description']][$trigger_db['expression']];
 						$trigger_db['hostid'] = $current_hostid;
-
-						$trigger_db['expression'] = $triggerExpressionConverter->convert($trigger_db['expression']);
 
 						$currentTrigger = API::Trigger()->get(array(
 							'output' => array('triggerid'),
 							'filter' => array('description' => $trigger_db['description']),
 							'hostids' => array($current_hostid),
+							'selectHosts' => array('hostid'),
 							'nopermissions' => true,
 							'limit' => 1,
 						));
+						$currentTrigger = reset($currentTrigger);
+
 						if ($currentTrigger) {
 							$dbTriggers = API::Trigger()->get(array(
 								'output' => API_OUTPUT_EXTEND,
@@ -1530,9 +1778,8 @@ class CXmlImport18 {
 				}
 // }}} TRIGGERS
 
-
 // GRAPHS {{{
-				if (!empty($rules['graphs']['updateExisting']) || !empty($rules['graphs']['createMissing'])) {
+				if ($rules['graphs']['updateExisting'] || $rules['graphs']['createMissing']) {
 					$graphs = $xpath->query('graphs/graph', $host);
 
 					$graphs_to_add = array();
@@ -1551,7 +1798,7 @@ class CXmlImport18 {
 							// {HOSTNAME} is here for backward compatibility
 							$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 							$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
-							if ($old_version_input) {
+							if ($oldVersionInput) {
 								$data[0] = self::convertOldSimpleKey($data[0]);
 							}
 							$gitem_db['key_'] = implode(':', $data);
@@ -1571,6 +1818,7 @@ class CXmlImport18 {
 									'host' => $gitem_db['host'],
 									'output' => array('itemid', 'hostid')
 								));
+
 								if (empty($current_item)) {
 									throw new Exception(_s('No permission for item "%1$s".', $gitem_db['key_']));
 								}
@@ -1589,7 +1837,6 @@ class CXmlImport18 {
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostids'] = $graph_hostids;
 
-
 						// do we need to show the graph legend, after it is imported?
 						// in 1.8, this setting was present only for pie and exploded graphs
 						// for other graph types we are always showing the legend
@@ -1599,6 +1846,8 @@ class CXmlImport18 {
 
 						$current_graph = API::Graph()->get(array(
 							'output' => array('graphid'),
+							'selectHosts' => array('hostid', 'host'),
+							'hostids' => $graph_db['hostids'],
 							'filter' => array('name' => $graph_db['name']),
 							'nopermissions' => true,
 							'limit' => 1
@@ -1673,16 +1922,10 @@ class CXmlImport18 {
 					}
 
 					if (!empty($graphs_to_add)) {
-						$r = API::Graph()->create($graphs_to_add);
-						if ($r === false) {
-							throw new Exception();
-						}
+						API::Graph()->create($graphs_to_add);
 					}
 					if (!empty($graphs_to_upd)) {
-						$r = API::Graph()->update($graphs_to_upd);
-						if ($r === false) {
-							throw new Exception();
-						}
+						API::Graph()->update($graphs_to_upd);
 					}
 				}
 			}

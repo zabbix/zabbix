@@ -26,14 +26,13 @@ $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 $proxyForm = new CForm();
 $proxyForm->setName('proxyForm');
 $proxyForm->addVar('form', $this->data['form']);
-$proxyForm->addVar('form_refresh', $this->data['form_refresh']);
 if ($this->data['proxyid']) {
 	$proxyForm->addVar('proxyid', $this->data['proxyid']);
 }
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
-$nameTextBox = new CTextBox('host', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
+$nameTextBox = new CTextBox('host', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 

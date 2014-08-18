@@ -1160,7 +1160,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$function = $expressionData->expressions[0]['functionName'];
 
 			$item = API::Item()->get(array(
-				'output' => array('itemid', 'lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid'),
+				'output' => array('itemid', 'value_type', 'units', 'valuemapid'),
 				'webitems' => true,
 				'filter' => array(
 					'host' => $itemHost,
@@ -1175,6 +1175,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 
 				continue;
+			}
+
+			$lastValue = Manager::History()->getLast(array($item));
+			if ($lastValue) {
+				$lastValue = reset($lastValue[$item['itemid']]);
+				$item['lastvalue'] = $lastValue['value'];
+				$item['lastclock'] = $lastValue['clock'];
+			}
+			else {
+				$item['lastvalue'] = '0';
+				$item['lastclock'] = '0';
 			}
 
 			// do function type (last, min, max, avg) related actions

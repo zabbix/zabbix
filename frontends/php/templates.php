@@ -74,24 +74,24 @@ $fields = array(
 	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT, null,		null,	null)
+	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,		null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+if (getRequest('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
 	access_deny();
 }
 
-$templateIds = get_request('templates', array());
+$templateIds = getRequest('templates', array());
 
 if ($exportData) {
 	$export = new CConfigurationExport(array('templates' => $templateIds));
@@ -262,6 +262,11 @@ elseif (hasRequest('save')) {
 				throw new Exception();
 			}
 
+			// copy web scenarios
+			if (!copyHttpTests($cloneTemplateId, $templateId)) {
+				throw new Exception();
+			}
+
 			// copy triggers
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid'),
@@ -333,8 +338,11 @@ elseif (hasRequest('save')) {
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -346,8 +354,6 @@ elseif (hasRequest('save')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
-
 	$result = API::Template()->massUpdate(array(
 		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 		'hosts' => array()
@@ -358,52 +364,51 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
 	$result = API::Template()->delete(array(getRequest('templateid')));
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
-	$templates = get_request('templates', array());
+	$templates = getRequest('templates', array());
 
 	DBstart();
 
-	$goResult = true;
+	$result = true;
 
 	if ($_REQUEST['go'] == 'delete') {
-		$goResult = API::Template()->massUpdate(array(
+		$result = API::Template()->massUpdate(array(
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
 		));
 	}
 
-	if ($goResult) {
-		$goResult = API::Template()->delete($templates);
+	if ($result) {
+		$result = API::Template()->delete($templates);
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 
 /*
@@ -419,14 +424,14 @@ $pageFilter = new CPageFilter(array(
 		'templated_hosts' => true,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null)
+	'groupid' => getRequest('groupid')
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
-	if ($templateId = get_request('templateid', 0)) {
+	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 

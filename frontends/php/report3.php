@@ -36,8 +36,8 @@ $fields = array(
 );
 check_fields($fields);
 
-$period = get_request('period', 'weekly');
-$year = get_request('year', date('Y'));
+$period = getRequest('period', 'weekly');
+$year = getRequest('year', date('Y'));
 
 define('YEAR_LEFT_SHIFT', 5);
 
