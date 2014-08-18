@@ -115,7 +115,7 @@ class CUserMacro extends CApiService {
 						' WHERE hm.hostid=hgg.hostid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.$permission.
+							' AND MAX(r.permission)>='.zbx_dbstr($permission).
 						')';
 			}
 		}

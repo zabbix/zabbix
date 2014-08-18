@@ -111,7 +111,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.$permission.
+						' OR MAX(r.permission)<'.zbx_dbstr($permission).
 					')';
 
 			// condition host or template
@@ -127,7 +127,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.$permission.
+						' OR MAX(r.permission)<'.zbx_dbstr($permission).
 					')';
 
 			// condition trigger
@@ -145,7 +145,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.$permission.
+						' OR MAX(r.permission)<'.zbx_dbstr($permission).
 					')';
 		}
 

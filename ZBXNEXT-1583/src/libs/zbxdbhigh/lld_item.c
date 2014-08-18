@@ -337,7 +337,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return;
 
-	/* only new items or items with a new data will be validated */
+	/* only new items or items with changed data will be validated */
 	if (0 != item->itemid && 0 == (item->flags & flag))
 		return;
 
@@ -409,7 +409,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		/* only new items or items with a new key will be validated */
+		/* only new items or items with changed key will be validated */
 		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			continue;
 

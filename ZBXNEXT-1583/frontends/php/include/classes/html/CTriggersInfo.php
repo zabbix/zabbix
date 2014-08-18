@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../triggers.inc.php';
-
 class CTriggersInfo extends CTable {
 
 	public $style;
