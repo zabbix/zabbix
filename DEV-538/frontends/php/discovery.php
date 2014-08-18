@@ -31,10 +31,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'druleid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null)
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
+	// sort and sortorder
+	'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'ip'"),									null),
+	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('ip', ZBX_SORT_UP, array('ip'));
+validate_sort_and_sortorder('ip', ZBX_SORT_UP);
 
 // check discovery for existing if defined druleid
 if ($druleid = getRequest('druleid')) {

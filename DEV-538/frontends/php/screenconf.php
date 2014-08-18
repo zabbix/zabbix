@@ -60,10 +60,13 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// import
 	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
-	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null)
+	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
 $_REQUEST['go'] = getRequest('go', 'none');

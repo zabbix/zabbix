@@ -54,7 +54,10 @@ $fields = array(
 	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'priority','lastchange','description'"),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
 
@@ -212,7 +215,7 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 /*
  * Page sorting
  */
-validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN, array('priority', 'lastchange', 'description'));
+validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 
 /*
  * Display
