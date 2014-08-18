@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
-	$http_request = new CHTTP_request();
-	$json = new CJSON();
+	$http_request = new CHttpRequest();
+	$json = new CJson();
 	$data = $json->decode($http_request->body(), true);
 }
 else {
@@ -395,7 +395,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 	}
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
-	$json = new CJSON();
+	$json = new CJson();
 
 	echo $json->encode(array(
 		'jsonrpc' => '2.0',
