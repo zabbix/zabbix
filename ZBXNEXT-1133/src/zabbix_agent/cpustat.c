@@ -118,7 +118,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int				cpu_num, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[8];
-	char				counterPath[PDH_MAX_COUNTER_PATH];
+	char				counterPath[PDH_MAX_COUNTER_PATH], *error = NULL;
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -141,8 +141,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 			goto clean;
 
-		if (NULL == (pcpus->cpu_counter[cpu_num] = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
+		if (NULL == (pcpus->cpu_counter[cpu_num] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+				&error)))
+		{
 			goto clean;
+		}
 	}
 
 	cpe.szObjectName = get_counter_name(PCI_SYSTEM);
@@ -152,11 +155,17 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 		goto clean;
 
-	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_CPU_HISTORY)))
+	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD, &error)))
 		goto clean;
 
 	ret = SUCCEED;
 clean:
+	if (NULL != error)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add performance counter \"%s\": %s", counterPath, error);
+		zbx_free(error);
+	}
+
 #else	/* not _WINDOWS */
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
@@ -634,7 +643,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (!CPU_COLLECTOR_STARTED(collector))
+	if (0 == CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;

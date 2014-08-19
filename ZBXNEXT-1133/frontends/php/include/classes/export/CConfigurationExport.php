@@ -80,7 +80,7 @@ class CConfigurationExport {
 				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
 				'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'inventory_link', 'flags'
+				'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'logtimefmt'
 			),
 			'drule' => array('itemid', 'hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_contextname',
@@ -94,7 +94,7 @@ class CConfigurationExport {
 				'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
 				'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'valuemapid',
 				'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey',
-				'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags'
+				'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'logtimefmt'
 			)
 		);
 	}
@@ -839,7 +839,12 @@ class CConfigurationExport {
 	 * @param array $exportScreens
 	 */
 	protected function prepareScreenExport(array &$exportScreens) {
-		$screenIds = $sysmapIds = $groupIds = $hostIds = $graphIds = $itemIds = array();
+		$screenIds = array();
+		$sysmapIds = array();
+		$groupIds = array();
+		$hostIds = array();
+		$graphIds = array();
+		$itemIds = array();
 
 		// gather element ids that must be substituted
 		foreach ($exportScreens as $screen) {
@@ -847,13 +852,9 @@ class CConfigurationExport {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
@@ -863,11 +864,12 @@ class CConfigurationExport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$graphIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-							// fall through
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
@@ -898,13 +900,9 @@ class CConfigurationExport {
 				if ($screenItem['resourceid'] != 0) {
 					switch ($screenItem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_INFO:
-							// fall through
 						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
-							// fall through
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];
 							break;
@@ -914,11 +912,12 @@ class CConfigurationExport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-							// fall through
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
 							break;
@@ -1149,7 +1148,8 @@ class CConfigurationExport {
 			'graphids' => $graphIds,
 			'selectHosts' => array('host'),
 			'output' => array('name'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($graphs as $id => $graph) {

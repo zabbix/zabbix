@@ -2302,7 +2302,7 @@ function getIconByMapping($iconMap, $inventory) {
 
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
-				$expr = new GlobalRegExp($mapping['expression']);
+				$expr = new CGlobalRegexp($mapping['expression']);
 				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
 					return $mapping['iconid'];
 				}

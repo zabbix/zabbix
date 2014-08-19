@@ -1061,26 +1061,6 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 	return true;
 }
 
-function order_by($def, $allways = '') {
-	$orderString = '';
-
-	$sortField = getPageSortField();
-	$sortable = explode(',', $def);
-	if (!str_in_array($sortField, $sortable)) {
-		$sortField = null;
-	}
-	if ($sortField !== null) {
-		$sortOrder = getPageSortOrder();
-		$orderString .= $sortField.' '.$sortOrder;
-	}
-	if (!empty($allways)) {
-		$orderString .= ($sortField === null) ? '' : ',';
-		$orderString .= $allways;
-	}
-
-	return empty($orderString) ? '' : ' ORDER BY '.$orderString;
-}
-
 /**
  * Sorts the macros in the given order. Supports user and LLD macros.
  *
@@ -1392,53 +1372,11 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 
 /*************** PAGE SORTING ******************/
 
-/**
- * Get the sort and sort order parameters for the current page and save it into profiles.
- *
- * @param string $sort
- * @param string $sortorder
- * @param array $allowedColumns
- *
- * @return void
- */
-function validate_sort_and_sortorder($defaultSort = null, $defaultSortOrder = ZBX_SORT_UP, array $allowedColumns = array()) {
-	global $page;
-
-	$sortKey = 'sort';
-	$sortOrderKey = 'sortorder';
-
-	if (hasRequest($sortKey) && $allowedColumns && !in_array(getRequest($sortKey), $allowedColumns)) {
-		error(_s('Cannot sort by field "%1$s".', getRequest($sortKey)));
-		invalid_url();
-	}
-
-	if (hasRequest($sortOrderKey) && !in_array(getRequest($sortOrderKey), array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
-			getRequest($sortOrderKey), ZBX_SORT_UP, ZBX_SORT_DOWN
-		));
-		invalid_url();
-	}
-
-	$profileSortFieldIndex = 'web.'.$page['file'].'.sort';
-	$profileSortOrderIndex = 'web.'.$page['file'].'.sortorder';
-
-	$currentSortField = getPageSortField($defaultSort);
-	$currentSortOrder = getPageSortOrder($defaultSortOrder);
-
-	if ($currentSortField) {
-		CProfile::update($profileSortOrderIndex, $currentSortOrder, PROFILE_TYPE_STR);
-		CProfile::update($profileSortFieldIndex, $currentSortField, PROFILE_TYPE_STR);
-
-		$_REQUEST[$sortKey] = $currentSortField;
-		$_REQUEST[$sortOrderKey] = $currentSortOrder;
-	}
-}
-
 // creates header col for sorting in table header
-function make_sorting_header($obj, $tabfield) {
+function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	global $page;
 
-	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
+	$sortorder = ($sortField == $tabfield && $sortOrder == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 	$link = CUrlFactory::getContextUrl();
 
@@ -1468,7 +1406,7 @@ function make_sorting_header($obj, $tabfield) {
 	$cont->addItem(SPACE);
 
 	$img = null;
-	if (isset($_REQUEST['sort']) && $tabfield == $_REQUEST['sort']) {
+	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
 			$img = new CSpan(SPACE, 'icon_sortdown');
 		}
@@ -1480,36 +1418,6 @@ function make_sorting_header($obj, $tabfield) {
 	$col->setAttribute('onclick', $script);
 
 	return $col;
-}
-
-/**
- * Returns the sort field for the current page.
- *
- * @param string $default
- *
- * @return string
- */
-function  getPageSortField($default = null) {
-	global $page;
-
-	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort'));
-
-	return ($sort) ? $sort : $default;
-}
-
-/**
- * Returns the sort order for the current page.
- *
- * @param string $default
- *
- * @return string
- */
-function getPageSortOrder($default = ZBX_SORT_UP) {
-	global $page;
-
-	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
-
-	return ($sortorder) ? $sortorder : $default;
 }
 
 /**
@@ -2272,7 +2180,7 @@ function imageOut(&$image, $format = null) {
 			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
-			$json = new CJSON();
+			$json = new CJson();
 			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:
