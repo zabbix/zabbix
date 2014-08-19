@@ -122,7 +122,6 @@ $fields = array(
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -366,13 +365,19 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'hostid' => getRequest('hostid', 0),
 		'host' => $host,
-		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
+		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
 
 	// discoveries
 	$data['discoveries'] = API::DiscoveryRule()->get(array(
@@ -383,17 +388,17 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if ($sortfield === 'status') {
-		orderItemsByStatus($data['discoveries'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderItemsByStatus($data['discoveries'], $sortOrder);
 	}
 	else {
-		order_result($data['discoveries'], $sortfield, getPageSortOrder());
+		order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
 	// paging

@@ -38,7 +38,12 @@ $fields = array(
 	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN);
+
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'host_count'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_DOWN));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 /*
  * Permissions
@@ -90,8 +95,10 @@ $hostinvent_wdgt->addItem(BR());
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(
 	array(
-		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),
-		make_sorting_header(_('Host count'), 'host_count'),
+		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field',
+			$sortField, $sortOrder
+		),
+		make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
 	)
 );
 
@@ -127,7 +134,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 		}
 	}
 
-	order_result($report, getPageSortField('host_count'), getPageSortOrder());
+	order_result($report, $sortField, $sortOrder);
 
 	foreach($report as $rep){
 		$row = array(

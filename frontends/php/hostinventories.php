@@ -60,7 +60,11 @@ if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid'))
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 if (hasRequest('filterState')) {
 	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
@@ -134,7 +138,9 @@ if ($hostId > 0) {
 else {
 	$data = array(
 		'config' => select_config(),
-		'hosts' => array()
+		'hosts' => array(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// filter
@@ -227,7 +233,7 @@ else {
 				}
 			}
 
-			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+			order_result($data['hosts'], $sortField, $sortOrder);
 		}
 	}
 

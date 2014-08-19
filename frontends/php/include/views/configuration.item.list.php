@@ -60,15 +60,15 @@ $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Triggers'),
-	make_sorting_header(_('Key'), 'key_'),
-	make_sorting_header(_('Interval'), 'delay'),
-	make_sorting_header(_('History'), 'history'),
-	make_sorting_header(_('Trends'), 'trends'),
-	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Applications'),
-	make_sorting_header(_('Status'), 'status'),
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$data['showInfoColumn'] ? _('Info') : null
 ));
 

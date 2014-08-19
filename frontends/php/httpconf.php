@@ -73,13 +73,12 @@ $fields = array(
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null),
 	// sort and sortorder
-	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
-	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"), null)
+	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'hostname','name','status'"),				null),
+	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $showDisabled = getRequest('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_INT);
@@ -526,6 +525,12 @@ if (isset($_REQUEST['form'])) {
 	$httpView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$pageFilter = new CPageFilter(array(
 		'groups' => array(
 			'editable' => true
@@ -543,7 +548,9 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
-		'paging' => null
+		'paging' => null,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// show the error column only for hosts
@@ -558,8 +565,6 @@ else {
 	}
 
 	if ($data['pageFilter']->hostsSelected) {
-		$sortField = getPageSortField('hostname');
-
 		$options = array(
 			'editable' => true,
 			'output' => array('httptestid'),
@@ -576,7 +581,7 @@ else {
 		}
 		$httpTests = API::HttpTest()->get($options);
 
-		order_result($httpTests, $sortField, getPageSortOrder());
+		order_result($httpTests, $sortField, $sortOrder);
 
 		$data['paging'] = getPagingLine($httpTests);
 
@@ -617,7 +622,7 @@ else {
 			$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
 		}
 
-		order_result($httpTests, $sortField, getPageSortOrder());
+		order_result($httpTests, $sortField, $sortOrder);
 
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 

@@ -135,7 +135,6 @@ $fields = array(
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -367,27 +366,33 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => getRequest('hostid'),
-		'discovery_rule' => $discovery_rule
+		'discovery_rule' => $discovery_rule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
 
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
-	order_result($data['items'], $sortfield, getPageSortOrder());
+	order_result($data['items'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['items']);
 

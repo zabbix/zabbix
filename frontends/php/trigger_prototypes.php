@@ -85,7 +85,6 @@ $fields = array(
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
@@ -279,23 +278,30 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'showInfoColumn' => false,
 		'discovery_rule' => $discovery_rule,
 		'hostid' => getRequest('hostid'),
 		'showdisabled' => getRequest('showdisabled', 1),
-		'triggers' => array()
+		'triggers' => array(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
-	$sortfield = getPageSortField('description');
 	$options = array(
 		'editable' => true,
 		'output' => array('triggerid'),
 		'discoveryids' => $data['parent_discoveryid'],
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	);
 	if (empty($data['showdisabled'])) {
@@ -313,7 +319,7 @@ else {
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND
 	));
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+	order_result($data['triggers'], $sortField, $sortOrder);
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);

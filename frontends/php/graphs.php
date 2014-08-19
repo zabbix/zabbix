@@ -86,7 +86,6 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['items'] = getRequest('items', array());
@@ -610,16 +609,21 @@ elseif (isset($_REQUEST['form'])) {
 	$graphView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'pageFilter' => $pageFilter,
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
 
 	// get graphs
 	$options = array(
@@ -635,13 +639,13 @@ else {
 		? API::Graph()->get($options)
 		: API::GraphPrototype()->get($options);
 
-	if ($sortfield == 'graphtype') {
+	if ($sortField == 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['graphs']);
 
@@ -662,7 +666,7 @@ else {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);

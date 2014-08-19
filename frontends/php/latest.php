@@ -142,10 +142,11 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-$sortField = getPageSortField();
-$sortOrder = getPageSortOrder();
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 $applications = $items = $hostScripts = array();
 
@@ -325,17 +326,17 @@ if (getRequest('hostid')) {
 	$hostColumn = null;
 }
 else {
-	$hostHeader = make_sorting_header(_('Host'), 'host');
+	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
 	$hostHeader->addClass('latest-host');
 	$hostHeader->setAttribute('title', _('Host'));
 
 	$hostColumn = SPACE;
 }
 
-$nameHeader = make_sorting_header(_('Name'), 'name');
+$nameHeader = make_sorting_header(_('Name'), 'name', $sortField, $sortOrder);
 $nameHeader->setAttribute('title', _('Name'));
 
-$lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock');
+$lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder);
 $lastCheckHeader->addClass('latest-lastcheck');
 $lastCheckHeader->setAttribute('title', _('Last check'));
 

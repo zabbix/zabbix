@@ -184,7 +184,6 @@ $fields = array(
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
@@ -960,12 +959,19 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
 }
 // list of items
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// items
@@ -982,7 +988,7 @@ else {
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
-		'sortfield' => $data['sortfield'],
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1181,11 +1187,11 @@ else {
 		}
 	}
 
-	if ($data['sortfield'] === 'status') {
-		orderItemsByStatus($data['items'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderItemsByStatus($data['items'], $sortOrder);
 	}
 	else {
-		order_result($data['items'], $data['sortfield'], getPageSortOrder());
+		order_result($data['items'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['items']);

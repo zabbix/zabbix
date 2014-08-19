@@ -62,7 +62,6 @@ $fields = array(
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 $mediaTypeId = getRequest('mediatypeid');
 
@@ -237,7 +236,16 @@ if (!empty($_REQUEST['form'])) {
 	$mediaTypeView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get media types
 	$data['mediatypes'] = API::Mediatype()->get(array(
@@ -279,8 +287,8 @@ else {
 			}
 		}
 
-		// sorting & paging
-		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
+		order_result($data['mediatypes'], $sortField, $sortOrder);
+
 		$data['paging'] = getPagingLine($data['mediatypes']);
 	}
 	else {
