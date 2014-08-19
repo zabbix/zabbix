@@ -342,48 +342,89 @@ if ($filter['groupids'] !== null) {
 $latestWidget = new CWidget(null, 'latest-mon');
 $latestWidget->addHeader(_('Items'));
 
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setTableClass('formtable old-filter');
+$filterForm = new CForm('get');
 $filterForm->setAttribute('name',' zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addRow(_('Host groups'), new CMultiSelect(array(
-	'name' => 'groupids[]',
-	'objectName' => 'hostGroup',
-	'data' => $multiSelectHostGroupData,
-	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-			'&srcfld1=groupid&multiselect=1',
-		'width' => 450,
-		'height' => 450,
-		'buttonClass' => 'input filter-button'
+
+$filterTable = new CTable(null, 'filter');
+$filterTable->setCellPadding(0);
+$filterTable->setCellSpacing(0);
+
+$filterTable->addRow(
+	array(
+		new CCol(bold(_('Host groups').NAME_DELIMITER), 'label'),
+		new CCol(new CMultiSelect(
+			array(
+				'name' => 'groupids[]',
+				'objectName' => 'hostGroup',
+				'data' => $multiSelectHostGroupData,
+				'popup' => array(
+					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
+						'&srcfld1=groupid&multiselect=1',
+					'width' => 450,
+					'height' => 450,
+					'buttonClass' => 'input filter-multiselect-select-button'
+				)
+			)),
+			'mscol'
+		),
+		new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
+		new CCol(new CTextBox('select', $filter['select'], 40), 'mscol'),
 	)
-)));
-$filterForm->addRow(_('Hosts'), new CMultiSelect(array(
-	'name' => 'hostids[]',
-	'objectName' => 'hosts',
-	'data' => $multiSelectHostData,
-	'popup' => array(
-		'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_'.
-			'&srcfld1=hostid&real_hosts=1&multiselect=1',
-		'width' => 450,
-		'height' => 450,
-		'buttonClass' => 'input filter-multiselect-select-button'
+);
+
+$filterTable->addRow(
+	array(
+		new CCol(bold(_('Hosts').NAME_DELIMITER), 'label'),
+		new CCol(new CMultiSelect(
+			array(
+				'name' => 'hostids[]',
+				'objectName' => 'hosts',
+				'data' => $multiSelectHostData,
+				'popup' => array(
+					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
+						'&real_hosts=1&multiselect=1',
+					'width' => 450,
+					'height' => 450,
+					'buttonClass' => 'input filter-multiselect-select-button'
+				)
+			)),
+			'mscol'
+		),
+		new CCol(bold(_('Show items without data').NAME_DELIMITER), 'label'),
+		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'mscol chbxcol')
 	)
-)));
-// application
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $filter['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-		'&dstfrm='.$filterForm->getName().'");',
-		'filter-button'
-	)
+);
+
+$filterTable->addRow(array(
+	new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
+	new CCol(
+		array(
+			new CTextBox('application', $filter['application']),
+			new CButton('application_name', _('Select'),
+				'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+					'&with_applications=1&dstfrm='.$filterForm->getName().'");',
+				'filter-select-button'
+			)
+		),
+		'mscol'
+	),
+	new CCol(bold(_('Show details').NAME_DELIMITER), 'label'),
+	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'mscol chbxcol'),
 ));
-$filterForm->addRow(_('Filter by name'), new CTextBox('select', $filter['select'], 20));
-$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
+
+$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
+$filterButton->useJQueryStyle('main');
+
+$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
+$resetButton->useJQueryStyle();
+
+$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons->setAttribute('style', 'padding: 4px 0px;');
+
+$filterTable->addRow(new CCol($divButtons, 'controls', 4));
+
+$filterForm->addItem($filterTable);
 
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
