@@ -75,12 +75,14 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'description','priority','status'"),		null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP, array('priority', 'description', 'status'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
@@ -345,10 +347,18 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
 	$triggersView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'showdisabled' => getRequest('showdisabled', 1),
 		'parent_discoveryid' => null,
-		'triggers' => array()
+		'triggers' => array(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
@@ -364,12 +374,11 @@ else {
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	// get triggers
-	$sortfield = getPageSortField('description');
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
 			'output' => array('triggerid'),
-			'sortfield' => $sortfield,
+			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showdisabled'])) {
@@ -399,11 +408,11 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 
-	if ($sortfield === 'status') {
-		orderTriggersByStatus($data['triggers'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderTriggersByStatus($data['triggers'], $sortOrder);
 	}
 	else {
-		order_result($data['triggers'], $sortfield, getPageSortOrder());
+		order_result($data['triggers'], $sortField, $sortOrder);
 	}
 
 	$dependencyIds = array();
