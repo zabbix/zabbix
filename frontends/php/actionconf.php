@@ -71,7 +71,10 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 
 $dataValid = check_fields($fields);
@@ -79,8 +82,6 @@ $dataValid = check_fields($fields);
 if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = getRequest('go', 'none');
 
@@ -493,11 +494,17 @@ if (hasRequest('form')) {
 	$actionView->show();
 }
 else {
-	$data = array(
-		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortField = getPageSortField('name');
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$data['actions'] = API::Action()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -510,7 +517,7 @@ else {
 	));
 
 	// sorting && paging
-	order_result($data['actions'], $sortField, getPageSortOrder());
+	order_result($data['actions'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['actions']);
 
 	// render view

@@ -76,12 +76,18 @@ $fields = array(
 	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>								array(T_ZBX_STR, O_OPT, P_SYS,
+												IN("'active_since','active_till','maintenance_type','name'"),
+												null
+											),
+	'sortorder' =>							array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),
+												null
+											)
 );
 
 check_fields($fields);
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'maintenance_type', 'active_since', 'active_till'));
 
 /*
  * Permissions
@@ -512,14 +518,20 @@ if (!empty($data['form'])) {
 }
 else {
 	// get maintenances
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data['sort'] = $sortField;
+	$data['sortorder'] = $sortOrder;
 
 	$options = array(
 		'output' => array('maintenanceid'),
 		'editable' => true,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	);
 
@@ -552,7 +564,7 @@ else {
 		}
 	}
 
-	order_result($data['maintenances'], $sortfield, $sortorder);
+	order_result($data['maintenances'], $sortField, $sortOrder);
 
 	$data['pageFilter'] = $pageFilter;
 

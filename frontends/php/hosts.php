@@ -101,10 +101,12 @@ $fields = array(
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = getRequest('go', 'none');
 
@@ -800,6 +802,12 @@ elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->setRootClass($rootClass);
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -851,7 +859,7 @@ else {
 	$table = new CTableInfo(_('No hosts found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-		make_sorting_header(_('Name'), 'name'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -860,23 +868,20 @@ else {
 		_('Web'),
 		_('Interface'),
 		_('Templates'),
-		make_sorting_header(_('Status'), 'status'),
+		make_sorting_header(_('Status'), 'status', $sortField, $sortOrder),
 		_('Availability')
 	));
 
 	// get Hosts
 	$hosts = array();
 
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
-
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid', 'name', 'status'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
+			'sortfield' => $sortField,
+			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
 				'name' => ($filter['host'] === '') ? null : $filter['host'],
@@ -893,7 +898,7 @@ else {
 	}
 
 	// sorting && paging
-	order_result($hosts, $sortfield, $sortorder);
+	order_result($hosts, $sortField, $sortOrder);
 	$paging = getPagingLine($hosts);
 
 	$hosts = API::Host()->get(array(
@@ -910,7 +915,7 @@ else {
 		'selectDiscoveryRule' => array('itemid', 'name'),
 		'selectHostDiscovery' => array('ts_delete')
 	));
-	order_result($hosts, $sortfield, $sortorder);
+	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
 	$templateIds = array();
