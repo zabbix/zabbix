@@ -70,7 +70,6 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
-
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -111,7 +110,6 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
-
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -361,7 +359,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_TCP_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No login prompt"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No login prompt."));
 		goto fail;
 	}
 
@@ -381,7 +379,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_TCP_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No password prompt"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No password prompt."));
 		goto fail;
 	}
 
@@ -404,7 +402,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_TCP_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Login failed"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Login failed."));
 		goto fail;
 	}
 
@@ -453,7 +451,8 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 
 	if (ZBX_TCP_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No prompt: %s", zbx_tcp_strerror()));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
+				strerror_from_system(zbx_sock_last_error())));
 		goto fail;
 	}
 
@@ -467,6 +466,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	for (i = 0; i < offset_lf; i++)
 	{
 		if ('\n' == command_lf[i])
+		{
 			if (SUCCEED != telnet_rm_echo(buf, &offset, "$ ", 2) &&
 				SUCCEED != telnet_rm_echo(buf, &offset, "# ", 2) &&
 				SUCCEED != telnet_rm_echo(buf, &offset, "> ", 2) &&
@@ -474,6 +474,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 			{
 				break;
 			}
+		}
 	}
 
 	telnet_rm_echo(buf, &offset, "\n", 1);
