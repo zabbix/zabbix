@@ -461,10 +461,10 @@ $lastValueHeader->setAttribute('title', _('Last value'));
 $lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
 $lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
-$checkAllCheckbox = new CCol(
-	new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');"),
-	'latest-checkbox'
-);
+$checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
+$checkAllCheckbox->setAttribute('autocomplete', 'off');
+
+$checkAllCheckboxCol = new CCol($checkAllCheckbox, 'latest-checkbox');
 
 if ($filter['showDetails']) {
 	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
@@ -485,7 +485,7 @@ if ($filter['showDetails']) {
 	$table->addClass('latest-details');
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$checkAllCheckbox,
+		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
 		$intervalHeader,
@@ -502,7 +502,7 @@ if ($filter['showDetails']) {
 else {
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$checkAllCheckbox,
+		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
@@ -567,6 +567,7 @@ foreach ($items as $key => $item){
 
 	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
 	$checkbox->removeAttribute('id');
+	$checkbox->setAttribute('autocomplete', 'off');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -754,6 +755,7 @@ foreach ($items as $item) {
 
 	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
 	$checkbox->removeAttribute('id');
+	$checkbox->setAttribute('autocomplete', 'off');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
