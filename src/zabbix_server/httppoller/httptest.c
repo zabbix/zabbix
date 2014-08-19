@@ -445,7 +445,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		{
 			char	*var_err_str = NULL;
 
-			zabbix_log(LOG_LEVEL_TRACE, "page data received from %s: %s", httpstep.url, page.data);
+			zabbix_log(LOG_LEVEL_TRACE, "received web content from %s: %s", httpstep.url, page.data);
 
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
