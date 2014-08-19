@@ -52,7 +52,7 @@ $fields = array(
 	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'host','name','lastclock'"),				null),
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'host','lastclock','name'"),				null),
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);

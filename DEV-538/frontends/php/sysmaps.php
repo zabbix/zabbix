@@ -78,7 +78,7 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// sort and sortorder
-	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','width','height'"),				null),
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'height','name','width'"),				null),
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);

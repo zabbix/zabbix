@@ -43,7 +43,7 @@ $fields = array(
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
 	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS,
-								IN("'name','pr_name','pr_type','pr_os','pr_serialno_a','pr_tag','pr_macaddress_a'"),
+								IN("'name','pr_macaddress_a','pr_name','pr_os','pr_serialno_a','pr_tag','pr_type'"),
 								null
 							),
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
