@@ -782,25 +782,33 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	return $tableRow;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function get_same_applications_for_host($applications, $hostid) {
-	$child_applications = array();
-	$db_apps = DBselect(
-		'SELECT a1.applicationid'.
+/**
+ * Get same application IDs on destination host and return array with keys as source application IDs
+ * and values as destination application IDs.
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ * @param array  $applicationIds
+ * @param string $hostId
+ *
+ * @return array
+ */
+function get_same_applications_for_host(array $applicationIds, $hostId) {
+	$applications = array();
+
+	$dbApplications = DBselect(
+		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.zbx_dbstr($hostid).
-			' AND '.dbConditionInt('a2.applicationid', $applications)
+			' AND a1.hostid='.zbx_dbstr($hostId).
+			' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 	);
-	while ($app = DBfetch($db_apps)) {
-		$child_applications[] = $app['applicationid'];
+
+	while ($dbApplication = DBfetch($dbApplications)) {
+		$applications[$dbApplication['srcappid']] = $dbApplication['dstappid'];
 	}
 
-	return $child_applications;
+	return $applications;
 }
 
 /******************************************************************************

@@ -748,7 +748,7 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 	if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 		return;
 
-	/* only new triggers or triggers with a new data will be validated */
+	/* only new triggers or triggers with changed data will be validated */
 	if (0 != trigger->triggerid && 0 == (trigger->flags & flag))
 		return;
 
