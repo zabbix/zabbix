@@ -39,7 +39,7 @@ $expressionFormList = new CFormList('expressionFormList');
 
 // append item to form list
 $item = array(
-	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 	new CButton('select', _('Select'), 'return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
 		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
