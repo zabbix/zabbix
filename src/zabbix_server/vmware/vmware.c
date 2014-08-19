@@ -661,6 +661,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_authenticate";
+
 	int		err, opt, timeout = 10, ret = FAIL;
 	char		xml[MAX_STRING_LEN], *error_object = NULL;
 
@@ -782,6 +783,7 @@ static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easy
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_contents";
+
 	int		err, opt, ret = FAIL;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMWARE_CONTENTS)))
@@ -1041,6 +1043,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_perf_counters";
+
 	char		tmp[MAX_STRING_LEN];
 	int		opts, err, ret = SUCCEED;
 
@@ -1136,7 +1139,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	 vmware_service_hv_get_stats (const zbx_vmware_service_t *service, CURL *easyhandle,
+static int	 vmware_service_hv_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_hv_t *hv, char **error)
 {
 	const char		*__function_name = "vmware_service_hv_get_stats";
@@ -1324,6 +1327,7 @@ out:
 static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 {
 	const char	*__function_name = "wmware_vm_get_nic_devices";
+
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1390,6 +1394,7 @@ out:
 static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t counterid)
 {
 	const char	*__function_name = "wmware_vm_get_devices_by_counterid";
+
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1621,6 +1626,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
+
 	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *url;
 	zbx_vmware_datastore_t	*datastore = NULL;
 
@@ -1766,6 +1772,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 		const char *id, char **error)
 {
 	const char		*__function_name = "vmware_service_create_hv";
+
 	zbx_vmware_hv_t		*hv;
 	int			ret = FAIL, i;
 	char			*value;
@@ -2531,7 +2538,7 @@ out:
  ******************************************************************************/
 static void	vmware_service_update(zbx_vmware_service_t *service)
 {
-	const char	*__function_name = "vmware_service_update";
+	const char		*__function_name = "vmware_service_update";
 
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
@@ -2647,6 +2654,7 @@ out:
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
 	const char		*__function_name = "zbx_vmware_get_service";
+
 	int			i, now;
 	zbx_vmware_service_t	*service = NULL;
 
@@ -2711,6 +2719,7 @@ out:
 void	zbx_vmware_init(void)
 {
 	const char	*__function_name = "zbx_vmware_init";
+
 	key_t		shm_key;
 	zbx_uint64_t	size_reserved;
 
