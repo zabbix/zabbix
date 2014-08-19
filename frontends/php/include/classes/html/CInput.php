@@ -47,18 +47,18 @@ class CInput extends CTag {
 		return $this;
 	}
 
-	public function setReadonly($value = 'yes') {
-		if ((is_string($value) && ($value == 'yes' || $value == 'checked' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0) || $value === true) {
+	public function setReadonly($value) {
+		if ($value) {
 			$this->attr('readonly', 'readonly');
-			return $this;
 		}
-		$this->removeAttr('readonly');
-		return $this;
+		else {
+			$this->removeAttribute('readonly');
+		}
 	}
 
 	public function setEnabled($value = 'yes') {
 		if ((is_string($value) && ($value == 'yes' || $value == 'checked' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0) || $value === true) {
-			$this->removeAttr('disabled');
+			$this->removeAttribute('disabled');
 			return $this;
 		}
 		$this->attr('disabled', 'disabled');

@@ -91,11 +91,11 @@ $frmHost->addVar('clear_templates', $clear_templates);
 $templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54, 'no', 128);
+$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
 $template_nameTB->attr('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, 'no', 128);
+$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
 $templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
