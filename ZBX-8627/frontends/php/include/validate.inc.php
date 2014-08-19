@@ -518,8 +518,6 @@ function check_fields(&$fields, $show_messages = true) {
 		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
 		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'page' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
 		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);
