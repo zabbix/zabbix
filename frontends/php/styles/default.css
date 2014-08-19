@@ -570,6 +570,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
+.multiselect-wrapper { white-space: normal; }
 .multiselect-wrapper .select-popup { margin-left: 10px; }
 
 /* menu popup */
