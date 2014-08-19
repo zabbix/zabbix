@@ -618,10 +618,10 @@ class CItem extends CItemGeneral {
 
 		$delItems = $this->get(array(
 			'output' => array('name', 'templateid'),
+			'selectHosts' => array('name'),
 			'itemids' => $itemIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'preservekeys' => true
 		));
 
 		// TODO: remove $nopermissions hack
@@ -675,7 +675,7 @@ class CItem extends CItemGeneral {
 		$this->checkGraphReference($itemIds);
 
 		$triggers = API::Trigger()->get(array(
-			'output' => array('triggerid'),
+			'output' => array(),
 			'itemids' => $itemIds,
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -688,7 +688,7 @@ class CItem extends CItemGeneral {
 		}
 
 		$triggerPrototypes = API::TriggerPrototype()->get(array(
-			'output' => array('triggerid'),
+			'output' => array(),
 			'itemids' => $itemIds,
 			'nopermissions' => true,
 			'preservekeys' => true
