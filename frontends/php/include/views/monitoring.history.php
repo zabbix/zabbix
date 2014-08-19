@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 
-$historyWidget = new CWidget();
+$historyWidget = new CWidget(null, 'history');
 
 $header = array(
 	'left' => _n('%1$s ITEM', '%1$s ITEMS', count($this->data['items'])),
@@ -229,7 +229,10 @@ else {
 				),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			);
-			$filterTable->addRow(array(array(_('Graph type'), new CSpan($graphType, 'jqueryinputset'))));
+			$filterTable->addRow(array(
+				new CCol(bold(_('Graph type').NAME_DELIMITER), 'label'),
+				new CCol(new CSpan($graphType, 'jqueryinputset'), 'buttoncol')
+			));
 
 			$filterForm = new CForm('GET');
 			$filterForm->setAttribute('name', 'zbx_filter');
