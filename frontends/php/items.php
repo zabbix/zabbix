@@ -178,7 +178,7 @@ $fields = array(
 	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
 	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS,
-									IN("'name','key_','delay','history','trends','status','type'"),
+									IN("'delay','history','name','key_','status','trends','type'"),
 									null
 								),
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
