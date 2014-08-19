@@ -366,10 +366,10 @@ $filterTable->addRow(
 					'buttonClass' => 'input filter-multiselect-select-button'
 				)
 			)),
-			'mscol'
+			'inputcol'
 		),
 		new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
-		new CCol(new CTextBox('select', $filter['select'], 40), 'mscol'),
+		new CCol(new CTextBox('select', $filter['select'], 40), 'inputcol'),
 	)
 );
 
@@ -389,10 +389,10 @@ $filterTable->addRow(
 					'buttonClass' => 'input filter-multiselect-select-button'
 				)
 			)),
-			'mscol'
+			'inputcol'
 		),
 		new CCol(bold(_('Show items without data').NAME_DELIMITER), 'label'),
-		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'mscol chbxcol')
+		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'inputcol')
 	)
 );
 
@@ -407,10 +407,10 @@ $filterTable->addRow(array(
 				'filter-select-button'
 			)
 		),
-		'mscol'
+		'inputcol'
 	),
 	new CCol(bold(_('Show details').NAME_DELIMITER), 'label'),
-	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'mscol chbxcol'),
+	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'inputcol'),
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
