@@ -8,7 +8,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
-...G...PS. [ZBX-8599] fixed incorrect error message in telnet_execute() function (Arturs)
+...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
 ....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
 A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing (Krists)
 ........S. [ZBX-8444] database queries for enabled items, triggers and hosts replaced with queries from configuration cache to improve performance for processing sleeping escalations (igors)
