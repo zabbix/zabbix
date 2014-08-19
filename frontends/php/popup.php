@@ -695,7 +695,7 @@ elseif ($srctbl == 'templates') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
 			}
-			$name->removeAttr('class');
+			$name->removeAttribute('class');
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
@@ -770,7 +770,7 @@ elseif ($srctbl == 'hosts') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
 			}
-			$name->removeAttr('class');
+			$name->removeAttribute('class');
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
@@ -846,7 +846,7 @@ elseif ($srctbl == 'host_templates') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
 			}
-			$name->removeAttr('class');
+			$name->removeAttribute('class');
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
@@ -917,7 +917,7 @@ elseif ($srctbl == 'host_groups') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
 			}
-			$name->removeAttr('class');
+			$name->removeAttribute('class');
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
@@ -1446,7 +1446,7 @@ elseif ($srctbl == 'sysmaps') {
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		if (isset($excludeids[$sysmap['sysmapid']])) {
-			$description->removeAttr('class');
+			$description->removeAttribute('class');
 		}
 		else {
 			$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
