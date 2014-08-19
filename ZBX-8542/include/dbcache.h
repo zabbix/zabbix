@@ -385,18 +385,6 @@ typedef struct
 }
 zbx_idset_t;
 
-/* user macro cache object */
-typedef struct
-{
-	/* the object id, for example trigger id */
-	zbx_uint64_t		objectid;
-	/* the macro source hosts */
-	zbx_vector_uint64_t	hostids;
-	/* the macro:value pairs */
-	zbx_vector_ptr_pair_t	macros;
-}
-zbx_umc_object_t;
-
 void	zbx_umc_init(zbx_hashset_t *cache);
 void	zbx_umc_destroy(zbx_hashset_t *cache);
 void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *expression);

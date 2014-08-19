@@ -29,6 +29,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxregexp.h"
+#include "macrocache.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)

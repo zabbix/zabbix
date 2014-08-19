@@ -21,6 +21,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "macrocache.h"
 
 /*
  * The purpose of user macro cache is to reduce configuration cache locking when

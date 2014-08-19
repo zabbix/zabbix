@@ -8,6 +8,7 @@ libzbxdbcache_a_SOURCES = \
 	dbconfig.c \
 	valuecache.c \
 	valuecache.h \
-	macrocache.c
+	macrocache.c \
+	macrocache.h
 
 libzbxdbcache_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/ -I@top_srcdir@/src/libs/zbxalgo
