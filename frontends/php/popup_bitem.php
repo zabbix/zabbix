@@ -133,7 +133,7 @@ else {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
 
-	$txtCondVal = new CTextBox('name', $caption, 50, 'yes');
+	$txtCondVal = new CTextBox('name', $caption, 50, true);
 
 	$btnSelect = new CSubmit('btn1', _('Select'),
 		'return PopUp("popup.php?'.

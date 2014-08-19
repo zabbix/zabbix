@@ -44,10 +44,12 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 /*
  * Form actions
@@ -334,18 +336,23 @@ if (hasRequest('form')) {
  * Display list
  */
 else {
-	$data = array(
-		'config' => $config
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortfield = getPageSortField('name');
-	$sortorder =  getPageSortOrder();
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'config' => $config,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$groups = API::HostGroup()->get(array(
 		'output' => array('groupid'),
 		'editable' => true,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	));
 
@@ -371,7 +378,7 @@ else {
 		'selectDiscoveryRule' => array('itemid', 'name'),
 		'limitSelects' => $config['max_in_table'] + 1
 	));
-	order_result($data['groups'], $sortfield, $sortorder);
+	order_result($data['groups'], $sortField, $sortOrder);
 
 	// render view
 	$hostgroupView = new CView('configuration.hostgroups.list', $data);

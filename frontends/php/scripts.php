@@ -54,13 +54,14 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'command','name'"),						null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
 
 $_REQUEST['go'] = getRequest('go', 'none');
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
@@ -260,7 +261,16 @@ if (isset($_REQUEST['form'])) {
 	$scriptView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
@@ -294,7 +304,7 @@ else {
 	}
 
 	// sorting & paging
-	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
+	order_result($data['scripts'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view

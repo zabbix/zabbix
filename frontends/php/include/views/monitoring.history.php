@@ -155,14 +155,14 @@ if ($this->data['plaintext']) {
 	$plaintextSpan = new CSpan(null, 'textblackwhite');
 
 	foreach ($headerPlaintext as $text) {
-		$plaintextSpan->addItem(array(new CJSscript($text), BR()));
+		$plaintextSpan->addItem(array(new CJsScript($text), BR()));
 	}
 
 	$screen = $screen->get();
 
 	$pre = new CTag('pre', true);
 	foreach ($screen as $text) {
-		$pre->addItem(new CJSscript($text));
+		$pre->addItem(new CJsScript($text));
 	}
 	$plaintextSpan->addItem($pre);
 	$historyWidget->addItem($plaintextSpan);

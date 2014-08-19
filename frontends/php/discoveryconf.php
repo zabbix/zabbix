@@ -51,10 +51,12 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'output' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'ajaxaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
+	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 $_REQUEST['dchecks'] = getRequest('dchecks', array());
@@ -82,7 +84,7 @@ $_REQUEST['go'] = getRequest('go', 'none');
 
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
-	$ajaxResponse = new AjaxResponse;
+	$ajaxResponse = new CAjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
 		$ajaxData = getRequest('ajaxdata', array());
@@ -185,7 +187,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBStart();
 
 	foreach (getRequest('g_druleid') as $druleId) {
-		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
+		$result &= DBexecute('UPDATE drules SET status='.zbx_dbstr($status).' WHERE druleid='.zbx_dbstr($druleId));
 
 		if ($result) {
 			$druleData = get_discovery_rule_by_druleid($druleId);
@@ -277,7 +279,16 @@ if (isset($_REQUEST['form'])) {
 	$discoveryView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
@@ -309,7 +320,7 @@ else {
 			}
 		}
 
-		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
+		order_result($data['drules'], $sortField, $sortOrder);
 	}
 
 	// get paging
