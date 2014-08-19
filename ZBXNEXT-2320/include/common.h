@@ -828,7 +828,7 @@ char	*get_param_dyn(const char *param, int num);
  *                       for their parameters - 1 or higher (for arrays)      *
  *      num       - [IN] parameter number; for item keys and OIDs the level   *
  *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
  *                                                                            *
  * Return value: NULL if parameter doesn't change; a new string - otherwise   *
@@ -957,11 +957,12 @@ void	zbx_on_exit(); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
-int	ip_in_list(char *list, char *ip);
+int	ip_in_list(char *list, const char *ip);
 
-int	expand_ipv6(const char *ip, char *str, size_t str_len);
+int	ip4_str2dig(const char *ip, unsigned int *ip_dig);
+int	ip6_str2dig(const char *ip, unsigned short *groups);
 #ifdef HAVE_IPV6
-char	*collapse_ipv6(char *str, size_t str_len);
+void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len);
 #endif
 
 /* time related functions */

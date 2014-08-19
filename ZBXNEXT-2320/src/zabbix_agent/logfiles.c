@@ -1305,6 +1305,11 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
 					"a logrt[] item. Error: %s", format, err_buf);
 			ret = FAIL;
+#ifdef _WINDOWS
+			/* the Windows gnuregex implementation does not correctly clean up */
+			/* allocated memory after regcomp() failure                        */
+			regfree(&re);
+#endif
 			goto clean1;
 		}
 
@@ -1453,7 +1458,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino))
 	{
-		/* an error occured or a file was not accessible for a log[] item */
+		/* an error occurred or a file was not accessible for a log[] item */
 		(*error_count)++;
 		ret = SUCCEED;
 		goto out;
@@ -1990,6 +1995,9 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 		goto out;
 	}
 
+	if (NULL != mtime)
+		*mtime = (int)buf.st_mtime;
+
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
 		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
@@ -2020,9 +2028,6 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	{
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
-
-		if (NULL != mtime)
-			*mtime = (int)buf.st_mtime;
 
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, pattern, output_template,
 				p_count, s_count, process_value, server, port, hostname, key);

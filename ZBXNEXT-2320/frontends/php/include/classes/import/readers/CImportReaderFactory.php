@@ -46,7 +46,7 @@ class CImportReaderFactory {
 	}
 
 	/**
-	 * Converts file extenion to associated import format.
+	 * Converts file extension to associated import format.
 	 *
 	 * @static
 	 * @throws Exception

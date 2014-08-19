@@ -32,7 +32,7 @@ $discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
 $discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
 $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 
-// craete table
+// create table
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));
 $discoveryTable->makeVerticalRotation();
 

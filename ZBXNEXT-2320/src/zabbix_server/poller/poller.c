@@ -48,13 +48,13 @@ extern int		process_num;
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
-	const char		*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			failed_type_buf[8];
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DC_TRIGGER		trigger;
+	const char	*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		failed_type_buf[8];
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DC_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 

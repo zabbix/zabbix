@@ -427,7 +427,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	// sorting & apging
+	// sorting & paging
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
 	$data['paging'] = getPagingLine($data['users'], array('userid'));
 

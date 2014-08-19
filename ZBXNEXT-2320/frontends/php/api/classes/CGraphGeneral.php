@@ -779,7 +779,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				}
 			}
 
-			// cheks that there is no two graphs with the same name within host
+			// checks that there are no two graphs with the same name within host
 			foreach ($hostAndTemplateIds as $id) {
 				if (!isset($graphNames[$graph['name']])) {
 					$graphNames[$graph['name']] = array();

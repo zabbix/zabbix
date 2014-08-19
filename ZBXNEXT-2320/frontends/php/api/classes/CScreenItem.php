@@ -810,7 +810,10 @@ class CScreenItem extends CZBXAPI {
 					continue;
 				}
 
-				if ($screenItem['x'] == $screenItem2['x'] && $screenItem['y'] == $screenItem2['y']) {
+				if ($screenItem['x'] == $screenItem2['x'] &&
+					$screenItem['y'] == $screenItem2['y'] &&
+					$screenItem['screenid'] == $screenItem2['screenid']
+				) {
 					$screenId = isset($screenItem['screenitemid'])
 						? $dbScreenItems[$screenItem['screenitemid']]['screenid']
 						: $screenItem['screenid'];

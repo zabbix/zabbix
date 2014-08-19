@@ -60,7 +60,7 @@ $iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
 $iconMappingsLink->setAttribute('target', '_blank');
 $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
 
-// append multiple checkboxs to form list
+// append multiple checkboxes to form list
 $sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $this->data['sysmap']['highlight'], null, 1));
 $sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $this->data['sysmap']['markelements'], null, 1));
 $sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $this->data['sysmap']['expandproblem'], null, 1));

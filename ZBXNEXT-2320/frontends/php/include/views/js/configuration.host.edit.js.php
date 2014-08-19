@@ -406,5 +406,4 @@
 		jQuery('#templates_' + templateid).remove();
 		jQuery('#template_row_' + templateid).remove();
 	}
-
 </script>

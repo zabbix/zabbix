@@ -23,11 +23,13 @@
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[16];
+	char			*tmp;
 	struct pst_dynamic	dyn;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
+
+	tmp = get_rparam(request, 0);
 
 	/* only "online" (default) for parameter "type" is supported */
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "online"))

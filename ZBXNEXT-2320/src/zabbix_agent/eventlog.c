@@ -314,7 +314,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	{
 		pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
 
-		for (i = 0; i < pELR->NumStrings; i++)
+		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
 		{
 			aInsertStrings[i] = pCh;
 			pCh += zbx_strlen(pCh) + 1;

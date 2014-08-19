@@ -2160,10 +2160,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$a[6] = $x2;
 				$a[7] = $y2max;
 
-			// don't use break, avg must be drawed in this statement
+			// don't use break, avg must be drawn in this statement
 			case CALC_FNC_AVG:
 
-			// don't use break, avg must be drawed in this statement
+			// don't use break, avg must be drawn in this statement
 			default:
 				$y1 = $y1avg;
 				$y2 = $y2avg;

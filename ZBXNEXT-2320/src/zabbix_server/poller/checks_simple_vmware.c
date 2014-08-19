@@ -166,7 +166,7 @@ static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, con
 
 	for (i = 0; i < clusters->values_num; i++)
 	{
-		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
 
 		if (0 == strcmp(cluster->name, name))
 			goto out;
@@ -352,7 +352,7 @@ out:
  *             ret       - [OUT] the operation result code                    *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
- *               found, did not have data or any error occured. In the last   *
+ *               found, did not have data or any error occurred. In the last  *
  *               case the error message will be stored in agent result.       *
  *                                                                            *
  * Comments: There are three possible cases:                                  *
@@ -1965,6 +1965,9 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#IFNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
+		if (NULL != dev->label)
+			zbx_json_addstring(&json_data, "{#IFDESC}", dev->label, ZBX_JSON_TYPE_STRING);
+
 		zbx_json_close(&json_data);
 	}
 
@@ -2229,6 +2232,8 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DISKNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
+		if (NULL != dev->label)
+			zbx_json_addstring(&json_data, "{#DISKDESC}", dev->label, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 

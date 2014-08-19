@@ -103,18 +103,6 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
-// retrieve trigger's priority for services
-function get_service_status_of_trigger($triggerid) {
-	$sql = 'SELECT t.triggerid,t.priority'.
-			' FROM triggers t'.
-			' WHERE t.triggerid='.zbx_dbstr($triggerid).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.value='.TRIGGER_VALUE_TRUE;
-	$rows = DBfetch(DBselect($sql, 1));
-
-	return !empty($rows['priority']) ? $rows['priority'] : 0;
-}
-
 /**
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
@@ -459,7 +447,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		$dependencies = array();
 		foreach ($dbSrcTriggers as $srcTrigger) {
 			if ($srcTrigger['dependencies']) {
-				// get coresponding created trigger id
+				// get corresponding created trigger id
 				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
 
 
@@ -675,11 +663,12 @@ function construct_expression($itemid, $expressions) {
 }
 
 /********************************************************************************
- *																				*
- * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10	*
- *																				*
- * Comments: !!! Don't forget sync code with C !!!								*
- *																				*
+ *                                                                              *
+ * Purpose: Translate {10}>10 to something like                                 *
+ * localhost:system.cpu.load.last(0)>10                                         *
+ *                                                                              *
+ * Comments: !!! Don't forget sync code with C !!!                              *
+ *                                                                              *
  *******************************************************************************/
 function explode_exp($expressionCompressed, $html = false, $resolveMacro = false, $sourceHost = null, $destinationHost = null) {
 	$expressionExpanded = $html ? array() : '';
@@ -993,9 +982,9 @@ function triggerExpression($trigger, $html = false) {
 /**
  * Implodes expression, replaces names and keys with IDs.
  *
- * Fro example: localhost:procload.last(0)>10 will translated to {12}>10 and created database representation.
+ * For example: localhost:system.cpu.load.last(0)>10 will be translated to {12}>10 and created database representation.
  *
- * @throws Exception if error occureed
+ * @throws Exception if error occurred
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid

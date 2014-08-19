@@ -234,7 +234,9 @@ abstract class CGraphDraw {
 			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
 		}
 
-		$str .= $this->period2str($this->period);
+		if ($this->period) {
+			$str .= $this->period2str($this->period);
+		}
 
 		// calculate largest font size that can fit graph header
 		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc

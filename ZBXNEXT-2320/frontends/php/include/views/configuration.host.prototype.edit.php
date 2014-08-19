@@ -182,7 +182,13 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	),
 	'data' => $groups,
-	'disabled' => (bool) $hostPrototype['templateid']
+	'disabled' => (bool) $hostPrototype['templateid'],
+	'popup' => array(
+		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
+			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1',
+		'width' => 450,
+		'height' => 450
+	)
 )));
 
 // new group prototypes
@@ -242,7 +248,13 @@ if (!$hostPrototype['templateid']) {
 	$newTemplateTable->addRow(array(new CMultiSelect(array(
 		'name' => 'add_templates[]',
 		'objectName' => 'templates',
-		'ignored' => $ignoreTemplates
+		'ignored' => $ignoreTemplates,
+		'popup' => array(
+			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
+			'width' => 450,
+			'height' => 450
+		)
 	))));
 
 	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));

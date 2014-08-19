@@ -35,7 +35,7 @@ typedef struct
 	zbx_uint64_t	sourceid;
 	/* the new status */
 	int		status;
-	/* timestmap */
+	/* timestamp */
 	int		clock;
 }
 zbx_status_update_t;

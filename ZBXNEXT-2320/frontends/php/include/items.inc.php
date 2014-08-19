@@ -660,7 +660,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'));
+	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'), 1, ZBX_HISTORY_PERIOD);
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
@@ -782,25 +782,33 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	return $tableRow;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function get_same_applications_for_host($applications, $hostid) {
-	$child_applications = array();
-	$db_apps = DBselect(
-		'SELECT a1.applicationid'.
+/**
+ * Get same application IDs on destination host and return array with keys as source application IDs
+ * and values as destination application IDs.
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ * @param array  $applicationIds
+ * @param string $hostId
+ *
+ * @return array
+ */
+function get_same_applications_for_host(array $applicationIds, $hostId) {
+	$applications = array();
+
+	$dbApplications = DBselect(
+		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.zbx_dbstr($hostid).
-			' AND '.dbConditionInt('a2.applicationid', $applications)
+			' AND a1.hostid='.zbx_dbstr($hostId).
+			' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 	);
-	while ($app = DBfetch($db_apps)) {
-		$child_applications[] = $app['applicationid'];
+
+	while ($dbApplication = DBfetch($dbApplications)) {
+		$applications[$dbApplication['srcappid']] = $dbApplication['dstappid'];
 	}
 
-	return $child_applications;
+	return $applications;
 }
 
 /******************************************************************************
@@ -917,7 +925,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
  *
  * @param array		$item
  * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
@@ -1207,7 +1215,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay, can be overriden
+ * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *

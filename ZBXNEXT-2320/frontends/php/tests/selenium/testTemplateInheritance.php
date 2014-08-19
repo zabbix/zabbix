@@ -75,7 +75,7 @@ class testTemplateInheritance extends CWebTest {
 				'test-general-item',
 				array()
 					),
-			// Dublicated item on Template inheritance test host
+			// Duplicated item on Template inheritance test host
 			array(
 				TEST_BAD,
 				'Template App Zabbix Agent',

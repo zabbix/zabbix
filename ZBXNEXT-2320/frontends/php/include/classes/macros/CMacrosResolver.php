@@ -527,7 +527,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $data							list or hashmap of graphs
 	 * @param type   $data[]['name']				string in which macros should be resolved
 	 * @param array  $data[]['items']				list of graph items
-	 * @param int    $data[]['items'][n]['hostid']	graph n-th item corresponding host Id
+	 * @param int    $data[]['items'][n]['hostid']	graph n-th item corresponding host ID
 	 * @param string $data[]['items'][n]['host']	graph n-th item corresponding host name
 	 *
 	 * @return string	inputted data with resolved source field

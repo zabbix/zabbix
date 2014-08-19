@@ -53,7 +53,6 @@ typedef struct
 {
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	index;
-	zbx_uint64_t	index_orig;
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	itemid_orig;
 	char		*function;
@@ -231,7 +230,6 @@ static void	lld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *f
 			function = zbx_malloc(NULL, sizeof(zbx_lld_function_t));
 
 			function->index = 0;
-			function->index_orig = 0;
 			ZBX_STR2UINT64(function->functionid, row[0]);
 			ZBX_STR2UINT64(triggerid, row[1]);
 			ZBX_STR2UINT64(function->itemid, row[2]);
@@ -497,13 +495,87 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 	return buffer;
 }
 
+static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions, zbx_uint64_t itemid)
+{
+	int			i;
+	zbx_lld_function_t	*function;
+
+	for (i = 0; i < functions->values_num; i++)
+	{
+		function = (zbx_lld_function_t *)functions->values[i];
+
+		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_DISCOVERED))
+			continue;
+
+		if (function->index == function_proto->index)
+			break;
+	}
+
+	if (i == functions->values_num)
+	{
+		function = zbx_malloc(NULL, sizeof(zbx_lld_function_t));
+
+		function->index = function_proto->index;
+		function->functionid = 0;
+		function->itemid = itemid;
+		function->itemid_orig = 0;
+		function->function = zbx_strdup(NULL, function_proto->function);
+		function->function_orig = NULL;
+		function->parameter = zbx_strdup(NULL, function_proto->parameter);
+		function->parameter_orig = NULL;
+		function->flags = ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
+
+		zbx_vector_ptr_append(functions, function);
+	}
+	else
+	{
+		if (function->itemid != itemid)
+		{
+			function->itemid_orig = function->itemid;
+			function->itemid = itemid;
+			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID;
+		}
+
+		if (0 != strcmp(function->function, function_proto->function))
+		{
+			function->function_orig = function->function;
+			function->function = zbx_strdup(NULL, function_proto->function);
+			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION;
+		}
+
+		if (0 != strcmp(function->parameter, function_proto->parameter))
+		{
+			function->parameter_orig = function->parameter;
+			function->parameter = zbx_strdup(NULL, function_proto->parameter);
+			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER;
+		}
+
+		function->flags |= ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
+	}
+}
+
+static void	lld_functions_delete(zbx_vector_ptr_t *functions)
+{
+	int	i;
+
+	for (i = 0; i < functions->values_num; i++)
+	{
+		zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[i];
+
+		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_DISCOVERED))
+			continue;
+
+		function->flags |= ZBX_FLAG_LLD_FUNCTION_DELETE;
+	}
+}
+
 static int	lld_functions_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *functions,
 		zbx_vector_ptr_t *items, zbx_vector_ptr_t *item_links)
 {
 	const char		*__function_name = "lld_functions_make";
 
 	int			i, index, ret = FAIL;
-	zbx_lld_function_t	*function_proto, *function;
+	zbx_lld_function_t	*function_proto;
 	zbx_lld_item_t		*item_proto;
 	zbx_lld_item_link_t	*item_link;
 	zbx_uint64_t		itemid;
@@ -536,61 +608,10 @@ static int	lld_functions_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 		else
 			itemid = item_proto->itemid;
 
-		if (i == functions->values_num)
-		{
-			function = zbx_malloc(NULL, sizeof(zbx_lld_function_t));
-
-			function->index = function_proto->index;
-			function->index_orig = 0;
-			function->functionid = 0;
-			function->itemid = itemid;
-			function->itemid_orig = 0;
-			function->function = zbx_strdup(NULL, function_proto->function);
-			function->function_orig = NULL;
-			function->parameter = zbx_strdup(NULL, function_proto->parameter);
-			function->parameter_orig = NULL;
-			function->flags = ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
-
-			zbx_vector_ptr_append(functions, function);
-		}
-		else
-		{
-			function = (zbx_lld_function_t *)functions->values[i];
-
-			function->index_orig = function->index;
-			function->index = function_proto->index;
-
-			if (function->itemid != itemid)
-			{
-				function->itemid_orig = function->itemid;
-				function->itemid = itemid;
-				function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID;
-			}
-
-			if (0 != strcmp(function->function, function_proto->function))
-			{
-				function->function_orig = function->function;
-				function->function = zbx_strdup(NULL, function_proto->function);
-				function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION;
-			}
-
-			if (0 != strcmp(function->parameter, function_proto->parameter))
-			{
-				function->parameter_orig = function->parameter;
-				function->parameter = zbx_strdup(NULL, function_proto->parameter);
-				function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER;
-			}
-
-			function->flags |= ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
-		}
+		lld_function_make(function_proto, functions, itemid);
 	}
 
-	for (; i < functions->values_num; i++)
-	{
-		function = (zbx_lld_function_t *)functions->values[i];
-
-		function->flags |= ZBX_FLAG_LLD_FUNCTION_DELETE;
-	}
+	lld_functions_delete(functions);
 
 	ret = SUCCEED;
 out:
@@ -727,7 +748,7 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 	if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 		return;
 
-	/* only new triggers or triggers with a new data will be validated */
+	/* only new triggers or triggers with changed data will be validated */
 	if (0 != trigger->triggerid && 0 == (trigger->flags & flag))
 		return;
 
@@ -878,8 +899,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 	if (0 != descriptions.values_num)
 	{
-		char			*sql = NULL, *condition = NULL, *description_esc;
-		size_t			sql_alloc = 256, sql_offset = 0, condition_alloc = 256, condition_offset = 0;
+		char			*sql = NULL;
+		size_t			sql_alloc = 256, sql_offset = 0;
 		DB_RESULT		result;
 		DB_ROW			row;
 		zbx_vector_ptr_t	db_triggers;
@@ -890,21 +911,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_str_sort(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 		zbx_vector_str_uniq(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-		condition = zbx_malloc(condition, condition_alloc);	/* list of trigger descriptions */
-
-		for (i = 0; i < descriptions.values_num; i++)
-		{
-			description_esc = DBdyn_escape_string(descriptions.values[i]);
-
-			if (0 != condition_offset)
-				zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, ',');
-			zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, '\'');
-			zbx_strcpy_alloc(&condition, &condition_alloc, &condition_offset, description_esc);
-			zbx_chrcpy_alloc(&condition, &condition_alloc, &condition_offset, '\'');
-
-			zbx_free(description_esc);
-		}
-
 		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -913,8 +919,11 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				" where t.triggerid=f.triggerid"
 					" and f.itemid=i.itemid"
 					" and i.hostid=" ZBX_FS_UI64
-					" and t.description in (%s)",
-				hostid, condition);
+					" and",
+				hostid);
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.description",
+				(const char **)descriptions.values, descriptions.values_num);
+
 		if (0 != triggerids.values_num)
 		{
 			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -981,8 +990,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 						if (0 != function->functionid)
 						{
-							function->index = function->index_orig;
-
 							lld_field_uint64_rollback(&function->itemid,
 									&function->itemid_orig,
 									&function->flags,
@@ -1015,7 +1022,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_ptr_destroy(&db_triggers);
 
 		zbx_free(sql);
-		zbx_free(condition);
 	}
 
 	zbx_vector_str_destroy(&descriptions);

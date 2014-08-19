@@ -108,7 +108,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 			access_deny();
 		}
 
-		// sets coresponding hostid for later usage
+		// sets corresponding hostid for later usage
 		if (empty($_REQUEST['hostid'])) {
 			$_REQUEST['hostid'] = $discovery_rule['hostid'];
 		}
