@@ -35,10 +35,10 @@ $scriptsForm->setAttribute('id', 'scripts');
 $scriptsTable = new CTableInfo(_('No scripts found.'));
 $scriptsTable->setHeader(array(
 	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scripts');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Type'),
 	_('Execute on'),
-	make_sorting_header(_('Commands'), 'command'),
+	make_sorting_header(_('Commands'), 'command', $this->data['sort'], $this->data['sortorder']),
 	_('User group'),
 	_('Host group'),
 	_('Host access')

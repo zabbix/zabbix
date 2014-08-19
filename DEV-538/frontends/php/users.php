@@ -82,7 +82,6 @@ $fields = array(
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('alias', ZBX_SORT_UP);
 
 /*
  * Permissions
@@ -382,8 +381,16 @@ if (!empty($_REQUEST['form'])) {
 	$usersView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'alias'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
-		'config' => $config
+		'config' => $config,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// get user groups
@@ -402,7 +409,7 @@ else {
 	));
 
 	// sorting & paging
-	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
+	order_result($data['users'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['users']);
 
 	// set default lastaccess time to 0

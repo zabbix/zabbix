@@ -48,7 +48,6 @@ $fields = array(
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 /*
  * Permissions
@@ -269,28 +268,33 @@ if (isset($_REQUEST['form'])) {
 	$applicationView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'pageFilter' => new CPageFilter(array(
 			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
 			'hostid' => getRequest('hostid'),
 			'groupid' => getRequest('groupid')
-		))
+		)),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	if ($data['pageFilter']->hostsSelected) {
 		// get application ids
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-
 		$data['applications'] = API::Application()->get(array(
 			'hostids' => ($data['pageFilter']->hostid > 0) ? $data['pageFilter']->hostid : null,
 			'groupids' => ($data['pageFilter']->groupid > 0) ? $data['pageFilter']->groupid : null,
 			'output' => array('applicationid'),
 			'editable' => true,
-			'sortfield' => $sortfield,
+			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		));
 
@@ -302,7 +306,7 @@ else {
 			'expandData' => true
 		));
 
-		order_result($data['applications'], $sortfield, $sortorder);
+		order_result($data['applications'], $sortField, $sortOrder);
 
 		// fetch template application source parents
 		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));

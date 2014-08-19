@@ -57,7 +57,6 @@ $fields = array(
 	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 $_REQUEST['dchecks'] = getRequest('dchecks', array());
@@ -280,7 +279,16 @@ if (isset($_REQUEST['form'])) {
 	$discoveryView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
@@ -312,7 +320,7 @@ else {
 			}
 		}
 
-		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
+		order_result($data['drules'], $sortField, $sortOrder);
 	}
 
 	// get paging

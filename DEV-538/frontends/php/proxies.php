@@ -49,7 +49,6 @@ $fields = array(
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
 /*
  * Permissions
@@ -258,17 +257,23 @@ if (isset($_REQUEST['form'])) {
 	$proxyView->show();
 }
 else {
-	$data = array(
-		'config' => select_config()
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'host'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortfield = getPageSortField('host');
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'config' => select_config(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$data['proxies'] = API::Proxy()->get(array(
 		'editable' => true,
 		'selectHosts' => array('hostid', 'host', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 	$data['proxies'] = zbx_toHash($data['proxies'], 'proxyid');
@@ -276,7 +281,7 @@ else {
 	$proxyIds = array_keys($data['proxies']);
 
 	// sorting & paging
-	order_result($data['proxies'], $sortfield, getPageSortOrder());
+	order_result($data['proxies'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['proxies']);
 
 	// calculate performance
