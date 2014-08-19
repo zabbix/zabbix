@@ -41,10 +41,10 @@ $maintenanceForm->setName('maintenanceForm');
 $maintenanceTable = new CTableInfo(_('No maintenance periods found.'));
 $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
-	make_sorting_header(_('Name'), 'name'),
-	make_sorting_header(_('Type'), 'maintenance_type'),
-	make_sorting_header(_('Active since'), 'active_since'),
-	make_sorting_header(_('Active till'), 'active_till'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
 	_('State'),
 	_('Description')
 ));
