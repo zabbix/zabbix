@@ -90,6 +90,7 @@ class CGraph extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectGraphDiscovery'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -621,6 +622,21 @@ class CGraph extends CGraphGeneral {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding graph discovery
+		if ($options['selectGraphDiscovery'] !== null) {
+			$graphDiscoveries = API::getApiService()->select('graph_discovery', array(
+				'output' => $this->outputExtend($options['selectGraphDiscovery'], array('graphid')),
+				'filter' => array('graphid' => array_keys($result)),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($graphDiscoveries, 'graphid', 'graphid');
+
+			$graphDiscoveries = $this->unsetExtraFields($graphDiscoveries, array('graphid'),
+				$options['selectGraphDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $graphDiscoveries, 'graphDiscovery');
 		}
 
 		return $result;
