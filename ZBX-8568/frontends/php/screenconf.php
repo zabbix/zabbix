@@ -60,10 +60,12 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// import
 	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
-	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null)
+	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
 $_REQUEST['go'] = getRequest('go', 'none');
@@ -284,16 +286,23 @@ if (isset($_REQUEST['form'])) {
 	$screenView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
-		'templateid' => getRequest('templateid')
+		'templateid' => getRequest('templateid'),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
-	$sortfield = getPageSortField('name');
 	$options = array(
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'templateids' => $data['templateid'],
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit']
 	);
 	if (!empty($data['templateid'])) {
@@ -302,7 +311,7 @@ else {
 	else {
 		$data['screens'] = API::Screen()->get($options);
 	}
-	order_result($data['screens'], $sortfield, getPageSortOrder());
+	order_result($data['screens'], $sortField, $sortOrder);
 
 	// paging
 	$data['paging'] = getPagingLine($data['screens']);

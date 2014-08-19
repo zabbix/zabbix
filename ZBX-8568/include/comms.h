@@ -52,13 +52,6 @@ typedef int	ZBX_SOCKET;
 
 typedef enum
 {
-	ZBX_TCP_ERR_NETWORK = 1,
-	ZBX_TCP_ERR_TIMEOUT
-}
-zbx_tcp_errors;
-
-typedef enum
-{
 	ZBX_BUF_TYPE_STAT = 0,
 	ZBX_BUF_TYPE_DYN
 }

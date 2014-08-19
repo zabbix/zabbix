@@ -700,6 +700,7 @@ class CConfigurationExportBuilder {
 				'dynamic' => $screenItem['dynamic'],
 				'sort_triggers' => $screenItem['sort_triggers'],
 				'resource' => $screenItem['resourceid'],
+				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
 			);
 		}

@@ -786,7 +786,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$sqlWhere = array();
 		foreach ($itemKeysByHostId as $hostId => $keys) {
-			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.dbConditionString('i.key_', $keys).')';
+			$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
 		}
 
 		if ($sqlWhere) {

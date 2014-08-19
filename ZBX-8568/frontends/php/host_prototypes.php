@@ -56,9 +56,11 @@ $fields = array(
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
 
 $_REQUEST['go'] = getRequest('go', 'none');
 
@@ -350,25 +352,32 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'discovery_rule' => $discoveryRule
+		'discovery_rule' => $discoveryRule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// get items
-	$sortfield = getPageSortField('name');
 	$data['hostPrototypes'] = API::HostPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => array('templateid', 'name'),
 		'editable' => true,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	if ($data['hostPrototypes']) {
-		order_result($data['hostPrototypes'], $sortfield, getPageSortOrder());
+		order_result($data['hostPrototypes'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['hostPrototypes']);

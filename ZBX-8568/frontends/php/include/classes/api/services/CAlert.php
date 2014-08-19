@@ -118,7 +118,7 @@ class CAlert extends CApiService {
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY f.triggerid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 			}
 			// items and LLD rules
@@ -137,7 +137,7 @@ class CAlert extends CApiService {
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 			}
 		}

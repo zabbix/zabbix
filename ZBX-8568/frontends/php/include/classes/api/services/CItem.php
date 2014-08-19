@@ -134,7 +134,7 @@ class CItem extends CItemGeneral {
 					' WHERE i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 

@@ -1131,7 +1131,8 @@ class CHostPrototype extends CHostBase {
 
 		$sqlWhere = array();
 		foreach ($valuesByDiscoveryRuleId as $discoveryRuleId => $values) {
-			$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.'.$field, $values).')';
+			$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).
+				' AND '.dbConditionString('h.'.$field, $values).')';
 		}
 
 		if ($sqlWhere) {
@@ -1177,7 +1178,7 @@ class CHostPrototype extends CHostBase {
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>'.PERM_DENY.
-				' AND MAX(r.permission)>='.$permission.
+				' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 

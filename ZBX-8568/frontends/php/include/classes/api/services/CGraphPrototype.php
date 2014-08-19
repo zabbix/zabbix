@@ -116,7 +116,7 @@ class CGraphPrototype extends CGraphGeneral {
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 				')';
@@ -582,6 +582,11 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
+		DB::delete('screens_items', array(
+			'resourceid' => $graphids,
+			'resourcetype' => SCREEN_RESOURCE_LLD_GRAPH
+		));
+
 		DB::delete('graphs', array('graphid' => $graphids));
 
 		foreach ($delGraphs as $graph) {
@@ -718,7 +723,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('name', 'value_type', 'flags'),
+			'output' => array('itemid', 'name', 'value_type', 'flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
 			'filter' => array(
@@ -740,9 +745,15 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+				foreach ($dbGraphs as $dbGraph) {
+					$itemIdsInGraphItems = zbx_objectValues($dbGraph['gitems'], 'itemid');
+					if (in_array($item['itemid'], $itemIdsInGraphItems)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+							$item['name'], $dbGraph['name']
+						));
+					}
+				}
 			}
 		}
 	}

@@ -48,10 +48,10 @@ $actionForm->setName('actionForm');
 $actionTable = new CTableInfo(_('No actions found.'));
 $actionTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Conditions'),
 	_('Operations'),
-	make_sorting_header(_('Status'), 'status')
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['actions'] as $action) {

@@ -37,9 +37,9 @@ $slideForm->setName('slideForm');
 $slidesTable = new CTableInfo(_('No slide shows found.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-	make_sorting_header(_('Name'), 'name'),
-	make_sorting_header(_('Delay'), 'delay'),
-	make_sorting_header(_('Count of slides'), 'cnt')
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Count of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['slides'] as $slide) {
