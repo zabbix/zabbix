@@ -58,15 +58,17 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo(_('No web scenarios found.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	($this->data['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
-	make_sorting_header(_('Name'), 'name'),
+	($this->data['hostid'] == 0)
+		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
+		: null,
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Number of steps'),
 	_('Update interval'),
 	_('Retries'),
 	_('Authentication'),
 	_('HTTP proxy'),
 	_('Application'),
-	make_sorting_header(_('Status'), 'status'),
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$this->data['showInfoColumn'] ? _('Info') : null
 ));
 

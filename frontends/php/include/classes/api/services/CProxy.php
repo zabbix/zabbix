@@ -550,7 +550,7 @@ class CProxy extends CApiService {
 			1
 		));
 		if ($dRule) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
+			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($dRule['proxy_hostid'])));
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Proxy "%1$s" is used by discovery rule "%2$s".', $proxy['host'], $dRule['name']));
@@ -570,7 +570,7 @@ class CProxy extends CApiService {
 			1
 		));
 		if ($host) {
-			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
+			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($host['proxy_hostid'])));
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));

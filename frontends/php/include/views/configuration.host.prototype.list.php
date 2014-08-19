@@ -45,9 +45,9 @@ $hostTable = new CTableInfo(_('No host prototypes found.'));
 
 $hostTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
-	make_sorting_header(_('Name'),'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),
-	make_sorting_header(_('Status'),'status')
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {

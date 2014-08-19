@@ -40,9 +40,9 @@ $sysmapWidget->addHeaderRowNumber();
 $sysmapTable = new CTableInfo(_('No maps found.'));
 $sysmapTable->setHeader(array(
 	new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
-	make_sorting_header(_('Name'), 'name'),
-	make_sorting_header(_('Width'), 'width'),
-	make_sorting_header(_('Height'), 'height'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
 	_('Edit')
 ));
 
