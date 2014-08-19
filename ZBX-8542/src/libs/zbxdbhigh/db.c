@@ -488,7 +488,8 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger)
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger,
+		zbx_hashset_t *trigger_cache)
 {
 	const char	*__function_name = "process_trigger";
 
@@ -557,7 +558,7 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 	if (0 != value_changed || 0 != state_changed || 0 != multiple_problem || 0 != error_changed)
 	{
-		if (SUCCEED == DCconfig_check_trigger_dependencies(trigger->triggerid))
+		if (SUCCEED == zbx_triggercache_check_dependencies(trigger_cache, trigger->triggerid))
 		{
 			if (NULL == *sql)
 			{
@@ -569,8 +570,8 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
-						&new_lastchange);
+				zbx_triggercache_update_trigger(trigger_cache, trigger->triggerid, new_value, new_state,
+						new_error_local, &new_lastchange);
 
 				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
@@ -580,8 +581,8 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 			}
 			else
 			{
-				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
-						NULL);
+				zbx_triggercache_update_trigger(trigger_cache, trigger->triggerid, new_value, new_state,
+						new_error_local, NULL);
 			}
 
 			if (0 != value_changed)
@@ -643,6 +644,7 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 	char			*sql = NULL;
 	size_t			sql_alloc, sql_offset;
 	zbx_vector_ptr_pair_t	trigger_sqls;
+	zbx_hashset_t		trigger_cache;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
@@ -651,6 +653,9 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 
 	zbx_vector_ptr_pair_create(&trigger_sqls);
 	zbx_vector_ptr_pair_reserve(&trigger_sqls, triggers->values_num);
+
+	zbx_triggercache_init(&trigger_cache);
+	zbx_triggercache_load(&trigger_cache, triggers);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -672,11 +677,14 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 		sql_alloc = 0;
 		sql_offset = 0;
 
-		count += (SUCCEED == process_trigger((char **)&trigger_sql->second, &sql_alloc, &sql_offset, trigger));
+		count += (SUCCEED == process_trigger((char **)&trigger_sql->second, &sql_alloc, &sql_offset, trigger,
+				&trigger_cache));
 	}
 
 	if (0 == count)
 		goto clean;
+
+	zbx_triggercache_flush(&trigger_cache);
 
 	zbx_vector_ptr_pair_sort(&trigger_sqls, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -706,6 +714,8 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 
 	zbx_free(sql);
 clean:
+	zbx_triggercache_destroy(&trigger_cache);
+
 	zbx_vector_ptr_pair_destroy(&trigger_sqls);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
