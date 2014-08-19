@@ -118,7 +118,15 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .filter tr td.inputcol { min-width: 277px; width: 35%; }
 .latest-mon .filter tr td.inputcol .checkbox { margin-top: 4px; }
 .latest-mon .filter tr td .text { width: 216px; }
+/* 2px width input field fix for Safari 5+ and Chrome */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	.latest-mon .filter tr td .text { width: 218px; }
+}
 .latest-mon .filter .multiselect { width: 217px; line-height: 12px; }
+
+/*history */
+.history .filter tr td { text-align: left; width: 50%; }
+.history .filter tr td.label { text-align: right; }
 
 /* trigger list */
 .trigger-list .dependencies { padding-left: 8px; }
