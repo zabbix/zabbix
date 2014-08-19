@@ -113,6 +113,12 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .tableinfo td span,
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
+.latest-mon .filter tr td { text-align: left; }
+.latest-mon .filter tr td.label { width: 15%; text-align: right; }
+.latest-mon .filter tr td.mscol { min-width: 277px; width: 35%; }
+.latest-mon .filter tr td.mscol.chbxcol { padding-top: 4px; }
+.latest-mon .filter tr td.mscol .text { width: 216px; }
+.latest-mon .filter .multiselect { width: 217px; line-height: 12px; }
 
 /* trigger list */
 .trigger-list .dependencies { padding-left: 8px; }
