@@ -8,6 +8,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8509] fixed value of field "Use custom multiplier" to correctly default to "1" if checkbox is unchecked (Krists)
 A......... [ZBX-8530] fixed host update to work when doing template unlink and interface remove in same request (Krists)
 .......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
 A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Krists)
