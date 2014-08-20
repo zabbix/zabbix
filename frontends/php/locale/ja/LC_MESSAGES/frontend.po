@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 13:25+0300\n"
-"PO-Revision-Date: 2014-08-08 05:46+0300\n"
+"POT-Creation-Date: 2014-08-20 13:50+0300\n"
+"PO-Revision-Date: 2014-08-19 05:05+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1407469580.0\n"
+"X-POOTLE-MTIME: 1408417520.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2005,7 +2005,7 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロ�
 #: include/classes/import/CConfigurationImport.php:1172
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "グラフ\"%3$s\"内で利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
@@ -2015,7 +2015,7 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%3$s\"内で利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
@@ -3275,7 +3275,7 @@ msgstr "メディアタイプの作成"
 
 #: include/views/conf.import.php:24
 msgid "Create new"
-msgstr ""
+msgstr "新規作成"
 
 #: include/views/administration.proxy.list.php:27
 msgid "Create proxy"
@@ -3792,7 +3792,7 @@ msgstr "削除"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "XMLファイル内に存在しないすべての要素を削除しますか？"
 
 #: include/views/configuration.template.edit.php:482
 msgid "Delete and clear"
@@ -3866,7 +3866,7 @@ msgstr "メンテナンス期間を削除しますか？"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "存在しない場合に削除"
 
 #: include/views/configuration.sysmap.edit.php:191
 msgid "Delete network map?"
@@ -5171,7 +5171,7 @@ msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "WMIクエリを実行して最初に選択したオブジェクトを返却。"
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
@@ -9715,7 +9715,7 @@ msgstr "Webシナリオに\"%1$s\"が定義されていません。"
 #: include/classes/api/services/CAction.php:2074
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルター条件の\"%2$s\"が定義されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:895
 #, c-format
@@ -9730,7 +9730,7 @@ msgstr "ホストのプロトタイプ\"%1$s\"に\"%2$s\"が定義されてい�
 #: include/classes/api/services/CAction.php:2024
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"のフィルターの\"%2$s\"が定義されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:863
 #, c-format
