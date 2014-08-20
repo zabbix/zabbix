@@ -161,12 +161,6 @@ elseif (hasRequest('save')) {
 			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 		);
 
-		// unset "operationid" in case cloned action is being saved for 1st time
-		foreach($action['operations'] as &$operation) {
-			unset($operation['operationid']);
-		}
-		unset($operation);
-
 		$result = API::Action()->create($action);
 
 		$messageSuccess = _('Action added');
