@@ -38,7 +38,9 @@ $fields = array(
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
 	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN("'hostgroup.massdelete','hostgroup.massdisable','hostgroup.massenable'"),
+							null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -174,8 +176,8 @@ if (hasRequest('form')) {
 /*
  * List actions
  */
-elseif (hasRequest('go')) {
-	if (getRequest('go') == 'delete') {
+elseif (hasRequest('action')) {
+	if (getRequest('action') == 'hostgroup.massdelete') {
 		$groupIds = getRequest('groups', array());
 
 		if ($groupIds) {
@@ -192,8 +194,8 @@ elseif (hasRequest('go')) {
 			);
 		}
 	}
-	elseif (getRequest('go') == 'activate' || getRequest('go') == 'disable') {
-		$enable = (getRequest('go') == 'activate');
+	elseif (getRequest('action') == 'hostgroup.massenable' || getRequest('action') == 'hostgroup.massdisable') {
+		$enable = (getRequest('action') == 'hostgroup.massenable');
 		$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 

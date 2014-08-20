@@ -81,7 +81,7 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid[]='.$userId, 'on')
+		? new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId, 'on')
 		: new CSpan(_('Ok'), 'green');
 
 	// user groups
@@ -146,11 +146,11 @@ foreach ($this->data['users'] as $user) {
 }
 
 // append Go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('unblock', _('Unblock selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('user.massunblock', _('Unblock selected'));
 $goOption->setAttribute('confirm', _('Unblock selected users?'));
 $goComboBox->addItem($goOption);
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('user.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected users?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');

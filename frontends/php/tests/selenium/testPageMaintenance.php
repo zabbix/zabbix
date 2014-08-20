@@ -42,7 +42,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestTextPresent($maintenance['name']);
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->zbxTestTextPresent('With data collection');
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->zbxTestTextPresent('No data collection');
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
 	}
 
 	/**
@@ -94,7 +94,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

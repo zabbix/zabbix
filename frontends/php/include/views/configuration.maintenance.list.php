@@ -76,8 +76,8 @@ foreach ($this->data['maintenances'] as $maintenance) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('maintenance.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected maintenance periods?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');

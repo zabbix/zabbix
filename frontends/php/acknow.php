@@ -32,8 +32,8 @@ ob_start();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$_REQUEST['go'] = getRequest('go');
-$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
+$action = getRequest('action');
+$bulk = ($getRequest['action'] == 'trigger.bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -45,7 +45,7 @@ $fields = array(
 	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'trigger.bulkacknowledge'"),	null),
 	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)

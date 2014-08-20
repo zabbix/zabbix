@@ -102,7 +102,7 @@ foreach ($this->data['items'] as $item) {
 	// status
 	$status = new CCol(new CLink(
 		itemIndicator($item['status'], $item['state']),
-		'?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.($item['status'] ? 'activate' : 'disable'),
+		'?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&action='.($item['status'] ? 'item.massenable' : 'item.massdisable'),
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
@@ -256,26 +256,26 @@ foreach ($this->data['items'] as $item) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('item.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected items?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('item.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected items?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('massupdate', _('Mass update'));
+$goOption = new CComboItem('item.massupdate', _('Mass update'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('copy_to', _('Copy selected to ...'));
+$goOption = new CComboItem('item.masscopyto', _('Copy selected to ...'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('clean_history', _('Clear history for selected'));
+$goOption = new CComboItem('item.massclearhistory', _('Clear history for selected'));
 $goOption->setAttribute('confirm', _('Delete history of selected items?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('item.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected items?'));
 $goComboBox->addItem($goOption);
 

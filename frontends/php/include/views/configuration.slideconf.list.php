@@ -52,8 +52,8 @@ foreach ($this->data['slides'] as $slide) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('slideshow.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected slide shows?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');

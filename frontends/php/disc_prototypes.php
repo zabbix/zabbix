@@ -120,7 +120,10 @@ $fields = array(
 	),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN("'itemprototype.massdelete','itemprototype.massdisable','itemprototype.massenable'"),
+									null
+								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -136,7 +139,6 @@ $fields = array(
 );
 check_fields($fields);
 
-$_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
@@ -302,9 +304,9 @@ elseif (hasRequest('save')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('itemprototype.massenable', 'itemprototype.massdisable')) && hasRequest('group_itemid')) {
 	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'itemprototype.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
@@ -324,7 +326,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
 	$result = API::Itemprototype()->delete(getRequest('group_itemid'));

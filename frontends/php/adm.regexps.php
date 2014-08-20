@@ -40,7 +40,8 @@ $fields = array(
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,	null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	// actions
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'regexp.massdelete'"),	null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,	null),
 	// ajax
@@ -49,7 +50,6 @@ $fields = array(
 	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null)
 );
 check_fields($fields);
-
 /*
  * Ajax
  */
@@ -102,15 +102,15 @@ if (isset($_REQUEST['regexpid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go']) && !isset($_REQUEST['regexpid'])) {
-	if (!isset($_REQUEST['regexpids']) || !is_array($_REQUEST['regexpids'])) {
+if (hasRequest('action') && !hasRequest('regexpid')) {
+	if (!hasRequest('regexpids') || !is_array(getRequest('regexpids'))) {
 		access_deny();
 	}
 	else {
 		$regExpChk = DBfetch(DBSelect(
-			'SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', $_REQUEST['regexpids'])
+			'SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', getRequest('regexpids'))
 		));
-		if ($regExpChk['cnt'] != count($_REQUEST['regexpids'])) {
+		if ($regExpChk['cnt'] != count(getRequest('regexpids'))) {
 			access_deny();
 		}
 	}
@@ -160,47 +160,45 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (isset($_REQUEST['go'])) {
-	if ($_REQUEST['go'] == 'delete') {
-		$regExpIds = getRequest('regexpid', array());
+elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
+	$regExpIds = getRequest('regexpid', array());
 
-		if (isset($_REQUEST['regexpids'])) {
-			$regExpIds = $_REQUEST['regexpids'];
-		}
-
-		zbx_value2array($regExpIds);
-
-		$regExps = array();
-		foreach ($regExpIds as $regExpId) {
-			$regExps[$regExpId] = getRegexp($regExpId);
-		}
-
-		DBstart();
-
-		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpIds));
-
-		$regExpCount = count($regExpIds);
-
-		if ($result) {
-			foreach ($regExps as $regExpId => $regExp) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
-					'Id ['.$regExpId.'] '._('Name').' ['.$regExp['name'].']'
-				);
-			}
-
-			unset($_REQUEST['form'], $_REQUEST['regexpid']);
-		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows();
-		}
-		show_messages($result,
-			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
-			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
-		);
+	if (isset($_REQUEST['regexpids'])) {
+		$regExpIds = $_REQUEST['regexpids'];
 	}
+
+	zbx_value2array($regExpIds);
+
+	$regExps = array();
+	foreach ($regExpIds as $regExpId) {
+		$regExps[$regExpId] = getRegexp($regExpId);
+	}
+
+	DBstart();
+
+	$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpIds));
+
+	$regExpCount = count($regExpIds);
+
+	if ($result) {
+		foreach ($regExps as $regExpId => $regExp) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
+				'Id ['.$regExpId.'] '._('Name').' ['.$regExp['name'].']'
+			);
+		}
+
+		unset($_REQUEST['form'], $_REQUEST['regexpid']);
+	}
+
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result,
+		_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
+		_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
+	);
 }
 
 /*

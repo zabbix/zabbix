@@ -37,7 +37,7 @@ $fields = array(
 	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({save})',_('Default delay (in seconds)')),
 	'slides' =>			array(null,		 O_OPT, null,		null,	null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'slideshow.massdelete'"),	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -68,22 +68,20 @@ if (isset($_REQUEST['slideshowid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['shows']) || !is_array($_REQUEST['shows'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('shows') || !is_array(getRequest('shows'))) {
 		access_deny();
 	}
 	else {
 		$dbSlideshowCount = DBfetch(DBselect(
-			'SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', $_REQUEST['shows'])
+			'SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', getRequest('shows'))
 		));
 
-		if ($dbSlideshowCount['cnt'] != count($_REQUEST['shows'])) {
+		if ($dbSlideshowCount['cnt'] != count(getRequest('shows'))) {
 			access_deny();
 		}
 	}
 }
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -139,7 +137,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	}
 	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
-elseif ($_REQUEST['go'] == 'delete') {
+elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete') {
 	$result = true;
 
 	$shows = getRequest('shows', array());

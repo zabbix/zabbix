@@ -61,8 +61,8 @@ foreach($this->data['regexps'] as $regexpid => $regexp) {
 	));
 }
 
-$goBox = new CComboBox('go');
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goBox = new CComboBox('action');
+$goOption = new CComboItem('regexp.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
 $goBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');

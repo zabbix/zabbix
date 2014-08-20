@@ -41,7 +41,7 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextPresent(array('Name', 'Dimension (cols x rows)', 'Screen'));
 		// Data
 		$this->zbxTestTextPresent(array($screen['name']));
-		$this->zbxTestDropdownHasOptions('go', array('Export selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Export selected', 'Delete selected'));
 	}
 
 	/**
@@ -128,7 +128,7 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

@@ -1613,7 +1613,7 @@ class testFormWeb extends CWebTest {
 
 		if (isset($data['remove'])) {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();
