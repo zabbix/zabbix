@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 12:04+0300\n"
+"POT-Creation-Date: 2014-08-20 13:25+0300\n"
 "PO-Revision-Date: 2014-06-05 14:47+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1668,7 +1668,7 @@ msgstr "Не удалось удалить соответствие иконок
 msgid "Cannot delete image"
 msgstr "Не удалось удалить изображение"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1160
 msgid "Cannot delete inventory."
 msgstr "Не удалось удалить инвентарные данные."
 
@@ -2213,7 +2213,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "Не удалось добавить оповещение пользователя."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1138
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
@@ -2230,7 +2230,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Не удалось выполнить выход."
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update host name."
 msgstr "Невозможно массово обновить имя узла сети."
 
@@ -2238,7 +2238,7 @@ msgstr "Невозможно массово обновить имя узла с�
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:949
 msgid "Cannot mass update visible host name."
 msgstr "Невозможно массово обновить видимое имя узла сети."
 
@@ -2371,7 +2371,7 @@ msgstr "Не удалось отсоединить и очистить элем�
 msgid "Cannot unlink and clear triggers"
 msgstr "Не удалось отсоединить и очистить триггеры"
 
-#: include/classes/api/services/CHost.php:1133
+#: include/classes/api/services/CHost.php:1113
 msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
@@ -4198,7 +4198,7 @@ msgstr "Удалено: Правило обнаружения \"%1$s\" из \"%2
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: График \"%1$s\" из \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1441
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
@@ -4937,7 +4937,7 @@ msgstr "Пустое имя узла сети."
 #: include/classes/api/services/CHostGroup.php:461
 #: include/classes/api/services/CHostGroup.php:532
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1289
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:613
@@ -6330,7 +6330,7 @@ msgstr[0] "Узел сети"
 msgstr[1] "Узел сети"
 msgstr[2] "Узел сети"
 
-#: include/classes/api/services/CHost.php:975
+#: include/classes/api/services/CHost.php:972
 #: include/classes/api/services/CTemplate.php:467
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6597,7 +6597,7 @@ msgstr "Маска подсети узла сети"
 msgid "Host time"
 msgstr "Время на узле сети"
 
-#: include/classes/api/services/CHost.php:849
+#: include/classes/api/services/CHost.php:846
 msgid "Host update failed."
 msgstr "Ошибка при обновлении узла сети."
 
@@ -7318,7 +7318,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Использованы некорректные символы в узле сети \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:622
-#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:955
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%s\"."
@@ -8131,7 +8131,7 @@ msgstr "Получено ошибочное имя представления \"
 msgid "Inventory"
 msgstr "Инвентаризация"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1179
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -10092,7 +10092,7 @@ msgstr "Графики не найдены."
 msgid "No groups for host \"%s\"."
 msgstr "Нет групп для узла сети \"%s\"."
 
-#: include/classes/api/services/CHost.php:944
+#: include/classes/api/services/CHost.php:941
 msgid "No groups for hosts."
 msgstr "Нет групп для узлов сети."
 
@@ -10355,7 +10355,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:526
 #: include/classes/api/services/CHost.php:609
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1634
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -13727,7 +13727,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Шаблон"
 
-#: include/classes/api/services/CHost.php:986
+#: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CTemplate.php:457
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15927,8 +15927,8 @@ msgstr "Вы не указали цели глобального скрипта 
 
 #: include/classes/api/services/CGraph.php:542
 #: include/classes/api/services/CGraphPrototype.php:553
-#: include/classes/api/services/CHost.php:880
-#: include/classes/api/services/CHost.php:938
+#: include/classes/api/services/CHost.php:877
+#: include/classes/api/services/CHost.php:935
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
