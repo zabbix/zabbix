@@ -1335,7 +1335,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 				else
 				{
 					if (FAIL == ret)
-						goto out;
+						goto clean;
 
 					ret = condition_result;
 					old_type = condition.conditiontype;
