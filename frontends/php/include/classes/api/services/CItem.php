@@ -665,10 +665,7 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($delGraphs) {
-			$result = API::Graph()->delete($delGraphs, true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph.'));
-			}
+			API::Graph()->delete($delGraphs, true);
 		}
 
 		// check if any graphs are referencing this item
@@ -681,10 +678,7 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		));
 		if ($triggers) {
-			$result = API::Trigger()->delete(array_keys($triggers), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger.'));
-			}
+			API::Trigger()->delete(array_keys($triggers), true);
 		}
 
 		$triggerPrototypes = API::TriggerPrototype()->get(array(
@@ -694,10 +688,7 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		));
 		if ($triggerPrototypes) {
-			$result = API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype.'));
-			}
+			API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
 		}
 
 		DB::delete('screens_items', array(
