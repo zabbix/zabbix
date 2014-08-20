@@ -54,7 +54,7 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
-	$ajaxResponse = new AjaxResponse;
+	$ajaxResponse = new CAjaxResponse;
 	$ajaxData = getRequest('ajaxdata', array());
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
@@ -73,7 +73,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 			if (!in_array($expression['expression_type'], array(EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE)) ||
 				$validator->validate($expression['expression'])
 			) {
-				$match = GlobalRegExp::matchExpression($expression, $ajaxData['testString']);
+				$match = CGlobalRegexp::matchExpression($expression, $ajaxData['testString']);
 
 				$result['expressions'][$id] = $match;
 			} else {

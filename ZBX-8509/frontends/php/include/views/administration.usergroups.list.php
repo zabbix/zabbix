@@ -42,7 +42,7 @@ $userGroupsForm->setName('userGroupsForm');
 $userGroupTable = new CTableInfo(_('No user groups found.'));
 $userGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	'#',
 	_('Members'),
 	_('Frontend access'),

@@ -68,25 +68,15 @@ class CAutoloader {
 	 * @return bool|string
 	 */
 	protected function findClassFile($className) {
-		$foundFile = false;
-
 		foreach ($this->includePaths as $includePath) {
 			$filePath = $includePath.'/'.$className.'.php';
 
 			if (is_file($filePath)) {
-				$foundFile = $filePath;
+				return $filePath;
 				break;
-			}
-			else {
-				// fallback to old class names
-				$filePath = $includePath.'/class.'.strtolower($className).'.php';
-				if (is_file($filePath)) {
-					$foundFile = $filePath;
-					break;
-				}
 			}
 		}
 
-		return $foundFile;
+		return false;
 	}
 }

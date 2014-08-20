@@ -87,7 +87,7 @@ $y = imagesy($im);
 /*
  * Actions
  */
-$json = new CJSON();
+$json = new CJson();
 
 if (isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])) {
 	$map['selements'] = getRequest('selements', '[]');
@@ -184,7 +184,7 @@ if (getRequest('base64image')) {
 	imagepng($im);
 	$imageSource = ob_get_contents();
 	ob_end_clean();
-	$json = new CJSON();
+	$json = new CJson();
 	echo $json->encode(array('result' => base64_encode($imageSource)));
 	imagedestroy($im);
 }
