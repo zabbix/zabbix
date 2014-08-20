@@ -628,7 +628,7 @@
 	jQuery(document).ready(function() {
 		// clone button
 		jQuery('#clone').click(function() {
-			jQuery('#actionid, #delete, #clone').remove();
+			jQuery('#actionid, #delete, #clone, input[name$=operationid\\]]').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
