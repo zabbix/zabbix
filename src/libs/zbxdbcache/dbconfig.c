@@ -29,6 +29,8 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxregexp.h"
+#include "macrocache.h"
+#include "triggercache.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
@@ -1703,8 +1705,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x01))
 				{
 					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->ip, addr);
 					zbx_free(addr);
 				}
@@ -1712,8 +1714,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x02))
 				{
 					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, &addr,
-							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->dns, addr);
 					zbx_free(addr);
 				}
@@ -5447,70 +5449,6 @@ void	DChost_update_availability(const zbx_host_availability_t *availability, int
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for DCconfig_check_trigger_dependencies()        *
- *                                                                            *
- ******************************************************************************/
-static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
-{
-	int				i;
-	const ZBX_DC_TRIGGER		*next_trigger;
-	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
-
-	if (32 < level)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
-				trigdep->triggerid);
-		return SUCCEED;
-	}
-
-	if (NULL != trigdep->dependencies)
-	{
-		for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
-		{
-			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state)
-			{
-				return FAIL;
-			}
-
-			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
-				return FAIL;
-		}
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_check_trigger_dependencies                              *
- *                                                                            *
- * Purpose: check whether any of trigger dependencies have value PROBLEM      *
- *                                                                            *
- * Return value: SUCCEED - trigger can change its value                       *
- *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
-{
-	int				ret = SUCCEED;
-	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
-
-	LOCK_CACHE;
-
-	if (NULL != (trigdep = zbx_hashset_search(&config->trigdeps, &triggerid)))
-		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0);
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Comments: helper function for DCconfig_sort_triggers_topologically()       *
  *                                                                            *
  ******************************************************************************/
@@ -5587,34 +5525,6 @@ static void	DCconfig_sort_triggers_topologically()
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_trigger_value                                       *
- *                                                                            *
- * Purpose: set trigger value, value flags, and error                         *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange)
-{
-	ZBX_DC_TRIGGER	*dc_trigger;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
-	{
-		DCstrpool_replace(1, &dc_trigger->error, error);
-		dc_trigger->value = value;
-		dc_trigger->state = state;
-		if (NULL != lastchange)
-			dc_trigger->lastchange = *lastchange;
-	}
-
-	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -5895,8 +5805,7 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 
 		if (NULL != (hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local)))
 		{
-			zbx_free(*replace_to);
-			*replace_to = strdup(hmacro_hm->hmacro_ptr->value);
+			*replace_to = zbx_strdup(*replace_to, hmacro_hm->hmacro_ptr->value);
 			ret = SUCCEED;
 			break;
 		}
@@ -6364,40 +6273,7 @@ double	DCget_required_performance()
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_functions_hostids                                          *
- *                                                                            *
- * Purpose: get hosts with items associated with a set of functions           *
- *                                                                            *
- * Parameters: hostids     - [OUT] a vector of host identifiers               *
- *             functionids - [IN] a vector containing source function ids     *
- *                                                                            *
- ******************************************************************************/
-void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids)
-{
-	ZBX_DC_FUNCTION		*dc_function;
-	ZBX_DC_ITEM		*dc_item;
-	int			i;
-
-	LOCK_CACHE;
-
-	for (i = 0; i < functionids->values_num; i++)
-	{
-		if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionids->values[i])))
-			continue;
-
-		if (NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
-			zbx_vector_uint64_append(hostids, dc_item->hostid);
-	}
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_sort(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_expressions                                                *
+ * Function: DCget_expressions_by_names                                       *
  *                                                                            *
  * Purpose: retrieves global expression data from cache                       *
  *                                                                            *
@@ -6504,3 +6380,299 @@ unlock:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_umc_resolve                                                  *
+ *                                                                            *
+ * Purpose: resolve user macros in user macro cache                           *
+ *                                                                            *
+ * Parameters: cache  - [IN] the user macro cache                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_umc_resolve(zbx_hashset_t *cache)
+{
+	const char		*__function_name = "zbx_umc_resolve";
+	zbx_hashset_iter_t	iter;
+	zbx_umc_object_t	*object;
+	int			i, resolved = 0, total = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_hashset_iter_reset(cache, &iter);
+
+	LOCK_CACHE;
+
+	while (NULL != (object = zbx_hashset_iter_next(&iter)))
+	{
+		for (i = 0; i < object->macros.values_num; i++)
+		{
+			zbx_ptr_pair_t	*pair = (zbx_ptr_pair_t *)&object->macros.values[i];
+
+			if (FAIL == DCget_host_macro(object->hostids.values, object->hostids.values_num, pair->first,
+					(char **)&pair->second))
+			{
+				DCget_global_macro(pair->first, (char **)&pair->second);
+			}
+
+			total++;
+			if (NULL != pair->second)
+				resolved++;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): resolved %d/%d user macro(s)", __function_name, resolved, total);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_grouped_hostids_by_functionids                             *
+ *                                                                            *
+ * Purpose: get function host ids grouped by an object (trigger) id           *
+ *                                                                            *
+ * Parameters: functionids - [IN] the function ids                            *
+ *             hostids     - [OUT] the host ids                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_grouped_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids)
+{
+	const char	*__function_name = "DCget_grouped_hostids_by_functionids";
+	zbx_idset_t	*fset, *hset;
+	ZBX_DC_FUNCTION	*function;
+	ZBX_DC_ITEM	*item;
+	int		i, j, hosts = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:%d", __function_name, functionids->values_num);
+
+	LOCK_CACHE;
+
+	for (i = 0; i < functionids->values_num; i++)
+	{
+		fset = (zbx_idset_t *)functionids->values[i];
+		hset = (zbx_idset_t *)zbx_malloc(NULL, sizeof(zbx_idset_t));
+
+		hset->id = fset->id;
+		zbx_vector_uint64_create(&hset->ids);
+		zbx_vector_ptr_append(hostids, hset);
+
+		for (j = 0; j < fset->ids.values_num; j++)
+		{
+			if (NULL == (function = zbx_hashset_search(&config->functions, &fset->ids.values[j])))
+				continue;
+
+			if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
+				zbx_vector_uint64_append(&hset->ids, item->hostid);
+		}
+
+		zbx_vector_uint64_sort(&hset->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hset->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		hosts += hset->ids.values_num;
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_hostids_by_functionids                                     *
+ *                                                                            *
+ * Purpose: get function host ids g                                           *
+ *                                                                            *
+ * Parameters: functionids - [IN] the function ids                            *
+ *             hostids     - [OUT] the host ids                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
+{
+	zbx_vector_ptr_t	fset, hset;
+	zbx_idset_t		*idset;
+
+	zbx_vector_ptr_create(&fset);
+	zbx_vector_ptr_create(&hset);
+
+	/* prepare function idset vector */
+	idset = (zbx_idset_t *)zbx_malloc(NULL, sizeof(zbx_idset_t));
+	idset->id = 0;
+	idset->ids = *functionids;
+	zbx_vector_ptr_append(&fset, idset);
+
+	DCget_grouped_hostids_by_functionids(&fset, &hset);
+
+	/* copy the result to output vector */
+	idset = (zbx_idset_t *)hset.values[0];
+	*hostids = idset->ids;
+
+	/* don't perform idset cleanup as idset->ids vector ownership was transferred to hostids vector */
+	zbx_vector_ptr_clean(&hset, (zbx_mem_free_func_t)zbx_ptr_free);
+	zbx_vector_ptr_destroy(&hset);
+
+	/* don't perform idset cleanup as functionids vector sill has ownership over idset->ids vector */
+	zbx_vector_ptr_clean(&fset, (zbx_mem_free_func_t)zbx_ptr_free);
+	zbx_vector_ptr_destroy(&fset);
+}
+
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_idset_free                                                   *
+ *                                                                            *
+ * Purpose: free idset data structure                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_idset_free(zbx_idset_t *idset)
+{
+	zbx_vector_uint64_destroy(&idset->ids);
+	zbx_free(idset);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_triggercache_load_trigger                                    *
+ *                                                                            *
+ * Purpose: load a trigger into local trigger cache                           *
+ *                                                                            *
+ * Parameters: cache     - [IN] the trigger cache                             *
+ *             triggerid - [IN] the trigger id                                *
+ *             trigdep   - [IN] trigger dependency list (can be NULL)         *
+ *             level     - [IN] recursion level                               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_triggercache_trigger_t	*zbx_triggercache_load_trigger(zbx_hashset_t *cache, zbx_uint64_t triggerid,
+		const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
+{
+	zbx_triggercache_trigger_t	*trigger, trigger_data = {triggerid};
+	int				i;
+	ZBX_DC_TRIGGER			*dc_trigger = NULL;
+
+	/* check if the trigger has not been cached already */
+	if (NULL != (trigger = zbx_hashset_search(cache, &triggerid)))
+		goto out;
+
+	if (32 < level)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep, triggerid:" ZBX_FS_UI64,
+				triggerid);
+		goto out;
+	}
+
+	/* add trigger to cache */
+	trigger = zbx_hashset_insert(cache, &trigger_data, sizeof(zbx_triggercache_trigger_t));
+	zbx_vector_ptr_create(&trigger->dependencies);
+
+	if (NULL == trigdep)
+		trigdep = zbx_hashset_search(&config->trigdeps, &triggerid);
+
+	if (NULL != trigdep)
+		dc_trigger = trigdep->trigger;
+	else
+		dc_trigger = zbx_hashset_search(&config->triggers, &triggerid);
+
+	if (NULL != dc_trigger)
+	{
+		trigger->state = dc_trigger->state;
+		trigger->value = dc_trigger->value;
+		trigger->lastchange = dc_trigger->lastchange;
+		trigger->loaded = 1;
+	}
+
+	if (NULL == trigdep || NULL == trigdep->dependencies)
+		goto out;
+
+	/* load trigger dependencies */
+	for (i = 0; NULL != trigdep->dependencies[i]; i++)
+	{
+		zbx_triggercache_trigger_t	*dep;
+		const ZBX_DC_TRIGGER_DEPLIST		*trdep = trigdep->dependencies[i];
+
+		if (NULL != (dep = zbx_triggercache_load_trigger(cache, trdep->triggerid, trdep, level + 1)))
+		{
+			zbx_vector_ptr_append(&trigger->dependencies, dep);
+		}
+	}
+out:
+	return trigger;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_triggercache_load                                            *
+ *                                                                            *
+ * Purpose: load trigger dependencies into local trigger cache                *
+ *                                                                            *
+ * Parameters: cache    - [IN] the trigger cache                              *
+ *             triggers - [IN] the triggers to load                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_triggercache_load(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers)
+{
+	const char	*__function_name = "zbx_triggercache_load";
+	int		i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() loading %d trigger(s)", __function_name, triggers->values_num);
+
+	LOCK_CACHE;
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		DC_TRIGGER	*trigger = (DC_TRIGGER *)triggers->values[i];
+
+		zbx_triggercache_load_trigger(cache, trigger->triggerid, NULL, 0);
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): cached %d trigger(s)", __function_name, cache->num_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_triggercache_flush                                           *
+ *                                                                            *
+ * Purpose: write changes made to triggers in local trigger cache to the      *
+ *          configuration cache                                               *
+ *                                                                            *
+ * Parameters: cache    - [IN] the trigger cache                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_triggercache_flush(zbx_hashset_t *cache)
+{
+	const char			*__function_name = "zbx_triggercache_flush";
+	zbx_hashset_iter_t		iter;
+	zbx_triggercache_trigger_t	*trigger;
+	ZBX_DC_TRIGGER			*dc_trigger;
+	int				updated = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_hashset_iter_reset(cache, &iter);
+
+	LOCK_CACHE;
+
+	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
+	{
+		if (0 == trigger->modified)
+			continue;
+
+		if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &trigger->triggerid)))
+			continue;
+
+		DCstrpool_replace(1, &dc_trigger->error, trigger->error);
+		dc_trigger->value = trigger->value;
+		dc_trigger->state = trigger->state;
+		dc_trigger->lastchange = trigger->lastchange;
+
+		updated++;
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): updated %d trigger(s)", __function_name, updated);
+}
+

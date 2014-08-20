@@ -162,7 +162,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		}
 		else
 		{
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL,
 					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
 		}
 
@@ -530,7 +530,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 		db_error = zbx_strdup(db_error, row[5]);
 
 		lifetime_str = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
 		{

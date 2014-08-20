@@ -3067,3 +3067,4 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	return nextid;
 }
+

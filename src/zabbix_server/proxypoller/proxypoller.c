@@ -193,7 +193,8 @@ static int	process_proxy(void)
 		proxy.addr = proxy.addr_orig;
 
 		port = zbx_strdup(port, proxy.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&port, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(port, &proxy.port))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
