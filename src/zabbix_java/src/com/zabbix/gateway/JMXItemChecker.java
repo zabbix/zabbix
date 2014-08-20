@@ -124,16 +124,13 @@ class JMXItemChecker extends ItemChecker
 			String attributeName = item.getArgument(2);
 			String realAttributeName;
 			String fieldNames = "";
-			int sep;
 
-			//
 			// Attribute name and composite data field names are separated by dots. On the other hand the
 			// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
 			// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
 			// separatorIndex() is used to locate it.
-			//
 
-			sep = HelperFunctionChest.separatorIndex(attributeName);
+			int sep = HelperFunctionChest.separatorIndex(attributeName);
 
 			if (-1 != sep)
 			{
@@ -190,7 +187,7 @@ class JMXItemChecker extends ItemChecker
 
 			JSONObject mapping = new JSONObject();
 			mapping.put(ItemChecker.JSON_TAG_DATA, counters);
-			return mapping.toString(2);
+			return mapping.toString();
 		}
 		else
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
