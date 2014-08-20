@@ -99,7 +99,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// status
 	$status = new CLink(item_status2str($hostPrototype['status']),
 		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoveryRule['itemid'].
-		'&go='.($hostPrototype['status'] ? 'activate' : 'disable'), itemIndicatorStyle($hostPrototype['status'])
+		'&action='.($hostPrototype['status'] ? 'hostprototype.massenable' : 'hostprototype.massdisable'), itemIndicatorStyle($hostPrototype['status'])
 	);
 
 	$hostTable->addRow(array(
@@ -111,16 +111,16 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('hostprototype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected host prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('hostprototype.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected host prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('hostprototype.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected host prototypes?'));
 $goComboBox->addItem($goOption);
 

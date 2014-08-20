@@ -97,16 +97,16 @@ foreach ($this->data['proxies'] as $proxy) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('proxy.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('proxy.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('proxy.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected proxies?'));
 $goComboBox->addItem($goOption);
 

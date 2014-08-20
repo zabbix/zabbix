@@ -37,7 +37,10 @@ $fields = array(
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN("'application.massdelete','application.massdisable','application.massenable'"),
+								null
+							),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -61,16 +64,16 @@ if (isset($_REQUEST['applicationid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['applications']) || !is_array($_REQUEST['applications'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('applications') || !is_array(getRequest('applications'))) {
 		access_deny();
 	}
 	else {
 		$dbApplications = API::Application()->get(array(
-			'applicationids' => $_REQUEST['applications'],
+			'applicationids' => getRequest('applications'),
 			'countOutput' => true
 		));
-		if ($dbApplications != count($_REQUEST['applications'])) {
+		if ($dbApplications != count(getRequest('applications'))) {
 			access_deny();
 		}
 	}
@@ -81,7 +84,6 @@ if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['grou
 if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -160,9 +162,9 @@ elseif (isset($_REQUEST['delete'])) {
 		show_messages($result, _('Application deleted'), _('Cannot delete application'));
 	}
 }
-elseif ($_REQUEST['go'] == 'delete') {
+elseif (hasRequest('action') && getRequest('action') == 'application.massdelete' && hasRequest('applications')) {
 	$result = true;
-	$applications = getRequest('applications', array());
+	$applications = getRequest('applications');
 	$deleted = 0;
 
 	DBstart();
@@ -201,10 +203,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 		_n('Cannot delete application', 'Cannot delete applications', $deleted)
 	);
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable'))) {
 	$result = true;
 	$hostId = getRequest('hostid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'application.massenable');
 	$updated = 0;
 
 	DBstart();

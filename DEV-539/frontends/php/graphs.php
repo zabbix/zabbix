@@ -60,7 +60,7 @@ $fields = array(
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'graph.masscopyto','graph.massdlete'"),			null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -87,7 +87,6 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['items'] = getRequest('items', array());
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
@@ -303,7 +302,7 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
+elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
 
 	if (hasRequest('parent_discoveryid')) {
@@ -322,7 +321,7 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
-} elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
+} elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$result = true;
 
@@ -370,10 +369,9 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 			uncheckTableRows(
 				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
 			);
+			unset($_REQUEST['group_graphid']);
 		}
 		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
-
-		$_REQUEST['go'] = 'none2';
 	}
 	else {
 		error(_('No target selected.'));
@@ -406,9 +404,11 @@ if (empty($_REQUEST['parent_discoveryid'])) {
 	}
 }
 
-if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
+if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
+	$data = getCopyElementsFormData('group_graphid');
+	$data['action'] = 'graph.masscopyto';
+	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
 }

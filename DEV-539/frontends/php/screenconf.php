@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['screens'])) {
+if (hasRequest('action') && getRequest('action') == 'screen.export' && hasRequest('screens')) {
 	$isExportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -51,7 +51,7 @@ $fields = array(
 	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
 	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Rows')),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'screen.export','screen.massdelete'"),		null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
@@ -68,7 +68,6 @@ $fields = array(
 check_fields($fields);
 
 CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
@@ -192,10 +191,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
+elseif ((hasRequest('delete') && hasRequest('screenid')) || (hasRequest('action') && getRequest('action') == 'screen.massdelete')) {
 	$screenids = getRequest('screens', array());
-	if (isset($_REQUEST['screenid'])) {
-		$screenids[] = $_REQUEST['screenid'];
+	if (hasRequest('screenid')) {
+		$screenids[] = getRequest('screenid');
 	}
 
 	DBstart();

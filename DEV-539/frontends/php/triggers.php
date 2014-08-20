@@ -56,7 +56,10 @@ $fields = array(
 	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN("'trigger.masscopyto','trigger.massdelete','trigger.massdisable','trigger.massenable','trigger.massupdate','trigger.massupdateform'"),
+								null
+							),
 	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'and_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -86,7 +89,6 @@ check_fields($fields);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
-$_REQUEST['go'] = getRequest('go', 'none');
 
 // validate permissions
 if (getRequest('triggerid')) {
@@ -213,7 +215,7 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
 	$visible = getRequest('visible', array());
 
 	// update triggers
@@ -242,8 +244,8 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	}
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('go') == 'activate');
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('trigger.massenable', 'trigger.massdisable')) && hasRequest('g_triggerid')) {
+	$enable = (getRequest('action') == 'trigger.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = array();
 
@@ -278,10 +280,11 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
+//		unset($_REQUEST['g_triggerid']);
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('copy') && hasRequest('g_triggerid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
@@ -310,17 +313,16 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_tri
 
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
+			unset($_REQUEST['g_triggerid']);
 		}
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
-
-		$_REQUEST['go'] = 'none2';
 	}
 	else {
 		show_error_message(_('No target selected'));
 	}
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
-	$result = API::Trigger()->delete($_REQUEST['g_triggerid']);
+elseif (hasRequest('action') && getRequest('action') == 'trigger.massdelete' && hasRequest('g_triggerid')) {
+	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
@@ -331,8 +333,10 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 /*
  * Display
  */
-if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
+if (hasRequest('action') && getRequest('action') == 'trigger.massupdateform' && hasRequest('g_triggerid')) {
+	$data = getTriggerMassupdateFormData();
+	$data['action'] = 'trigger.massupdate';
+	$triggersView = new CView('configuration.triggers.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
@@ -341,8 +345,10 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->render();
 	$triggersView->show();
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS')));
+elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('g_triggerid')) {
+	$data = getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS'));
+	$data['action'] = 'trigger.masscopyto';
+	$triggersView = new CView('configuration.copy.elements', $data);
 	$triggersView->render();
 	$triggersView->show();
 }

@@ -67,7 +67,7 @@ $fields = array(
 	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
 	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'go' =>									array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'maintenance.massdelete'"),	null),
 	'add_timeperiod' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_timeperiod' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -106,10 +106,9 @@ if (isset($_REQUEST['maintenanceid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go']) && (!isset($_REQUEST['maintenanceids']) || !is_array($_REQUEST['maintenanceids']))) {
+if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getRequest('maintenanceids')))) {
 	access_deny();
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -218,10 +217,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
+elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') == 'maintenance.massdelete')) {
 	$maintenanceids = getRequest('maintenanceid', array());
-	if (isset($_REQUEST['maintenanceids'])) {
-		$maintenanceids = $_REQUEST['maintenanceids'];
+	if (hasRequest('maintenanceids')) {
+		$maintenanceids = getRequest('maintenanceids');
 	}
 
 	zbx_value2array($maintenanceids);

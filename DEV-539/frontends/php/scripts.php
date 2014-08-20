@@ -48,11 +48,9 @@ $fields = array(
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'enableConfirmation' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'action' =>				array(T_ZBX_INT, O_OPT, P_ACT,			IN('0,1'),	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN("'script.massdelete'"),		null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null),
 	// sort and sortorder
@@ -60,8 +58,6 @@ $fields = array(
 	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
@@ -79,11 +75,7 @@ if ($scriptId = getRequest('scriptid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])) {
-	unset($_REQUEST['scriptid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['save'])) {
+if (isset($_REQUEST['save'])) {
 	$confirmation = getRequest('confirmation', '');
 	$enableConfirmation = getRequest('enableConfirmation', false);
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
@@ -135,7 +127,7 @@ elseif (isset($_REQUEST['save'])) {
 
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
-			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
+			unset($_REQUEST['form'], $_REQUEST['scriptid']);
 		}
 
 		$result = DBend($result);
@@ -146,8 +138,8 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }
-elseif (isset($_REQUEST['delete'])) {
-	$scriptId = getRequest('scriptid', 0);
+elseif (hasRequest('delete') && hasRequest('scriptid')) {
+	$scriptId = getRequest('scriptid');
 
 	DBstart();
 
@@ -165,8 +157,8 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
-	$scriptIds = $_REQUEST['scripts'];
+elseif (hasRequest('action') && getRequest('action') == 'script.massdelete' && hasRequest('scripts')) {
+	$scriptIds = getRequest('scripts');
 
 	DBstart();
 

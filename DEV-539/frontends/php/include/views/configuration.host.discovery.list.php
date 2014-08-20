@@ -71,7 +71,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// status
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate' : 'disable'),
+		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&action='.($discovery['status'] ? 'drule.massenable' : 'drule.massdisable'),
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
@@ -132,16 +132,16 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('discoveryrule.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('discoveryrule.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('discoveryrule.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 $goComboBox->addItem($goOption);
 

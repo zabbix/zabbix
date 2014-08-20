@@ -37,7 +37,10 @@ $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN("'proxy.massenable','proxy.massdisable','proxy.massdelete'"),
+							null
+						),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -65,7 +68,7 @@ if (isset($_REQUEST['proxyid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
+if (isset($_REQUEST['action'])) {
 	if (!isset($_REQUEST['hosts']) || !is_array($_REQUEST['hosts'])) {
 		access_deny();
 	}
@@ -81,7 +84,6 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -147,9 +149,9 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['proxyid'])) {
 	unset($_REQUEST['proxyid'], $_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('hosts')) {
+elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.massdisable')) && hasRequest('hosts')) {
 	$result = true;
-	$enable =(getRequest('go') == 'activate');
+	$enable =(getRequest('action') == 'proxy.massenable');
 	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$hosts = getRequest('hosts', array());
 
@@ -191,7 +193,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
+elseif (hasRequest('action') && getRequest('action') == 'proxy.massdelete' && hasRequest('hosts')) {
 	DBstart();
 
 	$result = API::Proxy()->delete(getRequest('hosts'));

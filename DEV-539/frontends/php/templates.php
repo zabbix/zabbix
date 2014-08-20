@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['templates'])) {
+if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
 	$exportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -64,7 +64,10 @@ $fields = array(
 	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	// actions
-	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN("'template.export','template.massdelete','template.massdeleteclear'"),
+								null
+							),
 	'unlink'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -80,8 +83,6 @@ $fields = array(
 	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
 );
 check_fields($fields);
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Permissions
@@ -387,14 +388,14 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	unset($_REQUEST['delete']);
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
-elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
+elseif (str_in_array(getRequest('action'), array('template.massdelete', 'template.massdeleteclear')) && hasRequest('templates')) {
 	$templates = getRequest('templates', array());
 
 	DBstart();
 
 	$result = true;
 
-	if ($_REQUEST['go'] == 'delete') {
+	if (getRequest('action') == 'action.massdelete') {
 		$result = API::Template()->massUpdate(array(
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
@@ -662,12 +663,12 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('go');
-	$goBox->addItem('export', _('Export selected'));
-	$goOption = new CComboItem('delete', _('Delete selected'));
+	$goBox = new CComboBox('action');
+	$goBox->addItem('template.export', _('Export selected'));
+	$goOption = new CComboItem('template.massdelete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected templates?'));
 	$goBox->addItem($goOption);
-	$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
+	$goOption = new CComboItem('template.massdeleteclear', _('Delete selected with linked elements'));
 	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
 	$goBox->addItem($goOption);
 	$goButton = new CSubmit('goButton', _('Go').' (0)');

@@ -55,9 +55,11 @@ $fields = array(
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN("'triggerprototype.massdelete','triggerprototype.massdisable','triggerprototype.massenable','triggerprototype.massupdate','triggerprototype.massupdateform'"),
+								null
+							),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_expression' => 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'and_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -88,7 +90,6 @@ check_fields($fields);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
-$_REQUEST['go'] = getRequest('go', 'none');
 
 // validate permissions
 if (getRequest('parent_discoveryid')) {
@@ -187,7 +188,7 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	}
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
-elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
 	$visible = getRequest('visible');
 
@@ -214,8 +215,8 @@ elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasReques
 	}
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('go') == 'activate');
+elseif (getRequest('action') && str_in_array(getRequest('action'), array('triggerprototype.massenable', 'triggerprototype.massdisable')) && hasRequest('g_triggerid')) {
+	$enable = (getRequest('action') == 'triggerprototype.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = array();
 
@@ -255,7 +256,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
@@ -267,8 +268,10 @@ elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
 /*
  * Display
  */
-if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
+if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
+	$data = getTriggerMassupdateFormData();
+	$data['action'] = 'triggerprototype.massupdate';
+	$triggersView = new CView('configuration.triggers.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }

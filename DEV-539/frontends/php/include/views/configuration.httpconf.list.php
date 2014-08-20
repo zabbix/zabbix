@@ -125,7 +125,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
-				'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+				'&action='.($httpTest['status'] ? 'httptest.massenable' : 'httptest.massdisable'),
 			httptest_status2style($httpTest['status'])
 		),
 		$infoIcon
@@ -133,20 +133,20 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('httptest.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('httptest.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm',_('Disable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('clean_history', _('Clear history for selected'));
+$goOption = new CComboItem('httptest.massclearhistory', _('Clear history for selected'));
 $goOption->setAttribute('confirm', _('Delete history of selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('httptest.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected web scenarios?'));
 $goComboBox->addItem($goOption);
 

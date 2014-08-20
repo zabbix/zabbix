@@ -825,8 +825,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$goComboBox = new CComboBox('go');
-	$goComboBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
+	$goComboBox = new CComboBox('action');
+	$goComboBox->addItem('trigger.bulkacknowledge', _('Bulk acknowledge'));
 
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
