@@ -342,10 +342,6 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
-int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
-
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
@@ -379,11 +375,39 @@ int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();
 
-void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids);
-
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
+/* a set of identifiers assigned to another identifier */
+typedef struct
+{
+	zbx_uint64_t		id;
+	zbx_vector_uint64_t	ids;
+}
+zbx_idset_t;
+
+/* local user macro cache support */
+void	zbx_umc_init(zbx_hashset_t *cache);
+void	zbx_umc_destroy(zbx_hashset_t *cache);
+void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *expression);
+void	zbx_umc_add_hostids(zbx_hashset_t *cache, zbx_uint64_t objectid, const zbx_uint64_t *hostids, int hostids_num);
+void	zbx_umc_resolve(zbx_hashset_t *cache);
+const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *macro);
+
+void	DCget_grouped_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
+void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+void	zbx_idset_free(zbx_idset_t *idset);
+
+/* local trigger cache support */
+void	zbx_triggercache_init(zbx_hashset_t *cache);
+void	zbx_triggercache_destroy(zbx_hashset_t *cache);
+int	zbx_triggercache_check_dependencies(zbx_hashset_t *cache, zbx_uint64_t triggerid);
+void	zbx_triggercache_update_trigger(zbx_hashset_t *cache, zbx_uint64_t triggerid, unsigned char value,
+		unsigned char state, const char *error, int *lastchange);
+
+void	zbx_triggercache_load(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers);
+void	zbx_triggercache_flush(zbx_hashset_t *cache);
 
 #endif
