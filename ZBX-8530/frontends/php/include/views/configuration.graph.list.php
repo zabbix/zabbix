@@ -74,10 +74,10 @@ $graphTable = new CTableInfo(!empty($this->data['parent_discoveryid']) ? _('No g
 $graphTable->setHeader(array(
 	new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
 	!empty($this->data['hostid']) ? null : _('Hosts'),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Width'),
 	_('Height'),
-	make_sorting_header(_('Graph type'), 'graphtype')
+	make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['graphs'] as $graph) {

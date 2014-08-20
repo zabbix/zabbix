@@ -36,8 +36,8 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
-	make_sorting_header(_('Name'), 'description'),
-	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Status'),
 	_('Used in actions'),
 	_('Details')
