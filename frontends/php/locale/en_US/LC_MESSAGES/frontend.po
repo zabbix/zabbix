@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 12:04+0300\n"
+"POT-Creation-Date: 2014-08-20 13:25+0300\n"
 "PO-Revision-Date: 2014-02-04 10:36+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -1652,7 +1652,7 @@ msgstr "Cannot delete icon map"
 msgid "Cannot delete image"
 msgstr "Cannot delete image"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1160
 msgid "Cannot delete inventory."
 msgstr "Cannot delete inventory."
 
@@ -2170,7 +2170,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "Cannot insert user media."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1138
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
@@ -2187,7 +2187,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Cannot logout."
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update host name."
 msgstr "Cannot mass update host name."
 
@@ -2195,7 +2195,7 @@ msgstr "Cannot mass update host name."
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:949
 msgid "Cannot mass update visible host name."
 msgstr "Cannot mass update visible host name."
 
@@ -2328,7 +2328,7 @@ msgstr "Cannot unlink and clear items"
 msgid "Cannot unlink and clear triggers"
 msgstr "Cannot unlink and clear triggers"
 
-#: include/classes/api/services/CHost.php:1133
+#: include/classes/api/services/CHost.php:1113
 msgid "Cannot unlink template"
 msgstr "Cannot unlink template"
 
@@ -4153,7 +4153,7 @@ msgstr "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Deleted: Graph \"%1$s\" on \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1441
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Deleted: Host \"%1$s\"."
@@ -4890,7 +4890,7 @@ msgstr "Empty host."
 #: include/classes/api/services/CHostGroup.php:461
 #: include/classes/api/services/CHostGroup.php:532
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1289
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:613
@@ -6282,7 +6282,7 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Host"
 
-#: include/classes/api/services/CHost.php:975
+#: include/classes/api/services/CHost.php:972
 #: include/classes/api/services/CTemplate.php:467
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6545,7 +6545,7 @@ msgstr "Host subnet mask"
 msgid "Host time"
 msgstr "Host time"
 
-#: include/classes/api/services/CHost.php:849
+#: include/classes/api/services/CHost.php:846
 msgid "Host update failed."
 msgstr "Host update failed."
 
@@ -7266,7 +7266,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Incorrect characters used for host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:622
-#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:955
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Incorrect characters used for host name \"%s\"."
@@ -8079,7 +8079,7 @@ msgstr "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgid "Inventory"
 msgstr "Inventory"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1179
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -10030,7 +10030,7 @@ msgstr "No graphs found."
 msgid "No groups for host \"%s\"."
 msgstr "No groups for host \"%s\"."
 
-#: include/classes/api/services/CHost.php:944
+#: include/classes/api/services/CHost.php:941
 msgid "No groups for hosts."
 msgstr "No groups for hosts."
 
@@ -10293,7 +10293,7 @@ msgstr "No permissions for system access."
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:526
 #: include/classes/api/services/CHost.php:609
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1634
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -13661,7 +13661,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:986
+#: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CTemplate.php:457
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15850,8 +15850,8 @@ msgstr "You did not specify targets for action operation global script \"%s\"."
 
 #: include/classes/api/services/CGraph.php:542
 #: include/classes/api/services/CGraphPrototype.php:553
-#: include/classes/api/services/CHost.php:880
-#: include/classes/api/services/CHost.php:938
+#: include/classes/api/services/CHost.php:877
+#: include/classes/api/services/CHost.php:935
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668

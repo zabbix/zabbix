@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 12:04+0300\n"
+"POT-Creation-Date: 2014-08-20 13:25+0300\n"
 "PO-Revision-Date: 2013-09-11 18:19+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1669,7 +1669,7 @@ msgstr "Nu se poate șterge maparea icon-ului"
 msgid "Cannot delete image"
 msgstr "Nu se poate șterge imaginea"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1160
 msgid "Cannot delete inventory."
 msgstr "Nu se poate șterge inventarul."
 
@@ -2214,7 +2214,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "Nu se poate insera media utilizator."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1138
 msgid "Cannot link template"
 msgstr "Nu se poate asocia șablonul"
 
@@ -2231,7 +2231,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Nu se poate face logout."
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update host name."
 msgstr "Nu se poate face actualizare în masă a numelui serverului."
 
@@ -2239,7 +2239,7 @@ msgstr "Nu se poate face actualizare în masă a numelui serverului."
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:949
 msgid "Cannot mass update visible host name."
 msgstr "Nu se poate face actualizare în masă a numelui vizibil al serverului."
 
@@ -2372,7 +2372,7 @@ msgstr "Nu se pot deconecta și șterge elementele"
 msgid "Cannot unlink and clear triggers"
 msgstr "Nu se pot deconecta și șterge trigerii"
 
-#: include/classes/api/services/CHost.php:1133
+#: include/classes/api/services/CHost.php:1113
 msgid "Cannot unlink template"
 msgstr "Nu se poate deconecta șablonul"
 
@@ -4199,7 +4199,7 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1441
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
@@ -4938,7 +4938,7 @@ msgstr ""
 #: include/classes/api/services/CHostGroup.php:461
 #: include/classes/api/services/CHostGroup.php:532
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1289
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:613
@@ -6330,7 +6330,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/api/services/CHost.php:975
+#: include/classes/api/services/CHost.php:972
 #: include/classes/api/services/CTemplate.php:467
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6597,7 +6597,7 @@ msgstr ""
 msgid "Host time"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:849
+#: include/classes/api/services/CHost.php:846
 msgid "Host update failed."
 msgstr ""
 
@@ -7318,7 +7318,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHost.php:622
-#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:955
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
@@ -8131,7 +8131,7 @@ msgstr ""
 msgid "Inventory"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1179
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -10089,7 +10089,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:944
+#: include/classes/api/services/CHost.php:941
 msgid "No groups for hosts."
 msgstr ""
 
@@ -10352,7 +10352,7 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:526
 #: include/classes/api/services/CHost.php:609
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1634
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -13723,7 +13723,7 @@ msgstr ""
 msgid "Template"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:986
+#: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CTemplate.php:457
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15922,8 +15922,8 @@ msgstr ""
 
 #: include/classes/api/services/CGraph.php:542
 #: include/classes/api/services/CGraphPrototype.php:553
-#: include/classes/api/services/CHost.php:880
-#: include/classes/api/services/CHost.php:938
+#: include/classes/api/services/CHost.php:877
+#: include/classes/api/services/CHost.php:935
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668

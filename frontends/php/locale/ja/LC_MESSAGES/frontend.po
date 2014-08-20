@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 12:04+0300\n"
+"POT-Creation-Date: 2014-08-20 13:25+0300\n"
 "PO-Revision-Date: 2014-08-08 05:46+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1634,7 +1634,7 @@ msgstr "アイコンのマッピングを削除できません"
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1160
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
@@ -2122,7 +2122,7 @@ msgstr "トリガー条件式を追加できません"
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1138
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
@@ -2139,7 +2139,7 @@ msgstr "ログインできません。"
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update host name."
 msgstr "ホスト名を一括更新できません"
 
@@ -2147,7 +2147,7 @@ msgstr "ホスト名を一括更新できません"
 msgid "Cannot mass update template name."
 msgstr "テンプレート名を一括更新できません。"
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:949
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名は一括更新できません。"
 
@@ -2280,7 +2280,7 @@ msgstr "アイテムのリンク削除と削除が行えません"
 msgid "Cannot unlink and clear triggers"
 msgstr "トリガーのリンク削除と削除が行えません"
 
-#: include/classes/api/services/CHost.php:1133
+#: include/classes/api/services/CHost.php:1113
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
@@ -4103,7 +4103,7 @@ msgstr "削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のグラフ\"%1$s\"。"
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1441
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
@@ -4838,7 +4838,7 @@ msgstr "ホストが空白です。"
 #: include/classes/api/services/CHostGroup.php:461
 #: include/classes/api/services/CHostGroup.php:532
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1289
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:613
@@ -6226,7 +6226,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
 
-#: include/classes/api/services/CHost.php:975
+#: include/classes/api/services/CHost.php:972
 #: include/classes/api/services/CTemplate.php:467
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6485,7 +6485,7 @@ msgstr "ホストのサブネットマスク"
 msgid "Host time"
 msgstr "ホスト時間"
 
-#: include/classes/api/services/CHost.php:849
+#: include/classes/api/services/CHost.php:846
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
@@ -7206,7 +7206,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"に不正な文字列が使用されています。"
 
 #: include/classes/api/services/CHost.php:622
-#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:955
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
@@ -8019,7 +8019,7 @@ msgstr "表示名\"%s\"が正しくありません。利用できる文字: \"a-
 msgid "Inventory"
 msgstr "インベントリ"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1179
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
@@ -9959,7 +9959,7 @@ msgstr "グラフはありません。"
 msgid "No groups for host \"%s\"."
 msgstr "ホスト\"%s\"にグループが設定されていません。"
 
-#: include/classes/api/services/CHost.php:944
+#: include/classes/api/services/CHost.php:941
 msgid "No groups for hosts."
 msgstr "ホストにグループが設定されていません。"
 
@@ -10222,7 +10222,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:526
 #: include/classes/api/services/CHost.php:609
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1634
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -13587,7 +13587,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "テンプレート"
 
-#: include/classes/api/services/CHost.php:986
+#: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CTemplate.php:457
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15764,8 +15764,8 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 
 #: include/classes/api/services/CGraph.php:542
 #: include/classes/api/services/CGraphPrototype.php:553
-#: include/classes/api/services/CHost.php:880
-#: include/classes/api/services/CHost.php:938
+#: include/classes/api/services/CHost.php:877
+#: include/classes/api/services/CHost.php:935
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
