@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-17 13:49+0300\n"
-"PO-Revision-Date: 2014-07-31 05:39+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"PO-Revision-Date: 2014-08-19 04:41+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1406777987.0\n"
+"X-POOTLE-MTIME: 1408416084.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -5023,7 +5023,7 @@ msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "WMIクエリを実行して最初に選択したオブジェクトを返却。"
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41

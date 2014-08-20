@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-17 11:45+0300\n"
-"PO-Revision-Date: 2014-06-09 18:29+0300\n"
+"PO-Revision-Date: 2014-08-17 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1402331391.0\n"
+"X-POOTLE-MTIME: 1408293044.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -5105,7 +5105,7 @@ msgstr "SQL chyba pri spustení [%1$s] v [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Spustiť WMI dotaz a vrátiť prvý vybraný objekt."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
