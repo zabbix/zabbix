@@ -60,7 +60,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	else {
-		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes');
+		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, true);
 	}
 
 	$authenticationFormList->addRow(
@@ -83,7 +83,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 				? 'uid'
 				: $this->data['config']['ldap_search_attribute'],
 			ZBX_TEXTBOX_STANDARD_SIZE,
-			'no',
+			false,
 			128
 		)
 	);

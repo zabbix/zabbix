@@ -121,7 +121,7 @@ class CTemplate extends CHostGeneral {
 					' WHERE h.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 
@@ -613,9 +613,6 @@ class CTemplate extends CHostGeneral {
 		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
-
-		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.dbConditionInt('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {
