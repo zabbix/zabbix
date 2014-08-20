@@ -628,7 +628,15 @@
 	jQuery(document).ready(function() {
 		// clone button
 		jQuery('#clone').click(function() {
-			jQuery('#actionid, #delete, #clone, input[name$=operationid\\]]').remove();
+			jQuery('#actionid, #delete, #clone').remove();
+
+			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/i;
+			jQuery('input[name^=operations]').each(function() {
+				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
