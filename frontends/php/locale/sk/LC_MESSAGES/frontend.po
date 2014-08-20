@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 12:04+0300\n"
+"POT-Creation-Date: 2014-08-20 13:25+0300\n"
 "PO-Revision-Date: 2014-08-02 09:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1666,7 +1666,7 @@ msgstr "Nie je možné zmazať mapu ikon"
 msgid "Cannot delete image"
 msgstr "Nie je možné zmazať obrázok"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1160
 msgid "Cannot delete inventory."
 msgstr "Nie je možné zmazať inventár."
 
@@ -2209,7 +2209,7 @@ msgstr "Nie je možné vložiť výraz spúšťača"
 msgid "Cannot insert user media."
 msgstr "Nie je možné vložiť médium používateľa."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1138
 msgid "Cannot link template"
 msgstr "Nie je možné nalinkovať šablónu"
 
@@ -2226,7 +2226,7 @@ msgstr "Nie je možné Vás prihlásiť."
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update host name."
 msgstr "Nie je možné hromadne aktualizovať meno hosta."
 
@@ -2234,7 +2234,7 @@ msgstr "Nie je možné hromadne aktualizovať meno hosta."
 msgid "Cannot mass update template name."
 msgstr "Nie je možné hromadne aktualizovať meno šablóny."
 
-#: include/classes/api/services/CHost.php:952
+#: include/classes/api/services/CHost.php:949
 msgid "Cannot mass update visible host name."
 msgstr "Nie je možné hromadne aktualizovať zobrazované meno hosta."
 
@@ -2367,7 +2367,7 @@ msgstr "Nie je možné zrušiť prepojenie a zmazať položky"
 msgid "Cannot unlink and clear triggers"
 msgstr "Nie je možné zrušiť prepojenie a zmazať spúšťače"
 
-#: include/classes/api/services/CHost.php:1133
+#: include/classes/api/services/CHost.php:1113
 msgid "Cannot unlink template"
 msgstr "Nie je možné zrušiť prepojenie šablóny"
 
@@ -4194,7 +4194,7 @@ msgstr "Zmazané: Zisťovacie pravidlo \"%1$s\" na \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Zmazané: Graf \"%1$s\" na \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1441
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Zmazané: Host \"%1$s\"."
@@ -4933,7 +4933,7 @@ msgstr "Prázdny host."
 #: include/classes/api/services/CHostGroup.php:461
 #: include/classes/api/services/CHostGroup.php:532
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1289
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:613
@@ -6325,7 +6325,7 @@ msgstr[0] "Host"
 msgstr[1] "Hosty"
 msgstr[2] "Hostov"
 
-#: include/classes/api/services/CHost.php:975
+#: include/classes/api/services/CHost.php:972
 #: include/classes/api/services/CTemplate.php:467
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6592,7 +6592,7 @@ msgstr "Hostova maska podsiete"
 msgid "Host time"
 msgstr "Hostov čas"
 
-#: include/classes/api/services/CHost.php:849
+#: include/classes/api/services/CHost.php:846
 msgid "Host update failed."
 msgstr "Aktualizácia hosta zlyhala."
 
@@ -7314,7 +7314,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Nepovolené znaky použité pre host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:622
-#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:955
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Nepovolené znaky použité pre meno hosta \"%s\"."
@@ -8127,7 +8127,7 @@ msgstr "Neplatné view meno pre \"%s\". Povolené znaky: \"a-z\" a \".\"."
 msgid "Inventory"
 msgstr "Inventár"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1179
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventár vypnutý pre hosta \"%1$s\"."
@@ -10085,7 +10085,7 @@ msgstr "Nenájdené žiadne grafy."
 msgid "No groups for host \"%s\"."
 msgstr "Žiadne skupiny pre host \"%s\"."
 
-#: include/classes/api/services/CHost.php:944
+#: include/classes/api/services/CHost.php:941
 msgid "No groups for hosts."
 msgstr "Žiadne skupiny pre hostov."
 
@@ -10348,7 +10348,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:526
 #: include/classes/api/services/CHost.php:609
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1634
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -13719,7 +13719,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Šablóna"
 
-#: include/classes/api/services/CHost.php:986
+#: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CTemplate.php:457
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15919,8 +15919,8 @@ msgstr "Nešpecifikovali ste ciele pre akciu globálneho skriptu \"%s\"."
 
 #: include/classes/api/services/CGraph.php:542
 #: include/classes/api/services/CGraphPrototype.php:553
-#: include/classes/api/services/CHost.php:880
-#: include/classes/api/services/CHost.php:938
+#: include/classes/api/services/CHost.php:877
+#: include/classes/api/services/CHost.php:935
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
