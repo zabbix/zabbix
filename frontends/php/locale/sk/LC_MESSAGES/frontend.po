@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 13:25+0300\n"
-"PO-Revision-Date: 2014-08-02 09:32+0300\n"
+"POT-Creation-Date: 2014-08-20 13:50+0300\n"
+"PO-Revision-Date: 2014-08-17 12:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1406964738.0\n"
+"X-POOTLE-MTIME: 1408271539.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2088,22 +2088,22 @@ msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú ako minimálna
 #: include/classes/import/CConfigurationImport.php:1172
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú v grafe \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú v prototype grafu \"%3$s\" zisťovacieho pravidla \"%4$s\" na \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú v spúšťači \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nemôžem nájsť položku \"%1$s\" na \"%2$s\" použitú v prototype spúšťača \"%3$s\" zisťovacieho pravidla \"%4$s\" na \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -3363,8 +3363,9 @@ msgid "Create media type"
 msgstr "Vytvoriť typ média"
 
 #: include/views/conf.import.php:24
+#, fuzzy
 msgid "Create new"
-msgstr ""
+msgstr "Vytvoriť nový"
 
 #: include/views/administration.proxy.list.php:27
 msgid "Create proxy"
@@ -3880,8 +3881,9 @@ msgid "Delete"
 msgstr "Zmazať"
 
 #: include/views/js/conf.import.js.php:5
+#, fuzzy
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Zmazať všetky elementy, ktoré nie sú prítomné v XML súbore?"
 
 #: include/views/configuration.template.edit.php:482
 msgid "Delete and clear"
@@ -3955,7 +3957,7 @@ msgstr "Zmazať servisné okno?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "Zmazať chýbajúce"
 
 #: include/views/configuration.sysmap.edit.php:191
 msgid "Delete network map?"
@@ -5266,7 +5268,7 @@ msgstr "SQL chyba pri spustení [%1$s] v [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Spustiť WMI dotaz a vrátiť prvý vybraný objekt."
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
