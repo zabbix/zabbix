@@ -36,6 +36,180 @@ typedef struct
 }
 net_stat_t;
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,14)
+
+int	nlerr;
+
+static int	find_tcp_port_by_status_nl(unsigned short port, int state)
+{
+	int				ret = -1, fd = -1;
+	int				family = -1, found = 0, done;
+	int				status = -1, sequence = 0x5A4258;
+	struct timeval			timeout = { .tv_sec = 1, .tv_usec = 500 * 1000 };
+
+	struct msghdr			s_msg;
+	struct sockaddr_nl		s_sa;
+	struct iovec			s_io[1];
+	struct {
+		struct nlmsghdr		nlhdr;
+		struct inet_diag_req	r;
+	} request;
+
+	char				buffer[BUFSIZ] = { 0 };
+	struct msghdr			r_msg;
+	struct sockaddr_nl		r_sa;
+	struct iovec			r_io[1];
+	struct nlmsghdr			*r_hdr = NULL;
+
+	do
+	{
+		if (-1 == (fd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)))
+		{
+			nlerr = NLERR_SOCKCREAT;
+			break;
+		}
+
+		if (0 != setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)))
+		{
+			nlerr = NLERR_SOCKCREAT;
+			close(fd);
+			break;
+		}
+
+		nlerr = NLERR_OK;
+
+		do
+		{
+			if (-1 == family)
+				family = AF_INET;
+			else if (AF_INET == family)
+				family = AF_INET6;
+			else
+				break;
+
+			memset(&s_sa, 0, sizeof(struct sockaddr_nl));
+			s_sa.nl_family			= AF_NETLINK;
+
+			memset(&request, 0, sizeof(request));
+			request.nlhdr.nlmsg_len		= sizeof(request);
+			request.nlhdr.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
+			request.nlhdr.nlmsg_pid		= 0;
+			request.nlhdr.nlmsg_seq		= sequence;
+			request.nlhdr.nlmsg_type	= TCPDIAG_GETSOCK;
+
+			request.r.idiag_family		= family;
+			request.r.idiag_states		= (1 << state);
+
+			s_io[0] = (struct iovec) {
+				.iov_base		= &request,
+				.iov_len		= sizeof(request)
+			};
+
+			s_msg = (struct msghdr) {
+				.msg_name		= (void *)&s_sa,
+				.msg_namelen		= sizeof(struct sockaddr_nl),
+				.msg_iov		= s_io,
+				.msg_iovlen		= 1
+			};
+
+			if (-1 == sendmsg(fd, &s_msg, 0))
+			{
+				nlerr = NLERR_BADSEND;
+				break;
+			}
+
+			memset(&r_sa, 0, sizeof(struct sockaddr_nl));
+			r_sa.nl_family			= AF_NETLINK;
+
+			r_io[0] = (struct iovec) {
+				.iov_base		= buffer,
+				.iov_len		= BUFSIZ
+			};
+
+			done = 0;
+
+			while (NLERR_OK == nlerr && 1 != done)
+			{
+				memset(&r_msg, 0, sizeof(struct msghdr));
+
+				r_msg = (struct msghdr) {
+					.msg_name	= (void *)&r_sa,
+					.msg_namelen	= sizeof(struct sockaddr_nl),
+					.msg_iov	= r_io,
+					.msg_iovlen	= 1
+				};
+
+				status = recvmsg(fd, &r_msg, 0);
+
+				if (0 > status)
+				{
+					if (EAGAIN == errno || EWOULDBLOCK == errno)
+						nlerr = NLERR_RECVTIMEOUT;
+					else if (EINTR != errno)
+						nlerr = NLERR_BADRECV;
+
+					continue;
+				}
+
+				if (0 == status)
+					break;
+
+				for (r_hdr = (struct nlmsghdr *)buffer;
+					NLMSG_OK(r_hdr, status) && 1 != found && 1 != done;
+					r_hdr = NLMSG_NEXT(r_hdr, status))
+				{
+					int			err;
+					struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
+
+					if (sequence != r_hdr->nlmsg_seq)
+						continue;
+
+					switch (r_hdr->nlmsg_type)
+					{
+						case NLMSG_DONE:
+								done = 1;
+								break;
+						case NLMSG_ERROR:
+								{
+									struct nlmsgerr	*err = (struct nlmsgerr *)NLMSG_DATA(r_hdr);
+
+									if (NLMSG_LENGTH(sizeof(struct nlmsgerr)) > r_hdr->nlmsg_len)
+										nlerr = NLERR_RESPTRUNCAT;
+									else
+									{
+										errno = -err->error;
+										nlerr = (EOPNOTSUPP == errno) ? NLERR_OPNOTSUPPORTED : NLERR_UNKNOWN;
+									}
+
+									done = 1;
+
+									break;
+								}
+						case 0x12:
+								if (family == r->idiag_family && state == r->idiag_state && port == ntohs(r->id.idiag_sport))
+									(found = 1) && (done = 1);
+
+								break;
+						default:
+								nlerr = NLERR_UNKNOWNMSGTYPE;
+					}
+				}
+			}
+
+		} while(NLERR_OK == nlerr && 1 != found);
+	} while(0);
+
+	if (NLERR_SOCKCREAT != nlerr)
+		close(fd);
+
+	if (NLERR_OK == nlerr)
+		ret = found;
+
+	return ret;
+}
+
+#endif
+
 static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 {
 	int	ret = SYSINFO_RET_FAIL;
@@ -342,6 +516,45 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,14)
+	n = find_tcp_port_by_status_nl(port, STATE_LISTEN);
+
+	if (-1 == n)
+	{
+		switch(nlerr)
+		{
+			case NLERR_UNKNOWN:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unrecognized netlink error occurred."));
+				break;
+			case NLERR_SOCKCREAT:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot create netlink socket."));
+				break;
+			case NLERR_BADSEND:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot send netlink message to kernel."));
+				break;
+			case NLERR_BADRECV:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive netlink message from kernel."));
+				break;
+			case NLERR_RECVTIMEOUT:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Receiving netlink response timed out."));
+				break;
+			case NLERR_RESPTRUNCAT:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Received truncated netlink response from kernel."));
+				break;
+			case NLERR_OPNOTSUPPORTED:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Netlink operation not supported."));
+				break;
+			case NLERR_UNKNOWNMSGTYPE:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Received message of unrecognized type from kernel."));
+				break;
+		}
+	}
+	else
+	{
+		ret = SYSINFO_RET_OK;
+		listen = n;
+	}
+#else
 	buffer = zbx_malloc(NULL, buffer_alloc);
 
 	if (0 < (n = proc_read_file("/proc/net/tcp", &buffer, &buffer_alloc)))
@@ -373,7 +586,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 out:
 	zbx_free(buffer);
-
+#endif /* LINUX_VERSION_CODE conditional */
 	SET_UI64_RESULT(result, listen);
 
 	return ret;
