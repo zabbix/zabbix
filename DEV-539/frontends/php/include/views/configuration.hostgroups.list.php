@@ -152,15 +152,19 @@ foreach ($this->data['groups'] as $group) {
 
 // create go button
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('hostgroup.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected hosts?'));
 $goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('hostgroup.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts in the selected host groups?'));
 $goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('hostgroup.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected host groups?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "groups";');

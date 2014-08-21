@@ -40,7 +40,8 @@ $fields = array(
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN("'hostgroup.massdelete','hostgroup.massdisable','hostgroup.massenable'"),
-							null),
+							null
+						),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
