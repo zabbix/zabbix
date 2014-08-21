@@ -88,7 +88,11 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
-	$statusLink = 'media_types.php?action='.(($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'mediatype.massenable' : 'mediatype.massdisable').
+	$statusLink = 'media_types.php'.
+		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
+			? 'mediatype.massenable'
+			: 'mediatype.massdisable'
+		).
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
@@ -108,6 +112,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 
 // create go button
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('mediatype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected media types?'));
 $goComboBox->addItem($goOption);

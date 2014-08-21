@@ -156,8 +156,8 @@ elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	}
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('mediatype.massenable', 'mediatype.massdisable'))) {
-	$mediaTypeIds = getRequest('mediatypeids', array());
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('mediatype.massenable', 'mediatype.massdisable')) && hasRequest('mediatypeids')) {
+	$mediaTypeIds = getRequest('mediatypeids');
 	$enable = (getRequest('action') == 'mediatype.massenable');
 	$status = $enable ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
 	$update = array();
@@ -185,8 +185,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('mediat
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'mediatype.massdelete') {
-	$result = API::Mediatype()->delete(getRequest('mediatypeids', array()));
+elseif (hasRequest('action') && getRequest('action') == 'mediatype.massdelete' && hasRequest('mediatypeids')) {
+	$result = API::Mediatype()->delete(getRequest('mediatypeids'));
 
 	if ($result) {
 		uncheckTableRows();
