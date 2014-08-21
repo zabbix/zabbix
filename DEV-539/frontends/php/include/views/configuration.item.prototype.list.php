@@ -72,7 +72,10 @@ foreach ($this->data['items'] as $item) {
 		itemIndicator($item['status']),
 		'?group_itemid='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&action='.($item['status'] ? 'itemprototype.massenable' : 'itemprototype.massdisable'),
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED
+				? 'itemprototype.massenable'
+				: 'itemprototype.massdisable'
+			),
 		itemIndicatorStyle($item['status'])
 	);
 
@@ -105,6 +108,7 @@ foreach ($this->data['items'] as $item) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('itemprototype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
