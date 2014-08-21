@@ -53,7 +53,9 @@ $fields = array(
 	'set_debug_mode' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'usergroup.massdisable','usergroup.massdisabledebug','usergroup.massdelete','usergroup.massenable','usergroup.massenabledebug','usergroup.set_gui_access'"),
+								IN("'usergroup.massdisable','usergroup.massdisabledebug','usergroup.massdelete',".
+									"'usergroup.massenable','usergroup.massenabledebug','usergroup.set_gui_access'"
+								),
 								null
 							),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),

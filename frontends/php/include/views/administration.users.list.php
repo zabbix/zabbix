@@ -147,12 +147,15 @@ foreach ($this->data['users'] as $user) {
 
 // append Go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('user.massunblock', _('Unblock selected'));
 $goOption->setAttribute('confirm', _('Unblock selected users?'));
 $goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('user.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected users?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
