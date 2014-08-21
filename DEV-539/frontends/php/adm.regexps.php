@@ -38,8 +38,6 @@ $fields = array(
 	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})', _('Test string')),
 	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})'),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,	null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'regexp.massdelete'"),	null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
@@ -50,6 +48,7 @@ $fields = array(
 	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null)
 );
 check_fields($fields);
+
 /*
  * Ajax
  */
@@ -119,11 +118,7 @@ if (hasRequest('action') && !hasRequest('regexpid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
-	unset($_REQUEST['regexpid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['save'])) {
+if (isset($_REQUEST['save'])) {
 	$regExp = array(
 		'name' => $_REQUEST['name'],
 		'test_string' => $_REQUEST['test_string']
@@ -161,11 +156,7 @@ elseif (isset($_REQUEST['save'])) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
-	$regExpIds = getRequest('regexpid', array());
-
-	if (isset($_REQUEST['regexpids'])) {
-		$regExpIds = $_REQUEST['regexpids'];
-	}
+	$regExpIds = getRequest('regexpids', getRequest('regexpid', array()));
 
 	zbx_value2array($regExpIds);
 
