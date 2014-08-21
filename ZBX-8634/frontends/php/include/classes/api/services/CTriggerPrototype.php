@@ -470,7 +470,16 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
 			}
 
-			$this->validateTriggerPrototype($triggerPrototype);
+			if (array_key_exists('templateid', $triggerPrototype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot set "templateid" for trigger prototype "%1$s".',
+					$triggerPrototype['description']
+				));
+			}
+
+			$this->checkIfExistsOnHost($triggerPrototype);
+
+			$this->validateTriggerPrototypeExpression($triggerPrototype);
 		}
 	}
 
@@ -874,7 +883,18 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			$this->validateTriggerPrototype($triggerPrototype);
+			if (array_key_exists('templateid', $triggerPrototype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot set "templateid" for trigger prototype "%1$s".',
+					$triggerPrototype['description']
+				));
+			}
+
+			$this->checkIfExistsOnHost($triggerPrototype);
+
+			if (isset($triggerPrototype['expression'])) {
+				$this->validateTriggerPrototypeExpression($triggerPrototype);
+			}
 		}
 	}
 
@@ -922,15 +942,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @return void
 	 */
-	protected function validateTriggerPrototype(array $triggerPrototype) {
-		// check for "templateid", because it is not allowed
-		if (array_key_exists('templateid', $triggerPrototype)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot set "templateid" for trigger prototype "%1$s".',
-				$triggerPrototype['description']
-			));
-		}
-
+	protected function validateTriggerPrototypeExpression(array $triggerPrototype) {
 		$triggerExpression = new CTriggerExpression();
 		if (!$triggerExpression->parse($triggerPrototype['expression'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
@@ -941,7 +953,5 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggerExpressionItems = getExpressionItems($triggerExpression);
 		$this->checkDiscoveryRuleCount($triggerPrototype, $triggerExpressionItems);
-
-		$this->checkIfExistsOnHost($triggerPrototype);
 	}
 }
