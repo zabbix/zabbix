@@ -214,7 +214,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'full_clone';
 }
-elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && isset($_REQUEST['masssave'])) {
+elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
 	$hostIds = getRequest('hosts', array());
 	$visible = getRequest('visible', array());
 	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
@@ -646,13 +646,12 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.massenable', 'host.massdisable'))) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.massenable', 'host.massdisable')) && hasRequest('hosts')) {
 	$enable =(getRequest('action') == 'host.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-	$hosts = getRequest('hosts', array());
 
 	$actHosts = API::Host()->get(array(
-		'hostids' => $hosts,
+		'hostids' => getRequest('hosts'),
 		'editable' => true,
 		'templated_hosts' => true,
 		'output' => array('hostid')
@@ -702,7 +701,7 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
 	$data = array(
-		'hosts' => getRequest('hosts', array()),
+		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', array()),
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
@@ -979,33 +978,24 @@ else {
 
 		$statusScript = null;
 
-		switch ($host['status']) {
-			case HOST_STATUS_MONITORED:
-				if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					$statusCaption = _('In maintenance');
-					$statusClass = 'orange';
-				}
-				else {
-					$statusCaption = _('Enabled');
-					$statusClass = 'enabled';
-				}
+		if ($host['status'] == HOST_STATUS_MONITORED) {
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$statusCaption = _('In maintenance');
+				$statusClass = 'orange';
+			}
+			else {
+				$statusCaption = _('Enabled');
+				$statusClass = 'enabled';
+			}
 
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
-				break;
-
-			case HOST_STATUS_NOT_MONITORED:
-				$statusCaption = _('Disabled');
-				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
-				$statusClass = 'disabled';
-				break;
-
-			default:
-				$statusCaption = _('Unknown');
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
-				$statusClass = 'unknown';
+			$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
+			$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
+		}
+		else {
+			$statusCaption = _('Disabled');
+			$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
+			$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
+			$statusClass = 'disabled';
 		}
 
 		$status = new CLink($statusCaption, $statusUrl, $statusClass, $statusScript);
@@ -1072,17 +1062,22 @@ else {
 	}
 
 	$goBox = new CComboBox('action');
+
 	$goBox->addItem('host.export', _('Export selected'));
+
 	$goBox->addItem('host.massupdateform', _('Mass update'));
 	$goOption = new CComboItem('host.massenable', _('Enable selected'));
 	$goOption->setAttribute('confirm', _('Enable selected hosts?'));
 	$goBox->addItem($goOption);
+
 	$goOption = new CComboItem('host.massdisable', _('Disable selected'));
 	$goOption->setAttribute('confirm', _('Disable selected hosts?'));
 	$goBox->addItem($goOption);
+
 	$goOption = new CComboItem('host.massdelete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected hosts?'));
 	$goBox->addItem($goOption);
+
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 
