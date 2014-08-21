@@ -297,7 +297,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	}
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'user.massunblock' && getRequest('group_userid')) {
+elseif (hasRequest('action') && getRequest('action') == 'user.massunblock' && hasRequest('group_userid')) {
 	$groupUserId = getRequest('group_userid');
 
 	DBstart();
