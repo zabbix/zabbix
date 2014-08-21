@@ -121,7 +121,9 @@ $fields = array(
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN("'itemprototype.massdelete','itemprototype.massdisable','itemprototype.massenable'"),
+									IN("'itemprototype.massdelete','itemprototype.massdisable',".
+										"'itemprototype.massenable'"
+									),
 									null
 								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
