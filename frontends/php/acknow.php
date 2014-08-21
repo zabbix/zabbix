@@ -32,8 +32,7 @@ ob_start();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$action = getRequest('action');
-$bulk = ($getRequest['action'] == 'trigger.bulkacknowledge');
+$bulk = (getRequest('action', '') == 'trigger.bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
