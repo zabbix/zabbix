@@ -3065,7 +3065,7 @@ void	free_database_cache()
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
 	const char	*__function_name = "DCget_nextid";
-	int		i, nodeid;
+	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
@@ -3107,17 +3107,23 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
-	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
-
-	if (table->flags & ZBX_SYNC)
+	if (0 == CONFIG_NODEID)
 	{
-		min += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
+		min = 0;
+		max = ZBX_STANDALONE_MAX_IDS;
+	}
+	else if (0 != (table->flags & ZBX_SYNC))
+	{
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID +
+			ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)CONFIG_NODEID;
 		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
 	}
 	else
+	{
+		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID;
 		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
+	}
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid,

@@ -443,16 +443,12 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
-		unsigned char item_type, const char *key, unsigned char flags)
+static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char type, const char *key)
 {
-	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
-				ITEM_TYPE_CALCULATED != item_type))
-	{
+	if (0 != proxy_hostid && ITEM_TYPE_AGGREGATE != type && ITEM_TYPE_CALCULATED != type)
 		return ZBX_NO_POLLER;
-	}
 
-	switch (item_type)
+	switch (type)
 	{
 		case ITEM_TYPE_SIMPLE:
 			if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
@@ -496,11 +492,39 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_counted_in_item_queue                                         *
+ *                                                                            *
+ * Purpose: determine whether the given item type is counted in item queue    *
+ *                                                                            *
+ * Return value: SUCCEED if item is counted in the queue, FAIL otherwise      *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_counted_in_item_queue(unsigned char type, const char *key)
+{
+	switch (type)
+	{
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			if (0 == strncmp(key, "log[", 4) ||
+					0 == strncmp(key, "logrt[", 6) ||
+					0 == strncmp(key, "eventlog[", 9))
+			{
+				return FAIL;
+			}
+			break;
+		case ITEM_TYPE_TRAPPER:
+		case ITEM_TYPE_HTTPTEST:
+		case ITEM_TYPE_SNMPTRAP:
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_item_nextcheck_seed                                          *
  *                                                                            *
  * Purpose: get the seed value to be used for item nextcheck calculations     *
- *                                                                            *
- * Parameters: item - [IN] the item                                           *
  *                                                                            *
  * Return value: the seed for nextcheck calculations                          *
  *                                                                            *
@@ -510,40 +534,45 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  *           same nextcheck values.                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
+static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t interfaceid, unsigned char type,
+		const char *key)
 {
-	if (ITEM_TYPE_JMX == item->type || SUCCEED == is_snmp_type(item->type))
-		return item->interfaceid;
+	if (ITEM_TYPE_JMX == type || SUCCEED == is_snmp_type(type))
+		return interfaceid;
 
-	if (ITEM_TYPE_SIMPLE == item->type)
+	if (ITEM_TYPE_SIMPLE == type)
 	{
-		if (SUCCEED == cmp_key_id(item->key, SERVER_ICMPPING_KEY) ||
-				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGSEC_KEY) ||
-				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGLOSS_KEY))
+		if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
+				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
+				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
 		{
-			return item->interfaceid;
+			return interfaceid;
 		}
 	}
 
-	return item->itemid;
+	return itemid;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 {
-	int	nextcheck;
+	int		nextcheck;
+	zbx_uint64_t	seed;
+
+	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-				config->config->refresh_unsupported, NULL, now);
+		nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL, now);
 	}
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
+		const char		*delay_flex;
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-				item->delay, NULL != flexitem ? flexitem->delay_flex : NULL, now);
+		delay_flex = (NULL != flexitem ? flexitem->delay_flex : NULL);
+
+		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now);
 	}
 
 	return nextcheck;
@@ -1101,9 +1130,8 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type, status;
-	int			delay, delay_flex_changed, found;
-	int			update_index, old_nextcheck;
+	unsigned char		old_poller_type, status, type;
+	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1129,6 +1157,7 @@ static void	DCsync_items(DB_RESULT result)
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UCHAR(status, row[2]);
+		ZBX_STR2UCHAR(type, row[3]);
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
@@ -1170,9 +1199,7 @@ static void	DCsync_items(DB_RESULT result)
 		/* store new information in item structure */
 
 		item->hostid = hostid;
-		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
-		DCstrpool_replace(found, &item->key, row[6]);
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
@@ -1188,9 +1215,12 @@ static void	DCsync_items(DB_RESULT result)
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
 
+		key_changed = (SUCCEED == DCstrpool_replace(found, &item->key, row[6]));
+
 		if (0 == found)
 		{
 			item->triggers = NULL;
+			item->nextcheck = 0;
 			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[20]);
 			item->db_state = item->state;
@@ -1198,10 +1228,8 @@ static void	DCsync_items(DB_RESULT result)
 			item->mtime = atoi(row[32]);
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
-
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
-			old_nextcheck = 0;
 		}
 		else
 		{
@@ -1209,7 +1237,6 @@ static void	DCsync_items(DB_RESULT result)
 				item->data_expected_from = now;
 
 			old_poller_type = item->poller_type;
-			old_nextcheck = item->nextcheck;
 
 			if (NULL != item->triggers)
 			{
@@ -1228,6 +1255,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		item->status = status;
+		old_nextcheck = item->nextcheck;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1265,8 +1293,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			item->poller_type = poller_by_item(itemid, host->proxy_hostid, item->type, item->key,
-					item->flags);
+			item->poller_type = poller_by_item(host->proxy_hostid, type, item->key);
 
 			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -1276,26 +1303,32 @@ static void	DCsync_items(DB_RESULT result)
 				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 			}
 
-			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
+			if (SUCCEED == is_counted_in_item_queue(type, item->key) &&
+					(0 == item->nextcheck || 0 != key_changed || item->type != type ||
 					(ITEM_STATE_NORMAL == item->state &&
-					(delay != item->delay || 0 != delay_flex_changed))))
+					(item->delay != delay || 0 != delay_flex_changed))))
 			{
+				zbx_uint64_t	seed;
+
+				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, type, item->key);
+
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, config->config->refresh_unsupported, NULL, now);
+					item->nextcheck = calculate_item_nextcheck(seed, type,
+							config->config->refresh_unsupported, NULL, now);
 				}
 				else
-				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
-							item->type, delay, row[16], now);
-				}
+					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16], now);
 			}
 		}
 		else
+		{
 			item->poller_type = ZBX_NO_POLLER;
+			item->nextcheck = 0;
+		}
 
 		item->delay = delay;
+		item->type = type;
 
 		/* numeric items */
 
@@ -4654,8 +4687,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
-				dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
-						dc_item->type, dc_item->key, dc_item->flags);
+				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
+						dc_item->key);
 
 				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -4952,8 +4985,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			return;
 
-		dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
-				dc_item->type, dc_item->key, dc_item->flags);
+		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
 	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
@@ -5008,7 +5040,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
+		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->nextcheck)
 			continue;
 
 		dc_item->state = states[i];
@@ -5017,6 +5049,9 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 			dc_item->lastlogsize = lastlogsizes[i];
 		if (NULL != mtimes)
 			dc_item->mtime = mtimes[i];
+
+		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
+			continue;
 
 		switch (errcodes[i])
 		{
@@ -5931,7 +5966,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		const ZBX_DC_HOST	*host;
 
-		if (ITEM_STATUS_ACTIVE != item->status)
+		if (ITEM_STATUS_ACTIVE != item->status || SUCCEED != is_counted_in_item_queue(item->type, item->key))
 			continue;
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
@@ -5948,22 +5983,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 		switch (item->type)
 		{
-			case ITEM_TYPE_ZABBIX_ACTIVE:
-				if (0 == strncmp(item->key, "log[", 4) ||
-						0 == strncmp(item->key, "logrt[", 6) ||
-						0 == strncmp(item->key, "eventlog[", 9))
-				{
-					continue;
-				}
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-			case ITEM_TYPE_SIMPLE:
-			case ITEM_TYPE_INTERNAL:
-			case ITEM_TYPE_DB_MONITOR:
-			case ITEM_TYPE_AGGREGATE:
-			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_CALCULATED:
-				break;
 			case ITEM_TYPE_ZABBIX:
 				if (HOST_AVAILABLE_TRUE != host->available)
 					continue;
@@ -5982,8 +6001,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				if (HOST_AVAILABLE_TRUE != host->jmx_available)
 					continue;
 				break;
-			default:
-				continue;
 		}
 
 		if ((-1 != from && from > now - item->nextcheck) || (-1 != to && now - item->nextcheck >= to))
