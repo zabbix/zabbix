@@ -359,7 +359,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
 	int		err;
-	char		*auth = NULL;
+	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
 	CURL            *easyhandle = NULL;
 #endif
@@ -384,6 +384,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+		goto clean;
+	}
+
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
@@ -398,7 +404,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
-	if (NULL != CONFIG_SSL_CA_LOCATION)
+	if (0 != httptest->httptest.verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
 		{
@@ -664,7 +670,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 		}
 		else
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			err_str = zbx_dsprintf(err_str, "%s: %s", curl_easy_strerror(err), errbuf);
 
 		zbx_free(page.data);
 httpstep_error:
