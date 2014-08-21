@@ -153,7 +153,7 @@ elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.mass
 	$result = true;
 	$enable =(getRequest('action') == 'proxy.massenable');
 	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = getRequest('hosts', array());
+	$hosts = getRequest('hosts');
 
 	DBstart();
 
