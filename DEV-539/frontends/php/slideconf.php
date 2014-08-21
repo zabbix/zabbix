@@ -137,10 +137,10 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	}
 	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete') {
+elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' && hasRequest('shows')) {
 	$result = true;
 
-	$shows = getRequest('shows', array());
+	$shows = getRequest('shows');
 	DBstart();
 
 	foreach ($shows as $showid) {
