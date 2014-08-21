@@ -191,7 +191,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ((hasRequest('delete') && hasRequest('screenid')) || (hasRequest('action') && getRequest('action') == 'screen.massdelete')) {
+elseif ((hasRequest('delete') && hasRequest('screenid')) || (hasRequest('action') && getRequest('action') == 'screen.massdelete' && hasRequest('screens'))) {
 	$screenids = getRequest('screens', array());
 	if (hasRequest('screenid')) {
 		$screenids[] = getRequest('screenid');
