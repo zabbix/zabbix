@@ -313,16 +313,16 @@ class CMap extends CMapElement {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('map.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
+		$map = $this->get(array(
 			'output' => array('sysmapid'),
+			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $map;
 	}
 
 	public function checkInput(&$maps, $method) {

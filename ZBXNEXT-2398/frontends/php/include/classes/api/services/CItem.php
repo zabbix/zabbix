@@ -415,9 +415,9 @@ class CItem extends CItemGeneral {
 		$this->deprecated('item.exists method is deprecated.');
 
 		$options = array(
+			'output' => array('itemid'),
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => true,
-			'output' => array('itemid'),
 			'limit' => 1
 		);
 
@@ -428,9 +428,9 @@ class CItem extends CItemGeneral {
 			$options['filter']['host'] = $object['host'];
 		}
 
-		$objs = $this->get($options);
+		$item = $this->get($options);
 
-		return !empty($objs);
+		return (bool) $item;
 	}
 
 	/**

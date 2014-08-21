@@ -266,10 +266,10 @@ class CMapImporter extends CImporter {
 
 				foreach ($link['linktriggers'] as &$linktrigger) {
 					$dbTriggers = API::Trigger()->get(array(
-						'filter' => $linktrigger['trigger'],
-						'output' => array('triggerid')
+						'output' => array('triggerid'),
+						'filter' => $linktrigger['trigger']
 					));
-					if (empty($dbTriggers)) {
+					if (!$dbTriggers) {
 						throw new Exception(_s(
 							'Cannot find trigger "%1$s" used in map "%2$s".',
 							$linktrigger['trigger']['description'],

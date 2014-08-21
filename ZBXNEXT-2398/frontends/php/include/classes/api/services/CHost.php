@@ -486,16 +486,16 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('host.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
+		$host = $this->get(array(
 			'output' => array('hostid'),
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $host;
 	}
 
 	protected function checkInput(&$hosts, $method) {

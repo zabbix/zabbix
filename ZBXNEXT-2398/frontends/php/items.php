@@ -328,19 +328,17 @@ foreach ($subfiltersList as $name) {
 	}
 }
 
-
-if (!hasRequest('form') && hasRequest('filter_hostid') && getRequest('filter_hostid')) {
-	$filterHostId = getRequest('filter_hostid');
-
+$filterHostId = getRequest('filter_hostid');
+if (!hasRequest('form') && $filterHostId) {
 	if (!isset($host)) {
 		$host = API::Host()->get(array(
-			'hostids' => $filterHostId,
-			'output' => array('hostid')
+			'output' => array('hostid'),
+			'hostids' => $filterHostId
 		));
-		if (empty($host)) {
+		if (!$host) {
 			$host = API::Template()->get(array(
-				'templateids' => $filterHostId,
-				'output' => array('templateid')
+				'output' => array('templateid'),
+				'templateids' => $filterHostId
 			));
 		}
 		$host = reset($host);

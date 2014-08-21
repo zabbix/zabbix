@@ -530,13 +530,7 @@ class CTrigger extends CTriggerGeneral {
 	public function exists(array $object) {
 		$this->deprecated('trigger.exists method is deprecated.');
 
-		$keyFields = array(
-			array(
-				'hostid',
-				'host'
-			),
-			'description'
-		);
+		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
 
@@ -1708,8 +1702,8 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$dependencies = $this->get(array(
-				'triggerids' => $relationMap->getRelatedIds(),
 				'output' => $options['selectDependencies'],
+				'triggerids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');

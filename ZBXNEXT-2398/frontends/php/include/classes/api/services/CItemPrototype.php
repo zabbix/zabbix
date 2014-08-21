@@ -273,21 +273,26 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('itemprototype.exists method is deprecated.');
 
 		$options = array(
-			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
+			'filter' => array('key_' => $object['key_']),
 			'limit' => 1
 		);
 
-		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
-		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
+		if (isset($object['hostid'])) {
+			$options['hostids'] = $object['hostid'];
+		}
 
-		$objs = $this->get($options);
+		if (isset($object['host'])) {
+			$options['filter']['host'] = $object['host'];
+		}
 
-		return !empty($objs);
+		$itemPrototype = $this->get($options);
+
+		return (bool) $itemPrototype;
 	}
 
 	/**

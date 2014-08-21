@@ -250,28 +250,30 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('graph.exists method is deprecated.');
 
 		$options = array(
-			'filter' => array('flags' => null),
 			'output' => array('graphid'),
+			'filter' => array('flags' => null),
 			'limit' => 1
 		);
 
 		if (isset($object['name'])) {
 			$options['filter']['name'] = $object['name'];
 		}
+
 		if (isset($object['host'])) {
 			$options['filter']['host'] = $object['host'];
 		}
+
 		if (isset($object['hostids'])) {
 			$options['hostids'] = zbx_toArray($object['hostids']);
 		}
 
-		$objs = $this->get($options);
+		$graph = $this->get($options);
 
-		return !empty($objs);
+		return (bool) $graph;
 	}
 
 	/**

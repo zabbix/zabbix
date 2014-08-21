@@ -268,13 +268,13 @@ class CMaintenance extends CApiService {
 
 		$keyFields = array(array('maintenanceid', 'name'));
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$maintenance = $this->get(array(
 			'output' => array('maintenanceid'),
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'limit' => 1
-		);
-		$objs = $this->get($options);
-		return !empty($objs);
+		));
+
+		return (bool) $maintenance;
 	}
 
 	/**

@@ -250,16 +250,16 @@ class CApplication extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('application.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
+		$application = $this->get(array(
 			'output' => array('applicationid'),
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $application;
 	}
 
 	public function checkInput(&$applications, $method) {

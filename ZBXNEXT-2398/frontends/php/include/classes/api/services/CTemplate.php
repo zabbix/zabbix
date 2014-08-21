@@ -316,16 +316,16 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('template.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
+		$template = $this->get(array(
 			'output' => array('templateid'),
+			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $template;
 	}
 
 	/**

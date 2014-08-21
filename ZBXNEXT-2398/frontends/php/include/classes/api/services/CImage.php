@@ -183,16 +183,16 @@ class CImage extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('image.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
+		$image = $this->get(array(
 			'output' => array('imageid'),
+			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $image;
 	}
 
 	/**

@@ -179,16 +179,22 @@ class CDRule extends CApiService {
 		$this->deprecated('drule.exists method is deprecated.');
 
 		$options = array(
-			'filter' => array(),
 			'output' => array('druleid'),
+			'filter' => array(),
 			'limit' => 1
 		);
-		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
-		if (isset($object['druleids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
-		$objs = $this->get($options);
+		if (isset($object['name'])) {
+			$options['filter']['name'] = $object['name'];
+		}
 
-		return !empty($objs);
+		if (isset($object['druleids'])) {
+			$options['druleids'] = zbx_toArray($object['druleids']);
+		}
+
+		$dRule = $this->get($options);
+
+		return (bool) $dRule;
 	}
 
 	public function checkInput(array &$dRules) {

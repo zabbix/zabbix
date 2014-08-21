@@ -451,14 +451,13 @@ class CGraphPrototype extends CGraphGeneral {
 					}
 
 					$chdGraphItemItems = array();
-					$options = array(
-						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
-						'output' => array('key_', 'hostid', 'itemid'),
-						'preservekeys' => true
-					);
+
 					foreach(array(API::Item(), API::ItemPrototype()) as $api) {
-						/* @var $api CItemGeneral */
-						$chdGraphItemItems += $api->get($options);
+						$chdGraphItemItems += $api->get(array(
+							'output' => array('key_', 'hostid', 'itemid'),
+							'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
+							'preservekeys' => true
+						));
 					}
 
 					if (count($chdGraph['gitems']) == count($tmpGraph['gitems'])) {

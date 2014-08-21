@@ -440,8 +440,8 @@ class CGraph extends CGraphGeneral {
 					}
 
 					$chdGraphItemItems = API::Item()->get(array(
-						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
 						'output' => array('itemid', 'key_', 'hostid'),
+						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
 						'preservekeys' => true
 					));
 
