@@ -98,6 +98,7 @@ foreach ($this->data['proxies'] as $proxy) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('proxy.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
