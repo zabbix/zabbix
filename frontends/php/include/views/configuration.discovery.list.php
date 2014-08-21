@@ -48,7 +48,7 @@ foreach ($data['drules'] as $drule) {
 
 	$status = new CCol(new CLink(
 		discovery_status2str($drule['status']),
-		'?g_druleid[]='.$drule['druleid'].($drule['status'] == DRULE_STATUS_ACTIVE ? '&action=drule.massdisable' : '&action=drule.massenable'),
+		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable'),
 		discovery_status2style($drule['status'])
 	));
 
@@ -64,6 +64,7 @@ foreach ($data['drules'] as $drule) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('drule.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
