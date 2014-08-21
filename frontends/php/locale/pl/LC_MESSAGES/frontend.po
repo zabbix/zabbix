@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 13:50+0300\n"
+"POT-Creation-Date: 2014-08-21 11:06+0300\n"
 "PO-Revision-Date: 2014-08-20 09:11+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -117,7 +117,7 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
 
-#: include/views/configuration.action.edit.php:483
+#: include/views/configuration.action.edit.php:484
 msgid "(0 - infinitely)"
 msgstr "(0 - nieskończenie)"
 
@@ -135,7 +135,7 @@ msgstr "(w dniach)"
 msgid "(in sec)"
 msgstr "(w sekundach)"
 
-#: include/views/configuration.action.edit.php:494
+#: include/views/configuration.action.edit.php:495
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(minimum 60 sekund, 0 - używaj wartości domyślnej dla akcji)"
 
@@ -264,7 +264,7 @@ msgstr "Konto zostało zablokowane na %s sekund"
 
 #: events.php:481 include/actions.inc.php:232 include/blocks.inc.php:1005
 #: include/blocks.inc.php:1299 include/events.inc.php:197
-#: include/events.inc.php:272 include/views/configuration.action.edit.php:1041
+#: include/events.inc.php:272 include/views/configuration.action.edit.php:1042
 msgid "Ack"
 msgstr "Potw."
 
@@ -315,11 +315,11 @@ msgstr "Potwierdzanie wyłączone"
 #: include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
-#: include/views/configuration.action.edit.php:552
-#: include/views/configuration.action.edit.php:561
-#: include/views/configuration.action.edit.php:677
-#: include/views/configuration.action.edit.php:947
-#: include/views/configuration.action.edit.php:1068
+#: include/views/configuration.action.edit.php:553
+#: include/views/configuration.action.edit.php:562
+#: include/views/configuration.action.edit.php:678
+#: include/views/configuration.action.edit.php:948
+#: include/views/configuration.action.edit.php:1069
 #: include/views/configuration.graph.edit.php:239
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.edit.php:688
@@ -441,12 +441,12 @@ msgstr "Aktywne do"
 #: include/views/common.filter.trigger.php:132
 #: include/views/common.macros.php:69
 #: include/views/configuration.action.edit.php:350
-#: include/views/configuration.action.edit.php:556
-#: include/views/configuration.action.edit.php:565
-#: include/views/configuration.action.edit.php:850
-#: include/views/configuration.action.edit.php:904
-#: include/views/configuration.action.edit.php:1047
-#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:557
+#: include/views/configuration.action.edit.php:566
+#: include/views/configuration.action.edit.php:851
+#: include/views/configuration.action.edit.php:905
+#: include/views/configuration.action.edit.php:1048
+#: include/views/configuration.action.edit.php:1057
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.host.discovery.edit.php:237
 #: include/views/configuration.host.discovery.edit.php:326
@@ -527,7 +527,7 @@ msgstr "Dodaj do ulubionych"
 msgid "Add to host group"
 msgstr "Dodaj do grupy hostów"
 
-#: include/actions.inc.php:405 include/views/configuration.action.edit.php:871
+#: include/actions.inc.php:405 include/views/configuration.action.edit.php:872
 msgid "Add to host groups"
 msgstr "Dodaj do grup hostów"
 
@@ -606,7 +606,7 @@ msgstr "Wyrównaj ikony"
 #: include/views/administration.script.list.php:81
 #: include/views/administration.usergroups.edit.php:44
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:603
+#: include/views/configuration.action.edit.php:604
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
@@ -636,14 +636,14 @@ msgstr "Ilość pamięci w bajtach. Jeżeli nie podano trybu, ilość ogółem."
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:120
-#: include/views/configuration.action.edit.php:988
+#: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
 msgstr "I"
 
 #: include/views/configuration.action.edit.php:119
-#: include/views/configuration.action.edit.php:987
+#: include/views/configuration.action.edit.php:988
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
 msgstr "I/Lub"
@@ -850,7 +850,7 @@ msgstr "Uwierzytelnienie"
 msgid "Authentication algorithm"
 msgstr "Algorytm uwierzytelniania"
 
-#: include/views/configuration.action.edit.php:756
+#: include/views/configuration.action.edit.php:757
 #: include/views/configuration.host.discovery.edit.php:166
 #: include/views/configuration.item.edit.php:172
 #: include/views/configuration.item.massupdate.php:250
@@ -1280,8 +1280,8 @@ msgstr "Kanada (136 znaków)"
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:215
 #: include/views/administration.general.regularexpressions.edit.php:58
-#: include/views/configuration.action.edit.php:1049
-#: include/views/configuration.action.edit.php:1058
+#: include/views/configuration.action.edit.php:1050
+#: include/views/configuration.action.edit.php:1059
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.housekeeper.edit.js.php:127
@@ -2851,7 +2851,7 @@ msgstr "Zegar"
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.proxy.edit.php:100
 #: include/views/administration.script.edit.php:118
-#: include/views/configuration.action.edit.php:1076
+#: include/views/configuration.action.edit.php:1077
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:91
 #: include/views/configuration.graph.edit.php:315
@@ -2940,8 +2940,8 @@ msgstr "Polecenie nie może być puste."
 
 #: include/views/administration.script.edit.php:60
 #: include/views/administration.script.list.php:41
-#: include/views/configuration.action.edit.php:806
-#: include/views/configuration.action.edit.php:810 popup.php:1709
+#: include/views/configuration.action.edit.php:807
+#: include/views/configuration.action.edit.php:811 popup.php:1709
 #: popup.php:1716
 msgid "Commands"
 msgstr "Polecenia"
@@ -2987,8 +2987,8 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr "Warunek \"%2$s\" użyty w formule \"%3$s\" dla reguły wyszukiwania \"%1$s\" nie jest zdefiniowany."
 
 #: include/views/configuration.action.edit.php:135
-#: include/views/configuration.action.edit.php:1001
-#: include/views/configuration.action.edit.php:1069
+#: include/views/configuration.action.edit.php:1002
+#: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.list.php:52
 msgid "Conditions"
 msgstr "Warunki"
@@ -3535,7 +3535,7 @@ msgstr "Własny mnożnik"
 msgid "Custom screens"
 msgstr "Własne ekrany"
 
-#: include/views/configuration.action.edit.php:729
+#: include/views/configuration.action.edit.php:730
 msgid "Custom script"
 msgstr "Własny skrypt"
 
@@ -3837,7 +3837,7 @@ msgid "Default delay (in seconds)"
 msgstr "Domyślne opóźnienie (w sekundach)"
 
 #: include/views/configuration.action.edit.php:48
-#: include/views/configuration.action.edit.php:616
+#: include/views/configuration.action.edit.php:617
 msgid "Default message"
 msgstr "Wiadomość domyślna"
 
@@ -3899,7 +3899,7 @@ msgstr "Usunąć i wyczyścić szablon? (Uwaga: wszystkie powiązane hosty zosta
 msgid "Delete application?"
 msgstr "Usunąć aplikację?"
 
-#: include/views/configuration.action.edit.php:1077
+#: include/views/configuration.action.edit.php:1078
 msgid "Delete current action?"
 msgstr "Usunąć aktualną akcję?"
 
@@ -5270,7 +5270,7 @@ msgstr "Wykonuje zapytanie WMI i zwraca pierwszy wybrany obiekt."
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:747
+#: include/views/configuration.action.edit.php:748
 #: include/views/js/configuration.action.edit.js.php:113 popup.php:1708
 #: popup.php:1715
 msgid "Execute on"
@@ -5633,7 +5633,7 @@ msgid "Friday"
 msgstr "Piątek"
 
 #: include/reports.inc.php:71 include/reports.inc.php:375
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:480
 #: include/views/configuration.services.edit.php:228
 #: include/views/configuration.services.edit.php:254
 #: include/views/js/configuration.sysmaps.js.php:337 popup_period.php:128
@@ -5753,7 +5753,7 @@ msgstr "Podane wyrażenie nie jest makrem"
 msgid "Global expression does not exist."
 msgstr "Wyrażenie globalne nie istnieje."
 
-#: include/views/configuration.action.edit.php:732
+#: include/views/configuration.action.edit.php:733
 msgid "Global script"
 msgstr "Skrypt globalny"
 
@@ -6745,7 +6745,7 @@ msgstr "Zakres IP nie może być pusty."
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:45
 #: include/views/administration.script.list.php:53
-#: include/views/configuration.action.edit.php:728
+#: include/views/configuration.action.edit.php:729
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:337
 #: include/views/configuration.host.prototype.edit.php:278
@@ -7136,7 +7136,7 @@ msgid "Incorrect action condition discovery check."
 msgstr "Błędny test wykrywania warunku akcji."
 
 #: include/classes/api/services/CAction.php:1683
-#: include/classes/api/services/CAction.php:2427
+#: include/classes/api/services/CAction.php:2425
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Błędny test wykrywania warunku akcji. Test wykrywania nie istnieje lub brak praw dostępu do niego."
 
@@ -7161,12 +7161,12 @@ msgid "Incorrect action condition event type."
 msgstr "Błędny typ zdarzenia warunku akcji."
 
 #: include/classes/api/services/CAction.php:1668
-#: include/classes/api/services/CAction.php:2394
+#: include/classes/api/services/CAction.php:2395
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Błędna grupa hostów warunku akcji. Grupa hostów nie istnieje lub brak praw dostępu do niej."
 
 #: include/classes/api/services/CAction.php:1671
-#: include/classes/api/services/CAction.php:2400
+#: include/classes/api/services/CAction.php:2401
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Błędny host warunku akcji. Host nie istnieje lub brak praw dostępu do niego."
 
@@ -7187,12 +7187,12 @@ msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Błędny port \"%1$s\" warunku akcji."
 
 #: include/classes/api/services/CAction.php:1686
-#: include/classes/api/services/CAction.php:2434
+#: include/classes/api/services/CAction.php:2431
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Błędne proxy warunku akcji. Serwer proxy nie istnieje lub brak praw dostępu do niego."
 
 #: include/classes/api/services/CAction.php:1674
-#: include/classes/api/services/CAction.php:2406
+#: include/classes/api/services/CAction.php:2407
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Błędny szablon warunku akcji. Szablon nie istnieje lub brak praw dostępu do niego."
 
@@ -7207,7 +7207,7 @@ msgid "Incorrect action condition trigger value."
 msgstr "Błędna wartość wyzwalacza warunku akcji."
 
 #: include/classes/api/services/CAction.php:1677
-#: include/classes/api/services/CAction.php:2412
+#: include/classes/api/services/CAction.php:2413
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Błędny wyzwalacz warunku akcji. Wyzwalacz nie istnieje lub brak praw dostępu do niego."
 
@@ -8500,7 +8500,7 @@ msgstr "Klucz"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Klucz \"%1$s\" nie pasuje do wyrażenia <grpmax|grpmin|grpsum|grpavg>[\"grupa hostów\", \"klucz pozycji\", \"<last|min|max|avg|sum|count>\", \"parametr\"]."
 
-#: include/views/configuration.action.edit.php:793
+#: include/views/configuration.action.edit.php:794
 #: include/views/js/common.item.edit.js.php:179
 msgid "Key passphrase"
 msgstr "Hasło klucza"
@@ -8557,7 +8557,7 @@ msgid "LOST"
 msgstr "ZGUBIONE"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:948
 #: include/views/configuration.host.discovery.edit.php:291
 #: include/views/js/configuration.sysmaps.js.php:70
 #: include/views/js/configuration.sysmaps.js.php:234
@@ -8754,7 +8754,7 @@ msgstr "Połącz z szablonem"
 msgid "Link to templates"
 msgstr "Połącz z szablonami"
 
-#: include/views/configuration.action.edit.php:925
+#: include/views/configuration.action.edit.php:926
 msgid "Link with templates"
 msgstr "Połącz z szablonami"
 
@@ -9341,7 +9341,7 @@ msgstr "Menu"
 #: include/classes/screens/CScreenActions.php:168
 #: include/views/administration.auditacts.list.php:73
 #: include/views/administration.auditacts.list.php:104
-#: include/views/configuration.action.edit.php:628
+#: include/views/configuration.action.edit.php:629
 msgid "Message"
 msgstr "Wiadomość"
 
@@ -9626,7 +9626,7 @@ msgstr "NTLM"
 #: include/views/administration.usergroups.list.php:45
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.list.php:51
 #: include/views/configuration.application.edit.php:42
 #: include/views/configuration.discovery.edit.php:39
@@ -9737,8 +9737,8 @@ msgid "Never executed"
 msgstr "Nigdy nie wykonano"
 
 #: include/views/configuration.action.edit.php:450
-#: include/views/configuration.action.edit.php:679
-#: include/views/configuration.action.edit.php:999
+#: include/views/configuration.action.edit.php:680
+#: include/views/configuration.action.edit.php:1000
 #: include/views/configuration.discovery.edit.php:55
 #: include/views/configuration.maintenance.edit.php:132
 msgid "New"
@@ -9968,7 +9968,7 @@ msgid "No command type specified for action operation."
 msgstr "Nie określono typu polecenia dla operacji akcji."
 
 #: include/views/configuration.action.edit.php:69
-#: include/views/configuration.action.edit.php:944
+#: include/views/configuration.action.edit.php:945
 msgid "No conditions defined."
 msgstr "Nie zdefiniowano żadnych warunków."
 
@@ -10562,7 +10562,7 @@ msgid "Normal view"
 msgstr "Widok normalny"
 
 #: include/actions.inc.php:232
-#: include/views/configuration.action.edit.php:1040
+#: include/views/configuration.action.edit.php:1041
 msgid "Not Ack"
 msgstr "Nie zatw."
 
@@ -11013,11 +11013,11 @@ msgstr "Operacja \"%s\" już istnieje."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operacja nie może być wykonana z powodu nieupoważnionego żądania."
 
-#: include/views/configuration.action.edit.php:1052
+#: include/views/configuration.action.edit.php:1053
 msgid "Operation condition"
 msgstr "Warunek operacji"
 
-#: include/views/configuration.action.edit.php:1060
+#: include/views/configuration.action.edit.php:1061
 msgid "Operation details"
 msgstr "Szczegóły operacji"
 
@@ -11029,12 +11029,12 @@ msgstr "Operacja nie ma grupy, na której może działać."
 msgid "Operation has no template to operate."
 msgstr "Operacja nie ma szablonu, na którym może działać."
 
-#: include/views/configuration.action.edit.php:512
-#: include/views/configuration.action.edit.php:518
+#: include/views/configuration.action.edit.php:513
+#: include/views/configuration.action.edit.php:519
 msgid "Operation type"
 msgstr "Typ operacji"
 
-#: include/views/configuration.action.edit.php:1070
+#: include/views/configuration.action.edit.php:1071
 #: include/views/configuration.action.list.php:53
 msgid "Operations"
 msgstr "Operacje"
@@ -11045,7 +11045,7 @@ msgstr "Operator"
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:121
-#: include/views/configuration.action.edit.php:989
+#: include/views/configuration.action.edit.php:990
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.triggers.edit.php:119
 msgid "Or"
@@ -11421,8 +11421,8 @@ msgstr "Pasywne"
 #: include/views/administration.users.edit.php:83
 #: include/views/administration.users.edit.php:101
 #: include/views/administration.users.edit.php:105
-#: include/views/configuration.action.edit.php:751
-#: include/views/configuration.action.edit.php:784
+#: include/views/configuration.action.edit.php:752
+#: include/views/configuration.action.edit.php:785
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
 #: include/views/configuration.host.edit.php:780
@@ -11560,7 +11560,7 @@ msgstr "Powielaj pola inwentarza hosta"
 #: include/forms.inc.php:470
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:56
-#: include/views/configuration.action.edit.php:798
+#: include/views/configuration.action.edit.php:799
 #: include/views/configuration.host.discovery.edit.php:154
 #: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.edit.php:340
@@ -11676,7 +11676,7 @@ msgstr "Hasło prywatności"
 msgid "Privacy protocol"
 msgstr "Protokół prywatności"
 
-#: include/views/configuration.action.edit.php:777
+#: include/views/configuration.action.edit.php:778
 #: include/views/configuration.host.discovery.edit.php:173
 #: include/views/configuration.item.edit.php:179
 #: include/views/configuration.item.massupdate.php:280
@@ -11786,14 +11786,14 @@ msgstr "Nazwa proxy"
 msgid "Proxy updated"
 msgstr "Zaktualizowano proxy"
 
-#: include/views/configuration.action.edit.php:752
+#: include/views/configuration.action.edit.php:753
 #: include/views/configuration.host.discovery.edit.php:165
 #: include/views/configuration.item.edit.php:171
 #: include/views/configuration.item.massupdate.php:247
 msgid "Public key"
 msgstr "Klucz publiczny"
 
-#: include/views/configuration.action.edit.php:770
+#: include/views/configuration.action.edit.php:771
 #: include/views/configuration.host.discovery.edit.php:170
 #: include/views/configuration.item.edit.php:176
 #: include/views/configuration.item.massupdate.php:270
@@ -11964,7 +11964,7 @@ msgstr "Zdalne polecenie"
 #: include/views/configuration.action.edit.php:100
 #: include/views/configuration.action.edit.php:421
 #: include/views/configuration.action.edit.php:434
-#: include/views/configuration.action.edit.php:973
+#: include/views/configuration.action.edit.php:974
 #: include/views/configuration.host.discovery.edit.php:211
 #: include/views/configuration.host.discovery.edit.php:320
 #: include/views/configuration.httpconf.edit.php:249
@@ -12024,7 +12024,7 @@ msgstr "Usuń z ulubionych"
 msgid "Remove from host group"
 msgstr "Usuń z grupy hostów"
 
-#: include/actions.inc.php:408 include/views/configuration.action.edit.php:872
+#: include/actions.inc.php:408 include/views/configuration.action.edit.php:873
 msgid "Remove from host groups"
 msgstr "Usuń z grup hostów"
 
@@ -12474,7 +12474,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Wykonanie zapytania SQL nie udało się \"%1$s\"."
 
 #: include/discovery.inc.php:56
-#: include/views/configuration.action.edit.php:730
+#: include/views/configuration.action.edit.php:731
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
 msgstr "SSH"
@@ -12556,7 +12556,7 @@ msgstr "Sobota"
 #: include/views/administration.users.edit.php:382
 #: include/views/administration.users.edit.php:386
 #: include/views/administration.users.edit.php:396
-#: include/views/configuration.action.edit.php:1081
+#: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:89
@@ -12845,7 +12845,7 @@ msgstr "Nazwa ochrony"
 #: include/views/configuration.action.edit.php:253
 #: include/views/configuration.action.edit.php:266
 #: include/views/configuration.action.edit.php:279
-#: include/views/configuration.action.edit.php:736
+#: include/views/configuration.action.edit.php:737
 #: include/views/configuration.graph.edit.php:129
 #: include/views/configuration.graph.edit.php:187
 #: include/views/configuration.item.edit.php:71
@@ -12921,7 +12921,7 @@ msgstr "Wyślij wiadomość do grup użytkowników"
 msgid "Send message to users"
 msgstr "Wyślij wiadomość do użytkowników"
 
-#: include/views/configuration.action.edit.php:613
+#: include/views/configuration.action.edit.php:614
 msgid "Send only to"
 msgstr "Wyślij wyłącznie do"
 
@@ -12929,11 +12929,11 @@ msgstr "Wyślij wyłącznie do"
 msgid "Send to"
 msgstr "Wyślij do"
 
-#: include/views/configuration.action.edit.php:599
+#: include/views/configuration.action.edit.php:600
 msgid "Send to User groups"
 msgstr "Wyślij do grup użytkowników"
 
-#: include/views/configuration.action.edit.php:600
+#: include/views/configuration.action.edit.php:601
 msgid "Send to Users"
 msgstr "Wyślij do użytkowników"
 
@@ -13487,7 +13487,7 @@ msgid "Status only"
 msgstr "Tylko stan"
 
 #: httpdetails.php:130 include/actions.inc.php:839 include/actions.inc.php:930
-#: include/views/configuration.action.edit.php:500
+#: include/views/configuration.action.edit.php:501
 msgid "Step"
 msgstr "Krok"
 
@@ -13496,7 +13496,7 @@ msgstr "Krok"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Krok \"%1$s\" [%2$s z %3$s] nie powiódł się: %4$s"
 
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:491
 msgid "Step duration"
 msgstr "Czas trwania kroku"
 
@@ -13541,7 +13541,7 @@ msgstr "Podfiltr [wpływa tylko na przefiltrowane dane!]"
 #: include/actions.inc.php:461 include/actions.inc.php:866
 #: include/classes/screens/CScreenActions.php:163
 #: include/views/administration.auditacts.list.php:99
-#: include/views/configuration.action.edit.php:624
+#: include/views/configuration.action.edit.php:625
 msgid "Subject"
 msgstr "Temat"
 
@@ -13688,14 +13688,14 @@ msgstr "Tabela \"%1$s\" nie posiada pola o nazwie \"%2$s\"."
 msgid "Tag"
 msgstr "Etykieta"
 
-#: include/views/configuration.action.edit.php:677
+#: include/views/configuration.action.edit.php:678
 #: include/views/configuration.copy.elements.php:105
 #: include/views/configuration.triggers.edit.php:152
 #: include/views/js/configuration.action.edit.js.php:84
 msgid "Target"
 msgstr "Cel"
 
-#: include/views/configuration.action.edit.php:724
+#: include/views/configuration.action.edit.php:725
 msgid "Target list"
 msgstr "Lista celi"
 
@@ -13704,7 +13704,7 @@ msgid "Target type"
 msgstr "Typ celu"
 
 #: include/discovery.inc.php:70
-#: include/views/configuration.action.edit.php:731
+#: include/views/configuration.action.edit.php:732
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
 msgstr "Telnet"
@@ -14077,7 +14077,7 @@ msgstr "Sygnatura czasowa uruchomienia systemu."
 msgid "Title"
 msgstr "Tytuł"
 
-#: include/views/configuration.action.edit.php:482
+#: include/views/configuration.action.edit.php:483
 #: include/views/js/configuration.sysmaps.js.php:338
 msgid "To"
 msgstr "Do"
@@ -14463,7 +14463,7 @@ msgstr "Dwie pozycje (\"%1$s\" oraz \"%2$s\") nie mogą dotyczyć jednego pola i
 #: include/views/administration.mediatypes.list.php:40
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.list.php:39
-#: include/views/configuration.action.edit.php:740
+#: include/views/configuration.action.edit.php:741
 #: include/views/configuration.graph.edit.php:233
 #: include/views/configuration.host.discovery.edit.php:57
 #: include/views/configuration.host.discovery.edit.php:64
@@ -14502,7 +14502,7 @@ msgid "Type (descending)"
 msgstr "Typ (malejąco)"
 
 #: include/views/configuration.action.edit.php:126
-#: include/views/configuration.action.edit.php:992
+#: include/views/configuration.action.edit.php:993
 #: include/views/configuration.host.discovery.edit.php:274
 msgid "Type of calculation"
 msgstr "Typ obliczeń"
@@ -14721,7 +14721,7 @@ msgstr "Odłącz i wyczyść"
 msgid "Unlink from template"
 msgstr "Odłącz od szablonu"
 
-#: include/actions.inc.php:432 include/views/configuration.action.edit.php:926
+#: include/actions.inc.php:432 include/views/configuration.action.edit.php:927
 msgid "Unlink from templates"
 msgstr "Odłącz od szablonów"
 
@@ -14836,7 +14836,7 @@ msgid "Up"
 msgstr "Działa"
 
 #: include/views/administration.auditlogs.list.php:46
-#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:1057
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
@@ -14964,7 +14964,7 @@ msgstr "Wykorzystywane w akcjach"
 #: include/hosts.inc.php:67 include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:343
-#: include/views/configuration.action.edit.php:561
+#: include/views/configuration.action.edit.php:562
 #: include/views/configuration.httpconf.edit.php:158
 msgid "User"
 msgstr "Użytkownik"
@@ -15006,7 +15006,7 @@ msgstr "Usunięto użytkownika"
 #: include/views/administration.script.list.php:42
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:552
+#: include/views/configuration.action.edit.php:553
 msgid "User group"
 msgstr "Grupa użytkowników"
 
@@ -15080,7 +15080,7 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "Użytkownik nie może modyfikować statusu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
-#: include/views/configuration.action.edit.php:763
+#: include/views/configuration.action.edit.php:764
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:260 items.php:73
@@ -15993,7 +15993,7 @@ msgstr "Użytkownik Zabbixa"
 
 #: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:52
-#: include/views/configuration.action.edit.php:745
+#: include/views/configuration.action.edit.php:746
 #: include/views/js/configuration.action.edit.js.php:118
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
@@ -16023,7 +16023,7 @@ msgstr "Wewnętrze uwierzytelnianie Zabbixa"
 #: include/classes/html/CServerInfo.php:37
 #: include/classes/setup/CSetupWizard.php:432
 #: include/views/administration.script.edit.php:53
-#: include/views/configuration.action.edit.php:746
+#: include/views/configuration.action.edit.php:747
 #: include/views/js/configuration.action.edit.js.php:122
 msgid "Zabbix server"
 msgstr "Serwer Zabbixa"
