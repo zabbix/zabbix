@@ -304,6 +304,9 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->instance)
 		__vm_mem_free_func(dev->instance);
 
+	if (NULL != dev->label)
+		__vm_mem_free_func(dev->label);
+
 	__vm_mem_free_func(dev);
 }
 
@@ -555,6 +558,7 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 	dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
 	dev->type = src->type;
 	dev->instance = vmware_shared_strdup(src->instance);
+	dev->label = vmware_shared_strdup(src->label);
 
 	return dev;
 }
@@ -685,6 +689,7 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 {
 	zbx_free(dev->instance);
+	zbx_free(dev->label);
 	zbx_free(dev);
 }
 
@@ -1244,6 +1249,8 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
 		dev->instance = zbx_strdup(NULL, key);
+		dev->label = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='deviceInfo']/*[local-name()='label']");
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -1258,73 +1265,129 @@ clean:
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, nics);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: wmware_service_get_devices_by_perfcounter                        *
+ * Function: wmware_vm_get_disk_devices                                       *
  *                                                                            *
- * Purpose: gets devices from virtual machine stats filtered by the specified *
- *          performance counter id                                            *
+ * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
- * Parameters: vm        - [IN] the virtual machine                           *
- *             counterid - [IN] the performance counter id                    *
+ * Parameters: vm     - [IN] the virtual machine                              *
  *                                                                            *
  ******************************************************************************/
-static void	wmware_service_get_devices_by_perfcounter(zbx_vmware_service_t *service, zbx_vmware_vm_t *vm,
-		const char *path)
+static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 {
-	const char	*__function_name = "wmware_service_get_devices_by_perfcounter";
-	char			*xpath = NULL;
-	int			i, devs = 0;
-	zbx_uint64_t		counterid;
-	zbx_vector_str_t	instances;
-	zbx_vmware_dev_t	*dev;
+	const char	*__function_name = "wmware_vm_get_disk_devices";
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i, disks = 0;
+	char		*xpath = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_str_create(&instances);
-
-	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter: %s", path);
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), "noname.xml", NULL, 0)))
 		goto out;
-	}
 
-	xpath = zbx_dsprintf(NULL, "//*[local-name()='returnval']"
-			"[*[local-name()='entity'][@type='VirtualMachine']/text()='%s']"
-			"//*[local-name()='id'][*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']"
-			"/*[local-name()='instance'][text()]", vm->id, counterid);
+	xpathCtx = xmlXPathNewContext(doc);
 
-	zbx_vmware_lock();
-
-	if (NULL == service->stats)
-		zabbix_log(LOG_LEVEL_DEBUG, "performance counter data is not present");
-	else
-		zbx_xml_read_values(service->stats, xpath, &instances);
-
-	zbx_vmware_unlock();
-
-	for (i = 0; i < instances.values_num; i++)
+	/* select all hardware devices of VirtualDisk type */
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
+			"*[local-name()='device'][string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
 	{
-		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
-		dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
-
-		/* transfer instance string ownership form vector to device object */
-		dev->instance = instances.values[i];
-
-		zbx_vector_ptr_append(&vm->devs, dev);
-		devs++;
+		goto clean;
 	}
 
-out:
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_dev_t	*dev;
+		char			*unitNumber = NULL, *controllerKey = NULL, *busNumber = NULL,
+					*scsiCtlrUnitNumber = NULL;
+		xmlXPathObject		*xpathObjController = NULL;
+
+		do
+		{
+			if (NULL == (unitNumber = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='unitNumber']")))
+			{
+				break;
+			}
+
+			if (NULL == (controllerKey = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='controllerKey']")))
+			{
+				break;
+			}
+
+			/* find the controller (parent) device */
+			xpath = zbx_dsprintf(xpath, "//*[local-name()='hardware']/*[local-name()='device']"
+					"[*[local-name()='key']/text()='%s']", controllerKey);
+
+			if (NULL == (xpathObjController = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+				break;
+
+			if (xmlXPathNodeSetIsEmpty(xpathObjController->nodesetval))
+				break;
+
+			if (NULL == (busNumber = zbx_xml_read_node_value(doc,
+					xpathObjController->nodesetval->nodeTab[0], "*[local-name()='busNumber']")))
+			{
+				break;
+			}
+
+			/* scsiCtlrUnitNumber property is simply used to determine controller type. */
+			/* For IDE controllers it is not set.                                       */
+			scsiCtlrUnitNumber = zbx_xml_read_node_value(doc, xpathObjController->nodesetval->nodeTab[0],
+				"*[local-name()='scsiCtlrUnitNumber']");
+
+			dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
+			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
+
+			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber> */
+			/* where controller type is either ide or scsi depending on the controller type   */
+			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", (NULL == scsiCtlrUnitNumber ? "ide" : "scsi"),
+					busNumber, unitNumber);
+
+			dev->label = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='deviceInfo']/*[local-name()='label']");
+
+			zbx_vector_ptr_append(&vm->devs, dev);
+
+			disks++;
+
+		} while (0);
+
+		if (NULL != xpathObjController)
+			xmlXPathFreeObject(xpathObjController);
+
+		zbx_free(scsiCtlrUnitNumber);
+		zbx_free(busNumber);
+		zbx_free(unitNumber);
+		zbx_free(controllerKey);
+
+	}
+
+clean:
 	zbx_free(xpath);
 
-	/* the vector contents are transferred to vm devices, so skip the cleaning of vector contents */
-	zbx_vector_str_destroy(&instances);
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, devs);
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
+
 }
 
 /******************************************************************************
@@ -1444,8 +1507,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vm->id = zbx_strdup(NULL, id);
 
 	wmware_vm_get_nic_devices(vm);
-
-	wmware_service_get_devices_by_perfcounter(service, vm, "virtualDisk/read[average]");
+	wmware_vm_get_disk_devices(vm);
 
 	ret = SUCCEED;
 out:
@@ -1713,7 +1775,7 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             hosts        - [OUT] list of host ids                          *
+ *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -1879,7 +1941,8 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret), hvs->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
+			hvs->values_num);
 
 	return ret;
 }
@@ -2334,7 +2397,7 @@ out:
 	zbx_vector_str_clean(&ids);
 	zbx_vector_str_destroy(&ids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
 			clusters->values_num);
 
 	return ret;
