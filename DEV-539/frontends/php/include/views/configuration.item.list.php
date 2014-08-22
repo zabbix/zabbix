@@ -102,7 +102,9 @@ foreach ($this->data['items'] as $item) {
 	// status
 	$status = new CCol(new CLink(
 		itemIndicator($item['status'], $item['state']),
-		'?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&action='.($item['status'] ? 'item.massenable' : 'item.massdisable'),
+		'?group_itemid='.$item['itemid'].
+			'&hostid='.$item['hostid'].
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable'),
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
@@ -257,6 +259,7 @@ foreach ($this->data['items'] as $item) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('item.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected items?'));
 $goComboBox->addItem($goOption);

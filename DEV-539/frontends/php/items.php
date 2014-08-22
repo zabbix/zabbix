@@ -126,7 +126,9 @@ $fields = array(
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN("'item.massclearhistory','item.masscopyto','item.massdelete','item.massdisable','item.massenable','item.massupdate'"),
+									IN("'item.massclearhistory','item.masscopyto','item.massdelete',".
+										"'item.massdisable','item.massenable','item.massupdate'"
+									),
 									null
 								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
