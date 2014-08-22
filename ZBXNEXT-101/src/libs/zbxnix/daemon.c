@@ -37,7 +37,7 @@ extern int	threads_num;
 
 extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
 
-extern void	zbx_sigusr_handler(zbx_task_t task);
+extern void	zbx_sigusr_handler(int flags);
 
 /******************************************************************************
  *                                                                            *
@@ -46,11 +46,11 @@ extern void	zbx_sigusr_handler(zbx_task_t task);
  * Purpose: common SIGUSR1 handler for worker processes                       *
  *                                                                            *
  ******************************************************************************/
-static void	common_worker_sigusr_handler(zbx_task_t task)
+static void	common_worker_sigusr_handler(int flags)
 {
-	switch (((unsigned char *)&task)[0])
+	switch (GET_TASK_MSG(flags))
 	{
-		case ZBX_TASK_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
 			if (SUCCEED != set_debug_level_up())
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
@@ -62,7 +62,7 @@ static void	common_worker_sigusr_handler(zbx_task_t task)
 						get_debug_level_string());
 			}
 			break;
-		case ZBX_TASK_LOG_LEVEL_DECREASE:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != set_debug_level_down())
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
@@ -75,7 +75,7 @@ static void	common_worker_sigusr_handler(zbx_task_t task)
 			}
 			break;
 		default:
-			zbx_sigusr_handler(task);
+			zbx_sigusr_handler(flags);
 			break;
 	}
 }
@@ -89,7 +89,7 @@ static void	common_worker_sigusr_handler(zbx_task_t task)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	zbx_task_t	task;
+	int	flags;
 
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -100,13 +100,13 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
 
-	task = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
+	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		common_worker_sigusr_handler(task);
+		common_worker_sigusr_handler(flags);
 	}
-	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
+	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == (GET_TASK_MSG(flags)))
 	{
 		extern unsigned char	daemon_type;
 
@@ -119,7 +119,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			union sigval	s;
 
-			s.ZBX_SIVAL_INT = task;
+			s.ZBX_SIVAL_INT = flags;
 
 			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
 			if (NULL != threads && -1 != sigqueue(threads[0], SIGUSR1, s))
@@ -128,19 +128,19 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 		}
 	}
-	else if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&task)[0] ||
-		ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&task)[0])
+	else if (ZBX_RTC_LOG_LEVEL_INCREASE == (GET_TASK_MSG(flags)) ||
+		ZBX_RTC_LOG_LEVEL_DECREASE == (GET_TASK_MSG(flags)))
 	{
 		union sigval	s;
 		int 		i, found = 0;
 
-		s.ZBX_SIVAL_INT = task;
+		s.ZBX_SIVAL_INT = flags;
 
-		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ((unsigned char *)&task)[1])
+		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == (GET_TASK_SCOPE(flags)))
 		{
 			for (i = 0; i < threads_num; i++)
 			{
-				if (0 != ((unsigned short *)&task)[1] && ((unsigned short *)&task)[1] != threads[i])
+				if (0 !=  (GET_TASK_DATA(flags)) &&  threads[i] != (GET_TASK_DATA(flags)))
 					continue;
 
 				found = 1;
@@ -156,11 +156,10 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				}
 			}
 
-			if (0 != ((unsigned short *)&task)[1] && 0 == found)
+			if (0 != (GET_TASK_DATA(flags)) && 0 == found)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
-						" worker process", (int)((unsigned short *)&task)[1]);
-
+						" worker process", GET_TASK_DATA(flags));
 			}
 		}
 		else
@@ -173,7 +172,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
 					break;
 
-				if (((unsigned char *)&task)[1] != process_type)
+				if ((GET_TASK_SCOPE(flags)) != process_type)
 				{
 					/* check if we have already checked processes of target type */
 					if (1 == found)
@@ -182,7 +181,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					continue;
 				}
 
-				if (0 != ((unsigned short *)&task)[1] && ((unsigned short *)&task)[1] != process_num)
+				if (0 != (GET_TASK_DATA(flags)) && (GET_TASK_DATA(flags)) != process_num)
 					continue;
 
 				found = 1;
@@ -200,18 +199,18 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			if (0 == found)
 			{
-				if (0 == ((unsigned short *)&task)[1])
+				if (0 == (GET_TASK_DATA(flags)))
 				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: \"%s\" process"
 							" does not exist",
-							get_process_type_string(((unsigned char *)&task)[1]));
+							get_process_type_string(GET_TASK_SCOPE(flags)));
 				}
 				else
 				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
 							" \"%s #%d\" process does not exist",
-							get_process_type_string(((unsigned char *)&task)[1]),
-							((unsigned short *)&task)[1]);
+							get_process_type_string(GET_TASK_SCOPE(flags)),
+							GET_TASK_DATA(flags));
 				}
 			}
 		}
@@ -374,7 +373,7 @@ void	daemon_stop()
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
-int	zbx_sigusr_send(zbx_task_t task)
+int	zbx_sigusr_send(int flags)
 {
 	int	ret = FAIL;
 	char	error[256];
@@ -385,7 +384,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 	{
 		union sigval	s;
 
-		s.ZBX_SIVAL_INT = task;
+		s.ZBX_SIVAL_INT = flags;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
 		{

@@ -551,11 +551,11 @@ static void	zbx_load_config()
 }
 
 #ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(zbx_task_t task)
+void	zbx_sigusr_handler(int flags)
 {
-	switch (((unsigned char *)&task)[0])
+	switch (GET_TASK_MSG(flags))
 	{
-		case ZBX_TASK_CONFIG_CACHE_RELOAD:
+		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 			zbx_wakeup();
 			break;
@@ -589,12 +589,15 @@ static void	zbx_free_config()
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	zbx_task_t	task = ZBX_TASK_START;
+	ZBX_TASK_EX	t;
 	char		ch = '\0';
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
+	memset(&t, 0, sizeof(t));
+	t.task = ZBX_TASK_START;
+
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -608,25 +611,32 @@ int	main(int argc, char **argv)
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
-					((char *)&task)[0] = ZBX_TASK_CONFIG_CACHE_RELOAD;
+					t.flags = MAKE_TASK(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						strlen(ZBX_LOG_LEVEL_INCREASE)))
+					strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),  &task);
+					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
+						&t.flags, ZBX_RTC_LOG_LEVEL_INCREASE))
+					{
+						exit(EXIT_FAILURE);
+					}
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						strlen(ZBX_LOG_LEVEL_DECREASE)))
+					strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					((char *)&task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
-					set_log_level_task(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE), &task);
+					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
+						&t.flags, ZBX_RTC_LOG_LEVEL_DECREASE))
+					{
+						exit(EXIT_FAILURE);
+					}
 				}
 				else
 				{
 					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
+				t.task = ZBX_TASK_SEND_MESSAGE;
 				break;
 			case 'h':
 				help();
@@ -651,9 +661,9 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_START != task)
+	if (ZBX_TASK_SEND_MESSAGE == t.task)
 	{
-		exit(SUCCEED == zbx_sigusr_send(task) ? EXIT_SUCCESS : EXIT_FAILURE);
+		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 #ifdef HAVE_OPENIPMI
