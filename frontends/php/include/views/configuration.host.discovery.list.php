@@ -71,7 +71,9 @@ foreach ($data['discoveries'] as $discovery) {
 	// status
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&action='.($discovery['status'] ? 'drule.massenable' : 'drule.massdisable'),
+		'?hostid='.$_REQUEST['hostid'].
+			'&g_hostdruleid='.$discovery['itemid'].
+			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED ? 'drule.massenable' : 'drule.massdisable'),
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
@@ -133,6 +135,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('discoveryrule.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
