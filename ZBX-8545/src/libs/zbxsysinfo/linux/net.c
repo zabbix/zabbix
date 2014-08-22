@@ -36,7 +36,7 @@ typedef struct
 }
 net_stat_t;
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,14)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
 
 int	nlerr;
 
