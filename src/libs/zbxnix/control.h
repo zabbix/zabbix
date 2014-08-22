@@ -23,5 +23,5 @@
 #include "common.h"
 #include "zbxself.h"
 
-void	set_log_level_task(const char *opt, zbx_task_t *task);
+int	get_log_level_message(const char *opt, int *message, int command);
 #endif	/* ZABBIX_CONTROL_H */

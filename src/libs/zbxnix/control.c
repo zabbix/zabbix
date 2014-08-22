@@ -19,30 +19,30 @@
 
 #include "control.h"
 
-void	set_log_level_task(const char *opt, zbx_task_t *task)
+int	get_log_level_message(const char *opt, int *message, int command)
 {
-	int	num = 0;
+	int	num = 0, scope, data;
 
 	if ('\0' == *opt)
 	{
-		((char *)task)[1] = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
-		((short *)task)[1] = 0;
+		scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
+		data = 0;
 	}
 	else if ('=' != *opt)
 	{
 		zbx_error("unknown log level control option: %s", opt);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 	else if (0 != isdigit(*(++opt)))
 	{
 		if (FAIL == is_ushort(opt, &num))
 		{
 			zbx_error("invalid log level control option: proccess identifier must be unsigned short value");
-			exit(EXIT_FAILURE);
+			return FAIL;
 		}
 
-		((char *)task)[1] = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
-		((short *)task)[1] = num;
+		scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
+		data = num;
 	}
 	else
 	{
@@ -58,26 +58,29 @@ void	set_log_level_task(const char *opt, zbx_task_t *task)
 			{
 				zbx_error("invalid log level control option: proccess number must be unsigned short"
 						" value");
-				exit(EXIT_FAILURE);
+				return FAIL;
 			}
 
 			if (0 == num)
 			{
 				zbx_error("invalid log level control option: proccess number cannot be zero");
-				exit(EXIT_FAILURE);
+				return FAIL;
 			}
 		}
 
 		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
 		{
 			zbx_error("invalid log level control option: unknown process type");
-			exit(EXIT_FAILURE);
+			return FAIL;
 		}
 
 		zbx_free(proc_name);
 
-		((char *)task)[1] = ZBX_RTC_LOG_SCOPE_PROC | proc_type;
-		((short *)task)[1] = num;
+		scope = ZBX_RTC_LOG_SCOPE_PROC | proc_type;
+		data = num;
 	}
-}
 
+	*message = MAKE_TASK(command, scope, data);
+
+	return SUCCEED;
+}

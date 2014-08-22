@@ -234,23 +234,30 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
 			case 'R':
-				opt = zbx_strdup(opt, zbx_optarg);
-
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					t->task = ZBX_TASK_LOG_LEVEL_INCREASE;
+					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
+						&t->flags, ZBX_RTC_LOG_LEVEL_INCREASE))
+					{
+						exit(EXIT_FAILURE);
+					}
+
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
 						strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					t->task = ZBX_TASK_LOG_LEVEL_DECREASE;
+					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
+						&t->flags, ZBX_RTC_LOG_LEVEL_DECREASE))
+					{
+						exit(EXIT_FAILURE);
+					}
 				}
 				else
 				{
 					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
-
+				t->task = ZBX_TASK_SEND_MESSAGE;
 				break;
 			case 'h':
 				help();
@@ -836,7 +843,7 @@ void	zbx_on_exit(void)
 }
 
 #if defined(HAVE_SIGQUEUE)
-void	zbx_sigusr_handler(zbx_task_t task)
+void	zbx_sigusr_handler(int flags)
 {
 }
 #endif
@@ -875,15 +882,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
-		case ZBX_TASK_LOG_LEVEL_INCREASE:
-			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_INCREASE;
-			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_INCREASE), &t.task);
-			zbx_free(opt);
-			break;
-		case ZBX_TASK_LOG_LEVEL_DECREASE:
-			((char *)&t.task)[0] = ZBX_TASK_LOG_LEVEL_DECREASE;
-			set_log_level_task(opt + strlen(ZBX_LOG_LEVEL_DECREASE), &t.task);
-			zbx_free(opt);
+		case ZBX_TASK_SEND_MESSAGE:
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -949,10 +948,10 @@ int	main(int argc, char **argv)
 			break;
 	}
 #ifndef _WINDOWS
-	if (ZBX_TASK_LOG_LEVEL_INCREASE == ((unsigned char *)&t.task)[0] || ZBX_TASK_LOG_LEVEL_DECREASE == ((unsigned char *)&t.task)[0])
+	if (ZBX_TASK_SEND_MESSAGE == t.task)
 	{
 		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
-		exit(SUCCEED == zbx_sigusr_send(t.task) ? EXIT_SUCCESS : EXIT_FAILURE);
+		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 #endif
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);

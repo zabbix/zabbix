@@ -710,11 +710,13 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CONFIG_CACHE_RELOAD,
-	ZBX_TASK_LOG_LEVEL_INCREASE,
-	ZBX_TASK_LOG_LEVEL_DECREASE
+	ZBX_TASK_SEND_MESSAGE
 }
 zbx_task_t;
+
+#define ZBX_RTC_LOG_LEVEL_INCREASE	1
+#define ZBX_RTC_LOG_LEVEL_DECREASE	2
+#define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 
 typedef enum
 {
@@ -732,6 +734,20 @@ typedef struct
 	int		flags;
 }
 ZBX_TASK_EX;
+
+#define MSG_BIT		0
+#define SCOPE_BIT	8
+#define DATA_BIT	16
+
+#define MSG_MASK	0xFF
+#define SCOPE_MASK	0xFF00
+#define DATA_MASK	0xFFFF0000
+
+#define GET_TASK_MSG(task) (task & MSG_MASK) >> MSG_BIT
+#define GET_TASK_SCOPE(task) (task & SCOPE_MASK) >> SCOPE_BIT
+#define GET_TASK_DATA(task) (task & DATA_MASK) >> DATA_BIT
+
+#define MAKE_TASK(msg, scope, data) (msg << MSG_BIT) | (scope << SCOPE_BIT) | (data << DATA_BIT)
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
