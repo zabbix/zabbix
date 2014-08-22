@@ -750,6 +750,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	const char	*__function_name = "DCsync_config";
 	DB_ROW		row;
 	int		i, found = 1;
+	int		unsupported_change = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -767,6 +768,8 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		if (0 == found)
 		{
 			/* load default config data */
+
+			unsupported_change = 1;
 
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
@@ -803,14 +806,13 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	{
 		/* store the config data */
 
-		if (atoi(row[0]) != config->config->refresh_unsupported)
+		if (0 != found)
 		{
-			config->config->refresh_unsupported = atoi(row[0]);
-
-			if (NULL != refresh_unsupported_changed)
-				*refresh_unsupported_changed = 1;
+			if (atoi(row[0]) != config->config->refresh_unsupported)
+				unsupported_change = 1;
 		}
 
+		config->config->refresh_unsupported = atoi(row[0]);
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 
@@ -852,6 +854,9 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
 	}
+
+	if (NULL != refresh_unsupported_changed)
+		*refresh_unsupported_changed = unsupported_change;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -1284,7 +1289,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			}
 
 			if (ZBX_NO_POLLER != item->poller_type && (0 == found || ZBX_NO_POLLER == old_poller_type ||
-					(ITEM_STATE_NOTSUPPORTED && 1 == refresh_unsupported_changed) ||
+					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state &&
 					(delay != item->delay || 0 != delay_flex_changed))))
 			{
@@ -2730,7 +2735,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		if_result = NULL;
 	DB_RESULT		expr_result = NULL;
 
-	int			i, refresh_unsupported_change = 0;
+	int			i, refresh_unsupported_changed = 0;
 	double			sec, csec, hsec, isec, tsec, dsec, fsec, hisec, htsec, gmsec, hmsec, ifsec, expr_sec,
 				csec2, hsec2, isec2, tsec2, dsec2, fsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2,
 				expr_sec2, total2;
@@ -2884,7 +2889,7 @@ void	DCsync_configuration(void)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_config(conf_result, &refresh_unsupported_change);
+	DCsync_config(conf_result, &refresh_unsupported_changed);
 	csec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2892,7 +2897,9 @@ void	DCsync_configuration(void)
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result, refresh_unsupported_change);	/* relies on host status, must be after DCsync_hosts() */
+
+	/* relies on host status, must be after DCsync_hosts() */
+	DCsync_items(item_result, refresh_unsupported_changed);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
