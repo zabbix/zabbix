@@ -629,6 +629,14 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
+
+			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=operations]').each(function() {
+				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
