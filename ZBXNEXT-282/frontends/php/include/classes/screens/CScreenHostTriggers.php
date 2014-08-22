@@ -127,7 +127,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$item->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
 		}
 
-		$output = new CUIWidget('hat_trstatus', make_latest_issues($params));
+		$output = new CUiWidget('hat_trstatus', make_latest_issues($params));
 		$output->setDoubleHeader(array(_('HOST ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE),
 			$item
 		);

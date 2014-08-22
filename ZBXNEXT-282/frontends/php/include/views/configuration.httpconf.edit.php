@@ -132,7 +132,7 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append HTTP proxy to form list
-$httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255);
+$httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255);
 $httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]proxy.example.com[:port]');
 $httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
@@ -155,8 +155,8 @@ $authenticationComboBox = new CComboBox('authentication', $this->data['authentic
 $authenticationComboBox->addItems(httptest_authentications());
 $httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
 
-$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
-$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64);
+$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
+$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
 
 $authenticationInputsHidden = $this->data['authentication'] == HTTPTEST_AUTH_NONE;
 
@@ -177,19 +177,19 @@ $httpAuthenticationFormList->addRow(_('SSL verify host'), new CCheckBox('verify_
 // SSL certificate file
 $httpAuthenticationFormList->addRow(
 	_('SSL certificate file'),
-	new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255)
+	new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
 );
 
 // SSL key file
 $httpAuthenticationFormList->addRow(
 	_('SSL key file'),
-	new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255)
+	new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
 );
 
 // SSL key password
 $httpAuthenticationFormList->addRow(
 	_('SSL key password'),
-	new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64)
+	new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64)
 );
 
 /*

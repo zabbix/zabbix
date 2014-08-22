@@ -124,7 +124,7 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
  *             functionids  - [OUT] the resulting vector of function ids      *
  *                                                                            *
  ******************************************************************************/
-static void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
+void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
 	const char	*start = expression;
 	zbx_uint64_t	functionid;

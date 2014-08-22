@@ -48,10 +48,10 @@ $actionForm->setName('actionForm');
 $actionTable = new CTableInfo(_('No actions found.'));
 $actionTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Conditions'),
 	_('Operations'),
-	make_sorting_header(_('Status'), 'status')
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['actions'] as $action) {
@@ -70,13 +70,13 @@ foreach ($this->data['actions'] as $action) {
 
 	if ($action['status'] == ACTION_STATUS_DISABLED) {
 		$status = new CLink(_('Disabled'),
-			'actionconf.php?go=activate&g_actionid[]='.$action['actionid'].url_param('eventsource'),
+			'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
 			'disabled'
 		);
 	}
 	else {
 		$status = new CLink(_('Enabled'),
-			'actionconf.php?go=disable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
+			'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
 			'enabled'
 		);
 	}
@@ -91,16 +91,17 @@ foreach ($this->data['actions'] as $action) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('action.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected actions?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('action.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected actions?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('action.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected actions?'));
 $goComboBox->addItem($goOption);
 
