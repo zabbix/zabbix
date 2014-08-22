@@ -1697,7 +1697,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 	int		err, opt, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() guesthvid:'%s'", __function_name, hvid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_hv_DETAILS,
 			vmware_service_objects[service->type].property_collector, hvid);
@@ -1723,7 +1723,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1752,7 +1752,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 	char			*value;
 	zbx_vector_str_t	datastores, vms;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() hvid:'%s'", __function_name, id);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __function_name, id);
 
 	hv = zbx_malloc(NULL, sizeof(zbx_vmware_hv_t));
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
@@ -1814,7 +1814,7 @@ out:
 		hv = NULL;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return hv;
 }
@@ -1979,7 +1979,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 	int		err, opt, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ZBX_VMWARE_SERVICE_VCENTER == service->type)
 	{
@@ -2001,7 +2001,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 				goto out;
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "%s() page.data:'%s'", __function_name, page.data);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
 
 			if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 				goto out;
@@ -2037,7 +2037,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s [%d]", __function_name, zbx_result_string(ret), hvs->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret), hvs->values_num);
 
 	return ret;
 }
@@ -2557,7 +2557,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vmware_data_t	*data;
 	zbx_vector_str_t	hvs;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() %s@%s", __function_name, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
 
 	data = zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
@@ -2631,7 +2631,7 @@ out:
 
 	zbx_vmware_unlock();
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
 /*

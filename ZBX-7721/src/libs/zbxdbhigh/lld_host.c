@@ -1643,9 +1643,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
 				db_insert_hmacro, db_insert_interface, db_insert_idiscovery;
 
-#define MY_CALL(n1, n2, n3, n4, args) n1 ## n2 ## n3 ## n4(args)
-
-	MY_CALL(zabbix_, set_, log_, level, LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&upd_host_inventory_hostids);
@@ -2063,7 +2060,6 @@ out:
 	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-	MY_CALL(zabbix_, set_, log_, level, LOG_LEVEL_WARNING);
 }
 
 /******************************************************************************
