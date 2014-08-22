@@ -48,7 +48,7 @@ static void	__zbx_set_last_odbc_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
-#define clean_odbc_strerror()	zbx_last_odbc_strerror[0] = '\0'
+#define clean_odbc_strerror() zbx_last_odbc_strerror[0]='\0'
 
 static void	odbc_free_row_data(ZBX_ODBC_DBH *pdbh)
 {
@@ -116,19 +116,15 @@ static int	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const ch
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): rc_msg:'%s' rec_nr:%d sql_state:'%s' native_err_code:%ld "
 					"err_msg:'%s'", __function_name, rc_msg, rec_nr, sql_state,
 					(long)native_err_code, err_msg);
-
 			if (sizeof(diag_msg) > offset)
 			{
 				offset += zbx_snprintf(diag_msg + offset, sizeof(diag_msg) - offset, "[%s][%ld][%s]|",
 						sql_state, (long)native_err_code, err_msg);
 			}
-
 			rec_nr++;
 		}
-
 		*(diag_msg + offset) = '\0';
 	}
-
 	set_last_odbc_strerror("%s:[%s]:%s", msg, rc_msg, diag_msg);
 
 	return (int)SQL_SUCCEEDED(sql_rc);
@@ -147,7 +143,7 @@ void	odbc_DBclose(ZBX_ODBC_DBH *pdbh)
 
 	if (NULL != pdbh->hdbc)
 	{
-		if (1 == pdbh->connected)
+		if (pdbh->connected)
 			SQLDisconnect(pdbh->hdbc);
 
 		SQLFreeHandle(SQL_HANDLE_DBC, pdbh->hdbc);
@@ -176,21 +172,21 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 	memset(pdbh, 0, sizeof(ZBX_ODBC_DBH));
 
 	/* allocate environment handle */
-	if (0 == SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &pdbh->henv)))
+	if (0 == SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &(pdbh->henv))))
 	{
 		set_last_odbc_strerror("%s", "Cannot create ODBC environment handle.");
 		goto end;
 	}
 
 	/* set the ODBC version environment attribute */
-	if (0 != CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0), rc, SQL_HANDLE_ENV,
+	if (0 != CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0), rc, SQL_HANDLE_ENV,
 			pdbh->henv, "Cannot set ODBC version"))
 	{
 		goto end;
 	}
 
 	/* allocate connection handle */
-	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &pdbh->hdbc), rc, SQL_HANDLE_ENV, pdbh->henv,
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), rc, SQL_HANDLE_ENV, pdbh->henv,
 			"Cannot create ODBC connection handle"))
 	{
 		goto end;
@@ -212,8 +208,8 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 	}
 
 	/* allocate statement handle */
-	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &pdbh->hstmt), rc, SQL_HANDLE_DBC, pdbh->hdbc,
-			"Cannot create ODBC statement handle"))
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), rc, SQL_HANDLE_DBC, pdbh->hdbc,
+			"Cannot create ODBC statement handle."))
 	{
 		goto end;
 	}
@@ -268,7 +264,7 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 		else
 			zbx_rtrim(pdbh->row_data[i], " ");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%d col]: '%s'", __function_name, i,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%i col]: '%s'", __function_name, i,
 				NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
 	}
 
@@ -313,7 +309,6 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	for (i = 0; i < pdbh->col_num; i++)
 	{
 		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
-
 		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
 				MAX_STRING_LEN, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot bind column in ODBC result"))
@@ -322,7 +317,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() selected %d columns", __function_name, pdbh->col_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() selected %i columns", __function_name, pdbh->col_num);
 
 	result = (ZBX_ODBC_RESULT)pdbh;
 end:

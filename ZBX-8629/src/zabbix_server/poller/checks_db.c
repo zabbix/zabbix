@@ -132,7 +132,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_ODBC
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
-	char		*db_dsn, *db_user, *db_pass, *db_sql;
+	char		*db_dsn = NULL, *db_user = NULL, *db_pass = NULL, *db_sql = NULL;
 #endif
 	int		ret = NOTSUPPORTED;
 
