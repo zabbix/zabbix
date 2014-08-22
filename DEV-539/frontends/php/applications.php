@@ -203,7 +203,7 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 		_n('Cannot delete application', 'Cannot delete applications', $deleted)
 	);
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable'))) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable')) && hasRequest('applications')) {
 	$result = true;
 	$hostId = getRequest('hostid');
 	$enable = (getRequest('action') == 'application.massenable');
