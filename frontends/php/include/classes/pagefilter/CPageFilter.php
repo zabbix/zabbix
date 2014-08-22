@@ -1,5 +1,3 @@
-						'output' => array('hostid'),
-						'templateids' => $hostId,
 <?php
 /*
 ** Zabbix
@@ -378,9 +376,9 @@ class CPageFilter {
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param string   $groupId
-	 * @param array $options
-	 * @param string   $hostId
+	 * @param string $groupId
+	 * @param array  $options
+	 * @param string $hostId
 	 */
 	private function _initGroups($groupId, array $options, $hostId) {
 		$defaultOptions = array(
@@ -392,7 +390,7 @@ class CPageFilter {
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if (is_null($groupId) && $this->_profileIds['groupid']) {
+		if ($groupId === null && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
 			$template = null;
@@ -432,8 +430,9 @@ class CPageFilter {
 		CProfile::update($this->_profileIdx['groups'], $groupId, PROFILE_TYPE_ID);
 		CProfile::update(self::GROUP_LATEST_IDX, $groupId, PROFILE_TYPE_ID);
 
-		$this->isSelected['groupsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups'])) || $groupId > 0;
-		$this->isSelected['groupsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups']) && $groupId == 0;
+		$firstIsAllAndHaveGroups = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && $this->data['groups'];
+		$this->isSelected['groupsSelected'] = $firstIsAllAndHaveGroups || $groupId > 0;
+		$this->isSelected['groupsAll'] = $firstIsAllAndHaveGroups && $groupId == 0;
 		$this->ids['groupid'] = $groupId;
 	}
 
