@@ -250,7 +250,7 @@ else {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-							$data['mediatypes'][$key]['listOfActions'][] = array(
+							$data['mediatypes'][$key]['listOfActions'][$actionId] = array(
 								'actionid' => $actionId,
 								'name' => $action['name']
 							);

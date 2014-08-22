@@ -39,15 +39,9 @@
 #	include "daemon.h"
 #endif
 
-#ifdef _WINDOWS
-__declspec(thread) static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
-__declspec(thread) static ZBX_ACTIVE_BUFFER	buffer;
-__declspec(thread) static zbx_vector_ptr_t	regexps;
-#else
-static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
-static ZBX_ACTIVE_BUFFER	buffer;
-static zbx_vector_ptr_t		regexps;
-#endif
+ZBX_THREAD_LOCAL static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
+ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
+ZBX_THREAD_LOCAL static zbx_vector_ptr_t	regexps;
 
 #ifdef _WINDOWS
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
@@ -415,11 +409,13 @@ json_error:
 static int	refresh_active_checks(const char *host, unsigned short port)
 {
 	const char	*__function_name = "refresh_active_checks";
-	zbx_sock_t	s;
-	char		*buf;
-	int		ret;
-	struct zbx_json	json;
-	static int	last_ret = SUCCEED;
+
+	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
+
+	zbx_sock_t			s;
+	char				*buf;
+	int				ret;
+	struct zbx_json			json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __function_name, host, port);
 
@@ -859,7 +855,7 @@ out:
 static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
-	int		i, s_count, p_count, is_logrt = -1;
+	int		i, s_count, p_count, is_logrt;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
 	char		params[MAX_STRING_LEN], filename[MAX_STRING_LEN];
@@ -905,6 +901,8 @@ static void	process_active_checks(char *server, unsigned short port)
 			is_logrt = 0;
 		else if (0 == strncmp(active_metrics[i].key, "logrt[", 6))	/* log files with rotation */
 			is_logrt = 1;
+		else
+			is_logrt = -1;
 
 		if (-1 != is_logrt)
 		{
@@ -1149,6 +1147,8 @@ static void	process_active_checks(char *server, unsigned short port)
 								/* buffer is full, stop processing active checks*/
 								/* till the buffer is cleared */
 								lastlogsize = active_metrics[i].lastlogsize;
+								finalize_eventlog6(&eventlog6_render_context,
+										&eventlog6_query);
 								goto ret;
 							}
 

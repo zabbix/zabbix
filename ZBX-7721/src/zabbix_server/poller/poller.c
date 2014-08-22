@@ -48,17 +48,15 @@ extern int		process_num;
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
-	const char		*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			failed_type_buf[8];
-	zbx_vector_ptr_t	triggers;
-	DC_TRIGGER		*trigger;
-	int			i;
+	const char	*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		failed_type_buf[8];
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DC_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
-
-	zbx_vector_ptr_create(&triggers);
 
 	/* determine failed item type */
 	switch (type)
@@ -156,40 +154,35 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger = zbx_malloc(NULL, sizeof(DC_TRIGGER));
-		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->description = zbx_strdup(NULL, row[1]);
-		trigger->expression_orig = zbx_strdup(NULL, row[2]);
-		trigger->priority = (unsigned char)atoi(row[3]);
-		trigger->type = (unsigned char)atoi(row[4]);
-		trigger->value = atoi(row[5]);
-		trigger->state = atoi(row[6]);
-		trigger->error = zbx_strdup(NULL, row[7]);
-		trigger->lastchange = atoi(row[8]);
-		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-		trigger->new_error = reason;
-		trigger->timespec = *ts;
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		trigger.description = row[1];
+		trigger.expression_orig = row[2];
+		ZBX_STR2UCHAR(trigger.priority, row[3]);
+		ZBX_STR2UCHAR(trigger.type, row[4]);
+		trigger.value = atoi(row[5]);
+		trigger.state = atoi(row[6]);
+		trigger.error = row[7];
+		trigger.lastchange = atoi(row[8]);
+		trigger.new_value = TRIGGER_VALUE_UNKNOWN;
+		trigger.new_error = reason;
+		trigger.timespec = *ts;
 
-		zbx_vector_ptr_append(&triggers, trigger);
+		sql_offset = 0;
+
+		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, &trigger))
+		{
+			DBbegin();
+			DBexecute("%s", sql);
+			DBcommit();
+		}
 	}
+
+	zbx_free(sql);
 	DBfree_result(result);
 
-	zbx_vector_ptr_sort(&triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	process_triggers(&triggers);
-
+	DBbegin();
 	process_events();
-
-	for (i = 0; i < triggers.values_num; i++)
-	{
-		trigger = (DC_TRIGGER *)triggers.values[i];
-
-		zbx_free(trigger->error);
-		zbx_free(trigger->expression_orig);
-		zbx_free(trigger->description);
-		zbx_free(trigger);
-	}
-	zbx_vector_ptr_destroy(&triggers);
+	DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

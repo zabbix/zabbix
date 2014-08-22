@@ -457,7 +457,7 @@ $triggerEditable = API::Trigger()->get(array(
 
 // get events
 if ($config['event_ack_enable']) {
-	// get all unacknowledged events, if trigger has unacknowledged even => it has events
+	// get all unacknowledged events, if trigger has unacknowledged event => it has events
 	$eventCounts = API::Event()->get(array(
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,

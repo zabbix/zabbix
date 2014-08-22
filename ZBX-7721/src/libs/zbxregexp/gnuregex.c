@@ -78,7 +78,7 @@
 
 /* Define the syntax stuff for \<, \>, etc.  */
 
-/* This must be nonzero for the wordchar and notwordchar pattern
+/* This must be non-zero for the wordchar and notwordchar pattern
    commands in re_match_2.  */
 #ifndef Sword
 #define Sword 1
@@ -461,7 +461,7 @@ extract_number_and_incr (destination, source)
 #endif /* DEBUG */
 
 /* If DEBUG is defined, Regex prints many voluminous messages about what
-   it is doing (if the variable `debug' is nonzero).  If linked with the
+   it is doing (if the variable `debug' is non-zero).  If linked with the
    main program in `iregex.c', you can enter patterns and strings
    interactively.  And if linked with the main program in `main.c' and
    the other test files, you can run the already-written tests.  */
@@ -1324,7 +1324,7 @@ regex_compile (pattern, size, syntax, bufp)
                 GET_BUFFER_SPACE (3);
 
                 /* We know we are not at the first character of the pattern,
-                   because laststart was nonzero.  And we've already
+                   because laststart was non-zero.  And we've already
                    incremented `p', by the way, to be the character after
                    the `*'.  Do we have to do something analogous here
                    for null bytes, because of RE_DOT_NOT_NULL?  */
@@ -3241,7 +3241,7 @@ re_match (bufp, string, size, pos, regs)
    and SIZE2, respectively).  We start matching at POS, and stop
    matching at STOP.
 
-   If REGS is non-null and the `no_sub' field of BUFP is nonzero, we
+   If REGS is non-null and the `no_sub' field of BUFP is non-zero, we
    store offsets for the substring each group matched in REGS.  See the
    documentation for exactly how many groups we fill.
 
@@ -4677,7 +4677,7 @@ common_op_match_null_string_p (p, end, reg_info)
 
 
 /* Return zero if TRANSLATE[S1] and TRANSLATE[S2] are identical for LEN
-   bytes; nonzero otherwise.  */
+   bytes; non-zero otherwise.  */
 
 static int
 bcmp_translate (s1, s2, len, translate)
@@ -4821,7 +4821,7 @@ re_exec (s)
      routine will report only success or failure, and nothing about the
      registers.
 
-   It returns 0 if it succeeds, nonzero if it doesn't.  (See regex.h for
+   It returns 0 if it succeeds, non-zero if it doesn't.  (See regex.h for
    the return codes and their meanings.)  */
 
 int

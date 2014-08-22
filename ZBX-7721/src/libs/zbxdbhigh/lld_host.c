@@ -50,18 +50,18 @@ typedef struct
 	unsigned char	type;
 	unsigned char	type_orig;
 	unsigned char	useip;
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE	0x01	/* interface.type field should be updated  */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN	0x02	/* interface.main field should be updated */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP	0x04	/* interface.useip field should be updated */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_IP	0x08	/* interface.ip field should be updated */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS	0x10	/* interface.dns field should be updated */
-#define ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT	0x20	/* interface.port field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE	__UINT64_C(0x00000001)	/* interface.type field should be updated  */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN	__UINT64_C(0x00000002)	/* interface.main field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP	__UINT64_C(0x00000004)	/* interface.useip field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_IP	__UINT64_C(0x00000008)	/* interface.ip field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS	__UINT64_C(0x00000010)	/* interface.dns field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT	__UINT64_C(0x00000020)	/* interface.port field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE								\
 		(ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE | ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
-#define ZBX_FLAG_LLD_INTERFACE_REMOVE		0x40	/* interfaces which should be deleted */
-	unsigned char	flags;
+#define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000040)	/* interfaces which should be deleted */
+	zbx_uint64_t	flags;
 }
 zbx_lld_interface_t;
 
@@ -88,20 +88,20 @@ typedef struct
 	char			*name_orig;
 	int			lastcheck;
 	int			ts_delete;
-#define ZBX_FLAG_LLD_HOST_DISCOVERED		0x01	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST		0x02	/* hosts.host and host_discovery.host fields should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_NAME		0x04	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY		0x08	/* hosts.proxy_hostid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH	0x10	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV	0x20	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER	0x40	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS	0x80	/* hosts.ipmi_password field should be updated */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED		__UINT64_C(0x00000001)	/* hosts which should be updated or added */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST		__UINT64_C(0x00000002)	/* hosts.host and host_discovery.host fields should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_NAME		__UINT64_C(0x00000004)	/* hosts.name field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY		__UINT64_C(0x00000008)	/* hosts.proxy_hostid field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH	__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV	__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER	__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS	__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE								\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_PROXY | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER |	\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS)
-	unsigned char		flags;
+	zbx_uint64_t		flags;
 	char			inventory_mode;
 }
 zbx_lld_host_t;
@@ -146,10 +146,10 @@ typedef struct
 	char			*name_orig;
 	int			lastcheck;
 	int			ts_delete;
-#define ZBX_FLAG_LLD_GROUP_DISCOVERED		0x01	/* groups which should be updated or added */
-#define ZBX_FLAG_LLD_GROUP_UPDATE_NAME		0x02	/* groups.name field should be updated */
+#define ZBX_FLAG_LLD_GROUP_DISCOVERED		__UINT64_C(0x00000001)	/* groups which should be updated or added */
+#define ZBX_FLAG_LLD_GROUP_UPDATE_NAME		__UINT64_C(0x00000002)	/* groups.name field should be updated */
 #define ZBX_FLAG_LLD_GROUP_UPDATE		ZBX_FLAG_LLD_GROUP_UPDATE_NAME
-	unsigned char		flags;
+	zbx_uint64_t		flags;
 }
 zbx_lld_group_t;
 
@@ -256,21 +256,18 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
 	const char		*__function_name = "lld_hosts_validate";
 
-	char			*tnames = NULL, *vnames = NULL, *host_esc, *name_esc;
-	size_t			tnames_alloc = 256, tnames_offset = 0,
-				vnames_alloc = 256, vnames_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
 	zbx_lld_host_t		*host, *host_b;
 	zbx_vector_uint64_t	hostids;
+	zbx_vector_str_t	tnames, vnames;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&hostids);
-
-	tnames = zbx_malloc(tnames, tnames_alloc);	/* list of technical host names */
-	vnames = zbx_malloc(vnames, vnames_alloc);	/* list of visible host names */
+	zbx_vector_str_create(&tnames);		/* list of technical host names */
+	zbx_vector_str_create(&vnames);		/* list of visible host names */
 
 	/* checking a host name validity */
 	for (i = 0; i < hosts->values_num; i++)
@@ -280,7 +277,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		/* only new hosts or hosts with a new host name will be validated */
+		/* only new hosts or hosts with changed host name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
@@ -293,11 +290,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->hostid)
 		{
-			/* return an original host name and drop the correspond flag */
-			zbx_free(host->host);
-			host->host = host->host_orig;
-			host->host_orig = NULL;
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+			lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 		}
 		else
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -311,7 +305,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		/* only new hosts or hosts with a new visible host name will be validated */
+		/* only new hosts or hosts with changed visible name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
@@ -328,11 +322,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->hostid)
 		{
-			/* return an original visible host name and drop the correspond flag */
-			zbx_free(host->name);
-			host->name = host->name_orig;
-			host->name_orig = NULL;
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+			lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 		}
 		else
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -346,7 +337,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		/* only new hosts or hosts with a new host name will be validated */
+		/* only new hosts or hosts with changed host name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
@@ -361,16 +352,13 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				continue;
 
 			*error = zbx_strdcatf(*error, "Cannot %s host:"
-						" host with the same name \"%s\" already exists.\n",
-						(0 != host->hostid ? "update" : "create"), host->host);
+					" host with the same name \"%s\" already exists.\n",
+					(0 != host->hostid ? "update" : "create"), host->host);
 
 			if (0 != host->hostid)
 			{
-				/* return an original host name and drop the correspond flag */
-				zbx_free(host->host);
-				host->host = host->host_orig;
-				host->host_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+				lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+						ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 			}
 			else
 				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -385,7 +373,7 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		/* only new hosts or hosts with a new visible host name will be validated */
+		/* only new hosts or hosts with changed visible name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
@@ -405,11 +393,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 			if (0 != host->hostid)
 			{
-				/* return an original visible host name and drop the correspond flag */
-				zbx_free(host->name);
-				host->name = host->name_orig;
-				host->name_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+				lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+						ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 			}
 			else
 				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -429,33 +414,13 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			zbx_vector_uint64_append(&hostids, host->hostid);
 
 		if (0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
-		{
-			host_esc = DBdyn_escape_string(host->host);
-
-			if (0 != tnames_offset)
-				zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, ',');
-			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
-			zbx_strcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, host_esc);
-			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
-
-			zbx_free(host_esc);
-		}
+			zbx_vector_str_append(&tnames, host->host);
 
 		if (0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
-		{
-			name_esc = DBdyn_escape_string(host->name);
-
-			if (0 != vnames_offset)
-				zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, ',');
-			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
-			zbx_strcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, name_esc);
-			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
-
-			zbx_free(name_esc);
-		}
+			zbx_vector_str_append(&vnames, host->name);
 	}
 
-	if (0 != tnames_offset || 0 != vnames_offset)
+	if (0 != tnames.values_num || 0 != vnames.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
@@ -465,19 +430,31 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				" from hosts"
 				" where status in (%d,%d,%d)"
 					" and flags<>%d"
-					" and ",
+					" and",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 				ZBX_FLAG_DISCOVERY_PROTOTYPE);
-		if (0 != tnames_offset && 0 != vnames_offset)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
-		if (0 != tnames_offset)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "host in (%s)", tnames);
-		if (0 != tnames_offset && 0 != vnames_offset)
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
-		if (0 != vnames_offset)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name in (%s)", vnames);
-		if (0 != tnames_offset && 0 != vnames_offset)
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (");
+
+		if (0 != tnames.values_num)
+		{
+			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
+					(const char **)tnames.values, tnames.values_num);
+		}
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or");
+
+		if (0 != vnames.values_num)
+		{
+			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
+					(const char **)vnames.values, vnames.values_num);
+		}
+
+		if (0 != tnames.values_num && 0 != vnames.values_num)
 			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
 		if (0 != hostids.values_num)
 		{
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -505,11 +482,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 					if (0 != host->hostid)
 					{
-						/* return an original host name and drop the correspond flag */
-						zbx_free(host->host);
-						host->host = host->host_orig;
-						host->host_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
+						lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+								ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 					}
 					else
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -523,11 +497,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 					if (0 != host->hostid)
 					{
-						/* return an original visible host name and drop the correspond flag */
-						zbx_free(host->name);
-						host->name = host->name_orig;
-						host->name_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
+						lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+								ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 					}
 					else
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
@@ -539,9 +510,8 @@ void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		zbx_free(sql);
 	}
 
-	zbx_free(vnames);
-	zbx_free(tnames);
-
+	zbx_vector_str_destroy(&vnames);
+	zbx_vector_str_destroy(&tnames);
 	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1013,19 +983,17 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 {
 	const char		*__function_name = "lld_groups_validate";
 
-	char			*names = NULL, *name_esc;
-	size_t			names_alloc = 256, names_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
 	zbx_lld_group_t		*group, *group_b;
 	zbx_vector_uint64_t	groupids;
+	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&groupids);
-
-	names = zbx_malloc(names, names_alloc);	/* list of group names */
+	zbx_vector_str_create(&names);		/* list of group names */
 
 	/* checking a group name validity */
 	for (i = 0; i < groups->values_num; i++)
@@ -1035,7 +1003,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
-		/* only new groups or groups with a new group name will be validated */
+		/* only new groups or groups with changed group name will be validated */
 		if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 			continue;
 
@@ -1052,11 +1020,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 		if (0 != group->groupid)
 		{
-			/* return an original group name and drop the correspond flag */
-			zbx_free(group->name);
-			group->name = group->name_orig;
-			group->name_orig = NULL;
-			group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+			lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+					ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 		}
 		else
 			group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1070,7 +1035,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
-		/* only new groups or groups with a new group name will be validated */
+		/* only new groups or groups with changed group name will be validated */
 		if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 			continue;
 
@@ -1090,11 +1055,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 			if (0 != group->groupid)
 			{
-				/* return an original group name and drop the correspond flag */
-				zbx_free(group->name);
-				group->name = group->name_orig;
-				group->name_orig = NULL;
-				group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+				lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+						ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 			}
 			else
 				group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1114,25 +1076,18 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 			zbx_vector_uint64_append(&groupids, group->groupid);
 
 		if (0 == group->groupid || 0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-		{
-			name_esc = DBdyn_escape_string(group->name);
-
-			if (0 != names_offset)
-				zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, ',');
-			zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-			zbx_strcpy_alloc(&names, &names_alloc, &names_offset, name_esc);
-			zbx_chrcpy_alloc(&names, &names_alloc, &names_offset, '\'');
-
-			zbx_free(name_esc);
-		}
+			zbx_vector_str_append(&names, group->name);
 	}
 
-	if (0 != names_offset)
+	if (0 != names.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where name in (%s)", names);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where");
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
+				(const char **)names.values, names.values_num);
+
 		if (0 != groupids.values_num)
 		{
 			zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1160,11 +1115,8 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 					if (0 != group->groupid)
 					{
-						/* return an original group name and drop the correspond flag */
-						zbx_free(group->name);
-						group->name = group->name_orig;
-						group->name_orig = NULL;
-						group->flags &= ~ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+						lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
+								ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
 					}
 					else
 						group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1176,8 +1128,7 @@ void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		zbx_free(sql);
 	}
 
-	zbx_free(names);
-
+	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

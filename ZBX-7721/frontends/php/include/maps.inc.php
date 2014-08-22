@@ -86,7 +86,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$hostIds[$selement['elementid']] = $selement['elementid'];
 
-			// expanding hosts url macros again as some hosts were added from hostgroup areeas
+			// expanding host URL macros again as some hosts were added from hostgroup areas
 			// and automatic expanding only happens for elements that are defined for map in db
 			foreach ($selement['urls'] as $urlId => $url) {
 				$selement['urls'][$urlId]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
@@ -432,10 +432,10 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 	foreach ($matches[0] as $expr) {
 		$macro = $expr;
 		if ($replaceHosts !== null) {
-			// search for macros with all possible indecies
+			// search for macros with all possible indices
 			foreach ($replaceHosts as $i => $host) {
 				$macroTmp = $macro;
-				// repalce only macro in first position
+				// replace only macro in first position
 				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 				// only one simple macro possible inside functional macro
 				if ($macro != $macroTmp) {
@@ -450,7 +450,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			continue;
 		}
 
-		// look in DB for coressponding item
+		// look in DB for corresponding item
 		$itemHost = $expressionData->expressions[0]['host'];
 		$key = $expressionData->expressions[0]['item'];
 		$function = $expressionData->expressions[0]['functionName'];
@@ -461,7 +461,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('itemid', 'lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid')
+			'output' => array('itemid', 'value_type', 'units', 'valuemapid')
 		));
 
 		$item = reset($item);
@@ -470,6 +470,17 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		if (!$item) {
 			$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 			continue;
+		}
+
+		$lastValue = Manager::History()->getLast(array($item));
+		if ($lastValue) {
+			$lastValue = reset($lastValue[$item['itemid']]);
+			$item['lastvalue'] = $lastValue['value'];
+			$item['lastclock'] = $lastValue['clock'];
+		}
+		else {
+			$item['lastvalue'] = '0';
+			$item['lastclock'] = '0';
 		}
 
 		// do function type (last, min, max, avg) related actions

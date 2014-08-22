@@ -57,7 +57,7 @@ class CScreenEvents extends CScreenBase {
 			$item->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 				get_node_name_by_elid($event['objectid']),
-				$host['host'],
+				$host['name'],
 				new CLink(
 					$trigger['description'],
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']

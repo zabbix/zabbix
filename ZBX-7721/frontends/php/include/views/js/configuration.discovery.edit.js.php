@@ -383,7 +383,7 @@
 				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
 				name = name.substring(0, name.length - 1);
 
-				// ignore "name" value bacause it is virtual
+				// ignore "name" value because it is virtual
 				if (name !== 'name') {
 					jQuery('#' + name).val(itemObj.val());
 
@@ -446,7 +446,7 @@
 				ignoreNames = ['druleid', 'name', 'ports', 'type'];
 
 			if (jQuery.inArray(dcheckType, snmpTypes) !== -1 && jQuery.inArray(oldType, snmpTypes) !== -1) {
-				// ignore value reset when change type from snmpt's
+				// ignore value reset when changing type from snmp's
 			}
 			else {
 				jQuery('#new_check_form input[type="text"]').each(function(i, item) {

@@ -43,7 +43,7 @@ abstract class CExportWriter {
 	abstract public function write(array $array);
 
 	/**
-	 * Enable or dsable output formatting. Enabled by default.
+	 * Enable or disable output formatting. Enabled by default.
 	 *
 	 * @param bool $value
 	 *

@@ -131,7 +131,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'color' => getSeverityColor($trigger['priority'], $event['value']),
-						'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).'[url='.$url_tr_status.']'.$host['host'].'[/url]',
+						'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).'[url='.$url_tr_status.']'.$host['name'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 							_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
