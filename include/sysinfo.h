@@ -25,7 +25,7 @@
 
 #include <linux/version.h>
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,14)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
 #	include <sys/socket.h>
 #	include <linux/netlink.h>
 #	include <linux/inet_diag.h>
@@ -63,7 +63,7 @@ enum
 };
 
 extern int	nlerr;
-#endif
+#endif /* LINUX_VERSION_CODE */
 
 /* CHECK RESULT */
 
