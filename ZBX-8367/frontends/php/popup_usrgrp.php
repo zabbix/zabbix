@@ -40,8 +40,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	check_fields($fields);
 
 // destination form
-	$dstfrm	= get_request('dstfrm',	0);
-	$new_groups = get_request('new_groups', array());
+	$dstfrm	= getRequest('dstfrm',	0);
+	$new_groups = getRequest('new_groups', array());
 
 	show_table_header(_('User groups'));
 ?>

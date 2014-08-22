@@ -303,6 +303,10 @@ class CHelpItems {
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
 					'description' => _('Get first occurrence of regexp in web page. Default path is /')
+				),
+				array(
+					'key' => 'wmi.get[<namespace>,<query>]',
+					'description' => _('Execute WMI query and return the first selected object.')
 				)
 			),
 			ITEM_TYPE_ZABBIX_ACTIVE => array(
@@ -561,6 +565,10 @@ class CHelpItems {
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
 					'description' => _('Get first occurrence of regexp in web page. Default path is /')
+				),
+				array(
+					'key' => 'wmi.get[<namespace>,<query>]',
+					'description' => _('Execute WMI query and return the first selected object.')
 				)
 			),
 			ITEM_TYPE_AGGREGATE => array(
@@ -813,6 +821,10 @@ class CHelpItems {
 				array(
 					'key' => 'zabbix[history_uint]',
 					'description' => _('Number of values stored in table HISTORY_UINT.')
+				),
+				array(
+					'key' => 'zabbix[host,,maintenance]',
+					'description' => _('Returns current maintenance status of the host.')
 				),
 				array(
 					'key' => 'zabbix[host,<type>,available]',

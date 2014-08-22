@@ -42,26 +42,25 @@ $fields = array(
 	'graphid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-	'action' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'go','add','remove'"), null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN("'add','remove'"), null)
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN('"add","remove"'), null)
 );
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-if (get_request('graphid')) {
+if (getRequest('graphid')) {
 	$graphs = API::Graph()->get(array(
 		'graphids' => array($_REQUEST['graphid']),
 		'output' => array('graphid')
@@ -74,10 +73,10 @@ if (get_request('graphid')) {
 $pageFilter = new CPageFilter(array(
 	'groups' => array('real_hosts' => true, 'with_graphs' => true),
 	'hosts' => array('with_graphs' => true),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null),
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid'),
 	'graphs' => array('templated' => 0),
-	'graphid' => get_request('graphid', null)
+	'graphid' => getRequest('graphid')
 ));
 
 /*
@@ -125,8 +124,8 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
-		'period' => get_request('period'),
-		'stime' => get_request('stime')
+		'period' => getRequest('period'),
+		'stime' => getRequest('stime')
 	));
 
 	$curl = new CUrl();

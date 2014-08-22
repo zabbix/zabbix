@@ -55,7 +55,7 @@ $fields = array(
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove'"), null),
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null),
 	// actions
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
@@ -119,7 +119,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Actions
  */
-$_REQUEST['action'] = get_request('action', 'showgraph');
+$_REQUEST['action'] = getRequest('action', 'showgraph');
 $_REQUEST['itemid'] = array_unique(zbx_toArray($_REQUEST['itemid']));
 
 /*
@@ -146,12 +146,12 @@ $host = reset($item['hosts']);
 $item['hostname'] = $host['name'];
 
 $data = array(
-	'itemids' => get_request('itemid'),
+	'itemids' => getRequest('itemid'),
 	'items' => $items,
 	'item' => $item,
-	'action' => get_request('action'),
-	'period' => get_request('period'),
-	'stime' => get_request('stime'),
+	'action' => getRequest('action'),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),

@@ -57,11 +57,11 @@ if (!$dbItems) {
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+	'profileIdx2' => getRequest('profileIdx2'),
+	'updateProfile' => getRequest('updateProfile', true),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 ));
 
 $graph = new CLineGraphDraw();

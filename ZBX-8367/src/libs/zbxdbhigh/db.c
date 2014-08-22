@@ -797,7 +797,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 		ret = SUCCEED;
 	}
 	else
-		*error = zbx_dsprintf(*error, "proxy \"%s\" does not exist", hostname);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

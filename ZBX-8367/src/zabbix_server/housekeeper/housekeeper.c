@@ -782,6 +782,11 @@ void	main_housekeeper_loop(void)
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
 	double	sec;
 
+	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
+			HOUSEKEEPER_STARTUP_DELAY);
+
+	zbx_sleep_loop(HOUSEKEEPER_STARTUP_DELAY * SEC_PER_MIN);
+
 	for (;;)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");

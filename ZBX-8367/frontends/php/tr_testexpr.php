@@ -39,7 +39,7 @@ $definedErrorPhrases = array(
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // expression analyze
-$expression = get_request('expression', '');
+$expression = getRequest('expression', '');
 
 define('NO_LINK_IN_TESTING', true);
 list($outline, $eHTMLTree) = analyzeExpression($expression);
@@ -71,7 +71,7 @@ if ($result) {
 		}
 
 		$fname = 'test_data_'.md5($token['value']);
-		$macrosData[$token['value']] = get_request($fname, '');
+		$macrosData[$token['value']] = getRequest($fname, '');
 
 		$info = get_item_function_info($token['value']);
 

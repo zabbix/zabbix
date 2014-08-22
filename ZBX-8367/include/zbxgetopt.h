@@ -69,7 +69,7 @@ extern int zbx_optopt;
 
    To have a long-named option do something other than set an `int' to
    a compiled-in constant, such as set a value from `optarg', set the
-   option's `flag' field to zero and its `val' field to a nonzero
+   option's `flag' field to zero and its `val' field to a non-zero
    value (the equivalent single-letter option character, if there is
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */

@@ -44,11 +44,11 @@ $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
 
 // active since
 if (isset($_REQUEST['active_since'])) {
-	$fromYear = get_request('active_since_year');
-	$fromMonth = get_request('active_since_month');
-	$fromDay = get_request('active_since_day');
-	$fromHours = get_request('active_since_hour');
-	$fromMinutes = get_request('active_since_minute');
+	$fromYear = getRequest('active_since_year');
+	$fromMonth = getRequest('active_since_month');
+	$fromDay = getRequest('active_since_day');
+	$fromHours = getRequest('active_since_hour');
+	$fromMinutes = getRequest('active_since_minute');
 	$fromDate = array(
 		'y' => $fromYear,
 		'm' => $fromMonth,
@@ -66,11 +66,11 @@ $maintenanceForm->addVar('active_since', $activeSince);
 
 // active till
 if (isset($_REQUEST['active_till'])) {
-	$toYear = get_request('active_till_year');
-	$toMonth = get_request('active_till_month');
-	$toDay = get_request('active_till_day');
-	$toHours = get_request('active_till_hour');
-	$toMinutes = get_request('active_till_minute');
+	$toYear = getRequest('active_till_year');
+	$toMonth = getRequest('active_till_month');
+	$toDay = getRequest('active_till_day');
+	$toHours = getRequest('active_till_hour');
+	$toMinutes = getRequest('active_till_minute');
 	$toDate = array(
 		'y' => $toYear,
 		'm' => $toMonth,

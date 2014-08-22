@@ -78,7 +78,7 @@ struct	_DC_TRIGGER;
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
-#define HOST_NAME_LEN			64
+#define HOST_NAME_LEN			128
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		(HOST_ERROR_LEN + 1)
 #define HOST_IPMI_USERNAME_LEN		16
@@ -508,7 +508,6 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 

@@ -37,16 +37,18 @@ $fields = array(
 	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({save})',_('Default delay (in seconds)')),
 	'slides' =>			array(null,		 O_OPT, null,		null,	null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"cnt","delay","name"'),					null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('cnt', 'name', 'delay'));
 
 if (!empty($_REQUEST['slides'])) {
 	natksort($_REQUEST['slides']);
@@ -60,28 +62,26 @@ if (isset($_REQUEST['slideshowid'])) {
 		access_deny();
 	}
 
-	$dbSlideshow = get_slideshow_by_slideshowid(get_request('slideshowid'));
+	$dbSlideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'));
 
 	if (!$dbSlideshow) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['shows']) || !is_array($_REQUEST['shows'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('shows') || !is_array(getRequest('shows'))) {
 		access_deny();
 	}
 	else {
 		$dbSlideshowCount = DBfetch(DBselect(
-			'SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', $_REQUEST['shows'])
+			'SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', getRequest('shows'))
 		));
 
-		if ($dbSlideshowCount['cnt'] != count($_REQUEST['shows'])) {
+		if ($dbSlideshowCount['cnt'] != count(getRequest('shows'))) {
 			access_deny();
 		}
 	}
 }
-
-$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
@@ -94,14 +94,14 @@ elseif (isset($_REQUEST['save'])) {
 	DBstart();
 
 	if (isset($_REQUEST['slideshowid'])) {
-		$result = update_slideshow($_REQUEST['slideshowid'], $_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
+		$result = update_slideshow($_REQUEST['slideshowid'], $_REQUEST['name'], $_REQUEST['delay'], getRequest('slides', array()));
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$result = add_slideshow($_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
+		$result = add_slideshow($_REQUEST['name'], $_REQUEST['delay'], getRequest('slides', array()));
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
@@ -114,8 +114,11 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	DBstart();
@@ -128,30 +131,32 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
 	$result = DBend($result);
-	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
-	clearCookies($result);
-}
-elseif ($_REQUEST['go'] == 'delete') {
-	$goResult = true;
 
-	$shows = get_request('shows', array());
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
+}
+elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' && hasRequest('shows')) {
+	$result = true;
+
+	$shows = getRequest('shows');
 	DBstart();
 
 	foreach ($shows as $showid) {
-		$goResult &= delete_slideshow($showid);
-		if (!$goResult) {
+		$result &= delete_slideshow($showid);
+		if (!$result) {
 			break;
 		}
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	if ($goResult) {
+	if ($result) {
 		unset($_REQUEST['form']);
+		uncheckTableRows();
 	}
-
-	show_messages($goResult, _('Slide show deleted'), _('Cannot delete slide show'));
-	clearCookies($goResult);
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
 
 /*
@@ -159,12 +164,12 @@ elseif ($_REQUEST['go'] == 'delete') {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', null),
+		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
-		'slideshowid' => get_request('slideshowid', null),
-		'name' => get_request('name', ''),
-		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'slides' => get_request('slides', array())
+		'slideshowid' => getRequest('slideshowid'),
+		'name' => getRequest('name', ''),
+		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+		'slides' => getRequest('slides', array())
 	);
 
 	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
@@ -172,21 +177,20 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $dbSlideshow['delay'];
 
 		// get slides
-		$db_slides = DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).' ORDER BY s.step');
-		while ($slide = DBfetch($db_slides)) {
-			$data['slides'][$slide['step']] = array(
-				'slideid' => $slide['slideid'],
-				'screenid' => $slide['screenid'],
-				'delay' => $slide['delay']
-			);
-		}
+		$data['slides'] = DBfetchArray(DBselect(
+				'SELECT s.slideid, s.screenid, s.delay'.
+				' FROM slides s'.
+				' WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).
+				' ORDER BY s.step'
+		));
 	}
 
 	// get slides without delay
 	$data['slides_without_delay'] = $data['slides'];
-	for ($i = 0, $size = count($data['slides_without_delay']); $i < $size; $i++) {
-		unset($data['slides_without_delay'][$i]['delay']);
+	foreach ($data['slides_without_delay'] as &$slide) {
+		unset($slide['delay']);
 	}
+	unset($slide);
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.edit', $data);
@@ -194,6 +198,17 @@ if (isset($_REQUEST['form'])) {
 	$slideshowView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
+
 	$data['slides'] = DBfetchArray(DBselect(
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
@@ -207,7 +222,7 @@ else {
 		}
 	}
 
-	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
+	order_result($data['slides'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['slides']);
 

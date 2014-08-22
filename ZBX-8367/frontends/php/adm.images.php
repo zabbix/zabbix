@@ -43,7 +43,7 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['imageid'])) {
-	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(get_request('imageid'))));
+	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(getRequest('imageid'))));
 	if (empty($dbImage)) {
 		access_deny();
 	}
@@ -155,7 +155,7 @@ $imageWidget = new CWidget();
 $imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array(
-	'form' => get_request('form'),
+	'form' => getRequest('form'),
 	'widget' => &$imageWidget
 );
 
@@ -167,14 +167,14 @@ if (!empty($data['form'])) {
 	}
 	else {
 		$data['imageid'] = null;
-		$data['imagename'] = get_request('name', '');
+		$data['imagename'] = getRequest('name', '');
 		$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 	}
 
 	$imageForm = new CView('administration.general.image.edit', $data);
 }
 else {
-	$data['imagetype'] = get_request('imagetype', IMAGE_TYPE_ICON);
+	$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 
 	$data['images'] = API::Image()->get(array(
 		'filter' => array('imagetype' => $data['imagetype']),

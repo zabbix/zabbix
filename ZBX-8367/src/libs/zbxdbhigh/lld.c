@@ -374,7 +374,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 	}
 
 	if (SUCCEED == evaluate(&result, expression, error, sizeof(error)))
-		ret = (0 == result ? FAIL : SUCCEED);
+		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 
 	zbx_free(expression);
 

@@ -47,7 +47,7 @@ $hostGroupForm->setName('hostgroupForm');
 $hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	' # ',
 	_('Members'),
 	_('Info')
@@ -151,16 +151,20 @@ foreach ($this->data['groups'] as $group) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('hostgroup.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected hosts?'));
 $goComboBox->addItem($goOption);
-$goOption = new CComboItem('disable', _('Disable selected'));
+
+$goOption = new CComboItem('hostgroup.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts in the selected host groups?'));
 $goComboBox->addItem($goOption);
-$goOption = new CComboItem('delete', _('Delete selected'));
+
+$goOption = new CComboItem('hostgroup.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected host groups?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "groups";');
