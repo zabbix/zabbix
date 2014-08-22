@@ -98,8 +98,13 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = new CLink(item_status2str($hostPrototype['status']),
-		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoveryRule['itemid'].
-		'&action='.($hostPrototype['status'] ? 'hostprototype.massenable' : 'hostprototype.massdisable'), itemIndicatorStyle($hostPrototype['status'])
+		'?group_hostid='.$hostPrototype['hostid'].
+			'&parent_discoveryid='.$discoveryRule['itemid'].
+			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
+				? 'hostprototype.massenable'
+				: 'hostprototype.massdisable'
+			),
+		itemIndicatorStyle($hostPrototype['status'])
 	);
 
 	$hostTable->addRow(array(
