@@ -23,7 +23,7 @@ my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
 my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name);
 my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix);
-my ($uniq);
+my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq);
 
 my %c = (
 	"type"		=>	"code",
@@ -467,6 +467,15 @@ sub process_field
 			else
 			{
 				$references = "";
+
+				if ($output{"database"} eq "mysql")
+				{
+					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} `${table_name}` ADD CONSTRAINT `${cname}` FOREIGN KEY (`${name}`) REFERENCES `${fk_table}` (`${fk_field}`)${fk_flags}${fk_eol}\n";
+				}
+				else
+				{
+					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
+				}
 			}
 		}
 
@@ -629,6 +638,7 @@ sub process
 	print $output{"before"};
 
 	$state = "bof";
+	$fkeys = "";
 	$sequences = "";
 	$uniq = "";
 	my ($type, $line);
@@ -657,6 +667,7 @@ sub process
 	newstate("table");
 
 	print $sequences.$sql_suffix;
+	print $fkeys_prefix.$fkeys.$fkeys_suffix;
 	print $output{"after"};
 }
 
@@ -677,6 +688,8 @@ sub main
 	$szcol3 = 25;
 	$szcol4 = 7;
 	$sql_suffix="";
+	$fkeys_prefix = "";
+	$fkeys_suffix = "";
 
 	if ($format eq 'c')		{ %output = %c; }
 	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
@@ -699,8 +712,10 @@ sub main
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
+		$fkeys_prefix = "const char\t*const db_schema_fkeys[] = {\n";
+		$fkeys_suffix = "\tNULL\n};\n";
 
-		print "\n#if defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
+		print "#if defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
 		print "#else\t/* HAVE_SQLITE3 */\n";
