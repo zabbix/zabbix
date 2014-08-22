@@ -107,6 +107,7 @@ foreach ($this->data['applications'] as $application) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('application.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected applications?'));
 $goComboBox->addItem($goOption);
