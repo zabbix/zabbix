@@ -750,7 +750,8 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	const char	*__function_name = "DCsync_config";
 	DB_ROW		row;
 	int		i, found = 1;
-	int		unsupported_change = 0;
+
+	*refresh_unsupported_changed = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -769,7 +770,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		{
 			/* load default config data */
 
-			unsupported_change = 1;
+			*refresh_unsupported_changed = 1;
 
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
@@ -804,15 +805,16 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	}
 	else
 	{
+		int	refresh_unsupported;
+
 		/* store the config data */
 
-		if (0 != found)
-		{
-			if (atoi(row[0]) != config->config->refresh_unsupported)
-				unsupported_change = 1;
-		}
+		refresh_unsupported = atoi(row[0]);
 
-		config->config->refresh_unsupported = atoi(row[0]);
+		if (0 == found || refresh_unsupported != config->config->refresh_unsupported)
+			*refresh_unsupported_changed = 1;
+
+		config->config->refresh_unsupported = refresh_unsupported;
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 
@@ -854,9 +856,6 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
 	}
-
-	if (NULL != refresh_unsupported_changed)
-		*refresh_unsupported_changed = unsupported_change;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -2735,7 +2734,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		if_result = NULL;
 	DB_RESULT		expr_result = NULL;
 
-	int			i, refresh_unsupported_changed = 0;
+	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, isec, tsec, dsec, fsec, hisec, htsec, gmsec, hmsec, ifsec, expr_sec,
 				csec2, hsec2, isec2, tsec2, dsec2, fsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2,
 				expr_sec2, total2;
@@ -3530,6 +3529,7 @@ void	DCload_config()
 	const char	*__function_name = "DCload_config";
 
 	DB_RESULT	result;
+	int		refresh_unsupported_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3537,7 +3537,7 @@ void	DCload_config()
 
 	LOCK_CACHE;
 
-	DCsync_config(result, NULL);
+	DCsync_config(result, &refresh_unsupported_changed);
 
 	UNLOCK_CACHE;
 
