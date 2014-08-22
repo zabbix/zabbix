@@ -48,12 +48,23 @@ var chkbxRange = {
 			}
 		}
 
-		// load selected checkboxes from cookies
+		// load selected checkboxes from cookies or cache
 		if (this.pageGoName != null) {
 			this.selectedIds = cookie.readJSON(this.cookieName);
-			jQuery.each(this.selectedIds, function(i, objectId) {
-				instance.checkObject(instance.pageGoName, objectId, true);
-			});
+
+			// check if checkboxes should be selected from cookies
+			if (!jQuery.isEmptyObject(this.selectedIds)) {
+				jQuery.each(this.selectedIds, function(i, objectId) {
+					instance.checkObject(instance.pageGoName, objectId, true);
+				});
+			}
+			// no checboxes selected from cookies, check browser cache if checkboxes are still checked and update state
+			else {
+				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)');
+				jQuery.each(checkedFromCache, function(i, object) {
+					instance.checkObject(instance.pageGoName, object.value, object.checked);
+				});
+			}
 
 			this.update(this.pageGoName);
 		}
@@ -286,7 +297,7 @@ var chkbxRange = {
 	 * Reset all selections on other pages.
 	 */
 	resetOtherPageCookies: function() {
-		for(var key in cookie.cookies) {
+		for (var key in cookie.cookies) {
 			var cookiePair = key.split('=');
 			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf(this.cookieName) == -1) {
 				cookie.erase(key);
