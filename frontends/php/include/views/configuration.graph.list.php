@@ -74,10 +74,10 @@ $graphTable = new CTableInfo(!empty($this->data['parent_discoveryid']) ? _('No g
 $graphTable->setHeader(array(
 	new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
 	!empty($this->data['hostid']) ? null : _('Hosts'),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Width'),
 	_('Height'),
-	make_sorting_header(_('Graph type'), 'graphtype')
+	make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['graphs'] as $graph) {
@@ -150,12 +150,13 @@ foreach ($this->data['graphs'] as $graph) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
+$goComboBox = new CComboBox('action');
+
 if (!$this->data['parent_discoveryid']) {
-	$goComboBox->addItem('copy_to', _('Copy selected to ...'));
+	$goComboBox->addItem('graph.masscopyto', _('Copy selected to ...'));
 }
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('graph.massdelete', _('Delete selected'));
 $goOption->setAttribute(
 	'confirm',
 	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')

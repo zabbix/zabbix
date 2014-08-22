@@ -44,14 +44,14 @@ $itemTable = new CTableInfo(_('No item prototypes found.'));
 
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
-	make_sorting_header(_('Name'),'name'),
-	make_sorting_header(_('Key'), 'key_'),
-	make_sorting_header(_('Interval'), 'delay'),
-	make_sorting_header(_('History'), 'history'),
-	make_sorting_header(_('Trends'), 'trends'),
-	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Applications'),
-	make_sorting_header(_('Status'), 'status')
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['items'] as $item) {
@@ -72,7 +72,10 @@ foreach ($this->data['items'] as $item) {
 		itemIndicator($item['status']),
 		'?group_itemid='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&go='.($item['status'] ? 'activate' : 'disable'),
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED
+				? 'itemprototype.massenable'
+				: 'itemprototype.massdisable'
+			),
 		itemIndicatorStyle($item['status'])
 	);
 
@@ -104,16 +107,17 @@ foreach ($this->data['items'] as $item) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('itemprototype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('itemprototype.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('itemprototype.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected item prototypes?'));
 $goComboBox->addItem($goOption);
 

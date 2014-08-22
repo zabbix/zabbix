@@ -48,19 +48,16 @@ $fields = array(
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'enableConfirmation' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'action' =>				array(T_ZBX_INT, O_OPT, P_ACT,			IN('0,1'),	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"script.massdelete"'),		null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"command","name"'),						null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-
-$_REQUEST['go'] = getRequest('go', 'none');
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
@@ -78,11 +75,7 @@ if ($scriptId = getRequest('scriptid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])) {
-	unset($_REQUEST['scriptid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['save'])) {
+if (isset($_REQUEST['save'])) {
 	$confirmation = getRequest('confirmation', '');
 	$enableConfirmation = getRequest('enableConfirmation', false);
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
@@ -134,7 +127,7 @@ elseif (isset($_REQUEST['save'])) {
 
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
-			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
+			unset($_REQUEST['form'], $_REQUEST['scriptid']);
 		}
 
 		$result = DBend($result);
@@ -145,8 +138,8 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }
-elseif (isset($_REQUEST['delete'])) {
-	$scriptId = getRequest('scriptid', 0);
+elseif (hasRequest('delete') && hasRequest('scriptid')) {
+	$scriptId = getRequest('scriptid');
 
 	DBstart();
 
@@ -164,8 +157,8 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
-	$scriptIds = $_REQUEST['scripts'];
+elseif (hasRequest('action') && getRequest('action') == 'script.massdelete' && hasRequest('scripts')) {
+	$scriptIds = getRequest('scripts');
 
 	DBstart();
 
@@ -260,7 +253,16 @@ if (isset($_REQUEST['form'])) {
 	$scriptView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
@@ -294,7 +296,7 @@ else {
 	}
 
 	// sorting & paging
-	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
+	order_result($data['scripts'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view

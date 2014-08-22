@@ -83,7 +83,7 @@ class CScreenPlainText extends CScreenBase {
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_LOG:
-					$value = $this->screenitem['style'] ? new CJSscript($history['value']) : $history['value'];
+					$value = $this->screenitem['style'] ? new CJsScript($history['value']) : $history['value'];
 					break;
 				default:
 					$value = $history['value'];
@@ -94,7 +94,9 @@ class CScreenPlainText extends CScreenBase {
 				$value = applyValueMap($value, $item['valuemapid']);
 			}
 
-			$table->addRow(array(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), new CCol($value, 'pre')));
+			$class = $this->screenitem['style'] ? null : 'pre';
+
+			$table->addRow(array(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), new CCol($value, $class)));
 		}
 
 		return $this->getOutput($table);
