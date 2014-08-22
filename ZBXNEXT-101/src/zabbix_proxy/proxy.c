@@ -583,7 +583,7 @@ static void	zbx_load_config()
 }
 
 #ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(zbx_task_t task)
+void	zbx_sigusr_handler(int flags)
 {
 	switch (GET_TASK_MSG(flags))
 	{
