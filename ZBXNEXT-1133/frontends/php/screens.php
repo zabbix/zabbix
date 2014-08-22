@@ -45,13 +45,13 @@ $fields = array(
 	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
+	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove'"), null)
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null)
 );
 check_fields($fields);
 

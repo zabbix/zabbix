@@ -64,7 +64,7 @@ $fields = array(
 	'refresh' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_HOUR), 'isset({save})', _('Refresh (in seconds)')),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),'isset({save})', _('Rows per page')),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"user.massdelete","user.massunblock"'),	null),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"add permission","delete permission"'), null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -78,8 +78,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'alias','name','surname','type'"),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -100,18 +100,18 @@ if (getRequest('filter_usrgrpid') && !API::UserGroup()->isWritable(array($_REQUE
 	access_deny();
 }
 
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('group_userid') || !is_array(getRequest('group_userid'))) {
 		access_deny();
 	}
 	else {
 		$usersChk = API::User()->get(array(
 			'output' => array('userid'),
-			'userids' => $_REQUEST['group_userid'],
+			'userids' => getRequest('group_userid'),
 			'countOutput' => true,
 			'editable' => true
 		));
-		if ($usersChk != count($_REQUEST['group_userid'])) {
+		if ($usersChk != count(getRequest('group_userid'))) {
 			access_deny();
 		}
 	}
@@ -120,7 +120,6 @@ if (isset($_REQUEST['go'])) {
 /*
  * Actions
  */
-$_REQUEST['go'] = getRequest('go', 'none');
 
 if (isset($_REQUEST['new_groups'])) {
 	$_REQUEST['new_groups'] = getRequest('new_groups', array());
@@ -298,8 +297,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	}
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 }
-elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
-	$groupUserId = getRequest('group_userid', array());
+elseif (hasRequest('action') && getRequest('action') == 'user.massunblock' && hasRequest('group_userid')) {
+	$groupUserId = getRequest('group_userid');
 
 	DBstart();
 
@@ -324,10 +323,10 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	}
 	show_messages($result, _('Users unblocked'), _('Cannot unblock users'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'user.massdelete' && hasRequest('group_userid')) {
 	$result = false;
 
-	$groupUserId = getRequest('group_userid', array());
+	$groupUserId = getRequest('group_userid');
 
 	$dbUsers = API::User()->get(array(
 		'userids' => $groupUserId,

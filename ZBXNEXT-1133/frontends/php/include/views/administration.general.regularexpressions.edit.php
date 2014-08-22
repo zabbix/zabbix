@@ -85,8 +85,8 @@ $form->addItem($regExpView);
 $secondaryActions = array(new CButtonCancel());
 if (isset($this->data['regexpid'])) {
 	array_unshift($secondaryActions,
-		new CSubmit('clone', _('Clone')),
-		new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('regexpid').url_param('delete', false, 'go'))
+		new CButton('clone', _('Clone')),
+		new CButtonDelete(_('Delete regular expression?'), url_param('regexpid').url_param('regexp.massdelete', false, 'action'))
 	);
 }
 $form->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
