@@ -109,7 +109,7 @@ $fields = array(
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
+								IN('"drule.massdelete","drule.massdisable","drule.massenable"'),
 								null
 							),
 	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -302,9 +302,9 @@ elseif (isset($_REQUEST['save'])) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('discoveryrule.massenable', 'discoveryrule.massdisable')) && hasRequest('g_hostdruleid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('drule.massenable', 'drule.massdisable')) && hasRequest('g_hostdruleid')) {
 	$groupHostDiscoveryRuleId = getRequest('g_hostdruleid');
-	$enable = (getRequest('action') == 'discoveryrule.massenable');
+	$enable = (getRequest('action') == 'drule.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
@@ -325,7 +325,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('discov
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
+elseif (hasRequest('action') && getRequest('action') == 'drule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
 
 	if ($result) {
