@@ -65,7 +65,9 @@ $fields = array(
 	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	// actions
 	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'httptest.massclearhistory','httptest.massdelete','httptest.massdisable','httptest.massenable'"),
+								IN("'httptest.massclearhistory','httptest.massdelete','httptest.massdisable',".
+									"'httptest.massenable'"
+								),
 								null
 							),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),

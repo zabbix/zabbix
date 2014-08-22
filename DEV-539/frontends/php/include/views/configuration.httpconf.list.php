@@ -125,7 +125,10 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
-				'&action='.($httpTest['status'] ? 'httptest.massenable' : 'httptest.massdisable'),
+				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
+					? 'httptest.massenable'
+					: 'httptest.massdisable'
+				),
 			httptest_status2style($httpTest['status'])
 		),
 		$infoIcon
@@ -134,6 +137,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('httptest.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected web scenarios?'));
 $goComboBox->addItem($goOption);
@@ -152,6 +156,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
