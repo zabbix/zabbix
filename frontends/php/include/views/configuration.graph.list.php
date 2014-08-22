@@ -151,6 +151,7 @@ foreach ($this->data['graphs'] as $graph) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 if (!$this->data['parent_discoveryid']) {
 	$goComboBox->addItem('graph.masscopyto', _('Copy selected to ...'));
 }
