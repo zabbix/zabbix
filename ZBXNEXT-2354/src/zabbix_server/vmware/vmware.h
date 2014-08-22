@@ -179,6 +179,52 @@ int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const ch
 int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid);
 
+#define ZBX_VM_QUICKSTATS(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
+
+#define ZBX_VM_CONFIG(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+
+#define ZBX_VM_STORAGE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
+
+#define ZBX_VM_HARDWARE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config']]"		\
+		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+
+#define ZBX_HV_QUICKSTATS(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
+
+#define ZBX_HV_CONFIG(property)										\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+
+#define ZBX_HV_CONFIG(property)										\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+
+#define ZBX_HV_HARDWARE(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+
+#define ZBX_HV_CONFIG_PRODUCT(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='product']"		\
+		"/*[local-name()='" property "']"
+
+#define ZBX_HV_STATUS()											\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='overallStatus']"
+
+#define ZBX_VMWARE_EVENTS()	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" \
+	"/*/*[local-name()='Event']"
+
+#define ZBX_VMWARE_ABOUT(property)	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
+
 /*
  * XML support
  */

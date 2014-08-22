@@ -138,6 +138,25 @@ zbx_vmware_perfcounter_t;
 			"</ns1:Body>"							\
 		"</SOAP-ENV:Envelope>"
 
+
+#define ZBX_VMWARE_FAULTSTRING()	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
+
+
+#define ZBX_PERFMGR_REFRESHRATE()	"/*/*/*/*/*[local-name()='refreshRate']"
+#define ZBX_PERFMGR_COUNTERS()		\
+	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
+
+#define ZBX_DATASTORE(property)		"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']"	\
+					"/*[local-name()='" property "']"
+
+#define ZBX_HV_DATASTORES()									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"	\
+	"/*[local-name()='val']/*[@type='Datastore']"
+
+#define ZBX_HV_VMS()									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"	\
+	"/*[local-name()='val']/*[@type='VirtualMachine']"
+
 typedef struct
 {
 	char	*data;
@@ -161,7 +180,6 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 {
 	return size * nmemb;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -881,7 +899,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			goto out;
 		}
 
-		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		{
 			/* Successfully authenticated with vcenter service manager. */
 			/* Set the service type and return with success.            */
@@ -921,7 +939,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	ret = SUCCEED;
@@ -973,7 +991,7 @@ static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easy
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*contents = zbx_strdup(*contents, page.data);
@@ -1037,10 +1055,10 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(page.data, ZBX_XPATH_LN2("returnval", "refreshRate"))))
+	if (NULL == (value = zbx_xml_read_value(page.data, ZBX_PERFMGR_REFRESHRATE())))
 	{
 		*error = zbx_strdup(*error, "Cannot find refreshRate.");
 		goto out;
@@ -1122,7 +1140,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 
@@ -1134,7 +1152,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='PerfCounterInfo']", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_PERFMGR_COUNTERS(), xpathCtx)))
 	{
 		*error = zbx_strdup(*error, "Cannot make performance counter list parsing query.");
 		goto clean;
@@ -1227,8 +1245,8 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
-			"*[local-name()='device'][*[local-name()='macAddress']]", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VM_HARDWARE("device")
+			"[*[local-name()='macAddress']]", xpathCtx)))
 	{
 		goto clean;
 	}
@@ -1295,8 +1313,8 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 	xpathCtx = xmlXPathNewContext(doc);
 
 	/* select all hardware devices of VirtualDisk type */
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
-			"*[local-name()='device'][string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VM_HARDWARE("device")
+			"[string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
 	{
 		goto clean;
 	}
@@ -1328,7 +1346,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 			}
 
 			/* find the controller (parent) device */
-			xpath = zbx_dsprintf(xpath, "//*[local-name()='hardware']/*[local-name()='device']"
+			xpath = zbx_dsprintf(xpath, ZBX_VM_HARDWARE("device")
 					"[*[local-name()='key']/text()='%s']", controllerKey);
 
 			if (NULL == (xpathObjController = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
@@ -1452,7 +1470,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*data = zbx_strdup(NULL, page.data);
@@ -1573,9 +1591,9 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 	if (CURLE_OK != curl_easy_perform(easyhandle))
 		goto out;
 
-	name = zbx_xml_read_value(page.data, ZBX_XPATH_LN2("val", "name"));
+	name = zbx_xml_read_value(page.data, ZBX_DATASTORE("name"));
 
-	if (NULL != (url = zbx_xml_read_value(page.data, ZBX_XPATH_LN2("val", "url"))))
+	if (NULL != (url = zbx_xml_read_value(page.data, ZBX_DATASTORE("url"))))
 	{
 		if ('\0' != *url)
 		{
@@ -1667,7 +1685,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*data = zbx_strdup(NULL, page.data);
@@ -1717,7 +1735,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &hv->details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_XPATH_LN2("hardware", "uuid"))))
+	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_HV_HARDWARE("uuid"))))
 		goto out;
 
 	hv->uuid = value;
@@ -1728,7 +1746,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 		hv->clusterid = value;
 	}
 
-	zbx_xml_read_values(hv->details, "//*[@type='Datastore']", &datastores);
+	zbx_xml_read_values(hv->details, ZBX_HV_DATASTORES(), &datastores);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -1738,7 +1756,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 			zbx_vector_ptr_append(&hv->datastores, datastore);
 	}
 
-	zbx_xml_read_values(hv->details, "//*[@type='VirtualMachine']", &vms);
+	zbx_xml_read_values(hv->details, ZBX_HV_VMS(), &vms);
 
 	for (i = 0; i < vms.values_num; i++)
 	{
@@ -1929,7 +1947,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
 
-		if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 			goto out;
 
 		zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
@@ -1997,10 +2015,10 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
-	if (NULL == (*event_session = zbx_xml_read_value(page.data, "//*[@type='EventHistoryCollector']")))
+	if (NULL == (*event_session = zbx_xml_read_value(page.data, "/*/*/*/*[@type='EventHistoryCollector']")))
 	{
 		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session.");
 		goto out;
@@ -2076,7 +2094,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*events = zbx_strdup(NULL, page.data);
@@ -2248,7 +2266,7 @@ static int	vmware_service_get_clusters(const zbx_vmware_service_t *service, CURL
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*clusters = zbx_strdup(*clusters, page.data);
@@ -2320,7 +2338,7 @@ static int	vmware_service_get_cluster_status(const zbx_vmware_service_t *service
 		goto out;
 	}
 
-	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_VMWARE_FAULTSTRING())))
 		goto out;
 
 	*status = zbx_strdup(NULL, page.data);
