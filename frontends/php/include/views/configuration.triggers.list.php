@@ -226,7 +226,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$status = new CLink(
 			triggerIndicator($trigger['status']),
 			'trigger_prototypes.php?'.
-				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'triggerprototype.massenable' : 'triggerprototype.massdisable').
+				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+					? 'triggerprototype.massenable'
+					: 'triggerprototype.massdisable'
+				).
 				'&hostid='.$this->data['hostid'].
 				'&g_triggerid='.$triggerid.
 				'&parent_discoveryid='.$this->data['parent_discoveryid'],
@@ -237,7 +240,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$status = new CLink(
 			triggerIndicator($trigger['status'], $trigger['state']),
 			'triggers.php?'.
-				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'trigger.massenable' : 'trigger.massdisable').
+				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+					? 'trigger.massenable'
+					: 'trigger.massdisable'
+				).
 				'&hostid='.$this->data['hostid'].
 				'&g_triggerid='.$triggerid,
 			triggerIndicatorStyle($trigger['status'], $trigger['state'])
@@ -275,6 +281,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 $actionObject = $this->data['parent_discoveryid'] ? 'triggerprototype' : 'trigger';
 
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem($actionObject.'.massenable', _('Enable selected'));
 $goOption->setAttribute(
 	'confirm',
@@ -291,6 +298,7 @@ $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem($actionObject.'.massupdateform', _('Mass update'));
 $goComboBox->addItem($goOption);
+
 if (empty($this->data['parent_discoveryid'])) {
 	$goOption = new CComboItem($actionObject.'.masscopyto', _('Copy selected to ...'));
 	$goComboBox->addItem($goOption);

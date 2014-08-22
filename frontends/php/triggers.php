@@ -57,7 +57,9 @@ $fields = array(
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'trigger.masscopyto','trigger.massdelete','trigger.massdisable','trigger.massenable','trigger.massupdate','trigger.massupdateform'"),
+								IN("'trigger.masscopyto','trigger.massdelete','trigger.massdisable',".
+									"'trigger.massenable','trigger.massupdate','trigger.massupdateform'"
+								),
 								null
 							),
 	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -220,7 +222,7 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && 
 
 	// update triggers
 	$triggersToUpdate = array();
-	foreach ($_REQUEST['g_triggerid'] as $triggerid) {
+	foreach (getRequest('g_triggerid') as $triggerid) {
 		$trigger = array('triggerid' => $triggerid);
 
 		if (isset($visible['priority'])) {
@@ -280,7 +282,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('trigge
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
-//		unset($_REQUEST['g_triggerid']);
+		unset($_REQUEST['g_triggerid']);
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
