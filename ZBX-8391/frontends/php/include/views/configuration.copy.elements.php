@@ -36,7 +36,7 @@ $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar($this->data['elements_field'], $this->data['elements']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('go', 'copy_to');
+$triggersForm->addVar('action', $this->data['action']);
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');

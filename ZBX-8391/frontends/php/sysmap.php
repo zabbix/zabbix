@@ -55,7 +55,7 @@ check_fields($fields);
  * Ajax
  */
 if (isset($_REQUEST['favobj'])) {
-	$json = new CJSON();
+	$json = new CJson();
 
 	if ($_REQUEST['favobj'] == 'sysmap' && $_REQUEST['action'] == 'save') {
 		$sysmapid = getRequest('sysmapid', 0);

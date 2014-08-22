@@ -55,6 +55,6 @@ class testPageApplications extends CWebTest {
 		// table
 		$this->zbxTestTextPresent(array('Applications', 'Show'));
 
-		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 }

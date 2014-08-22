@@ -107,7 +107,7 @@ function getUserGuiAccess($userId, $maxGuiAccess = null) {
 		' FROM usrgrp g,users_groups ug'.
 		' WHERE ug.userid='.zbx_dbstr($userId).
 			' AND g.usrgrpid=ug.usrgrpid'.
-			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.zbx_dbstr($maxGuiAccess))
 	));
 
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
@@ -149,7 +149,7 @@ function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
 		'SELECT MAX(g.gui_access) AS gui_access'.
 		' FROM usrgrp g'.
 		' WHERE '.dbConditionInt('g.usrgrpid', $groupIds).
-			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.zbx_dbstr($maxGuiAccess))
 	));
 
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
