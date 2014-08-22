@@ -42,13 +42,12 @@ $fields = array(
 	'graphid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-	'action' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'go','add','remove'"), null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN("'add','remove'"), null)
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN('"add","remove"'), null)
 );
 check_fields($fields);
 

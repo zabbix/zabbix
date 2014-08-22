@@ -66,7 +66,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		);
 		$this->zbxTestTextNotPresent('Error');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('go', array(
+		$this->zbxTestDropdownHasOptions('action', array(
 				'Enable selected',
 				'Disable selected',
 				'Mass update',
@@ -93,7 +93,7 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 
@@ -148,7 +148,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 
