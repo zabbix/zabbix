@@ -91,13 +91,11 @@ $frmHost->addVar('clear_templates', $clear_templates);
 $templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54);
-$template_nameTB->setAttribute('maxlength', 64);
+$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
 $template_nameTB->attr('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
 $templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
@@ -372,6 +370,28 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$listBox->addItems($screensList);
 
 		$templateList->addRow(_('Screens'), $listBox);
+	}
+
+	// web scenarios
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('httptestid', 'name'),
+		'hostids' => $templateid,
+		'inherited' => false
+	));
+
+	if ($httpTests) {
+		$httpTestList = array();
+
+		foreach ($httpTests as $httpTest) {
+			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
+		}
+
+		order_result($httpTestList);
+
+		$listBox = new CListBox('httpTests', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($httpTestList);
+		$templateList->addRow(_('Web scenarios'), $listBox);
 	}
 }
 

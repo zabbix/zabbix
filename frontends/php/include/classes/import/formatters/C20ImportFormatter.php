@@ -129,7 +129,6 @@ class C20ImportFormatter extends CImportFormatter {
 
 	public function getApplications() {
 		$applicationsData = array();
-
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['applications'])) {
@@ -172,6 +171,7 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 			}
 		}
+
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {

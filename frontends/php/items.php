@@ -125,7 +125,12 @@ $fields = array(
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										'"item.massdisable","item.massenable","item.massupdate"'
+									),
+									null
+								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -175,11 +180,16 @@ $fields = array(
 	'subfilter_history' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_trends' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// ajax
-	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS,
+									IN('"delay","history","key_","name","status","trends","type"'),
+									null
+								),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'history', 'trends', 'status', 'type'));
-$_REQUEST['go'] = getRequest('go', 'none');
+
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
@@ -676,9 +686,9 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	}
 	show_messages($result, _('Items updated'), _('Cannot update items'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('item.massenable', 'item.massdisable')) && hasRequest('group_itemid')) {
 	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'item.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
@@ -699,7 +709,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
@@ -726,10 +736,9 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$result = DBend($result);
 
-		$_REQUEST['go'] = 'none2';
-
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
+			unset($_REQUEST['group_itemid']);
 		}
 		show_messages($result, _('Items copied'), _('Cannot copy items'));
 	}
@@ -738,12 +747,12 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 	}
 }
 // clean history for selected items
-elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'item.massclearhistory' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$result = delete_history_by_itemid($_REQUEST['group_itemid']);
+	$result = delete_history_by_itemid(getRequest('group_itemid'));
 
-	foreach ($_REQUEST['group_itemid'] as $id) {
+	foreach (getRequest('group_itemid') as $id) {
 		if (!$item = get_item_by_itemid($id)) {
 			continue;
 		}
@@ -760,10 +769,10 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	}
 	show_messages($result, _('History cleared'), $result);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$group_itemid = $_REQUEST['group_itemid'];
+	$group_itemid = getRequest('group_itemid');
 
 	$itemsToDelete = API::Item()->get(array(
 		'output' => array('key_', 'itemid'),
@@ -825,7 +834,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$itemView->render();
 	$itemView->show();
 }
-elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
+elseif ((hasRequest('action') && getRequest('action') == 'item.massupdate') || hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
@@ -946,20 +955,29 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$itemView->render();
 	$itemView->show();
 }
-elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('group_itemid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS')));
+	$data = getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS'));
+	$data['action'] = 'item.masscopyto';
+	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
 }
 // list of items
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// items
@@ -976,7 +994,7 @@ else {
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
-		'sortfield' => $data['sortfield'],
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1175,11 +1193,11 @@ else {
 		}
 	}
 
-	if ($data['sortfield'] === 'status') {
-		orderItemsByStatus($data['items'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderItemsByStatus($data['items'], $sortOrder);
 	}
 	else {
-		order_result($data['items'], $data['sortfield'], getPageSortOrder());
+		order_result($data['items'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['items']);
