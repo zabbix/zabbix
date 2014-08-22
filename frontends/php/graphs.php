@@ -60,7 +60,7 @@ $fields = array(
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'graph.masscopyto','graph.massdelete'"),	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete"'),	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -69,8 +69,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'graphtype','name'"),					null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name"'),					null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 $percentVisible = getRequest('visible');
 if (!isset($percentVisible['percent_left'])) {

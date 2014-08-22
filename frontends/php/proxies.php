@@ -38,7 +38,7 @@ $fields = array(
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-							IN("'proxy.massenable','proxy.massdisable','proxy.massdelete'"),
+							IN('"proxy.massenable","proxy.massdisable","proxy.massdelete"'),
 							null
 						),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -48,8 +48,8 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'host'"),								null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"host"'),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

@@ -38,7 +38,7 @@ $fields = array(
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'application.massdelete','application.massdisable','application.massenable'"),
+								IN('"application.massdelete","application.massdisable","application.massenable"'),
 								null
 							),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -47,8 +47,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

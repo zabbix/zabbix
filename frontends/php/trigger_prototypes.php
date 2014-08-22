@@ -56,9 +56,9 @@ $fields = array(
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'triggerprototype.massdelete','triggerprototype.massdisable',".
-									"'triggerprototype.massenable','triggerprototype.massupdate',".
-									"'triggerprototype.massupdateform'"
+								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
+									'"triggerprototype.massenable","triggerprototype.massupdate",'.
+									'"triggerprototype.massupdateform"'
 								),
 								null
 							),
@@ -84,8 +84,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'description','priority','status'"),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 

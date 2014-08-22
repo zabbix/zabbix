@@ -39,7 +39,7 @@ $fields = array(
 	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})'),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
-	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'regexp.massdelete'"),	null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,	null),
 	// ajax

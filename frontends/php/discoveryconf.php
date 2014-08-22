@@ -43,7 +43,7 @@ $fields = array(
 	'dchecks' =>		array(null, O_OPT, null,		null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-							IN("'drule.massdelete','drule.massdisable','drule.massenable'"),
+							IN('"drule.massdelete","drule.massdisable","drule.massenable"'),
 							null
 						),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -55,8 +55,8 @@ $fields = array(
 	'ajaxaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
-	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
-	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

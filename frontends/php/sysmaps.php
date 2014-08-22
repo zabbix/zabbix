@@ -70,7 +70,7 @@ $fields = array(
 	'urls' =>					array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'severity_min' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null),
 	// actions
-	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'map.export','map.massdelete'"),		null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
@@ -78,8 +78,8 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// sort and sortorder
-	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'height','name','width'"),				null),
-	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
