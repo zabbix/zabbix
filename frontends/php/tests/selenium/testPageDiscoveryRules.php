@@ -80,7 +80,7 @@ class testPageDiscoveryRules extends CWebTest {
 			$this->zbxTestTextNotPresent('Error');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('go', array(
+		$this->zbxTestDropdownHasOptions('action', array(
 				'Enable selected',
 				'Disable selected',
 				'Delete selected'
@@ -104,7 +104,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 
@@ -160,7 +160,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 

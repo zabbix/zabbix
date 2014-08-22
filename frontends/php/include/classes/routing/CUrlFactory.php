@@ -106,7 +106,7 @@ class CUrlFactory {
 			'remove' => array('userid')
 		),
 		'__default' => array(
-			'remove' => array('go', 'cancel', 'form', 'delete')
+			'remove' => array('action', 'cancel', 'form', 'delete')
 		)
 	);
 
