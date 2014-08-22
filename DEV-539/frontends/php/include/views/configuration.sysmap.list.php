@@ -58,10 +58,13 @@ foreach ($this->data['maps'] as $map) {
 
 // create go button
 $goComboBox = new CComboBox('action');
+
 $goComboBox->addItem('map.export', _('Export selected'));
+
 $goOption = new CComboItem('map.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected maps?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "maps";');
