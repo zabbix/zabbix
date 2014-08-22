@@ -45,7 +45,7 @@ $fields = array(
 	'save' =>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, null,	null),
 	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'filter','hat'"), null),
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"filter","hat"'), null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );

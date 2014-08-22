@@ -84,8 +84,9 @@ foreach ($this->data['scripts'] as $script) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('script.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected scripts?'));
 $goComboBox->addItem($goOption);
 

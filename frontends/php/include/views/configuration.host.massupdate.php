@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 // create form
 $hostForm = new CForm();
 $hostForm->setName('hostForm');
-$hostForm->addVar('go', 'massupdate');
+$hostForm->addVar('action', 'host.massupdate');
 foreach ($this->data['hosts'] as $hostid) {
 	$hostForm->addVar('hosts['.$hostid.']', $hostid);
 }

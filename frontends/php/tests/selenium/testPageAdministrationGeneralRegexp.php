@@ -69,10 +69,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestTextPresent($dbRow['name']);
 		}
 
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
 		$this->assertElementValue('goButton', 'Go (0)');
 
-		$this->assertElementPresent("//select[@id='go' and @disabled]");
+		$this->assertElementPresent("//select[@id='action' and @disabled]");
 		$this->assertElementPresent("//input[@id='goButton' and @disabled]");
 	}
 
@@ -83,7 +83,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClick('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
@@ -106,7 +106,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('regexpids['.$regexp['regexpid'].']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
@@ -130,7 +130,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');

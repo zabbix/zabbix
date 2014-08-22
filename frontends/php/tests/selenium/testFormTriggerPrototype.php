@@ -880,7 +880,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickWait("link=Trigger prototypes");
 
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();
