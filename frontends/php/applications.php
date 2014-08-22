@@ -103,15 +103,15 @@ if (isset($_REQUEST['save'])) {
 		$application['applicationid'] = $_REQUEST['applicationid'];
 		$dbApplications = API::Application()->update($application);
 
-		$successMessage = _('Application updated');
-		$failureMessage = _('Cannot update application');
+		$messageSuccess = _('Application updated');
+		$messageFailed = _('Cannot update application');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$dbApplications = API::Application()->create($application);
 
-		$successMessage = _('Application added');
-		$failureMessage = _('Cannot add application');
+		$messageSuccess = _('Application added');
+		$messageFailed = _('Cannot add application');
 		$auditAction = AUDIT_ACTION_ADD;
 	}
 
@@ -131,7 +131,7 @@ if (isset($_REQUEST['save'])) {
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-	show_messages($result, $successMessage, $failureMessage);
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
 	unset($_REQUEST['applicationid']);
@@ -207,51 +207,43 @@ elseif ($_REQUEST['go'] == 'delete') {
 	);
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
-	$hostId = $pageFilter->hostid;
 	$activateApplications = (getRequest('go') == 'activate');
+
+	$applications = API::Application()->get(array(
+		'output' => array('applicationid'),
+		'applicationids' => getRequest('applications', array()),
+		'selectItems' => array('itemid'),
+		'hostids' => $pageFilter->hostid
+	));
+
+	$actionSuccessful = true;
 	$updatedItemCount = 0;
+	DBstart();
+	foreach ($applications as $application) {
+		foreach($application['items'] as $item) {
+			$itemId = $item['itemid'];
 
-	if($hostId) {
-		$actionSuccessful = true;
-		DBstart();
-		foreach (getRequest('applications') as $id => $appId) {
-			$dbItems = DBselect(
-				'SELECT ia.itemid'.
-				' FROM items_applications ia'.
-					' LEFT JOIN items i ON ia.itemid=i.itemid'.
-				' WHERE ia.applicationid='.zbx_dbstr($appId).
-					' AND i.hostid='.zbx_dbstr($hostId).
-					' AND i.type<>'.ITEM_TYPE_HTTPTEST
-			);
+			$actionSuccessful &= $activateApplications
+				? activate_item($itemId)
+				: disable_item($itemId);
 
-			while ($dbItem = DBfetch($dbItems)) {
-				$dbItemId = $dbItem['itemid'];
-
-				$actionSuccessful &= $activateApplications
-					? activate_item($dbItemId)
-					: disable_item($dbItemId);
-
-				$updatedItemCount++;
-			}
+			$updatedItemCount++;
 		}
-		$actionSuccessful = DBend($actionSuccessful);
 	}
-	else {
-		$actionSuccessful = false;
-	}
+	$actionSuccessful = DBend($actionSuccessful);
 
 	if ($actionSuccessful) {
-		uncheckTableRows($hostId);
+		uncheckTableRows($pageFilter->hostid);
 	}
 
-	$successMessage = $activateApplications
+	$messageSuccess = $activateApplications
 		? _n('Item enabled', 'Items enabled', $updatedItemCount)
 		: _n('Item disabled', 'Items disabled', $updatedItemCount);
-	$failureMessage = $activateApplications
+	$messageFailed = $activateApplications
 		? _n('Cannot enable item', 'Cannot enable items', $updatedItemCount)
 		: _n('Cannot disable item', 'Cannot disable items', $updatedItemCount);
 
-	show_messages($actionSuccessful, $successMessage, $failureMessage);
+	show_messages($actionSuccessful, $messageSuccess, $messageFailed);
 }
 
 /*
