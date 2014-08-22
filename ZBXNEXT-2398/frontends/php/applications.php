@@ -296,7 +296,7 @@ else {
 			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('itemid'),
-			'selectHost' => array('hostid', 'host')
+			'selectHosts' => array('hostid', 'host')
 		));
 
 		order_result($data['applications'], $sortfield, $sortorder);
