@@ -83,9 +83,11 @@ const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
 const char	usage_message[] =
-	"[-Vhp]"
+#ifndef _WINDOWS
+	"[-VRhp]"
+#endif
 #ifdef _WINDOWS
-	" [-idsx] [-m]"
+	"[-Vhp] [-idsx] [-m]"
 #endif
 	" [-c <config-file>] [-t <item key>]";
 /* end of application USAGE message */
@@ -94,11 +96,23 @@ const char	usage_message[] =
 const char	*help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <config-file>  Absolute path to the configuration file",
-	"  -p --print                 Print known items and exit",
-	"  -t --test <item key>       Test specified item and exit",
-	"  -h --help                  Give this help",
-	"  -V --version               Display version number",
+	"  -c --config <config-file>       Absolute path to the configuration file",
+	"  -p --print                      Print known items and exit",
+	"  -t --test <item key>            Test specified item and exit",
+	"  -h --help                       Give this help",
+	"  -V --version                    Display version number",
+#ifndef _WINDOWS
+	"  -R --runtime-control <option>   Perform administrative functions",
+	"",
+	"Runtime control options:",
+	"  " ZBX_LOG_LEVEL_INCREASE "=<target>     Increase log level, affect all processes if target is not specified",
+	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
+	"",
+	"Log level control targets:",
+	"  <pid>                           Process identifier",
+	"  <process type>                  All processes of specified type (e.g. poller)",
+	"  <process type,N>                Process type and number (e.g. poller,3)",
+#endif
 #ifdef _WINDOWS
 	"",
 	"Functions:",
