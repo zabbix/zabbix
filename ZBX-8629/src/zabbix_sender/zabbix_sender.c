@@ -143,65 +143,74 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 
 	for (state = 0; '\0' != *p; p++)
 	{
-		switch (state) {
-		/* init state */
-		case 0:
-			if (' ' == *p || '\t' == *p)
-				/* skipping the leading spaces */;
-			else if ('"' == *p)
-				state = 1;
-			else
-			{
-				state = 2;
-				p--;
-			}
-			break;
-		/* quoted */
-		case 1:
-			if ('"' == *p)
-			{
-				if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
-					return NULL;	/* incorrect syntax */
+		switch (state)
+		{
+			/* init state */
+			case 0:
+				if (' ' == *p || '\t' == *p)
+				{
+					/* skipping the leading spaces */;
+				}
+				else if ('"' == *p)
+				{
+					state = 1;
+				}
+				else
+				{
+					state = 2;
+					p--;
+				}
+				break;
+			/* quoted */
+			case 1:
+				if ('"' == *p)
+				{
+					if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
+						return NULL;	/* incorrect syntax */
 
-				while (' ' == p[1] || '\t' == p[1])
+					while (' ' == p[1] || '\t' == p[1])
+						p++;
+
+					buf[buf_i] = '\0';
+					return ++p;
+				}
+				else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
+				{
 					p++;
-
-				buf[buf_i] = '\0';
-				return ++p;
-			}
-			else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
-			{
-				p++;
-				if (buf_i < bufsize)
+					if (buf_i < bufsize)
+						buf[buf_i++] = *p;
+				}
+				else if ('\\' == *p && 'n' == p[1])
+				{
+					p++;
+					if (buf_i < bufsize)
+						buf[buf_i++] = '\n';
+				}
+				else if (buf_i < bufsize)
+				{
 					buf[buf_i++] = *p;
-			}
-			else if ('\\' == *p && 'n' == p[1])
-			{
-				p++;
-				if (buf_i < bufsize)
-					buf[buf_i++] = '\n';
-			}
-			else if (buf_i < bufsize)
-				buf[buf_i++] = *p;
-			break;
-		/* unquoted */
-		case 2:
-			if (' ' == *p || '\t' == *p)
-			{
-				while (' ' == *p || '\t' == *p)
-					p++;
+				}
+				break;
+			/* unquoted */
+			case 2:
+				if (' ' == *p || '\t' == *p)
+				{
+					while (' ' == *p || '\t' == *p)
+						p++;
 
-				buf[buf_i] = '\0';
-				return p;
-			}
-			else if (buf_i < bufsize)
-				buf[buf_i++] = *p;
-			break;
+					buf[buf_i] = '\0';
+					return p;
+				}
+				else if (buf_i < bufsize)
+				{
+					buf[buf_i++] = *p;
+				}
+				break;
 		}
 	}
 
 	/* missing terminating '"' character */
-	if (state == 1)
+	if (1 == state)
 		return NULL;
 
 	buf[buf_i] = '\0';
