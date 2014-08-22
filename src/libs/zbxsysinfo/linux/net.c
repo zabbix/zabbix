@@ -178,7 +178,9 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 									else
 									{
 										errno = -err->error;
-										nlerr = (EOPNOTSUPP == errno) ? NLERR_OPNOTSUPPORTED : NLERR_UNKNOWN;
+										nlerr = (EOPNOTSUPP == errno) ?
+											NLERR_OPNOTSUPPORTED :
+											NLERR_UNKNOWN;
 									}
 
 									done = 1;
@@ -186,7 +188,9 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 									break;
 								}
 						case 0x12:
-								if (family == r->idiag_family && state == r->idiag_state && port == ntohs(r->id.idiag_sport))
+								if (family == r->idiag_family &&
+									state == r->idiag_state &&
+									port == ntohs(r->id.idiag_sport))
 									(found = 1) && (done = 1);
 
 								break;
