@@ -92,6 +92,7 @@ foreach ($this->data['actions'] as $action) {
 
 // create go buttons
 $goComboBox = new CComboBox('action');
+
 $goOption = new CComboItem('action.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected actions?'));
 $goComboBox->addItem($goOption);
