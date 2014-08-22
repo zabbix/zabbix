@@ -161,6 +161,8 @@ class CImage extends CApiService {
 	/**
 	 * Get images.
 	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
 	 * @param array $image
 	 * @param array $image['name']
 	 * @param array $image['hostid']
@@ -168,6 +170,8 @@ class CImage extends CApiService {
 	 * @return array|boolean
 	 */
 	public function getObjects($imageData) {
+		$this->deprecated('image.getobjects method is deprecated.');
+
 		return $this->get(array(
 			'filter' => $imageData,
 			'output' => API_OUTPUT_EXTEND

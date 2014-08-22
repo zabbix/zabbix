@@ -294,6 +294,8 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Get template ID by template name.
 	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
 	 * @param array $templateData
 	 * @param array $templateData['host']
 	 * @param array $templateData['templateid']
@@ -301,6 +303,8 @@ class CTemplate extends CHostGeneral {
 	 * @return string
 	 */
 	public function getObjects($templateData) {
+		$this->deprecated('template.getobjects method is deprecated.');
+
 		return $this->get(array(
 			'filter' => $templateData,
 			'output'=>API_OUTPUT_EXTEND
