@@ -70,7 +70,6 @@ $fields = array(
 	'add_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_opcondition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -100,11 +99,7 @@ if (isset($_REQUEST['actionid'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['actionid'])) {
-	unset($_REQUEST['actionid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['cancel_new_operation'])) {
+if (isset($_REQUEST['cancel_new_operation'])) {
 	unset($_REQUEST['new_operation']);
 }
 elseif (isset($_REQUEST['cancel_new_opcondition'])) {
