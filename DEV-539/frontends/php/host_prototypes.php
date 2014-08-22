@@ -50,7 +50,9 @@ $fields = array(
 	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN("'hostprototype.massdelete','hostprototype.massdisable','hostprototype.massenable'"),
+									IN("'hostprototype.massdelete','hostprototype.massdisable',".
+										"'hostprototype.massenable'"
+									),
 									null
 								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
