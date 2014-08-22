@@ -132,10 +132,6 @@ ZBX_THREAD_SENDVAL_ARGS;
  *                                                                            *
  * Return value: pointer to the next string                                   *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
- *                                                                            *
  ******************************************************************************/
 static const char	*get_string(const char *p, char *buf, size_t bufsize)
 {
@@ -148,10 +144,10 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 	for (state = 0; '\0' != *p; p++)
 	{
 		switch (state) {
-		/* Init state */
+		/* init state */
 		case 0:
 			if (' ' == *p || '\t' == *p)
-				/* Skip of leading spaces */;
+				/* skipping the leading spaces */;
 			else if ('"' == *p)
 				state = 1;
 			else
@@ -160,7 +156,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 				p--;
 			}
 			break;
-		/* Quoted */
+		/* quoted */
 		case 1:
 			if ('"' == *p)
 			{
@@ -188,7 +184,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 			else if (buf_i < bufsize)
 				buf[buf_i++] = *p;
 			break;
-		/* Unquoted */
+		/* unquoted */
 		case 2:
 			if (' ' == *p || '\t' == *p)
 			{
