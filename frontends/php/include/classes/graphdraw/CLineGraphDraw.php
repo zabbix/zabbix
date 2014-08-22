@@ -1836,6 +1836,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$legend->addRow($row);
 		$rowNum = $legend->getNumRows();
 
+		CArrayHelper::sort($this->items, array('hostname', 'name_expanded', 'itemid'));
+		$this->items = array_values($this->items);
+
 		$i = ($this->type == GRAPH_TYPE_STACKED) ? $this->num - 1 : 0;
 		while ($i >= 0 && $i < $this->num) {
 			$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
