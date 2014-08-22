@@ -106,7 +106,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	{
 		common_worker_sigusr_handler(flags);
 	}
-	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == (GET_TASK_MSG(flags)))
+	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == GET_TASK_MSG(flags))
 	{
 		extern unsigned char	daemon_type;
 
@@ -128,19 +128,18 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 		}
 	}
-	else if (ZBX_RTC_LOG_LEVEL_INCREASE == (GET_TASK_MSG(flags)) ||
-		ZBX_RTC_LOG_LEVEL_DECREASE == (GET_TASK_MSG(flags)))
+	else if (ZBX_RTC_LOG_LEVEL_INCREASE == GET_TASK_MSG(flags) || ZBX_RTC_LOG_LEVEL_DECREASE == GET_TASK_MSG(flags))
 	{
 		union sigval	s;
 		int 		i, found = 0;
 
 		s.ZBX_SIVAL_INT = flags;
 
-		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == (GET_TASK_SCOPE(flags)))
+		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == GET_TASK_SCOPE(flags))
 		{
 			for (i = 0; i < threads_num; i++)
 			{
-				if (0 !=  (GET_TASK_DATA(flags)) &&  threads[i] != (GET_TASK_DATA(flags)))
+				if (0 !=  GET_TASK_DATA(flags) &&  threads[i] != GET_TASK_DATA(flags))
 					continue;
 
 				found = 1;
@@ -156,7 +155,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				}
 			}
 
-			if (0 != (GET_TASK_DATA(flags)) && 0 == found)
+			if (0 != GET_TASK_DATA(flags) && 0 == found)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
 						" worker process", GET_TASK_DATA(flags));
@@ -172,7 +171,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
 					break;
 
-				if ((GET_TASK_SCOPE(flags)) != process_type)
+				if (GET_TASK_SCOPE(flags) != process_type)
 				{
 					/* check if we have already checked processes of target type */
 					if (1 == found)
@@ -181,7 +180,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					continue;
 				}
 
-				if (0 != (GET_TASK_DATA(flags)) && (GET_TASK_DATA(flags)) != process_num)
+				if (0 != GET_TASK_DATA(flags) && GET_TASK_DATA(flags) != process_num)
 					continue;
 
 				found = 1;
@@ -199,7 +198,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			if (0 == found)
 			{
-				if (0 == (GET_TASK_DATA(flags)))
+				if (0 == GET_TASK_DATA(flags))
 				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: \"%s\" process"
 							" does not exist",
