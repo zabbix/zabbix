@@ -99,7 +99,7 @@ const char	*help_message[] = {
 	"  -c --config <config-file>       Absolute path to the configuration file",
 	"  -p --print                      Print known items and exit",
 	"  -t --test <item key>            Test specified item and exit",
-	"  -h --help                       Give this help",
+	"  -h --help                       Display help information",
 	"  -V --version                    Display version number",
 #ifndef _WINDOWS
 	"  -R --runtime-control <option>   Perform administrative functions",

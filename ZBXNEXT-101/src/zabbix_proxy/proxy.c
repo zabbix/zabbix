@@ -75,7 +75,7 @@ const char	*help_message[] = {
 	"  <process type,N>                 Process type and number (e.g. poller,3)",
 	"",
 	"Other options:",
-	"  -h --help                       Give this help",
+	"  -h --help                       Display help information",
 	"  -V --version                    Display version number",
 	NULL	/* end of text */
 };
