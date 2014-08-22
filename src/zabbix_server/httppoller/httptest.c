@@ -440,9 +440,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
 		zbx_free(file_name);
 
-		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
-						httptest->httptest.ssl_key_password)))
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
+	if ('\0' != httptest->httptest.ssl_key_password)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
+				httptest->httptest.ssl_key_password)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto clean;
