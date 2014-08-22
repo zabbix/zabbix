@@ -65,12 +65,7 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 show_messages();
 
 if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
-
-	if (!is_null(CWebUser::$data)
-			&& isset(CWebUser::$data['debug_mode'])
-			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED
-			&& !getRequest('fullscreen')
-	) {
+	if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		CProfiler::getInstance()->stop();
 		CProfiler::getInstance()->show();
 	}

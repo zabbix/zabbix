@@ -27,7 +27,7 @@ $sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
 // create sysmap form
 $sysmapForm = new CForm();
 $sysmapForm->setName('map.edit.php');
-$sysmapForm->addVar('form', get_request('form', 1));
+$sysmapForm->addVar('form', getRequest('form', 1));
 
 if (isset($this->data['sysmap']['sysmapid'])) {
 	$sysmapForm->addVar('sysmapid', $this->data['sysmap']['sysmapid']);
@@ -142,7 +142,7 @@ $i = 0;
 foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
-	$urlEtype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
+	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype']);
 	$urlEtype->addItems(sysmap_element_types());
 	$removeButton = new CSpan(_('Remove'), 'link_menu');
 	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
@@ -159,7 +159,7 @@ $templateUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
 $templateUrlLabel->setAttribute('disabled', 'disabled');
 $templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
 $templateUrlLink->setAttribute('disabled', 'disabled');
-$templateUrlEtype = new CCombobox('urls[#{id}][elementtype]');
+$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]');
 $templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateUrlEtype->addItems(sysmap_element_types());
 $templateRemoveButton = new CSpan(_('Remove'), 'link_menu');

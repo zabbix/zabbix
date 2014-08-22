@@ -44,7 +44,7 @@ foreach ($macros as $i => $macro) {
 	$text1->setAttribute('placeholder', '{$MACRO}');
 	$text2 = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, $readonly, 255);
 	$text2->setAttribute('placeholder', _('value'));
-	$span = new CSpan(RARR);
+	$span = new CSpan('&rArr;');
 	$span->addStyle('vertical-align:top;');
 
 	$deleteButtonCell = null;

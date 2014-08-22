@@ -43,7 +43,7 @@ function sdb($return = false) {
 function sdi($msg = 'SDI') {
 	echo 'DEBUG INFO: ';
 	var_dump($msg);
-	echo SBR;
+	echo BR();
 }
 
 function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
@@ -60,7 +60,7 @@ function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
 	}
 	echo 'DEBUG INFO: '.$for;
 	echo '<pre>'.print_r($msg, true).'</pre>';
-	echo SBR;
+	echo BR();
 }
 
 function vdp($var, $msg = null) {
@@ -69,11 +69,11 @@ function vdp($var, $msg = null) {
 		echo '"'.$msg.'"'.SPACE;
 	}
 	var_dump($var);
-	echo SBR;
+	echo BR();
 }
 
 function todo($msg) {
-	echo 'TODO: '.$msg.SBR;
+	echo 'TODO: '.$msg.BR();
 }
 
 
@@ -129,7 +129,7 @@ function sdf(&$var) {
 	else {
 		echo $value;
 	}
-	echo SBR;
+	echo BR();
 }
 
 /**

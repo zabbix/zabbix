@@ -93,9 +93,7 @@ jQuery(function($) {
 				var obj = $(this);
 				var ms = $(this).data('multiSelect');
 
-				if (ms.options.data.length) {
-					resizeAllSelectedTexts(obj, ms.options, ms.values);
-				}
+				resizeAllSelectedTexts(obj, ms.options, ms.values);
 			});
 		},
 
@@ -506,6 +504,11 @@ jQuery(function($) {
 
 				obj.parent().append(popupButton);
 			}
+
+			// IE browsers use default width
+			if (IE) {
+				options.defaultWidth = $('input[type="text"]', obj).width();
+			}
 		});
 	};
 
@@ -889,7 +892,8 @@ jQuery(function($) {
 
 			input.css({
 				'padding-top': top,
-				'padding-left': left
+				'padding-left': left,
+				'width': options.defaultWidth - left
 			});
 
 			// IE8 hack to fix inline-block container resizing and poke input element value to trigger reflow

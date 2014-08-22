@@ -44,7 +44,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['iconmapid'])) {
 	$iconMap = API::IconMap()->get(array(
-		'iconmapids' => get_request('iconmapid'),
+		'iconmapids' => getRequest('iconmapid'),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'preservekeys' => true,
@@ -130,8 +130,8 @@ $iconMapWidget = new CWidget();
 $iconMapWidget->addPageHeader(_('CONFIGURATION OF ICON MAPPING'), $iconMapForm);
 
 $data = array(
-	'form_refresh' => get_request('form_refresh', 0),
-	'iconmapid' => get_request('iconmapid'),
+	'form_refresh' => getRequest('form_refresh', 0),
+	'iconmapid' => getRequest('iconmapid'),
 	'iconList' => array(),
 	'inventoryList' => array()
 );
@@ -154,7 +154,7 @@ foreach ($inventoryFields as $field) {
 
 if (isset($_REQUEST['form'])) {
 	if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
-		$data['iconmap'] = get_request('iconmap');
+		$data['iconmap'] = getRequest('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {
 		$data['iconmap'] = reset($iconMap);

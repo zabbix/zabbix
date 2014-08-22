@@ -733,7 +733,7 @@ class CApiService {
 	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
 		$idValidator = new CIdValidator(array(
 			'messageEmpty' => $messageEmpty,
-			'messageRegex' => $messageInvalid
+			'messageInvalid' => $messageInvalid
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {

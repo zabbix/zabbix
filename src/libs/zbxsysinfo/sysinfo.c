@@ -287,7 +287,7 @@ void	free_request(AGENT_REQUEST *request)
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
  ******************************************************************************/
-int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
+int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
 	int	i;
 	char	key[MAX_STRING_LEN], params[MAX_STRING_LEN];

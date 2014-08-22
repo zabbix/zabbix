@@ -32,12 +32,10 @@ require_once dirname(__FILE__).'/function_DBloadfile.php';
 require_once dirname(__FILE__).'/function_DBrollback.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/function_DBstart.php';
-require_once dirname(__FILE__).'/CTimePeriodValidatorTest.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
 require_once dirname(__FILE__).'/urlParamTest.php';
-require_once dirname(__FILE__).'/CTriggerFunctionValidatorTest.php';
 
 class GeneralTests {
 
@@ -57,12 +55,10 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBrollback');
 		$suite->addTestSuite('function_DBselect');
 		$suite->addTestSuite('function_DBstart');
-		$suite->addTestSuite('CTimePeriodValidatorTest');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('dbConditionIntTest');
 		$suite->addTestSuite('dbConditionStringTest');
 		$suite->addTestSuite('urlParamTest');
-		$suite->addTestSuite('CTriggerFunctionValidatorTest');
 
 		return $suite;
 	}

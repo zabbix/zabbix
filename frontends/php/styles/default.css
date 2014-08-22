@@ -240,7 +240,7 @@ ul.favorites { padding-left: 5px; margin: 8px 4px 8px 0; }
 ul.favorites li { padding-left: 25px; margin: 9px 0; list-style: none; background: url("../images/general/chart.png") no-repeat left top; }
 ul.favorites li.empty { color: #999; background: none; }
 
-/* frondend messages */
+/* frontend messages */
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }

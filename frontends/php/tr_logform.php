@@ -56,12 +56,12 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid']))
-		|| get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
+if (getRequest('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid']))
+		|| getRequest('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
 	access_deny();
 }
 
-$itemid = get_request('itemid', 0);
+$itemid = getRequest('itemid', 0);
 
 $item = API::Item()->get(array(
 	'output' => array('key_'),

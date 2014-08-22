@@ -319,7 +319,7 @@ else {
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if (getRequest('triggerid') != 0) {
-			$r_form->addVar('triggerid', get_request('triggerid'));
+			$r_form->addVar('triggerid', getRequest('triggerid'));
 		}
 
 		$r_form->addItem(array(
@@ -378,7 +378,7 @@ else {
 		$filterForm->addRow(new CRow(array(
 			new CCol(_('Trigger'), 'form_row_l'),
 			new CCol(array(
-				new CTextBox('trigger', $trigger, 96, 'yes'),
+				new CTextBox('trigger', $trigger, 96, true),
 				new CButton('btn1', _('Select'),
 					'return PopUp("popup.php?'.
 						'dstfrm='.$filterForm->getName().

@@ -36,13 +36,6 @@ class CDecimalValidator extends CValidator {
 	public $maxScale;
 
 	/**
-	 * Error message for format validation.
-	 *
-	 * @var string
-	 */
-	public $messageFormat;
-
-	/**
 	 * Error message for precision validation (optional).
 	 *
 	 * @var string
@@ -64,6 +57,13 @@ class CDecimalValidator extends CValidator {
 	public $messageScale;
 
 	/**
+	 * Error message for type and decimal format validation
+	 *
+	 * @var string
+	 */
+	public $messageInvalid;
+
+	/**
 	 * Checks if the given string is correct double.
 	 *
 	 * @param string $value
@@ -71,56 +71,38 @@ class CDecimalValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		// validate format
-		if (!preg_match('/^-?(?:\d+|\d*\.\d+)$/', $value)) {
-			$this->error($this->messageFormat, $value);
+		if (!is_numeric($value) || !preg_match('/^-?\d+(\.\d+)?$/', $value)) {
+			$this->error($this->messageInvalid, $this->stringify($value));
 
 			return false;
 		}
 
 		$parts = explode('.', $value);
 
-		$natural = $parts[0];
-		$naturalSize = strlen($natural);
+		$beforeDot = trim($parts[0], '-');
+		$afterDot = isset($parts[1]) ? $parts[1] : '';
 
-		if (isset($parts[1])) {
-			$scale = $parts[1];
-			$scaleSize = strlen($scale);
-		}
-		else {
-			$scale = null;
-			$scaleSize = 0;
+		$beforeDotLength = strlen($beforeDot);
+		$afterDotLength = strlen($afterDot);
+
+		if ($this->maxPrecision > 0 && $this->maxScale > 0) {
+			// validate overall precision
+			if ($beforeDotLength + $afterDotLength > $this->maxPrecision) {
+				$this->error($this->messagePrecision, $value, $this->maxPrecision - $this->maxScale, $this->maxScale);
+
+				return false;
+			}
 		}
 
-		// validate scale without natural
-		if ($scaleSize > 0 && $naturalSize == 0) {
-			$this->error($this->messageFormat, $value);
+		// digits before dot
+		if ($beforeDotLength > $this->maxPrecision - $this->maxScale) {
+			$this->error($this->messageNatural, $value, $this->maxPrecision - $this->maxScale);
 
 			return false;
 		}
 
-		if ($this->maxPrecision !== null) {
-			$maxNaturals = $this->maxPrecision - $this->maxScale;
-
-			// validate precision
-			if ($naturalSize + $scaleSize > $this->maxPrecision) {
-				$this->error($this->messagePrecision, $value, $maxNaturals, $this->maxScale);
-
-				return false;
-			}
-
-			// validate digits before point
-			if ($this->maxScale !== null) {
-				if ($naturalSize > $maxNaturals) {
-					$this->error($this->messageNatural, $value, $maxNaturals);
-
-					return false;
-				}
-			}
-		}
-
-		// validate scale
-		if ($this->maxScale !== null && $scaleSize > $this->maxScale) {
+		// digits after dot
+		if ($afterDotLength > $this->maxScale) {
 			$this->error($this->messageScale, $value, $this->maxScale);
 
 			return false;
