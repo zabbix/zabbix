@@ -196,7 +196,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		'output' => array('triggerid', 'description', 'expression', 'value'),
 		'expandDescription' => true,
 		'monitored' => true,
-		'selectHosts' => API_OUTPUT_EXTEND, // rquired for getting visible host name
+		'selectHosts' => array('name'),
 		'filter' => array(),
 		'hostids' => null,
 		'limit' => $config['search_limit'] + 1
