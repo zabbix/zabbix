@@ -53,8 +53,8 @@ $fields = array(
 	'set_debug_mode' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'usergroup.massdisable','usergroup.massdisabledebug','usergroup.massdelete',".
-									"'usergroup.massenable','usergroup.massenabledebug','usergroup.set_gui_access'"
+								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
+									'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
 								),
 								null
 							),
@@ -77,8 +77,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

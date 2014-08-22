@@ -67,7 +67,7 @@ $fields = array(
 	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
 	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'maintenance.massdelete'"), null),
+	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null),
 	'add_timeperiod' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_timeperiod' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -79,10 +79,10 @@ $fields = array(
 	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
 	'sort' =>								array(T_ZBX_STR, O_OPT, P_SYS,
-												IN("'active_since','active_till','maintenance_type','name'"),
+												IN('"active_since","active_till","maintenance_type","name"'),
 												null
 											),
-	'sortorder' =>							array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),
+	'sortorder' =>							array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),
 												null
 											)
 );

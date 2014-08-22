@@ -64,7 +64,7 @@ $fields = array(
 	'refresh' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_HOUR), 'isset({save})', _('Refresh (in seconds)')),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),'isset({save})', _('Rows per page')),
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN("'user.massdelete','user.massunblock'"),	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"user.massdelete","user.massunblock"'),	null),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"add permission","delete permission"'), null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -78,8 +78,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'alias','name','surname','type'"),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

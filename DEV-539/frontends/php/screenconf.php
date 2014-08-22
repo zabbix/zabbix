@@ -51,7 +51,7 @@ $fields = array(
 	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
 	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Rows')),
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN("'screen.export','screen.massdelete'"),		null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"screen.export","screen.massdelete"'),		null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
@@ -62,8 +62,8 @@ $fields = array(
 	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
 	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	// sort and sortorder
-	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name'"),								null),
-	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

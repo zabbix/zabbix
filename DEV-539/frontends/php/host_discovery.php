@@ -109,7 +109,7 @@ $fields = array(
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN("'discoveryrule.massdelete','discoveryrule.massdisable','discoveryrule.massenable'"),
+								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
 								null
 							),
 	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -121,8 +121,8 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'delay','key_','name','status','type'"),	null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 

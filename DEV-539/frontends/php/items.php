@@ -126,8 +126,8 @@ $fields = array(
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN("'item.massclearhistory','item.masscopyto','item.massdelete',".
-										"'item.massdisable','item.massenable','item.massupdate'"
+									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										'"item.massdisable","item.massenable","item.massupdate"'
 									),
 									null
 								),
@@ -183,10 +183,10 @@ $fields = array(
 	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
 	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS,
-									IN("'delay','history','key_','name','status','trends','type'"),
+									IN('"delay","history","key_","name","status","trends","type"'),
 									null
 								),
-	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
