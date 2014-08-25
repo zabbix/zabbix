@@ -314,6 +314,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.6 
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
+
 Changes for 2.2.6rc1
 
 New features:
@@ -394,7 +399,7 @@ Bug fixes:
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
 .......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
-........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+........S. [ZBX-8348] fixed processing of LLD triggers; functions in a trigger expression could have incorrect ordering (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc2
@@ -1392,7 +1397,7 @@ Bug fixes:
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
-........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+........S. [ZBX-8348] fixed processing of LLD triggers; functions in a trigger expression could have incorrect ordering (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
