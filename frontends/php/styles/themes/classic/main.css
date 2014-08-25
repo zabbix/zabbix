@@ -60,11 +60,11 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	background: #EEE; color: #383838;
 }
 
-.classic .filter .ui-state-default {
+.classic .filter .ui-state-default.button {
 	background: url("images/menu_not_active2.gif") repeat-x scroll left top #5473AA; color: #FFF;
 }
 
-.classic .filter .ui-state-hover {
+.classic .filter .ui-state-hover.button {
 	background: #5473AA
 }
 
