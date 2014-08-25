@@ -285,19 +285,26 @@ $httpForm->addItem($httpTab);
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?')),
-			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
-			new CButtonCancel(url_param('hostid'))
+			new CButtonQMessage('del_history',
+				_('Clear history and trends'),
+				_('History clearing can take a long time. Continue?')
+			),
+			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'),
+				url_param('form').url_param('httptestid').url_param('hostid')
+			),
+			new CButtonCancel()
 		)
 	));
 }
 else {
 	$httpForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel()
+		new CSubmit('add', _('Add')),
+		array(
+			new CButtonCancel()
+		)
 	));
 }
 $httpWidget->addItem($httpForm);

@@ -88,7 +88,10 @@ if (isset($this->data['regexpid'])) {
 		new CButton('clone', _('Clone')),
 		new CButtonDelete(_('Delete regular expression?'), url_param('regexpid').url_param('regexp.massdelete', false, 'action'))
 	);
+	$form->addItem(makeFormFooter(new CSubmit('update', _('Update')), $secondaryActions));
 }
-$form->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
+else {
+	$form->addItem(makeFormFooter(new CSubmit('add', _('Add')), $secondaryActions));
+}
 
 return $form;

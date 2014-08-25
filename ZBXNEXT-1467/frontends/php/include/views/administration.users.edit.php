@@ -379,11 +379,11 @@ $userForm->addItem($userTab);
 
 // append buttons to form
 if (empty($this->data['userid'])) {
-	$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
+	$userForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('config'))));
 }
 else {
 	if ($this->data['is_profile']) {
-		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
+		$userForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButtonCancel(url_param('config'))));
 	}
 	else {
 		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid').url_param('config'));
@@ -393,7 +393,7 @@ else {
 		}
 
 		$userForm->addItem(makeFormFooter(
-			new CSubmit('save', _('Save')),
+			new CSubmit('update', _('Update')),
 			array(
 				$deleteButton,
 				new CButtonCancel(url_param('config'))

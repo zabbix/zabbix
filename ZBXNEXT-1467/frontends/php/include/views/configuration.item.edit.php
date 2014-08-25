@@ -440,8 +440,8 @@ $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['itemid'])) {
+	$buttons = array();
 	array_push($buttons, new CSubmit('clone', _('Clone')));
 
 	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
@@ -455,9 +455,12 @@ if (!empty($this->data['itemid'])) {
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
+	array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
+	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
-array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
+else {
+	$itemForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))));
+}
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';

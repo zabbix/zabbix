@@ -203,7 +203,7 @@ class testPageActions extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestClickWait('link='.$action['name']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');
 		$this->zbxTestTextPresent($action['name']);

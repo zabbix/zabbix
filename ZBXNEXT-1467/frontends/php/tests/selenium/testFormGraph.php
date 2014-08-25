@@ -564,14 +564,14 @@ class testFormGraph extends CWebTest {
 
 		$this->zbxTestClick('link=Preview');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
 		if (isset($data['templatedHost'])) {
-			$this->assertAttribute("//input[@id='save']/@aria-disabled", 'true');
+			$this->assertAttribute("//input[@id='update']/@aria-disabled", 'true');
 		}
 		else {
-			$this->assertAttribute("//input[@id='save']/@aria-disabled", 'false');
+			$this->assertAttribute("//input[@id='update']/@aria-disabled", 'false');
 		}
 
 		$this->assertVisible('cancel');
@@ -619,7 +619,7 @@ class testFormGraph extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestTextPresent(array(
 			'Graph updated',
@@ -973,7 +973,7 @@ class testFormGraph extends CWebTest {
 			$this->assertEquals($ymax_nameValue, $this->host.": $ymax_name");
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:

@@ -444,6 +444,7 @@
 		// it's needed because after clone all expressions should be added as new for cloned reg. exp
 		$('#clone').click(function() {
 			$('#regexpid, #clone, #delete').remove();
+			$('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr('name','add');
 			$('#cancel').addClass('ui-corner-left');
 
 			for (var id in zabbixRegExp.expressions) {

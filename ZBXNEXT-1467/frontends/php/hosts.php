@@ -49,14 +49,14 @@ $fields = array(
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form})&&{form}=="update"'),
-	'host' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})', _('Host name')),
-	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
+	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'),
+	'host' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')),
+	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,			IN(array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)), null),
 	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
+	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')),
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'templates' =>		array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
 	'add_template' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
@@ -89,7 +89,8 @@ $fields = array(
 	'delete_from_group' => array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
 	'unlink' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'unlink_and_clear' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'masssave' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'full_clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
@@ -366,9 +367,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		DBend(false);
 		show_error_message(_('Cannot update hosts'));
 	}
-	unset($_REQUEST['save']);
 }
-elseif (hasRequest('save')) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
@@ -618,8 +618,6 @@ elseif (hasRequest('save')) {
 		DBend(false);
 		show_messages(false, $msgOk, $msgFail);
 	}
-
-	unset($_REQUEST['save']);
 }
 elseif (hasRequest('delete') && hasRequest('hostid')) {
 	DBstart();

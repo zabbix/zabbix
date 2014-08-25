@@ -30,7 +30,6 @@ $itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 // create form
 $itemForm = new CForm();
 $itemForm->setName('itemForm');
-$itemForm->addVar('massupdate', 1);
 $itemForm->addVar('group_itemid', $this->data['itemids']);
 $itemForm->addVar('hostid', $this->data['hostid']);
 
@@ -567,7 +566,7 @@ $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))));
+$itemForm->addItem(makeFormFooter(new CSubmit('massupdate', _('Update')), new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))));
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

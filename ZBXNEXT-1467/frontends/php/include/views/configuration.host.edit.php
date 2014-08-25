@@ -880,15 +880,21 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$others = array();
 // do not display the clone and delete buttons for clone forms and new host forms
 if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
+	$others = array();
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
 	$others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));
+	$others[] = new CButtonCancel(url_param('groupid'));
+	$frmHost->addItem(makeFormFooter(new CSubmit('update', _('Update')), $others));
 }
-$others[] = new CButtonCancel(url_param('groupid'));
+else {
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid'))
+	));
+}
 
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

@@ -474,15 +474,18 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $frmHost->addItem($divTabs);
 
 // Footer
-$others = array();
 if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
+	$others = array();
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
 	$others[] = new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid'));
 	$others[] = new CButtonQMessage('delete_and_clear', _('Delete and clear'), _('Delete and clear template? (Warning: all linked hosts will be cleared!)'), url_param('form').url_param('templateid').url_param('groupid'));
+	$others[] = new CButtonCancel(url_param('groupid'));
+	$frmHost->addItem(makeFormFooter(new CSubmit('update', _('Update')), $others));
 }
-$others[] = new CButtonCancel(url_param('groupid'));
+else {
+	$frmHost->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('groupid'))));
+}
 
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

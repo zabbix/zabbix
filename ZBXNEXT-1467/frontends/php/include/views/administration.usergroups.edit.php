@@ -133,13 +133,13 @@ $userGroupForm->addItem($userGroupTab);
 // append buttons to form
 if (empty($this->data['usrgrpid'])) {
 	$userGroupForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('add', _('Add')),
 		new CButtonCancel(url_param('config'))
 	));
 }
 else {
 	$userGroupForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid').url_param('config')),
 			new CButtonCancel(url_param('config'))

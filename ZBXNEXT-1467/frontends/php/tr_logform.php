@@ -341,7 +341,7 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(_('Disabled'),
 		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
 	);
-	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save')));
+	$frmTRLog->addItemToBottomRow(new CSubmit('update', _('Update')));
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 

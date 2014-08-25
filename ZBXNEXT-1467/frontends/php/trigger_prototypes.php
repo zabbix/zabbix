@@ -34,25 +34,25 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
+	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'expression' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Expression')),
-	'priority' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({save})'),
-	'comments' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
+	'expression' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')),
+	'priority' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'),
+	'comments' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
+	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
 	'status' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'input_method' =>		array(T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'),
-	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
-	'expr_target_single' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
+	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
+	'expr_target_single' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
 	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'),
 	'rem_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && ({copy_type} == 0))'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -77,7 +77,8 @@ $fields = array(
 	'group_delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'mass_save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -151,19 +152,19 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
 	unset($_REQUEST['triggerid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (hasRequest('save')) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	$trigger = array(
-		'expression' => $_REQUEST['expression'],
-		'description' => $_REQUEST['description'],
-		'type' => $_REQUEST['type'],
-		'priority' => $_REQUEST['priority'],
-		'status' => $_REQUEST['status'],
-		'comments' => $_REQUEST['comments'],
-		'url' => $_REQUEST['url'],
+		'expression' => getRequest('expression'),
+		'description' => getRequest('description'),
+		'type' => getRequest('type'),
+		'priority' => getRequest('priority'),
+		'status' => getRequest('status'),
+		'comments' => getRequest('comments'),
+		'url' => getRequest('url'),
 		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
-	if (hasRequest('triggerid')) {
+	if (hasRequest('update')) {
 		$trigger['triggerid'] = getRequest('triggerid');
 		$result = API::TriggerPrototype()->update($trigger);
 
@@ -179,8 +180,6 @@ elseif (hasRequest('save')) {
 		unset($_REQUEST['form']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-
-	unset($_REQUEST['save']);
 }
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));

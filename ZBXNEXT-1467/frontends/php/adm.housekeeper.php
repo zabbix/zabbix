@@ -63,7 +63,7 @@ $fields = array(
 	'hk_trends' => 			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999), null,
 		_('Trend data storage period')
 	),
-	'save' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
+	'update' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null, null, null)
 );
 check_fields($fields);
@@ -73,7 +73,7 @@ $data['config'] = select_config();
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	DBstart();
 
 	$configs = array(
