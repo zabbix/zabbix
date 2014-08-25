@@ -35,7 +35,7 @@ check_fields($fields);
 
 $rprt_wdgt = new CWidget();
 
-$_REQUEST['period'] = get_request('period', 'day');
+$_REQUEST['period'] = getRequest('period', 'day');
 $admin_links = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 
 $form = new CForm('get');

@@ -696,6 +696,9 @@ ZABBIX.apps.map = (function($) {
 						this.massForm.hide();
 						$('#link-connect-to').show();
 						this.form.show();
+
+						// resize multiselect
+						$('.multiselect').multiSelect('resize');
 					}
 
 					// multiple elements selected

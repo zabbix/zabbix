@@ -24,7 +24,6 @@ class CRegexValidatorTest extends CValidatorTest
 	{
 		return array(array(
 			array(
-				'messageType' => 'Not a string',
 				'messageInvalid' => 'Invalid regular expression'
 			)
 		));
@@ -57,27 +56,27 @@ class CRegexValidatorTest extends CValidatorTest
 	{
 		return array(
 			array(
-				array('messageType' => 'Not a string'),
+				array('messageInvalid' => 'Not a string'),
 				array(),
 				'Not a string'
 			),
 			array(
-				array('messageType' => 'Not a string'),
+				array('messageInvalid' => 'Not a string'),
 				null,
 				'Not a string'
 			),
 			array(
-				array('messageType' => 'Not a string'),
+				array('messageInvalid' => 'Not a string'),
 				true,
 				'Not a string'
 			),
 			array(
-				array('messageInvalid' => 'Incorrect regular expression "%1$s": "%2$s"'),
+				array('messageRegex' => 'Incorrect regular expression "%1$s": "%2$s"'),
 				'[[',
 				'Incorrect regular expression "[[": "Compilation failed: missing terminating ] for character class at offset 2"'
 			),
 			array(
-				array('messageInvalid' => 'Incorrect regular expression "%1$s": "%2$s".'),
+				array('messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'),
 				'asd(',
 				'Incorrect regular expression "asd(": "Compilation failed: missing ) at offset 4".'
 			)
@@ -88,7 +87,7 @@ class CRegexValidatorTest extends CValidatorTest
 	{
 		return array(
 			array(
-				array('messageInvalid' => 'Incorrect regular expression "%2$s" for object "%1$s": "%3$s"'),
+				array('messageRegex' => 'Incorrect regular expression "%2$s" for object "%1$s": "%3$s"'),
 				'test[',
 				'Incorrect regular expression "test[" for object "object": "Compilation failed: missing terminating ] for character class at offset 5"'
 			)

@@ -68,25 +68,25 @@ function getUserFormData($userid, $isProfile = false) {
 		}
 	}
 	else {
-		$data['alias']			= get_request('alias', '');
-		$data['name']			= get_request('name', '');
-		$data['surname']		= get_request('surname', '');
-		$data['password1']		= get_request('password1', '');
-		$data['password2']		= get_request('password2', '');
-		$data['url']			= get_request('url', '');
-		$data['autologin']		= get_request('autologin', 0);
-		$data['autologout']		= get_request('autologout', 900);
-		$data['lang']			= get_request('lang', 'en_gb');
-		$data['theme']			= get_request('theme', THEME_DEFAULT);
-		$data['refresh']		= get_request('refresh', 30);
-		$data['rows_per_page']	= get_request('rows_per_page', 50);
-		$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);
-		$data['user_groups']	= get_request('user_groups', array());
-		$data['change_password']= get_request('change_password', null);
-		$data['user_medias']	= get_request('user_medias', array());
+		$data['alias']			= getRequest('alias', '');
+		$data['name']			= getRequest('name', '');
+		$data['surname']		= getRequest('surname', '');
+		$data['password1']		= getRequest('password1', '');
+		$data['password2']		= getRequest('password2', '');
+		$data['url']			= getRequest('url', '');
+		$data['autologin']		= getRequest('autologin', 0);
+		$data['autologout']		= getRequest('autologout', 900);
+		$data['lang']			= getRequest('lang', 'en_gb');
+		$data['theme']			= getRequest('theme', THEME_DEFAULT);
+		$data['refresh']		= getRequest('refresh', 30);
+		$data['rows_per_page']	= getRequest('rows_per_page', 50);
+		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
+		$data['user_groups']	= getRequest('user_groups', array());
+		$data['change_password']= getRequest('change_password');
+		$data['user_medias']	= getRequest('user_medias', array());
 
 		// set messages
-		$data['messages'] = get_request('messages', array());
+		$data['messages'] = getRequest('messages', array());
 		if (!isset($data['messages']['enabled'])) {
 			$data['messages']['enabled'] = 0;
 		}
@@ -428,7 +428,7 @@ function getItemFilterForm(&$items) {
 	$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').NAME_DELIMITER));
 	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
-	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
+	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
 	$updateIntervalInput->setEnabled('no');
 
 	// data type
@@ -470,7 +470,7 @@ function getItemFilterForm(&$items) {
 	$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').NAME_DELIMITER));
 	$portLabel->setAttribute('id', 'filter_port_label');
 
-	$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
+	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
 	$portField->setEnabled('no');
 
 	// row 1
@@ -578,7 +578,7 @@ function getItemFilterForm(&$items) {
 		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 		new CCol(array($snmpCommunityField, $snmpSecurityField)),
 		new CCol(array(bold(_('History')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
-		new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
+		new CCol(new CNumericBox('filter_history', $filter_history, 8, false, true)),
 		new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
 		new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 			-1 => _('all'),
@@ -593,7 +593,7 @@ function getItemFilterForm(&$items) {
 		new CCol($snmpOidLabel, 'label'),
 		new CCol($snmpOidField),
 		new CCol(array(bold(_('Trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
-		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
+		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, false, true)),
 		new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
 		new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
 			-1 => _('all'),
@@ -950,53 +950,53 @@ function getItemFilterForm(&$items) {
  */
 function getItemFormData(array $item = array(), array $options = array()) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh'),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
-		'parent_discoveryid' => get_request('parent_discoveryid', !empty($options['is_discovery_rule']) ? get_request('itemid', null) : null),
-		'itemid' => get_request('itemid', null),
+		'parent_discoveryid' => getRequest('parent_discoveryid', !empty($options['is_discovery_rule']) ? getRequest('itemid') : null),
+		'itemid' => getRequest('itemid'),
 		'limited' => false,
-		'interfaceid' => get_request('interfaceid', 0),
-		'name' => get_request('name', ''),
-		'description' => get_request('description', ''),
-		'key' => get_request('key', ''),
-		'hostname' => get_request('hostname', null),
-		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'history' => get_request('history', 90),
-		'status' => get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => get_request('type', 0),
-		'snmp_community' => get_request('snmp_community', 'public'),
-		'snmp_oid' => get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
-		'port' => get_request('port', ''),
-		'value_type' => get_request('value_type', ITEM_VALUE_TYPE_UINT64),
-		'data_type' => get_request('data_type', ITEM_DATA_TYPE_DECIMAL),
-		'trapper_hosts' => get_request('trapper_hosts', ''),
-		'units' => get_request('units', ''),
-		'valuemapid' => get_request('valuemapid', 0),
-		'params' => get_request('params', ''),
-		'multiplier' => get_request('multiplier', 0),
-		'delta' => get_request('delta', 0),
-		'trends' => get_request('trends', DAY_IN_YEAR),
-		'new_application' => get_request('new_application', ''),
-		'applications' => get_request('applications', array()),
-		'delay_flex' => get_request('delay_flex', array()),
-		'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
-		'snmpv3_contextname' => get_request('snmpv3_contextname', ''),
-		'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
-		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
-		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
-		'ipmi_sensor' => get_request('ipmi_sensor', ''),
-		'authtype' => get_request('authtype', 0),
-		'username' => get_request('username', ''),
-		'password' => get_request('password', ''),
-		'publickey' => get_request('publickey', ''),
-		'privatekey' => get_request('privatekey', ''),
-		'formula' => get_request('formula', 1),
-		'logtimefmt' => get_request('logtimefmt', ''),
-		'add_groupid' => get_request('add_groupid', get_request('groupid', 0)),
+		'interfaceid' => getRequest('interfaceid', 0),
+		'name' => getRequest('name', ''),
+		'description' => getRequest('description', ''),
+		'key' => getRequest('key', ''),
+		'hostname' => getRequest('hostname'),
+		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+		'history' => getRequest('history', 90),
+		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
+		'type' => getRequest('type', 0),
+		'snmp_community' => getRequest('snmp_community', 'public'),
+		'snmp_oid' => getRequest('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
+		'port' => getRequest('port', ''),
+		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
+		'data_type' => getRequest('data_type', ITEM_DATA_TYPE_DECIMAL),
+		'trapper_hosts' => getRequest('trapper_hosts', ''),
+		'units' => getRequest('units', ''),
+		'valuemapid' => getRequest('valuemapid', 0),
+		'params' => getRequest('params', ''),
+		'multiplier' => getRequest('multiplier', 0),
+		'delta' => getRequest('delta', 0),
+		'trends' => getRequest('trends', DAY_IN_YEAR),
+		'new_application' => getRequest('new_application', ''),
+		'applications' => getRequest('applications', array()),
+		'delay_flex' => getRequest('delay_flex', array()),
+		'new_delay_flex' => getRequest('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
+		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
+		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
+		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
+		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
+		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase', ''),
+		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
+		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
+		'ipmi_sensor' => getRequest('ipmi_sensor', ''),
+		'authtype' => getRequest('authtype', 0),
+		'username' => getRequest('username', ''),
+		'password' => getRequest('password', ''),
+		'publickey' => getRequest('publickey', ''),
+		'privatekey' => getRequest('privatekey', ''),
+		'formula' => getRequest('formula', 1),
+		'logtimefmt' => getRequest('logtimefmt', ''),
+		'add_groupid' => getRequest('add_groupid', getRequest('groupid', 0)),
 		'valuemaps' => null,
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
@@ -1015,7 +1015,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		$data['hostid'] = $discoveryRule['hostid'];
 	}
 	else {
-		$data['hostid'] = get_request('hostid', 0);
+		$data['hostid'] = getRequest('hostid', 0);
 	}
 
 	// types, http items only for internal processes
@@ -1032,7 +1032,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	if ($item) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
-		$data['limited'] = $data['item']['templateid'] != 0;
+		$data['limited'] = ($data['item']['templateid'] != 0);
 
 		// get templates
 		$itemid = $item['itemid'];
@@ -1061,17 +1061,17 @@ function getItemFormData(array $item = array(), array $options = array()) {
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
 						$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
 						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
 						$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
-						$data['templates'][] = SPACE.RARR.SPACE;
+						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
 				$itemid = $item['templateid'];
@@ -1141,7 +1141,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		$data['publickey'] = $data['item']['publickey'];
 		$data['privatekey'] = $data['item']['privatekey'];
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
-		$data['new_application'] = get_request('new_application', '');
+		$data['new_application'] = getRequest('new_application', '');
 
 		if (!$data['is_discovery_rule']) {
 			$data['formula'] = $data['item']['formula'];
@@ -1309,16 +1309,15 @@ function getCopyElementsFormData($elementsField, $title = null) {
 
 function getTriggerMassupdateFormData() {
 	$data = array(
-		'visible' => get_request('visible', array()),
-		'priority' => get_request('priority', ''),
-		'dependencies' => get_request('dependencies', array()),
-		'massupdate' => get_request('massupdate', 1),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'go' => get_request('go', 'massupdate'),
-		'g_triggerid' => get_request('g_triggerid', array()),
-		'priority' => get_request('priority', 0),
+		'visible' => getRequest('visible', array()),
+		'priority' => getRequest('priority', ''),
+		'dependencies' => getRequest('dependencies', array()),
+		'massupdate' => getRequest('massupdate', 1),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'g_triggerid' => getRequest('g_triggerid', array()),
+		'priority' => getRequest('priority', 0),
 		'config' => select_config(),
-		'hostid' => get_request('hostid', 0)
+		'hostid' => getRequest('hostid', 0)
 	);
 
 	// get dependencies
@@ -1352,24 +1351,24 @@ function getTriggerMassupdateFormData() {
  */
 function getTriggerFormData($exprAction) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh'),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'dependencies' => get_request('dependencies', array()),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'dependencies' => getRequest('dependencies', array()),
 		'db_dependencies' => array(),
-		'triggerid' => get_request('triggerid'),
-		'expression' => get_request('expression', ''),
-		'expr_temp' => get_request('expr_temp', ''),
-		'description' => get_request('description', ''),
-		'type' => get_request('type', 0),
-		'priority' => get_request('priority', 0),
-		'status' => get_request('status', 0),
-		'comments' => get_request('comments', ''),
-		'url' => get_request('url', ''),
-		'input_method' => get_request('input_method', IM_ESTABLISHED),
-		'limited' => null,
+		'triggerid' => getRequest('triggerid'),
+		'expression' => getRequest('expression', ''),
+		'expr_temp' => getRequest('expr_temp', ''),
+		'description' => getRequest('description', ''),
+		'type' => getRequest('type', 0),
+		'priority' => getRequest('priority', 0),
+		'status' => getRequest('status', 0),
+		'comments' => getRequest('comments', ''),
+		'url' => getRequest('url', ''),
+		'input_method' => getRequest('input_method', IM_ESTABLISHED),
+		'limited' => false,
 		'templates' => array(),
-		'hostid' => get_request('hostid', 0)
+		'hostid' => getRequest('hostid', 0)
 	);
 
 	if (!empty($data['triggerid'])) {
@@ -1409,14 +1408,14 @@ function getTriggerFormData($exprAction) {
 					$link,
 					'highlight underline weight_normal'
 				);
-				$data['templates'][] = SPACE.RARR.SPACE;
+				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
 		} while ($tmp_triggerid != 0);
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
-		$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+		$data['limited'] = ($data['trigger']['templateid'] != 0);
 
 		// select first host from triggers if gived not match
 		$hosts = $data['trigger']['hosts'];
@@ -1426,10 +1425,10 @@ function getTriggerFormData($exprAction) {
 		}
 	}
 
-	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
+	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = explode_exp($data['trigger']['expression']);
 
-		if (empty($data['limited']) || !isset($_REQUEST['form_refresh'])) {
+		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];
 			$data['type'] = $data['trigger']['type'];
 			$data['priority'] = $data['trigger']['priority'];
@@ -1477,7 +1476,7 @@ function getTriggerFormData($exprAction) {
 			}
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
-			$data['expression_field_readonly'] = 'yes';
+			$data['expression_field_readonly'] = true;
 			$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 		}
 		else {
@@ -1518,7 +1517,7 @@ function get_timeperiod_form() {
 	$tblPeriod = new CTable(null, 'formElementTable');
 
 	// init new_timeperiod variable
-	$new_timeperiod = get_request('new_timeperiod', array());
+	$new_timeperiod = getRequest('new_timeperiod', array());
 	$new = is_array($new_timeperiod);
 
 	if (is_array($new_timeperiod)) {
@@ -1747,11 +1746,11 @@ function get_timeperiod_form() {
 
 		if (isset($_REQUEST['add_timeperiod'])) {
 			$date = array(
-				'y' => get_request('new_timeperiod_start_date_year'),
-				'm' => get_request('new_timeperiod_start_date_month'),
-				'd' => get_request('new_timeperiod_start_date_day'),
-				'h' => get_request('new_timeperiod_start_date_hour'),
-				'i' => get_request('new_timeperiod_start_date_minute')
+				'y' => getRequest('new_timeperiod_start_date_year'),
+				'm' => getRequest('new_timeperiod_start_date_month'),
+				'd' => getRequest('new_timeperiod_start_date_day'),
+				'h' => getRequest('new_timeperiod_start_date_hour'),
+				'i' => getRequest('new_timeperiod_start_date_minute')
 			);
 		}
 		else {
