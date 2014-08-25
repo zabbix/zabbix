@@ -448,9 +448,9 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
-void		DBbegin();
-void		DBcommit();
-void		DBrollback();
+void		DBbegin(void);
+void		DBcommit(void);
+void		DBrollback(void);
 void		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
@@ -549,8 +549,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 
-int	DBtxn_status();
-int	DBtxn_ongoing();
+int	DBtxn_status(void);
+int	DBtxn_ongoing(void);
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);

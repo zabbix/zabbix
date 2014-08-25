@@ -143,7 +143,7 @@ static void	DBtxn_operation(int (*txn_operation)())
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin()
+void	DBbegin(void)
 {
 	DBtxn_operation(zbx_db_begin);
 }
@@ -159,7 +159,7 @@ void	DBbegin()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit()
+void	DBcommit(void)
 {
 	DBtxn_operation(zbx_db_commit);
 }
@@ -175,7 +175,7 @@ void	DBcommit()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback()
+void	DBrollback(void)
 {
 	DBtxn_operation(zbx_db_rollback);
 }
@@ -1702,12 +1702,12 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 
 #undef ZBX_MAX_INVENTORY_FIELDS
 
-int	DBtxn_status()
+int	DBtxn_status(void)
 {
 	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
 }
 
-int	DBtxn_ongoing()
+int	DBtxn_ongoing(void)
 {
 	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
