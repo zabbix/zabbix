@@ -35,7 +35,7 @@ $fields = array(
 );
 check_fields($fields);
 
-if (get_request('media_type')) {
+if (getRequest('media_type')) {
 	$mediaTypeData = API::MediaType()->get(array(
 		'mediatypeids' => array($_REQUEST['media_type']),
 		'countOutput' => true
@@ -45,9 +45,9 @@ if (get_request('media_type')) {
 	}
 }
 
-$year = get_request('year', intval(date('Y')));
-$period = get_request('period', 'weekly');
-$media_type = get_request('media_type', 0);
+$year = getRequest('year', intval(date('Y')));
+$period = getRequest('period', 'weekly');
+$media_type = getRequest('media_type', 0);
 
 $_REQUEST['year'] = $year;
 $_REQUEST['period'] = $period;
@@ -192,7 +192,7 @@ else {
 			'output' => array('mediatypeid', 'userid', 'clock'),
 			'eventsource' => $sourceObject['source'],
 			'eventobject' => $sourceObject['object'],
-			'mediatypeids' => (get_request('media_type')) ? get_request('media_type') : null,
+			'mediatypeids' => (getRequest('media_type')) ? getRequest('media_type') : null,
 			'time_from' => $minTime,
 			'time_till' => $maxTime
 		)));
@@ -249,7 +249,7 @@ else {
 	$table->show();
 
 	if ($media_type == 0) {
-		echo SBR;
+		echo BR();
 
 		$links = array();
 		foreach ($media_types as $id => $description) {

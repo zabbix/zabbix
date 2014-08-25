@@ -34,7 +34,7 @@ class CScreenSystemStatus extends CScreenBase {
 		// rewrite page file
 		$page['file'] = $this->pageFile;
 
-		$item = new CUIWidget('hat_syssum', make_system_status(array(
+		$item = new CUiWidget('hat_syssum', make_system_status(array(
 			'groupids' => null,
 			'hostids' => null,
 			'maintenance' => null,

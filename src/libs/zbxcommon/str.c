@@ -484,108 +484,50 @@ void	zbx_remove_chars(register char *str, const char *charlist)
 	*str = '\0';
 }
 
-/*
- * Function: strlcpy, strlcat
- * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_strlcpy                                                      *
  *                                                                            *
- * Purpose: replacement of insecure strncpy, same as OpenBSD's strlcpy        *
+ * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *
+ *          will be copied. Always null terminates (unless siz == 0).         *
  *                                                                            *
- * Copy src to string dst of size siz.  At most siz-1 characters              *
- * will be copied.  Always NUL terminates (unless siz == 0).                  *
- * Returns strlen(src); if retval >= siz, truncation occurred.                *
- *                                                                            *
- * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
+ * Return value : the number of characters copied (excluding the null byte)   *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
-	char		*d = dst;
 	const char	*s = src;
-	size_t		n = siz;
 
-	/* copy as many bytes as will fit */
-	if (0 != n)
+	if (0 != siz)
 	{
-		while (0 != --n)
-		{
-			if ('\0' == (*d++ = *s++))
-				break;
-		}
+		while (0 != --siz && '\0' != *s)
+			*dst++ = *s++;
+
+		*dst = '\0';
 	}
 
-	/* not enough room in dst, add NUL and traverse rest of src */
-	if (0 == n)
-	{
-		if (0 != siz)
-			*d = '\0';	/* NUL-terminate dst */
-		while ('\0' != *s++)
-			;
-	}
-
-	return s - src - 1;	/* count does not include NUL */
+	return s - src;	/* count does not include null */
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: zbx_strlcat                                                      *
  *                                                                            *
- * Purpose: replacement of insecure strncat, same as OpenBSD's strlcat        *
- *                                                                            *
- * Appends src to string dst of size siz (unlike strncat, size is the         *
- * full size of dst, not space left).  At most siz-1 characters               *
- * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).        *
- * Returns strlen(src) + MIN(siz, strlen(initial dst)).                       *
- * If retval >= siz, truncation occurred.                                     *
- *                                                                            *
- * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
+ * Purpose: Appends src to string dst of size siz (unlike strncat, size is    *
+ *          the full size of dst, not space left). At most siz - 1 characters *
+ *          will be copied. Always null terminates (unless                    *
+ *          siz <= strlen(dst)).                                              *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
+void	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
-	char		*d = dst;
-	const char	*s = src;
-	size_t		n = siz;
-	size_t		dlen;
-
-	/* find the end of dst and adjust bytes left but don't go past end */
-	while (0 != n-- && '\0' != *d)
-		d++;
-	dlen = d - dst;
-	n = siz - dlen;
-
-	if (0 == n)
-		return dlen + strlen(s);
-
-	while ('\0' != *s)
+	while ('\0' != *dst)
 	{
-		if (1 != n)
-		{
-			*d++ = *s;
-			n--;
-		}
-		s++;
+		dst++;
+		siz--;
 	}
 
-	*d = '\0';
-
-	return dlen + (s - src);	/* count does not include NUL */
+	zbx_strlcpy(dst, src, siz);
 }
 
 /******************************************************************************
@@ -730,6 +672,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  * Purpose: check a byte stream for a valid hostname                          *
  *                                                                            *
  * Parameters: hostname - pointer to the first char of hostname               *
+ *             error - pointer to the error message (can be NULL)             *
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
@@ -738,18 +681,35 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_hostname(const char *hostname)
+int	zbx_check_hostname(const char *hostname, char **error)
 {
 	int	len = 0;
 
 	while ('\0' != hostname[len])
 	{
-		if (FAIL == is_hostname_char(hostname[len++]))
+		if (FAIL == is_hostname_char(hostname[len]))
+		{
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[len]);
 			return FAIL;
+		}
+
+		len++;
 	}
 
-	if (0 == len || MAX_ZBX_HOSTNAME_LEN < len)
+	if (0 == len)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, "name is empty");
 		return FAIL;
+	}
+
+	if (MAX_ZBX_HOSTNAME_LEN < len)
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
+		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -1782,101 +1742,6 @@ void	remove_param(char *p, int num)
 	}
 
 	*buf = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_string                                                       *
- *                                                                            *
- * Purpose: get current string from the quoted or unquoted string list,       *
- *          delimited by blanks                                               *
- *                                                                            *
- * Parameters:                                                                *
- *      p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
- *      buf     - [OUT] output buffer                                         *
- *      bufsize - [IN] output buffer size                                     *
- *                                                                            *
- * Return value: pointer to the next string                                   *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
- *                                                                            *
- ******************************************************************************/
-const char	*get_string(const char *p, char *buf, size_t bufsize)
-{
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state;
-	size_t	buf_i = 0;
-
-	bufsize--;	/* '\0' */
-
-	for (state = 0; '\0' != *p; p++)
-	{
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (' ' == *p || '\t' == *p)
-				/* Skip of leading spaces */;
-			else if ('"' == *p)
-				state = 1;
-			else
-			{
-				state = 2;
-				p--;
-			}
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-			{
-				if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
-					return NULL;	/* incorrect syntax */
-
-				while (' ' == p[1] || '\t' == p[1])
-					p++;
-
-				buf[buf_i] = '\0';
-				return ++p;
-			}
-			else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
-			{
-				p++;
-				if (buf_i < bufsize)
-					buf[buf_i++] = *p;
-			}
-			else if ('\\' == *p && 'n' == p[1])
-			{
-				p++;
-				if (buf_i < bufsize)
-					buf[buf_i++] = '\n';
-			}
-			else if (buf_i < bufsize)
-				buf[buf_i++] = *p;
-			break;
-		/* Unquoted */
-		case 2:
-			if (' ' == *p || '\t' == *p)
-			{
-				while (' ' == *p || '\t' == *p)
-					p++;
-
-				buf[buf_i] = '\0';
-				return p;
-			}
-			else if (buf_i < bufsize)
-				buf[buf_i++] = *p;
-			break;
-		}
-	}
-
-	/* missing terminating '"' character */
-	if (state == 1)
-		return NULL;
-
-	buf[buf_i] = '\0';
-
-	return p;
 }
 
 /******************************************************************************

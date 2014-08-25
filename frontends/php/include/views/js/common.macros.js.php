@@ -5,7 +5,7 @@
 				placeholder="{$MACRO}" style="text-transform:uppercase;">
 		</td>
 		<td>
-			<span style="vertical-align:top;"><?php echo RARR ?></span>
+			<span style="vertical-align:top;">&rArr;</span>
 		</td>
 		<td>
 			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="value">

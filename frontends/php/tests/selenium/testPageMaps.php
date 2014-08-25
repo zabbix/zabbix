@@ -40,7 +40,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0');
 		$this->zbxTestTextPresent(array('Name', 'Width', 'Height', 'Edit'));
 		$this->zbxTestTextPresent(array($map['name'], $map['width'], $map['height']));
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected', 'Export selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected', 'Export selected'));
 	}
 
 	/**
@@ -130,7 +130,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckboxSelect('maps['.$sysmapid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

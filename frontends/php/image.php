@@ -39,8 +39,8 @@ check_fields($fields);
 $resize = false;
 if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 	$resize = true;
-	$width = get_request('width', 0);
-	$height = get_request('height', 0);
+	$width = getRequest('width', 0);
+	$height = getRequest('height', 0);
 }
 if (!($row = get_image_by_imageid($_REQUEST['imageid']))) {
 	error(_('Incorrect image index.'));
