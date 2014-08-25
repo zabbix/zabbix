@@ -52,7 +52,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		$oldHashDiscovery = DBhash($sqlDiscovery);
 
 		$this->zbxTestLogin('host_discovery.php?form=update&itemid='.$data['itemid']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 
@@ -92,7 +92,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		$this->input_type('name', $data['name']);
 		$this->input_type('key', $data['key']);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');

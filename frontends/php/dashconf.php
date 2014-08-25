@@ -44,7 +44,7 @@ $fields = array(
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,			null)
 );
 check_fields($fields);
@@ -52,7 +52,7 @@ check_fields($fields);
 /*
  * Actions
  */
-if (hasRequest('save')) {
+if (hasRequest('update')) {
 	// filter
 	$filterEnable = getRequest('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);

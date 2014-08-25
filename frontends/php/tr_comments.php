@@ -32,8 +32,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'triggerid' =>	array(T_ZBX_INT, O_MAND, P_SYS,			DB_ID,	null),
-	'comments' =>	array(T_ZBX_STR, O_OPT, null,			null,	'isset({save})'),
-	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'comments' =>	array(T_ZBX_STR, O_OPT, null,			null,	'isset({update})'),
+	// actions
+	'update' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 );
 check_fields($fields);
@@ -60,13 +61,13 @@ $trigger = reset($trigger);
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	DBstart();
 
 	$result = DBexecute(
 		'UPDATE triggers'.
-		' SET comments='.zbx_dbstr($_REQUEST['comments']).
-		' WHERE triggerid='.zbx_dbstr($_REQUEST['triggerid'])
+		' SET comments='.zbx_dbstr(getRequest('comments')).
+		' WHERE triggerid='.zbx_dbstr(getRequest('triggerid'))
 	);
 
 	$trigger['comments'] = $_REQUEST['comments'];

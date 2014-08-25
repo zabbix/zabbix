@@ -335,8 +335,8 @@ if (empty($this->data['parent_discoveryid'])) {
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['triggerid'])) {
+	$buttons = array();
 	$buttons[] = new CSubmit('clone', _('Clone'));
 
 	$deleteButton = new CButtonDelete(
@@ -347,12 +347,18 @@ if (!empty($this->data['triggerid'])) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 	$buttons [] = $deleteButton;
+	$buttons[] = new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')));
+	$triggersForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array($buttons)
+	));
 }
-$buttons[] = new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')));
-$triggersForm->addItem(makeFormFooter(
-	new CSubmit('save', _('Save')),
-	array($buttons)
-));
+else {
+	$triggersForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+			$buttons[] = new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+	));
+}
 
 $triggersWidget->addItem($triggersForm);
 

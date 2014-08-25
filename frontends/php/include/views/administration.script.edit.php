@@ -113,13 +113,17 @@ $scriptView->addTab('scripts', _('Script'), $scriptFormList);
 $scriptForm->addItem($scriptView);
 
 // footer
-$others = array();
 if (isset($_REQUEST['scriptid'])) {
+	$others = array();
 	$others[] = new CButton('clone', _('Clone'));
 	$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
+	$others[] = new CButtonCancel();
+	$scriptForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $others));
+	$scriptsWidget->addItem($scriptForm);
 }
-$others[] = new CButtonCancel();
-$scriptForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
-$scriptsWidget->addItem($scriptForm);
+else {
+	$scriptForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
+	$scriptsWidget->addItem($scriptForm);
+}
 
 return $scriptsWidget;

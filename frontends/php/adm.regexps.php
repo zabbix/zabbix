@@ -33,13 +33,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
-	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})', _('Test string')),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({save})'),
-	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'),
+	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})', _('Test string')),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})'),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null),
+	'add' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,	null),
 	// ajax
@@ -118,17 +119,17 @@ if (hasRequest('action') && !hasRequest('regexpid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$regExp = array(
-		'name' => $_REQUEST['name'],
-		'test_string' => $_REQUEST['test_string']
+		'name' => getRequest('name'),
+		'test_string' => getRequest('test_string')
 	);
 	$expressions = getRequest('expressions', array());
 
 	DBstart();
 
-	if (isset($_REQUEST['regexpid'])) {
-		$regExp['regexpid'] = $_REQUEST['regexpid'];
+	if (hasRequest('update')) {
+		$regExp['regexpid'] = getRequest('regexpid');
 		$result = updateRegexp($regExp, $expressions);
 
 		$messageSuccess = _('Regular expression updated');
@@ -142,8 +143,8 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-			AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$_REQUEST['name']);
+		add_audit(!hasRequest('regexpid') ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+			AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.getRequest('name'));
 
 		unset($_REQUEST['form']);
 	}

@@ -48,11 +48,11 @@ $imageForm->addItem($imageTab);
 
 // append buttons
 if (empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
+	$imageForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
 }
 else {
 	$imageForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
 			new CButtonCancel()

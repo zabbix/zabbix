@@ -30,10 +30,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'proxyid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Proxy name')),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
-	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
+	'proxyid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
+	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Proxy name')),
+	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({add}) || isset({update})'),
+	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && {status} == '.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
@@ -41,7 +41,8 @@ $fields = array(
 							IN('"proxy.massenable","proxy.massdisable","proxy.massdelete"'),
 							null
 						),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -88,7 +89,7 @@ if (isset($_REQUEST['action'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$proxy = array(
 		'host' => getRequest('host'),
 		'status' => getRequest('status'),
@@ -105,8 +106,8 @@ if (isset($_REQUEST['save'])) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
-	if (isset($_REQUEST['proxyid'])) {
-		$proxy['proxyid'] = $_REQUEST['proxyid'];
+	if (hasRequest('update')) {
+		$proxy['proxyid'] = getRequest('proxyid');
 		$result = API::Proxy()->update($proxy);
 
 		$messageSuccess = _('Proxy updated');
@@ -125,7 +126,8 @@ if (isset($_REQUEST['save'])) {
 		add_audit($auditAction, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($result['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
-	unset($_REQUEST['save']);
+	unset($_REQUEST['add']);
+	unset($_REQUEST['update']);
 
 	$result = DBend($result);
 

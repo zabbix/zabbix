@@ -32,16 +32,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({applicationid})'),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
-	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
+	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"application.massdelete","application.massdisable","application.massenable"'),
 								null
 							),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
@@ -88,7 +89,7 @@ if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	$application = array(
@@ -120,8 +121,6 @@ if (isset($_REQUEST['save'])) {
 		);
 		unset($_REQUEST['form']);
 	}
-
-	unset($_REQUEST['save']);
 
 	$result = DBend($dbApplications);
 

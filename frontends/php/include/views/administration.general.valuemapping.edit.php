@@ -57,7 +57,7 @@ $valueMappingForm->addItem($valueMappingTab);
 // append buttons
 if (!empty($this->data['valuemapid'])) {
 	$valueMappingForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
@@ -65,7 +65,7 @@ if (!empty($this->data['valuemapid'])) {
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
+	$valueMappingForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
 }
 
 return $valueMappingForm;

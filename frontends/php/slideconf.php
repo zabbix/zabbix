@@ -32,14 +32,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'shows' =>			array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
-	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'(isset({form})&&({form}=="update"))'),
-	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
-	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({save})',_('Default delay (in seconds)')),
+	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'(isset({form}) && {form} == "update")'),
+	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
+	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')),
 	'slides' =>			array(null,		 O_OPT, null,		null,	null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
@@ -90,18 +91,18 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
 	unset($_REQUEST['slideshowid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
-	if (isset($_REQUEST['slideshowid'])) {
-		$result = update_slideshow($_REQUEST['slideshowid'], $_REQUEST['name'], $_REQUEST['delay'], getRequest('slides', array()));
+	if (hasRequest('update')) {
+		$result = update_slideshow(getRequest('slideshowid'), getRequest('name'), getRequest('delay'), getRequest('slides', array()));
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$result = add_slideshow($_REQUEST['name'], $_REQUEST['delay'], getRequest('slides', array()));
+		$result = add_slideshow(getRequest('name'), getRequest('delay'), getRequest('slides', array()));
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
@@ -109,7 +110,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit($auditAction, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$_REQUEST['name'].'" ');
+		add_audit($auditAction, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.getRequest('name').'" ');
 		unset($_REQUEST['form'], $_REQUEST['slideshowid']);
 	}
 
