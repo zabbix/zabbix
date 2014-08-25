@@ -182,12 +182,13 @@ out:
 static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char *type, const char *id,
 		const char *path, const char *instance, int coeff, AGENT_RESULT *result)
 {
-	const char	*__function_name = "vmware_service_counter_get";
-	int		ret = SYSINFO_RET_FAIL;
-	zbx_uint64_t	counterid;
-	int		i, found = 0;
-	char		*xpath = NULL, *value = NULL;
-	size_t		xpath_alloc = 0, xpath_offset = 0;
+	const char			*__function_name = "vmware_service_counter_get";
+	int				ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t			counterid;
+	int				i;
+	zbx_vmware_perf_entity_t	*entity;
+	zbx_vmware_perf_counter_t	*perfcounter;
+	zbx_ptr_pair_t			*perfvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s path:%s instance:%s", __function_name, type, id, path,
 			instance);
@@ -198,23 +199,7 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 		goto out;
 	}
 
-	/* check if the performance counter was queried by the last statistics update */
-	for (i = 0; i < service->stats_entities.values_num; i++)
-	{
-		zbx_vmware_perf_entity_t	*entity = service->stats_entities.values[i];
-
-		if (0 == strcmp(entity->type, type) && 0 == strcmp(entity->id, id))
-		{
-			if (FAIL != zbx_vector_uint64_search(&entity->counters, counterid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				found = 1;
-				break;
-			}
-		}
-	}
-
-	if (0 == found)
+	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
 		/* the requested counter has not been queried yet */
 		zabbix_log(LOG_LEVEL_DEBUG, "performance data is not yet ready, ignoring request");
@@ -222,36 +207,47 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 		goto out;
 	}
 
-	zbx_snprintf_alloc(&xpath, &xpath_alloc, &xpath_offset,
-			"/*/*/*/*[*[local-name()='entity'][@type='%s']/text()='%s']"
-			"/*[local-name()='value']"
-			"[*[local-name()='id']/*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']"
-			"[*[local-name()='id']/*[local-name()='instance']", type, id, counterid);
-
-	if ('\0' != *instance)
-		zbx_snprintf_alloc(&xpath, &xpath_alloc, &xpath_offset, "/text()='%s'" ,instance);
-	else
-		zbx_snprintf_alloc(&xpath, &xpath_alloc, &xpath_offset, "[not(text())]");
-
-	zbx_snprintf_alloc(&xpath, &xpath_alloc, &xpath_offset, "]/*[local-name()='value']", type, id, counterid,
-			instance);
-
-	if (NULL == (value = zbx_xml_read_value(service->stats, xpath)))
+	for (i = 0; i < entity->counters.values_num; i++)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find counter value in performance data."));
+		perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
+
+		if (perfcounter->counterid == counterid)
+			break;
+	}
+
+	if (i == entity->counters.values_num)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
 	}
 
-	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, value))
+	for (i = 0; i < perfcounter->values.values_num; i++)
+	{
+		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
+
+		if (NULL == perfvalue->first)
+		{
+			if ('\0' == *instance)
+				break;
+			continue;
+		}
+
+		if (0 == strcmp(perfvalue->first, instance))
+			break;
+	}
+
+	if (i == perfcounter->values.values_num)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter instance was not found."));
+		goto out;
+	}
+
+	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, perfvalue->second))
 	{
 		result->ui64 *= coeff;
 		ret = SYSINFO_RET_OK;
 	}
-
-	zbx_free(value);
 out:
-	zbx_free(xpath);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
 	return ret;

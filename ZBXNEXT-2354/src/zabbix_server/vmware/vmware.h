@@ -31,6 +31,18 @@
 #define ZBX_VMWARE_STATE_UPDATING	0x100
 #define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
 
+/* performance counter data */
+typedef struct
+{
+	/* the counter id */
+	zbx_uint64_t		counterid;
+
+	/* the counter values for various instances                      */
+	/*    pair->first  - instance (can be NULL for aggregate values) */
+	/*    pair->second - value                                       */
+	zbx_vector_ptr_pair_t	values;
+} zbx_vmware_perf_counter_t;
+
 /* an entity monitored with performance counters */
 typedef struct
 {
@@ -40,14 +52,14 @@ typedef struct
 	/* entity id */
 	char			*id;
 
-	/* the peformance counte refresh rate */
+	/* the performance counter refresh rate */
 	int			refresh;
 
 	/* timestamp when the entity was queried last time */
 	int			last_seen;
 
 	/* the performance counters to monitor */
-	zbx_vector_uint64_t	counters;
+	zbx_vector_ptr_t	counters;
 }
 zbx_vmware_perf_entity_t;
 
@@ -133,16 +145,13 @@ typedef struct
 	char			*contents;
 
 	/* the performance counter values */
-	char			*stats;
+	zbx_hashset_t		stats;
 
 	/* the performance counters */
 	zbx_hashset_t 		counters;
 
 	/* list of entities to monitor with performance counters */
-	zbx_vector_ptr_t	perf_entities;
-
-	/* list of entities monitored during last performance update*/
-	zbx_vector_ptr_t	stats_entities;
+	zbx_vector_ptr_t	entities;
 
 	/* The service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
@@ -178,6 +187,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
 int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid);
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id);
 
 #define ZBX_VM_QUICKSTATS(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
