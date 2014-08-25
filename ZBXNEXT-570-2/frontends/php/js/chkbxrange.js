@@ -217,7 +217,7 @@ var chkbxRange = {
 		var instance = this;
 
 		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
-		if (!jQuery.isEmptyObject(this.chkboxes)) {
+		if (typeof this.chkboxes[object] !== 'undefined') {
 			jQuery.each(this.chkboxes[object], function(i, checkbox) {
 				instance.checkObject(object, instance.getObjectIdFromName(checkbox.name), checked);
 			});
