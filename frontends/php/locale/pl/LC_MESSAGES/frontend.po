@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-17 11:45+0300\n"
-"PO-Revision-Date: 2014-08-20 09:11+0300\n"
+"PO-Revision-Date: 2014-08-25 09:21+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408518666.0\n"
+"X-POOTLE-MTIME: 1408951266.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1494,7 +1494,7 @@ msgstr "Nie można sklonować prototypów wyzwalaczy."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Nie można połączyć z portem trappera serwera ZABBIX, jednakże powinien on być dostepny aby uruchomić skrypt."
+msgstr "Nie można połączyć z portem trappera serwera ZABBIX, jednakże powinien on być dostępny aby uruchomić skrypt."
 
 #: graphs.php:347
 msgid "Cannot copy graphs"
