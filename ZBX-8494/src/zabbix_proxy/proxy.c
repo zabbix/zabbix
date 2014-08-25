@@ -611,7 +611,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, proxy_num = 0, proxy_count = 0;
+	int		i, proxy_num = 0, proxy_count = 0, db_kind;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -686,6 +686,20 @@ int	MAIN_ZABBIX_ENTRY()
 		zbx_vmware_init();
 
 	DBinit();
+
+	if (FAIL == (db_kind = DBserver_or_proxy()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Seems like the database has not been prepared for Zabbix use. Cannot "
+				"determine is the process started with server or proxy database.");
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_PROXY_DB != db_kind)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Seems like the database has been prepared for server use. Zabbix proxy "
+				"cannot work with Zabbix server database.");
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
