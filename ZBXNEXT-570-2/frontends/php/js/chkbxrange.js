@@ -31,8 +31,6 @@ var chkbxRange = {
 	cookieName:		null,
 
 	init: function() {
-		var instance = this;
-
 		// cookie name
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
@@ -54,15 +52,14 @@ var chkbxRange = {
 
 			// check if checkboxes should be selected from cookies
 			if (!jQuery.isEmptyObject(this.selectedIds)) {
-				jQuery.each(this.selectedIds, function(i, objectId) {
-					instance.checkObject(instance.pageGoName, objectId, true);
-				});
+				var objectIds = jQuery.map(this.selectedIds, function(id) { return id });
+				this.checkObjects(this.pageGoName, objectIds, true);
 			}
-			// no checboxes selected from cookies, check browser cache if checkboxes are still checked and update state
+			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
 				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)');
 				jQuery.each(checkedFromCache, jQuery.proxy(function(i, object) {
-					instance.checkObject(instance.pageGoName, this.getObjectIdFromName(object.name), object.checked);
+					this.checkObjects(this.pageGoName, [this.getObjectIdFromName(object.name)], object.checked);
 				}, this));
 			}
 
@@ -119,7 +116,7 @@ var chkbxRange = {
 		}
 		// an individual checkbox
 		else {
-			this.checkObject(object, objectId, checkbox.checked);
+			this.checkObjects(object, [objectId], checkbox.checked);
 		}
 
 		this.update(object);
@@ -154,34 +151,31 @@ var chkbxRange = {
 	},
 
 	/**
-	 * Toggle all checkboxes of the given object.
+	 * Toggle all checkboxes of the given objects.
 	 *
-	 * Checks all of the checkboxes that belong to that object and highlights the table row.
+	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
 	 *
-	 * @param {string} object
-	 * @param {string} objectId
-	 * @param {bool} checked
+	 * @param {string}  object
+	 * @param {Array}   objectIds     array of objects IDs as integers
+	 * @param {bool}    checked
 	 */
-	checkObject: function(object, objectId, checked) {
-		var instance = this;
+	checkObjects: function(object, objectIds, checked) {
+		jQuery.each(this.chkboxes[object], jQuery.proxy(function(i, checkbox) {
+			var objectId = this.getObjectIdFromName(checkbox.name);
 
-		// toggle all checkboxes belonging to this object
-		jQuery.each(this.chkboxes[object], function(i, checkbox) {
-			if (instance.getObjectIdFromName(checkbox.name) == objectId) {
+			if (objectIds.indexOf(objectId) > -1) {
 				checkbox.checked = checked;
 
-				// mark the table rows as selected
 				jQuery(checkbox).closest('tr').toggleClass('selected', checked);
-			}
-		});
 
-		// update the selectedIds array
-		if (checked) {
-			this.selectedIds[objectId] = objectId;
-		}
-		else {
-			delete this.selectedIds[objectId];
-		}
+				if (checked) {
+					this.selectedIds[objectId] = objectId;
+				}
+				else {
+					delete this.selectedIds[objectId];
+				}
+			}
+		}, this));
 	},
 
 	/**
@@ -200,10 +194,12 @@ var chkbxRange = {
 		var start = Math.min(startCheckboxIndex, endCheckboxIndex);
 		var end = Math.max(startCheckboxIndex, endCheckboxIndex);
 
+		var objectIds = [];
 		for (var i = start; i <= end; i++) {
-			var checkbox = checkboxes[i];
-			this.checkObject(object, this.getObjectIdFromName(checkbox.name), checked);
+			objectIds.push(this.getObjectIdFromName(checkboxes[i].name));
 		}
+		this.checkObjects(object, objectIds, checked);
+
 	},
 
 	/**
@@ -214,13 +210,15 @@ var chkbxRange = {
 	 * @param {bool} checked
 	 */
 	checkObjectAll: function(object, checked) {
-		var instance = this;
+		var start = new Date().getTime();
 
 		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
 		if (typeof this.chkboxes[object] !== 'undefined') {
-			jQuery.each(this.chkboxes[object], function(i, checkbox) {
-				instance.checkObject(object, instance.getObjectIdFromName(checkbox.name), checked);
-			});
+			var objectIds = jQuery.map(this.chkboxes[object], jQuery.proxy(function(checkbox) {
+				return this.getObjectIdFromName(checkbox.name);
+			}, this));
+
+			this.checkObjects(object, objectIds, checked);
 		}
 	},
 
