@@ -368,7 +368,7 @@ $filterTable->addRow(
 			)),
 			'inputcol'
 		),
-		new CCol(bold(_('Item').':'), 'label'),
+		new CCol(bold(_('Name').':'), 'label'),
 		new CCol(new CTextBox('select', $filter['select'], 40), 'inputcol'),
 	)
 );
