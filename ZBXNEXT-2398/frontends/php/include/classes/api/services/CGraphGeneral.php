@@ -277,22 +277,22 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Get graphid by graph name.
-	 *
-	 * params: hostids, name
+	 * Get graphs by name and host IDs.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @param array $graphData
+	 * @param array  $graphData
+	 * @param string $graphData['hostids']
+	 * @param string $graphData['name']
 	 *
 	 * @return array
 	 */
-	public function getObjects($graphData) {
+	public function getObjects(array $graphData) {
 		$this->deprecated('graph.getobjects method is deprecated.');
 
 		return $this->get(array(
-			'filter' => $graphData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $graphData
 		));
 	}
 

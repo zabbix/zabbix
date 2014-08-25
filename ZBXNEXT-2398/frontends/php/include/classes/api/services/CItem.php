@@ -386,23 +386,23 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Get itemid by host.name and item.key.
+	 * Get items by item key and hostid.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @param array $itemData
-	 * @param array $itemData['key_']
-	 * @param array $itemData['hostid']
+	 * @param array  $itemData
+	 * @param string $itemData['key_']
+	 * @param string $itemData['hostid']
 	 *
 	 * @return array
 	 */
-	public function getObjects($itemData) {
+	public function getObjects(array $itemData) {
 		$this->deprecated('item.getobjects method is deprecated.');
 
 		return $this->get(array(
-			'filter' => $itemData,
 			'output' => API_OUTPUT_EXTEND,
-			'webitems' => true
+			'webitems' => true,
+			'filter' => $itemData
 		));
 	}
 

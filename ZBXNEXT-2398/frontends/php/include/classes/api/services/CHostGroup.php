@@ -365,21 +365,21 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Get host group id by name.
+	 * Get host groups by name.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
 	 * @param array $hostgroupData
 	 * @param array $hostgroupData['name']
 	 *
-	 * @return string|boolean host group id or false if error
+	 * @return array
 	 */
-	public function getObjects($hostgroupData) {
+	public function getObjects(array $hostgroupData) {
 		$this->deprecated('hostgroup.getobjects method is deprecated.');
 
 		return $this->get(array(
-			'filter' => $hostgroupData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $hostgroupData
 		));
 	}
 

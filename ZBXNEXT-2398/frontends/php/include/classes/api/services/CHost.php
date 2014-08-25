@@ -463,21 +463,21 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Get Host ID by Host name.
+	 * Get hosts by name.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @param array $host_data
-	 * @param string $host_data['host']
+	 * @param array  $hostData
+	 * @param string $hostData['host']
 	 *
 	 * @return array
 	 */
-	public function getObjects($hostData) {
+	public function getObjects(array $hostData) {
 		$this->deprecated('host.getobjects method is deprecated.');
 
 		return $this->get(array(
-			'filter' => $hostData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $hostData
 		));
 	}
 

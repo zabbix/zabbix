@@ -484,24 +484,24 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Get triggerid by host.host and trigger.expression.
+	 * Get trigger by host name, host ID, trigger expression and trigger description.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @param array $triggerData multidimensional array with trigger objects
-	 * @param array $triggerData[0,...]['expression']
-	 * @param array $triggerData[0,...]['host']
-	 * @param array $triggerData[0,...]['hostid'] OPTIONAL
-	 * @param array $triggerData[0,...]['description'] OPTIONAL
+	 * @param array  $triggerData multidimensional array with trigger objects
+	 * @param string $triggerData[0,...]['expression']
+	 * @param array  $triggerData[0,...]['host']
+	 * @param string $triggerData[0,...]['hostid'] OPTIONAL
+	 * @param string $triggerData[0,...]['description'] OPTIONAL
 	 *
-	 * @return array|int
+	 * @return array
 	 */
 	public function getObjects(array $triggerData) {
 		$this->deprecated('trigger.getobjects method is deprecated.');
 
 		$options = array(
-			'filter' => $triggerData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $triggerData
 		);
 
 		// expression is checked later

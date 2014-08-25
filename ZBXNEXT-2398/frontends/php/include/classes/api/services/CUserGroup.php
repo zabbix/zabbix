@@ -167,12 +167,18 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Get UserGroup ID by UserGroup name.
+	 * Get user groups by name.
 	 *
-	 * @param array $groupData
-	 * @return string|boolean
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array  $groupData
+	 * @param string $groupData['name']
+	 *
+	 * @return array
 	 */
-	public function getObjects($groupData) {
+	public function getObjects(array $groupData) {
+		$this->deprecated('usergroup.getobjects method is deprecated.');
+
 		$result = array();
 		$usrgrpids = array();
 
@@ -186,8 +192,11 @@ class CUserGroup extends CApiService {
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
 
-		if (!empty($usrgrpids)) {
-			$result = $this->get(array('usrgrpids' => $usrgrpids, 'output' => API_OUTPUT_EXTEND));
+		if ($usrgrpids) {
+			$result = $this->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'usrgrpids' => $usrgrpids
+			));
 		}
 
 		return $result;

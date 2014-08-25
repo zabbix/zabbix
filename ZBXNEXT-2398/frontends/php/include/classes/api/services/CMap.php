@@ -289,13 +289,13 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Get Sysmap IDs by Sysmap params.
+	 * Get maps by map name and ID.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @param array $sysmapData
-	 * @param array $sysmapData['name']
-	 * @param array $sysmapData['sysmapid']
+	 * @param array  $sysmapData
+	 * @param string $sysmapData['name']
+	 * @param string $sysmapData['sysmapid']
 	 *
 	 * @return array
 	 */
@@ -303,8 +303,8 @@ class CMap extends CMapElement {
 		$this->deprecated('map.getobjects method is deprecated.');
 
 		return $this->get(array(
-			'filter' => $sysmapData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $sysmapData
 		));
 	}
 
