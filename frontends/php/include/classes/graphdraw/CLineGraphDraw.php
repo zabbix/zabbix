@@ -100,6 +100,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
+		// TODO: graphs shouldn't retrieve items and resolve macros themselves
+		// all of the data must be passed as parameters
 		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
 		$item = reset($items);
 
@@ -1835,9 +1837,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$legend->addRow($row);
 		$rowNum = $legend->getNumRows();
-
-		CArrayHelper::sort($this->items, array('hostname', 'name_expanded', 'itemid'));
-		$this->items = array_values($this->items);
 
 		$i = ($this->type == GRAPH_TYPE_STACKED) ? $this->num - 1 : 0;
 		while ($i >= 0 && $i < $this->num) {

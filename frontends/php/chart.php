@@ -50,6 +50,7 @@ $itemIds = getRequest('itemids');
  */
 $items = API::Item()->get(array(
 	'output' => array('itemid', 'name'),
+	'selectHosts' => array('name'),
 	'itemids' => $itemIds,
 	'webitems' => true,
 	'preservekeys' => true
@@ -60,7 +61,12 @@ foreach ($itemIds as $itemId) {
 	}
 }
 
-CArrayHelper::sort($items, array('name'));
+// sort items
+foreach ($items as &$item) {
+	$item['hostname'] = $item['hosts'][0]['name'];
+}
+unset($item);
+CArrayHelper::sort($items, array('name', 'hostname', 'itemid'));
 
 /*
  * Display
