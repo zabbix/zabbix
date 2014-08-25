@@ -64,6 +64,10 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
 
+/* kind of data base */
+#define ZBX_SERVER_DB	1
+#define ZBX_PROXY_DB	2
+
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
@@ -416,7 +420,7 @@ DB_ESCALATION;
 
 int	DBconnect(int flag);
 void	DBinit(void);
-
+int	DBserver_or_proxy(void);
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE

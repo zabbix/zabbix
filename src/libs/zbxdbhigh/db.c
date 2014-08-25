@@ -2545,3 +2545,73 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	exit(EXIT_FAILURE);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBserver_or_proxy                                                *
+ *                                                                            *
+ * Purpose: determine is it a server or a proxy data base                     *
+ *                                                                            *
+ * Return value: ZBX_SERVER_DB - server data base                             *
+ *               ZBX_PROXY_DB - proxy data base                               *
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	DBserver_or_proxy(void)
+{
+	const char	*__function_name = "DBserver_or_proxy", *result_string;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (SUCCEED != DBtable_exists("users"))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "table \"users\" does not exist");
+		goto out;
+	}
+
+	if (SUCCEED != DBfield_exists("users", "userid"))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "table \"users\" has no field \"userid\"");
+		goto out;
+	}
+
+	result = DBselectN("select userid from users", 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
+		ret = ZBX_SERVER_DB;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no records in \"users\" table");
+		ret = ZBX_PROXY_DB;
+	}
+
+	DBfree_result(result);
+out:
+	DBclose();
+
+	switch (ret)
+	{
+		case ZBX_SERVER_DB:
+			result_string = "ZBX_SERVER_DB";
+			break;
+		case ZBX_PROXY_DB:
+			result_string = "ZBX_PROXY_DB";
+			break;
+		case FAIL:
+			result_string = "FAIL";
+			break;
+		default:
+			result_string = "Unknown";
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
+
+	return ret;
+}
