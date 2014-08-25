@@ -867,9 +867,9 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	DB_ROW		row;
 	int		i, found = 1;
 
-	*refresh_unsupported_changed = 0;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	*refresh_unsupported_changed = 0;
 
 	if (NULL == config->config)
 	{
@@ -927,7 +927,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 		refresh_unsupported = atoi(row[0]);
 
-		if (0 == found || refresh_unsupported != config->config->refresh_unsupported)
+		if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
 			*refresh_unsupported_changed = 1;
 
 		config->config->refresh_unsupported = refresh_unsupported;
