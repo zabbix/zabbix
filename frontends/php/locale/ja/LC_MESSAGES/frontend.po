@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-25 14:56+0300\n"
-"PO-Revision-Date: 2014-08-19 05:05+0300\n"
+"POT-Creation-Date: 2014-08-25 14:59+0300\n"
+"PO-Revision-Date: 2014-08-25 02:59+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408417520.0\n"
+"X-POOTLE-MTIME: 1408928376.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -5826,7 +5826,7 @@ msgstr "グラフのプロトタイプを削除しました"
 
 #: include/classes/screens/CScreenLldGraph.php:175
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "グラフのプロトタイプが見つかりません。"
 
 #: graphs.php:230
 msgid "Graph prototype updated"
@@ -7339,7 +7339,7 @@ msgstr "スクリーンの要素のグラフID\"%1$s\"が正しくありませ�
 #: include/classes/api/services/CScreenItem.php:661
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のグラフのプロトタイプID\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7425,7 +7425,7 @@ msgstr "トリガー条件式\"%2$s\"に正しくないアイテムキー\"%1$s\
 #: include/classes/api/services/CScreenItem.php:698
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のアイテムのプロトタイプID\"%1$s\"が正しくありません。"
 
 #: include/classes/validators/CFunctionValidator.php:254
 #, c-format
@@ -7489,7 +7489,7 @@ msgstr "マップ\"%s\"の幅の値が正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:590
 msgid "Incorrect max columns provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素の最大列数が正しくありません。"
 
 #: include/classes/api/services/CScript.php:563
 #, c-format
@@ -9070,7 +9070,7 @@ msgstr "要素の一括更新"
 #: include/views/configuration.screen.constructor.edit.php:287
 #: screenedit.php:71
 msgid "Max columns"
-msgstr ""
+msgstr "最大列数"
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
@@ -9938,7 +9938,7 @@ msgstr "グラフID\"%s\"のグラフアイテムがありません。"
 
 #: include/classes/api/services/CScreenItem.php:501
 msgid "No graph prototype ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のグラフのプロトタイプIDが設定されていません。"
 
 #: include/views/configuration.graph.list.php:73 popup.php:1300
 msgid "No graph prototypes found."
@@ -10069,7 +10069,7 @@ msgstr "アイテムのキーが設定されていません。"
 
 #: include/classes/api/services/CScreenItem.php:511
 msgid "No item prototype ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のアイテムのプロトタイプIDが設定されていません。"
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:1092
 msgid "No item prototypes found."
@@ -13076,7 +13076,7 @@ msgstr "シンプルグラフ"
 
 #: include/screens.inc.php:46
 msgid "Simple graph prototype"
-msgstr ""
+msgstr "シンプルグラフのプロトタイプ"
 
 #: include/hosts.inc.php:370
 msgid "Site ZIP / postal"
