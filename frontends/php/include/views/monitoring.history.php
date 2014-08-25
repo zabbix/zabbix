@@ -230,7 +230,7 @@ else {
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			);
 			$filterTable->addRow(array(
-				new CCol(bold(_('Graph type').NAME_DELIMITER), 'label'),
+				new CCol(bold(_('Graph type').':'), 'label'),
 				new CCol(new CSpan($graphType, 'jqueryinputset'), 'buttoncol')
 			));
 

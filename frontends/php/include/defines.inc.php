@@ -764,7 +764,13 @@ define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
  */
 define('SPACE',	'&nbsp;');
 
+/**
+ * Symbol used to separate name pairs such as "host: item" or "proxy: host".
+ *
+ * Should not be used as just a colon.
+ */
 define('NAME_DELIMITER', ': ');
+
 define('UNKNOWN_VALUE', '-');
 
 // suffixes
