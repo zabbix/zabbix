@@ -484,7 +484,7 @@ class CItemPrototype extends CItemGeneral {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while ($parentItemids	);
+		} while ($parentItemids);
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -500,13 +500,13 @@ class CItemPrototype extends CItemGeneral {
 
 		// delete graphs with this item prototype
 		$delGraphPrototypes = API::GraphPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('graphid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
 		if ($delGraphPrototypes) {
-			API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
+			API::GraphPrototype()->delete(array_keys($delGraphPrototypes), true);
 		}
 
 		// check if any graphs are referencing this item
@@ -526,13 +526,13 @@ class CItemPrototype extends CItemGeneral {
 
 // TRIGGER PROTOTYPES
 		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
 		if ($delTriggerPrototypes) {
-			API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
+			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
 		}
 
 		// screen items
