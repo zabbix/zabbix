@@ -61,9 +61,9 @@ var chkbxRange = {
 			// no checboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
 				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)');
-				jQuery.each(checkedFromCache, function(i, object) {
-					instance.checkObject(instance.pageGoName, object.value, object.checked);
-				});
+				jQuery.each(checkedFromCache, jQuery.proxy(function(i, object) {
+					instance.checkObject(instance.pageGoName, this.getObjectIdFromName(object.name), object.checked);
+				}, this));
 			}
 
 			this.update(this.pageGoName);
