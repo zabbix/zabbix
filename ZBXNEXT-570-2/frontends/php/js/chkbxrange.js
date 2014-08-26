@@ -53,16 +53,16 @@ var chkbxRange = {
 			// check if checkboxes should be selected from cookies
 			if (!jQuery.isEmptyObject(this.selectedIds)) {
 				var objectIds = jQuery.map(this.selectedIds, function(id) { return id });
-				this.checkObjects(this.pageGoName, objectIds, true);
 			}
 			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
-				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)');
-				jQuery.each(checkedFromCache, jQuery.proxy(function(i, object) {
-					this.checkObjects(this.pageGoName, [this.getObjectIdFromName(object.name)], object.checked);
+				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:checked:not(:disabled)');
+				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
+					return this.getObjectIdFromName(checkbox.name);
 				}, this));
 			}
 
+			this.checkObjects(this.pageGoName, objectIds, true);
 			this.update(this.pageGoName);
 		}
 
