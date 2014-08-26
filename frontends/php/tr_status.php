@@ -56,8 +56,8 @@ $fields = array(
 	// ajax
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'description','lastchange','priority'"),	null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -825,8 +825,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$goComboBox = new CComboBox('go');
-	$goComboBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
+	$goComboBox = new CComboBox('action');
+	$goComboBox->addItem('trigger.bulkacknowledge', _('Bulk acknowledge'));
 
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');

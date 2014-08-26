@@ -1701,7 +1701,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickWait("link=Discovery rules");
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

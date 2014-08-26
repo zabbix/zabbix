@@ -443,9 +443,7 @@
 		// on clone we remove regexpid hidden field and also expressionid from expressions
 		// it's needed because after clone all expressions should be added as new for cloned reg. exp
 		$('#clone').click(function() {
-			$('#regexpid').remove();
-			$('#clone').remove();
-			$('#delete').remove();
+			$('#regexpid, #clone, #delete').remove();
 			$('#cancel').addClass('ui-corner-left');
 
 			for (var id in zabbixRegExp.expressions) {
