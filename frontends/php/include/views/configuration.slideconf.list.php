@@ -37,9 +37,9 @@ $slideForm->setName('slideForm');
 $slidesTable = new CTableInfo(_('No slide shows found.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-	make_sorting_header(_('Name'), 'name'),
-	make_sorting_header(_('Delay'), 'delay'),
-	make_sorting_header(_('Count of slides'), 'cnt')
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Count of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['slides'] as $slide) {
@@ -52,10 +52,12 @@ foreach ($this->data['slides'] as $slide) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('slideshow.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected slide shows?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "shows";');

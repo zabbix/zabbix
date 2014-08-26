@@ -428,7 +428,7 @@ function getItemFilterForm(&$items) {
 	$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').NAME_DELIMITER));
 	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
-	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
+	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
 	$updateIntervalInput->setEnabled('no');
 
 	// data type
@@ -470,7 +470,7 @@ function getItemFilterForm(&$items) {
 	$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').NAME_DELIMITER));
 	$portLabel->setAttribute('id', 'filter_port_label');
 
-	$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
+	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
 	$portField->setEnabled('no');
 
 	// row 1
@@ -578,7 +578,7 @@ function getItemFilterForm(&$items) {
 		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 		new CCol(array($snmpCommunityField, $snmpSecurityField)),
 		new CCol(array(bold(_('History')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
-		new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
+		new CCol(new CNumericBox('filter_history', $filter_history, 8, false, true)),
 		new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
 		new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 			-1 => _('all'),
@@ -593,7 +593,7 @@ function getItemFilterForm(&$items) {
 		new CCol($snmpOidLabel, 'label'),
 		new CCol($snmpOidField),
 		new CCol(array(bold(_('Trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
-		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
+		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, false, true)),
 		new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
 		new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
 			-1 => _('all'),
@@ -1032,7 +1032,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	if ($item) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
-		$data['limited'] = $data['item']['templateid'] != 0;
+		$data['limited'] = ($data['item']['templateid'] != 0);
 
 		// get templates
 		$itemid = $item['itemid'];
@@ -1314,7 +1314,6 @@ function getTriggerMassupdateFormData() {
 		'dependencies' => getRequest('dependencies', array()),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'go' => getRequest('go', 'massupdate'),
 		'g_triggerid' => getRequest('g_triggerid', array()),
 		'priority' => getRequest('priority', 0),
 		'config' => select_config(),
@@ -1367,7 +1366,7 @@ function getTriggerFormData($exprAction) {
 		'comments' => getRequest('comments', ''),
 		'url' => getRequest('url', ''),
 		'input_method' => getRequest('input_method', IM_ESTABLISHED),
-		'limited' => null,
+		'limited' => false,
 		'templates' => array(),
 		'hostid' => getRequest('hostid', 0)
 	);
@@ -1416,7 +1415,7 @@ function getTriggerFormData($exprAction) {
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
-		$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+		$data['limited'] = ($data['trigger']['templateid'] != 0);
 
 		// select first host from triggers if gived not match
 		$hosts = $data['trigger']['hosts'];
@@ -1426,10 +1425,10 @@ function getTriggerFormData($exprAction) {
 		}
 	}
 
-	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
+	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = explode_exp($data['trigger']['expression']);
 
-		if (empty($data['limited']) || !isset($_REQUEST['form_refresh'])) {
+		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];
 			$data['type'] = $data['trigger']['type'];
 			$data['priority'] = $data['trigger']['priority'];
@@ -1477,7 +1476,7 @@ function getTriggerFormData($exprAction) {
 			}
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
-			$data['expression_field_readonly'] = 'yes';
+			$data['expression_field_readonly'] = true;
 			$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 		}
 		else {

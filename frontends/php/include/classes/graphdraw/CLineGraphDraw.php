@@ -100,6 +100,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
+		// TODO: graphs shouldn't retrieve items and resolve macros themselves
+		// all of the data must be passed as parameters
 		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
 		$item = reset($items);
 
@@ -262,7 +264,7 @@ class CLineGraphDraw extends CGraphDraw {
 						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
 						'MAX(value_max) AS max,MAX(clock) AS clock'.
 					' FROM trends'.
-					' WHERE itemid='.$this->items[$i]['itemid'].
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
 						' AND clock>='.zbx_dbstr($from_time).
 						' AND clock<='.zbx_dbstr($to_time).
 					' GROUP BY itemid,'.$calc_field
@@ -455,7 +457,11 @@ class CLineGraphDraw extends CGraphDraw {
 				' ORDER BY tr.priority'
 			);
 			while (($trigger = DBfetch($db_triggers)) && $cnt < $max) {
-				$db_fnc_cnt = DBselect('SELECT COUNT(*) AS cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
+				$db_fnc_cnt = DBselect(
+					'SELECT COUNT(*) AS cnt'.
+					' FROM functions f'.
+					' WHERE f.triggerid='.zbx_dbstr($trigger['triggerid'])
+				);
 				$fnc_cnt = DBfetch($db_fnc_cnt);
 
 				if ($fnc_cnt['cnt'] != 1) {
@@ -1927,6 +1933,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$rowNum++;
 
+			// legends for stacked graphs are written in reverse order so that the order of items
+			// matches the order of lines on the graphs
 			if ($this->type == GRAPH_TYPE_STACKED) {
 				$i--;
 			}

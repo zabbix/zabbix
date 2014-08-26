@@ -211,7 +211,7 @@ class CConfigurationImport {
 		$templateScreensRefs = array();
 		$macrosRefs = array();
 		$proxyRefs = array();
-		$hostPrototypeRefs = array();
+		$hostPrototypesRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -324,7 +324,7 @@ class CConfigurationImport {
 				}
 
 				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
-					$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
+					$hostPrototypesRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
 
 					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
 						if (isset($groupPrototype['group'])) {
@@ -446,11 +446,13 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
+						case SCREEN_RESOURCE_LLD_GRAPH:
 							$hostsRefs[$resource['host']] = $resource['host'];
 							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$hostsRefs[$resource['host']] = $resource['host'];
 							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
@@ -478,11 +480,13 @@ class CConfigurationImport {
 
 						switch ($screenItem['resourcetype']) {
 							case SCREEN_RESOURCE_GRAPH:
+							case SCREEN_RESOURCE_LLD_GRAPH:
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
@@ -507,7 +511,7 @@ class CConfigurationImport {
 		$this->referencer->addTemplateScreens($templateScreensRefs);
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
-		$this->referencer->addHostPrototypes($hostPrototypeRefs);
+		$this->referencer->addHostPrototypes($hostPrototypesRefs);
 	}
 
 	/**
@@ -1097,6 +1101,7 @@ class CConfigurationImport {
 		}
 		if ($graphsToCreate) {
 			API::GraphPrototype()->create($graphsToCreate);
+			$this->referencer->refreshGraphs();
 		}
 		if ($graphsToUpdate) {
 			API::GraphPrototype()->update($graphsToUpdate);

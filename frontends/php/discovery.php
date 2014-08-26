@@ -31,10 +31,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'druleid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null)
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
+	// sort and sortorder
+	'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"ip"'),									null),
+	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('ip', ZBX_SORT_UP, array('ip'));
+
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'ip'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 // check discovery for existing if defined druleid
 if ($druleid = getRequest('druleid')) {
@@ -53,8 +61,8 @@ if ($druleid = getRequest('druleid')) {
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'druleid' => getRequest('druleid', 0),
-	'sort' => getRequest('sort'),
-	'sortorder' => getRequest('sortorder'),
+	'sort' => $sortField,
+	'sortorder' => $sortOrder,
 	'services' => array(),
 	'drules' => array()
 );
@@ -86,8 +94,8 @@ if ($data['pageFilter']->drulesSelected) {
 	$options = array(
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => getPageSortField('ip'),
-		'sortorder' => getPageSortOrder(),
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limitSelects' => 1
 	);
 	if (!empty($data['druleid'])) {

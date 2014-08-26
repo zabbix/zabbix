@@ -120,7 +120,12 @@ $fields = array(
 	),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"itemprototype.massdelete","itemprototype.massdisable",'.
+										'"itemprototype.massenable"'
+									),
+									null
+								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -128,12 +133,16 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS,
+									IN('"delay","history","key_","name","status","trends","type"'),
+									null
+								),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'history', 'trends', 'status', 'type'));
 
-$_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
@@ -250,7 +259,7 @@ elseif (hasRequest('save')) {
 		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-		'formula'		=> getRequest('formula'),
+		'formula'		=> getRequest('formula', '1'),
 		'logtimefmt'	=> getRequest('logtimefmt'),
 		'valuemapid'	=> getRequest('valuemapid'),
 		'authtype'		=> getRequest('authtype'),
@@ -299,9 +308,9 @@ elseif (hasRequest('save')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('itemprototype.massenable', 'itemprototype.massdisable')) && hasRequest('group_itemid')) {
 	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'itemprototype.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
@@ -321,7 +330,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
 	$result = API::Itemprototype()->delete(getRequest('group_itemid'));
@@ -363,27 +372,33 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => getRequest('hostid'),
-		'discovery_rule' => $discovery_rule
+		'discovery_rule' => $discovery_rule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
 
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
-	order_result($data['items'], $sortfield, getPageSortOrder());
+	order_result($data['items'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['items']);
 
