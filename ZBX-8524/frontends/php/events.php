@@ -194,9 +194,9 @@ else {
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
 
-		// change the triggerid when we change host id
+		// change the triggerid when we change host id (but not when new triggerid is set in filter)
 		$hostId = getRequest('hostid');
-		if ($triggerId != 0 && $hostId) {
+		if ($triggerId != 0 && $hostId && !hasRequest('filter_set')) {
 			$oldTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'description', 'expression'),
 				'selectHosts' => array('hostid', 'host'),
