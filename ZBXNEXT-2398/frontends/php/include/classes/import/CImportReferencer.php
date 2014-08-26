@@ -58,7 +58,7 @@ class CImportReferencer {
 	protected $templateScreensRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
-	protected $hostPrototypeRefs;
+	protected $hostPrototypesRefs;
 
 
 	/**
@@ -199,7 +199,7 @@ class CImportReferencer {
 	 * Get graph ID by host ID and graph name.
 	 *
 	 * @param string $hostId
-	 * @param strign $name
+	 * @param string $name
 	 *
 	 * @return string|bool
 	 */
@@ -315,12 +315,12 @@ class CImportReferencer {
 	 * @return string|bool
 	 */
 	public function resolveHostPrototype($hostId, $discoveryRuleId, $hostPrototype) {
-		if ($this->hostPrototypeRefs === null) {
+		if ($this->hostPrototypesRefs === null) {
 			$this->selectHostPrototypes();
 		}
 
-		if (isset($this->hostPrototypeRefs[$hostId][$discoveryRuleId][$hostPrototype])) {
-			return $this->hostPrototypeRefs[$hostId][$discoveryRuleId][$hostPrototype];
+		if (isset($this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype])) {
+			return $this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype];
 		}
 		else {
 			return false;
@@ -718,8 +718,8 @@ class CImportReferencer {
 			}
 
 			if ($sqlWhere) {
-				$dbitems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbItem = DBfetch($dbitems)) {
+				$dbItems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
+				while ($dbItem = DBfetch($dbItems)) {
 					$this->itemsRefs[$dbItem['hostid']][$dbItem['key_']] = $dbItem['itemid'];
 				}
 			}
@@ -798,11 +798,7 @@ class CImportReferencer {
 				'selectHosts' => array('hostid'),
 				'filter' => array(
 					'name' => $graphNames,
-					'flags' => array(
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					)
+					'flags' => null
 				),
 				'editable' => true
 			));
@@ -957,7 +953,7 @@ class CImportReferencer {
 	 */
 	protected function selectHostPrototypes() {
 		if (!empty($this->hostPrototypes)) {
-			$this->hostPrototypeRefs = array();
+			$this->hostPrototypesRefs = array();
 			$sqlWhere = array();
 			foreach ($this->hostPrototypes as $host => $discoveryRule) {
 				$hostId = $this->resolveHostOrTemplate($host);
@@ -979,7 +975,7 @@ class CImportReferencer {
 						' AND '.implode(' OR ', $sqlWhere)
 				);
 				while ($data = DBfetch($query)) {
-					$this->hostPrototypeRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
+					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
 				}
 			}
 		}

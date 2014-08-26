@@ -178,7 +178,9 @@ function change_group_status($userGroupIds, $usersStatus) {
 
 	if ($grant) {
 		return DBexecute(
-			'UPDATE usrgrp SET users_status='.$usersStatus.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+			'UPDATE usrgrp'.
+			' SET users_status='.zbx_dbstr($usersStatus).
+			' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 		);
 	}
 	else {
@@ -203,7 +205,7 @@ function change_group_gui_access($userGroupIds, $guiAccess) {
 
 	if ($grant) {
 		return DBexecute(
-			'UPDATE usrgrp SET gui_access='.$guiAccess.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+			'UPDATE usrgrp SET gui_access='.zbx_dbstr($guiAccess).' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 		);
 	}
 	else {
@@ -225,7 +227,7 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 	zbx_value2array($userGroupIds);
 
 	return DBexecute(
-		'UPDATE usrgrp SET debug_mode='.$debugMode.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+		'UPDATE usrgrp SET debug_mode='.zbx_dbstr($debugMode).' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
 	);
 }
 

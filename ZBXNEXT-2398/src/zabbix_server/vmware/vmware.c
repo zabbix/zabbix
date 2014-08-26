@@ -118,8 +118,8 @@ zbx_perfcounter_mapping_t;
 			"<SOAP-ENV:Header/>"						\
 			"<ns1:Body>"
 
-#define ZBX_POST_VSPHERE_FOOTER								\
-			"</ns1:Body>"							\
+#define ZBX_POST_VSPHERE_FOOTER		\
+			"</ns1:Body>"	\
 		"</SOAP-ENV:Envelope>"
 
 typedef struct
@@ -772,11 +772,11 @@ out:
 static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easyhandle, char **contents,
 		char **error)
 {
-#	define ZBX_POST_VMWARE_CONTENTS 						\
-		ZBX_POST_VSPHERE_HEADER							\
-		"<ns0:RetrieveServiceContent>"						\
+#	define ZBX_POST_VMWARE_CONTENTS 							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveServiceContent>"							\
 			"<ns0:_this type=\"ServiceInstance\">ServiceInstance</ns0:_this>"	\
-		"</ns0:RetrieveServiceContent>"						\
+		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	int	err, opt, ret = FAIL;
@@ -856,7 +856,7 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:QueryPerfProviderSummary>"				\
 			"<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>"	\
-			"<ns0:entity type=\"%s\">%s</ns0:entity>"	\
+			"<ns0:entity type=\"%s\">%s</ns0:entity>"		\
 		"</ns0:QueryPerfProviderSummary>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
@@ -1673,23 +1673,23 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		char **data, char **error)
 {
 #	define ZBX_POST_hv_DETAILS 							\
-		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrieveProperties>"							\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"	\
-			"<ns0:specSet>"								\
-				"<ns0:propSet>"							\
-					"<ns0:type>HostSystem</ns0:type>"			\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
-					"<ns0:pathSet>vm</ns0:pathSet>"				\
-					"<ns0:pathSet>summary</ns0:pathSet>"			\
-					"<ns0:pathSet>parent</ns0:pathSet>"			\
-					"<ns0:pathSet>datastore</ns0:pathSet>"			\
-				"</ns0:propSet>"						\
-				"<ns0:objectSet>"						\
-					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
-				"</ns0:objectSet>"						\
-			"</ns0:specSet>"							\
-		"</ns0:RetrieveProperties>"							\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrieveProperties>"						\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:specSet>"							\
+				"<ns0:propSet>"						\
+					"<ns0:type>HostSystem</ns0:type>"		\
+					"<ns0:pathSet>name</ns0:pathSet>"		\
+					"<ns0:pathSet>vm</ns0:pathSet>"			\
+					"<ns0:pathSet>summary</ns0:pathSet>"		\
+					"<ns0:pathSet>parent</ns0:pathSet>"		\
+					"<ns0:pathSet>datastore</ns0:pathSet>"		\
+				"</ns0:propSet>"					\
+				"<ns0:objectSet>"					\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"	\
+				"</ns0:objectSet>"					\
+			"</ns0:specSet>"						\
+		"</ns0:RetrieveProperties>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_hv_data";
@@ -1956,34 +1956,79 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#	define ZBX_POST_VCENTER_HV_LIST_CONTINUE								\
+		ZBX_POST_VSPHERE_HEADER										\
+		"<ns0:ContinueRetrievePropertiesEx xsi:type=\"ns0:ContinueRetrievePropertiesExRequestType\">"	\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"			\
+			"<ns0:token>%s</ns0:token>"								\
+		"</ns0:ContinueRetrievePropertiesEx>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN			\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"	\
+		"/*[local-name()='RetrievePropertiesExResponse']"	\
+		"/*[local-name()='returnval']/*[local-name()='token']"
+
+#	define ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN			\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"		\
+		"/*[local-name()='ContinueRetrievePropertiesExResponse']"	\
+		"/*[local-name()='returnval']/*[local-name()='token']"
+
 	const char	*__function_name = "vmware_service_get_hv_list";
 
 	int		err, opt, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ZBX_VMWARE_SERVICE_VCENTER == service->type)
 	{
+		char	*token, *token_xpath = NULL;
+
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
 			goto out;
 		}
 
-		page.offset = 0;
-
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		while (1)
 		{
-			*error = zbx_strdup(*error, curl_easy_strerror(err));
-			goto out;
+			page.offset = 0;
+
+			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+			{
+				*error = zbx_strdup(*error, curl_easy_strerror(err));
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
+
+			if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+				goto out;
+
+			zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
+
+			if (NULL == token_xpath)
+				token_xpath = ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN;
+			else
+				token_xpath = ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN;
+
+			if (NULL == (token = zbx_xml_read_value(page.data, token_xpath)))
+				break;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'",
+					__function_name, token);
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_LIST_CONTINUE, token);
+			zbx_free(token);
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+			{
+				*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt,
+						curl_easy_strerror(err));
+				goto out;
+			}
 		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
-
-		if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-			goto out;
-
-		zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
 	}
 	else
 	{

@@ -112,7 +112,7 @@ class CApplication extends CApiService {
 					' WHERE a.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 
@@ -564,7 +564,7 @@ class CApplication extends CApiService {
 					'SELECT a1.applicationid'.
 					' FROM applications a1,applications a2'.
 					' WHERE a1.name=a2.name'.
-						' AND a1.hostid='.$child['hostid'].
+						' AND a1.hostid='.zbx_dbstr($child['hostid']).
 						' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 				);
 

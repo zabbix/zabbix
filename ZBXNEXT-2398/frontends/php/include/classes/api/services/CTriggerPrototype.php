@@ -125,7 +125,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 			')';

@@ -29,31 +29,6 @@ class CTemplateScreenItem extends CApiService {
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';
 
-	/**
-	 * Supported values for the resourcetype column.
-	 *
-	 * @var array
-	 */
-	protected static $resourceTypes = array(
-		SCREEN_RESOURCE_GRAPH,
-		SCREEN_RESOURCE_SIMPLE_GRAPH,
-		SCREEN_RESOURCE_MAP,
-		SCREEN_RESOURCE_PLAIN_TEXT,
-		SCREEN_RESOURCE_HOSTS_INFO,
-		SCREEN_RESOURCE_TRIGGERS_INFO,
-		SCREEN_RESOURCE_SERVER_INFO,
-		SCREEN_RESOURCE_CLOCK,
-		SCREEN_RESOURCE_SCREEN,
-		SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-		SCREEN_RESOURCE_DATA_OVERVIEW,
-		SCREEN_RESOURCE_URL,
-		SCREEN_RESOURCE_ACTIONS,
-		SCREEN_RESOURCE_EVENTS,
-		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-		SCREEN_RESOURCE_SYSTEM_STATUS,
-		SCREEN_RESOURCE_HOST_TRIGGERS
-	);
-
 	protected $sortColumns = array(
 		'screenitemid',
 		'screenid'
@@ -75,7 +50,7 @@ class CTemplateScreenItem extends CApiService {
 	}
 
 	/**
-	 * Get screem item data.
+	 * Get screen item data.
 	 *
 	 * @param array $options
 	 * @param array $options['hostid']			Use hostid to get real resource id
