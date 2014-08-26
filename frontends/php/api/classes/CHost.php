@@ -2156,7 +2156,6 @@ class CHost extends CHostGeneral {
 // TODO: remove info from API
 		foreach ($hosts as $host) {
 			info(_s('Deleted: Host "%1$s".', $host['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
 
 		return array('hostids' => $hostids);

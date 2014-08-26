@@ -1245,8 +1245,6 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($delTriggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
 					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
-					$trigger['description'], null, null, null);
 		}
 
 		// execute delete
@@ -1480,8 +1478,6 @@ class CTrigger extends CTriggerGeneral {
 			));
 
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
-					$trigger['description'], null, null, null);
 		}
 	}
 
@@ -1584,8 +1580,6 @@ class CTrigger extends CTriggerGeneral {
 			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $expressionFull;
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],
-					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
 		}
 		unset($trigger);
 

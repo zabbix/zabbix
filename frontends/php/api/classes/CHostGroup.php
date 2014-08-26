@@ -863,11 +863,6 @@ class CHostGroup extends CZBXAPI {
 			'groupid' => $groupids
 		));
 
-		// TODO: remove audit
-		foreach ($groupids as $groupid) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
-		}
-
 		return array('groupids' => $groupids);
 	}
 
