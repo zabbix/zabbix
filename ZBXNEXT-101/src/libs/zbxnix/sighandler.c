@@ -73,11 +73,11 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	{
 		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
-				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%u,"
 				"reason:%d]. Exiting ...",
 				sig, get_signal_name(sig),
 				SIG_CHECKED_FIELD(siginfo, si_pid),
-				SIG_CHECKED_FIELD(siginfo, si_uid),
+				SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
 				SIG_CHECKED_FIELD(siginfo, si_code));
 		exit(FAIL);
 	}
@@ -88,11 +88,11 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			sig_exiting = 1;
 			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
-					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%u,"
 					"reason:%d]. Exiting ...",
 					sig, get_signal_name(sig),
 					SIG_CHECKED_FIELD(siginfo, si_pid),
-					SIG_CHECKED_FIELD(siginfo, si_uid),
+					SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
 					SIG_CHECKED_FIELD(siginfo, si_code));
 			zbx_on_exit();
 		}
