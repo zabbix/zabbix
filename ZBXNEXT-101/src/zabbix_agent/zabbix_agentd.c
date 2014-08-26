@@ -251,7 +251,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
 					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
-						&t->flags, ZBX_RTC_LOG_LEVEL_INCREASE))
+						ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
 					}
@@ -261,7 +261,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 						strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
 					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
-						&t->flags, ZBX_RTC_LOG_LEVEL_DECREASE))
+						ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
 					}

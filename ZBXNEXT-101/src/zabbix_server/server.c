@@ -613,8 +613,8 @@ int	main(int argc, char **argv)
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset, &t.flags,
-							ZBX_RTC_LOG_LEVEL_INCREASE))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+							ZBX_RTC_LOG_LEVEL_INCREASE, &t.flags))
 					{
 						exit(EXIT_FAILURE);
 					}
@@ -622,8 +622,8 @@ int	main(int argc, char **argv)
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
 						offset = strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset, &t.flags,
-							ZBX_RTC_LOG_LEVEL_DECREASE))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+							ZBX_RTC_LOG_LEVEL_DECREASE, &t.flags))
 					{
 						exit(EXIT_FAILURE);
 					}
