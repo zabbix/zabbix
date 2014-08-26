@@ -60,16 +60,19 @@ $fields = array(
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete"'),	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name"'),					null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
-$percentVisible = get_request('visible');
+$percentVisible = getRequest('visible');
 if (!isset($percentVisible['percent_left'])) {
 	unset($_REQUEST['percent_left']);
 }
@@ -83,12 +86,10 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
 
-$_REQUEST['go'] = get_request('go', 'none');
-$_REQUEST['items'] = get_request('items', array());
-$_REQUEST['show_3d'] = get_request('show_3d', 0);
-$_REQUEST['show_legend'] = get_request('show_legend', 0);
+$_REQUEST['items'] = getRequest('items', array());
+$_REQUEST['show_3d'] = getRequest('show_3d', 0);
+$_REQUEST['show_legend'] = getRequest('show_legend', 0);
 
 /*
  * Permissions
@@ -271,8 +272,11 @@ elseif (hasRequest('save')) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows($cookieId);
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, $cookieId);
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
@@ -280,38 +284,46 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete(array($graphId));
 
+		if ($result) {
+			uncheckTableRows(getRequest('parent_discoveryid'));
+		}
 		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
-		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
 		$result = API::Graph()->delete(array($graphId));
 
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
-		clearCookies($result, getRequest('hostid'));
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
+elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
 
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
 
+		if ($result) {
+			uncheckTableRows(getRequest('parent_discoveryid'));
+		}
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
-		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
 
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
-		clearCookies($result, getRequest('hostid'));
 	}
-} elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
+} elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
-		$goResult = true;
+		$result = true;
 
 		$options = array(
 			'output' => array('hostid'),
@@ -348,17 +360,18 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$goResult &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
 			}
 		}
-		$goResult = DBend($goResult);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
-		clearCookies($goResult,
-			getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
-		);
-
-		$_REQUEST['go'] = 'none2';
+		if ($result) {
+			uncheckTableRows(
+				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
+			);
+			unset($_REQUEST['group_graphid']);
+		}
+		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
 	}
 	else {
 		error(_('No target selected.'));
@@ -378,8 +391,8 @@ $pageFilter = new CPageFilter(array(
 		'editable' => true,
 		'templated_hosts' => true
 	),
-	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null)
+	'groupid' => getRequest('groupid'),
+	'hostid' => getRequest('hostid')
 ));
 
 if (empty($_REQUEST['parent_discoveryid'])) {
@@ -391,21 +404,23 @@ if (empty($_REQUEST['parent_discoveryid'])) {
 	}
 }
 
-if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
+if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
+	$data = getCopyElementsFormData('group_graphid');
+	$data['action'] = 'graph.masscopyto';
+	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
-		'graphid' => get_request('graphid', 0),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'group_gid' => get_request('group_gid', array()),
-		'hostid' => get_request('hostid', 0),
-		'normal_only' => get_request('normal_only')
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'graphid' => getRequest('graphid', 0),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'group_gid' => getRequest('group_gid', array()),
+		'hostid' => getRequest('hostid', 0),
+		'normal_only' => getRequest('normal_only')
 	);
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
@@ -449,7 +464,7 @@ elseif (isset($_REQUEST['form'])) {
 				$parentGraph = getGraphByGraphId($parentGraphid);
 
 				// parent graph prototype link
-				if (get_request('parent_discoveryid')) {
+				if (getRequest('parent_discoveryid')) {
 					$parentGraphPrototype = API::GraphPrototype()->get(array(
 						'output' => array('graphid'),
 						'graphids' => $parentGraph['graphid'],
@@ -476,7 +491,7 @@ elseif (isset($_REQUEST['form'])) {
 				}
 				if (isset($link)) {
 					$data['templates'][] = $link;
-					$data['templates'][] = SPACE.RARR.SPACE;
+					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);
@@ -494,39 +509,39 @@ elseif (isset($_REQUEST['form'])) {
 		));
 	}
 	else {
-		$data['name'] = get_request('name', '');
-		$data['graphtype'] = get_request('graphtype', GRAPH_TYPE_NORMAL);
+		$data['name'] = getRequest('name', '');
+		$data['graphtype'] = getRequest('graphtype', GRAPH_TYPE_NORMAL);
 
 		if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			$data['width'] = get_request('width', 400);
-			$data['height'] = get_request('height', 300);
+			$data['width'] = getRequest('width', 400);
+			$data['height'] = getRequest('height', 300);
 		}
 		else {
-			$data['width'] = get_request('width', 900);
-			$data['height'] = get_request('height', 200);
+			$data['width'] = getRequest('width', 900);
+			$data['height'] = getRequest('height', 200);
 		}
 
-		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['yaxismin'] = get_request('yaxismin', 0);
-		$data['yaxismax'] = get_request('yaxismax', 100);
-		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
-		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
-		$data['show_work_period'] = get_request('show_work_period', 0);
-		$data['show_triggers'] = get_request('show_triggers', 0);
-		$data['show_legend'] = get_request('show_legend', 0);
-		$data['show_3d'] = get_request('show_3d', 0);
-		$data['visible'] = get_request('visible');
+		$data['ymin_type'] = getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['ymax_type'] = getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['yaxismin'] = getRequest('yaxismin', 0);
+		$data['yaxismax'] = getRequest('yaxismax', 100);
+		$data['ymin_itemid'] = getRequest('ymin_itemid', 0);
+		$data['ymax_itemid'] = getRequest('ymax_itemid', 0);
+		$data['show_work_period'] = getRequest('show_work_period', 0);
+		$data['show_triggers'] = getRequest('show_triggers', 0);
+		$data['show_legend'] = getRequest('show_legend', 0);
+		$data['show_3d'] = getRequest('show_3d', 0);
+		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = get_request('visible');
-		$data['items'] = get_request('items', array());
+		$data['visible'] = getRequest('visible');
+		$data['items'] = getRequest('items', array());
 
 		if (isset($data['visible']['percent_left'])) {
-			$data['percent_left'] = get_request('percent_left', 0);
+			$data['percent_left'] = getRequest('percent_left', 0);
 		}
 		if (isset($data['visible']['percent_right'])) {
-			$data['percent_right'] = get_request('percent_right', 0);
+			$data['percent_right'] = getRequest('percent_right', 0);
 		}
 	}
 
@@ -594,22 +609,27 @@ elseif (isset($_REQUEST['form'])) {
 	$graphView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
-		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
 
 	// get graphs
 	$options = array(
 		'hostids' => $data['hostid'] ? $data['hostid'] : null,
 		'groupids' => (!$data['hostid'] && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
-		'discoveryids' => empty($_REQUEST['parent_discoveryid']) ? null : get_request('parent_discoveryid'),
+		'discoveryids' => empty($_REQUEST['parent_discoveryid']) ? null : getRequest('parent_discoveryid'),
 		'editable' => true,
 		'output' => array('graphid', 'name', 'graphtype'),
 		'limit' => $config['search_limit'] + 1
@@ -619,13 +639,13 @@ else {
 		? API::Graph()->get($options)
 		: API::GraphPrototype()->get($options);
 
-	if ($sortfield == 'graphtype') {
+	if ($sortField == 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['graphs']);
 
@@ -646,7 +666,7 @@ else {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);

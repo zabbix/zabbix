@@ -1335,7 +1335,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 				else
 				{
 					if (FAIL == ret)
-						goto out;
+						goto clean;
 
 					ret = condition_result;
 					old_type = condition.conditiontype;
@@ -1385,7 +1385,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 	}
 clean:
 	DBfree_result(result);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

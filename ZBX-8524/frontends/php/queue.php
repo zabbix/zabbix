@@ -43,7 +43,7 @@ $fields = array(
 
 check_fields($fields);
 
-$config = get_request('config', CProfile::get('web.queue.config', 0));
+$config = getRequest('config', CProfile::get('web.queue.config', 0));
 CProfile::update('web.queue.config', $config, PROFILE_TYPE_INT);
 
 // fetch data

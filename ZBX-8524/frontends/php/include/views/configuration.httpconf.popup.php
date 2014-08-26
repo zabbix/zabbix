@@ -75,16 +75,16 @@ if (hasRequest('save') && $result) {
 }
 else {
 	$httpPopupForm = new CForm();
-	$httpPopupForm->addVar('dstfrm', getRequest('dstfrm', null));
-	$httpPopupForm->addVar('stepid', getRequest('stepid', null));
-	$httpPopupForm->addVar('list_name', getRequest('list_name', null));
-	$httpPopupForm->addVar('templated', getRequest('templated', null));
-	$httpPopupForm->addVar('old_name', getRequest('old_name', null));
-	$httpPopupForm->addVar('steps_names', getRequest('steps_names', null));
+	$httpPopupForm->addVar('dstfrm', getRequest('dstfrm'));
+	$httpPopupForm->addVar('stepid', getRequest('stepid'));
+	$httpPopupForm->addVar('list_name', getRequest('list_name'));
+	$httpPopupForm->addVar('templated', getRequest('templated'));
+	$httpPopupForm->addVar('old_name', getRequest('old_name'));
+	$httpPopupForm->addVar('steps_names', getRequest('steps_names'));
 
 	$httpPopupFormList = new CFormList('httpPopupFormList');
-	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, getRequest('templated', null), 64));
-	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, 'no', null));
+	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64));
+	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')));
 	$httpPopupFormList->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')));
 
@@ -104,7 +104,7 @@ else {
 	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
-	$stepid = getRequest('stepid', null);
+	$stepid = getRequest('stepid');
 	$httpPopupForm->addItem(makeFormFooter(
 		new CSubmit('save', isset($stepid) ? _('Update') : _('Add')),
 		new CButtonCancel(null, 'close_window();')

@@ -69,7 +69,7 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	}
 }
 else {
-	$period = get_request('period', 7 * 24);
+	$period = getRequest('period', 7 * 24);
 	$period_end = time();
 
 	switch ($period) {

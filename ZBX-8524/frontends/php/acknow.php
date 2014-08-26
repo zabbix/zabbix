@@ -32,8 +32,7 @@ ob_start();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$_REQUEST['go'] = get_request('go', null);
-$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
+$bulk = (getRequest('action', '') == 'trigger.bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -45,14 +44,14 @@ $fields = array(
 	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null),
 	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
 );
 check_fields($fields);
 
-$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
+$_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
 
 /*
  * Redirect
@@ -83,9 +82,9 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	show_message(_('No events to acknowledge'));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
-elseif (get_request('eventid')) {
+elseif (getRequest('eventid')) {
 	$event = API::Event()->get(array(
-		'eventids' => get_request('eventid'),
+		'eventids' => getRequest('eventid'),
 		'output' => array('eventid'),
 		'limit' => 1
 	));
@@ -93,9 +92,9 @@ elseif (get_request('eventid')) {
 		access_deny();
 	}
 }
-elseif (get_request('triggers')) {
+elseif (getRequest('triggers')) {
 	$trigger = API::Trigger()->get(array(
-		'triggerids' => get_request('triggers'),
+		'triggerids' => getRequest('triggers'),
 		'output' => array('triggerid'),
 		'limit' => 1
 	));
@@ -194,7 +193,7 @@ ob_end_flush();
  */
 show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
 
-echo SBR;
+echo BR();
 
 if ($bulk) {
 	$title = _('Acknowledge alarm by');

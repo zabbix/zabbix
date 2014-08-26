@@ -48,24 +48,21 @@ $fields = array(
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'enableConfirmation' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'action' =>				array(T_ZBX_INT, O_OPT, P_ACT,			IN('0,1'),	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"script.massdelete"'),		null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"command","name"'),						null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-
-$_REQUEST['go'] = get_request('go', 'none');
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions
  */
-if ($scriptId = get_request('scriptid')) {
+if ($scriptId = getRequest('scriptid')) {
 	$scripts = API::Script()->get(array(
 		'scriptids' => $scriptId,
 		'output' => array('scriptid')
@@ -78,13 +75,9 @@ if ($scriptId = get_request('scriptid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])) {
-	unset($_REQUEST['scriptid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['save'])) {
-	$confirmation = get_request('confirmation', '');
-	$enableConfirmation = get_request('enableConfirmation', false);
+if (isset($_REQUEST['save'])) {
+	$confirmation = getRequest('confirmation', '');
+	$enableConfirmation = getRequest('enableConfirmation', false);
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
 
 	if (empty($_REQUEST['hgstype'])) {
@@ -109,7 +102,7 @@ elseif (isset($_REQUEST['save'])) {
 			'usrgrpid' => $_REQUEST['usrgrpid'],
 			'groupid' => $_REQUEST['groupid'],
 			'host_access' => getRequest('host_access'),
-			'confirmation' => get_request('confirmation', '')
+			'confirmation' => getRequest('confirmation', '')
 		);
 
 		DBstart();
@@ -134,16 +127,19 @@ elseif (isset($_REQUEST['save'])) {
 
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
-			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
+			unset($_REQUEST['form'], $_REQUEST['scriptid']);
 		}
 
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
-elseif (isset($_REQUEST['delete'])) {
-	$scriptId = get_request('scriptid', 0);
+elseif (hasRequest('delete') && hasRequest('scriptid')) {
+	$scriptId = getRequest('scriptid');
 
 	DBstart();
 
@@ -155,11 +151,14 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
-	$scriptIds = $_REQUEST['scripts'];
+elseif (hasRequest('action') && getRequest('action') == 'script.massdelete' && hasRequest('scripts')) {
+	$scriptIds = getRequest('scripts');
 
 	DBstart();
 
@@ -173,8 +172,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
-	clearCookies($result);
 }
 
 /*
@@ -182,24 +184,24 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0),
-		'scriptid' => get_request('scriptid')
+		'form' => getRequest('form', 1),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'scriptid' => getRequest('scriptid')
 	);
 
 	if (!$data['scriptid'] || isset($_REQUEST['form_refresh'])) {
-		$data['name'] = get_request('name', '');
-		$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
-		$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
-		$data['command'] = get_request('command', '');
-		$data['commandipmi'] = get_request('commandipmi', '');
-		$data['description'] = get_request('description', '');
-		$data['usrgrpid'] = get_request('usrgrpid', 0);
-		$data['groupid'] = get_request('groupid', 0);
+		$data['name'] = getRequest('name', '');
+		$data['type'] = getRequest('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
+		$data['execute_on'] = getRequest('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
+		$data['command'] = getRequest('command', '');
+		$data['commandipmi'] = getRequest('commandipmi', '');
+		$data['description'] = getRequest('description', '');
+		$data['usrgrpid'] = getRequest('usrgrpid', 0);
+		$data['groupid'] = getRequest('groupid', 0);
 		$data['host_access'] = getRequest('host_access', 0);
-		$data['confirmation'] = get_request('confirmation', '');
-		$data['enableConfirmation'] = get_request('enableConfirmation', false);
-		$data['hgstype'] = get_request('hgstype', 0);
+		$data['confirmation'] = getRequest('confirmation', '');
+		$data['enableConfirmation'] = getRequest('enableConfirmation', false);
+		$data['hgstype'] = getRequest('hgstype', 0);
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(
@@ -251,7 +253,16 @@ if (isset($_REQUEST['form'])) {
 	$scriptView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
@@ -285,7 +296,7 @@ else {
 	}
 
 	// sorting & paging
-	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
+	order_result($data['scripts'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view

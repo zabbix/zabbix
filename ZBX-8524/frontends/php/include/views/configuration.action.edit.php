@@ -248,7 +248,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
@@ -261,7 +261,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
@@ -274,7 +274,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
@@ -358,7 +358,7 @@ $operationFormList = new CFormList('operationlist');
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationFormList->addRow(_('Default operation step duration'), array(
-		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
+		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6),
 		' ('._('minimum 60 seconds').')')
 	);
 }
@@ -456,6 +456,7 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
+	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[id]', $this->data['new_operation']['id']));
@@ -1007,7 +1008,7 @@ if (!empty($this->data['new_operation'])) {
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 
-		$new_opcondition = get_request('new_opcondition', array());
+		$new_opcondition = getRequest('new_opcondition', array());
 		if (!is_array($new_opcondition)) {
 			$new_opcondition = array();
 		}

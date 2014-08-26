@@ -57,7 +57,7 @@ return array(
 			'host' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'status' => array(
@@ -220,7 +220,7 @@ return array(
 			'name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'flags' => array(
@@ -489,6 +489,12 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			),
+			'max_columns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
 			),
 		),
 	),

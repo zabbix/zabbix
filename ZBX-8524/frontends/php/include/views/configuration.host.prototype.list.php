@@ -45,9 +45,9 @@ $hostTable = new CTableInfo(_('No host prototypes found.'));
 
 $hostTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
-	make_sorting_header(_('Name'),'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),
-	make_sorting_header(_('Status'),'status')
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
@@ -98,8 +98,13 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = new CLink(item_status2str($hostPrototype['status']),
-		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoveryRule['itemid'].
-		'&go='.($hostPrototype['status'] ? 'activate' : 'disable'), itemIndicatorStyle($hostPrototype['status'])
+		'?group_hostid='.$hostPrototype['hostid'].
+			'&parent_discoveryid='.$discoveryRule['itemid'].
+			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
+				? 'hostprototype.massenable'
+				: 'hostprototype.massdisable'
+			),
+		itemIndicatorStyle($hostPrototype['status'])
 	);
 
 	$hostTable->addRow(array(
@@ -111,16 +116,16 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+$goOption = new CComboItem('hostprototype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected host prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('hostprototype.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected host prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('hostprototype.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected host prototypes?'));
 $goComboBox->addItem($goOption);
 

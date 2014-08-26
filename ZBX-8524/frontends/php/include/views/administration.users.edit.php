@@ -33,7 +33,7 @@ else {
 // create form
 $userForm = new CForm();
 $userForm->setName('userForm');
-$userForm->addVar('config', get_request('config', 0));
+$userForm->addVar('config', getRequest('config', 0));
 $userForm->addVar('form', $this->data['form']);
 
 if (isset($_REQUEST['userid'])) {

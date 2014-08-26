@@ -572,7 +572,8 @@ class CConfigurationExportBuilder {
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
-				'valuemap' => $item['valuemap']
+				'valuemap' => $item['valuemap'],
+				'logtimefmt' => $item['logtimefmt']
 			);
 
 			if (isset($item['interface_ref'])) {
@@ -699,6 +700,7 @@ class CConfigurationExportBuilder {
 				'dynamic' => $screenItem['dynamic'],
 				'sort_triggers' => $screenItem['sort_triggers'],
 				'resource' => $screenItem['resourceid'],
+				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
 			);
 		}

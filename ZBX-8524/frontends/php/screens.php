@@ -45,13 +45,13 @@ $fields = array(
 	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
+	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove'"), null)
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null)
 );
 check_fields($fields);
 
@@ -60,8 +60,8 @@ check_fields($fields);
  */
 // validate group IDs
 $validateGroupIds = array_filter(array(
-	get_request('groupid'),
-	get_request('tr_groupid')
+	getRequest('groupid'),
+	getRequest('tr_groupid')
 ));
 if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
 	access_deny();
@@ -69,14 +69,14 @@ if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
 
 // validate host IDs
 $validateHostIds = array_filter(array(
-	get_request('hostid'),
-	get_request('tr_hostid')
+	getRequest('hostid'),
+	getRequest('tr_hostid')
 ));
 if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
 	access_deny();
 }
 
-if (get_request('elementid')) {
+if (getRequest('elementid')) {
 	$screens = API::Screen()->get(array(
 		'screenids' => array($_REQUEST['elementid']),
 		'output' => array('screenid')
@@ -142,9 +142,9 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
-	'period' => get_request('period'),
-	'stime' => get_request('stime'),
-	'elementid' => get_request('elementid', false),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime'),
+	'elementid' => getRequest('elementid', false),
 
 	// whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	'use_screen_name' => isset($_REQUEST['screenname'])
@@ -163,7 +163,7 @@ $data['screens'] = API::Screen()->get(array(
 // if screen name is provided it takes priority over elementid
 if ($data['use_screen_name']) {
 	$data['screens'] = zbx_toHash($data['screens'], 'name');
-	$data['elementIdentifier'] = get_request('screenname');
+	$data['elementIdentifier'] = getRequest('screenname');
 }
 else {
 	$data['screens'] = zbx_toHash($data['screens'], 'screenid');

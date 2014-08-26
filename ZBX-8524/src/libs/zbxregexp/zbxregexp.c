@@ -26,11 +26,12 @@
 
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
-	char		*c = NULL;
-	static char	*old_pattern = NULL;
-	static int	old_flags;
-	static regex_t	re;
-	regmatch_t	match;
+	ZBX_THREAD_LOCAL static char	*old_pattern = NULL;
+	ZBX_THREAD_LOCAL static int	old_flags;
+	ZBX_THREAD_LOCAL static regex_t	re;
+
+	char				*c = NULL;
+	regmatch_t			match;
 
 	if (NULL != len)
 		*len = 0;
@@ -55,6 +56,11 @@ compile:
 	}
 	else
 	{
+#ifdef _WINDOWS
+		/* the Windows gnuregex implementation does not correctly clean up */
+		/* allocated memory after regcomp() failure                        */
+		regfree(&re);
+#endif
 		zbx_free(old_pattern);
 		goto out;
 	}
@@ -192,11 +198,12 @@ out:
  *********************************************************************************/
 static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
 {
-	static regex_t	re;
-	regmatch_t	match[10];	/* up to 10 capture groups in regexp */
-	char		*ptr = NULL;
-	static char	*old_pattern = NULL;
-	static int	old_flags;
+	ZBX_THREAD_LOCAL static char	*old_pattern = NULL;
+	ZBX_THREAD_LOCAL static int	old_flags;
+	ZBX_THREAD_LOCAL static regex_t	re;
+
+	regmatch_t			match[10];	/* up to 10 capture groups in regexp */
+	char				*ptr = NULL;
 
 	if (NULL == string)
 		return NULL;
@@ -221,6 +228,11 @@ compile:
 	}
 	else
 	{
+#ifdef _WINDOWS
+		/* the Windows gnuregex implementation does not correctly clean up */
+		/* allocated memory after regcomp() failure                        */
+		regfree(&re);
+#endif
 		zbx_free(old_pattern);
 		return NULL;
 	}
