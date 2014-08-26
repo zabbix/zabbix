@@ -864,7 +864,7 @@ void	zbx_sigusr_handler(int flags)
 
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t;
+	ZBX_TASK_EX	t = {ZBX_TASK_START};
 #ifdef _WINDOWS
 	int		ret;
 
@@ -877,9 +877,6 @@ int	main(int argc, char **argv)
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
-	memset(&t, 0, sizeof(t));
-	t.task = ZBX_TASK_START;
-
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv, &t);
@@ -897,6 +894,8 @@ int	main(int argc, char **argv)
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_SEND_MESSAGE:
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -961,13 +960,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}
-#ifndef _WINDOWS
-	if (ZBX_TASK_SEND_MESSAGE == t.task)
-	{
-		zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
-		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
-	}
-#endif
+
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
 	exit(SUCCEED);
