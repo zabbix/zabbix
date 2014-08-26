@@ -633,7 +633,7 @@ int	main(int argc, char **argv)
 					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
-				t.task = ZBX_TASK_SEND_MESSAGE;
+				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
 				help();
@@ -658,7 +658,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_SEND_MESSAGE == t.task)
+	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
 		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
