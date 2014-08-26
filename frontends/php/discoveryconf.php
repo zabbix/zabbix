@@ -42,19 +42,23 @@ $fields = array(
 	'g_druleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'dchecks' =>		array(null, O_OPT, null,		null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN('"drule.massdelete","drule.massdisable","drule.massenable"'),
+							null
+						),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'output' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'ajaxaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
+	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 $_REQUEST['dchecks'] = getRequest('dchecks', array());
@@ -77,8 +81,6 @@ if (isset($_REQUEST['druleid'])) {
 		access_deny();
 	}
 }
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 // ajax
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
@@ -175,9 +177,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 	}
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_druleid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('drule.massenable', 'drule.massdisable')) && hasRequest('g_druleid')) {
 	$result = true;
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'drule.massenable');
 	$status = $enable ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
@@ -185,7 +187,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	DBStart();
 
 	foreach (getRequest('g_druleid') as $druleId) {
-		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
+		$result &= DBexecute('UPDATE drules SET status='.zbx_dbstr($status).' WHERE druleid='.zbx_dbstr($druleId));
 
 		if ($result) {
 			$druleData = get_discovery_rule_by_druleid($druleId);
@@ -209,8 +211,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
-	$result = API::DRule()->delete($_REQUEST['g_druleid']);
+elseif (hasRequest('action') && getRequest('action') == 'drule.massdelete' && hasRequest('g_druleid')) {
+	$result = API::DRule()->delete(getRequest('g_druleid'));
 
 	if ($result) {
 		uncheckTableRows();
@@ -277,7 +279,16 @@ if (isset($_REQUEST['form'])) {
 	$discoveryView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
@@ -309,7 +320,7 @@ else {
 			}
 		}
 
-		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
+		order_result($data['drules'], $sortField, $sortOrder);
 	}
 
 	// get paging

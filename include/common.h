@@ -808,7 +808,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 		size_t maxerrlen);
 
 void	remove_param(char *param, int num);
-const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -881,7 +880,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
-size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
+void	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
@@ -920,11 +919,12 @@ void	zbx_on_exit(); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
-int	ip_in_list(char *list, char *ip);
+int	ip_in_list(char *list, const char *ip);
 
-int	expand_ipv6(const char *ip, char *str, size_t str_len);
+int	ip4_str2dig(const char *ip, unsigned int *ip_dig);
+int	ip6_str2dig(const char *ip, unsigned short *groups);
 #ifdef HAVE_IPV6
-char	*collapse_ipv6(char *str, size_t str_len);
+void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len);
 #endif
 
 /* time related functions */

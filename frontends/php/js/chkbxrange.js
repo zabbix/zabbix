@@ -249,7 +249,7 @@ var chkbxRange = {
 		var goButton = jQuery('#goButton');
 		goButton.val(goButton.val().split(' ')[0] + ' (' + count + ')')
 			.prop('disabled', count == 0);
-		jQuery('#go').prop('disabled', count == 0);
+		jQuery('#action').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
