@@ -58,6 +58,7 @@ $availableJScripts = array(
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
+	'chkbxrange.js' => '',
 	// vendors
 	'prototype.js' => '',
 	'jquery.js' => 'jquery/',
@@ -247,6 +248,7 @@ if (empty($_GET['files'])) {
 		'class.bbcode.js',
 		'class.csuggest.js',
 		'main.js',
+		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
 		'init.js'

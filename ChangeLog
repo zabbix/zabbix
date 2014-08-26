@@ -1,6 +1,7 @@
 Changes for 2.3.4
 
 New features:
+..F....... [ZBXNEXT-570] implemented the ability to quickly display items on a graph from the latest data page (Ivo, Pavels)
 .......PS. [ZBX-8367] added recalculating of unsupported items queue when changed "Refresh unsupported items" parameter (Juris, Sasha)
 A.F....... [ZBXNEXT-1583] implemented new screen element types - "Graph prototype" and "Simple graph prototype" (Krists)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
