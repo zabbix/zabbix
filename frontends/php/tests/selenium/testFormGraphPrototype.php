@@ -1230,7 +1230,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestClickWait("link=Graph prototypes");
 
 			$this->zbxTestCheckboxSelect("group_graphid_$graphid");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

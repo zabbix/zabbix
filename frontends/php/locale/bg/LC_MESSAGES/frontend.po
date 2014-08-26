@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 13:25+0300\n"
+"POT-Creation-Date: 2014-08-25 14:56+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -18,8 +18,8 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
 #: include/classes/api/services/CMaintenance.php:513
-#: include/classes/api/services/CMaintenance.php:518 maintenance.php:151
-#: maintenance.php:163 services.php:193 services.php:207
+#: include/classes/api/services/CMaintenance.php:518 maintenance.php:150
+#: maintenance.php:162 services.php:193 services.php:207
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" трябва да бъде между 1970.01.01 и 2038.01.18"
@@ -108,7 +108,7 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:483
+#: include/views/configuration.action.edit.php:484
 msgid "(0 - infinitely)"
 msgstr "(0 - безкрайно)"
 
@@ -126,7 +126,7 @@ msgstr "(в дни)"
 msgid "(in sec)"
 msgstr "(в сек)"
 
-#: include/views/configuration.action.edit.php:494
+#: include/views/configuration.action.edit.php:495
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(минимум 60 секунди, 0 - използване подразбиращото се)"
 
@@ -145,7 +145,7 @@ msgstr ""
 msgid "-"
 msgstr ""
 
-#: acknow.php:135
+#: acknow.php:134
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ОБЩО ПОТВЪРЖДАВАНЕ]----"
 
@@ -204,7 +204,7 @@ msgstr ""
 msgid "AES"
 msgstr ""
 
-#: acknow.php:195
+#: acknow.php:194
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ПОТВЪРЖДАВАНЕ НА АЛАРМА"
 
@@ -255,23 +255,23 @@ msgstr "Акаунтът е блокиран за %s секунди"
 
 #: events.php:481 include/actions.inc.php:232 include/blocks.inc.php:1005
 #: include/blocks.inc.php:1299 include/events.inc.php:197
-#: include/events.inc.php:272 include/views/configuration.action.edit.php:1041
+#: include/events.inc.php:272 include/views/configuration.action.edit.php:1042
 msgid "Ack"
 msgstr "Потвърдено"
 
-#: acknow.php:234 jsLoader.php:180 tr_status.php:689
+#: acknow.php:233 jsLoader.php:180 tr_status.php:689
 msgid "Acknowledge"
 msgstr "Потвърждавам"
 
-#: acknow.php:161
+#: acknow.php:160
 msgid "Acknowledge added"
 msgstr "Потвърждение добавено"
 
-#: acknow.php:200 acknow.php:233
+#: acknow.php:199 acknow.php:232
 msgid "Acknowledge alarm by"
 msgstr "Потвърждение аларма от"
 
-#: acknow.php:201 acknow.php:235
+#: acknow.php:200 acknow.php:234
 msgid "Acknowledge and return"
 msgstr "Потвърждение и назад"
 
@@ -306,11 +306,11 @@ msgstr "Потвърждаване изключено"
 #: include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
-#: include/views/configuration.action.edit.php:552
-#: include/views/configuration.action.edit.php:561
-#: include/views/configuration.action.edit.php:677
-#: include/views/configuration.action.edit.php:947
-#: include/views/configuration.action.edit.php:1068
+#: include/views/configuration.action.edit.php:553
+#: include/views/configuration.action.edit.php:562
+#: include/views/configuration.action.edit.php:678
+#: include/views/configuration.action.edit.php:948
+#: include/views/configuration.action.edit.php:1069
 #: include/views/configuration.graph.edit.php:239
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.edit.php:688
@@ -324,7 +324,7 @@ msgstr "Потвърждаване изключено"
 #: include/views/configuration.template.edit.php:409
 #: include/views/configuration.triggers.edit.php:155
 #: include/views/configuration.triggers.edit.php:282
-#: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:272
+#: include/views/configuration.triggers.massupdate.php:88 tr_logform.php:272
 #: tr_logform.php:276
 msgid "Action"
 msgstr "Действие"
@@ -348,21 +348,21 @@ msgstr "В действието \"%1$s\" е зададена неправилн�
 msgid "Action \"%1$s\" no operations defined."
 msgstr ""
 
-#: actionconf.php:166
+#: actionconf.php:162
 msgid "Action added"
 msgstr "Действие добавено"
 
-#: actionconf.php:190
+#: actionconf.php:186
 msgid "Action deleted"
 msgstr "Действие изтрито"
 
-#: actionconf.php:342
+#: actionconf.php:338
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:341
+#: actionconf.php:337
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -379,7 +379,7 @@ msgstr ""
 msgid "Action operations"
 msgstr "Действие на операции"
 
-#: actionconf.php:155
+#: actionconf.php:151
 msgid "Action updated"
 msgstr "Действие актуализирано"
 
@@ -402,16 +402,16 @@ msgstr "Активно"
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:513
 #: include/views/configuration.maintenance.edit.php:89
-#: include/views/configuration.maintenance.list.php:46 maintenance.php:145
-#: maintenance.php:151
+#: include/views/configuration.maintenance.list.php:46 maintenance.php:144
+#: maintenance.php:150
 msgid "Active since"
 msgstr "Активно с"
 
 #: include/classes/api/services/CMaintenance.php:381
 #: include/classes/api/services/CMaintenance.php:518
 #: include/views/configuration.maintenance.edit.php:90
-#: include/views/configuration.maintenance.list.php:47 maintenance.php:159
-#: maintenance.php:163
+#: include/views/configuration.maintenance.list.php:47 maintenance.php:158
+#: maintenance.php:162
 msgid "Active till"
 msgstr "Активно до"
 
@@ -430,12 +430,12 @@ msgstr "Активно до"
 #: include/views/common.filter.trigger.php:132
 #: include/views/common.macros.php:69
 #: include/views/configuration.action.edit.php:350
-#: include/views/configuration.action.edit.php:556
-#: include/views/configuration.action.edit.php:565
-#: include/views/configuration.action.edit.php:850
-#: include/views/configuration.action.edit.php:904
-#: include/views/configuration.action.edit.php:1047
-#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:557
+#: include/views/configuration.action.edit.php:566
+#: include/views/configuration.action.edit.php:851
+#: include/views/configuration.action.edit.php:905
+#: include/views/configuration.action.edit.php:1048
+#: include/views/configuration.action.edit.php:1057
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.host.discovery.edit.php:237
 #: include/views/configuration.host.discovery.edit.php:326
@@ -459,7 +459,7 @@ msgstr "Активно до"
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:104
 #: include/views/configuration.triggers.edit.php:318
-#: include/views/configuration.triggers.massupdate.php:125
+#: include/views/configuration.triggers.massupdate.php:124
 #: include/views/js/adm.regexprs.edit.js.php:249
 #: include/views/js/configuration.action.edit.js.php:313
 #: include/views/js/configuration.discovery.edit.js.php:110
@@ -475,7 +475,7 @@ msgstr "Добави"
 msgid "Add child"
 msgstr ""
 
-#: acknow.php:228
+#: acknow.php:227
 msgid "Add comment by"
 msgstr "Добави коментар от"
 
@@ -507,7 +507,7 @@ msgstr "Добави прототип"
 msgid "Add to"
 msgstr "Добави към"
 
-#: charts.php:110 history.php:96 include/html.inc.php:189 maps.php:67
+#: charts.php:109 history.php:96 include/html.inc.php:189 maps.php:67
 #: screens.php:117
 msgid "Add to favourites"
 msgstr "Добави към любими"
@@ -516,7 +516,7 @@ msgstr "Добави към любими"
 msgid "Add to host group"
 msgstr "Добави към хост група"
 
-#: include/actions.inc.php:405 include/views/configuration.action.edit.php:871
+#: include/actions.inc.php:405 include/views/configuration.action.edit.php:872
 msgid "Add to host groups"
 msgstr "Добави към хост групи"
 
@@ -595,7 +595,7 @@ msgstr "Подравняване на иконите"
 #: include/views/administration.script.list.php:81
 #: include/views/administration.usergroups.edit.php:44
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:603
+#: include/views/configuration.action.edit.php:604
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
@@ -625,14 +625,14 @@ msgstr ""
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:120
-#: include/views/configuration.action.edit.php:988
+#: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:119
-#: include/views/configuration.action.edit.php:987
+#: include/views/configuration.action.edit.php:988
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
 msgstr ""
@@ -646,7 +646,7 @@ msgstr "Някой"
 msgid "Any character string included"
 msgstr "Всеки включващ символен низ"
 
-#: applications.php:117 httpconf.php:42 include/actions.inc.php:88
+#: applications.php:119 httpconf.php:42 include/actions.inc.php:88
 #: include/audit.inc.php:32 include/forms.inc.php:566
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:61
@@ -664,11 +664,11 @@ msgstr "Приложение"
 msgid "Application \"%1$s\" already exists."
 msgstr "Приложението \"%1$s\" вече съществува."
 
-#: applications.php:108
+#: applications.php:110
 msgid "Application added"
 msgstr "Приложение добавено"
 
-#: applications.php:160 applications.php:200
+#: applications.php:162 applications.php:202
 #, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
@@ -679,7 +679,7 @@ msgstr[1] "Приложение изтрито"
 msgid "Application error."
 msgstr "Грешка в приложението."
 
-#: applications.php:101
+#: applications.php:103
 msgid "Application updated"
 msgstr "Приложение актуализирано"
 
@@ -688,7 +688,7 @@ msgstr "Приложение актуализирано"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
 
-#: hosts.php:863 hosts.php:952 include/forms.inc.php:889
+#: hosts.php:862 hosts.php:951 include/forms.inc.php:889
 #: include/html.inc.php:361 include/html.inc.php:365
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:446
@@ -698,7 +698,7 @@ msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"
 #: include/views/configuration.template.edit.php:196
 #: include/views/conf.import.php:32 include/views/inventory.host.view.php:227
 #: popup.php:55 search.php:140 search.php:169 search.php:197 search.php:394
-#: search.php:422 search.php:454 templates.php:509 templates.php:567
+#: search.php:422 search.php:454 templates.php:510 templates.php:568
 msgid "Applications"
 msgstr "Приложения"
 
@@ -717,7 +717,7 @@ msgstr "Приближаване"
 msgid "Apr"
 msgstr "Апр"
 
-#: include/forms.inc.php:1685 include/func.inc.php:120
+#: include/forms.inc.php:1684 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:115
 msgid "April"
 msgstr "Април"
@@ -778,7 +778,7 @@ msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1766
+#: include/forms.inc.php:1765
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
 
@@ -820,7 +820,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Авг"
 
-#: include/forms.inc.php:1677 include/func.inc.php:124
+#: include/forms.inc.php:1676 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:119
 msgid "August"
 msgstr "Август"
@@ -837,7 +837,7 @@ msgstr "Автентификация"
 msgid "Authentication algorithm"
 msgstr "Алгоритъм за автентификация"
 
-#: include/views/configuration.action.edit.php:756
+#: include/views/configuration.action.edit.php:757
 #: include/views/configuration.host.discovery.edit.php:166
 #: include/views/configuration.item.edit.php:172
 #: include/views/configuration.item.massupdate.php:250
@@ -912,7 +912,7 @@ msgstr "Автоматично съответствие на икона"
 msgid "Automatic icon selection"
 msgstr "Автоматичен избор на икона"
 
-#: hosts.php:872
+#: hosts.php:871
 msgid "Availability"
 msgstr "Наличност"
 
@@ -1060,7 +1060,7 @@ msgstr "КОНФИГУРАЦИЯ НА ПРИЛОЖЕНИЯ"
 msgid "CONFIGURATION OF AUTHENTICATION"
 msgstr "КОНФИГУРАЦИЯ НА АВТЕНТИКАЦИЯ"
 
-#: host_discovery.php:343 include/views/configuration.discovery.edit.php:25
+#: host_discovery.php:345 include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 #: include/views/configuration.host.discovery.list.php:29
 msgid "CONFIGURATION OF DISCOVERY RULES"
@@ -1090,7 +1090,7 @@ msgstr "КОНФИГУРАЦИЯ НА ХОСТ ГРУПИ"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr ""
 
-#: hosts.php:702 hosts.php:767 hosts.php:819
+#: hosts.php:701 hosts.php:766 hosts.php:818
 msgid "CONFIGURATION OF HOSTS"
 msgstr "КОНФИГУРАЦИЯ НА ХОСТОВЕ"
 
@@ -1112,14 +1112,14 @@ msgstr "КОНФИГУРАЦИЯ НА ИЗОБРАЖЕНИЯ"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "КОНФИГУРАЦИЯ НА IT УСЛУГИТЕ"
 
-#: disc_prototypes.php:360
+#: disc_prototypes.php:366
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "КОНФИГУРАЦИЯ НА ЕЛЕМЕНТ НА ДАННИТЕ ПРОТОТИПИ"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:821
-#: items.php:956
+#: include/views/configuration.item.massupdate.php:28 items.php:825
+#: items.php:960
 msgid "CONFIGURATION OF ITEMS"
 msgstr "КОНФИГУРАЦИЯ НА елементи на данните"
 
@@ -1148,7 +1148,7 @@ msgstr "КОНФИГУРАЦИЯ КАРТИ НА МРЕЖАТА"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "КОНФИГУРАЦИЯ НА ПРОКСИТА"
 
-#: adm.regexps.php:231
+#: adm.regexps.php:220
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "КОНФИГУРАЦИЯ НА РЕГУЛЯРНИ ИЗРАЗИ"
 
@@ -1168,7 +1168,7 @@ msgstr "КОНФИГУРАЦИЯ НА СКРИПТОВЕ"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "КОНФИГУРАЦИЯ НА СЛАЙДШОУ"
 
-#: templates.php:434 templates.php:494
+#: templates.php:435 templates.php:495
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "КОНФИГУРАЦИЯ НА ШАБЛОНИТЕ"
 
@@ -1184,7 +1184,7 @@ msgstr "КОНФИГУРАЦИЯ ВАЖНОСТ НА ТРИГЕР "
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:345
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:351
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "КОНФИГУРАЦИЯ НА ТРИГЕРИ"
 
@@ -1269,8 +1269,8 @@ msgstr "Канада (136 символа)"
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:215
 #: include/views/administration.general.regularexpressions.edit.php:58
-#: include/views/configuration.action.edit.php:1049
-#: include/views/configuration.action.edit.php:1058
+#: include/views/configuration.action.edit.php:1050
+#: include/views/configuration.action.edit.php:1059
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.housekeeper.edit.js.php:127
@@ -1282,7 +1282,7 @@ msgstr "Канада (136 символа)"
 msgid "Cancel"
 msgstr "Отказ"
 
-#: acknow.php:168
+#: acknow.php:167
 msgid "Cannot acknowledge event"
 msgstr "Събитието не може да се потвърди"
 
@@ -1304,15 +1304,15 @@ msgstr ""
 msgid "Cannot add a non-numeric item \"%1$s\"."
 msgstr ""
 
-#: actionconf.php:167
+#: actionconf.php:163
 msgid "Cannot add action"
 msgstr "Не може да се добави действие"
 
-#: actionconf.php:252
+#: actionconf.php:248
 msgid "Cannot add action condition"
 msgstr ""
 
-#: applications.php:109
+#: applications.php:111
 msgid "Cannot add application"
 msgstr "Не може да се добави приложение"
 
@@ -1325,19 +1325,19 @@ msgstr "Не може да се добави зависимост от хост 
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Не може да се добави зависимост от тригер \"%1$s:%2$s\" към несъществуващ тригер \"%3$s:%4$s\"."
 
-#: host_discovery.php:295
+#: host_discovery.php:297
 msgid "Cannot add discovery rule"
 msgstr "Не може да се добави правило за откриване"
 
-#: graphs.php:256
+#: graphs.php:255
 msgid "Cannot add graph"
 msgstr "Не може да се добави графика"
 
-#: graphs.php:238
+#: graphs.php:237
 msgid "Cannot add graph prototype"
 msgstr ""
 
-#: hostgroups.php:117 usergrps.php:191
+#: hostgroups.php:120 usergrps.php:195
 msgid "Cannot add group"
 msgstr "Не може да се добави група"
 
@@ -1346,11 +1346,11 @@ msgstr "Не може да се добави група"
 msgid "Cannot add group."
 msgstr ""
 
-#: hosts.php:392
+#: hosts.php:394
 msgid "Cannot add host"
 msgstr "Не може да се добави потребител"
 
-#: host_prototypes.php:204
+#: host_prototypes.php:208
 msgid "Cannot add host prototype"
 msgstr ""
 
@@ -1362,7 +1362,7 @@ msgstr "Не може да се добави изображение"
 msgid "Cannot add image."
 msgstr "Не може да се добави изображение."
 
-#: items.php:488
+#: items.php:493
 msgid "Cannot add item"
 msgstr "Не може да се добави елемент на данните"
 
@@ -1371,7 +1371,7 @@ msgstr "Не може да се добави елемент на данните"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:295
+#: disc_prototypes.php:301
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1383,11 +1383,11 @@ msgstr ""
 msgid "Cannot add macro."
 msgstr "Не може да се добави макро."
 
-#: maintenance.php:132
+#: maintenance.php:131
 msgid "Cannot add maintenance"
 msgstr "Не може да се добави поддръжка"
 
-#: media_types.php:133
+#: media_types.php:134
 msgid "Cannot add media type"
 msgstr "Не може да се добави метод на уведомление"
 
@@ -1401,28 +1401,28 @@ msgstr "Не може да се добави повече от един елем
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr ""
 
-#: sysmaps.php:177
+#: sysmaps.php:175
 msgid "Cannot add network map"
 msgstr "Не може да се добави карта на мрежата"
 
-#: httpconf.php:258
+#: httpconf.php:261
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Не може да се добави ново приложение \"%1$s\"."
 
-#: proxies.php:118
+#: proxies.php:120
 msgid "Cannot add proxy"
 msgstr "Не може да се добави прокси"
 
-#: adm.regexps.php:146
+#: adm.regexps.php:141
 msgid "Cannot add regular expression"
 msgstr "Не може да се добави регулярен израз"
 
-#: screenconf.php:169
+#: screenconf.php:168
 msgid "Cannot add screen"
 msgstr "Не може да се добави екран"
 
-#: scripts.php:97 scripts.php:101 scripts.php:130
+#: scripts.php:89 scripts.php:93 scripts.php:122
 msgid "Cannot add script"
 msgstr "Не може да се добави скрипт"
 
@@ -1430,27 +1430,27 @@ msgstr "Не може да се добави скрипт"
 msgid "Cannot add service"
 msgstr "Не може да се добави услуга"
 
-#: slideconf.php:109
+#: slideconf.php:107
 msgid "Cannot add slide show"
 msgstr "Не може да се добави слайдшоу"
 
-#: templates.php:244
+#: templates.php:245
 msgid "Cannot add template"
 msgstr "Не може да се добави шаблон"
 
-#: triggers.php:186 triggers.php:314 tr_logform.php:147
+#: triggers.php:190 triggers.php:320 tr_logform.php:147
 msgid "Cannot add trigger"
 msgstr "Не може да се добави тригер"
 
-#: trigger_prototypes.php:171
+#: trigger_prototypes.php:175
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:249
+#: users.php:248
 msgid "Cannot add user"
 msgstr "Не може да се добави потребител"
 
-#: users.php:192
+#: users.php:191
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "Не може да се добави потребител. И двете пароли трябва да бъдат еднакви."
 
@@ -1462,7 +1462,7 @@ msgstr "Не може да се добавят потребители."
 msgid "Cannot add value map"
 msgstr "Не може да се добави стойност на реализациите"
 
-#: httpconf.php:195
+#: httpconf.php:198
 msgid "Cannot add web scenario"
 msgstr "Не може да се добави уеб сценарий"
 
@@ -1482,7 +1482,7 @@ msgstr "Не може да се промени метода на автенти�
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не може да се промени метода на автентификация на Zabbix вътрешен"
 
-#: httpconf.php:183 httpconf.php:404 items.php:515
+#: httpconf.php:186 httpconf.php:407 items.php:520
 msgid "Cannot clear history"
 msgstr "Не може да се изчисти историята"
 
@@ -1510,7 +1510,7 @@ msgstr "Не може да се свърже към трапер порта на
 msgid "Cannot copy graphs"
 msgstr "Не може да се копират графиките"
 
-#: items.php:739
+#: items.php:743
 msgid "Cannot copy items"
 msgstr "Не може да се копират елементите от данните"
 
@@ -1560,7 +1560,7 @@ msgstr "Не може да се създаде съответствие на и�
 msgid "Cannot create map \"%s\"."
 msgstr "Не може да се създаде карта  \"%s\"."
 
-#: httpconf.php:202
+#: httpconf.php:205
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не може да се създаде ново приложение, вече е възложен уеб сценарий за приложението."
 
@@ -1577,11 +1577,11 @@ msgstr ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не може да се изтрие Zabbix вътрешен потребител \"%1$s\", опитайте с изключване на този потребител."
 
-#: actionconf.php:190
+#: actionconf.php:186
 msgid "Cannot delete action"
 msgstr "Не може да се изтрие действието"
 
-#: applications.php:160 applications.php:201
+#: applications.php:162 applications.php:203
 #, fuzzy
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
@@ -1592,24 +1592,24 @@ msgstr[1] "Не може да се изтрие приложението"
 msgid "Cannot delete dependency"
 msgstr "Не може да се изтрие зависимостта"
 
-#: discoveryconf.php:178 host_discovery.php:183
+#: discoveryconf.php:178 host_discovery.php:185
 #: include/classes/api/services/CDiscoveryRule.php:430
 msgid "Cannot delete discovery rule"
 msgstr "Не може да се изтрие правило за откриване"
 
-#: discoveryconf.php:220 host_discovery.php:332
+#: discoveryconf.php:220 host_discovery.php:334
 msgid "Cannot delete discovery rules"
 msgstr "Не може да се изтрият правилата за откриване"
 
-#: graphs.php:299
+#: graphs.php:298
 msgid "Cannot delete graph"
 msgstr "Не може да се изтрие графиката"
 
-#: graphs.php:291 include/classes/api/services/CItemPrototype.php:511
+#: graphs.php:290 include/classes/api/services/CItemPrototype.php:511
 msgid "Cannot delete graph prototype"
 msgstr "Не може да се изтрие графичния прототип"
 
-#: graphs.php:315
+#: graphs.php:314
 msgid "Cannot delete graph prototypes"
 msgstr ""
 
@@ -1617,7 +1617,7 @@ msgstr ""
 msgid "Cannot delete graph."
 msgstr "Не може да се изтрие графиката."
 
-#: graphs.php:323
+#: graphs.php:322
 msgid "Cannot delete graphs"
 msgstr "Не може да се изтрият графиките"
 
@@ -1625,14 +1625,14 @@ msgstr "Не може да се изтрият графиките"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Не може да се изтрият графиките, създадени с ниско ниво на откриване."
 
-#: hostgroups.php:169 hostgroups.php:191 usergrps.php:224 usergrps.php:255
+#: hostgroups.php:172 hostgroups.php:194 usergrps.php:228 usergrps.php:259
 #, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Не може да се изтрие групата"
 msgstr[1] "Не може да се изтрие групата"
 
-#: hosts.php:632 hosts.php:647
+#: hosts.php:634 hosts.php:647
 msgid "Cannot delete host"
 msgstr "Не може да се изтрие хоста"
 
@@ -1644,7 +1644,7 @@ msgstr "Не може да се изтрие хост групата."
 msgid "Cannot delete host prototype."
 msgstr ""
 
-#: host_prototypes.php:124 host_prototypes.php:253
+#: host_prototypes.php:128 host_prototypes.php:257
 msgid "Cannot delete host prototypes"
 msgstr ""
 
@@ -1661,19 +1661,19 @@ msgstr "Не може да се изтрие изображението"
 msgid "Cannot delete inventory."
 msgstr "Не може да се изтрият инвентарните данни."
 
-#: items.php:377
+#: items.php:382
 msgid "Cannot delete item"
 msgstr "Не може да се изтрие елемент на данните"
 
-#: disc_prototypes.php:196
+#: disc_prototypes.php:202
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:336
+#: disc_prototypes.php:342
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:796
+#: items.php:800
 msgid "Cannot delete items"
 msgstr "Не може да се изтрият елементите от данните"
 
@@ -1681,33 +1681,33 @@ msgstr "Не може да се изтрият елементите от дан�
 msgid "Cannot delete items created by low level discovery."
 msgstr "Не може да се изтрият елементите от данните, създадени с ниско ниво на откриване."
 
-#: maintenance.php:252
+#: maintenance.php:251
 msgid "Cannot delete maintenance"
 msgstr "Не може да се изтрие поддръжката"
 
-#: media_types.php:156 media_types.php:193
+#: media_types.php:157 media_types.php:194
 msgid "Cannot delete media type"
 msgstr "Не може да се изтрие метод на уведомление"
 
-#: sysmaps.php:222
+#: sysmaps.php:220
 msgid "Cannot delete network map"
 msgstr "Не може да се изтрие картата на мрежата"
 
-#: proxies.php:142 proxies.php:203
+#: proxies.php:144 proxies.php:205
 msgid "Cannot delete proxy"
 msgstr "Не може да се изтрие проксито"
 
-#: adm.regexps.php:201
+#: adm.regexps.php:191
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не може да се изтрие регулярния израз"
 msgstr[1] "Не може да се изтрият регулярните изрази"
 
-#: screenconf.php:240
+#: screenconf.php:239
 msgid "Cannot delete screen"
 msgstr "Не може да се изтрие екрана"
 
-#: scripts.php:166 scripts.php:187
+#: scripts.php:158 scripts.php:179
 msgid "Cannot delete script"
 msgstr "Не може да се изтрие скрипта"
 
@@ -1725,7 +1725,7 @@ msgstr "Не може да се изтрият скриптовете. Скри�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:360
+#: actionconf.php:356
 msgid "Cannot delete selected actions"
 msgstr "Не може да се изтрият избраните действия "
 
@@ -1733,11 +1733,11 @@ msgstr "Не може да се изтрият избраните действи
 msgid "Cannot delete service"
 msgstr "Не може да се изтрие услугата"
 
-#: slideconf.php:140 slideconf.php:161
+#: slideconf.php:138 slideconf.php:159
 msgid "Cannot delete slide show"
 msgstr "Не може да се изтрие слайдшоу"
 
-#: templates.php:374 templates.php:388 templates.php:413
+#: templates.php:375 templates.php:389 templates.php:414
 msgid "Cannot delete template"
 msgstr "Не може да се изтрие шаблона"
 
@@ -1777,16 +1777,16 @@ msgstr "Не може да се изтрие шаблонния тригер \"%
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Не може да се изтрие шаблон на уеб сценарий \"%1$s\"."
 
-#: triggers.php:204
+#: triggers.php:208
 msgid "Cannot delete trigger"
 msgstr "Не може да се изтрие тригера"
 
 #: include/classes/api/services/CItemPrototype.php:543
-#: trigger_prototypes.php:188
+#: trigger_prototypes.php:192
 msgid "Cannot delete trigger prototype"
 msgstr "Не може да се изтрие шаблонния тригер прототипа"
 
-#: trigger_prototypes.php:264
+#: trigger_prototypes.php:268
 msgid "Cannot delete trigger prototypes"
 msgstr ""
 
@@ -1794,7 +1794,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr "Не може да се изтрие тригера."
 
-#: triggers.php:328
+#: triggers.php:332
 msgid "Cannot delete triggers"
 msgstr "Не може да се изтрият тригерите"
 
@@ -1802,7 +1802,7 @@ msgstr "Не може да се изтрият тригерите"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Не може да се изтрият тригерите, създадени с ниско ниво на откриване."
 
-#: users.php:299 users.php:359
+#: users.php:298 users.php:358
 msgid "Cannot delete user"
 msgstr "Не може да се изтрие потребителя"
 
@@ -1814,11 +1814,11 @@ msgstr "Не може да се изтрие потребителско увед
 msgid "Cannot delete value map"
 msgstr "Не може да се изтрие стойност на реализациите"
 
-#: httpconf.php:150 httpconf.php:412
+#: httpconf.php:153 httpconf.php:415
 msgid "Cannot delete web scenario"
 msgstr "Не може да се изтрие уеб сценарий"
 
-#: actionconf.php:345
+#: actionconf.php:341
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1830,62 +1830,62 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_discovery.php:322
+#: host_discovery.php:324
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:241 hosts.php:679 proxies.php:190
+#: hostgroups.php:244 hosts.php:678 proxies.php:192
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_prototypes.php:238
+#: host_prototypes.php:242
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:234 items.php:703
+#: applications.php:236 items.php:708
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:320
+#: disc_prototypes.php:326
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: media_types.php:183
+#: media_types.php:184
 #, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Не може да се изключи метод на уведомление"
 msgstr[1] "Не може да се изключи метод на уведомление"
 
-#: triggers.php:277
+#: triggers.php:281
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:254
+#: trigger_prototypes.php:258
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: usergrps.php:365
+#: usergrps.php:369
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] ""
 msgstr[1] ""
 
-#: httpconf.php:365
+#: httpconf.php:368
 #, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
@@ -1900,7 +1900,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:344
+#: actionconf.php:340
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -1912,62 +1912,62 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_discovery.php:321
+#: host_discovery.php:323
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:240 hosts.php:678 proxies.php:189
+#: hostgroups.php:243 hosts.php:677 proxies.php:191
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_prototypes.php:237
+#: host_prototypes.php:241
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:233 items.php:702
+#: applications.php:235 items.php:707
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:319
+#: disc_prototypes.php:325
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: media_types.php:182
+#: media_types.php:183
 #, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Не може да се активира метод на уведомление"
 msgstr[1] "Не може да се активира метод на уведомление"
 
-#: triggers.php:276
+#: triggers.php:280
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:253
+#: trigger_prototypes.php:257
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: usergrps.php:364
+#: usergrps.php:368
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] ""
 msgstr[1] ""
 
-#: httpconf.php:364
+#: httpconf.php:367
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
@@ -2296,7 +2296,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "Не може да се превключи хоста на мрежовия интерфейс."
 
-#: users.php:325
+#: users.php:324
 msgid "Cannot unblock users"
 msgstr "Не може да се деблокират потребителите"
 
@@ -2420,11 +2420,11 @@ msgstr ""
 msgid "Cannot update a discovered host group."
 msgstr ""
 
-#: actionconf.php:156
+#: actionconf.php:152
 msgid "Cannot update action"
 msgstr "Не може да се актуализира действието"
 
-#: applications.php:102
+#: applications.php:104
 msgid "Cannot update application"
 msgstr "Не може да се актуализира приложението"
 
@@ -2434,7 +2434,7 @@ msgstr "Не може да се актуализира приложението"
 msgid "Cannot update configuration"
 msgstr "Не може да се актуализира конфигурацията"
 
-#: usergrps.php:327
+#: usergrps.php:331
 msgid "Cannot update debug mode"
 msgstr "Не може да се актуализира режима за отстраняване на грешки"
 
@@ -2442,23 +2442,23 @@ msgstr "Не може да се актуализира режима за отс�
 msgid "Cannot update description"
 msgstr ""
 
-#: discoveryconf.php:147 host_discovery.php:291
+#: discoveryconf.php:147 host_discovery.php:293
 msgid "Cannot update discovery rule"
 msgstr "Не може да се актуализират правилата за откриване"
 
-#: usergrps.php:290
+#: usergrps.php:294
 msgid "Cannot update frontend access"
 msgstr "Не може да се актуализира достъпа до уеб интерфейс"
 
-#: graphs.php:250
+#: graphs.php:249
 msgid "Cannot update graph"
 msgstr "Не може да се актуализира графиката"
 
-#: graphs.php:232
+#: graphs.php:231
 msgid "Cannot update graph prototype"
 msgstr ""
 
-#: hostgroups.php:68 usergrps.php:184
+#: hostgroups.php:71 usergrps.php:188
 msgid "Cannot update group"
 msgstr "Не може да се актуализира групата"
 
@@ -2473,15 +2473,15 @@ msgstr "Не може да се актуализира групата."
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
 
-#: hosts.php:379
+#: hosts.php:381
 msgid "Cannot update host"
 msgstr "Не може да се актуализира хоста"
 
-#: host_prototypes.php:190
+#: host_prototypes.php:194
 msgid "Cannot update host prototype"
 msgstr ""
 
-#: hosts.php:365
+#: hosts.php:367
 msgid "Cannot update hosts"
 msgstr "Не може да се актуализират хостовете"
 
@@ -2503,15 +2503,15 @@ msgstr "Не може да се актуализира изображениет�
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:485
+#: items.php:490
 msgid "Cannot update item"
 msgstr "Не може да се актуализира елемент на данните"
 
-#: disc_prototypes.php:291
+#: disc_prototypes.php:297
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:682
+#: items.php:687
 msgid "Cannot update items"
 msgstr "Не може да се актуализират елементите на данните"
 
@@ -2523,7 +2523,7 @@ msgstr "Не може да се актуализира макроса."
 msgid "Cannot update macros"
 msgstr "Не може да се актуализират макросите"
 
-#: maintenance.php:127
+#: maintenance.php:126
 msgid "Cannot update maintenance"
 msgstr "Не може да се актуализира поддръжката"
 
@@ -2532,15 +2532,15 @@ msgstr "Не може да се актуализира поддръжката"
 msgid "Cannot update map \"%s\"."
 msgstr "Не може да се актуализира карта на мрежата \"%s\"."
 
-#: media_types.php:125
+#: media_types.php:126
 msgid "Cannot update media type"
 msgstr "Не може да се актуализира метод на уведомление"
 
-#: sysmaps.php:170
+#: sysmaps.php:168
 msgid "Cannot update network map"
 msgstr "Не може да се актуализира картата на мрежата"
 
-#: proxies.php:111
+#: proxies.php:113
 msgid "Cannot update proxy"
 msgstr "Не може да се актуализира проксито"
 
@@ -2549,15 +2549,15 @@ msgstr "Не може да се актуализира проксито"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr ""
 
-#: adm.regexps.php:140
+#: adm.regexps.php:135
 msgid "Cannot update regular expression"
 msgstr "Не може да се актуализират регуларните изрази"
 
-#: screenconf.php:134 screenedit.php:227 screenedit.php:244
+#: screenconf.php:133 screenedit.php:227 screenedit.php:244
 msgid "Cannot update screen"
 msgstr "Не може да се актуализира екрана"
 
-#: scripts.php:123
+#: scripts.php:115
 msgid "Cannot update script"
 msgstr "Не може да се актуализира скрипта"
 
@@ -2565,11 +2565,11 @@ msgstr "Не може да се актуализира скрипта"
 msgid "Cannot update service"
 msgstr "Не може да се актуализират услугите"
 
-#: slideconf.php:102
+#: slideconf.php:100
 msgid "Cannot update slide show"
 msgstr "Не може да се актуализира слайдшоу"
 
-#: templates.php:234
+#: templates.php:235
 msgid "Cannot update template"
 msgstr "Не може да се актуализира шаблона"
 
@@ -2583,19 +2583,19 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: triggers.php:182 triggers.php:243 tr_logform.php:122
+#: triggers.php:186 triggers.php:247 tr_logform.php:122
 msgid "Cannot update trigger"
 msgstr "Не може да се актуализира тригера"
 
-#: trigger_prototypes.php:166
+#: trigger_prototypes.php:170
 msgid "Cannot update trigger prototype"
 msgstr ""
 
-#: trigger_prototypes.php:215
+#: trigger_prototypes.php:219
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:180 users.php:242
+#: profile.php:180 users.php:241
 msgid "Cannot update user"
 msgstr "Не може да се актуализира потребителя"
 
@@ -2603,7 +2603,7 @@ msgstr "Не може да се актуализира потребителя"
 msgid "Cannot update user media."
 msgstr "Не може да се актуализира потребителското уведомление."
 
-#: profile.php:114 users.php:189
+#: profile.php:114 users.php:188
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "Не може да се актуализира потребителя. И двете пароли трябва да бъдат еднакви."
 
@@ -2611,7 +2611,7 @@ msgstr "Не може да се актуализира потребителя. �
 msgid "Cannot update value map"
 msgstr "Не може да се актуализира стойност на реализациите"
 
-#: httpconf.php:190
+#: httpconf.php:193
 msgid "Cannot update web scenario"
 msgstr " Не може да се актуализира уеб сценарий"
 
@@ -2802,8 +2802,8 @@ msgstr "Изчисти"
 msgid "Clear history and trends"
 msgstr "Изчисти историята и динамиката на промените"
 
-#: include/views/configuration.httpconf.list.php:145
-#: include/views/configuration.item.list.php:274
+#: include/views/configuration.httpconf.list.php:149
+#: include/views/configuration.item.list.php:277
 msgid "Clear history for selected"
 msgstr "Изчисти историята за избраните"
 
@@ -2819,7 +2819,7 @@ msgstr "Часовник"
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.proxy.edit.php:100
 #: include/views/administration.script.edit.php:118
-#: include/views/configuration.action.edit.php:1076
+#: include/views/configuration.action.edit.php:1077
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:91
 #: include/views/configuration.graph.edit.php:315
@@ -2903,14 +2903,14 @@ msgstr "Команда"
 msgid "Command actions"
 msgstr "Команда за действия"
 
-#: scripts.php:100
+#: scripts.php:92
 msgid "Command cannot be empty."
 msgstr "Комапдата не може да бъде празна."
 
 #: include/views/administration.script.edit.php:60
 #: include/views/administration.script.list.php:41
-#: include/views/configuration.action.edit.php:806
-#: include/views/configuration.action.edit.php:810 popup.php:1709
+#: include/views/configuration.action.edit.php:807
+#: include/views/configuration.action.edit.php:811 popup.php:1709
 #: popup.php:1716
 msgid "Commands"
 msgstr "Команди"
@@ -2956,8 +2956,8 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr ""
 
 #: include/views/configuration.action.edit.php:135
-#: include/views/configuration.action.edit.php:1001
-#: include/views/configuration.action.edit.php:1069
+#: include/views/configuration.action.edit.php:1002
+#: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.list.php:52
 msgid "Conditions"
 msgstr "Условия"
@@ -3229,9 +3229,9 @@ msgid_plural "Copy %1$s elements to..."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/views/configuration.graph.list.php:155
-#: include/views/configuration.item.list.php:271
-#: include/views/configuration.triggers.list.php:292
+#: include/views/configuration.graph.list.php:156
+#: include/views/configuration.item.list.php:274
+#: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
 
@@ -3285,7 +3285,7 @@ msgstr "Създаване на графика (първо изберете хо
 msgid "Create graph prototype"
 msgstr "Създаване на графични прототипи"
 
-#: hosts.php:814
+#: hosts.php:813
 msgid "Create host"
 msgstr "Създаване на хост"
 
@@ -3307,7 +3307,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr "Създаване съответствие на икона"
 
-#: include/views/configuration.item.list.php:37 items.php:802
+#: include/views/configuration.item.list.php:37 items.php:806
 msgid "Create item"
 msgstr "Създаване на елемент на данните"
 
@@ -3359,7 +3359,7 @@ msgstr "Създаване на скрипт"
 msgid "Create slide show"
 msgstr "Създаване на слайдшоу"
 
-#: templates.php:489
+#: templates.php:490
 msgid "Create template"
 msgstr "Създаване на шаблон"
 
@@ -3504,7 +3504,7 @@ msgstr "Персонализиран множител"
 msgid "Custom screens"
 msgstr "Персонализирани екрани"
 
-#: include/views/configuration.action.edit.php:729
+#: include/views/configuration.action.edit.php:730
 msgid "Custom script"
 msgstr "Персонализиран скрипт"
 
@@ -3556,7 +3556,7 @@ msgstr "ИЗКЛЮЧЕНО"
 msgid "DISCOVERED"
 msgstr "ОТКРИТО"
 
-#: events.php:461 hosts.php:832 include/views/administration.proxy.edit.php:61
+#: events.php:461 hosts.php:831 include/views/administration.proxy.edit.php:61
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3580,7 +3580,7 @@ msgstr "DNS име"
 msgid "DOWN"
 msgstr "НЕДОСТЪПНО"
 
-#: include/forms.inc.php:1634 include/maintenances.inc.php:33
+#: include/forms.inc.php:1633 include/maintenances.inc.php:33
 #: include/reports.inc.php:62 include/reports.inc.php:386
 #: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
@@ -3688,7 +3688,7 @@ msgstr "Тип на база данни"
 msgid "Database user"
 msgstr "База данни потребител"
 
-#: include/forms.inc.php:1701 include/forms.inc.php:1762 jsrpc.php:136
+#: include/forms.inc.php:1700 include/forms.inc.php:1761 jsrpc.php:136
 msgid "Date"
 msgstr "Дата"
 
@@ -3708,11 +3708,11 @@ msgstr "Дата за изтичане на поддръжката HW"
 msgid "Date HW purchased"
 msgstr "Дата на закупуване HW"
 
-#: include/forms.inc.php:1703 report3.php:124 report4.php:159 report5.php:44
+#: include/forms.inc.php:1702 report3.php:124 report4.php:159 report5.php:44
 msgid "Day"
 msgstr "Ден"
 
-#: include/forms.inc.php:1735
+#: include/forms.inc.php:1734
 msgid "Day of month"
 msgstr "Ден от месеца"
 
@@ -3732,8 +3732,8 @@ msgstr "Деня от месеца е > N"
 msgid "Day of month is NOT N"
 msgstr "Деня от месеца НЕ е N"
 
-#: include/forms.inc.php:1663 include/forms.inc.php:1706
-#: include/forms.inc.php:1731
+#: include/forms.inc.php:1662 include/forms.inc.php:1705
+#: include/forms.inc.php:1730
 msgid "Day of week"
 msgstr "Ден от седмицата"
 
@@ -3753,7 +3753,7 @@ msgstr "Деня от седмицата е > N"
 msgid "Day of week is NOT N"
 msgstr "Деня от седмицата НЕ е N"
 
-#: include/forms.inc.php:1779
+#: include/forms.inc.php:1778
 msgid "Days"
 msgstr "Дни"
 
@@ -3767,7 +3767,7 @@ msgstr "Отстраняване на грешки"
 msgid "Debug mode"
 msgstr "Режим за отстраняване на грешки"
 
-#: usergrps.php:327
+#: usergrps.php:331
 msgid "Debug mode updated"
 msgstr "Режим за отстраняване на грешки актуализиран"
 
@@ -3775,7 +3775,7 @@ msgstr "Режим за отстраняване на грешки актуал�
 msgid "Dec"
 msgstr "Дек"
 
-#: include/forms.inc.php:1697 include/func.inc.php:128
+#: include/forms.inc.php:1696 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:123
 msgid "December"
 msgstr "Декември"
@@ -3806,7 +3806,7 @@ msgid "Default delay (in seconds)"
 msgstr "Забавяне по подразбиране (в секунди)"
 
 #: include/views/configuration.action.edit.php:48
-#: include/views/configuration.action.edit.php:616
+#: include/views/configuration.action.edit.php:617
 msgid "Default message"
 msgstr "Съобщение по подразбиране"
 
@@ -3856,7 +3856,7 @@ msgstr ""
 msgid "Delete and clear"
 msgstr "Изтриване и изчистване"
 
-#: templates.php:671
+#: templates.php:675
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Изтриване и изчистване на избраните шаблони? (Внимание: всички свързани хостове ще бъдат изчистени!)"
 
@@ -3868,7 +3868,7 @@ msgstr "Изтриване и изчистване на шаблона? (Вни�
 msgid "Delete application?"
 msgstr "Изтриване на приложението?"
 
-#: include/views/configuration.action.edit.php:1077
+#: include/views/configuration.action.edit.php:1078
 msgid "Delete current action?"
 msgstr "Изтриване на текущото действие?"
 
@@ -3890,11 +3890,11 @@ msgstr ""
 msgid "Delete graph?"
 msgstr "Изтриване на графиката?"
 
-#: include/views/configuration.item.list.php:275
+#: include/views/configuration.item.list.php:278
 msgid "Delete history of selected items?"
 msgstr "Изтриване историята на избраните елементи на данните?"
 
-#: include/views/configuration.httpconf.list.php:146
+#: include/views/configuration.httpconf.list.php:150
 msgid "Delete history of selected web scenarios?"
 msgstr ""
 
@@ -3951,47 +3951,47 @@ msgstr "Изтриване на екран?"
 msgid "Delete script?"
 msgstr "Изтриване на скрипт?"
 
-#: hosts.php:1083 include/reports.inc.php:111 include/reports.inc.php:201
+#: hosts.php:1077 include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
-#: include/views/administration.general.regularexpressions.list.php:65
-#: include/views/administration.mediatypes.list.php:119
-#: include/views/administration.proxy.list.php:109
-#: include/views/administration.script.list.php:88
+#: include/views/administration.general.regularexpressions.list.php:66
+#: include/views/administration.mediatypes.list.php:124
+#: include/views/administration.proxy.list.php:110
+#: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:107
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.usergroups.list.php:148
 #: include/views/administration.users.edit.php:73
 #: include/views/administration.users.edit.php:221
-#: include/views/administration.users.list.php:153
-#: include/views/configuration.action.list.php:103
-#: include/views/configuration.application.list.php:118
-#: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:158
-#: include/views/configuration.host.discovery.list.php:144
-#: include/views/configuration.hostgroups.list.php:161
-#: include/views/configuration.host.prototype.list.php:123
-#: include/views/configuration.httpconf.list.php:149
-#: include/views/configuration.item.list.php:278
-#: include/views/configuration.item.prototype.list.php:116
-#: include/views/configuration.maintenance.list.php:80
+#: include/views/administration.users.list.php:155
+#: include/views/configuration.action.list.php:104
+#: include/views/configuration.application.list.php:119
+#: include/views/configuration.discovery.list.php:76
+#: include/views/configuration.graph.list.php:159
+#: include/views/configuration.host.discovery.list.php:150
+#: include/views/configuration.hostgroups.list.php:164
+#: include/views/configuration.host.prototype.list.php:128
+#: include/views/configuration.httpconf.list.php:153
+#: include/views/configuration.item.list.php:281
+#: include/views/configuration.item.prototype.list.php:120
+#: include/views/configuration.maintenance.list.php:81
 #: include/views/configuration.screen.list.php:70
-#: include/views/configuration.slideconf.list.php:56
-#: include/views/configuration.sysmap.list.php:62
-#: include/views/configuration.triggers.list.php:296 templates.php:667
+#: include/views/configuration.slideconf.list.php:57
+#: include/views/configuration.sysmap.list.php:64
+#: include/views/configuration.triggers.list.php:307 templates.php:670
 msgid "Delete selected"
 msgstr "Изтриване на избраните"
 
-#: include/views/configuration.action.list.php:104
+#: include/views/configuration.action.list.php:105
 msgid "Delete selected actions?"
 msgstr "Изтриване на избраните действия?"
 
-#: include/views/configuration.application.list.php:119
+#: include/views/configuration.application.list.php:120
 msgid "Delete selected applications?"
 msgstr "Изтриване на избраните приложения?"
 
-#: include/views/configuration.discovery.list.php:76
-#: include/views/configuration.host.discovery.list.php:145
+#: include/views/configuration.discovery.list.php:77
+#: include/views/configuration.host.discovery.list.php:151
 msgid "Delete selected discovery rules?"
 msgstr "Изтриване на избраните правила за откриване?"
 
@@ -3999,11 +3999,11 @@ msgstr "Изтриване на избраните правила за откр�
 msgid "Delete selected elements?"
 msgstr "Изтриване на избраните елементи?"
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:162
 msgid "Delete selected graph prototypes?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:162
 msgid "Delete selected graphs?"
 msgstr "Изтриване на избраните графики?"
 
@@ -4016,7 +4016,7 @@ msgstr "Изтриване на избраната група ?"
 msgid "Delete selected groups?"
 msgstr "Изтриване на избраните групи?"
 
-#: include/views/configuration.hostgroups.list.php:162
+#: include/views/configuration.hostgroups.list.php:165
 msgid "Delete selected host groups?"
 msgstr "Изтриване на избраните хост групи?"
 
@@ -4024,7 +4024,7 @@ msgstr "Изтриване на избраните хост групи?"
 msgid "Delete selected host prototype?"
 msgstr ""
 
-#: include/views/configuration.host.prototype.list.php:124
+#: include/views/configuration.host.prototype.list.php:129
 msgid "Delete selected host prototypes?"
 msgstr ""
 
@@ -4032,7 +4032,7 @@ msgstr ""
 msgid "Delete selected host?"
 msgstr "Изтриване на избрания хост?"
 
-#: hosts.php:1084
+#: hosts.php:1078
 msgid "Delete selected hosts?"
 msgstr "Изтриване на избраните хостове?"
 
@@ -4040,19 +4040,19 @@ msgstr "Изтриване на избраните хостове?"
 msgid "Delete selected image?"
 msgstr "Изтриване на избраното изображение?"
 
-#: include/views/configuration.item.prototype.list.php:117
+#: include/views/configuration.item.prototype.list.php:121
 msgid "Delete selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:279
+#: include/views/configuration.item.list.php:282
 msgid "Delete selected items?"
 msgstr "Изтриване на избраните елементи на данните?"
 
-#: include/views/configuration.maintenance.list.php:81
+#: include/views/configuration.maintenance.list.php:82
 msgid "Delete selected maintenance periods?"
 msgstr "Изтриване на избрания период на поддръжка?"
 
-#: include/views/configuration.sysmap.list.php:63
+#: include/views/configuration.sysmap.list.php:65
 msgid "Delete selected maps?"
 msgstr "Изтриване на избраните карти?"
 
@@ -4060,15 +4060,15 @@ msgstr "Изтриване на избраните карти?"
 msgid "Delete selected media type?"
 msgstr "Изтриване на избрания метод на уведомление?"
 
-#: include/views/administration.mediatypes.list.php:120
+#: include/views/administration.mediatypes.list.php:125
 msgid "Delete selected media types?"
 msgstr "Изтриване на избраните методи на уведомление?"
 
-#: include/views/administration.proxy.list.php:110
+#: include/views/administration.proxy.list.php:111
 msgid "Delete selected proxies?"
 msgstr "Изтриване на избраните проксита?"
 
-#: include/views/administration.general.regularexpressions.list.php:66
+#: include/views/administration.general.regularexpressions.list.php:67
 msgid "Delete selected regular expressions?"
 msgstr "Изтриване на избраните регулярни изрази?"
 
@@ -4076,23 +4076,23 @@ msgstr "Изтриване на избраните регулярни израз
 msgid "Delete selected screens?"
 msgstr "Изтриване на избраните екрани?"
 
-#: include/views/administration.script.list.php:89
+#: include/views/administration.script.list.php:90
 msgid "Delete selected scripts?"
 msgstr "Изтриване на избраните скриптове?"
 
-#: include/views/configuration.slideconf.list.php:57
+#: include/views/configuration.slideconf.list.php:58
 msgid "Delete selected slide shows?"
 msgstr "Изтриване на избраните слайдшоу?"
 
-#: templates.php:668
+#: templates.php:671
 msgid "Delete selected templates?"
 msgstr "Изтриване на избраните шаблони?"
 
-#: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.list.php:310
 msgid "Delete selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.list.php:310
 msgid "Delete selected triggers?"
 msgstr "Изтриване на избраните тригери?"
 
@@ -4100,7 +4100,7 @@ msgstr "Изтриване на избраните тригери?"
 msgid "Delete selected user?"
 msgstr "Изтриване на избрания потребител?"
 
-#: include/views/administration.users.list.php:154
+#: include/views/administration.users.list.php:156
 msgid "Delete selected users?"
 msgstr "Изтриване на избраните потребители?"
 
@@ -4115,11 +4115,11 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Изтриване на избраната стойност на реализациите? То се използва от елемент на данните %d !"
 msgstr[1] "Изтриване на избраната стойност на реализациите? То се използва от елементи на данните %d !"
 
-#: include/views/configuration.httpconf.list.php:150
+#: include/views/configuration.httpconf.list.php:154
 msgid "Delete selected web scenarios?"
 msgstr ""
 
-#: templates.php:670
+#: templates.php:674
 msgid "Delete selected with linked elements"
 msgstr "Изтриване на избраните и свързаните с тях елементи"
 
@@ -4383,44 +4383,44 @@ msgstr "Изключване режим за отстраняване на гр�
 msgid "Disable host"
 msgstr "Изключване на хост"
 
-#: hosts.php:993 hosts.php:1006
+#: hosts.php:991
 msgid "Disable host?"
 msgstr "Изключване на хост?"
 
-#: include/views/configuration.hostgroups.list.php:159
+#: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
 msgstr "Изключване на хост в избраната хост група?"
 
-#: include/views/administration.proxy.list.php:106
+#: include/views/administration.proxy.list.php:107
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Изключване на хост, който се наблюдава от избраното прокси?"
 
-#: hosts.php:1080 include/views/administration.mediatypes.list.php:115
-#: include/views/administration.proxy.list.php:105
+#: hosts.php:1073 include/views/administration.mediatypes.list.php:120
+#: include/views/administration.proxy.list.php:106
 #: include/views/administration.usergroups.list.php:136
-#: include/views/configuration.action.list.php:99
-#: include/views/configuration.application.list.php:114
-#: include/views/configuration.discovery.list.php:71
-#: include/views/configuration.host.discovery.list.php:140
-#: include/views/configuration.hostgroups.list.php:158
-#: include/views/configuration.host.prototype.list.php:119
-#: include/views/configuration.httpconf.list.php:141
-#: include/views/configuration.item.list.php:264
-#: include/views/configuration.item.prototype.list.php:112
-#: include/views/configuration.triggers.list.php:282
+#: include/views/configuration.action.list.php:100
+#: include/views/configuration.application.list.php:115
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:146
+#: include/views/configuration.hostgroups.list.php:160
+#: include/views/configuration.host.prototype.list.php:124
+#: include/views/configuration.httpconf.list.php:145
+#: include/views/configuration.item.list.php:267
+#: include/views/configuration.item.prototype.list.php:116
+#: include/views/configuration.triggers.list.php:292
 msgid "Disable selected"
 msgstr "Изключване на избраните"
 
-#: include/views/configuration.action.list.php:100
+#: include/views/configuration.action.list.php:101
 msgid "Disable selected actions?"
 msgstr "Изключване на избраните действия?"
 
-#: include/views/configuration.application.list.php:115
+#: include/views/configuration.application.list.php:116
 msgid "Disable selected applications?"
 msgstr "Изключване на избраните приложения?"
 
-#: include/views/configuration.discovery.list.php:72
-#: include/views/configuration.host.discovery.list.php:141
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.host.discovery.list.php:147
 msgid "Disable selected discovery rules?"
 msgstr "Изключване на избраните правила за откриване??"
 
@@ -4428,44 +4428,44 @@ msgstr "Изключване на избраните правила за отк�
 msgid "Disable selected groups?"
 msgstr "Изключване на избраните групи?"
 
-#: include/views/configuration.host.prototype.list.php:120
+#: include/views/configuration.host.prototype.list.php:125
 msgid "Disable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1081
+#: hosts.php:1074
 msgid "Disable selected hosts?"
 msgstr "Изключване на избраните хостове?"
 
-#: include/views/configuration.item.prototype.list.php:113
+#: include/views/configuration.item.prototype.list.php:117
 msgid "Disable selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:265
+#: include/views/configuration.item.list.php:268
 msgid "Disable selected items?"
 msgstr "Изключване на избраните елементи на данните?"
 
-#: include/views/administration.mediatypes.list.php:116
+#: include/views/administration.mediatypes.list.php:121
 msgid "Disable selected media types?"
 msgstr "Изключване на избраните методи на уведомление?"
 
-#: include/views/configuration.triggers.list.php:285
+#: include/views/configuration.triggers.list.php:295
 msgid "Disable selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:285
+#: include/views/configuration.triggers.list.php:295
 msgid "Disable selected triggers?"
 msgstr "Изключване на избраните тригери?"
 
-#: include/views/configuration.httpconf.list.php:142
+#: include/views/configuration.httpconf.list.php:146
 msgid "Disable selected web scenarios?"
 msgstr ""
 
-#: auditlogs.php:146 dashboard.php:295 hosts.php:998
+#: auditlogs.php:146 dashboard.php:295 hosts.php:995
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
 #: include/items.inc.php:209 include/triggers.inc.php:1486
 #: include/triggers.inc.php:2323 include/users.inc.php:85
-#: include/views/administration.mediatypes.list.php:96
+#: include/views/administration.mediatypes.list.php:100
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:87
@@ -4501,13 +4501,13 @@ msgstr ""
 msgid "Discovered device"
 msgstr "Открито устройство"
 
-#: events.php:338 hosts.php:867 hosts.php:960 include/html.inc.php:351
+#: events.php:338 hosts.php:866 hosts.php:959 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:232
 #: include/views/inventory.host.view.php:242 search.php:144 search.php:185
 #: search.php:201 search.php:399 search.php:442 search.php:459
-#: templates.php:514 templates.php:577
+#: templates.php:515 templates.php:578
 msgid "Discovery"
 msgstr "Откриване"
 
@@ -4568,27 +4568,27 @@ msgstr ""
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "В правило за откриване \"%1$s:%2$s\" има неправилен период за съхранение на изгубените ресурси: \"%3$s\". (мин: %4$d, макс: %5$d, потребителско макро позволено)"
 
-#: discoveryconf.php:153 host_discovery.php:295
+#: discoveryconf.php:153 host_discovery.php:297
 msgid "Discovery rule created"
 msgstr "Правило за откриване създадено"
 
-#: discoveryconf.php:178 host_discovery.php:183
+#: discoveryconf.php:178 host_discovery.php:185
 msgid "Discovery rule deleted"
 msgstr "Правило за откриване изтрито"
 
-#: discoveryconf.php:202 host_discovery.php:319
+#: discoveryconf.php:202 host_discovery.php:321
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:201 host_discovery.php:318
+#: discoveryconf.php:201 host_discovery.php:320
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: discoveryconf.php:146 host_discovery.php:291
+#: discoveryconf.php:146 host_discovery.php:293
 msgid "Discovery rule updated"
 msgstr "Правило за откриване актуализирано"
 
@@ -4601,7 +4601,7 @@ msgstr "Правило за откриване актуализирано"
 msgid "Discovery rules"
 msgstr "Правила за откриване"
 
-#: discoveryconf.php:220 host_discovery.php:332
+#: discoveryconf.php:220 host_discovery.php:334
 msgid "Discovery rules deleted"
 msgstr "Правила за откриване изтрити"
 
@@ -5008,11 +5008,11 @@ msgstr "Активиране потвърждаване на събитие"
 msgid "Enable host"
 msgstr "Активиране на хост"
 
-#: hosts.php:1000
+#: hosts.php:997
 msgid "Enable host?"
 msgstr "Активиране на хост?"
 
-#: include/views/administration.proxy.list.php:102
+#: include/views/administration.proxy.list.php:103
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Активиране наблюдаване на хостове от избраните проксита?"
 
@@ -5025,32 +5025,32 @@ msgstr "Активиране наблюдаване на хостове от и�
 msgid "Enable internal housekeeping"
 msgstr ""
 
-#: hosts.php:1077 include/views/administration.mediatypes.list.php:111
-#: include/views/administration.proxy.list.php:101
+#: hosts.php:1069 include/views/administration.mediatypes.list.php:116
+#: include/views/administration.proxy.list.php:102
 #: include/views/administration.usergroups.list.php:132
-#: include/views/configuration.action.list.php:95
-#: include/views/configuration.application.list.php:110
-#: include/views/configuration.discovery.list.php:67
-#: include/views/configuration.host.discovery.list.php:136
-#: include/views/configuration.hostgroups.list.php:155
-#: include/views/configuration.host.prototype.list.php:115
-#: include/views/configuration.httpconf.list.php:137
-#: include/views/configuration.item.list.php:260
-#: include/views/configuration.item.prototype.list.php:108
-#: include/views/configuration.triggers.list.php:275
+#: include/views/configuration.action.list.php:96
+#: include/views/configuration.application.list.php:111
+#: include/views/configuration.discovery.list.php:68
+#: include/views/configuration.host.discovery.list.php:142
+#: include/views/configuration.hostgroups.list.php:156
+#: include/views/configuration.host.prototype.list.php:120
+#: include/views/configuration.httpconf.list.php:141
+#: include/views/configuration.item.list.php:263
+#: include/views/configuration.item.prototype.list.php:112
+#: include/views/configuration.triggers.list.php:285
 msgid "Enable selected"
 msgstr "Активиране на избрани"
 
-#: include/views/configuration.action.list.php:96
+#: include/views/configuration.action.list.php:97
 msgid "Enable selected actions?"
 msgstr "Активиране на избраните действия?"
 
-#: include/views/configuration.application.list.php:111
+#: include/views/configuration.application.list.php:112
 msgid "Enable selected applications?"
 msgstr "Активиране на избраните приложения?"
 
-#: include/views/configuration.discovery.list.php:68
-#: include/views/configuration.host.discovery.list.php:137
+#: include/views/configuration.discovery.list.php:69
+#: include/views/configuration.host.discovery.list.php:143
 msgid "Enable selected discovery rules?"
 msgstr "Активиране на избраните правила за откриване?"
 
@@ -5058,44 +5058,44 @@ msgstr "Активиране на избраните правила за отк�
 msgid "Enable selected groups?"
 msgstr "Активиране на избраните групи?"
 
-#: include/views/configuration.host.prototype.list.php:116
+#: include/views/configuration.host.prototype.list.php:121
 msgid "Enable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1078 include/views/configuration.hostgroups.list.php:156
+#: hosts.php:1070 include/views/configuration.hostgroups.list.php:157
 msgid "Enable selected hosts?"
 msgstr "Активиране на избраните хостове?"
 
-#: include/views/configuration.item.prototype.list.php:109
+#: include/views/configuration.item.prototype.list.php:113
 msgid "Enable selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:261
+#: include/views/configuration.item.list.php:264
 msgid "Enable selected items?"
 msgstr "Активиране на избраните елементи на данните?"
 
-#: include/views/administration.mediatypes.list.php:112
+#: include/views/administration.mediatypes.list.php:117
 msgid "Enable selected media types?"
 msgstr "Активиране на избраните методи на уведомление?"
 
-#: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.list.php:288
 msgid "Enable selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.list.php:288
 msgid "Enable selected triggers?"
 msgstr "Активиране на избраните тригери?"
 
-#: include/views/configuration.httpconf.list.php:138
+#: include/views/configuration.httpconf.list.php:142
 msgid "Enable selected web scenarios?"
 msgstr ""
 
-#: auditlogs.php:143 dashboard.php:295 hosts.php:989
+#: auditlogs.php:143 dashboard.php:295 hosts.php:987
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
 #: include/items.inc.php:206 include/triggers.inc.php:2320
 #: include/views/administration.mediatypes.edit.php:95
-#: include/views/administration.mediatypes.list.php:95
+#: include/views/administration.mediatypes.list.php:99
 #: include/views/administration.usergroups.edit.php:64
 #: include/views/administration.usergroups.edit.php:70
 #: include/views/administration.usergroups.list.php:57
@@ -5157,7 +5157,7 @@ msgstr "ID-то на събитие от последния запис в рег
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
 msgstr "ID-то на събитие от последния запис в регистъра съответства на регулярен израз T, тогава N НЕ е 1, 0 - в противен случай"
 
-#: acknow.php:168 include/actions.inc.php:86
+#: acknow.php:167 include/actions.inc.php:86
 msgid "Event acknowledged"
 msgstr "Потвърждаване на събитие"
 
@@ -5205,11 +5205,11 @@ msgstr "Събития"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1646
+#: include/forms.inc.php:1645
 msgid "Every day(s)"
 msgstr "Всеки ден "
 
-#: include/forms.inc.php:1653
+#: include/forms.inc.php:1652
 msgid "Every week(s)"
 msgstr "Всяка седмица"
 
@@ -5237,7 +5237,7 @@ msgstr ""
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:747
+#: include/views/configuration.action.edit.php:748
 #: include/views/js/configuration.action.edit.js.php:113 popup.php:1708
 #: popup.php:1715
 msgid "Execute on"
@@ -5279,8 +5279,8 @@ msgstr "Изтекъл"
 msgid "Exploded"
 msgstr "Разширено кръгова"
 
-#: hosts.php:1075 include/views/configuration.screen.list.php:68
-#: include/views/configuration.sysmap.list.php:61 templates.php:666
+#: hosts.php:1066 include/views/configuration.screen.list.php:68
+#: include/views/configuration.sysmap.list.php:62 templates.php:668
 msgid "Export selected"
 msgstr "Експортиране на избраните"
 
@@ -5293,7 +5293,7 @@ msgstr "Експортиране в CSV"
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
 #: include/views/administration.general.regularexpressions.edit.php:73
-#: include/views/configuration.item.list.php:146
+#: include/views/configuration.item.list.php:148
 #: include/views/configuration.triggers.edit.php:142
 #: include/views/configuration.triggers.edit.php:153
 #: include/views/configuration.triggers.list.php:103 trigger_prototypes.php:42
@@ -5302,8 +5302,8 @@ msgstr "Експортиране в CSV"
 msgid "Expression"
 msgstr "Изразяване"
 
-#: include/forms.inc.php:1470 include/forms.inc.php:1475
-#: include/forms.inc.php:1484
+#: include/forms.inc.php:1469 include/forms.inc.php:1474
+#: include/forms.inc.php:1483
 msgid "Expression Syntax Error."
 msgstr "Грешка в синтаксиса на изразяване."
 
@@ -5402,7 +5402,7 @@ msgstr "Любими "
 msgid "Feb"
 msgstr "Фев"
 
-#: include/forms.inc.php:1675 include/func.inc.php:118
+#: include/forms.inc.php:1674 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:113
 msgid "February"
 msgstr "Февруари"
@@ -5486,7 +5486,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "Запълване"
 
-#: events.php:400 hosts.php:837 include/forms.inc.php:616
+#: events.php:400 hosts.php:836 include/forms.inc.php:616
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/common.filter.trigger.php:147
@@ -5546,7 +5546,7 @@ msgstr "Завърши"
 msgid "Finnish (fi_FI)"
 msgstr "Финландски (fi_FI)"
 
-#: include/forms.inc.php:1713 include/maintenances.inc.php:111
+#: include/forms.inc.php:1712 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Първи"
 
@@ -5574,7 +5574,7 @@ msgstr "Гъвкави интервали"
 msgid "Follow redirects"
 msgstr ""
 
-#: profile.php:117 users.php:198
+#: profile.php:117 users.php:197
 msgid "For guest, password must be empty"
 msgstr "За гостите, паролата трябва да бъде празна"
 
@@ -5582,7 +5582,7 @@ msgstr "За гостите, паролата трябва да бъде пра�
 msgid "Formula"
 msgstr "Формула"
 
-#: include/forms.inc.php:1716 include/maintenances.inc.php:114
+#: include/forms.inc.php:1715 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Четвърти"
 
@@ -5594,13 +5594,13 @@ msgstr "Френски (fr_FR)"
 msgid "Fri"
 msgstr "Пт"
 
-#: include/forms.inc.php:1660 include/forms.inc.php:1728
+#: include/forms.inc.php:1659 include/forms.inc.php:1727
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "Петък"
 
 #: include/reports.inc.php:71 include/reports.inc.php:375
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:480
 #: include/views/configuration.services.edit.php:228
 #: include/views/configuration.services.edit.php:254
 #: include/views/js/configuration.sysmaps.js.php:337 popup_period.php:128
@@ -5616,7 +5616,7 @@ msgstr "От"
 msgid "Frontend access"
 msgstr "Достъп до уеб интерфейс"
 
-#: usergrps.php:290
+#: usergrps.php:294
 msgid "Frontend access updated"
 msgstr "Достъп до уеб интерфейс актуализиран"
 
@@ -5659,7 +5659,7 @@ msgid "GSM modem"
 msgstr "GSM модем"
 
 #: adm.gui.php:95 adm.housekeeper.php:126 adm.iconmapping.php:109
-#: adm.images.php:133 adm.macros.php:158 adm.other.php:109 adm.regexps.php:211
+#: adm.images.php:133 adm.macros.php:158 adm.other.php:109 adm.regexps.php:200
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:81
 #: adm.valuemapping.php:126 adm.workingtime.php:62
 #: include/views/administration.general.gui.edit.php:51
@@ -5720,7 +5720,7 @@ msgstr "Като се има предвид, израза не е макро"
 msgid "Global expression does not exist."
 msgstr "Глобалния израз не съществува."
 
-#: include/views/configuration.action.edit.php:732
+#: include/views/configuration.action.edit.php:733
 msgid "Global script"
 msgstr "Глобален скрипт"
 
@@ -5728,28 +5728,28 @@ msgstr "Глобален скрипт"
 msgid "Global scripts"
 msgstr "Глобални скриптове"
 
-#: hosts.php:1086
-#: include/views/administration.general.regularexpressions.list.php:68
-#: include/views/administration.mediatypes.list.php:123
-#: include/views/administration.proxy.list.php:113
-#: include/views/administration.script.list.php:92
+#: hosts.php:1081
+#: include/views/administration.general.regularexpressions.list.php:70
+#: include/views/administration.mediatypes.list.php:128
+#: include/views/administration.proxy.list.php:114
+#: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:152
-#: include/views/administration.users.list.php:156
-#: include/views/configuration.action.list.php:107
-#: include/views/configuration.application.list.php:122
-#: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:165
-#: include/views/configuration.host.discovery.list.php:148
-#: include/views/configuration.hostgroups.list.php:164
-#: include/views/configuration.host.prototype.list.php:127
-#: include/views/configuration.httpconf.list.php:153
-#: include/views/configuration.item.list.php:282
-#: include/views/configuration.item.prototype.list.php:120
-#: include/views/configuration.maintenance.list.php:83
+#: include/views/administration.users.list.php:159
+#: include/views/configuration.action.list.php:108
+#: include/views/configuration.application.list.php:123
+#: include/views/configuration.discovery.list.php:80
+#: include/views/configuration.graph.list.php:166
+#: include/views/configuration.host.discovery.list.php:154
+#: include/views/configuration.hostgroups.list.php:168
+#: include/views/configuration.host.prototype.list.php:132
+#: include/views/configuration.httpconf.list.php:157
+#: include/views/configuration.item.list.php:285
+#: include/views/configuration.item.prototype.list.php:124
+#: include/views/configuration.maintenance.list.php:85
 #: include/views/configuration.screen.list.php:74
-#: include/views/configuration.slideconf.list.php:59
-#: include/views/configuration.sysmap.list.php:65
-#: include/views/configuration.triggers.list.php:303 templates.php:673
+#: include/views/configuration.slideconf.list.php:61
+#: include/views/configuration.sysmap.list.php:68
+#: include/views/configuration.triggers.list.php:314 templates.php:678
 #: tr_status.php:831
 msgid "Go"
 msgstr "Изпълни"
@@ -5833,11 +5833,11 @@ msgstr "Графика \"%1$s\" пропуснато - потребителск�
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Графика \"%1$s\" с шаблонни елементи на данните не може да съдържа елементи на данните от други хостове."
 
-#: graphs.php:255
+#: graphs.php:254
 msgid "Graph added"
 msgstr "Графика добавена"
 
-#: graphs.php:299
+#: graphs.php:298
 msgid "Graph deleted"
 msgstr "Графика изтрита"
 
@@ -5878,11 +5878,11 @@ msgstr "Графичен прототип \"%1$s\" с шаблонни елем�
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Графичен прототип \"%s\" изтрит."
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph prototype added"
 msgstr ""
 
-#: graphs.php:291
+#: graphs.php:290
 msgid "Graph prototype deleted"
 msgstr ""
 
@@ -5890,18 +5890,18 @@ msgstr ""
 msgid "Graph prototype not found."
 msgstr ""
 
-#: graphs.php:231
+#: graphs.php:230
 msgid "Graph prototype updated"
 msgstr ""
 
 #: include/html.inc.php:424 include/html.inc.php:428
-#: include/views/configuration.host.discovery.list.php:120
+#: include/views/configuration.host.discovery.list.php:125
 #: include/views/configuration.host.edit.php:627
 #: include/views/configuration.template.edit.php:351 popup.php:91
 msgid "Graph prototypes"
 msgstr "Графични прототипи"
 
-#: graphs.php:315
+#: graphs.php:314
 msgid "Graph prototypes deleted"
 msgstr ""
 
@@ -5918,7 +5918,7 @@ msgstr "Обща графика"
 msgid "Graph type"
 msgstr "Тип графика"
 
-#: graphs.php:249
+#: graphs.php:248
 msgid "Graph updated"
 msgstr "Графика актуализирана"
 
@@ -5934,7 +5934,7 @@ msgstr "Графика с името \"%1$s\" вече съществува в �
 msgid "Graph with same name but other type exist."
 msgstr "Графика със същото име, но различен тип вече съществува."
 
-#: dashboard.php:317 hosts.php:866 hosts.php:958 include/html.inc.php:435
+#: dashboard.php:317 hosts.php:865 hosts.php:957 include/html.inc.php:435
 #: include/html.inc.php:439 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:49
@@ -5945,7 +5945,7 @@ msgstr "Графика със същото име, но различен тип 
 #: include/views/inventory.host.view.php:241 jsLoader.php:201 popup.php:87
 #: search.php:137 search.php:143 search.php:181 search.php:200 search.php:223
 #: search.php:277 search.php:330 search.php:397 search.php:434 search.php:457
-#: templates.php:512 templates.php:573
+#: templates.php:513 templates.php:574
 msgid "Graphs"
 msgstr "Графики"
 
@@ -5953,7 +5953,7 @@ msgstr "Графики"
 msgid "Graphs copied"
 msgstr "Графики копирани"
 
-#: graphs.php:323
+#: graphs.php:322
 msgid "Graphs deleted"
 msgstr "Графики изтрити"
 
@@ -5966,7 +5966,7 @@ msgstr "Гръцки (el_GR)"
 msgid "Grid"
 msgstr "Решетка"
 
-#: events.php:326 hostinventoriesoverview.php:90 hosts.php:822 httpmon.php:77
+#: events.php:326 hostinventoriesoverview.php:90 hosts.php:821 httpmon.php:77
 #: include/classes/html/CHostsInfo.php:105
 #: include/classes/html/CTriggersInfo.php:111
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -5989,7 +5989,7 @@ msgstr "Решетка"
 #: include/views/monitoring.overview.triggers.php:31
 #: include/views/monitoring.screen.php:96
 #: include/views/monitoring.slides.php:82 latest.php:303 popup.php:483
-#: templates.php:497 tr_status.php:230
+#: templates.php:498 tr_status.php:230
 msgid "Group"
 msgstr "Група"
 
@@ -6008,11 +6008,11 @@ msgstr "Група \"%1$s\" не съществува."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Група \"%1$s\" за хост \"%2$s\" не съществува."
 
-#: hostgroups.php:116 usergrps.php:190
+#: hostgroups.php:119 usergrps.php:194
 msgid "Group added"
 msgstr "Група добавена"
 
-#: hostgroups.php:169 hostgroups.php:190 usergrps.php:224 usergrps.php:255
+#: hostgroups.php:172 hostgroups.php:193 usergrps.php:228 usergrps.php:259
 #, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
@@ -6048,7 +6048,7 @@ msgstr ""
 msgid "Group prototypes"
 msgstr ""
 
-#: hostgroups.php:67 usergrps.php:183
+#: hostgroups.php:70 usergrps.php:187
 msgid "Group updated"
 msgstr "Група актуализирана"
 
@@ -6202,14 +6202,14 @@ msgstr "Висок"
 #: include/page_header.php:323
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:67
-#: include/views/configuration.item.prototype.list.php:50 items.php:157
+#: include/views/configuration.item.prototype.list.php:50 items.php:162
 #: jsLoader.php:202 latest.php:353 latest.php:354 latest.php:454
 #: latest.php:632
 msgid "History"
 msgstr "История"
 
-#: httpconf.php:183 httpconf.php:404 items.php:509 items.php:515 items.php:757
-#: items.php:766
+#: httpconf.php:186 httpconf.php:407 items.php:514 items.php:520 items.php:761
+#: items.php:770
 msgid "History cleared"
 msgstr "История изчистена"
 
@@ -6281,8 +6281,8 @@ msgstr "Хоризонтално подравняване"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:509 items.php:757
-#: items.php:786 jsLoader.php:140 latest.php:304 latest.php:329 latest.php:331
+#: include/views/monitoring.slides.php:83 items.php:514 items.php:761
+#: items.php:790 jsLoader.php:140 latest.php:304 latest.php:329 latest.php:331
 #: popup.php:475 popup.php:501 popup.php:1094 queue.php:229 report2.php:360
 #: report2.php:394 report5.php:58 search.php:131 tr_status.php:231
 #: tr_status.php:308
@@ -6319,7 +6319,7 @@ msgstr "IP адрес на хост"
 msgid "Host access"
 msgstr "Хост достъп"
 
-#: hosts.php:391
+#: hosts.php:393
 msgid "Host added"
 msgstr "Хост добавен"
 
@@ -6332,17 +6332,17 @@ msgstr "Хоста не може да има повече от един стан
 msgid "Host count"
 msgstr "Хост брояч"
 
-#: hosts.php:632 hosts.php:647
+#: hosts.php:634 hosts.php:647
 msgid "Host deleted"
 msgstr "Хост изтрит"
 
-#: hostgroups.php:238 hosts.php:676 proxies.php:187
+#: hostgroups.php:241 hosts.php:675 proxies.php:189
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:237 hosts.php:675 proxies.php:186
+#: hostgroups.php:240 hosts.php:674 proxies.php:188
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
@@ -6476,27 +6476,27 @@ msgstr ""
 msgid "Host prototype \"%1$s\" must have at least one host group."
 msgstr ""
 
-#: host_prototypes.php:204
+#: host_prototypes.php:208
 msgid "Host prototype added"
 msgstr ""
 
-#: host_prototypes.php:124
+#: host_prototypes.php:128
 msgid "Host prototype deleted"
 msgstr ""
 
-#: host_prototypes.php:235
+#: host_prototypes.php:239
 msgid "Host prototype disabled"
 msgid_plural "Host prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_prototypes.php:234
+#: host_prototypes.php:238
 msgid "Host prototype enabled"
 msgid_plural "Host prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: host_prototypes.php:190
+#: host_prototypes.php:194
 msgid "Host prototype updated"
 msgstr ""
 
@@ -6521,12 +6521,12 @@ msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr ""
 
 #: include/html.inc.php:448 include/html.inc.php:452
-#: include/views/configuration.host.discovery.list.php:96
+#: include/views/configuration.host.discovery.list.php:101
 #: include/views/configuration.host.edit.php:646
 msgid "Host prototypes"
 msgstr ""
 
-#: host_prototypes.php:253
+#: host_prototypes.php:257
 msgid "Host prototypes deleted"
 msgstr ""
 
@@ -6558,7 +6558,7 @@ msgstr "Хост време"
 msgid "Host update failed."
 msgstr "Актуализацията на хоста се провали."
 
-#: hosts.php:378
+#: hosts.php:380
 msgid "Host updated"
 msgstr "Хост актуализиран"
 
@@ -6583,7 +6583,7 @@ msgstr ""
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Хост със същото видимо име \"%s\" вече съществува."
 
-#: hostinventoriesoverview.php:92 hosts.php:824 include/forms.inc.php:199
+#: hostinventoriesoverview.php:92 hosts.php:823 include/forms.inc.php:199
 #: include/forms.inc.php:884 include/items.inc.php:723
 #: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:367 include/views/administration.proxy.edit.php:87
@@ -6629,7 +6629,7 @@ msgstr "Информация за хостове"
 msgid "Hosts location"
 msgstr "Местоположение на хостове"
 
-#: hosts.php:359
+#: hosts.php:361
 msgid "Hosts updated"
 msgstr "Хостове актуализирани"
 
@@ -6638,12 +6638,12 @@ msgstr "Хостове актуализирани"
 msgid "Hourly"
 msgstr "Ежечасово"
 
-#: include/forms.inc.php:1781
+#: include/forms.inc.php:1780
 msgid "Hours"
 msgstr "Часа"
 
 #: adm.gui.php:96 adm.housekeeper.php:127 adm.iconmapping.php:110
-#: adm.images.php:134 adm.macros.php:159 adm.other.php:110 adm.regexps.php:212
+#: adm.images.php:134 adm.macros.php:159 adm.other.php:110 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:76 adm.triggerseverities.php:82
 #: adm.valuemapping.php:127 adm.workingtime.php:63
 #: include/views/administration.general.housekeeper.edit.php:164
@@ -6668,7 +6668,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:460 hosts.php:833
+#: events.php:460 hosts.php:832
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:60
 #: include/views/inventory.host.view.php:57
@@ -6707,7 +6707,7 @@ msgstr "IP диапазонът не може да бъде празен."
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:45
 #: include/views/administration.script.list.php:53
-#: include/views/configuration.action.edit.php:728
+#: include/views/configuration.action.edit.php:729
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:337
 #: include/views/configuration.host.prototype.edit.php:278
@@ -6902,7 +6902,7 @@ msgstr "Съответствие на икона с iconmapid \"%s\" не същ
 
 #: adm.gui.php:98 adm.housekeeper.php:129 adm.iconmapping.php:112
 #: adm.iconmapping.php:175 adm.images.php:136 adm.macros.php:161
-#: adm.other.php:112 adm.regexps.php:214 adm.triggerdisplayoptions.php:78
+#: adm.other.php:112 adm.regexps.php:203 adm.triggerdisplayoptions.php:78
 #: adm.triggerseverities.php:84 adm.valuemapping.php:129
 #: adm.workingtime.php:65
 #, fuzzy
@@ -6975,7 +6975,7 @@ msgid "Image updated"
 msgstr "Изображение актуализирано"
 
 #: adm.gui.php:97 adm.housekeeper.php:128 adm.iconmapping.php:111
-#: adm.images.php:135 adm.macros.php:160 adm.other.php:111 adm.regexps.php:213
+#: adm.images.php:135 adm.macros.php:160 adm.other.php:111 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:77 adm.triggerseverities.php:83
 #: adm.valuemapping.php:128 adm.workingtime.php:64
 #: include/views/administration.general.image.list.php:29
@@ -6991,10 +6991,10 @@ msgstr "Изображенията за всички карти ще бъдат 
 msgid "Immediately"
 msgstr "Веднага"
 
-#: hosts.php:815 include/views/configuration.screen.list.php:33
+#: hosts.php:814 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:83 include/views/conf.import.php:88
-#: templates.php:490
+#: templates.php:491
 msgid "Import"
 msgstr "Импортиране"
 
@@ -7034,7 +7034,7 @@ msgstr "В група"
 msgid "In groups"
 msgstr "В групи"
 
-#: hosts.php:985 include/html.inc.php:329
+#: hosts.php:983 include/html.inc.php:329
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -7105,7 +7105,7 @@ msgid "Incorrect action condition discovery check."
 msgstr "Неправилно действие в условие проверка за откриване."
 
 #: include/classes/api/services/CAction.php:1683
-#: include/classes/api/services/CAction.php:2427
+#: include/classes/api/services/CAction.php:2425
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Неправилно действие в условие проверка за откриване. Проверка за откриване не съществува или нямате права за достъп до него."
 
@@ -7130,12 +7130,12 @@ msgid "Incorrect action condition event type."
 msgstr ""
 
 #: include/classes/api/services/CAction.php:1668
-#: include/classes/api/services/CAction.php:2394
+#: include/classes/api/services/CAction.php:2395
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Неправилно действие в условие хост група. Хост групата не съществува или нямате права за достъп до нея."
 
 #: include/classes/api/services/CAction.php:1671
-#: include/classes/api/services/CAction.php:2400
+#: include/classes/api/services/CAction.php:2401
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Неправилно действие в условие хост. Хоста не съществува или нямате права за достъп до него."
 
@@ -7156,12 +7156,12 @@ msgid "Incorrect action condition port \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CAction.php:1686
-#: include/classes/api/services/CAction.php:2434
+#: include/classes/api/services/CAction.php:2431
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Неправилно действие в условие прокси. Проксито не съществува или нямате права за достъп до него."
 
 #: include/classes/api/services/CAction.php:1674
-#: include/classes/api/services/CAction.php:2406
+#: include/classes/api/services/CAction.php:2407
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Неправилно действие в условие шаблон. Шаблона не съществува или нямате права за достъп до него."
 
@@ -7176,7 +7176,7 @@ msgid "Incorrect action condition trigger value."
 msgstr ""
 
 #: include/classes/api/services/CAction.php:1677
-#: include/classes/api/services/CAction.php:2412
+#: include/classes/api/services/CAction.php:2413
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Неправилно действие в условие тригер. Тригера не съществува или нямате права за достъп до него."
 
@@ -7516,35 +7516,35 @@ msgstr "Неправилен ключ."
 msgid "Incorrect list of items."
 msgstr "Неправилен списък на елементи на данните."
 
-#: maintenance.php:330
+#: maintenance.php:329
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Неправилна поддръжка - датата трябва да бъде между 1970.01.01 и 2038.01.18"
 
-#: maintenance.php:358
+#: maintenance.php:357
 msgid "Incorrect maintenance date"
 msgstr "Неправилна дата на поддръжка."
 
-#: maintenance.php:337
+#: maintenance.php:336
 msgid "Incorrect maintenance day period"
 msgstr "Неправилен ден от периода на поддържане"
 
-#: maintenance.php:344 maintenance.php:355
+#: maintenance.php:343 maintenance.php:354
 msgid "Incorrect maintenance days of week"
 msgstr "Неправилен ден от седмицата на поддръжката"
 
-#: maintenance.php:352
+#: maintenance.php:351
 msgid "Incorrect maintenance month period"
 msgstr "Неправилен период от месеца за поддръжката"
 
-#: maintenance.php:317
+#: maintenance.php:316
 msgid "Incorrect maintenance period"
 msgstr "Неправилен период за поддръжката"
 
-#: maintenance.php:314
+#: maintenance.php:313
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Неправилен период за поддръжката (минимум 5 минути)"
 
-#: maintenance.php:341
+#: maintenance.php:340
 msgid "Incorrect maintenance week period"
 msgstr "Неправилен период от седмицата за поддръжката"
 
@@ -7647,7 +7647,7 @@ msgstr "Неправилен протокол за поверителност з
 msgid "Incorrect proxyid."
 msgstr "Неправилно id на прокси."
 
-#: adm.regexps.php:69 include/regexp.inc.php:120
+#: adm.regexps.php:68 include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr ""
@@ -7900,7 +7900,7 @@ msgstr "Инсталация"
 msgid "Installer name"
 msgstr "Име на инсталатора"
 
-#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:869
+#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:868
 #: include/views/administration.proxy.edit.php:70 items.php:40
 msgid "Interface"
 msgstr "Интерфейс"
@@ -7996,7 +7996,7 @@ msgstr "Невалиден JSON. Възникна грешка на сървър
 msgid "Invalid Request."
 msgstr "Невалидна заявка."
 
-#: maintenance.php:145 maintenance.php:159 services.php:187 services.php:201
+#: maintenance.php:144 maintenance.php:158 services.php:187 services.php:201
 #, c-format
 msgid "Invalid date \"%s\"."
 msgstr "Невалидна дата \\\"%s\\\"."
@@ -8034,7 +8034,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
 
-#: maintenance.php:325
+#: maintenance.php:324
 msgid "Invalid maintenance period"
 msgstr "Невалиден период на поддръжка"
 
@@ -8082,7 +8082,7 @@ msgstr ""
 msgid "Invalid third parameter."
 msgstr ""
 
-#: disc_prototypes.php:185 host_discovery.php:174 items.php:364
+#: disc_prototypes.php:191 host_discovery.php:176 items.php:369
 msgid "Invalid time period"
 msgstr "Невалиден период на време"
 
@@ -8138,8 +8138,8 @@ msgstr "Италиански (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:508
-#: items.php:757 items.php:786 tr_logform.php:249
+#: include/views/configuration.triggers.expression.php:57 items.php:513
+#: items.php:761 items.php:790 tr_logform.php:249
 msgid "Item"
 msgstr "Елемент на данните"
 
@@ -8189,7 +8189,7 @@ msgstr "Елемент на данните \"%1$s\" пропуска - потр�
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент на данните \"%1$s:%2$s\" има невалиден порт: \"%3$s\"."
 
-#: items.php:488
+#: items.php:493
 msgid "Item added"
 msgstr "Елемент на данните добавен"
 
@@ -8197,17 +8197,17 @@ msgstr "Елемент на данните добавен"
 msgid "Item count"
 msgstr "Брой елементи на данните "
 
-#: items.php:377
+#: items.php:382
 msgid "Item deleted"
 msgstr "Елемент на данните изтрит"
 
-#: applications.php:231 items.php:700
+#: applications.php:233 items.php:705
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applications.php:230 items.php:699
+#: applications.php:232 items.php:704
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -8239,38 +8239,38 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:295
+#: disc_prototypes.php:301
 msgid "Item prototype added"
 msgstr ""
 
-#: disc_prototypes.php:196
+#: disc_prototypes.php:202
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:317
+#: disc_prototypes.php:323
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:316
+#: disc_prototypes.php:322
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: disc_prototypes.php:291
+#: disc_prototypes.php:297
 msgid "Item prototype updated"
 msgstr ""
 
 #: include/html.inc.php:374 include/html.inc.php:378
-#: include/views/configuration.host.discovery.list.php:106
+#: include/views/configuration.host.discovery.list.php:111
 #: include/views/configuration.host.edit.php:576
 #: include/views/configuration.template.edit.php:309 popup.php:95
 msgid "Item prototypes"
 msgstr "Елемент на данните прототипи"
 
-#: disc_prototypes.php:336
+#: disc_prototypes.php:342
 msgid "Item prototypes deleted"
 msgstr ""
 
@@ -8278,7 +8278,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr "Елемент на данните прототип за"
 
-#: items.php:485
+#: items.php:490
 msgid "Item updated"
 msgstr "Елемент на данните актуализиран"
 
@@ -8330,7 +8330,7 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува."
 
-#: hosts.php:864 hosts.php:954 include/html.inc.php:385
+#: hosts.php:863 hosts.php:953 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
 #: include/reports.inc.php:117 include/reports.inc.php:250
 #: include/views/configuration.application.list.php:97
@@ -8342,8 +8342,8 @@ msgstr "Ключ от елемент на данните \"%1$s\" вече съ�
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:229
 #: include/views/inventory.host.view.php:239 latest.php:306 popup.php:71
 #: queue.php:101 report6.php:44 search.php:141 search.php:173 search.php:198
-#: search.php:395 search.php:426 search.php:455 templates.php:510
-#: templates.php:569
+#: search.php:395 search.php:426 search.php:455 templates.php:511
+#: templates.php:570
 msgid "Items"
 msgstr "Елементи на данните "
 
@@ -8351,11 +8351,11 @@ msgstr "Елементи на данните "
 msgid "Items (m/d/n)"
 msgstr "Елементи на данните (m/d/n)"
 
-#: items.php:739
+#: items.php:743
 msgid "Items copied"
 msgstr "Елементи на данните копирани"
 
-#: items.php:796
+#: items.php:800
 msgid "Items deleted"
 msgstr "Елементи на данните изтрити"
 
@@ -8363,7 +8363,7 @@ msgstr "Елементи на данните изтрити"
 msgid "Items list"
 msgstr "Списък елементи на данните"
 
-#: items.php:682
+#: items.php:687
 msgid "Items updated"
 msgstr "Елементи на данните актуализирани"
 
@@ -8413,7 +8413,7 @@ msgstr "Идентификатор Jabber"
 msgid "Jan"
 msgstr "Яну"
 
-#: include/forms.inc.php:1670 include/func.inc.php:117
+#: include/forms.inc.php:1669 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:112
 msgid "January"
 msgstr "Януари"
@@ -8426,7 +8426,7 @@ msgstr "Японски (ja_JP)"
 msgid "Jul"
 msgstr "Юли"
 
-#: include/forms.inc.php:1672 include/func.inc.php:123
+#: include/forms.inc.php:1671 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:118
 msgid "July"
 msgstr "Юли"
@@ -8435,7 +8435,7 @@ msgstr "Юли"
 msgid "Jun"
 msgstr "Юни"
 
-#: include/forms.inc.php:1695 include/func.inc.php:122
+#: include/forms.inc.php:1694 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:117
 msgid "June"
 msgstr "Юни"
@@ -8465,7 +8465,7 @@ msgstr "Ключ"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не съвпада с <grpmax|grpmin|grpsum|grpavg>[\"Хост група(и)\", \"Ключ елемент на данните\", \"<last|min|max|avg|sum|count>\", \"параметри\"]."
 
-#: include/views/configuration.action.edit.php:793
+#: include/views/configuration.action.edit.php:794
 #: include/views/js/common.item.edit.js.php:179
 msgid "Key passphrase"
 msgstr "Ключ фраза за достъп"
@@ -8522,7 +8522,7 @@ msgid "LOST"
 msgstr "ИЗГУБЕН"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:948
 #: include/views/configuration.host.discovery.edit.php:291
 #: include/views/js/configuration.sysmaps.js.php:70
 #: include/views/js/configuration.sysmaps.js.php:234
@@ -8539,7 +8539,7 @@ msgstr "Разположение на етикет"
 msgid "Language"
 msgstr "Език"
 
-#: include/forms.inc.php:1717 include/maintenances.inc.php:115
+#: include/forms.inc.php:1716 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Последно"
 
@@ -8718,7 +8718,7 @@ msgstr "Връзка към шаблон"
 msgid "Link to templates"
 msgstr "Връзка към шаблони"
 
-#: include/views/configuration.action.edit.php:925
+#: include/views/configuration.action.edit.php:926
 msgid "Link with templates"
 msgstr "Връзка с шаблони"
 
@@ -8726,11 +8726,11 @@ msgstr "Връзка с шаблони"
 #: include/views/configuration.host.edit.php:744
 #: include/views/configuration.host.prototype.edit.php:233
 #: include/views/configuration.template.edit.php:435
-#: include/views/configuration.template.edit.php:462 templates.php:516
+#: include/views/configuration.template.edit.php:462 templates.php:517
 msgid "Linked templates"
 msgstr "Свързани шаблони"
 
-#: templates.php:517
+#: templates.php:518
 msgid "Linked to"
 msgstr "Свързано с"
 
@@ -8953,7 +8953,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Макро с hostmacroid \"%1$s\" не съществува."
 
 #: adm.gui.php:100 adm.housekeeper.php:131 adm.iconmapping.php:114
-#: adm.images.php:138 adm.macros.php:163 adm.other.php:114 adm.regexps.php:216
+#: adm.images.php:138 adm.macros.php:163 adm.other.php:114 adm.regexps.php:205
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:86
 #: adm.valuemapping.php:131 adm.workingtime.php:67
 #: include/views/administration.general.macros.edit.php:31
@@ -8992,11 +8992,11 @@ msgstr "Стойността за поддръжката \"Активно от\"
 msgid "Maintenance action condition value must be empty."
 msgstr ""
 
-#: maintenance.php:131
+#: maintenance.php:130
 msgid "Maintenance added"
 msgstr "Поддръжка добавена"
 
-#: maintenance.php:252
+#: maintenance.php:251
 msgid "Maintenance deleted"
 msgstr "Поддръжка изтрита"
 
@@ -9004,7 +9004,7 @@ msgstr "Поддръжка изтрита"
 msgid "Maintenance period"
 msgstr "Период на поддръжка"
 
-#: include/forms.inc.php:1776
+#: include/forms.inc.php:1775
 msgid "Maintenance period length"
 msgstr "Продължителност на поддръжката"
 
@@ -9020,7 +9020,7 @@ msgstr "Състояние на поддръжката"
 msgid "Maintenance type"
 msgstr "Тип поддръжка"
 
-#: maintenance.php:126
+#: maintenance.php:125
 msgid "Maintenance updated"
 msgstr "Поддръжка актуализирана"
 
@@ -9116,7 +9116,7 @@ msgstr "Карти на мрежата"
 msgid "Mar"
 msgstr "Мар"
 
-#: include/forms.inc.php:1680 include/func.inc.php:119
+#: include/forms.inc.php:1679 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:114
 msgid "March"
 msgstr "Март"
@@ -9137,9 +9137,9 @@ msgstr "Маркирай избраните"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:1076 include/views/configuration.item.list.php:268
+#: hosts.php:1068 include/views/configuration.item.list.php:271
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.triggers.list.php:289
+#: include/views/configuration.triggers.list.php:299
 msgid "Mass update"
 msgstr "Общо актуализиране"
 
@@ -9210,7 +9210,7 @@ msgstr "Максималната стойност за период T е > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Максималната стойност за период T НЕ е N"
 
-#: include/forms.inc.php:1690 include/func.inc.php:121
+#: include/forms.inc.php:1689 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:116
 msgid "May"
 msgstr "Май"
@@ -9236,29 +9236,29 @@ msgstr "Метод на уведомление"
 msgid "Media type \"%s\" already exists."
 msgstr "Метод на уведомление \"%s\" вече съществува."
 
-#: media_types.php:132
+#: media_types.php:133
 msgid "Media type added"
 msgstr "Метод на уведомление добавено"
 
-#: media_types.php:156 media_types.php:193
+#: media_types.php:157 media_types.php:194
 msgid "Media type deleted"
 msgstr "Метод на уведомление изтрито"
 
-#: media_types.php:180
+#: media_types.php:181
 #, fuzzy
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Метод на уведомление изключено"
 msgstr[1] "Метод на уведомление изключено"
 
-#: media_types.php:179
+#: media_types.php:180
 #, fuzzy
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Метод на уведомление включено"
 msgstr[1] "Метод на уведомление включено"
 
-#: media_types.php:124
+#: media_types.php:125
 msgid "Media type updated"
 msgstr "Метод на уведомление актуализирано"
 
@@ -9293,18 +9293,18 @@ msgstr ""
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
 #: dashboard.php:388 dashboard.php:411 dashboard.php:434 dashboard.php:457
-#: dashboard.php:487 include/views/configuration.item.list.php:231
+#: dashboard.php:487 include/views/configuration.item.list.php:233
 #: include/views/monitoring.slides.php:42
 msgid "Menu"
 msgstr "Меню"
 
-#: acknow.php:274 include/actions.inc.php:447 include/actions.inc.php:456
+#: acknow.php:273 include/actions.inc.php:447 include/actions.inc.php:456
 #: include/actions.inc.php:462 include/actions.inc.php:824
 #: include/actions.inc.php:871 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenActions.php:168
 #: include/views/administration.auditacts.list.php:73
 #: include/views/administration.auditacts.list.php:104
-#: include/views/configuration.action.edit.php:628
+#: include/views/configuration.action.edit.php:629
 msgid "Message"
 msgstr "Съобщение"
 
@@ -9410,7 +9410,7 @@ msgstr "Минималната стойност за период T е > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Минималната стойност за период T НЕ е N"
 
-#: include/forms.inc.php:1783
+#: include/forms.inc.php:1782
 msgid "Minutes"
 msgstr "Минути"
 
@@ -9478,7 +9478,7 @@ msgstr "Модел"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:1656 include/forms.inc.php:1724
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "Понеделник"
@@ -9509,11 +9509,11 @@ msgstr ""
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1699 report3.php:106 report4.php:146 report5.php:46
+#: include/forms.inc.php:1698 report3.php:106 report4.php:146 report5.php:46
 msgid "Month"
 msgstr "Месец"
 
-#: include/forms.inc.php:1636 include/maintenances.inc.php:37
+#: include/forms.inc.php:1635 include/maintenances.inc.php:37
 #: include/reports.inc.php:64 include/reports.inc.php:388
 #: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
@@ -9569,9 +9569,9 @@ msgstr "НЯМА ДАННИ"
 msgid "NTLM"
 msgstr ""
 
-#: actionconf.php:37 actionconf.php:172 adm.regexps.php:37 adm.regexps.php:151
-#: adm.regexps.php:187 applications.php:38 disc_prototypes.php:42
-#: graphs.php:41 host_discovery.php:49 hosts.php:831 hosts.php:862
+#: actionconf.php:37 actionconf.php:168 adm.regexps.php:37 adm.regexps.php:146
+#: adm.regexps.php:177 applications.php:38 disc_prototypes.php:42
+#: graphs.php:41 host_discovery.php:49 hosts.php:830 hosts.php:861
 #: httpconf.php:44 httpmon.php:92 include/classes/setup/CSetupWizard.php:384
 #: include/forms.inc.php:591 include/hosts.inc.php:115
 #: include/reports.inc.php:169
@@ -9590,7 +9590,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:45
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:948
 #: include/views/configuration.action.list.php:51
 #: include/views/configuration.application.edit.php:42
 #: include/views/configuration.discovery.edit.php:39
@@ -9611,7 +9611,7 @@ msgstr ""
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:52
 #: include/views/configuration.item.list.php:63
-#: include/views/configuration.item.list.php:145
+#: include/views/configuration.item.list.php:147
 #: include/views/configuration.item.prototype.list.php:47
 #: include/views/configuration.maintenance.edit.php:39
 #: include/views/configuration.maintenance.list.php:44
@@ -9627,11 +9627,11 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.list.php:102
-#: include/views/configuration.triggers.massupdate.php:88
+#: include/views/configuration.triggers.massupdate.php:87
 #: include/views/inventory.host.list.php:76
 #: include/views/js/configuration.sysmaps.js.php:184 items.php:44
-#: latest.php:336 latest.php:337 maintenance.php:44 maintenance.php:210
-#: maintenance.php:241 popup_httpstep.php:36 popup.php:537 popup.php:662
+#: latest.php:336 latest.php:337 maintenance.php:44 maintenance.php:209
+#: maintenance.php:240 popup_httpstep.php:36 popup.php:537 popup.php:662
 #: popup.php:737 popup.php:812 popup.php:888 popup.php:954 popup.php:977
 #: popup.php:1098 popup.php:1229 popup.php:1311 popup.php:1416 popup.php:1419
 #: popup.php:1486 popup.php:1489 popup.php:1550 popup.php:1554 popup.php:1604
@@ -9676,15 +9676,15 @@ msgstr ""
 msgid "Network interface output statistic. Integer value. If mode is missing bytes is used."
 msgstr ""
 
-#: sysmaps.php:176
+#: sysmaps.php:174
 msgid "Network map added"
 msgstr "Карта на мрежата добавена"
 
-#: sysmaps.php:222
+#: sysmaps.php:220
 msgid "Network map deleted"
 msgstr "Карта на мрежата изтрита"
 
-#: sysmaps.php:169
+#: sysmaps.php:167
 msgid "Network map updated"
 msgstr "Карта на мрежата актуализирана"
 
@@ -9701,8 +9701,8 @@ msgid "Never executed"
 msgstr "Никога да не се изпълнява"
 
 #: include/views/configuration.action.edit.php:450
-#: include/views/configuration.action.edit.php:679
-#: include/views/configuration.action.edit.php:999
+#: include/views/configuration.action.edit.php:680
+#: include/views/configuration.action.edit.php:1000
 #: include/views/configuration.discovery.edit.php:55
 #: include/views/configuration.maintenance.edit.php:132
 msgid "New"
@@ -9745,7 +9745,7 @@ msgstr "Нов елемент на данните за графика"
 msgid "New media"
 msgstr "Ново уведомление"
 
-#: adm.regexps.php:227
+#: adm.regexps.php:216
 msgid "New regular expression"
 msgstr "Нов регулярен израз"
 
@@ -9932,7 +9932,7 @@ msgid "No command type specified for action operation."
 msgstr "За операция на действие не е уточнен тип команда."
 
 #: include/views/configuration.action.edit.php:69
-#: include/views/configuration.action.edit.php:944
+#: include/views/configuration.action.edit.php:945
 msgid "No conditions defined."
 msgstr "Не са дефинирани условия."
 
@@ -9956,7 +9956,7 @@ msgstr "Не е интерфейс по подразбиране \"%1$s\" тип
 
 #: include/views/configuration.services.edit.php:89
 #: include/views/configuration.triggers.edit.php:279
-#: include/views/configuration.triggers.massupdate.php:84
+#: include/views/configuration.triggers.massupdate.php:83
 msgid "No dependencies defined."
 msgstr "Не са дефинирани зависимостите."
 
@@ -9997,7 +9997,7 @@ msgstr "Няма събиния"
 msgid "No events found."
 msgstr ""
 
-#: acknow.php:83
+#: acknow.php:82
 msgid "No events to acknowledge"
 msgstr "Няма събиния за потвърждаване"
 
@@ -10102,7 +10102,7 @@ msgstr ""
 msgid "No host with hostid \"%s\"."
 msgstr "Няма хост с  hostid \"%s\"."
 
-#: hostinventoriesoverview.php:95 hosts.php:859
+#: hostinventoriesoverview.php:95 hosts.php:858
 #: include/views/inventory.host.list.php:72 popup.php:735 popup.php:810
 #: search.php:129
 msgid "No hosts found."
@@ -10439,15 +10439,15 @@ msgstr ""
 msgid "No status for proxy."
 msgstr ""
 
-#: triggers.php:319
+#: triggers.php:323
 msgid "No target selected"
 msgstr "Не е избрана цел"
 
-#: graphs.php:379 items.php:742
+#: graphs.php:377 items.php:746
 msgid "No target selected."
 msgstr "Не е избрана цел."
 
-#: popup.php:660 search.php:403 templates.php:505
+#: popup.php:660 search.php:403 templates.php:506
 msgid "No templates found."
 msgstr ""
 
@@ -10526,7 +10526,7 @@ msgid "Normal view"
 msgstr "Нормален преглед"
 
 #: include/actions.inc.php:232
-#: include/views/configuration.action.edit.php:1040
+#: include/views/configuration.action.edit.php:1041
 msgid "Not Ack"
 msgstr "Непотвърдено"
 
@@ -10599,7 +10599,7 @@ msgstr "Нотификации"
 msgid "Nov"
 msgstr "Ное"
 
-#: include/forms.inc.php:1692 include/func.inc.php:127
+#: include/forms.inc.php:1691 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:122
 msgid "November"
 msgstr "Ноември"
@@ -10835,7 +10835,7 @@ msgstr "Окт"
 msgid "Octal"
 msgstr "Осмичен"
 
-#: include/forms.inc.php:1687 include/func.inc.php:126
+#: include/forms.inc.php:1686 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:121
 msgid "October"
 msgstr "Октомври"
@@ -10870,7 +10870,7 @@ msgstr "Веднъж"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1633 include/maintenances.inc.php:31
+#: include/forms.inc.php:1632 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Само един път"
 
@@ -10970,7 +10970,7 @@ msgstr "Преброени са само тригерите възложени �
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:277
+#: actionconf.php:273
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" вече съществува."
@@ -10979,11 +10979,11 @@ msgstr "Операция \"%s\" вече съществува."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операцията не може да се извърши поради неоторизирано искане."
 
-#: include/views/configuration.action.edit.php:1052
+#: include/views/configuration.action.edit.php:1053
 msgid "Operation condition"
 msgstr "Състояние на операция"
 
-#: include/views/configuration.action.edit.php:1060
+#: include/views/configuration.action.edit.php:1061
 msgid "Operation details"
 msgstr "Детайли на операция"
 
@@ -10995,12 +10995,12 @@ msgstr "Операцията няма група за да функционир�
 msgid "Operation has no template to operate."
 msgstr "Операцията няма шаблон за да функционира."
 
-#: include/views/configuration.action.edit.php:512
-#: include/views/configuration.action.edit.php:518
+#: include/views/configuration.action.edit.php:513
+#: include/views/configuration.action.edit.php:519
 msgid "Operation type"
 msgstr "Тип операция"
 
-#: include/views/configuration.action.edit.php:1070
+#: include/views/configuration.action.edit.php:1071
 #: include/views/configuration.action.list.php:53
 msgid "Operations"
 msgstr "Операции"
@@ -11011,7 +11011,7 @@ msgstr "Оператор"
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:121
-#: include/views/configuration.action.edit.php:989
+#: include/views/configuration.action.edit.php:990
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.triggers.edit.php:119
 msgid "Or"
@@ -11062,8 +11062,8 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:496
 #: include/views/configuration.item.massupdate.php:547
 #: include/views/configuration.item.massupdate.php:560
-#: include/views/configuration.triggers.massupdate.php:76
-#: include/views/configuration.triggers.massupdate.php:151
+#: include/views/configuration.triggers.massupdate.php:75
+#: include/views/configuration.triggers.massupdate.php:150
 msgid "Original"
 msgstr "Оригинал"
 
@@ -11072,7 +11072,7 @@ msgid "Original blue"
 msgstr "Оригинално синьо"
 
 #: adm.gui.php:105 adm.housekeeper.php:136 adm.iconmapping.php:119
-#: adm.images.php:143 adm.macros.php:168 adm.other.php:119 adm.regexps.php:221
+#: adm.images.php:143 adm.macros.php:168 adm.other.php:119 adm.regexps.php:210
 #: adm.triggerdisplayoptions.php:85 adm.triggerseverities.php:91
 #: adm.valuemapping.php:136 adm.workingtime.php:72
 #: include/classes/html/CTweenBox.php:76
@@ -11387,8 +11387,8 @@ msgstr "Пасивен"
 #: include/views/administration.users.edit.php:83
 #: include/views/administration.users.edit.php:101
 #: include/views/administration.users.edit.php:105
-#: include/views/configuration.action.edit.php:751
-#: include/views/configuration.action.edit.php:784
+#: include/views/configuration.action.edit.php:752
+#: include/views/configuration.action.edit.php:785
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
 #: include/views/configuration.host.edit.php:780
@@ -11407,7 +11407,7 @@ msgstr "Парола"
 msgid "Password (once again)"
 msgstr "Парола (потвърждаване)"
 
-#: users.php:167
+#: users.php:166
 #, c-format
 msgid "Password is unavailable for users with %1$s."
 msgstr ""
@@ -11417,7 +11417,7 @@ msgstr ""
 msgid "Password required for media type."
 msgstr "За метода на уведомлението се изисква парола."
 
-#: profile.php:120 users.php:203
+#: profile.php:120 users.php:202
 msgid "Password should not be empty"
 msgstr "Паролата не трябва да е празена"
 
@@ -11453,7 +11453,7 @@ msgstr ""
 msgid "Period"
 msgstr "Период"
 
-#: include/forms.inc.php:1638
+#: include/forms.inc.php:1637
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Тип период"
@@ -11505,7 +11505,7 @@ msgstr "Възпроизвеждане на звук"
 msgid "Please correct all issues and press \"Retry\" button"
 msgstr "Моля, коригирайте всички проблеми и натиснете бутон \"Повторен опит\""
 
-#: scripts.php:96
+#: scripts.php:88
 msgid "Please enter confirmation text."
 msgstr "Моля, въведете текста за потвърждение."
 
@@ -11522,11 +11522,11 @@ msgid "Populates host inventory field"
 msgstr "Попълнете полето: данни за инвентаризация на хост"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:85
-#: hosts.php:834 include/classes/setup/CSetupWizard.php:379
+#: hosts.php:833 include/classes/setup/CSetupWizard.php:379
 #: include/forms.inc.php:470
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:56
-#: include/views/configuration.action.edit.php:798
+#: include/views/configuration.action.edit.php:799
 #: include/views/configuration.host.discovery.edit.php:154
 #: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.edit.php:340
@@ -11536,7 +11536,7 @@ msgstr "Попълнете полето: данни за инвентариза�
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:154 items.php:89 items.php:153
+#: include/views/inventory.host.view.php:154 items.php:89 items.php:158
 #: setup.php:48
 msgid "Port"
 msgstr "Порт"
@@ -11643,7 +11643,7 @@ msgstr "Защита фраза за достъп"
 msgid "Privacy protocol"
 msgstr "Протокол за поверителност"
 
-#: include/views/configuration.action.edit.php:777
+#: include/views/configuration.action.edit.php:778
 #: include/views/configuration.host.discovery.edit.php:173
 #: include/views/configuration.item.edit.php:179
 #: include/views/configuration.item.massupdate.php:280
@@ -11721,11 +11721,11 @@ msgstr "Прокси \"%1$s\" се използва от правило за о�
 msgid "Proxy \"%s\" already exists."
 msgstr "Прокси \"%s\" вече съществува."
 
-#: proxies.php:117
+#: proxies.php:119
 msgid "Proxy added"
 msgstr "Прокси добавено"
 
-#: proxies.php:142 proxies.php:203
+#: proxies.php:144 proxies.php:205
 msgid "Proxy deleted"
 msgstr "Прокси изтрито"
 
@@ -11749,18 +11749,18 @@ msgstr "Режим на прокси"
 msgid "Proxy name"
 msgstr "Име на прокси"
 
-#: proxies.php:110
+#: proxies.php:112
 msgid "Proxy updated"
 msgstr "Прокси актуализирано"
 
-#: include/views/configuration.action.edit.php:752
+#: include/views/configuration.action.edit.php:753
 #: include/views/configuration.host.discovery.edit.php:165
 #: include/views/configuration.item.edit.php:171
 #: include/views/configuration.item.massupdate.php:247
 msgid "Public key"
 msgstr "Обществен ключ"
 
-#: include/views/configuration.action.edit.php:770
+#: include/views/configuration.action.edit.php:771
 #: include/views/configuration.host.discovery.edit.php:170
 #: include/views/configuration.item.edit.php:176
 #: include/views/configuration.item.massupdate.php:270
@@ -11885,11 +11885,11 @@ msgstr "Регулярен израз V съответства на послед
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
 msgstr "Регулярен израз V съответства на последната стойност в период T, тогава N = 1, 0 - в противен случай (без малки и главни букви)"
 
-#: adm.regexps.php:145
+#: adm.regexps.php:140
 msgid "Regular expression added"
 msgstr "Регулярен израз добавен"
 
-#: adm.regexps.php:200
+#: adm.regexps.php:190
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Регулярен израз изтрит"
@@ -11899,16 +11899,16 @@ msgstr[1] "Регулярни изрази изтрити"
 msgid "Regular expression does not exist."
 msgstr "Регулярен израз не съществува."
 
-#: adm.regexps.php:68 include/regexp.inc.php:119
+#: adm.regexps.php:67 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
 msgstr ""
 
-#: adm.regexps.php:139
+#: adm.regexps.php:134
 msgid "Regular expression updated"
 msgstr "Регулярен израз актуализиран"
 
 #: adm.gui.php:99 adm.housekeeper.php:130 adm.iconmapping.php:113
-#: adm.images.php:137 adm.macros.php:162 adm.other.php:113 adm.regexps.php:215
+#: adm.images.php:137 adm.macros.php:162 adm.other.php:113 adm.regexps.php:204
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:85
 #: adm.valuemapping.php:130 adm.workingtime.php:66
 #: include/views/administration.general.regularexpressions.list.php:22
@@ -11930,7 +11930,7 @@ msgstr "Отдалечена команда"
 #: include/views/configuration.action.edit.php:100
 #: include/views/configuration.action.edit.php:421
 #: include/views/configuration.action.edit.php:434
-#: include/views/configuration.action.edit.php:973
+#: include/views/configuration.action.edit.php:974
 #: include/views/configuration.host.discovery.edit.php:211
 #: include/views/configuration.host.discovery.edit.php:320
 #: include/views/configuration.httpconf.edit.php:249
@@ -11943,7 +11943,7 @@ msgstr "Отдалечена команда"
 #: include/views/configuration.sysmap.edit.php:147
 #: include/views/configuration.sysmap.edit.php:165
 #: include/views/configuration.triggers.edit.php:305
-#: include/views/configuration.triggers.massupdate.php:113
+#: include/views/configuration.triggers.massupdate.php:112
 #: include/views/js/administration.general.valuemapping.edit.js.php:11
 #: include/views/js/adm.regexprs.edit.js.php:8
 #: include/views/js/common.filter.trigger.js.php:16
@@ -11981,7 +11981,7 @@ msgstr "Премахни елемент"
 msgid "Remove from"
 msgstr "Премахни от"
 
-#: charts.php:103 history.php:89 include/html.inc.php:182 maps.php:60
+#: charts.php:102 history.php:89 include/html.inc.php:182 maps.php:60
 #: screens.php:110
 msgid "Remove from favourites"
 msgstr "Премахни от любими"
@@ -11990,7 +11990,7 @@ msgstr "Премахни от любими"
 msgid "Remove from host group"
 msgstr "Премахни от хост група"
 
-#: include/actions.inc.php:408 include/views/configuration.action.edit.php:872
+#: include/actions.inc.php:408 include/views/configuration.action.edit.php:873
 msgid "Remove from host groups"
 msgstr "Премахни от хост групи"
 
@@ -12015,7 +12015,7 @@ msgstr "Смени"
 msgid "Replace applications"
 msgstr ""
 
-#: include/views/configuration.triggers.massupdate.php:145
+#: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace depenencies"
 msgstr "Смени зависимостите"
 
@@ -12087,7 +12087,7 @@ msgstr "Необходими кодове за състояние"
 msgid "Required string"
 msgstr "Необходим низ"
 
-#: events.php:401 hosts.php:840 include/forms.inc.php:619
+#: events.php:401 hosts.php:839 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
@@ -12443,7 +12443,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Грешка при изпълнение на SQL заявка \"%1$s\"."
 
 #: include/discovery.inc.php:56
-#: include/views/configuration.action.edit.php:730
+#: include/views/configuration.action.edit.php:731
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
 msgstr "SSH"
@@ -12496,12 +12496,12 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Сб"
 
-#: include/forms.inc.php:1661 include/forms.inc.php:1729
+#: include/forms.inc.php:1660 include/forms.inc.php:1728
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "Събота"
 
-#: acknow.php:229 include/views/administration.authentication.edit.php:123
+#: acknow.php:228 include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:56
 #: include/views/administration.general.housekeeper.edit.php:169
 #: include/views/administration.general.iconmap.edit.php:149
@@ -12525,7 +12525,7 @@ msgstr "Събота"
 #: include/views/administration.users.edit.php:382
 #: include/views/administration.users.edit.php:386
 #: include/views/administration.users.edit.php:396
-#: include/views/configuration.action.edit.php:1081
+#: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:89
@@ -12550,14 +12550,14 @@ msgstr "Събота"
 #: include/views/configuration.sysmap.edit.php:195
 #: include/views/configuration.template.edit.php:486
 #: include/views/configuration.triggers.edit.php:353
-#: include/views/configuration.triggers.massupdate.php:165
+#: include/views/configuration.triggers.massupdate.php:164
 #: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:176
 #: popup_media.php:137 tr_logform.php:344
 msgid "Save"
 msgstr "Запиши"
 
-#: acknow.php:230
+#: acknow.php:229
 msgid "Save and return"
 msgstr "Запиши и обратни"
 
@@ -12569,11 +12569,11 @@ msgstr "Мащаб"
 msgid "Scenario"
 msgstr "Сценарий"
 
-#: httpconf.php:194
+#: httpconf.php:197
 msgid "Scenario added"
 msgstr "Сценарий добавен"
 
-#: httpconf.php:189
+#: httpconf.php:192
 msgid "Scenario updated"
 msgstr "Сценарий актуализиран"
 
@@ -12647,7 +12647,7 @@ msgstr "Екран \"%1$s\" пропуснато - потребителско п
 msgid "Screen \"%1$s\" updated."
 msgstr "Екран \"%1$s\" актуализиран."
 
-#: screenconf.php:168
+#: screenconf.php:167
 msgid "Screen added"
 msgstr "Екран добавен"
 
@@ -12655,7 +12655,7 @@ msgstr "Екран добавен"
 msgid "Screen cell configuration"
 msgstr "Конфигуриране на екран"
 
-#: screenconf.php:240
+#: screenconf.php:239
 msgid "Screen deleted"
 msgstr "Екран изтрит"
 
@@ -12663,7 +12663,7 @@ msgstr "Екран изтрит"
 msgid "Screen should contain at least one row and column."
 msgstr "Екрана трябва да съдържа най-малко един ред и колона."
 
-#: screenconf.php:133 screenedit.php:227 screenedit.php:244
+#: screenconf.php:132 screenedit.php:227 screenedit.php:244
 msgid "Screen updated"
 msgstr "Екран актуализиран"
 
@@ -12676,7 +12676,7 @@ msgstr "Екран актуализиран"
 #: include/views/monitoring.screen.php:77
 #: include/views/monitoring.slides.php:29 popup.php:79 popup.php:103
 #: search.php:138 search.php:224 search.php:398 search.php:438 search.php:458
-#: templates.php:513 templates.php:575
+#: templates.php:514 templates.php:576
 msgid "Screens"
 msgstr "Екрани"
 
@@ -12684,8 +12684,8 @@ msgstr "Екрани"
 #: include/views/administration.mediatypes.edit.php:41
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.edit.php:112
-#: include/views/administration.script.list.php:50 scripts.php:157
-#: scripts.php:177
+#: include/views/administration.script.list.php:50 scripts.php:149
+#: scripts.php:169
 msgid "Script"
 msgstr "Скрипт"
 
@@ -12696,11 +12696,11 @@ msgstr "Скрипт"
 msgid "Script \"%1$s\" already exists."
 msgstr ""
 
-#: scripts.php:129
+#: scripts.php:121
 msgid "Script added"
 msgstr "Скрипт добавен"
 
-#: scripts.php:166 scripts.php:187
+#: scripts.php:158 scripts.php:179
 msgid "Script deleted"
 msgstr "Скрипт изтрит"
 
@@ -12723,7 +12723,7 @@ msgstr ""
 msgid "Script profiler"
 msgstr "Профил на скрипт"
 
-#: scripts.php:122
+#: scripts.php:114
 msgid "Script updated"
 msgstr "Скрипт актуализиран"
 
@@ -12754,7 +12754,7 @@ msgstr "Шаблона за търсене е празен"
 msgid "Search/Filter elements limit"
 msgstr "Ограничение за елементи на търсене/филтър"
 
-#: include/forms.inc.php:1714 include/maintenances.inc.php:112
+#: include/forms.inc.php:1713 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Вторичен"
 
@@ -12814,7 +12814,7 @@ msgstr "Име на сигурност"
 #: include/views/configuration.action.edit.php:253
 #: include/views/configuration.action.edit.php:266
 #: include/views/configuration.action.edit.php:279
-#: include/views/configuration.action.edit.php:736
+#: include/views/configuration.action.edit.php:737
 #: include/views/configuration.graph.edit.php:129
 #: include/views/configuration.graph.edit.php:187
 #: include/views/configuration.item.edit.php:71
@@ -12862,7 +12862,7 @@ msgstr "Изберете редовете, които съдържат опис�
 msgid "Selected"
 msgstr "Избрано"
 
-#: actionconf.php:360
+#: actionconf.php:356
 msgid "Selected actions deleted"
 msgstr "Избраните действия са изтрити"
 
@@ -12890,7 +12890,7 @@ msgstr "Изпрати съобщение до потребителски гру
 msgid "Send message to users"
 msgstr "Изпрати съобщение до потребители"
 
-#: include/views/configuration.action.edit.php:613
+#: include/views/configuration.action.edit.php:614
 msgid "Send only to"
 msgstr "Изпратете само до"
 
@@ -12898,11 +12898,11 @@ msgstr "Изпратете само до"
 msgid "Send to"
 msgstr "Изпрати до"
 
-#: include/views/configuration.action.edit.php:599
+#: include/views/configuration.action.edit.php:600
 msgid "Send to User groups"
 msgstr "Изпрати до потребителски групи"
 
-#: include/views/configuration.action.edit.php:600
+#: include/views/configuration.action.edit.php:601
 msgid "Send to Users"
 msgstr "Изпрати до потребители"
 
@@ -12920,7 +12920,7 @@ msgstr "Сеп"
 msgid "Separated"
 msgstr "Разделен"
 
-#: include/forms.inc.php:1682 include/func.inc.php:125
+#: include/forms.inc.php:1681 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:120
 msgid "September"
 msgstr "Септември"
@@ -13025,10 +13025,10 @@ msgstr "Сесията е прекратена, моля влезте повто
 
 #: events.php:479 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:167
-#: include/triggers.inc.php:1479 include/views/configuration.item.list.php:144
+#: include/triggers.inc.php:1479 include/views/configuration.item.list.php:146
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:100
-#: include/views/configuration.triggers.massupdate.php:70 popup.php:978
+#: include/views/configuration.triggers.massupdate.php:69 popup.php:978
 #: report5.php:60 tr_logform.php:338 tr_status.php:301
 msgid "Severity"
 msgstr "Важност"
@@ -13245,11 +13245,11 @@ msgstr ""
 msgid "Slide show \"%s\" already exists."
 msgstr "Слайдшоу \"%s\" вече съществува."
 
-#: slideconf.php:108
+#: slideconf.php:106
 msgid "Slide show added"
 msgstr "Слайдшоу добавено"
 
-#: slideconf.php:140 slideconf.php:161
+#: slideconf.php:138 slideconf.php:159
 msgid "Slide show deleted"
 msgstr "Слайдшоу изтрито"
 
@@ -13257,7 +13257,7 @@ msgstr "Слайдшоу изтрито"
 msgid "Slide show must contain slides."
 msgstr "Слайдшоу трябва да съдържа слайдове."
 
-#: slideconf.php:101
+#: slideconf.php:99
 msgid "Slide show updated"
 msgstr "Слайдшоу актуализирано"
 
@@ -13385,7 +13385,7 @@ msgstr "Състояние"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:463 events.php:478 hosts.php:871 httpdetails.php:134
+#: events.php:463 events.php:478 hosts.php:870 httpdetails.php:134
 #: httpmon.php:95 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13403,7 +13403,7 @@ msgstr ""
 #: include/views/configuration.host.prototype.list.php:50
 #: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.item.list.php:71
-#: include/views/configuration.item.list.php:147
+#: include/views/configuration.item.list.php:149
 #: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:104 popup_media.php:134
@@ -13454,7 +13454,7 @@ msgid "Status only"
 msgstr "Само състояние"
 
 #: httpdetails.php:130 include/actions.inc.php:839 include/actions.inc.php:930
-#: include/views/configuration.action.edit.php:500
+#: include/views/configuration.action.edit.php:501
 msgid "Step"
 msgstr "Стъпка"
 
@@ -13463,7 +13463,7 @@ msgstr "Стъпка"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Стъпка \"%1$s\" [%2$s of %3$s] неуспешно: %4$s"
 
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:491
 msgid "Step duration"
 msgstr "Продължителност на стъпка"
 
@@ -13508,7 +13508,7 @@ msgstr "Подфилтър [засяга само филтрирани данн�
 #: include/actions.inc.php:461 include/actions.inc.php:866
 #: include/classes/screens/CScreenActions.php:163
 #: include/views/administration.auditacts.list.php:99
-#: include/views/configuration.action.edit.php:624
+#: include/views/configuration.action.edit.php:625
 msgid "Subject"
 msgstr "Тема"
 
@@ -13545,7 +13545,7 @@ msgstr "Сумата от стойностите на период T НЕ е N"
 msgid "Sun"
 msgstr "Нед"
 
-#: include/forms.inc.php:1662 include/forms.inc.php:1730
+#: include/forms.inc.php:1661 include/forms.inc.php:1729
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "Неделя"
@@ -13655,14 +13655,14 @@ msgstr "Таблица \"%1$s\" няма поле с име \"%2$s\"."
 msgid "Tag"
 msgstr "Етикет"
 
-#: include/views/configuration.action.edit.php:677
+#: include/views/configuration.action.edit.php:678
 #: include/views/configuration.copy.elements.php:105
 #: include/views/configuration.triggers.edit.php:152
 #: include/views/js/configuration.action.edit.js.php:84
 msgid "Target"
 msgstr "Цел"
 
-#: include/views/configuration.action.edit.php:724
+#: include/views/configuration.action.edit.php:725
 msgid "Target list"
 msgstr "Списък на цели"
 
@@ -13671,7 +13671,7 @@ msgid "Target type"
 msgstr "Тип цел"
 
 #: include/discovery.inc.php:70
-#: include/views/configuration.action.edit.php:731
+#: include/views/configuration.action.edit.php:732
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
 msgstr "Telnet"
@@ -13701,7 +13701,7 @@ msgstr "Шаблон \"%1$s\" за хост \"%2$s\" не съществува."
 msgid "Template \"%1$s\" with item key \"%2$s\" already linked to host."
 msgstr ""
 
-#: templates.php:243
+#: templates.php:244
 msgid "Template added"
 msgstr "Шаблон добавен"
 
@@ -13709,7 +13709,7 @@ msgstr "Шаблон добавен"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Шаблонът не може да бъде прикрепен към друг шаблон повече от веднъж, дори чрез други шаблони."
 
-#: templates.php:374 templates.php:388 templates.php:413
+#: templates.php:375 templates.php:389 templates.php:414
 msgid "Template deleted"
 msgstr "Шаблон изтрит"
 
@@ -13743,7 +13743,7 @@ msgstr "Шаблон на екрани"
 msgid "Template trigger"
 msgstr "Шаблон на тригер"
 
-#: templates.php:233
+#: templates.php:234
 msgid "Template updated"
 msgstr "Шаблон актуалзиран"
 
@@ -13772,7 +13772,7 @@ msgstr "Шаблон със същото видимо име \"%s\" вече с�
 msgid "Templated items"
 msgstr "Шаблонни елементи на данните"
 
-#: hosts.php:870 include/menu.inc.php:158
+#: hosts.php:869 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:747
 #: include/views/configuration.hostgroups.list.php:144
@@ -13780,8 +13780,8 @@ msgstr "Шаблонни елементи на данните"
 #: include/views/configuration.host.prototype.edit.php:263
 #: include/views/configuration.host.prototype.list.php:49
 #: include/views/conf.import.php:29 popup.php:39 search.php:280 search.php:309
-#: search.php:314 search.php:321 search.php:485 templates.php:499
-#: templates.php:508
+#: search.php:314 search.php:321 search.php:485 templates.php:500
+#: templates.php:509
 msgid "Templates"
 msgstr "Шаблони"
 
@@ -13880,7 +13880,7 @@ msgid_plural "The image is used in maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/views/configuration.item.list.php:124
+#: include/views/configuration.item.list.php:126
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Още не е открит елемента на данните и ще бъде изтрит от %1$s (on %2$s at %3$s)."
@@ -13913,7 +13913,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Съществува \"%1$d\" група с вътрешен достъп до Графичен потребителски интерфейс (GUI)."
 msgstr[1] "Съществуват \"%1$d\" групи с вътрешен достъп до Графичен потребителски интерфейс (GUI)."
 
-#: include/forms.inc.php:1715 include/maintenances.inc.php:113
+#: include/forms.inc.php:1714 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Трети"
 
@@ -13946,7 +13946,7 @@ msgstr "Тази година"
 msgid "Thu"
 msgstr "Чет"
 
-#: include/forms.inc.php:1659 include/forms.inc.php:1727
+#: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "Четвъртък"
@@ -14042,7 +14042,7 @@ msgstr ""
 msgid "Title"
 msgstr "Заглавие"
 
-#: include/views/configuration.action.edit.php:482
+#: include/views/configuration.action.edit.php:483
 #: include/views/js/configuration.sysmaps.js.php:338
 msgid "To"
 msgstr "Към"
@@ -14109,7 +14109,7 @@ msgstr ""
 #: include/forms.inc.php:595 include/forms.inc.php:929
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:68
-#: include/views/configuration.item.prototype.list.php:51 items.php:158
+#: include/views/configuration.item.prototype.list.php:51 items.php:163
 #: latest.php:356 latest.php:357
 msgid "Trends"
 msgstr "Динамика на промените"
@@ -14151,7 +14151,7 @@ msgstr "Тригер \"%1$s\" пропуснат - потребителско п
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
 
-#: triggers.php:186 triggers.php:314 tr_logform.php:147
+#: triggers.php:190 triggers.php:320 tr_logform.php:147
 msgid "Trigger added"
 msgstr "Тригер добавен"
 
@@ -14163,7 +14163,7 @@ msgstr ""
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:204
+#: triggers.php:208
 msgid "Trigger deleted"
 msgstr "Тригер изтрит"
 
@@ -14171,21 +14171,21 @@ msgstr "Тригер изтрит"
 msgid "Trigger description"
 msgstr ""
 
-#: triggers.php:274
+#: triggers.php:278
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
 msgstr[1] ""
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
-#: adm.images.php:142 adm.macros.php:167 adm.other.php:118 adm.regexps.php:220
+#: adm.images.php:142 adm.macros.php:167 adm.other.php:118 adm.regexps.php:209
 #: adm.triggerdisplayoptions.php:84 adm.triggerseverities.php:90
 #: adm.valuemapping.php:135 adm.workingtime.php:71
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr "Преглед на опциите на тригер"
 
-#: triggers.php:273
+#: triggers.php:277
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -14257,38 +14257,38 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: trigger_prototypes.php:171
+#: trigger_prototypes.php:175
 msgid "Trigger prototype added"
 msgstr ""
 
-#: trigger_prototypes.php:188
+#: trigger_prototypes.php:192
 msgid "Trigger prototype deleted"
 msgstr ""
 
-#: trigger_prototypes.php:251
+#: trigger_prototypes.php:255
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:250
+#: trigger_prototypes.php:254
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:166
+#: trigger_prototypes.php:170
 msgid "Trigger prototype updated"
 msgstr ""
 
 #: include/html.inc.php:399 include/html.inc.php:403
-#: include/views/configuration.host.discovery.list.php:113
+#: include/views/configuration.host.discovery.list.php:118
 #: include/views/configuration.host.edit.php:603
 #: include/views/configuration.template.edit.php:330
 msgid "Trigger prototypes"
 msgstr "Тригер прототипи"
 
-#: trigger_prototypes.php:264
+#: trigger_prototypes.php:268
 msgid "Trigger prototypes deleted"
 msgstr ""
 
@@ -14296,12 +14296,12 @@ msgstr ""
 msgid "Trigger prototypes of"
 msgstr "Тригер прототип за"
 
-#: trigger_prototypes.php:215
+#: trigger_prototypes.php:219
 msgid "Trigger prototypes updated"
 msgstr ""
 
 #: adm.gui.php:103 adm.housekeeper.php:134 adm.iconmapping.php:117
-#: adm.images.php:141 adm.macros.php:166 adm.other.php:117 adm.regexps.php:219
+#: adm.images.php:141 adm.macros.php:166 adm.other.php:117 adm.regexps.php:208
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:89
 #: adm.valuemapping.php:134 adm.workingtime.php:70
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -14320,7 +14320,7 @@ msgstr ""
 msgid "Trigger status \"Problem\""
 msgstr ""
 
-#: triggers.php:182 triggers.php:243 tr_logform.php:122
+#: triggers.php:186 triggers.php:247 tr_logform.php:122
 msgid "Trigger updated"
 msgstr "Тригер актуализиран"
 
@@ -14328,14 +14328,14 @@ msgstr "Тригер актуализиран"
 msgid "Trigger value"
 msgstr "Стойност на тригер"
 
-#: hosts.php:865 hosts.php:956 include/forms.inc.php:582
+#: hosts.php:864 hosts.php:955 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
 #: include/triggers.inc.php:1081
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:496
 #: include/views/configuration.item.list.php:64
-#: include/views/configuration.item.list.php:203
+#: include/views/configuration.item.list.php:205
 #: include/views/configuration.template.edit.php:241
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:211
@@ -14346,7 +14346,7 @@ msgstr "Стойност на тригер"
 #: include/views/monitoring.overview.triggers.php:27 jsLoader.php:219
 #: popup.php:59 search.php:135 search.php:142 search.php:177 search.php:199
 #: search.php:221 search.php:275 search.php:328 search.php:396 search.php:430
-#: search.php:456 templates.php:511 templates.php:571 tr_status.php:238
+#: search.php:456 templates.php:512 templates.php:572 tr_status.php:238
 msgid "Triggers"
 msgstr "Тригери"
 
@@ -14354,7 +14354,7 @@ msgstr "Тригери"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:328
+#: triggers.php:332
 msgid "Triggers deleted"
 msgstr "Тригери изтрити"
 
@@ -14362,7 +14362,7 @@ msgstr "Тригери изтрити"
 msgid "Triggers info"
 msgstr "Информация за тригери"
 
-#: include/views/configuration.triggers.massupdate.php:160
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Triggers massupdate"
 msgstr "Общо актуализиране на тригери"
 
@@ -14395,7 +14395,7 @@ msgstr "Опитай пак да прочетеш недостъпното св�
 msgid "Tue"
 msgstr "Вто"
 
-#: include/forms.inc.php:1657 include/forms.inc.php:1725
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "Вторник"
@@ -14423,7 +14423,7 @@ msgstr "Двата елемента на данните (\"%1$s\" и \"%2$s\") �
 #: include/views/administration.mediatypes.list.php:40
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.list.php:39
-#: include/views/configuration.action.edit.php:740
+#: include/views/configuration.action.edit.php:741
 #: include/views/configuration.graph.edit.php:233
 #: include/views/configuration.host.discovery.edit.php:57
 #: include/views/configuration.host.discovery.edit.php:64
@@ -14462,7 +14462,7 @@ msgid "Type (descending)"
 msgstr "Тип (низходящ)"
 
 #: include/views/configuration.action.edit.php:126
-#: include/views/configuration.action.edit.php:992
+#: include/views/configuration.action.edit.php:993
 #: include/views/configuration.host.discovery.edit.php:274
 msgid "Type of calculation"
 msgstr "Тип на изчислението"
@@ -14587,11 +14587,11 @@ msgstr "Само непотвърдени"
 msgid "Unavailable for users with %1$s."
 msgstr ""
 
-#: include/views/administration.users.list.php:150
+#: include/views/administration.users.list.php:151
 msgid "Unblock selected"
 msgstr "Деблокирай избраните"
 
-#: include/views/administration.users.list.php:151
+#: include/views/administration.users.list.php:152
 msgid "Unblock selected users?"
 msgstr "Деблокиране на избраните потребители?"
 
@@ -14601,7 +14601,7 @@ msgid "Units"
 msgstr "Единици за измерване"
 
 #: events.php:573 events.php:574 events.php:584 events.php:585 events.php:586
-#: events.php:587 hosts.php:1005 httpdetails.php:165 httpmon.php:174
+#: events.php:587 httpdetails.php:165 httpmon.php:174
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14681,7 +14681,7 @@ msgstr "Прекратяване на връзката и изчистване"
 msgid "Unlink from template"
 msgstr "Прекратяване на връзката от шаблон"
 
-#: include/actions.inc.php:432 include/views/configuration.action.edit.php:926
+#: include/actions.inc.php:432 include/views/configuration.action.edit.php:927
 msgid "Unlink from templates"
 msgstr "Прекратяване на връзката от шаблони"
 
@@ -14796,7 +14796,7 @@ msgid "Up"
 msgstr "Достъпен"
 
 #: include/views/administration.auditlogs.list.php:46
-#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:1057
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:570
@@ -14811,7 +14811,7 @@ msgid "Update existing"
 msgstr "Актуализиране на съществуващото"
 
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:66
-#: items.php:156
+#: items.php:161
 msgid "Update interval"
 msgstr "Интервал за актуализиране"
 
@@ -14925,7 +14925,7 @@ msgstr "Използва се в действия"
 #: include/hosts.inc.php:67 include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:343
-#: include/views/configuration.action.edit.php:561
+#: include/views/configuration.action.edit.php:562
 #: include/views/configuration.httpconf.edit.php:158
 msgid "User"
 msgstr "Потребител"
@@ -14935,7 +14935,7 @@ msgstr "Потребител"
 msgid "User \"%s\" cannot be without user group."
 msgstr "Потребител \"%s\" не може да бъде без потребителска група."
 
-#: users.php:248
+#: users.php:247
 msgid "User added"
 msgstr "Потребител добавен"
 
@@ -14959,7 +14959,7 @@ msgstr "Потребителят не може да промени състоя�
 msgid "User cannot change status of himself."
 msgstr "Потребителят не може да промени състоянието за себе си"
 
-#: users.php:299 users.php:359
+#: users.php:298 users.php:358
 msgid "User deleted"
 msgstr "Потребител изтрит"
 
@@ -14967,7 +14967,7 @@ msgstr "Потребител изтрит"
 #: include/views/administration.script.list.php:42
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:552
+#: include/views/configuration.action.edit.php:553
 msgid "User group"
 msgstr "Потребителска група"
 
@@ -14996,13 +14996,13 @@ msgstr "Потребителска група \"%1$s\" се използва в 
 msgid "User group \"%s\" already exists."
 msgstr "Потребителска група \"%s\" вече съществува."
 
-#: usergrps.php:362
+#: usergrps.php:366
 msgid "User group disabled"
 msgid_plural "User groups disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: usergrps.php:361
+#: usergrps.php:365
 msgid "User group enabled"
 msgid_plural "User groups enabled"
 msgstr[0] ""
@@ -15039,7 +15039,7 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "Потребителят не може да промени системното състояние за себе си, като стане член на потребителска група  \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
-#: include/views/configuration.action.edit.php:763
+#: include/views/configuration.action.edit.php:764
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:260 items.php:73
@@ -15078,7 +15078,7 @@ msgstr ""
 msgid "User type"
 msgstr "Тип потребител"
 
-#: profile.php:180 users.php:241
+#: profile.php:180 users.php:240
 msgid "User updated"
 msgstr "Потребител актуализиран"
 
@@ -15108,7 +15108,7 @@ msgstr "Потребители"
 msgid "Users (online)"
 msgstr "Потребители (на линия)"
 
-#: users.php:325
+#: users.php:324
 msgid "Users unblocked"
 msgstr "Деблокирани потребители"
 
@@ -15393,7 +15393,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Стойност на реализациите с valuemapid \"%1$s\" не съществува."
 
 #: adm.gui.php:101 adm.housekeeper.php:132 adm.iconmapping.php:115
-#: adm.images.php:139 adm.macros.php:164 adm.other.php:115 adm.regexps.php:217
+#: adm.images.php:139 adm.macros.php:164 adm.other.php:115 adm.regexps.php:206
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:87
 #: adm.valuemapping.php:132 adm.valuemapping.php:198 adm.workingtime.php:68
 #: include/views/administration.general.valuemapping.edit.php:54
@@ -15487,13 +15487,13 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Съжаляваме, достигнат е максималния възможен брой от елементи."
 
-#: hosts.php:868 hosts.php:962 include/menu.inc.php:41
+#: hosts.php:867 hosts.php:961 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:208
 #: include/views/inventory.host.view.php:234
 #: include/views/inventory.host.view.php:243 search.php:139 search.php:145
 #: search.php:189 search.php:202 search.php:225 search.php:278 search.php:331
-#: search.php:400 search.php:446 search.php:460 templates.php:515
-#: templates.php:579
+#: search.php:400 search.php:446 search.php:460 templates.php:516
+#: templates.php:580
 msgid "Web"
 msgstr "Уеб"
 
@@ -15514,18 +15514,18 @@ msgstr "Уеб сценарий \"%1$s\" вече съществува в хос
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Уеб сценарий \"%1$s\" вече съществува."
 
-#: httpconf.php:150 httpconf.php:412
+#: httpconf.php:153 httpconf.php:415
 msgid "Web scenario deleted"
 msgstr "Уеб сценарий изтрит"
 
-#: httpconf.php:362
+#: httpconf.php:365
 #, fuzzy
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Уеб сценарий изключен"
 msgstr[1] "Уеб сценарий изключен"
 
-#: httpconf.php:361
+#: httpconf.php:364
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
@@ -15579,7 +15579,7 @@ msgstr "Уеб сценарии"
 msgid "Wed"
 msgstr "Сря"
 
-#: include/forms.inc.php:1658 include/forms.inc.php:1726
+#: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "Сряда"
@@ -15588,7 +15588,7 @@ msgstr "Сряда"
 msgid "Week"
 msgstr "Седмица"
 
-#: include/forms.inc.php:1635 include/maintenances.inc.php:35
+#: include/forms.inc.php:1634 include/maintenances.inc.php:35
 #: include/reports.inc.php:63 include/reports.inc.php:387
 #: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
@@ -15643,7 +15643,7 @@ msgid "Wizard"
 msgstr "Помощник"
 
 #: adm.gui.php:102 adm.housekeeper.php:133 adm.iconmapping.php:116
-#: adm.images.php:140 adm.macros.php:165 adm.other.php:116 adm.regexps.php:218
+#: adm.images.php:140 adm.macros.php:165 adm.other.php:116 adm.regexps.php:207
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:88
 #: adm.valuemapping.php:133 adm.workingtime.php:69
 #: include/views/administration.general.workingtime.edit.php:25
@@ -15954,7 +15954,7 @@ msgstr "Zabbix Потребител"
 
 #: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:52
-#: include/views/configuration.action.edit.php:745
+#: include/views/configuration.action.edit.php:746
 #: include/views/js/configuration.action.edit.js.php:118
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
@@ -15984,7 +15984,7 @@ msgstr "Вътрешена автентификация Zabbix"
 #: include/classes/html/CServerInfo.php:37
 #: include/classes/setup/CSetupWizard.php:432
 #: include/views/administration.script.edit.php:53
-#: include/views/configuration.action.edit.php:746
+#: include/views/configuration.action.edit.php:747
 #: include/views/js/configuration.action.edit.js.php:122
 msgid "Zabbix server"
 msgstr "Zabbix сървър"
@@ -16261,7 +16261,7 @@ msgstr ""
 msgid "last"
 msgstr "последно"
 
-#: hosts.php:831 hosts.php:832 hosts.php:833 include/actions.inc.php:29
+#: hosts.php:830 hosts.php:831 hosts.php:832 include/actions.inc.php:29
 #: include/forms.inc.php:449 include/forms.inc.php:456
 #: include/forms.inc.php:463 include/forms.inc.php:470
 #: include/forms.inc.php:591 include/forms.inc.php:606
