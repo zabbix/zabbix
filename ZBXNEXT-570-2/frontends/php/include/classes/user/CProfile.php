@@ -304,7 +304,7 @@ class CProfile {
 		);
 	}
 
-	public static function getFieldByType($type) {
+	private static function getFieldByType($type) {
 		switch ($type) {
 			case PROFILE_TYPE_INT:
 				$field = 'value_int';

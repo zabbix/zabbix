@@ -36,8 +36,8 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
-	make_sorting_header(_('Name'), 'description'),
-	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Status'),
 	_('Used in actions'),
 	_('Details')
@@ -88,7 +88,11 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
-	$statusLink = 'media_types.php?go='.(($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
+	$statusLink = 'media_types.php'.
+		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
+			? 'mediatype.massenable'
+			: 'mediatype.massdisable'
+		).
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
@@ -107,16 +111,17 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('mediatype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected media types?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('mediatype.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected media types?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('mediatype.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected media types?'));
 $goComboBox->addItem($goOption);
 

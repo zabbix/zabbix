@@ -32,17 +32,44 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+$knownResourceTypes = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_MAP,
+	SCREEN_RESOURCE_PLAIN_TEXT,
+	SCREEN_RESOURCE_HOSTS_INFO,
+	SCREEN_RESOURCE_TRIGGERS_INFO,
+	SCREEN_RESOURCE_SERVER_INFO,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_SCREEN,
+	SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+	SCREEN_RESOURCE_DATA_OVERVIEW,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_ACTIONS,
+	SCREEN_RESOURCE_EVENTS,
+	SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+	SCREEN_RESOURCE_SYSTEM_STATUS,
+	SCREEN_RESOURCE_HOST_TRIGGERS,
+	SCREEN_RESOURCE_HISTORY,
+	SCREEN_RESOURCE_CHART,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_LLD_GRAPH
+);
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'screenid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null),
 	'screenitemid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 16),	'isset({save})'),
+	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	IN($knownResourceTypes), 'isset({save})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({save})',
 		isset($_REQUEST['save']) ? getResourceNameByType($_REQUEST['resourcetype']) : null),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
+	'max_columns' =>	array(T_ZBX_INT, O_OPT, null,
+		BETWEEN(SCREEN_SURROGATE_MAX_COLUMNS_MIN, SCREEN_SURROGATE_MAX_COLUMNS_MAX), null, _('Max columns')
+	),
 	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Column span')),
 	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Row span')),
 	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')),
@@ -166,6 +193,7 @@ if (isset($_REQUEST['save'])) {
 		'valign' => getRequest('valign'),
 		'colspan' => getRequest('colspan'),
 		'rowspan' => getRequest('rowspan'),
+		'max_columns' => getRequest('max_columns'),
 		'dynamic' => getRequest('dynamic'),
 		'elements' => getRequest('elements', 0),
 		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),

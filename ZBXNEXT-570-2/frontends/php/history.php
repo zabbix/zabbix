@@ -52,7 +52,7 @@ $fields = array(
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove'"), null),
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null),
 	// actions
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),

@@ -58,15 +58,17 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo(_('No web scenarios found.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	($this->data['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
-	make_sorting_header(_('Name'), 'name'),
+	($this->data['hostid'] == 0)
+		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
+		: null,
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Number of steps'),
 	_('Update interval'),
 	_('Retries'),
 	_('Authentication'),
 	_('HTTP proxy'),
 	_('Application'),
-	make_sorting_header(_('Status'), 'status'),
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$this->data['showInfoColumn'] ? _('Info') : null
 ));
 
@@ -123,7 +125,10 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
-				'&go='.($httpTest['status'] ? 'activate' : 'disable'),
+				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
+					? 'httptest.massenable'
+					: 'httptest.massdisable'
+				),
 			httptest_status2style($httpTest['status'])
 		),
 		$infoIcon
@@ -131,25 +136,27 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('httptest.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('httptest.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm',_('Disable selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('clean_history', _('Clear history for selected'));
+$goOption = new CComboItem('httptest.massclearhistory', _('Clear history for selected'));
 $goOption->setAttribute('confirm', _('Delete history of selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('httptest.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected web scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');

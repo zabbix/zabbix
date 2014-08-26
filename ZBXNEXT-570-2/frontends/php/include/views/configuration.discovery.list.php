@@ -37,7 +37,7 @@ $discoveryForm->setName('druleForm');
 $discoveryTable = new CTableInfo(_('No discovery rules found.'));
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('IP range'),
 	_('Delay'),
 	_('Checks'),
@@ -48,7 +48,7 @@ foreach ($data['drules'] as $drule) {
 
 	$status = new CCol(new CLink(
 		discovery_status2str($drule['status']),
-		'?g_druleid[]='.$drule['druleid'].($drule['status'] == DRULE_STATUS_ACTIVE ? '&go=disable' : '&go=activate'),
+		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable'),
 		discovery_status2style($drule['status'])
 	));
 
@@ -63,16 +63,17 @@ foreach ($data['drules'] as $drule) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('drule.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('drule.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('drule.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 $goComboBox->addItem($goOption);
 

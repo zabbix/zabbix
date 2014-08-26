@@ -51,10 +51,10 @@ $usersForm->setName('userForm');
 $usersTable = new CTableInfo(_('No users found.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
-	make_sorting_header(_('Alias'), 'alias'),
-	make_sorting_header(_x('Name', 'user first name'), 'name'),
-	make_sorting_header(_('Surname'), 'surname'),
-	make_sorting_header(_('User type'), 'type'),
+	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('User type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Groups'),
 	_('Is online?'),
 	_('Login'),
@@ -81,7 +81,7 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid[]='.$userId, 'on')
+		? new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId, 'on')
 		: new CSpan(_('Ok'), 'green');
 
 	// user groups
@@ -146,13 +146,16 @@ foreach ($this->data['users'] as $user) {
 }
 
 // append Go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('unblock', _('Unblock selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('user.massunblock', _('Unblock selected'));
 $goOption->setAttribute('confirm', _('Unblock selected users?'));
 $goComboBox->addItem($goOption);
-$goOption = new CComboItem('delete', _('Delete selected'));
+
+$goOption = new CComboItem('user.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected users?'));
 $goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
