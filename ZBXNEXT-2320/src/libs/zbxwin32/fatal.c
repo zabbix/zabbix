@@ -108,16 +108,18 @@ static void	print_backtrace(CONTEXT *pctx)
 	SymGetLineFromAddrW64_func_t	zbx_SymGetLineFromAddrW64 = NULL;
 	SymFromAddr_func_t		zbx_SymFromAddr	= NULL;
 
-	CONTEXT		ctx;
-	STACKFRAME64	s;
-	PSYMBOL_INFO	pSym = NULL;
-	HMODULE		hModule;
-	HANDLE		hProcess, hThread;
-	BOOL		bPrintSymbols = FALSE;
-	wchar_t		szProcessName[MAX_PATH];
-	char		*process_name = NULL;
-	char		*frame = NULL;
-	size_t		frame_alloc = 0, frame_offset;
+	CONTEXT			ctx, ctxcount;
+	STACKFRAME64		s, scount;
+	PSYMBOL_INFO		pSym = NULL;
+	HMODULE			hModule;
+	HANDLE			hProcess, hThread;
+	BOOL			bPrintSymbols = FALSE;
+	DWORD64			offset;
+	wchar_t			szProcessName[MAX_PATH];
+	char			*process_name = NULL;
+	char			*frame = NULL;
+	size_t			frame_alloc = 0, frame_offset;
+	int			nframes = 0;
 
 	ctx = *pctx;
 
@@ -165,30 +167,42 @@ static void	print_backtrace(CONTEXT *pctx)
 		}
 	}
 
+	scount = s;
+	ctxcount = ctx;
+
+	while (TRUE == StackWalk64(ZBX_IMAGE_FILE_MACHINE, hProcess, hThread, &scount, &ctxcount, NULL, NULL, NULL,
+			NULL))
+	{
+		if (0 == scount.AddrReturn.Offset)
+			break;
+		nframes++;
+	}
+
 	while (TRUE == StackWalk64(ZBX_IMAGE_FILE_MACHINE, hProcess, hThread, &s, &ctx, NULL, NULL, NULL, NULL))
 	{
 		frame_offset = 0;
-		zbx_strcpy_alloc(&frame, &frame_alloc, &frame_offset, NULL == process_name ? "(unknown)" : process_name);
+		zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%d: %s", nframes--,
+				NULL == process_name ? "(unknown)" : process_name);
 
 		if (TRUE == bPrintSymbols)
 		{
 			DWORD		dwDisplacement;
 			IMAGEHLP_LINE64	line = {sizeof(IMAGEHLP_LINE64)};
 
+			zbx_chrcpy_alloc(&frame, &frame_alloc, &frame_offset, '(');
+			if (NULL != zbx_SymFromAddr &&
+					TRUE == zbx_SymFromAddr(hProcess, s.AddrPC.Offset, &offset, pSym))
+			{
+				zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%s+0x%lx", pSym->Name, offset);
+			}
+
 			if (NULL != zbx_SymGetLineFromAddrW64 && TRUE == zbx_SymGetLineFromAddrW64(hProcess,
 					s.AddrPC.Offset, &dwDisplacement, &line))
 			{
-				zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, " (%s:%d)", line.FileName,
+				zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, " %s:%d", line.FileName,
 						line.LineNumber);
 			}
-			else
-			{
-				if (NULL != zbx_SymFromAddr && TRUE == zbx_SymFromAddr(hProcess, s.AddrPC.Offset, NULL,
-						pSym))
-				{
-					zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, " (%s)", pSym->Name);
-				}
-			}
+			zbx_chrcpy_alloc(&frame, &frame_alloc, &frame_offset, ')');
 		}
 
 		zabbix_log(LOG_LEVEL_CRIT, "%s [0x%lx]", frame, s.AddrPC.Offset);
