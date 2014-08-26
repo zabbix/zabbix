@@ -430,9 +430,11 @@ class CPageFilter {
 		CProfile::update($this->_profileIdx['groups'], $groupId, PROFILE_TYPE_ID);
 		CProfile::update(self::GROUP_LATEST_IDX, $groupId, PROFILE_TYPE_ID);
 
-		$firstIsAllAndHaveGroups = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && $this->data['groups'];
-		$this->isSelected['groupsSelected'] = $firstIsAllAndHaveGroups || $groupId > 0;
-		$this->isSelected['groupsAll'] = $firstIsAllAndHaveGroups && $groupId == 0;
+		$firstIsAllAndHaveGroups = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && $this->data['groups']);
+
+		$this->isSelected['groupsSelected'] = ($firstIsAllAndHaveGroups || $groupId > 0);
+		$this->isSelected['groupsAll'] = ($firstIsAllAndHaveGroups && $groupId == 0);
+
 		$this->ids['groupid'] = $groupId;
 	}
 
