@@ -689,7 +689,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_START != t.task)
+	if (ZBX_TASK_SEND_MESSAGE == t.task)
 	{
 		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
