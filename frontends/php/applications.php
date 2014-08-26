@@ -210,40 +210,42 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 		_n('Cannot delete application', 'Cannot delete applications', $deleted)
 	);
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable')) && hasRequest('applications')) {
-	$activateApplications = (getRequest('action') == 'application.massenable');
+elseif (hasRequest('applications')
+		&& str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable'))) {
+	$enableApplicationItems = (getRequest('action') === 'application.massenable');
 
 	$applications = API::Application()->get(array(
-		'output' => array('applicationid'),
+		'output' => array(),
 		'applicationids' => getRequest('applications', array()),
 		'selectItems' => array('itemid'),
-		'hostids' => $pageFilter->hostid
+		'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null
 	));
 
 	$actionSuccessful = true;
 	$updatedItemCount = 0;
+
 	DBstart();
+
 	foreach ($applications as $application) {
 		foreach($application['items'] as $item) {
-			$itemId = $item['itemid'];
-
-			$actionSuccessful &= $activateApplications
-				? activate_item($itemId)
-				: disable_item($itemId);
+			$actionSuccessful &= $enableApplicationItems
+				? activate_item($item['itemid'])
+				: disable_item($item['itemid']);
 
 			$updatedItemCount++;
 		}
 	}
+
 	$actionSuccessful = DBend($actionSuccessful);
 
 	if ($actionSuccessful) {
 		uncheckTableRows($pageFilter->hostid);
 	}
 
-	$messageSuccess = $activateApplications
+	$messageSuccess = $enableApplicationItems
 		? _n('Item enabled', 'Items enabled', $updatedItemCount)
 		: _n('Item disabled', 'Items disabled', $updatedItemCount);
-	$messageFailed = $activateApplications
+	$messageFailed = $enableApplicationItems
 		? _n('Cannot enable item', 'Cannot enable items', $updatedItemCount)
 		: _n('Cannot disable item', 'Cannot disable items', $updatedItemCount);
 
