@@ -271,7 +271,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
-				t->task = ZBX_TASK_SEND_MESSAGE;
+				t->task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
 				help();
@@ -893,7 +893,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
-		case ZBX_TASK_SEND_MESSAGE:
+		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
