@@ -433,10 +433,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param int    $triggerPrototypes['status']
 	 * @param string $triggerPrototypes['comments']
 	 * @param string $triggerPrototypes['url']
-	 * @param string $triggerPrototypes['flags']
-	 * @param int    $triggerPrototypes['templateid']
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function create(array $triggerPrototypes) {
 		$triggerPrototypes = zbx_toArray($triggerPrototypes);
