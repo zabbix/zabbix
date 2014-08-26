@@ -570,7 +570,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!$nopermissions) {
 			foreach ($triggerIds as $triggerId) {
 				if (!isset($delTriggers[$triggerId])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _(
+						'No permissions to referred object or it does not exist!'
+					));
 				}
 
 				if ($delTriggers[$triggerId]['templateid'] != 0) {
@@ -917,7 +919,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		foreach ($expressionHostnames as $expressionHostname) {
 			if (!isset($dbExpressionHosts[$expressionHostname])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect trigger prototype expression. Host "%1$s" does not exist or you have no access to this host.',
+					'Incorrect trigger prototype expression.'
+					.' Host "%1$s" does not exist or you have no access to this host.',
 					$expressionHostname
 				));
 			}
@@ -927,7 +930,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$hostsStatusFlags |= ($dbExpressionHost['status'] == HOST_STATUS_TEMPLATE) ? 0x1 : 0x2;
 			if ($hostsStatusFlags == 0x3) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _(
-					'Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously.'
+					'Incorrect trigger prototype expression.'.
+					' Trigger prototype expression elements should not belong to a template and a host simultaneously.'
 				));
 			}
 		}
