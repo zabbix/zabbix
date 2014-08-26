@@ -62,11 +62,11 @@ else {
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+	'profileIdx2' => getRequest('profileIdx2'),
+	'updateProfile' => getRequest('updateProfile', true),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 ));
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
@@ -111,12 +111,12 @@ if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
 
-$width = get_request('width', 0);
+$width = getRequest('width', 0);
 if ($width <= 0) {
 	$width = $dbGraph['width'];
 }
 
-$height = get_request('height', 0);
+$height = getRequest('height', 0);
 if ($height <= 0) {
 	$height = $dbGraph['height'];
 }

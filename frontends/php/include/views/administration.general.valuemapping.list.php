@@ -30,7 +30,7 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 
 	$mappings = array();
 	foreach ($valuemap['maps'] as $map) {
-		$mappings[] = $map['value'].SPACE.RARR.SPACE.$map['newvalue'];
+		$mappings[] = $map['value'].SPACE.'&rArr;'.SPACE.$map['newvalue'];
 		$mappings[] = BR();
 	}
 	$valueMappingTable->addRow(array(

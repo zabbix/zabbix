@@ -53,15 +53,15 @@ if (isset($_REQUEST['save'])) {
 	DBstart();
 
 	$configs = array(
-		'default_theme' => get_request('default_theme'),
-		'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
-		'event_expire' => get_request('event_expire'),
-		'event_show_max' => get_request('event_show_max'),
-		'dropdown_first_entry' => get_request('dropdown_first_entry'),
-		'dropdown_first_remember' => (is_null(get_request('dropdown_first_remember')) ? 0 : 1),
-		'max_in_table' => get_request('max_in_table'),
-		'search_limit' => get_request('search_limit'),
-		'server_check_interval' => get_request('server_check_interval', 0)
+		'default_theme' => getRequest('default_theme'),
+		'event_ack_enable' => (is_null(getRequest('event_ack_enable')) ? 0 : 1),
+		'event_expire' => getRequest('event_expire'),
+		'event_show_max' => getRequest('event_show_max'),
+		'dropdown_first_entry' => getRequest('dropdown_first_entry'),
+		'dropdown_first_remember' => (is_null(getRequest('dropdown_first_remember')) ? 0 : 1),
+		'max_in_table' => getRequest('max_in_table'),
+		'search_limit' => getRequest('search_limit'),
+		'server_check_interval' => getRequest('server_check_interval', 0)
 	);
 
 	$result = update_config($configs);
@@ -70,14 +70,14 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Default theme "%1$s".', get_request('default_theme'));
-		$msg[] = _s('Event acknowledges "%1$s".', get_request('event_ack_enable'));
-		$msg[] = _s('Show events not older than (in days) "%1$s".', get_request('event_expire'));
-		$msg[] = _s('Show events max "%1$s".', get_request('event_show_max'));
-		$msg[] = _s('Dropdown first entry "%1$s".', get_request('dropdown_first_entry'));
-		$msg[] = _s('Dropdown remember selected "%1$s".', get_request('dropdown_first_remember'));
-		$msg[] = _s('Max count of elements to show inside table cell "%1$s".', get_request('max_in_table'));
-		$msg[] = _s('Zabbix server is running check interval "%1$s".', get_request('server_check_interval'));
+		$msg[] = _s('Default theme "%1$s".', getRequest('default_theme'));
+		$msg[] = _s('Event acknowledges "%1$s".', getRequest('event_ack_enable'));
+		$msg[] = _s('Show events not older than (in days) "%1$s".', getRequest('event_expire'));
+		$msg[] = _s('Show events max "%1$s".', getRequest('event_show_max'));
+		$msg[] = _s('Dropdown first entry "%1$s".', getRequest('dropdown_first_entry'));
+		$msg[] = _s('Dropdown remember selected "%1$s".', getRequest('dropdown_first_remember'));
+		$msg[] = _s('Max count of elements to show inside table cell "%1$s".', getRequest('max_in_table'));
+		$msg[] = _s('Zabbix server is running check interval "%1$s".', getRequest('server_check_interval'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
@@ -110,19 +110,19 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF GUI'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 
 if ($data['form_refresh']) {
-	$data['config']['default_theme'] = get_request('default_theme');
-	$data['config']['event_ack_enable'] = get_request('event_ack_enable');
-	$data['config']['dropdown_first_entry'] = get_request('dropdown_first_entry');
-	$data['config']['dropdown_first_remember'] = get_request('dropdown_first_remember');
-	$data['config']['search_limit'] = get_request('search_limit');
-	$data['config']['max_in_table'] = get_request('max_in_table');
-	$data['config']['event_expire'] = get_request('event_expire');
-	$data['config']['event_show_max'] = get_request('event_show_max');
-	$data['config']['server_check_enabled'] = get_request('server_check_enabled');
-	$data['config']['server_check_interval'] = get_request('server_check_interval', 0);
+	$data['config']['default_theme'] = getRequest('default_theme');
+	$data['config']['event_ack_enable'] = getRequest('event_ack_enable');
+	$data['config']['dropdown_first_entry'] = getRequest('dropdown_first_entry');
+	$data['config']['dropdown_first_remember'] = getRequest('dropdown_first_remember');
+	$data['config']['search_limit'] = getRequest('search_limit');
+	$data['config']['max_in_table'] = getRequest('max_in_table');
+	$data['config']['event_expire'] = getRequest('event_expire');
+	$data['config']['event_show_max'] = getRequest('event_show_max');
+	$data['config']['server_check_enabled'] = getRequest('server_check_enabled');
+	$data['config']['server_check_interval'] = getRequest('server_check_interval', 0);
 }
 else {
 	$data['config'] = select_config(false);

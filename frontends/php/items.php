@@ -125,7 +125,12 @@ $fields = array(
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										'"item.massdisable","item.massenable","item.massupdate"'
+									),
+									null
+								),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -175,11 +180,16 @@ $fields = array(
 	'subfilter_history' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_trends' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// ajax
-	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS,
+									IN('"delay","history","key_","name","status","trends","type"'),
+									null
+								),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'history', 'trends', 'status', 'type'));
-$_REQUEST['go'] = getRequest('go', 'none');
+
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
@@ -364,9 +374,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
 		$result = API::Item()->delete(array(getRequest('itemid')));
 	}
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, getRequest('hostid'));
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -429,7 +442,7 @@ elseif (isset($_REQUEST['save'])) {
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula'),
+			'formula' => getRequest('formula', '1'),
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
@@ -473,7 +486,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	$result = DBend($result);
 
-	if (isset($_REQUEST['itemid'])) {
+	if (hasRequest('itemid')) {
 		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
@@ -482,7 +495,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, getRequest('hostid'));
+		uncheckTableRows(getRequest('hostid'));
 	}
 }
 // cleaning history for one item
@@ -503,8 +516,8 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 
 	$result = DBend($result);
+
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, getRequest('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -526,14 +539,22 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$db_delay_flex = null;
 	}
 
-	if (!is_null(getRequest('formula', null))) {
-		$_REQUEST['multiplier'] = 1;
+	$formula = getRequest('formula');
+	if ($formula === null) {
+		// no changes to formula/multiplier
+		$multiplier = null;
 	}
-	if (getRequest('formula', null) === '0') {
-		$_REQUEST['multiplier'] = 0;
+	elseif ($formula === '0') {
+		// for mass update "magic" value '0' means that multiplier must be disabled and formula set to default value '1'
+		$multiplier = 0;
+		$formula = '1';
+	}
+	else {
+		// otherwise multiplier must be enabled with formula value entered by user
+		$multiplier = 1;
 	}
 
-	$applications = getRequest('applications', null);
+	$applications = getRequest('applications');
 	if (isset($applications[0]) && $applications[0] == '0') {
 		$applications = array();
 	}
@@ -600,7 +621,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			'trapper_hosts' => getRequest('trapper_hosts'),
 			'port' => getRequest('port'),
 			'units' => getRequest('units'),
-			'multiplier' => getRequest('multiplier'),
+			'multiplier' => $multiplier,
 			'delta' => getRequest('delta'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
@@ -609,7 +630,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula'),
+			'formula' => $formula,
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
@@ -659,20 +680,23 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	$result = DBend($result);
 
-	show_messages($result, _('Items updated'), _('Cannot update items'));
-
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-		clearCookies($result, getRequest('hostid'));
+		uncheckTableRows(getRequest('hostid'));
 	}
+	show_messages($result, _('Items updated'), _('Cannot update items'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('item.massenable', 'item.massdisable')) && hasRequest('group_itemid')) {
 	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'item.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
 	$updated = count($groupItemId);
 
@@ -684,9 +708,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
-elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
@@ -710,26 +733,26 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 
 		DBstart();
 
-		$goResult = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
-		$goResult = DBend($goResult);
+		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
-		clearCookies($goResult, getRequest('hostid'));
-
-		$_REQUEST['go'] = 'none2';
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+			unset($_REQUEST['group_itemid']);
+		}
+		show_messages($result, _('Items copied'), _('Cannot copy items'));
 	}
 	else {
 		show_error_message(_('No target selected.'));
 	}
 }
 // clean history for selected items
-elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'item.massclearhistory' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$goResult = delete_history_by_itemid($_REQUEST['group_itemid']);
+	$result = delete_history_by_itemid(getRequest('group_itemid'));
 
-
-	foreach ($_REQUEST['group_itemid'] as $id) {
+	foreach (getRequest('group_itemid') as $id) {
 		if (!$item = get_item_by_itemid($id)) {
 			continue;
 		}
@@ -739,15 +762,17 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 		);
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('History cleared'), $goResult);
-	clearCookies($goResult, getRequest('hostid'));
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('History cleared'), $result);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
-	$group_itemid = $_REQUEST['group_itemid'];
+	$group_itemid = getRequest('group_itemid');
 
 	$itemsToDelete = API::Item()->get(array(
 		'output' => array('key_', 'itemid'),
@@ -768,8 +793,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
-	clearCookies($result, getRequest('hostid'));
 }
 
 /*
@@ -806,7 +834,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$itemView->render();
 	$itemView->show();
 }
-elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
+elseif ((hasRequest('action') && getRequest('action') == 'item.massupdate') || hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
@@ -927,20 +955,29 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$itemView->render();
 	$itemView->show();
 }
-elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('group_itemid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS')));
+	$data = getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS'));
+	$data['action'] = 'item.masscopyto';
+	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
 }
 // list of items
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// items
@@ -957,7 +994,7 @@ else {
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
-		'sortfield' => $data['sortfield'],
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1156,11 +1193,11 @@ else {
 		}
 	}
 
-	if ($data['sortfield'] === 'status') {
-		orderItemsByStatus($data['items'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderItemsByStatus($data['items'], $sortOrder);
 	}
 	else {
-		order_result($data['items'], $data['sortfield'], getPageSortOrder());
+		order_result($data['items'], $sortField, $sortOrder);
 	}
 
 	$data['paging'] = getPagingLine($data['items']);

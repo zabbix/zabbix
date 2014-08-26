@@ -31,7 +31,7 @@ $page['hist_arg'] = array('hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$paramsFieldName = getParamFieldNameByType(get_request('type', 0));
+$paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
 // supported eval types
 $evalTypes = array(
@@ -73,7 +73,7 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	$paramsFieldName =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.
 		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
-		getParamFieldLabelByType(get_request('type', 0))),
+		getParamFieldLabelByType(getRequest('type', 0))),
 	'snmp_community' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type'),
 		_('SNMP community')),
@@ -108,7 +108,10 @@ $fields = array(
 	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
+								null
+							),
 	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -116,19 +119,20 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'type', 'status'));
 
-$_REQUEST['go'] = get_request('go', 'none');
-$_REQUEST['params'] = get_request($paramsFieldName, '');
+$_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 /*
  * Permissions
  */
-if (get_request('itemid', false)) {
+if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -161,7 +165,7 @@ else {
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
-	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
+	$_REQUEST['delay_flex'] = getRequest('delay_flex', array());
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
 		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
@@ -175,12 +179,15 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete(array(getRequest('itemid')));
 
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
+
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['save'])) {
-	$delay_flex = get_request('delay_flex', array());
+	$delay_flex = getRequest('delay_flex', array());
 
 	$db_delay_flex = '';
 	foreach ($delay_flex as $val) {
@@ -292,16 +299,20 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		uncheckTableRows(getRequest('hostid'));
 	}
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_hostdruleid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('discoveryrule.massenable', 'discoveryrule.massdisable')) && hasRequest('g_hostdruleid')) {
 	$groupHostDiscoveryRuleId = getRequest('g_hostdruleid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'discoveryrule.massenable');
 
 	DBstart();
 	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 
 	$updated = count($groupHostDiscoveryRuleId);
 
@@ -313,13 +324,14 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable discovery rules', 'Cannot disable discovery rules', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('hostid'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
-	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+elseif (hasRequest('action') && getRequest('action') == 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
+	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
 
-	show_messages($goResult, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
-	clearCookies($goResult, $_REQUEST['hostid']);
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 
 /*
@@ -355,13 +367,19 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
-	$data = array(
-		'hostid' => get_request('hostid', 0),
-		'host' => $host,
-		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortfield = getPageSortField('name');
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'hostid' => getRequest('hostid', 0),
+		'host' => $host,
+		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// discoveries
 	$data['discoveries'] = API::DiscoveryRule()->get(array(
@@ -372,17 +390,17 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if ($sortfield === 'status') {
-		orderItemsByStatus($data['discoveries'], getPageSortOrder());
+	if ($sortField === 'status') {
+		orderItemsByStatus($data['discoveries'], $sortOrder);
 	}
 	else {
-		order_result($data['discoveries'], $sortfield, getPageSortOrder());
+		order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
 	// paging

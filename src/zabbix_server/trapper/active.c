@@ -49,16 +49,17 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 {
 	const char	*__function_name = "get_hostid_by_host";
 
-	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX];
+	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX], *ch_error;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s'", __function_name, host);
 
-	if (FAIL == zbx_check_hostname(host))
+	if (FAIL == zbx_check_hostname(host, &ch_error))
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]", host);
+		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]: %s", host, ch_error);
+		zbx_free(ch_error);
 		goto out;
 	}
 
