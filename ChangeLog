@@ -9,6 +9,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+A......... [ZBX-8636] fixed user accounts not being disabled after exceeding number of unsuccessful login attempts (Krists)
 ........S. [ZBX-7721] added support for discovering more than 100 hypervisors on large vcenter installations to vmware collector (wiper, dimir)
 ...G....S. [ZBX-8564] added standard error output while running remote script (Arturs)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
