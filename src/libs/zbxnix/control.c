@@ -19,7 +19,22 @@
 
 #include "control.h"
 
-int	get_log_level_message(const char *opt, int *message, int command)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_log_level_message                                            *
+ *                                                                            *
+ * Purpose: create runtime control message for log level changes based on     *
+ *          the command line arguments                                        *
+ *                                                                            *
+ * Parameters: opt     - [IN] the options to log level change command         *
+ *             command - [IN] the log level change command (increase/decrease)*
+ *             message - [OUT] the log level change runtime control message   *
+ *                                                                            *
+ * Return value: SUCCEEED - the message was created successfully              *
+ *               FAIL     - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	get_log_level_message(const char *opt, int command, int *message)
 {
 	int	num = 0, scope, data;
 
