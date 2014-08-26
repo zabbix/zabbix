@@ -813,7 +813,7 @@ else {
 	$hostsWidget->setRootClass('host-list');
 
 	// filter
-	$filterTable = new CTable('', 'filter');
+	$filterTable = new CTable('', 'filter filter-center');
 	$filterTable->addRow(array(
 		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
 		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
@@ -830,7 +830,7 @@ else {
 	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');
 
-	$filterTable->addRow(new CCol($divButtons, 'center', 4));
+	$filterTable->addRow(new CCol($divButtons, 'controls', 4));
 
 	$filterForm = new CForm('get');
 	$filterForm->setAttribute('name', 'zbx_filter');

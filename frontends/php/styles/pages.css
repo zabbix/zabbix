@@ -113,20 +113,14 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .tableinfo td span,
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
-.latest-mon .filter tr td { text-align: left; }
-.latest-mon .filter tr td.label { width: 15%; text-align: right; }
+.latest-mon .filter tr td.label { width: 15%; }
 .latest-mon .filter tr td.inputcol { min-width: 277px; width: 35%; }
 .latest-mon .filter tr td.inputcol .checkbox { margin-top: 4px; }
 .latest-mon .filter tr td .text { width: 216px; }
-/* 2px width input field fix for Safari 5+ and Chrome */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-	.latest-mon .filter tr td .text { width: 218px; }
-}
 .latest-mon .filter .multiselect { width: 217px; line-height: 12px; }
 
 /*history */
-.history .filter tr td { text-align: left; width: 50%; }
-.history .filter tr td.label { text-align: right; }
+.history .filter tr td { width: 50%; }
 
 /* trigger list */
 .trigger-list .dependencies { padding-left: 8px; }
@@ -144,7 +138,6 @@ table.tableinfo-overview-hint { width: 200px; }
 
 /* item list */
 .item-list table.filter { text-align: left; min-width: 1024px; }
-.item-list table.filter tr td.label { text-align: right; }
 .item-list table.filter tr td.col1 { width: 230px; }
 .item-list table.filter tr td.label.col1 { width: 6%; }
 .item-list table.filter tr td.label.col4 { width: 8%; }
