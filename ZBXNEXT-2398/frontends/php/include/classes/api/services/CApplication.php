@@ -454,7 +454,10 @@ class CApplication extends CApiService {
 
 		// TODO: remove info from API
 		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
-			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $delApplication['host']['name']));
+			info(_s(
+				'Deleted: Application "%1$s" on "%2$s".',
+				$delApplication['name'], $delApplication['host']['name']
+			));
 		}
 
 		return array('applicationids' => $applicationids);
@@ -638,12 +641,12 @@ class CApplication extends CApiService {
 		if ($options['selectHost'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
 			$hosts = API::Host()->get(array(
-					'output' => $options['selectHost'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'templated_hosts' => true,
-					'preservekeys' => true
-				));
+				'output' => $options['selectHost'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'templated_hosts' => true,
+				'preservekeys' => true
+			));
 			$result = $relationMap->mapOne($result, $hosts, 'host');
 		}
 
