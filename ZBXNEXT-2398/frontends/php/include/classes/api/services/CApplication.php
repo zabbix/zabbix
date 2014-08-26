@@ -82,6 +82,7 @@ class CApplication extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'expandData'				=> null,
+			'selectHost'				=> null,
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
@@ -94,6 +95,7 @@ class CApplication extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->checkDeprecatedParam($options, 'expandData');
+		$this->checkDeprecatedParam($options, 'selectHosts');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -408,7 +410,7 @@ class CApplication extends CApiService {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('name', 'hostid')
+			'selectHost' => array('name', 'hostid')
 		);
 		$delApplications = $this->get($options);
 
@@ -445,15 +447,14 @@ class CApplication extends CApiService {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('name', 'hostid')
+			'selectHost' => array('name', 'hostid')
 		));
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
 		// TODO: remove info from API
 		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
-			$host = $delApplication['host'][0];
-			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
+			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $delApplication['host']['name']));
 		}
 
 		return array('applicationids' => $applicationids);
@@ -482,7 +483,7 @@ class CApplication extends CApiService {
 		$allowedApplications = $this->get(array(
 			'applicationids' => $applicationIds,
 			'output' => array('applicationid', 'hostid', 'name'),
-			'selectHosts' => array('hostid', 'name'),
+			'selectHost' => array('hostid', 'name'),
 			'editable' => true,
 			'preservekeys' => true
 		));
@@ -507,7 +508,7 @@ class CApplication extends CApiService {
 
 		// validate hosts
 		$dbApplication = reset($allowedApplications);
-		$dbApplicationHost = reset($dbApplication['host']);
+		$dbApplicationHost = $dbApplication['host'];
 		foreach ($applications as $application) {
 			if ($dbApplicationHost['hostid'] != $allowedApplications[$application['applicationid']]['hostid']) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot process applications from different hosts or templates.'));
@@ -620,7 +621,7 @@ class CApplication extends CApiService {
 			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
 		}
 
-		// adding hosts
+		// adding hosts (deprecated)
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
 			$hosts = API::Host()->get(array(
@@ -631,6 +632,19 @@ class CApplication extends CApiService {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// adding one host
+		if ($options['selectHost'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
+			$hosts = API::Host()->get(array(
+					'output' => $options['selectHost'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'nopermissions' => true,
+					'templated_hosts' => true,
+					'preservekeys' => true
+				));
+			$result = $relationMap->mapOne($result, $hosts, 'host');
 		}
 
 		// adding items

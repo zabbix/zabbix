@@ -90,7 +90,7 @@ foreach ($this->data['applications'] as $application) {
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
-		($this->data['hostid'] > 0) ? null : $application['hosts'][0]['host'],
+		($this->data['hostid'] > 0) ? null : $application['host']['host'],
 		$name,
 		array(
 			new CLink(
