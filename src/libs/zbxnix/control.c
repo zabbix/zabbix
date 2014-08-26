@@ -80,7 +80,7 @@ int	get_log_level_message(const char *opt, int *message, int command)
 		data = num;
 	}
 
-	*message = MAKE_TASK(command, scope, data);
+	*message = ZBX_RTC_MAKE_MESSAGE(command, scope, data);
 
 	return SUCCEED;
 }

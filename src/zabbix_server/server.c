@@ -552,7 +552,7 @@ static void	zbx_load_config()
 #ifdef HAVE_SIGQUEUE
 void	zbx_sigusr_handler(int flags)
 {
-	switch (GET_TASK_MSG(flags))
+	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
@@ -588,15 +588,13 @@ static void	zbx_free_config()
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t;
+	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch = '\0';
+	int		offset;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
-	memset(&t, 0, sizeof(t));
-	t.task = ZBX_TASK_START;
-
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -610,22 +608,22 @@ int	main(int argc, char **argv)
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
-					t.flags = MAKE_TASK(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
+					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-					strlen(ZBX_LOG_LEVEL_INCREASE)))
+						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
-						&t.flags, ZBX_RTC_LOG_LEVEL_INCREASE))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset, &t.flags,
+							ZBX_RTC_LOG_LEVEL_INCREASE))
 					{
 						exit(EXIT_FAILURE);
 					}
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-					strlen(ZBX_LOG_LEVEL_DECREASE)))
+						offset = strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
-						&t.flags, ZBX_RTC_LOG_LEVEL_DECREASE))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset, &t.flags,
+							ZBX_RTC_LOG_LEVEL_DECREASE))
 					{
 						exit(EXIT_FAILURE);
 					}
