@@ -454,9 +454,8 @@ class CApplication extends CApiService {
 
 		// TODO: remove info from API
 		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
-			info(_s(
-				'Deleted: Application "%1$s" on "%2$s".',
-				$delApplication['name'], $delApplication['host']['name']
+			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'],
+				$delApplication['host']['name']
 			));
 		}
 
