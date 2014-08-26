@@ -36,7 +36,7 @@ $auditWidget->addHeaderRowNumber();
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(array(
 	bold(_('Recipient')),
 	SPACE,
