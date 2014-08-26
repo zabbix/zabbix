@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['maps'])) {
+if (hasRequest('action') && getRequest('action') == 'map.export' && hasRequest('maps')) {
 	$page['file'] = 'zbx_export_maps.xml';
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
@@ -70,16 +70,16 @@ $fields = array(
 	'urls' =>					array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'severity_min' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null),
 	// actions
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	// form
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
 	// sort and sortorder
-	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'height','name','width'"),				null),
-	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -119,8 +119,6 @@ if ($isExportData) {
 
 	exit;
 }
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -190,7 +188,7 @@ if (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 'delete') {
+elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
 	$sysmapIds = getRequest('maps', array());
 
 	if (hasRequest('sysmapid')) {
