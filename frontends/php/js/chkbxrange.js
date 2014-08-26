@@ -210,8 +210,6 @@ var chkbxRange = {
 	 * @param {bool} checked
 	 */
 	checkObjectAll: function(object, checked) {
-		var start = new Date().getTime();
-
 		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
 		if (typeof this.chkboxes[object] !== 'undefined') {
 			var objectIds = jQuery.map(this.chkboxes[object], jQuery.proxy(function(checkbox) {
