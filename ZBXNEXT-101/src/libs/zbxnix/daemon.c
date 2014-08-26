@@ -89,7 +89,9 @@ static void	common_worker_sigusr_handler(int flags)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	int	flags;
+	int		flags, process_num, found = 0, i;
+	union sigval	s;
+	unsigned char	process_type;
 
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -114,26 +116,36 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
 					" cannot be performed for a passive proxy");
+			return;
 		}
-		else
-		{
-			union sigval	s;
 
+		for (i = 0; i < threads_num; i++)
+		{
+			if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+				continue;
+
+			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
+				break;
+		}
+
+		if (i != threads_num)
+		{
 			s.ZBX_SIVAL_INT = flags;
 
-			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
-			if (NULL != threads && -1 != sigqueue(threads[0], SIGUSR1, s))
+			if (-1 != sigqueue(threads[i], SIGUSR1, s))
 				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to the configuration syncer");
 			else
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal to configuration syncer: "
+					"process not found");
 		}
 	}
 	else if (ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
 			ZBX_RTC_LOG_LEVEL_DECREASE == ZBX_RTC_GET_MSG(flags))
 	{
-		union sigval	s;
-		int 		i, found = 0;
-
 		s.ZBX_SIVAL_INT = flags;
 
 		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
@@ -164,9 +176,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		}
 		else
 		{
-			unsigned char	process_type;
-			int		process_num, found = 0;
-
 			for (i = 0; i < threads_num; i++)
 			{
 				if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
