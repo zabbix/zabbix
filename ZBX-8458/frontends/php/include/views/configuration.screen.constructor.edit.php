@@ -185,7 +185,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 	$screenFormList->addRow(_('Graph name'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
-	));
+	), false, null, 'nowrap');
 
 	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
 }
@@ -282,7 +282,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
-	));
+	), false, null, 'nowrap');
 
 	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
 }
@@ -313,7 +313,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 				'&writeonly=1", 400, 450);',
 			'formlist'
 		)
-	));
+	), false, null, 'nowrap');
 }
 
 /*
@@ -360,7 +360,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
-	));
+	), false, null, 'nowrap');
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addRow(_('Show text as HTML'), new CCheckBox('style', $style, null, 1));
 }
@@ -538,7 +538,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 				'&writeonly=1&screenid='.$_REQUEST['screenid'].'", 800, 450);',
 			'formlist'
 		)
-	));
+	), false, null, 'nowrap');
 }
 
 /*
