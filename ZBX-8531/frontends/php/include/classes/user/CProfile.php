@@ -107,6 +107,30 @@ class CProfile {
 	}
 
 	/**
+	 * Returns the values stored under the given $ids as an array.
+	 *
+	 * @param string    $idx
+	 * @param mixed     $defaultValue
+	 *
+	 * @return mixed
+	 */
+	public static function getArray($idx, $defaultValue = null) {
+		if (self::get($idx, null, 0) === null) {
+			return $defaultValue;
+		}
+
+		$i = 0;
+		$values = array();
+		while (self::get($idx, null, $i) !== null) {
+			$values[] = self::get($idx, null, $i);
+
+			$i++;
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Removes profile values from DB and profiles cache.
 	 *
 	 * @param string 		$idx	first identifier
@@ -188,7 +212,7 @@ class CProfile {
 		}
 
 		if (!self::checkValueType($value, $type)) {
-			return false;
+			return;
 		}
 
 		$profile = array(
@@ -198,7 +222,7 @@ class CProfile {
 			'idx2' => $idx2
 		);
 
-		$current = CProfile::get($idx, null, $idx2);
+		$current = self::get($idx, null, $idx2);
 		if (is_null($current)) {
 			if (!isset(self::$insert[$idx])) {
 				self::$insert[$idx] = array();
@@ -219,6 +243,35 @@ class CProfile {
 		}
 
 		self::$profiles[$idx][$idx2] = $value;
+	}
+
+	/**
+	 * Stores an array in the profiles.
+	 *
+	 * Each value is stored under the given idx and a sequentially generated idx2.
+	 *
+	 * @param string    $idx
+	 * @param array     $values
+	 * @param int       $type
+	 */
+	public static function updateArray($idx, array $values, $type) {
+		// save new values
+		$i = 0;
+		foreach ($values as $value) {
+			self::update($idx, $value, $type, $i);
+
+			$i++;
+		}
+
+		// delete remaining old values
+		$idx2 = array();
+		while (self::get($idx, null, $i) !== null) {
+			$idx2[] = $i;
+
+			$i++;
+		}
+
+		self::delete($idx, $idx2);
 	}
 
 	private static function insertDB($idx, $value, $type, $idx2) {
@@ -251,7 +304,7 @@ class CProfile {
 		);
 	}
 
-	public static function getFieldByType($type) {
+	private static function getFieldByType($type) {
 		switch ($type) {
 			case PROFILE_TYPE_INT:
 				$field = 'value_int';

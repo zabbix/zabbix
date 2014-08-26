@@ -48,7 +48,7 @@ $screenForm->addVar('templateid', $this->data['templateid']);
 $screenTable = new CTableInfo(_('No screens found.'));
 $screenTable->setHeader(array(
 	new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');"),
-	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Dimension (cols x rows)'),
 	_('Screen')
 ));
@@ -63,11 +63,11 @@ foreach ($this->data['screens'] as $screen) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
+$goComboBox = new CComboBox('action');
 if (empty($this->data['templateid'])) {
-	$goComboBox->addItem('export', _('Export selected'));
+	$goComboBox->addItem('screen.export', _('Export selected'));
 }
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('screen.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected screens?'));
 $goComboBox->addItem($goOption);
 

@@ -59,7 +59,10 @@ $fields = array(
 	'opconditions' =>		array(null,		O_OPT,	null,	null,		null),
 	'new_opcondition' =>	array(null,		O_OPT,	null,	null,		'isset({add_opcondition})'),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"action.massdelete","action.massdisable","action.massenable"'),
+								null
+							),
 	'add_condition' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_condition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'add_operation' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -67,11 +70,13 @@ $fields = array(
 	'add_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_opcondition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 
 $dataValid = check_fields($fields);
@@ -79,10 +84,6 @@ $dataValid = check_fields($fields);
 if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
 	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
 }
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'status'));
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 if (isset($_REQUEST['actionid'])) {
 	$actionPermissions = API::Action()->get(array(
@@ -98,11 +99,7 @@ if (isset($_REQUEST['actionid'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['actionid'])) {
-	unset($_REQUEST['actionid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (isset($_REQUEST['cancel_new_operation'])) {
+if (isset($_REQUEST['cancel_new_operation'])) {
 	unset($_REQUEST['new_operation']);
 }
 elseif (isset($_REQUEST['cancel_new_opcondition'])) {
@@ -305,9 +302,9 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 		$_REQUEST['new_operation']['action'] = 'update';
 	}
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_actionid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('action.massenable', 'action.massdisable')) && hasRequest('g_actionid')) {
 	$result = true;
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'action.massenable');
 	$status = $enable ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
 	$statusName = $enable ? 'enabled' : 'disabled';
 	$actionIds = array();
@@ -318,7 +315,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$dbActions = DBselect(
 		'SELECT a.actionid'.
 		' FROM actions a'.
-		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
+		' WHERE '.dbConditionInt('a.actionid', getRequest('g_actionid'))
 	);
 	while ($row = DBfetch($dbActions)) {
 		$result &= DBexecute(
@@ -350,8 +347,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	$result = API::Action()->delete($_REQUEST['g_actionid']);
+elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && hasRequest('g_actionid')) {
+	$result = API::Action()->delete(getRequest('g_actionid'));
 
 	if ($result) {
 		uncheckTableRows();
@@ -493,11 +490,17 @@ if (hasRequest('form')) {
 	$actionView->show();
 }
 else {
-	$data = array(
-		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortField = getPageSortField('name');
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$data['actions'] = API::Action()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -510,7 +513,7 @@ else {
 	));
 
 	// sorting && paging
-	order_result($data['actions'], $sortField, getPageSortOrder());
+	order_result($data['actions'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['actions']);
 
 	// render view

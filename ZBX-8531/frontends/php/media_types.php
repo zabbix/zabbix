@@ -51,15 +51,20 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
 	'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
+	'action' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,
+							IN('"mediatype.massdelete","mediatype.massdisable","mediatype.massenable"'),
+							null
+						),
 	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
-	'go' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","type"'),					null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP, array('description', 'type'));
 
 $mediaTypeId = getRequest('mediatypeid');
 
@@ -75,22 +80,20 @@ if (isset($_REQUEST['mediatypeid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['mediatypeids']) || !is_array($_REQUEST['mediatypeids'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('mediatypeids') || !is_array(getRequest('mediatypeids'))) {
 		access_deny();
 	}
 	else {
 		$mediaTypeChk = API::Mediatype()->get(array(
-			'mediatypeids' => $_REQUEST['mediatypeids'],
+			'mediatypeids' => getRequest('mediatypeids'),
 			'countOutput' => true
 		));
-		if ($mediaTypeChk != count($_REQUEST['mediatypeids'])) {
+		if ($mediaTypeChk != count(getRequest('mediatypeids'))) {
 			access_deny();
 		}
 	}
 }
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -153,9 +156,9 @@ elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	}
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
-	$mediaTypeIds = getRequest('mediatypeids', array());
-	$enable = (getRequest('go') == 'activate');
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('mediatype.massenable', 'mediatype.massdisable')) && hasRequest('mediatypeids')) {
+	$mediaTypeIds = getRequest('mediatypeids');
+	$enable = (getRequest('action') == 'mediatype.massenable');
 	$status = $enable ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
 	$update = array();
 
@@ -182,8 +185,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete') {
-	$result = API::Mediatype()->delete(getRequest('mediatypeids', array()));
+elseif (hasRequest('action') && getRequest('action') == 'mediatype.massdelete' && hasRequest('mediatypeids')) {
+	$result = API::Mediatype()->delete(getRequest('mediatypeids'));
 
 	if ($result) {
 		uncheckTableRows();
@@ -234,7 +237,16 @@ if (!empty($_REQUEST['form'])) {
 	$mediaTypeView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get media types
 	$data['mediatypes'] = API::Mediatype()->get(array(
@@ -276,8 +288,8 @@ else {
 			}
 		}
 
-		// sorting & paging
-		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
+		order_result($data['mediatypes'], $sortField, $sortOrder);
+
 		$data['paging'] = getPagingLine($data['mediatypes']);
 	}
 	else {

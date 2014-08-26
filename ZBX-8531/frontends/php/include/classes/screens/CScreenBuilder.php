@@ -231,16 +231,7 @@ class CScreenBuilder {
 				return new CScreenDataOverview($options);
 
 			case SCREEN_RESOURCE_URL:
-				if (isset($options['screen'])) {
-					$options['isTemplatedScreen'] = ($options['screen']['templateid']);
-				}
-				elseif (isset($options['screenid'])) {
-					$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
-						'screenids' => array($options['screenid']),
-						'output' => array()
-					));
-				}
-
+				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenUrl($options);
 
 			case SCREEN_RESOURCE_ACTIONS:
@@ -259,14 +250,59 @@ class CScreenBuilder {
 				return new CScreenHostTriggers($options);
 
 			case SCREEN_RESOURCE_HISTORY:
+				// TODO: pass the items from the outside instead of retrieving them by ids
+				if (isset($options['itemids'])) {
+					$items = API::Item()->get(array(
+						'itemids' => $options['itemids'],
+						'webitems' => true,
+						'selectHosts' => array('name'),
+						'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
+						'preservekeys' => true
+					));
+
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+
+					$options['items'] = $items;
+					unset($options['itemids']);
+				}
+
 				return new CScreenHistory($options);
 
 			case SCREEN_RESOURCE_CHART:
 				return new CScreenChart($options);
 
+			case SCREEN_RESOURCE_LLD_GRAPH:
+				$options = self::appendTemplatedScreenOption($options);
+				return new CScreenLldGraph($options);
+
+			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+				$options = self::appendTemplatedScreenOption($options);
+				return new CScreenLldSimpleGraph($options);
+
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * Appends boolean option 'isTemplatedScreen' to ouput options.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	protected static function appendTemplatedScreenOption(array $options) {
+		if (isset($options['screen'])) {
+			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
+		}
+		elseif (isset($options['screenid'])) {
+			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
+				'screenids' => array($options['screenid']),
+				'output' => array()
+			));
+		}
+
+		return $options;
 	}
 
 	/**
@@ -304,7 +340,7 @@ class CScreenBuilder {
 		$screenTable->setAttribute('class',
 			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen_view' : 'screen_edit'
 		);
-		$screenTable->setAttribute('id', 'iframe');
+		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -561,7 +597,7 @@ class CScreenBuilder {
 	 * @param string $screenid
 	 */
 	public static function insertInitScreenJs($screenid) {
-		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
+		zbx_add_post_js('init_screen("'.$screenid.'", "'.self::makeScreenTableId($screenid).'", "'.$screenid.'");');
 	}
 
 	/**
@@ -595,5 +631,16 @@ class CScreenBuilder {
 		CScreenBuilder::insertScreenScrollJs($options);
 		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();
+	}
+
+	/**
+	 * Creates a string for screen table ID attribute.
+	 *
+	 * @param string $screenId
+	 *
+	 * @return string
+	 */
+	protected static function makeScreenTableId($screenId) {
+		return 'screentable_'.$screenId;
 	}
 }

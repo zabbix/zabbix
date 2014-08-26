@@ -1,11 +1,36 @@
 Changes for 2.3.4
 
 New features:
+..F....... [ZBXNEXT-570] implemented the ability to quickly display items on a graph from the latest data page (Ivo, Pavels)
+.......PS. [ZBX-8367] added recalculating of unsupported items queue when changed "Refresh unsupported items" parameter (Juris, Sasha)
+A.F....... [ZBXNEXT-1583] implemented new screen element types - "Graph prototype" and "Simple graph prototype" (Krists)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 ....I..PS. [ZBXNEXT-2359] made server and proxy refuse to start if StartPollersUnreachable=0, but other pollers are started (asaveljevs)
 ....I..PS. [ZBX-8557] implemented housekeeper 30 minutes startup delay (Arturs)
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+A......... [ZBX-8568] fixed item.delete and itemprototype.delete to also remove trigger prototypes using them (Krists)
+A......... [ZBX-8636] fixed user accounts not being disabled after exceeding number of unsuccessful login attempts (Krists)
+........S. [ZBX-7721] added support for discovering more than 100 hypervisors on large vcenter installations to vmware collector (wiper, dimir)
+...G....S. [ZBX-8564] added standard error output while running remote script (Arturs)
+...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
+....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
+.........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
+..F....... [ZBX-8509] fixed value of field "Use custom multiplier" to correctly default to "1" if checkbox is unchecked (Krists)
+A......... [ZBX-8530] fixed host update to work when doing template unlink and interface remove in same request (Krists)
+.......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
+A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Krists)
+...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
+....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
+A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing; thanks to Leann for the report (Krists)
+........S. [ZBX-8444] database queries for enabled items, triggers and hosts replaced with queries from configuration cache to improve performance for processing sleeping escalations (igors)
+..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
+........S. [ZBX-8608] fixed clearing of discovered services with using CIDR notation in ip lists (Sasha)
+........S. [ZBX-8415] fixed possible server crash on LLD host or host group update (dimir, Sasha)
+...G...... [ZBX-8455] improved synchronization between perfromance collector and agent threads (wiper)
+...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
+...G...PS. [ZBX-8601] fixed bad performance of the proxy configuration synchronization (Sasha)
 .......PS. [ZBX-8600] fixed SQL errors in proxy configuration synchronization (Sasha)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
 ..F....... [ZBX-8484] fixed "Plain text" screen elements with "Show text as HTML" enabled trying to display the text as preformatted (Andrejs)
@@ -55,7 +80,7 @@ Changes for 2.3.2
 New features:
 A.F....PS. [ZBXNEXT-2301] added a way to disable SNMP bulk operations per interface (asaveljevs, Oleg)
 ..F....... [ZBX-2603] added validation while working with regular expressions (Andrejs)
-..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in php 5.6+ (Andrejs)
+..F....... [ZBX-8278] prepared frontend for mbstring.internal_encoding ini option deprecation in PHP 5.6+ (Andrejs)
 ..F....... [ZBXNEXT-2222] added trigger status filter to the trigger overview page (Sasha)
 ..F....... [ZBX-8339] removed auto login/logout controls while editing guest user (Andrejs)
 ...G...... [ZBXNEXT-2203] added information on the reason log[] and logrt[] items became not supported (Andris, asaveljevs)
@@ -81,7 +106,7 @@ A.F....... [ZBX-8397] removed outdated queue related code from frontend and API 
 ..F....... [ZBX-8240] fixed multiselect input placeholder behaviour on IE8, input cursor issue and removed "clear field" button for multiselect in IE10+ (Oleg, Krists)
 ..F....... [ZBXNEXT-1782] fixed trigger expression testing not working incorrectly for some expressions that contain nested parentheses (Pavels)
 ...G...... [ZBX-8270] fixed disk space reporting for large AIX file systems (>= 16 TB) (Andris)
-.......PS. [ZBX-8422] removed php mutex locking from server code because of not being used and incompatible licensing issues (wiper)
+.......PS. [ZBX-8422] removed PHP mutex locking from server code because of not being used and incompatible licensing issues (wiper)
 ..F....... [ZBX-8377] fixed dark orange theme input fields being displayed light blue, submit button hover not displaying as disabled and made readonly and disabled input fields more readable on all browsers (Ivo)
 A......... [ZBX-8332] removed redundant screen import code from 1.8 importer (Krists)
 ..F....... [ZBX-1215] changed captions of items and periods to be autogenerated by default in barreports (Andrejs)
@@ -292,13 +317,29 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.6
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
+
 Changes for 2.2.6rc1
 
 New features:
+..F....... [ZBX-8275] added a feature to automatically clone web scenarios when cloning a host or template (Ivo)
 A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
-A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7721] added support for discovering more than 100 hypervisors on large vcenter installations to vmware collector (wiper, dimir)
+...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
+....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
+.........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
+.......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
+........S. [ZBX-8444] increased the interval for checking sleeping escalations to improve performance (igors)
+..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
+A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not updating properly when linking template to host (Ivo)
+........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
+...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
 .......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
 .......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
@@ -361,7 +402,7 @@ Bug fixes:
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
 A.F....... [ZBX-8334] fixed selecting group prototypes in HostPrototype::get() using Oracle backend (Andrejs)
 .......PS. [ZBX-8061] fixed vmware cluster functions returning notsupported despite clusters being discovered normally (wiper)
-........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+........S. [ZBX-8348] fixed processing of LLD triggers; functions in a trigger expression could have incorrect ordering (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc2
@@ -1352,9 +1393,14 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
+....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
+.....J.... [ZBX-6229] removed pretty formatting from Java gateway JSON responses (asaveljevs)
+.........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
+..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ..F....... [ZBX-8358] fixed overview screen elements being displayed incorrectly after refreshing (Pavels)
-........S. [ZBX-8348] fixed processing of lld triggers; functions in a trigger expression could be not on the places (Sasha)
+........S. [ZBX-8348] fixed processing of LLD triggers; functions in a trigger expression could have incorrect ordering (Sasha)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
@@ -2915,6 +2961,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)

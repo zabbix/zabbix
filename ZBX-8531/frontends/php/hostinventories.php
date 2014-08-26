@@ -40,7 +40,13 @@ $fields = array(
 	'filter_field_value' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_exact' =>		array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
 	//ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS,
+								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
+								null
+							),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -54,9 +60,11 @@ if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid'))
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP,
-	array('name', 'pr_name', 'pr_type', 'pr_os', 'pr_serialno_a', 'pr_tag', 'pr_macaddress_a')
-);
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 if (hasRequest('filterState')) {
 	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
@@ -130,7 +138,9 @@ if ($hostId > 0) {
 else {
 	$data = array(
 		'config' => select_config(),
-		'hosts' => array()
+		'hosts' => array(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 
 	// filter
@@ -223,7 +233,7 @@ else {
 				}
 			}
 
-			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+			order_result($data['hosts'], $sortField, $sortOrder);
 		}
 	}
 
