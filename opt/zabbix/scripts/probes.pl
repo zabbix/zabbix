@@ -196,11 +196,11 @@ sub delete_probe($) {
                                                                      
     check_probe_data($probe_host_mon, "Probe monitoring host with name '$probe_name - mon' is not found", false);
                                                                      
-    $probe_tmpl = get_template('Template '.$probe_name, true);
+    $probe_tmpl = get_template('Template '.$probe_name, true, false);
                                                                      
     check_probe_data($probe_tmpl, "Probe monitoring template with name 'Template $probe_name' is not found", false);
                                                                      
-    $probe_tmpl_status = get_template('Template '.$probe_name.' Status', false);
+    $probe_tmpl_status = get_template('Template '.$probe_name.' Status', false, false);
 
     check_probe_data($probe_tmpl_status, "Probe Status monitoring template with name 'Template $probe_name Status' is not found", false);
 
@@ -313,11 +313,11 @@ sub disable_probe($) {
 
     check_probe_data($probe_host_mon, "Probe monitoring host with name '$probe_name - mon' is not found", false);
 
-    $probe_tmpl = get_template('Template '.$probe_name, true);
+    $probe_tmpl = get_template('Template '.$probe_name, true, false);
 
     check_probe_data($probe_tmpl, "Probe monitoring template with name 'Template $probe_name' is not found", false);
 
-    $probe_tmpl_status = get_template('Template '.$probe_name.' Status', false);
+    $probe_tmpl_status = get_template('Template '.$probe_name.' Status', false, false);
 
     check_probe_data($probe_tmpl_status, "Probe Status monitoring template with name 'Template $probe_name Status' is not found", false);
 
