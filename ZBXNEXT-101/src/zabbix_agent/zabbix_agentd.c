@@ -248,6 +248,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
 			case 'R':
+#ifndef _WINDOWS
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
 					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
@@ -272,6 +273,10 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					exit(EXIT_FAILURE);
 				}
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
+#else
+				zbx_error("process runtime control is not supported on Windows platform");
+				exit(EXIT_FAILURE);
+#endif
 				break;
 			case 'h':
 				help();
