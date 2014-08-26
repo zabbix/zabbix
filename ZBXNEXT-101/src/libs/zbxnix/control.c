@@ -26,9 +26,12 @@
  * Purpose: create runtime control message for log level changes based on     *
  *          the command line arguments                                        *
  *                                                                            *
- * Parameters: opt     - [IN] the options to log level change command         *
- *             command - [IN] the log level change command (increase/decrease)*
- *             message - [OUT] the log level change runtime control message   *
+ * Parameters: opt     - [IN] the command line argument                       *
+ *                            (command with/without options)                  *
+ *             command - [IN] the command for log level change                *
+ *                            (increase/decrease)                             *
+ *             message - [OUT] the message containing options                 *
+ *                             for log level change                           *
  *                                                                            *
  * Return value: SUCCEEED - the message was created successfully              *
  *               FAIL     - otherwise                                         *
