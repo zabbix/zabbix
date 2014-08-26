@@ -64,7 +64,12 @@ $fields = array(
 	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	// actions
-	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
+									'"httptest.massenable"'
+								),
+								null
+							),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'del_history'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -73,8 +78,8 @@ $fields = array(
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null),
 	// sort and sortorder
-	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'hostname','name','status'"),				null),
-	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null),
+	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
@@ -103,8 +108,6 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
-$_REQUEST['go'] = getRequest('go', 'none');
-
 
 /*
  * Actions
@@ -324,10 +327,10 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $messageFalse);
 	}
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_httptestid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httptest.massenable', 'httptest.massdisable')) && hasRequest('group_httptestid')) {
 	$result = true;
 	$groupHttpTestId = getRequest('group_httptestid');
-	$enable = (getRequest('go') == 'activate');
+	$enable = (getRequest('action') == 'httptest.massenable');
 	$status = $enable ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
 	$statusName = $enable ? 'enabled' : 'disabled';
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
@@ -371,9 +374,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'httptest.massclearhistory' && hasRequest('group_httptestid')) {
 	$result = true;
-	$group_httptestid = $_REQUEST['group_httptestid'];
+	$group_httptestid = getRequest('group_httptestid');
 
 	DBStart();
 
@@ -403,8 +406,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	}
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
-	$result = API::HttpTest()->delete($_REQUEST['group_httptestid']);
+elseif (hasRequest('action') && getRequest('action') == 'httptest.massdelete' && hasRequest('group_httptestid')) {
+	$result = API::HttpTest()->delete(getRequest('group_httptestid'));
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));

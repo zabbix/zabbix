@@ -484,7 +484,7 @@ class CItemPrototype extends CItemGeneral {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parentItemids));
+		} while ($parentItemids);
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -500,16 +500,13 @@ class CItemPrototype extends CItemGeneral {
 
 		// delete graphs with this item prototype
 		$delGraphPrototypes = API::GraphPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('graphid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($delGraphPrototypes)) {
-			$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
-			}
+		if ($delGraphPrototypes) {
+			API::GraphPrototype()->delete(array_keys($delGraphPrototypes), true);
 		}
 
 		// check if any graphs are referencing this item
@@ -522,26 +519,20 @@ class CItemPrototype extends CItemGeneral {
 		while ($item = DBfetch($dbItems)) {
 			$createdItems[$item['itemid']] = $item['itemid'];
 		}
-		if (!empty($createdItems)) {
-			$result = API::Item()->delete($createdItems, true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete items created by low level discovery.'));
-			}
+		if ($createdItems) {
+			API::Item()->delete($createdItems, true);
 		}
 
 
 // TRIGGER PROTOTYPES
 		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
-		if (!empty($delTriggerPrototypes)) {
-			$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype'));
-			}
+		if ($delTriggerPrototypes) {
+			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
 		}
 
 		// screen items
