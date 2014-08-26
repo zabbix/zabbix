@@ -2712,7 +2712,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

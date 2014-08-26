@@ -1201,7 +1201,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 				'name' => $dbItem['name_expanded'],
 				'params' => array(
 					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-						? 'showgraph' : 'showlatest',
+						? HISTORY_GRAPH : HISTORY_VALUES,
 					'itemid' => $dbItem['itemid'],
 					'period' => 3600
 				)

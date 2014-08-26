@@ -72,7 +72,10 @@ foreach ($this->data['items'] as $item) {
 		itemIndicator($item['status']),
 		'?group_itemid='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&go='.($item['status'] ? 'activate' : 'disable'),
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED
+				? 'itemprototype.massenable'
+				: 'itemprototype.massdisable'
+			),
 		itemIndicatorStyle($item['status'])
 	);
 
@@ -104,16 +107,17 @@ foreach ($this->data['items'] as $item) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('itemprototype.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('itemprototype.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('itemprototype.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
