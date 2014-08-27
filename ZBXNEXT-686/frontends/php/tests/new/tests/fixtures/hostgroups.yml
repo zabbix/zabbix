@@ -1,5 +1,4 @@
 hostgroups:
-  cleanup: [groups]
   require: []
   rows:
     groups:
