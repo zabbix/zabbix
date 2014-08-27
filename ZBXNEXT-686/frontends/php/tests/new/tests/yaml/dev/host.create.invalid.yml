@@ -1,0 +1,27 @@
+# Create a host, link it to a template and verify the result using host.get.
+
+fixtures: [base_users, base_hostgroups]
+
+steps:
+  step1:
+    request:
+      method:  host.create
+      params:
+        interfaces:
+          -
+            type: 1
+            main: 1
+            useip: 1
+            ip: "192.168.3.1"
+            dns: ""
+            port: "10050"
+        groups:
+          -
+            groupid: "1"
+
+    expect: error
+
+    error:
+      message: "Invalid params."
+      data: "Wrong fields for host \"\"."
+      code: -32602
