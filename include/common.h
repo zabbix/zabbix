@@ -742,20 +742,20 @@ typedef struct
 }
 ZBX_TASK_EX;
 
-#define ZBX_RTC_MSG_BIT		0
-#define ZBX_RTC_SCOPE_BIT	8
-#define ZBX_RTC_DATA_BIT	16
+#define ZBX_RTC_MSG_SHIFT	0
+#define ZBX_RTC_SCOPE_SHIFT	8
+#define ZBX_RTC_DATA_SHIFT	16
 
-#define ZBX_RTC_MSG_MASK	0xFF
-#define ZBX_RTC_SCOPE_MASK	0xFF00
-#define ZBX_RTC_DATA_MASK	0xFFFF0000
+#define ZBX_RTC_MSG_MASK	0x000000ff
+#define ZBX_RTC_SCOPE_MASK	0x0000ff00
+#define ZBX_RTC_DATA_MASK	0xffff0000
 
-#define ZBX_RTC_GET_MSG(task)	(int)((task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_BIT)
-#define ZBX_RTC_GET_SCOPE(task)	(int)((task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_BIT)
-#define ZBX_RTC_GET_DATA(task)	(int)((task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_BIT)
+#define ZBX_RTC_GET_MSG(task)	(int)((task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
+#define ZBX_RTC_GET_SCOPE(task)	(int)((task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
+#define ZBX_RTC_GET_DATA(task)	(int)((task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
-#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_BIT) | (scope << ZBX_RTC_SCOPE_BIT) | \
-	(data << ZBX_RTC_DATA_BIT))
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
+	(data << ZBX_RTC_DATA_SHIFT))
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
