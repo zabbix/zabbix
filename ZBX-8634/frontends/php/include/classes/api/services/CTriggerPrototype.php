@@ -969,8 +969,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		foreach ($expressionHostnames as $expressionHostname) {
 			if (!isset($dbExpressionHosts[$expressionHostname])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect trigger prototype expression.'
-					.' Host "%1$s" does not exist or you have no access to this host.',
+					'Incorrect trigger prototype expression.'.
+					' Host "%1$s" does not exist or you have no access to this host.',
 					$expressionHostname
 				));
 			}
