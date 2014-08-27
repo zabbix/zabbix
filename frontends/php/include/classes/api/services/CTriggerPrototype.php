@@ -35,9 +35,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @see https://www.zabbix.com/documentation/2.4/manual/api/reference/triggerprototype/get
 	 *
-	 * @param array		$options	specifies what and how to get.
+	 * @param array $options
 	 *
-	 * @return array	item data as array or empty array
+	 * @return array|int
 	 */
 	public function get(array $options = array()) {
 		$result = array();
@@ -418,7 +418,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @see https://www.zabbix.com/documentation/2.4/manual/api/reference/triggerprototype/create
 	 *
-	 * @param array		$triggerPrototypes	contains data from which new trigger prototypes are created
+	 * @param array $triggerPrototypes
 	 *
 	 * @return array
 	 */
@@ -439,7 +439,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Validate trigger prototypes to be created.
 	 *
-	 * @param array		$triggerPrototypes
+	 * @param array $triggerPrototypes
 	 *
 	 * @throws APIException		if validation failed
 	 *
@@ -491,46 +491,47 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$this->validateUpdate($triggerPrototypes, $dbTriggerPrototypes);
 
-		foreach ($triggerPrototypes as $key => $triggerPrototype) {
+		foreach ($triggerPrototypes as &$triggerPrototype) {
 			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
 
 			if (isset($triggerPrototype['expression'])) {
 				$expressionFull = explode_exp($dbTriggerPrototype['expression']);
 				if (strcmp($triggerPrototype['expression'], $expressionFull) == 0) {
-					unset($triggerPrototypes[$key]['expression']);
+					unset($triggerPrototype['expression']);
 				}
 			}
 
 			if (isset($triggerPrototype['description'])
 					&& strcmp($triggerPrototype['description'], $dbTriggerPrototype['comments']) == 0) {
-				unset($triggerPrototypes[$key]['description']);
+				unset($triggerPrototype['description']);
 			}
 
 			if (isset($triggerPrototype['priority'])
 					&& $triggerPrototype['priority'] == $dbTriggerPrototype['priority']) {
-				unset($triggerPrototypes[$key]['priority']);
+				unset($triggerPrototype['priority']);
 			}
 
 			if (isset($triggerPrototype['type'])
 					&& $triggerPrototype['type'] == $dbTriggerPrototype['type']) {
-				unset($triggerPrototypes[$key]['type']);
+				unset($triggerPrototype['type']);
 			}
 
 			if (isset($triggerPrototype['comments'])
 					&& strcmp($triggerPrototype['comments'], $dbTriggerPrototype['comments']) == 0) {
-				unset($triggerPrototypes[$key]['comments']);
+				unset($triggerPrototype['comments']);
 			}
 
 			if (isset($triggerPrototype['url'])
 					&& strcmp($triggerPrototype['url'], $dbTriggerPrototype['url']) == 0) {
-				unset($triggerPrototypes[$key]['url']);
+				unset($triggerPrototype['url']);
 			}
 
 			if (isset($triggerPrototype['status'])
 					&& $triggerPrototype['status'] == $dbTriggerPrototype['status']) {
-				unset($triggerPrototypes[$key]['status']);
+				unset($triggerPrototype['status']);
 			}
 		}
+		unset($triggerPrototype);
 
 		$this->updateReal($triggerPrototypes);
 
@@ -547,8 +548,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @see https://www.zabbix.com/documentation/2.4/manual/api/reference/triggerprototype/delete
 	 *
-	 * @param array		$triggerPrototypeIds	array with trigger IDs
-	 * @param bool		$noPermissionsCheck
+	 * @param array $triggerPrototypeIds
+	 * @param bool  $noPermissionsCheck
 	 *
 	 * @throws APIException
 	 *
