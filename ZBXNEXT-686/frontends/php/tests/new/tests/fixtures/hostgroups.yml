@@ -1,0 +1,6 @@
+hostgroups:
+  cleanup: [groups]
+  require: []
+  rows:
+    groups:
+      - { groupid: 1, name: "Zabbix servers" }

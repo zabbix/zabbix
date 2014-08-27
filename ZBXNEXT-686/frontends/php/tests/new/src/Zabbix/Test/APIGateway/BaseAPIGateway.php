@@ -50,6 +50,12 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 			))
 		);
 
+		if ($result->isException()) {
+			throw new \RuntimeException(
+				sprintf('API authentication error: "%s"', $result->getMessage())
+			);
+		}
+
 		if (!preg_match('/^[a-z0-9]{32}$/', $result->getResult())) {
 			throw new \RuntimeException(
 				sprintf('API auth token does not much expected format, "%s" given',

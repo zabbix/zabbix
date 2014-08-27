@@ -1,0 +1,6 @@
+dbversion:
+  cleanup: [dbversion]
+  require: []
+  rows:
+    dbversion:
+      - { mandatory: 2030109, optional: 2030109 }

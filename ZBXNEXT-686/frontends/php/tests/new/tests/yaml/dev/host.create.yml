@@ -16,37 +16,32 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "50"
-        templates:
-          -
-            templateid: "20045"
+            groupid: "1"
 
-    expect: result
+    expect: response
 
     response:
-      result:
-        # possible shorter notation
-        #_assert: { arrayOf: id, count: 1 }
-        _assert: { type: array, count: 1 }
-        _each:
-          _assert: { type: id }
+      _keys: sequence
+      hostids:
+        _assert: arr|length(1)
 
   step2:
     request:
       method: host.get
       params:
-        hostids: [@step1.response.result@]
-        selectInterfaces: extend
+        hostids: ["@step1.response.result.hostids[0]@"]
+        selectGroups: [groupid]
+        selectInterfaces: [ip]
         selectParentTemplate: [templateid]
 
-    expect: result
+    expect: response
 
     response:
-      result:
+      _equals:
         -
-          hostid: @step1.response.result[0]@
-          host: @step1.response.result.host@
-          name: @step1.response.result.name@
+          hostid: @step1.response.result.hostids[0]@
+          host: @step1.request.params.host@
+          name: @step1.request.params.host@
           proxy_hostid: "0"
           status: "0"
           disable_until: "0"
@@ -80,17 +75,6 @@ steps:
           groups:
             -
               groupid: @step1.request.params.groups[0].groupid@
-          parentTemplates:
-            -
-              templateid: @step1.request.params.templates[0].templateid@
           interfaces:
             -
-              interfaceid: { _assert: { type: id } }
-              hostid: @step1.response.result[0]@
-              main: @step1.request.params.interfaces[0].main@
-              type: @step1.request.params.interfaces[0].type@
-              useip: @step1.request.params.interfaces[0].useip@
               ip: @step1.request.params.interfaces[0].ip@
-              dns: @step1.request.params.interfaces[0].dns@
-              port: @step1.request.params.interfaces[0].useip@
-              bulk: @step1.request.params.interfaces[0].port@
