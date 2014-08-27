@@ -41,7 +41,7 @@ $fields = array(
 	'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
+	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save}) || isset({saveandreturn})'),
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null),
@@ -225,8 +225,8 @@ else {
 
 	if ($eventAcknowledged) {
 		$title = _('Add comment by');
-		$saveLabel = _('Save');
-		$saveAndReturnLabel = _('Save and return');
+		$saveLabel = _('Update');
+		$saveAndReturnLabel = _('Update and return');
 	}
 	else {
 		$title = _('Acknowledge alarm by');

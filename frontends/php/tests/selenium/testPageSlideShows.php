@@ -59,7 +59,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show updated');
 		$this->zbxTestTextPresent("$name");

@@ -39,13 +39,13 @@ $fields = array(
 	'groupids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupid' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// maintenance
-	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
 	'maintenanceids' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
-	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
-	'description' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'active_since' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
-	'active_till' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
+	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'),
+	'description' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
+	'active_since' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'),
+	'active_till' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'),
 	'active_since_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
@@ -70,7 +70,8 @@ $fields = array(
 	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null),
 	'add_timeperiod' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_timeperiod' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
@@ -120,8 +121,8 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
-elseif (isset($_REQUEST['save'])) {
-	if (isset($_REQUEST['maintenanceid'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
+	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
 		$auditAction = AUDIT_ACTION_UPDATE;

@@ -146,7 +146,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				break;
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextNotPresent('ERROR');
@@ -187,7 +187,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Media type updated');
 
 		$newHashMediaType = DBhash($sqlMediaType);
