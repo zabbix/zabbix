@@ -33,7 +33,7 @@ $srctbl = getRequest('srctbl', ''); // source table name
 switch ($srctbl) {
 	case 'hosts':
 		$page['title'] = _('Hosts');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
 	case 'templates':
 		$page['title'] = _('Templates');

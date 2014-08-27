@@ -151,6 +151,17 @@ var chkbxRange = {
 	},
 
 	/**
+	 * Returns the checkboxes in an object group.
+	 *
+	 * @param string object
+	 *
+	 * @returns {Array}
+	 */
+	getObjectCheckboxes: function(object) {
+		return this.chkboxes[object] || [];
+	},
+
+	/**
 	 * Toggle all checkboxes of the given objects.
 	 *
 	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
@@ -160,7 +171,7 @@ var chkbxRange = {
 	 * @param {bool}    checked
 	 */
 	checkObjects: function(object, objectIds, checked) {
-		jQuery.each(this.chkboxes[object], jQuery.proxy(function(i, checkbox) {
+		jQuery.each(this.getObjectCheckboxes(object), jQuery.proxy(function(i, checkbox) {
 			var objectId = this.getObjectIdFromName(checkbox.name);
 
 			if (objectIds.indexOf(objectId) > -1) {
@@ -187,7 +198,7 @@ var chkbxRange = {
 	 * @param {bool} checked
 	 */
 	checkObjectRange: function(object, startCheckbox, endCheckbox, checked) {
-		var checkboxes = this.chkboxes[object];
+		var checkboxes = this.getObjectCheckboxes(object);
 
 		var startCheckboxIndex = checkboxes.indexOf(startCheckbox);
 		var endCheckboxIndex = checkboxes.indexOf(endCheckbox);
@@ -211,13 +222,11 @@ var chkbxRange = {
 	 */
 	checkObjectAll: function(object, checked) {
 		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
-		if (typeof this.chkboxes[object] !== 'undefined') {
-			var objectIds = jQuery.map(this.chkboxes[object], jQuery.proxy(function(checkbox) {
-				return this.getObjectIdFromName(checkbox.name);
-			}, this));
+		var objectIds = jQuery.map(this.getObjectCheckboxes(object), jQuery.proxy(function(checkbox) {
+			return this.getObjectIdFromName(checkbox.name);
+		}, this));
 
-			this.checkObjects(object, objectIds, checked);
-		}
+		this.checkObjects(object, objectIds, checked);
 	},
 
 	/**
