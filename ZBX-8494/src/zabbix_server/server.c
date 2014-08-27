@@ -562,7 +562,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, server_num = 0, server_count = 0, db_kind;
+	int		i, server_num = 0, server_count = 0, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -652,16 +652,15 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_sqlite3_mutex();
 #endif
 
-	if (FAIL == (db_kind = DBserver_or_proxy()))
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Seems like the database has not been prepared for Zabbix use. Cannot "
-				"determine is the process started with server or proxy database.");
+		zabbix_log(LOG_LEVEL_ERR, "Database \"%s\" does not look like a Zabbix database.", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
-	else if (ZBX_SERVER_DB != db_kind)
+	else if (ZBX_DB_SERVER != db_type)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Seems like the database has been prepared for proxy use. Zabbix server "
-				"cannot work with Zabbix proxy database.");
+		zabbix_log(LOG_LEVEL_ERR, "Database \"%s\" looks like a Zabbix proxy database. Zabbix server cannot "
+				"work with a Zabbix proxy database.", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 
