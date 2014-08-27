@@ -612,6 +612,9 @@ else {
 			}
 			unset($lastData);
 		}
+		else {
+			$httpTestsLastData = array();
+		}
 
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
