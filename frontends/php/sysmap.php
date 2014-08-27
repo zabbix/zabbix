@@ -39,7 +39,7 @@ $fields = array(
 	'selements' =>	array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
 	'links' =>		array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'update'"),	null),
+	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"update"'),	null),
 	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
