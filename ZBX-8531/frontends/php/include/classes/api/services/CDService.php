@@ -212,16 +212,16 @@ class CDService extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('dservice.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
+		$service = $this->get(array(
 			'output' => array('dserviceid'),
+			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $service;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

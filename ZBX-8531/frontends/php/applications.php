@@ -318,7 +318,7 @@ else {
 			'applicationids' => $applicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('itemid'),
-			'expandData' => true
+			'selectHost' => array('hostid', 'name')
 		));
 
 		order_result($data['applications'], $sortField, $sortOrder);
