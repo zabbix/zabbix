@@ -118,13 +118,12 @@ void	redirect_std(const char *filename)
 }
 #endif	/* not _WINDOWS */
 
-int zabbix_open_log(int type, int level, const char *filename)
+int	zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE	*log_file = NULL;
 #ifdef _WINDOWS
 	wchar_t	*wevent_source;
 #endif
-
 	log_level = level;
 
 	if (LOG_TYPE_FILE == type && NULL == filename)
@@ -133,7 +132,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 	if (LOG_TYPE_SYSLOG == type)
 	{
 		log_type = LOG_TYPE_SYSLOG;
-
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
@@ -170,7 +168,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	return SUCCEED;
 }
 
-void zabbix_close_log()
+void	zabbix_close_log()
 {
 	if (LOG_TYPE_SYSLOG == log_type)
 	{
@@ -187,7 +185,7 @@ void zabbix_close_log()
 	}
 }
 
-void zabbix_errlog(zbx_err_codes_t err, ...)
+void	zabbix_errlog(zbx_err_codes_t err, ...)
 {
 	const char	*msg;
 	char		*s = NULL;
@@ -239,12 +237,12 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int zabbix_check_log_level(int level)
+int	zabbix_check_log_level(int level)
 {
 	return ZBX_CHECK_LOG_LEVEL(level);
 }
 
-void __zbx_zabbix_log(int level, const char *fmt, ...)
+void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE			*log_file = NULL;
 	char			message[MAX_BUFFER_LEN], filename_old[MAX_STRING_LEN];
@@ -260,7 +258,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 #else
 	struct timeval		current_time;
 #endif
-
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 

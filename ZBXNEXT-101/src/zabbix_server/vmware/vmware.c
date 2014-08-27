@@ -1144,14 +1144,14 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	 vmware_service_hv_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle,
+static int	vmware_service_hv_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_hv_t *hv, char **error)
 {
-	const char		*__function_name = "vmware_service_hv_get_stats";
+	const char	*__function_name = "vmware_service_hv_get_stats";
 
-	int			err, opt, ret = FAIL, refresh_rate;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
+	int		err, opt, ret = FAIL, refresh_rate;
+	char		*tmp = NULL;
+	size_t		tmp_alloc = 0, tmp_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1300,7 +1300,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
