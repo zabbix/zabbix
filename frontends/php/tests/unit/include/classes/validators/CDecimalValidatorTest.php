@@ -47,6 +47,7 @@ class CDecimalValidatorTest extends CValidatorTest {
 			array(array('maxPrecision' => 5, 'maxScale' => 3), '99.999'),
 			array(array('maxPrecision' => 5, 'maxScale' => 3), -99.999),
 			array(array('maxPrecision' => 5, 'maxScale' => 3), '-99.999'),
+			array(array('maxScale' => 3), '1.001'),
 		);
 	}
 
