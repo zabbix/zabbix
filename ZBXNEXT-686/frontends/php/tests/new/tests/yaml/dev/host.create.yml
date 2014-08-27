@@ -34,7 +34,7 @@ steps:
     request:
       method: host.get
       params:
-        hostids: ["@step1.response.result.hostids[0]@"]
+        hostids: ["@step1.response.hostids[0]@"]
         selectGroups: [groupid]
         selectInterfaces: [ip]
         selectParentTemplate: [templateid]
@@ -44,7 +44,7 @@ steps:
     response:
       _equals:
         -
-          hostid: @step1.response.result.hostids[0]@
+          hostid: @step1.response.hostids[0]@
           host: @step1.request.params.host@
           name: @step1.request.params.host@
           proxy_hostid: "0"

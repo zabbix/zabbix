@@ -279,10 +279,11 @@ class FileApiTestCase extends ApiTestCase {
 			throw new \Exception(sprintf('Second part of the expressions should be "request" or "response", "%s" given', $type));
 		}
 
-		// third key is method, params or result
-		$subtype = array_shift($keys);
 
 		if ($type == 'request') {
+			// third key is method or params
+			$subtype = array_shift($keys);
+
 			$allow = array('method', 'params');
 
 			if (!in_array($subtype, $allow)) {
@@ -309,16 +310,6 @@ class FileApiTestCase extends ApiTestCase {
 		}
 
 		if ($type == 'response') {
-			$allow = array('result');
-
-			if (!in_array($subtype, $allow)) {
-				throw new \Exception(sprintf('Third part of request expression must be one of "%s", "%s" given',
-						implode(', ', $allow),
-						$subtype
-					)
-				);
-			}
-
 			if (!isset($this->stepStack[$stepName]['response'])) {
 				throw new \Exception(sprintf('No response has been logged yet for step "%s"', $stepName));
 			}
@@ -326,7 +317,7 @@ class FileApiTestCase extends ApiTestCase {
 			/* @var $response \Zabbix\Test\APITestResponse */
 			$response = $this->stepStack[$stepName]['response'];
 
-			return $this->drillIn($response->getResult(), $keys);
+			return $this->drillIn($response->getResponseData(), $keys);
 		}
 	}
 
