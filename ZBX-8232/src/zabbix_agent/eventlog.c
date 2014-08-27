@@ -393,7 +393,6 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 {
 	const char	*__function_name = "process_eventlog";
 	int		ret = FAIL;
-	static HMODULE	hmod_wevtapi = NULL;
 	HANDLE		eventlog_handle;
 	LPTSTR		wsource;
 	zbx_uint64_t	FirstID, LastID;

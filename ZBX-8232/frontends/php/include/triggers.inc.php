@@ -103,18 +103,6 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
-// retrieve trigger's priority for services
-function get_service_status_of_trigger($triggerid) {
-	$sql = 'SELECT t.triggerid,t.priority'.
-			' FROM triggers t'.
-			' WHERE t.triggerid='.zbx_dbstr($triggerid).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.value='.TRIGGER_VALUE_TRUE;
-	$rows = DBfetch(DBselect($sql, 1));
-
-	return !empty($rows['priority']) ? $rows['priority'] : 0;
-}
-
 /**
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
