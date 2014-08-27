@@ -10,6 +10,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8531] fixed inconsistent group selection dropdown behaviour in application configuration (Krists)
 ..F....... [ZBX-8653] fixed big double value check in the decimal validator (Oleg)
 ..F....... [ZBX-8377] fixed style and hover effect for disabled bulk action buttons and improved readability for readonly input fields (Ivo)
 A......... [ZBX-8568] fixed item.delete and itemprototype.delete to also remove trigger prototypes using them (Krists)
