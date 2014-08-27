@@ -114,16 +114,22 @@ $scriptForm->addItem($scriptView);
 
 // footer
 if (isset($_REQUEST['scriptid'])) {
-	$others = array();
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
-	$others[] = new CButtonCancel();
-	$scriptForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $others));
-	$scriptsWidget->addItem($scriptForm);
+	$scriptForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid')),
+			new CButtonCancel()
+		)
+	));
 }
 else {
-	$scriptForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
-	$scriptsWidget->addItem($scriptForm);
+	$scriptForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
 }
+
+$scriptsWidget->addItem($scriptForm);
 
 return $scriptsWidget;

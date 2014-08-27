@@ -125,9 +125,8 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
 
-if ($data['form_refresh']) {
+if (hasRequest('form_refresh')) {
 	$data['config']['discovery_groupid'] = getRequest('discovery_groupid');
 	$data['config']['alert_usrgrpid'] = getRequest('alert_usrgrpid');
 	$data['config']['refresh_unsupported'] = getRequest('refresh_unsupported');

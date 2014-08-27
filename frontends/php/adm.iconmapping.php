@@ -43,7 +43,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('iconmapid')) {
+if (hasRequest('iconmapid')) {
 	$iconMap = API::IconMap()->get(array(
 		'iconmapids' => getRequest('iconmapid'),
 		'output' => API_OUTPUT_EXTEND,

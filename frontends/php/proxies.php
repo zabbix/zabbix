@@ -126,8 +126,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		add_audit($auditAction, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($result['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
-	unset($_REQUEST['add']);
-	unset($_REQUEST['update']);
 
 	$result = DBend($result);
 
