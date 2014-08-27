@@ -338,12 +338,18 @@ foreach ($subfiltersList as $name) {
 	}
 }
 
-
-if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
+$filterHostId = getRequest('filter_hostid');
+if (!hasRequest('form') && $filterHostId) {
 	if (!isset($host)) {
-		$host = API::Host()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
-		if (empty($host)) {
-			$host = API::Template()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
+		$host = API::Host()->get(array(
+			'output' => array('hostid'),
+			'hostids' => $filterHostId
+		));
+		if (!$host) {
+			$host = API::Template()->get(array(
+				'output' => array('templateid'),
+				'templateids' => $filterHostId
+			));
 		}
 		$host = reset($host);
 	}
@@ -1065,12 +1071,12 @@ else {
 		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
 
-	$afterFilter = count($options, COUNT_RECURSIVE);
-	if (empty($options['hostids']) && $preFilter == $afterFilter) {
-		$data['items'] = array();
+	$data['filterSet'] = ($options['hostids'] || $preFilter != count($options, COUNT_RECURSIVE));
+	if ($data['filterSet']) {
+		$data['items'] = API::Item()->get($options);
 	}
 	else {
-		$data['items'] = API::Item()->get($options);
+		$data['items'] = array();
 	}
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown

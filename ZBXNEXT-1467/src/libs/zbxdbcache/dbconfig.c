@@ -861,13 +861,15 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 #define DEFAULT_REFRESH_UNSUPPORTED	600
 static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
 
-static int	DCsync_config(DB_RESULT result)
+static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
 	const char	*__function_name = "DCsync_config";
 	DB_ROW		row;
 	int		i, found = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	*refresh_unsupported_changed = 0;
 
 	if (NULL == config->config)
 	{
@@ -883,6 +885,8 @@ static int	DCsync_config(DB_RESULT result)
 		if (0 == found)
 		{
 			/* load default config data */
+
+			*refresh_unsupported_changed = 1;
 
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
@@ -917,9 +921,16 @@ static int	DCsync_config(DB_RESULT result)
 	}
 	else
 	{
+		int	refresh_unsupported;
+
 		/* store the config data */
 
-		config->config->refresh_unsupported = atoi(row[0]);
+		refresh_unsupported = atoi(row[0]);
+
+		if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
+			*refresh_unsupported_changed = 1;
+
+		config->config->refresh_unsupported = refresh_unsupported;
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 
@@ -1726,7 +1737,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_items(DB_RESULT result)
+static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 {
 	const char		*__function_name = "DCsync_items";
 
@@ -1927,6 +1938,7 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (SUCCEED == is_counted_in_item_queue(type, item->key) &&
 					(0 == item->nextcheck || 0 != key_changed || item->type != type ||
+					(ITEM_STATE_NOTSUPPORTED == item->state && 1 == refresh_unsupported_changed) ||
 					(ITEM_STATE_NORMAL == item->state &&
 					(item->delay != delay || 0 != delay_flex_changed))))
 			{
@@ -2842,7 +2854,7 @@ void	DCsync_configuration(void)
 	DB_RESULT		func_result = NULL;
 	DB_RESULT		expr_result = NULL;
 
-	int			i;
+	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
 				expr_sec2, total, total2;
@@ -2996,7 +3008,7 @@ void	DCsync_configuration(void)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_config(conf_result);
+	DCsync_config(conf_result, &refresh_unsupported_changed);
 	csec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -3020,11 +3032,13 @@ void	DCsync_configuration(void)
 	hmsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_interfaces(if_result);	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
+	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
+	DCsync_interfaces(if_result);
 	ifsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(item_result);	/* relies on hosts and interfaces, must be after DCsync_{hosts,interfaces}() */
+	/* relies on hosts and interfaces, must be after DCsync_{hosts,interfaces}() */
+	DCsync_items(item_result, refresh_unsupported_changed);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -3636,6 +3650,7 @@ void	DCload_config()
 	const char	*__function_name = "DCload_config";
 
 	DB_RESULT	result;
+	int		refresh_unsupported_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3643,7 +3658,7 @@ void	DCload_config()
 
 	LOCK_CACHE;
 
-	DCsync_config(result);
+	DCsync_config(result, &refresh_unsupported_changed);
 
 	UNLOCK_CACHE;
 
