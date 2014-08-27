@@ -51,7 +51,7 @@ static void	common_worker_sigusr_handler(int flags)
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			if (SUCCEED != set_debug_level_up())
+			if (SUCCEED != zabbix_increase_log_level())
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
 						" maximum level has been already set");
@@ -59,11 +59,11 @@ static void	common_worker_sigusr_handler(int flags)
 			else
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to \"%s\"",
-						get_debug_level_string());
+						zabbix_get_log_level_string());
 			}
 			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			if (SUCCEED != set_debug_level_down())
+			if (SUCCEED != zabbix_decrease_log_level())
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
 						" minimum level has been already set");
@@ -71,7 +71,7 @@ static void	common_worker_sigusr_handler(int flags)
 			else
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to \"%s\"",
-						get_debug_level_string());
+						zabbix_get_log_level_string());
 			}
 			break;
 		default:
