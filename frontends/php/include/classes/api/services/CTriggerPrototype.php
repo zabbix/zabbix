@@ -556,7 +556,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @return array
 	 */
 	public function delete(array $triggerPrototypeIds, $noPermissionsCheck = false) {
-		if ($triggerPrototypeIds) {
+		if (!$triggerPrototypeIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
