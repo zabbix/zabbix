@@ -545,13 +545,6 @@ class CApiService {
 				}
 
 				$sqlParts = $this->applyQuerySortField($sortfield, $sortorder, $tableAlias, $sqlParts);
-
-				// add sort field to select if distinct is used
-				if (count($sqlParts['from']) > 1) {
-					if (!str_in_array($tableAlias.'.'.$sortfield, $sqlParts['select']) && !str_in_array($tableAlias.'.*', $sqlParts['select'])) {
-						$sqlParts['select'][$sortfield] = $tableAlias.'.'.$sortfield;
-					}
-				}
 			}
 		}
 
@@ -569,6 +562,14 @@ class CApiService {
 	 * @return array
 	 */
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
+		// add sort field to select if distinct is used
+		if (count($sqlParts['from']) > 1
+				&& !str_in_array($alias.'.'.$sortfield, $sqlParts['select'])
+				&& !str_in_array($alias.'.*', $sqlParts['select'])) {
+
+			$sqlParts['select'][$sortfield] = $alias.'.'.$sortfield;
+		}
+
 		$sqlParts['order'][$alias.'.'.$sortfield] = $alias.'.'.$sortfield.$sortorder;
 
 		return $sqlParts;
@@ -732,7 +733,7 @@ class CApiService {
 	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
 		$idValidator = new CIdValidator(array(
 			'messageEmpty' => $messageEmpty,
-			'messageRegex' => $messageInvalid
+			'messageInvalid' => $messageInvalid
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
@@ -926,7 +927,7 @@ class CApiService {
 	 *
 	 * @param array $array
 	 * @param CPartialValidatorInterface $validator
-	 * @parma array $fullArray
+	 * @param array $fullArray
 	 */
 	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
 		if (!$validator->validatePartial($array, $fullArray)) {

@@ -72,7 +72,7 @@ $expressionTextBox = new CTextArea(
 		'readonly' => $this->data['expression_field_readonly']
 	)
 );
-if ($this->data['expression_field_readonly'] == 'yes') {
+if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
 
@@ -84,41 +84,47 @@ $addExpressionButton = new CButton(
 		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 265);',
 	'formlist'
 );
-if ($this->data['limited'] == 'yes') {
+if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
 $expressionRow = array($expressionTextBox, $addExpressionButton);
-if (!empty($this->data['expression_macro_button'])) {
-	array_push($expressionRow, $this->data['expression_macro_button']);
-}
+
 if ($this->data['input_method'] == IM_TREE) {
+	// insert macro button
+	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'formlist');
+	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
+	if ($this->data['limited']) {
+		$insertMacroButton->setAttribute('disabled', 'disabled');
+	}
+	$expressionRow[] = $insertMacroButton;
+
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
 		// add button
 		$addExpressionButton = new CSubmit('add_expression', _('Add'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 	}
 	else {
 		// add button
-		$addExpressionButton = new CSubmit('and_expression', _('AND'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'formlist');
+		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
-		$orExpressionButton = new CSubmit('or_expression', _('OR'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'formlist');
+		if ($this->data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $orExpressionButton);
 
 		// replace button
 		$replaceExpressionButton = new CSubmit('replace_expression', _('Replace'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $replaceExpressionButton);
@@ -143,24 +149,24 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader(array(
-		($this->data['limited'] == 'yes') ? null : _('Target'),
+		$this->data['limited'] ? null : _('Target'),
 		_('Expression'),
 		empty($this->data['parent_discoveryid']) ? _('Error') : null,
-		($this->data['limited'] == 'yes') ? null : _('Action')
+		$this->data['limited'] ? null : _('Action')
 	));
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
-			if ($this->data['limited'] != 'yes') {
+			if (!$this->data['limited']) {
 				$deleteUrl = new CSpan(_('Delete'), 'link');
 				$deleteUrl->setAttribute('onclick', 'javascript:'.
-					' if (Confirm("'._('Delete expression?').'")) {'.
+					' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
 						' delete_expression("'.$e['id'] .'");'.
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
 				);
-				$triggerCheckbox = new CCheckbox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
+				$triggerCheckbox = new CCheckBox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
 			}
 			else {
 				$triggerCheckbox = null;
@@ -183,7 +189,7 @@ if ($this->data['input_method'] == IM_TREE) {
 							array_push($errorTexts, $expVal, ':', $errTxt);
 						}
 					}
-					$errorImg->setHint($errorTexts, '', 'left');
+					$errorImg->setHint($errorTexts, 'left');
 				}
 				$errorColumn = new CCol($errorImg, 'center');
 			}
@@ -192,7 +198,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			// templated trigger
-			if ($this->data['limited'] == 'yes') {
+			if ($this->data['limited']) {
 				// make all links inside inactive
 				$listSize = count($e['list']);
 				for ($i = 0; $i < $listSize; $i++) {

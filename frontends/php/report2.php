@@ -207,6 +207,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 * Filter
 	 */
 	$filterForm = new CFormTable();
+	$filterForm->setTableClass('formtable old-filter');
 	$filterForm->setAttribute('name', 'zbx_filter');
 	$filterForm->setAttribute('id', 'zbx_filter');
 	$filterForm->addVar('config', $availabilityReportMode);

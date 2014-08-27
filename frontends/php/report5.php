@@ -35,7 +35,7 @@ check_fields($fields);
 
 $rprt_wdgt = new CWidget();
 
-$_REQUEST['period'] = get_request('period', 'day');
+$_REQUEST['period'] = getRequest('period', 'day');
 $admin_links = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 
 $form = new CForm('get');
@@ -78,7 +78,7 @@ switch ($_REQUEST['period']) {
 }
 
 $triggersEventCount = array();
-// get 100 triggerids with max even count
+// get 100 triggerids with max event count
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' FROM triggers t,events e'.
 		' WHERE t.triggerid=e.objectid'.
@@ -114,7 +114,7 @@ $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
 	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
-	'selectHosts' => array('hostid'),
+	'selectHosts' => array('hostid', 'status'),
 	'expandDescription' => true,
 	'expandData' => true,
 	'preservekeys' => true,
@@ -136,7 +136,7 @@ foreach ($triggers as $triggerId => $trigger) {
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? 'showgraph' : 'showvalues'
+					? HISTORY_GRAPH : HISTORY_VALUES
 			)
 		);
 	}
@@ -151,7 +151,7 @@ CArrayHelper::sort($triggers, array(
 ));
 
 $hosts = API::Host()->get(array(
-	'output' => array('hostid'),
+	'output' => array('hostid', 'status'),
 	'hostids' => $hostIds,
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
@@ -163,7 +163,10 @@ $scripts = API::Script()->getScriptsByHosts($hostIds);
 foreach ($triggers as $trigger) {
 	$hostId = $trigger['hostid'];
 
-	$hostName = new CSpan($trigger['hostname'], 'link_menu');
+	$hostName = new CSpan($trigger['hostname'],
+		'link_menu menu-host'.(($hosts[$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+	);
+
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');

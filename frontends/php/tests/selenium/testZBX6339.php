@@ -61,7 +61,7 @@ class testZBX6339 extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of screens');
 
 		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

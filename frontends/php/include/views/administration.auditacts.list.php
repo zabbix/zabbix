@@ -36,7 +36,7 @@ $auditWidget->addHeaderRowNumber();
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(array(
 	bold(_('Recipient')),
 	SPACE,
@@ -116,7 +116,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 	else {
 		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], '', 'on');
+		$info->setHint($alert['error'], 'on');
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
@@ -124,7 +124,7 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
-		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
+		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
 		new CCol($recipient, 'top'),

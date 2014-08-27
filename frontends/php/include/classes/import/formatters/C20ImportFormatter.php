@@ -24,6 +24,20 @@
  */
 class C20ImportFormatter extends CImportFormatter {
 
+	/**
+	 * Converter for trigger expressions.
+	 *
+	 * @var C24TriggerConverter
+	 */
+	protected $triggerExpressionConverter;
+
+	/**
+	 * @param C24TriggerConverter $triggerExpressionConverter
+	 */
+	public function __construct(C24TriggerConverter $triggerExpressionConverter) {
+		$this->triggerExpressionConverter = $triggerExpressionConverter;
+	}
+
 	public function getGroups() {
 		if (!isset($this->data['groups'])) {
 			return array();
@@ -77,6 +91,11 @@ class C20ImportFormatter extends CImportFormatter {
 
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
+						// set bulk default value
+						if (!isset($interface['bulk'])) {
+							$interface['bulk'] = SNMP_BULK_ENABLED;
+						}
+
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 					}
 				}
@@ -110,7 +129,6 @@ class C20ImportFormatter extends CImportFormatter {
 
 	public function getApplications() {
 		$applicationsData = array();
-
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['applications'])) {
@@ -153,6 +171,7 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 			}
 		}
+
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {
@@ -227,6 +246,8 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['triggers'])) {
 			foreach ($this->data['triggers'] as $trigger) {
 				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
+
+				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 
 				$triggersData[] = $this->renameTriggerFields($trigger);
 			}
@@ -352,6 +373,8 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($discoveryRule['trigger_prototypes'])) {
 			foreach ($discoveryRule['trigger_prototypes'] as &$trigger) {
+				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
+
 				$trigger = $this->renameTriggerFields($trigger);
 			}
 			unset($trigger);

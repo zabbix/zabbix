@@ -870,6 +870,349 @@ static int	DBpatch_2030091(void)
 
 	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
+
+static int	DBpatch_2030092(void)
+{
+	const ZBX_FIELD field = {"timeout", "15", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("httpstep", &field);
+}
+
+static int	DBpatch_2030093(void)
+{
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field);
+}
+
+static int	DBpatch_2030094(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*p, *expr = NULL, *expr_esc;
+	size_t		expr_alloc = 0, expr_offset;
+
+	result = DBselect("select triggerid,expression from triggers");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		expr_offset = 0;
+
+		for (p = row[1]; '\0' != *p; p++)
+		{
+			if (NULL == strchr("#&|", *p))
+			{
+				if (' ' != *p || (0 != expr_offset && ' ' != expr[expr_offset - 1]))
+					zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, *p);
+
+				continue;
+			}
+
+			if (('&' == *p || '|' == *p) && 0 != expr_offset && ' ' != expr[expr_offset - 1])
+				zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, ' ');
+
+			switch (*p)
+			{
+				case '#':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "<>");
+					break;
+				case '&':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "and");
+					break;
+				case '|':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "or");
+					break;
+			}
+
+			if (('&' == *p || '|' == *p) && ' ' != *(p + 1))
+				zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, ' ');
+		}
+
+		if (2048 < expr_offset && 2048 /* TRIGGER_EXPRESSION_LEN */ < zbx_strlen_utf8(expr))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger expression \"%s\":"
+					" resulting expression is too long", row[1]);
+		}
+		else if (0 != strcmp(row[1], expr))
+		{
+			expr_esc = DBdyn_escape_string(expr);
+
+			if (ZBX_DB_OK > DBexecute("update triggers set expression='%s' where triggerid=%s",
+					expr_esc, row[0]))
+			{
+				ret = FAIL;
+			}
+
+			zbx_free(expr_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(expr);
+
+	return ret;
+}
+
+static int	DBpatch_2030095(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*p, *q, *params = NULL, *params_esc;
+	size_t		params_alloc = 0, params_offset;
+
+	result = DBselect("select itemid,params from items where type=%d", 15 /* ITEM_TYPE_CALCULATED */);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		params_offset = 0;
+
+		for (p = row[1]; '\0' != *p; p++)
+		{
+			if (NULL != strchr(ZBX_WHITESPACE, *p))
+			{
+				if (' ' != *p || (0 != params_offset &&
+						NULL == strchr(ZBX_WHITESPACE, params[params_offset - 1])))
+				{
+					zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
+				}
+
+				continue;
+			}
+
+			if (NULL != strchr("#&|", *p))
+			{
+				if (('&' == *p || '|' == *p) && 0 != params_offset &&
+						NULL == strchr(ZBX_WHITESPACE, params[params_offset - 1]))
+				{
+					zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ' ');
+				}
+
+				switch (*p)
+				{
+					case '#':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "<>");
+						break;
+					case '&':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "and");
+						break;
+					case '|':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "or");
+						break;
+				}
+
+				if (('&' == *p || '|' == *p) && NULL == strchr(ZBX_WHITESPACE, *(p + 1)))
+					zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ' ');
+
+				continue;
+			}
+
+			q = p;
+
+			if (SUCCEED == parse_function(&q, NULL, NULL))
+			{
+				zbx_strncpy_alloc(&params, &params_alloc, &params_offset, p, q - p);
+				p = q - 1;
+				continue;
+			}
+
+			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
+		}
+
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+		if (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+#else
+		if (65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+#endif
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\":"
+					" resulting expression is too long", row[1]);
+		}
+		else if (0 != strcmp(row[1], params))
+		{
+			params_esc = DBdyn_escape_string(params);
+
+			if (ZBX_DB_OK > DBexecute("update items set params='%s' where itemid=%s", params_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(params_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(params);
+
+	return ret;
+}
+
+static int	DBpatch_2030096(void)
+{
+	const ZBX_FIELD	field = {"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030097(void)
+{
+	const ZBX_FIELD	field = {"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030098(void)
+{
+	const ZBX_FIELD	field = {"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030099(void)
+{
+	const ZBX_FIELD	field = {"verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030100(void)
+{
+	const ZBX_FIELD	field = {"verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030101(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030102(void)
+{
+	const ZBX_FIELD field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("httpstep", &field);
+}
+
+static int	DBpatch_2030103(void)
+{
+	const ZBX_FIELD	field = {"follow_redirects", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2030104(void)
+{
+	const ZBX_FIELD	field = {"retrieve_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2030105(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2030106(void)
+{
+	const ZBX_FIELD field = {"colspan", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("screens_items", &field);
+}
+
+static int	DBpatch_2030107(void)
+{
+	const ZBX_FIELD field = {"rowspan", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("screens_items", &field);
+}
+
+static int	DBpatch_2030108(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update screens_items set colspan=1 where colspan=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2030109(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update screens_items set rowspan=1 where rowspan=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2030110(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.view.application'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030111(void)
+{
+	const ZBX_FIELD	field = {"bulk", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
+static int	DBpatch_2030112(void)
+{
+	const ZBX_FIELD	field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_2030113(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ('web.latest.php.sort', 'web.httpmon.php.sort')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030114(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.httpconf.php.sort' and value_str='h.hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030115(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.hostinventories.php.sort ' and value_str='hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030116(void)
+{
+	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2030117(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2030118(void)
+{
+	const ZBX_FIELD	field = {"max_columns", "3", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("screens_items", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -967,5 +1310,32 @@ DBPATCH_ADD(2030088, 0, 1)
 DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
+DBPATCH_ADD(2030092, 0, 1)
+DBPATCH_ADD(2030093, 0, 1)
+DBPATCH_ADD(2030094, 0, 1)
+DBPATCH_ADD(2030095, 0, 1)
+DBPATCH_ADD(2030096, 0, 1)
+DBPATCH_ADD(2030097, 0, 1)
+DBPATCH_ADD(2030098, 0, 1)
+DBPATCH_ADD(2030099, 0, 1)
+DBPATCH_ADD(2030100, 0, 1)
+DBPATCH_ADD(2030101, 0, 1)
+DBPATCH_ADD(2030102, 0, 1)
+DBPATCH_ADD(2030103, 0, 1)
+DBPATCH_ADD(2030104, 0, 1)
+DBPATCH_ADD(2030105, 0, 1)
+DBPATCH_ADD(2030106, 0, 1)
+DBPATCH_ADD(2030107, 0, 1)
+DBPATCH_ADD(2030108, 0, 1)
+DBPATCH_ADD(2030109, 0, 1)
+DBPATCH_ADD(2030110, 0, 0)
+DBPATCH_ADD(2030111, 0, 1)
+DBPATCH_ADD(2030112, 0, 1)
+DBPATCH_ADD(2030113, 0, 0)
+DBPATCH_ADD(2030114, 0, 0)
+DBPATCH_ADD(2030115, 0, 0)
+DBPATCH_ADD(2030116, 0, 1)
+DBPATCH_ADD(2030117, 0, 1)
+DBPATCH_ADD(2030118, 0, 1)
 
 DBPATCH_END()

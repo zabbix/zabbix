@@ -121,7 +121,7 @@ function getFavouriteGraphs() {
 
 	if ($data['simpleGraphs']) {
 		foreach ($data['simpleGraphs'] as $item) {
-			$favourites->addItem(new CLink($item['label'], 'history.php?action=showgraph&itemid='.$item['id']), 'nowrap');
+			$favourites->addItem(new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id']), 'nowrap');
 		}
 	}
 
@@ -318,7 +318,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => API_OUTPUT_EXTEND,
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -326,27 +326,29 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' =>  API_OUTPUT_EXTEND,
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
 		'selectHosts' => array('name'),
 		'selectGroups' => array('groupid'),
 		'preservekeys' => true
 	));
 
-	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as $tnum => $trigger) {
-		if (!empty($trigger['lastEvent'])) {
+
+	foreach ($triggers as $triggerId => $trigger) {
+		if ($trigger['lastEvent']) {
 			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
 		}
 
-		$triggers[$tnum]['event'] = $trigger['lastEvent'];
-		unset($triggers[$tnum]['lastEvent']);
+		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
+		unset($triggers[$triggerId]['lastEvent']);
 	}
+
+	// get acknowledges
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
 			'output' => array('eventid'),
 			'eventids' => $eventIds,
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => array('eventid', 'clock', 'message', 'alias', 'name', 'surname'),
 			'preservekeys' => true
 		));
 	}
@@ -357,17 +359,17 @@ function make_system_status($filter) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		// event
-		if (empty($trigger['event'])) {
+		if ($trigger['event']) {
+			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
+				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+				: 0;
+		}
+		else {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
 				'value' => $trigger['value']
 			);
-		}
-		else {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
-				: 0;
 		}
 
 		// groups
@@ -375,6 +377,7 @@ function make_system_status($filter) {
 			if (!isset($groups[$group['groupid']])) {
 				continue;
 			}
+
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
@@ -395,6 +398,8 @@ function make_system_status($filter) {
 	}
 	unset($triggers);
 
+	$config = select_config();
+
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
@@ -412,13 +417,13 @@ function make_system_status($filter) {
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions));
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions));
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
 			}
 
 			switch ($filter['extAck']) {
@@ -448,8 +453,8 @@ function make_system_status($filter) {
 		$table->addRow($groupRow);
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js(
+		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -467,6 +472,7 @@ function make_hoststat_summary($filter) {
 	// get host groups
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => 1,
 		'output' => array('groupid', 'name')
 	));
@@ -479,7 +485,7 @@ function make_hoststat_summary($filter) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
-		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'name'),
@@ -783,8 +789,8 @@ function make_hoststat_summary($filter) {
 		$table->addRow($group_row);
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js(
+		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -841,11 +847,11 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$frontendSetup = new FrontendSetup();
+		$frontendSetup = new CFrontendSetup();
 		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
-			if ($req['result'] != FrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == FrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
+			if ($req['result'] != CFrontendSetup::CHECK_OK) {
+				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
 				$table->addRow(array(
 					new CSpan($req['name'], $class),
 					new CSpan($req['current'], $class),
@@ -855,8 +861,8 @@ function make_status_of_zbx() {
 		}
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js(
+		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -1044,7 +1050,7 @@ function make_latest_issues(array $filter = array()) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// trigger has events
@@ -1082,13 +1088,12 @@ function make_latest_issues(array $filter = array()) {
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
-				'', '', false
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false
 			);
 		}
 
 		// clock
-		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
+		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
 			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
 				'&show_unknown=1&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
 				'&period='.ZBX_PERIOD_DEFAULT
@@ -1113,8 +1118,8 @@ function make_latest_issues(array $filter = array()) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js(
+		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
@@ -1203,7 +1208,7 @@ function make_webmon_overview($filter) {
 	foreach ($groups as $group) {
 		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
-				$group['name'],
+				new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
 				new CSpan(
 					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
@@ -1214,8 +1219,8 @@ function make_webmon_overview($filter) {
 		}
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js(
+		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -1264,8 +1269,8 @@ function make_discovery_status() {
 		));
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
+		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -1279,12 +1284,11 @@ function make_discovery_status() {
  * @param array $triggers
  * @param array $ackParams
  * @param array $actions
+ * @param array $config
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
-	$config = select_config();
-
+function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
 	$popupTable = new CTableInfo();
 	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(
@@ -1303,7 +1307,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// ack

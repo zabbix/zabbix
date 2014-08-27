@@ -87,7 +87,7 @@ abstract class DbBackend {
 	}
 
 	/**
-	 * Return error or null if no error occured.
+	 * Return error or null if no error occurred.
 	 *
 	 * @return mixed
 	 */

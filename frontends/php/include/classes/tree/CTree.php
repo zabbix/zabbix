@@ -113,7 +113,7 @@ class CTree {
 
 	private function makeSImgStr($id) {
 		$tr = new CRow();
-		$count = isset($this->tree[$id]['nodeimg']) ? zbx_strlen($this->tree[$id]['nodeimg']) : 0;
+		$count = isset($this->tree[$id]['nodeimg']) ? strlen($this->tree[$id]['nodeimg']) : 0;
 
 		for ($i = 0; $i < $count; $i++) {
 			$td = new CCol();
@@ -208,7 +208,7 @@ class CTree {
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['alias'].'_'.$this->treename.'", '.$this->treename.'_tree);');
 
-		return new CJSscript($js);
+		return new CJsScript($js);
 	}
 
 	private function getImg($id, $img) {

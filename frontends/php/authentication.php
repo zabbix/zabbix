@@ -114,8 +114,8 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 		));
 
 		$login = $ldapValidator->validate(array(
-			'user' => get_request('user', CWebUser::$data['alias']),
-			'password' => get_request('user_password', '')
+			'user' => getRequest('user', CWebUser::$data['alias']),
+			'password' => getRequest('user_password', '')
 		));
 
 		if (!$login) {
@@ -165,7 +165,7 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	if (isset($_REQUEST['save'])) {
-		// get groups wich use this authentication method
+		// get groups that use this authentication method
 		$result = DBfetch(DBselect(
 			'SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL
 		));
@@ -210,13 +210,13 @@ show_messages();
  * Display
  */
 $data = array(
-	'form_refresh' => get_request('form_refresh'),
+	'form_refresh' => getRequest('form_refresh'),
 	'config' => $config,
 	'is_authentication_type_changed' => $isAuthenticationTypeChanged,
-	'user' => get_request('user', CWebUser::$data['alias']),
-	'user_password' => get_request('user_password', ''),
+	'user' => getRequest('user', CWebUser::$data['alias']),
+	'user_password' => getRequest('user_password', ''),
 	'user_list' => null,
-	'change_bind_password' => get_request('change_bind_password')
+	'change_bind_password' => getRequest('change_bind_password')
 );
 
 // get tab title

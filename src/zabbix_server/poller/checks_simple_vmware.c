@@ -166,7 +166,7 @@ static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, con
 
 	for (i = 0; i < clusters->values_num; i++)
 	{
-		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
 
 		if (0 == strcmp(cluster->name, name))
 			goto out;
@@ -352,7 +352,7 @@ out:
  *             ret       - [OUT] the operation result code                    *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
- *               found, did not have data or any error occured. In the last   *
+ *               found, did not have data or any error occurred. In the last  *
  *               case the error message will be stored in agent result.       *
  *                                                                            *
  * Comments: There are three possible cases:                                  *
@@ -390,8 +390,8 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 		SET_MSG_RESULT(result, zbx_strdup(NULL, NULL != service->data->error ? service->data->error :
 				"Unknown VMware service error"));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service at %s: %s",
-				(NULL == service->data->error ? "unknown error" : service->data->error));
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service: %s",
+				NULL != service->data->error ? service->data->error : "unknown error");
 
 		*ret = SYSINFO_RET_FAIL;
 		service = NULL;
@@ -691,7 +691,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 	else if (0 == strcmp(status, "red"))
 		SET_UI64_RESULT(result, 3);
 	else
-		ret =  SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
 
 	zbx_free(status);
 unlock:
@@ -928,7 +928,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NAME}", name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
-				(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
+				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 
 		zbx_free(name);
@@ -1661,7 +1661,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.NAME}", vm_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.NAME}", hv_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
-					(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
+					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json_data);
 
 			zbx_free(hv_name);
@@ -1965,6 +1965,9 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#IFNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
+		if (NULL != dev->label)
+			zbx_json_addstring(&json_data, "{#IFDESC}", dev->label, ZBX_JSON_TYPE_STRING);
+
 		zbx_json_close(&json_data);
 	}
 
@@ -2229,6 +2232,8 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DISKNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
+		if (NULL != dev->label)
+			zbx_json_addstring(&json_data, "{#DISKDESC}", dev->label, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 
@@ -2521,7 +2526,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 	else if (0 == strcmp(mode, "used"))
 		SET_UI64_RESULT(result, value_total - value_free);
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+		SET_DBL_RESULT(result, 0 != value_total ? (double)(100.0 * value_free) / value_total : 0);
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, 100.0 - (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
 	else

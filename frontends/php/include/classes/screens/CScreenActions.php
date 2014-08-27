@@ -175,11 +175,11 @@ class CScreenActions extends CScreenBase {
 			}
 			else {
 				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($alert['error'], '', 'on');
+				$info->setHint($alert['error'], 'on');
 			}
 
 			$actionTable->addRow(array(
-				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 				new CCol($actions[$alert['actionid']]['name'], 'top'),
 				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),

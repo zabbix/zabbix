@@ -102,6 +102,7 @@ typedef struct
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
 	char		inventory_mode;
+	unsigned char	status;
 }
 DC_HOST;
 
@@ -125,6 +126,7 @@ typedef struct
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
+	unsigned char	status;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
@@ -163,21 +165,25 @@ typedef struct
 }
 DC_FUNCTION;
 
-typedef struct
+typedef struct _DC_TRIGGER
 {
 	zbx_uint64_t	triggerid;
 	char		*description;
 	char		*expression_orig;
+	/* temporary value, allocated during processing and freed right after */
 	char		*expression;
+
 	char		*error;
 	char		*new_error;
 	zbx_timespec_t	timespec;
 	int		lastchange;
+	unsigned char	topoindex;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
 	unsigned char	state;
 	unsigned char	new_value;
+	unsigned char	status;
 }
 DC_TRIGGER;
 
@@ -196,8 +202,8 @@ DC_PROXY;
 
 typedef struct
 {
-	char	*host;
-	char	*key;
+	const char	*host;
+	const char	*key;
 }
 zbx_host_key_t;
 
@@ -253,6 +259,9 @@ typedef struct
 }
 zbx_host_availability_t;
 
+int	is_item_processed_by_server(unsigned char type, const char *key);
+int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
+		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
@@ -291,15 +300,17 @@ void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
 
+void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
+		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
-void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
-		zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
+void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -308,8 +319,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 		int process_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
-int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail);
-int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail);
+int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items);
@@ -369,7 +379,7 @@ int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();
 
-void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids);
+void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);

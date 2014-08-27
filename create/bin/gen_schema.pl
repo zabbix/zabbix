@@ -23,12 +23,12 @@ my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
 my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name);
 my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix);
-my ($fkeys, $fkeys_prefix, $fkeys_suffix, $fkeys_drop, $uniq);
+my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq);
 
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
+	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
@@ -72,6 +72,12 @@ const ZBX_TABLE\ttables[] = {
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048
 #else
 #	define ZBX_TYPE_SHORTTEXT_LEN	65535
+#endif
+
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_LONGTEXT_LEN	2048
+#else
+#	define ZBX_TYPE_LONGTEXT_LEN	0
 #endif
 
 ";
@@ -305,6 +311,10 @@ sub process_field
 		{
 			$length = "ZBX_TYPE_SHORTTEXT_LEN";
 		}
+		elsif ($type eq "ZBX_TYPE_LONGTEXT")
+		{
+			$length = "ZBX_TYPE_LONGTEXT_LEN";
+		}
 		else
 		{
 			$length = 0;
@@ -461,12 +471,10 @@ sub process_field
 				if ($output{"database"} eq "mysql")
 				{
 					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} `${table_name}` ADD CONSTRAINT `${cname}` FOREIGN KEY (`${name}`) REFERENCES `${fk_table}` (`${fk_field}`)${fk_flags}${fk_eol}\n";
-					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} `${table_name}` DROP FOREIGN KEY `${cname}`${fk_eol}\n";
 				}
 				else
 				{
 					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
-					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP CONSTRAINT ${cname}${fk_eol}\n";
 				}
 			}
 		}
@@ -631,7 +639,6 @@ sub process
 
 	$state = "bof";
 	$fkeys = "";
-	$fkeys_drop = "";
 	$sequences = "";
 	$uniq = "";
 	my ($type, $line);
@@ -683,7 +690,6 @@ sub main
 	$sql_suffix="";
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
-	my $fkeys_drop_prefix = "";
 
 	if ($format eq 'c')		{ %output = %c; }
 	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
@@ -708,29 +714,13 @@ sub main
 		$sql_suffix="\";\n";
 		$fkeys_prefix = "const char\t*const db_schema_fkeys[] = {\n";
 		$fkeys_suffix = "\tNULL\n};\n";
-		$fkeys_drop_prefix = "const char\t*const db_schema_fkeys_drop[] = {\n";
 
-		print "\n#if defined(HAVE_IBM_DB2)\nconst char\t*const db_schema = \"\\\n";
-		%output = %ibm_db2;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif defined(HAVE_MYSQL)\nconst char\t*const db_schema = \"\\\n";
-		%output = %mysql;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif defined(HAVE_ORACLE)\nconst char\t*const db_schema = \"\\\n";
-		%output = %oracle;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif defined(HAVE_POSTGRESQL)\nconst char\t*const db_schema = \"\\\n";
-		%output = %postgresql;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
+		print "#if defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#endif\t/* HAVE_SQLITE3 */\n";
+		print "#else\t/* HAVE_SQLITE3 */\n";
+		print "const char\t*const db_schema = NULL;\n";
+		print "#endif\t/* not HAVE_SQLITE3 */\n";
 	}
 }
 

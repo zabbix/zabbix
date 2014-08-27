@@ -167,19 +167,28 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['os']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['os']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['os']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['os']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 	if ($this->data['host']['inventory']['hardware']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['hardware']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['hardware']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['hardware']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 	if ($this->data['host']['inventory']['software']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['software']['title'],
-			new CSpan(zbx_str2links($this->data['host']['inventory']['software']), 'text-field')
+			array(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['software']), 'inventory-text-field'),
+				'inventory-text-field-wrap'
+			))
 		);
 	}
 }
@@ -187,15 +196,20 @@ if ($this->data['host']['inventory']) {
 // description
 if ($this->data['host']['description'] !== '') {
 	$overviewFormList->addRow(_('Description'),
-		new CDiv(zbx_str2links($this->data['host']['description']), 'description')
+		array(new CDiv(new CSpan(
+			zbx_str2links($this->data['host']['description']), 'inventory-text-field'),
+			'inventory-text-field-wrap'
+		))
 	);
 }
 
 // latest data
-$overviewFormList->addRow(_('Latest data'), array(
+$overviewFormList->addRow(_('Monitoring'), array(
 	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	new CLink(_('Latest data'), 'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostid='.
-		$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Latest data'),
+		'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$this->data['host']['hostid'],
+		'overview-link'
+	),
 	new CLink(_('Triggers'),
 		'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
 		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
@@ -256,7 +270,7 @@ if ($this->data['host']['inventory']) {
 		if (!zbx_empty($value)) {
 			$detailsFormList->addRow(
 				$this->data['tableTitles'][$key]['title'],
-				new CSpan(zbx_str2links($value), 'text-field')
+				array(new CDiv(new CSpan(zbx_str2links($value), 'inventory-text-field'), 'inventory-text-field-wrap'))
 			);
 
 			$inventoryValues = true;

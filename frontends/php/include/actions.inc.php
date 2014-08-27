@@ -832,7 +832,7 @@ function getActionMessages(array $alerts) {
 
 		$mediaType = array_pop($alert['mediatypes']);
 
-		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
 
 		if ($alert['esc_step'] > 0) {
 			$time = array(
@@ -878,7 +878,7 @@ function getActionMessages(array $alerts) {
 		}
 		else {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($alert['error'], '', 'on');
+			$info->setHint($alert['error'], 'on');
 		}
 
 		$table->addRow(array(
@@ -923,7 +923,7 @@ function getActionCommands(array $alerts) {
 			continue;
 		}
 
-		$time = zbx_date2str(EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
 
 		if ($alert['esc_step'] > 0) {
 			$time = array(
@@ -977,7 +977,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				' LEFT JOIN users u ON u.userid=a.userid'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 			' WHERE a.eventid='.zbx_dbstr($eventid).
-				(is_null($status)?'':' AND a.status='.$status).
+				(is_null($status)?'':' AND a.status='.zbx_dbstr($status)).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 			' ORDER BY a.alertid';

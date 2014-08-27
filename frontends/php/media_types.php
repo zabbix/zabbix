@@ -51,17 +51,22 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
 	'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
+	'action' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,
+							IN('"mediatype.massdelete","mediatype.massdisable","mediatype.massenable"'),
+							null
+						),
 	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
-	'go' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","type"'),					null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
-$mediaTypeId = get_request('mediatypeid');
+$mediaTypeId = getRequest('mediatypeid');
 
 /*
  * Permissions
@@ -75,38 +80,36 @@ if (isset($_REQUEST['mediatypeid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['mediatypeids']) || !is_array($_REQUEST['mediatypeids'])) {
+if (hasRequest('action')) {
+	if (!hasRequest('mediatypeids') || !is_array(getRequest('mediatypeids'))) {
 		access_deny();
 	}
 	else {
 		$mediaTypeChk = API::Mediatype()->get(array(
-			'mediatypeids' => $_REQUEST['mediatypeids'],
+			'mediatypeids' => getRequest('mediatypeids'),
 			'countOutput' => true
 		));
-		if ($mediaTypeChk != count($_REQUEST['mediatypeids'])) {
+		if ($mediaTypeChk != count(getRequest('mediatypeids'))) {
 			access_deny();
 		}
 	}
 }
-
-$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
  */
 if (isset($_REQUEST['save'])) {
 	$mediaType = array(
-		'type' => get_request('type'),
-		'description' => get_request('description'),
-		'smtp_server' => get_request('smtp_server'),
-		'smtp_helo' => get_request('smtp_helo'),
-		'smtp_email' => get_request('smtp_email'),
-		'exec_path' => get_request('exec_path'),
-		'gsm_modem' => get_request('gsm_modem'),
-		'username' => get_request('username'),
-		'passwd' => get_request('password'),
-		'status' => get_request('status', MEDIA_TYPE_STATUS_DISABLED)
+		'type' => getRequest('type'),
+		'description' => getRequest('description'),
+		'smtp_server' => getRequest('smtp_server'),
+		'smtp_helo' => getRequest('smtp_helo'),
+		'smtp_email' => getRequest('smtp_email'),
+		'exec_path' => getRequest('exec_path'),
+		'gsm_modem' => getRequest('gsm_modem'),
+		'username' => getRequest('username'),
+		'passwd' => getRequest('password'),
+		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
 
 	if (is_null($mediaType['passwd'])) {
@@ -138,22 +141,24 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	$result = API::Mediatype()->delete(array(getRequest('mediatypeid')));
 
 	if ($result) {
 		unset($_REQUEST['form']);
+		uncheckTableRows();
 	}
-
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
-	clearCookies($result);
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
-	$mediaTypeIds = getRequest('mediatypeids', array());
-	$enable = (getRequest('go') == 'activate');
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('mediatype.massenable', 'mediatype.massdisable')) && hasRequest('mediatypeids')) {
+	$mediaTypeIds = getRequest('mediatypeids');
+	$enable = (getRequest('action') == 'mediatype.massenable');
 	$status = $enable ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
 	$update = array();
 
@@ -165,7 +170,12 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	}
 	$result = API::Mediatype()->update($update);
 
+	if ($result) {
+		uncheckTableRows();
+	}
+
 	$updated = count($update);
+
 	$messageSuccess = $enable
 		? _n('Media type enabled', 'Media types enabled', $updated)
 		: _n('Media type disabled', 'Media types disabled', $updated);
@@ -174,13 +184,14 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		: _n('Cannot disable media type', 'Cannot disable media types', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
-elseif ($_REQUEST['go'] == 'delete') {
-	$goResult = API::Mediatype()->delete(get_request('mediatypeids', array()));
+elseif (hasRequest('action') && getRequest('action') == 'mediatype.massdelete' && hasRequest('mediatypeids')) {
+	$result = API::Mediatype()->delete(getRequest('mediatypeids'));
 
-	show_messages($goResult, _('Media type deleted'), _('Cannot delete media type'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 }
 
 /*
@@ -188,8 +199,8 @@ elseif ($_REQUEST['go'] == 'delete') {
  */
 if (!empty($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'mediatypeid' => $mediaTypeId
 	);
 
@@ -208,16 +219,16 @@ if (!empty($_REQUEST['form'])) {
 		$data['status'] = $mediaType['status'];
 	}
 	else {
-		$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
-		$data['description'] = get_request('description', '');
-		$data['smtp_server'] = get_request('smtp_server', 'localhost');
-		$data['smtp_helo'] = get_request('smtp_helo', 'localhost');
-		$data['smtp_email'] = get_request('smtp_email', 'zabbix@localhost');
-		$data['exec_path'] = get_request('exec_path', '');
-		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
-		$data['username'] = get_request('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
-		$data['password'] = get_request('password', '');
-		$data['status'] = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
+		$data['type'] = getRequest('type', MEDIA_TYPE_EMAIL);
+		$data['description'] = getRequest('description', '');
+		$data['smtp_server'] = getRequest('smtp_server', 'localhost');
+		$data['smtp_helo'] = getRequest('smtp_helo', 'localhost');
+		$data['smtp_email'] = getRequest('smtp_email', 'zabbix@localhost');
+		$data['exec_path'] = getRequest('exec_path', '');
+		$data['gsm_modem'] = getRequest('gsm_modem', '/dev/ttyS0');
+		$data['username'] = getRequest('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
+		$data['password'] = getRequest('password', '');
+		$data['status'] = getRequest('status', MEDIA_TYPE_STATUS_ACTIVE);
 	}
 
 	// render view
@@ -226,7 +237,16 @@ if (!empty($_REQUEST['form'])) {
 	$mediaTypeView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get media types
 	$data['mediatypes'] = API::Mediatype()->get(array(
@@ -256,7 +276,7 @@ else {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-							$data['mediatypes'][$key]['listOfActions'][] = array(
+							$data['mediatypes'][$key]['listOfActions'][$actionId] = array(
 								'actionid' => $actionId,
 								'name' => $action['name']
 							);
@@ -268,13 +288,13 @@ else {
 			}
 		}
 
-		// sorting & paging
-		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
-		$data['paging'] = getPagingLine($data['mediatypes'], array('mediatypeid'));
+		order_result($data['mediatypes'], $sortField, $sortOrder);
+
+		$data['paging'] = getPagingLine($data['mediatypes']);
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine($arr, array('mediatypeid'));
+		$data['paging'] = getPagingLine($arr);
 	}
 
 	// render view

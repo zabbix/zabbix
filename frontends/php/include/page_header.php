@@ -25,7 +25,7 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-$_REQUEST['fullscreen'] = get_request('fullscreen', 0);
+$_REQUEST['fullscreen'] = getRequest('fullscreen', 0);
 if ($_REQUEST['fullscreen'] === '1') {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);
@@ -111,7 +111,7 @@ switch ($page['type']) {
 		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
-			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
+			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::$data['refresh']).']';
 		}
 		break;
 }
@@ -220,7 +220,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
 		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && isset($config) && $config['authentication_type'] == ZBX_AUTH_HTTP) {
 			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
-			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
+			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, false);
 		}
 		else {
 			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
@@ -326,7 +326,7 @@ if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $p
 	$table->show();
 }
 elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	echo SBR;
+	echo BR();
 }
 
 // unset multiple variables
@@ -344,8 +344,8 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 		'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 		$attempip,
-		zbx_date2str(_('d M Y'), $attempdate),
-		zbx_date2str(_('H:i'), $attempdate),
+		zbx_date2str(DATE_FORMAT, $attempdate),
+		zbx_date2str(TIME_FORMAT, $attempdate),
 		$failedAttempts
 	);
 	error($error_msg);

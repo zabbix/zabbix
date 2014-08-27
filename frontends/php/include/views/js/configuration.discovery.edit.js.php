@@ -203,6 +203,9 @@
 		}
 	}
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		// templates
 		var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
@@ -317,6 +320,10 @@
 
 			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
 		}
+
+		if (IE8) {
+			jQuery('#dcheckList').find('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
@@ -383,7 +390,7 @@
 				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
 				name = name.substring(0, name.length - 1);
 
-				// ignore "name" value bacause it is virtual
+				// ignore "name" value because it is virtual
 				if (name !== 'name') {
 					jQuery('#' + name).val(itemObj.val());
 
@@ -391,9 +398,9 @@
 					var radioObj = jQuery('input[name=' + name + ']');
 
 					if (radioObj.attr('type') == 'radio') {
-						radioObj.removeAttr('checked');
+						radioObj.prop('checked', false);
 
-						jQuery('#' + name + '_' + itemObj.val()).attr('checked', 'checked');
+						jQuery('#' + name + '_' + itemObj.val()).prop('checked', true);
 					}
 				}
 			});
@@ -446,7 +453,7 @@
 				ignoreNames = ['druleid', 'name', 'ports', 'type'];
 
 			if (jQuery.inArray(dcheckType, snmpTypes) !== -1 && jQuery.inArray(oldType, snmpTypes) !== -1) {
-				// ignore value reset when change type from snmpt's
+				// ignore value reset when changing type from snmp's
 			}
 			else {
 				jQuery('#new_check_form input[type="text"]').each(function(i, item) {
@@ -498,6 +505,10 @@
 		}
 		if (showPrivProtocol) {
 			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
+		}
+
+		if (IE8) {
+			jQuery('#type').closest('li').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 
@@ -638,7 +649,7 @@
 	}
 
 	function selectUniquenessCriteriaDefault() {
-		jQuery('#uniqueness_criteria_ip').attr('checked', 'checked');
+		jQuery('#uniqueness_criteria_ip').prop('checked', true);
 	}
 
 	jQuery(document).ready(function() {

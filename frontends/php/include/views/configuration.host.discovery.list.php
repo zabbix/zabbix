@@ -41,21 +41,17 @@ $discoveryForm->addVar('hostid', $this->data['hostid']);
 // create table
 $discoveryTable = new CTableInfo(_('No discovery rules found.'));
 
-$sortLink = new CUrl();
-$sortLink->setArgument('hostid', $this->data['hostid']);
-$sortLink = $sortLink->getUrl();
-
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
-	make_sorting_header(_('Name'), 'name', $sortLink),
+	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
 	_('Triggers'),
 	_('Graphs'),
 	($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
-	make_sorting_header(_('Key'), 'key_', $sortLink),
-	make_sorting_header(_('Interval'), 'delay', $sortLink),
-	make_sorting_header(_('Type'), 'type', $sortLink),
-	make_sorting_header(_('Status'), 'status', $sortLink),
+	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$data['showInfoColumn'] ? _('Info') : null
 ));
 
@@ -75,7 +71,12 @@ foreach ($data['discoveries'] as $discovery) {
 	// status
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate' : 'disable'),
+		'?hostid='.$_REQUEST['hostid'].
+			'&g_hostdruleid='.$discovery['itemid'].
+			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
+				? 'discoveryrule.massenable'
+				: 'discoveryrule.massdisable'
+			),
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
@@ -83,7 +84,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], '', 'on');
+			$info->setHint($discovery['error'], 'on');
 		}
 		else {
 			$info = '';
@@ -108,21 +109,21 @@ foreach ($data['discoveries'] as $discovery) {
 		array(
 			new CLink(
 				_('Item prototypes'),
-				'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'disc_prototypes.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['items'].')'
 		),
 		array(
 			new CLink(
 				_('Trigger prototypes'),
-				'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'trigger_prototypes.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['triggers'].')'
 		),
 		array(
 			new CLink(
 				_('Graph prototypes'),
-				'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'graphs.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['graphs'].')'
 		),
@@ -136,16 +137,17 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('discoveryrule.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('discoveryrule.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('discoveryrule.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
 $goComboBox->addItem($goOption);
 

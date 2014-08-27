@@ -28,7 +28,6 @@ $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'));
 $discoveryForm = new CForm();
 $discoveryForm->setName('discoveryForm');
 $discoveryForm->addVar('form', $this->data['form']);
-$discoveryForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
 }

@@ -54,7 +54,7 @@ if (isset($_REQUEST['save'])) {
 			'preservekeys' => true
 		));
 
-		$newMacros = get_request('macros', array());
+		$newMacros = getRequest('macros', array());
 
 		// remove empty new macro lines
 		foreach ($newMacros as $number => $newMacro) {
@@ -66,7 +66,7 @@ if (isset($_REQUEST['save'])) {
 		$duplicatedMacros = array();
 		foreach ($newMacros as $number => $newMacro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
-			$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
+			$newMacros[$number]['macro'] = mb_strtoupper($newMacro['macro']);
 		}
 
 		// update
@@ -93,7 +93,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot update macro.'));
 			}
 			foreach ($macrosToUpdate as $macro) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -104,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot remove macro.'));
 			}
 			foreach ($globalMacros as $macro) {
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -125,7 +125,7 @@ if (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_EXTEND
 			));
 			foreach ($newMacrosCreated as $macro) {
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -173,11 +173,11 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 $data['macros'] = array();
 
 if ($data['form_refresh']) {
-	$data['macros'] = get_request('macros', array());
+	$data['macros'] = getRequest('macros', array());
 }
 else {
 	$data['macros'] = API::UserMacro()->get(array(

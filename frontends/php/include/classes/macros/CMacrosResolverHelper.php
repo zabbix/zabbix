@@ -30,6 +30,17 @@ class CMacrosResolverHelper {
 	private static $macrosResolver;
 
 	/**
+	 * Create CMacrosResolver object and store in static variable.
+	 *
+	 * @static
+	 */
+	private static function init() {
+		if (self::$macrosResolver === null) {
+			self::$macrosResolver = new CMacrosResolver();
+		}
+	}
+
+	/**
 	 * Resolve macros.
 	 *
 	 * @static
@@ -512,13 +523,27 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Create CMacrosResolver object and store in static variable.
+	 * Resolve macros in screen element URL.
 	 *
 	 * @static
+	 *
+	 * @param array $screenElement
+	 *
+	 * @return string
 	 */
-	private static function init() {
-		if (self::$macrosResolver === null) {
-			self::$macrosResolver = new CMacrosResolver();
-		}
+	public static function resolveScreenElementURL(array $screenElement) {
+		self::init();
+
+		$macros = self::$macrosResolver->resolve(array(
+			'config' => $screenElement['config'],
+			'data' => array(
+				$screenElement['hostid'] => array(
+					'url' => $screenElement['url']
+				)
+			)
+		));
+		$macros = reset($macros);
+
+		return $macros['url'];
 	}
 }

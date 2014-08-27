@@ -1056,26 +1056,26 @@ class testFormWeb extends CWebTest {
 					)
 				)
 			),
-			// Dublicate web scenario
+			// Duplicate web scenario
 			array(
 				array(
 					'expected' => TEST_GOOD,
-					'name' => 'Dublicate web test',
+					'name' => 'Duplicate web test',
 					'add_step' => array(
-						array('step' => 'Dublicate web test')
+						array('step' => 'Duplicate web test')
 					)
 				)
 			),
 			array(
 				array(
 					'expected' => TEST_BAD,
-					'name' => 'Dublicate web test',
+					'name' => 'Duplicate web test',
 					'add_step' => array(
-						array('step' => 'Dublicate web test')
+						array('step' => 'Duplicate web test')
 					),
 					'errors' => array(
 						'ERROR: Cannot add web scenario',
-						'Web scenario "Dublicate web test" already exists.'
+						'Web scenario "Duplicate web test" already exists.'
 					)
 				)
 			),
@@ -1613,7 +1613,7 @@ class testFormWeb extends CWebTest {
 
 		if (isset($data['remove'])) {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

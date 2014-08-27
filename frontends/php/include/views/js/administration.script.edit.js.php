@@ -46,7 +46,7 @@
 
 		// confirmation text input
 		jQuery('#confirmation').keyup(function() {
-			jQuery('#testConfirmation, #confirmationLabel').prop('disabled', (this.value == ''));
+			jQuery('#testConfirmation').prop('disabled', (this.value == ''));
 		}).keyup();
 
 		// enable confirmation checkbox
@@ -55,7 +55,7 @@
 				jQuery('#confirmation').removeAttr('disabled').keyup();
 			}
 			else {
-				jQuery('#confirmation, #testConfirmation, #confirmationLabel').prop('disabled', true);
+				jQuery('#confirmation, #testConfirmation').prop('disabled', true);
 			}
 		}).change();
 

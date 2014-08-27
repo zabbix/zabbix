@@ -49,16 +49,17 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 {
 	const char	*__function_name = "get_hostid_by_host";
 
-	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX];
+	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX], *ch_error;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s'", __function_name, host);
 
-	if (FAIL == zbx_check_hostname(host))
+	if (FAIL == zbx_check_hostname(host, &ch_error))
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]", host);
+		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]: %s", host, ch_error);
+		zbx_free(ch_error);
 		goto out;
 	}
 
@@ -209,6 +210,12 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 						" server cache. Not sending now.", __function_name, itemids.values[i]);
 				continue;
 			}
+
+			if (ITEM_STATUS_ACTIVE != dc_items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
+				continue;
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
@@ -367,6 +374,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				continue;
 			}
 
+			if (ITEM_STATUS_ACTIVE != dc_items[i].status)
+				continue;
+
+			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
+				continue;
+
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
@@ -449,7 +462,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_json_addstring(&json, "expression", regexp->expression, ZBX_JSON_TYPE_STRING);
 
 			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->expression_type);
-			zbx_json_addstring(&json, "expression_type",buffer, ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "expression_type", buffer, ZBX_JSON_TYPE_INT);
 
 			zbx_snprintf(buffer, sizeof(buffer), "%c", regexp->exp_delimiter);
 			zbx_json_addstring(&json, "exp_delimiter", buffer, ZBX_JSON_TYPE_STRING);

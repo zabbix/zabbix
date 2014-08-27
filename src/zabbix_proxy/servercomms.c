@@ -75,16 +75,16 @@ static int	send_data_to_server(zbx_sock_t *sock, const char *data)
 	return res;
 }
 
-static int	recv_data_from_server(zbx_sock_t *sock, char **data)
+static int	recv_data_from_server(zbx_sock_t *sock)
 {
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In recv_data_from_server()");
 
-	if (FAIL == (res = zbx_tcp_recv(sock, data)))
+	if (FAIL == (res = zbx_tcp_recv(sock)))
 		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from server [%s]", zbx_tcp_strerror());
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", *data);
+		zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
 
 	return res;
 }
@@ -110,7 +110,7 @@ void	disconnect_server(zbx_sock_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
+int	get_data_from_server(zbx_sock_t *sock, const char *request)
 {
 	const char	*__function_name = "get_data_from_server";
 
@@ -126,7 +126,7 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 	if (FAIL == send_data_to_server(sock, j.buffer))
 		goto exit;
 
-	if (FAIL == recv_data_from_server(sock, data))
+	if (FAIL == recv_data_from_server(sock))
 		goto exit;
 
 	ret = SUCCEED;

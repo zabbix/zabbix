@@ -43,7 +43,7 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['imageid'])) {
-	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(get_request('imageid'))));
+	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(getRequest('imageid'))));
 	if (empty($dbImage)) {
 		access_deny();
 	}
@@ -75,15 +75,14 @@ if (isset($_REQUEST['save'])) {
 			}
 		}
 
-		if (isset($_REQUEST['imageid'])) {
+		if (hasRequest('imageid')) {
 			$result = API::Image()->update(array(
-				'imageid' => $_REQUEST['imageid'],
-				'name' => $_REQUEST['name'],
-				'imagetype' => $_REQUEST['imagetype'],
+				'imageid' => getRequest('imageid'),
+				'name' => getRequest('name'),
 				'image' => $image
 			));
 
-			$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+			$audit_action = 'Image ['.getRequest('name').'] updated';
 		}
 		else {
 			$result = API::Image()->create(array(
@@ -146,14 +145,17 @@ $generalComboBox->addItems(array(
 $form->addItem($generalComboBox);
 
 if (!isset($_REQUEST['form'])) {
-	$form->addItem(new CSubmit('form', _('Create image')));
+	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
+
+	$form->addVar('imagetype', $imageType);
+	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
 }
 
 $imageWidget = new CWidget();
 $imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array(
-	'form' => get_request('form'),
+	'form' => getRequest('form'),
 	'widget' => &$imageWidget
 );
 
@@ -165,14 +167,14 @@ if (!empty($data['form'])) {
 	}
 	else {
 		$data['imageid'] = null;
-		$data['imagename'] = get_request('name', '');
-		$data['imagetype'] = get_request('imagetype', 1);
+		$data['imagename'] = getRequest('name', '');
+		$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 	}
 
 	$imageForm = new CView('administration.general.image.edit', $data);
 }
 else {
-	$data['imagetype'] = get_request('imagetype', IMAGE_TYPE_ICON);
+	$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 
 	$data['images'] = API::Image()->get(array(
 		'filter' => array('imagetype' => $data['imagetype']),

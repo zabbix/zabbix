@@ -57,7 +57,7 @@ return array(
 			'host' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'status' => array(
@@ -220,7 +220,7 @@ return array(
 			'name' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			),
 			'flags' => array(
@@ -434,13 +434,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'rowspan' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'elements' => array(
 				'null' => false,
@@ -489,6 +489,12 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			),
+			'max_columns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
 			),
 		),
 	),
@@ -803,6 +809,41 @@ return array(
 				'length' => 10,
 				'default' => '1',
 			),
+			'ssl_cert_file' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
+			'ssl_key_file' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
+			'ssl_key_password' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'verify_peer' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'verify_host' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'headers' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
 		),
 	),
 	'httpstep' => array(
@@ -835,14 +876,14 @@ return array(
 			'url' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			),
 			'timeout' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '30',
+				'default' => '15',
 			),
 			'posts' => array(
 				'null' => false,
@@ -862,6 +903,23 @@ return array(
 				'default' => '',
 			),
 			'variables' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
+			'follow_redirects' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'retrieve_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'headers' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
@@ -918,6 +976,12 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '10050',
+			),
+			'bulk' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
 			),
 		),
 	),
@@ -1069,7 +1133,7 @@ return array(
 			'error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'lastlogsize' => array(
@@ -1640,6 +1704,12 @@ return array(
 			'r_longdata' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
+			'formula' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '',
 			),
 		),

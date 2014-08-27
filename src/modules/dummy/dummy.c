@@ -93,7 +93,7 @@ int	zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (1 != request->nparam)
 	{
 		/* set optional error message */
-		SET_MSG_RESULT(result, strdup("Invalid number of parameters"));
+		SET_MSG_RESULT(result, strdup("Invalid number of parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -133,10 +133,10 @@ int	zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*param1, *param2;
 	int	from, to;
 
-	if (request->nparam != 2)
+	if (2 != request->nparam)
 	{
 		/* set optional error message */
-		SET_MSG_RESULT(result, strdup("Invalid number of parameters"));
+		SET_MSG_RESULT(result, strdup("Invalid number of parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -149,7 +149,7 @@ int	zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (from > to)
 	{
-		SET_MSG_RESULT(result, strdup("Incorrect range given"));
+		SET_MSG_RESULT(result, strdup("Invalid range specified."));
 		return SYSINFO_RET_FAIL;
 	}
 

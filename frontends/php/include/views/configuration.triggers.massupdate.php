@@ -45,9 +45,8 @@ else {
 // create form
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
-$triggersForm->addVar('massupdate', $this->data['massupdate']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('go', $this->data['go']);
+$triggersForm->addVar('action', $this->data['action']);
 if ($this->data['parent_discoveryid']) {
 	$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -127,12 +126,11 @@ if (empty($this->data['parent_discoveryid'])) {
 					'dstfrm=massupdate'.
 					'&dstact=add_dependency'.
 					'&reference=deptrigger'.
-					'&dstfld1=new_dependency[]'.
+					'&dstfld1=new_dependency'.
 					'&srctbl=triggers'.
 					'&objname=triggers'.
 					'&srcfld1=triggerid'.
 					'&multiselect=1'.
-					'&monitored_hosts=1'.
 					'&with_triggers=1", 1000, 700);',
 				'link_menu'
 			)

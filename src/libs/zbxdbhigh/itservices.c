@@ -35,7 +35,7 @@ typedef struct
 	zbx_uint64_t	sourceid;
 	/* the new status */
 	int		status;
-	/* timestmap */
+	/* timestamp */
 	int		clock;
 }
 zbx_status_update_t;
@@ -624,7 +624,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 {
 	const char		*__function_name = "its_flush_updates";
 
-	int			j, i, ret = FAIL;
+	int			i, j, k, ret = FAIL;
 	zbx_status_update_t	*update;
 	zbx_itservices_t	itservices;
 	zbx_vector_ptr_t	alarms;
@@ -661,39 +661,33 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 	zbx_vector_ptr_create(&alarms);
 
 	/* apply status updates */
-	for (j = 0; j < updates->values_num; j++)
+	for (i = 0; i < updates->values_num; i++)
 	{
-		update = updates->values[j];
+		update = updates->values[i];
 
-		if (NULL != (index = zbx_hashset_search(&itservices.index, update)))
+		if (NULL == (index = zbx_hashset_search(&itservices.index, update)))
+			continue;
+
+		/* change the status of services based on the update */
+		for (j = 0; j < index->itservices.values_num; j++)
 		{
-			/* change the status of services based on the update */
-			for (i = 0; i < index->itservices.values_num; i++)
-			{
-				zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[i];
+			zbx_itservice_t	*itservice = (zbx_itservice_t *)index->itservices.values[j];
 
-				if (SERVICE_ALGORITHM_NONE == itservice->algorithm ||
-						itservice->status == update->status)
-				{
-					continue;
-				}
+			if (SERVICE_ALGORITHM_NONE == itservice->algorithm || itservice->status == update->status)
+				continue;
 
-				its_updates_append(&alarms, itservice->serviceid, update->status, update->clock);
-				itservice->status = update->status;
-			}
+			its_updates_append(&alarms, itservice->serviceid, update->status, update->clock);
+			itservice->status = update->status;
+		}
 
-			/* recalculate status of the parent services */
-			for (i = 0; i < index->itservices.values_num; i++)
-			{
-				zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[i];
+		/* recalculate status of the parent services */
+		for (j = 0; j < index->itservices.values_num; j++)
+		{
+			zbx_itservice_t	*itservice = (zbx_itservice_t *)index->itservices.values[j];
 
-				/* update parent services */
-				for (i = 0; i < itservice->parents.values_num; i++)
-				{
-					its_itservice_update_status(itservice->parents.values[i], update->clock,
-							&alarms);
-				}
-			}
+			/* update parent services */
+			for (k = 0; k < itservice->parents.values_num; k++)
+				its_itservice_update_status(itservice->parents.values[k], update->clock, &alarms);
 		}
 	}
 
@@ -819,7 +813,7 @@ void	zbx_create_itservices_lock()
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
 	{
 		zbx_error("cannot create mutex for IT services");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 

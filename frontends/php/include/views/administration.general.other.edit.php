@@ -42,7 +42,6 @@ $otherView->addTab('other', _('Other parameters'), $otherTab);
 
 $otherForm = new CForm();
 $otherForm->setName('otherForm');
-$otherForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $otherForm->addItem($otherView);
 $otherForm->addItem(makeFormFooter(new CSubmit('save', _('Save'))));
 

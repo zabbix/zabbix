@@ -34,8 +34,6 @@ catch (Exception $e) {
 	exit;
 }
 
-require_once dirname(__FILE__).'/include/setup.inc.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
@@ -61,8 +59,7 @@ $fields = array(
 );
 
 // config
-$ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
-$ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
+$ZBX_CONFIG = ZBase::getInstance()->getSession();
 $ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
 if (!isset($ZBX_CONFIG['step'])) {
 	$ZBX_CONFIG['step'] = 0;
@@ -73,7 +70,7 @@ if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 	// on the last step of the setup we always have a guest user logged in;
 	// when he presses the "Finish" button he must be redirected to the login screen
 	if (CWebUser::isGuest() && $ZBX_CONFIG['step'] == 5 && hasRequest('finish')) {
-		zbx_unsetcookie('ZBX_CONFIG');
+		$ZBX_CONFIG->clear();
 		redirect('index.php');
 	}
 	// the guest user can also view the last step of the setup
@@ -84,7 +81,7 @@ if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 }
 // if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
 elseif (hasRequest('cancel') || hasRequest('finish')) {
-	zbx_unsetcookie('ZBX_CONFIG');
+	$ZBX_CONFIG->clear();
 	redirect('index.php');
 }
 
@@ -92,8 +89,6 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
  * Setup wizard
  */
 $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
-
-zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
 // page title
 $pageTitle = '';

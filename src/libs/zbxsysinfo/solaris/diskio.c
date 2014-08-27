@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 typedef struct
 {
@@ -26,42 +27,54 @@ typedef struct
 	zbx_uint64_t	nwritten;
 	zbx_uint64_t	reads;
 	zbx_uint64_t	writes;
-} zbx_kstat_t;
-
-static zbx_kstat_t zbx_kstat;
+}
+zbx_kstat_t;
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }
 
-static int	get_kstat_io(const char *name, zbx_kstat_t *zk)
+static int	get_kstat_io(const char *name, zbx_kstat_t *zk, char **error)
 {
-	int		result = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 	kstat_ctl_t	*kc;
 	kstat_t		*kt;
 	kstat_io_t	kio;
 
-	if (0 == (kc = kstat_open()))
-		return result;
+	if (NULL == (kc = kstat_open()))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
+		return ret;
+	}
 
 	if ('\0' != *name)
 	{
-		if (0 == (kt = kstat_lookup(kc, NULL, -1, (char *)name)))
+		if (NULL == (kt = kstat_lookup(kc, NULL, -1, (char *)name)))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s",
+					zbx_strerror(errno));
 			goto clean;
+		}
 
 		if (KSTAT_TYPE_IO != kt->ks_type)
-			goto clean;
-
-		if (-1 != kstat_read(kc, kt, &kio))
 		{
-			zk->nread = kio.nread;
-			zk->nwritten = kio.nwritten;
-			zk->reads = kio.reads;
-			zk->writes = kio.writes;
-
-			result = SYSINFO_RET_OK;
+			*error = zbx_strdup(NULL, "Information looked up in kernel statistics facility"
+					" is of the wrong type.");
+			goto clean;
 		}
+
+		if (-1 == kstat_read(kc, kt, &kio))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
+					zbx_strerror(errno));
+			goto clean;
+		}
+
+		zk->nread = kio.nread;
+		zk->nwritten = kio.nwritten;
+		zk->reads = kio.reads;
+		zk->writes = kio.writes;
 	}
 	else
 	{
@@ -71,7 +84,12 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk)
 		{
 			if (KSTAT_TYPE_IO == kt->ks_type && 0 == strcmp("disk", kt->ks_class))
 			{
-				kstat_read(kc, kt, &kio);
+				if (-1 == kstat_read(kc, kt, &kio))
+				{
+					*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
+							zbx_strerror(errno));
+					goto clean;
+				}
 
 				zk->nread += kio.nread;
 				zk->nwritten += kio.nwritten;
@@ -79,77 +97,99 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk)
 				zk->writes += kio.writes;
 			}
 		}
-
-		result = SYSINFO_RET_OK;
 	}
+
+	ret = SYSINFO_RET_OK;
 clean:
 	kstat_close(kc);
 
-	return result;
+	return ret;
 }
 
 static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	zbx_kstat_t	zk;
+	char		*error;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.nread);
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
-	return ret;
+	SET_UI64_RESULT(result, zk.nread);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	zbx_kstat_t	zk;
+	char		*error;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.reads);
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
-	return ret;
+	SET_UI64_RESULT(result, zk.reads);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	zbx_kstat_t	zk;
+	char		*error;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.nwritten);
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
-	return ret;
+	SET_UI64_RESULT(result, zk.nwritten);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	zbx_kstat_t	zk;
+	char		*error;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.writes);
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
 
-	return ret;
+	SET_UI64_RESULT(result, zk.writes);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {
-	char	devname[MAX_STRING_LEN], mode[16];
-	char	*devname_str, *mode_str;
-	int	i;
+	const char	*devname, *mode;
+	int		i;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	devname_str = get_rparam(request, 0);
+	devname = get_rparam(request, 0);
 
-	if (NULL == devname_str || 0 == strcmp("all", devname_str))
-		*devname = '\0';
-	else
-		strscpy(devname, devname_str);
+	if (NULL == devname || 0 == strcmp("all", devname))
+		devname = "";
 
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "bytes");
-	else
-		strscpy(mode, mode_str);
+	if (NULL == mode || '\0' == *mode)
+		mode = "bytes";
 
 	for (i = 0; NULL != fl[i].mode; i++)
 	{
@@ -157,19 +197,9 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 			return (fl[i].function)(devname, result);
 	}
 
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+
 	return SYSINFO_RET_FAIL;
-}
-
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes", 	VFS_DEV_WRITE_BYTES},
-		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
-		{NULL,		NULL}
-	};
-
-	return process_mode_function(request, result, fl);
 }
 
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -178,6 +208,18 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
+		{NULL,		NULL}
+	};
+
+	return process_mode_function(request, result, fl);
+}
+
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const MODE_FUNCTION	fl[] =
+	{
+		{"bytes", 	VFS_DEV_WRITE_BYTES},
+		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
 		{NULL,		NULL}
 	};
 

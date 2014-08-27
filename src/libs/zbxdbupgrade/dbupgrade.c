@@ -660,14 +660,13 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i, total = 0;
+	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
-	int			current = 0, completed, last_completed = -1;
+	int			total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	required = ZBX_FIRST_DB_VERSION;
@@ -707,22 +706,29 @@ int	DBcheck_version(void)
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
 				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
+		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+
 		goto out;
 #endif
 	}
 
 	DBget_version(&db_mandatory, &db_optional);
 
+#ifndef HAVE_SQLITE3
 	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
 		{
+			if (0 != patches[i].mandatory)
+				optional_num = 0;
+			else
+				optional_num++;
+
 			if (db_optional < patches[i].version)
 				total++;
 		}
 	}
 
-#ifndef HAVE_SQLITE3
 	if (required < db_mandatory)
 #else
 	if (required != db_mandatory)
@@ -733,6 +739,10 @@ int	DBcheck_version(void)
 				" Required mandatory version: %08d.",
 				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy",
 				db_mandatory, db_optional, required);
+#ifdef HAVE_SQLITE3
+		if (required > db_mandatory)
+			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+#endif
 		goto out;
 	}
 
@@ -745,6 +755,9 @@ int	DBcheck_version(void)
 #ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
+
+	if (0 != optional_num)
+		zabbix_log(LOG_LEVEL_INFORMATION, "optional patches were found");
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 

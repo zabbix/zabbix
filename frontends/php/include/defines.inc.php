@@ -19,12 +19,12 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.0');
-define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030091);
+define('ZABBIX_VERSION',		'2.3.4');
+define('ZABBIX_API_VERSION',	'2.3.4');
+define('ZABBIX_DB_VERSION',		2030118);
 
-define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2014');
+define('ZABBIX_COPYRIGHT_FROM',	'2001');
+define('ZABBIX_COPYRIGHT_TO',	'2014');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -33,6 +33,10 @@ define('ZBX_MIN_PERIOD',		3600); // 1 hour
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+
+// the maximum period to display history data for the latest data and item overview pages in seconds
+// by default set to 86400 seconds (24 hours)
+define('ZBX_HISTORY_PERIOD', 86400);
 
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -121,7 +125,6 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_PERIOD',		3);
 define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
@@ -136,6 +139,7 @@ define('P_SYS',				1);
 define('P_UNSET_EMPTY',		2);
 define('P_ACT',				16);
 define('P_NZERO',			32);
+define('P_NO_TRIM',			64);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -251,6 +255,9 @@ define('INTERFACE_TYPE_AGENT',		1);
 define('INTERFACE_TYPE_SNMP',		2);
 define('INTERFACE_TYPE_IPMI',		3);
 define('INTERFACE_TYPE_JMX',		4);
+
+define('SNMP_BULK_DISABLED',	0);
+define('SNMP_BULK_ENABLED',		1);
 
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);
@@ -513,6 +520,8 @@ define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 // used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
+define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
+define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -537,9 +546,13 @@ define('SCREEN_DYNAMIC_ITEM',	1);
 define('SCREEN_REFRESH_TIMEOUT',		30);
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
+define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
+define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
+define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
+
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
-// alignes
+// alignments
 define('HALIGN_DEFAULT',	0);
 define('HALIGN_CENTER',		0);
 define('HALIGN_LEFT',		1);
@@ -551,7 +564,7 @@ define('VALIGN_TOP',		1);
 define('VALIGN_BOTTOM',		2);
 
 // info module style
-define('STYLE_HORISONTAL',	0);
+define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
 // view style [Overview]
@@ -632,6 +645,18 @@ define('HTTPSTEP_ITEM_TYPE_TIME',		1);
 define('HTTPSTEP_ITEM_TYPE_IN',			2);
 define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 define('HTTPSTEP_ITEM_TYPE_LASTERROR',	4);
+
+define('HTTPTEST_STEP_RETRIEVE_MODE_CONTENT', 0);
+define('HTTPTEST_STEP_RETRIEVE_MODE_HEADERS', 1);
+
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF', 0);
+define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON', 1);
+
+define('HTTPTEST_VERIFY_PEER_OFF', 0);
+define('HTTPTEST_VERIFY_PEER_ON', 1);
+
+define('HTTPTEST_VERIFY_HOST_OFF', 0);
+define('HTTPTEST_VERIFY_HOST_ON', 1);
 
 define('EVENT_ACK_DISABLED',	'0');
 define('EVENT_ACK_ENABLED',		'1');
@@ -740,15 +765,19 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
-define('SBR',	"<br/>\n");
+/**
+ * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
+ */
 define('SPACE',	'&nbsp;');
-define('RARR',	'&rArr;');
-define('SQUAREBRACKETS', '%5B%5D');
-define('NAME_DELIMITER', ': ');
-define('UNKNOWN_VALUE', '-');
 
-define('REGEXP_INCLUDE', 0);
-define('REGEXP_EXCLUDE', 1);
+/**
+ * Symbol used to separate name pairs such as "host: item" or "proxy: host".
+ *
+ * Should not be used as just a colon.
+ */
+define('NAME_DELIMITER', ': ');
+
+define('UNKNOWN_VALUE', '-');
 
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
@@ -837,6 +866,14 @@ define('XML_TAG_DEPENDENCY',		'dependency');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
+// XML import flags
+// See ZBX-8151. Old version of libxml suffered from setting DTDLOAD and NOENT flags by default, which allowed
+// performing XXE attacks. Calling libxml_disable_entity_loader(true) also had no affect if flags passed to libxml
+// calls were 0 - so for better security with legacy libxml we need to call libxml_disable_entity_loader(true) AND
+// pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
+// so this flag is not needed here.
+define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
+
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
@@ -885,7 +922,6 @@ define('WIDGET_ZABBIX_STATUS',		'stszbx');
 define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
 define('NOT_ZERO',	"({}!=0)&&");
-define('NO_TRIM',	'NO_TRIM');
 
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
@@ -902,6 +938,9 @@ define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');
 define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
+
+// date format context, usable for translators
+define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
 // actions
 define('LONG_DESCRIPTION',	0);
@@ -923,6 +962,11 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 define('COPY_TYPE_TO_HOST', 0);
 define('COPY_TYPE_TO_TEMPLATE', 2);
 define('COPY_TYPE_TO_HOST_GROUP', 1);
+
+define('HISTORY_GRAPH', 'showgraph');
+define('HISTORY_BATCH_GRAPH', 'batchgraph');
+define('HISTORY_VALUES', 'showvalues');
+define('HISTORY_LATEST', 'showlatest');
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');

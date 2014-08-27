@@ -21,21 +21,25 @@
 
 function init_mbstrings() {
 	$res = true;
-	$res &= mbstrings_available();
-	ini_set('mbstring.internal_encoding', 'UTF-8');
-	$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
-	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
-	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
-	if ($res) {
-		define('ZBX_MBSTRINGS_ENABLED', true);
+	$res &= extension_loaded('mbstring');
+
+	if (version_compare(PHP_VERSION, '5.6', '<')) {
+		ini_set('mbstring.internal_encoding', 'UTF-8');
+		$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
+	} else {
+		// it may be necessary to check / set php.internal encoding too after 5.6 is released, see ZBX-8278
+		ini_set('default_charset', 'UTF-8');
+		$res &= (ini_get('default_charset') == 'UTF-8');
 	}
+
+	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
+	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
+
+
 	return $res;
 }
 
-function mbstrings_available() {
-	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
-}
-
+/**
 /**
  * Returns a list of all used locales.
  *
@@ -75,7 +79,8 @@ function getLocales() {
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
 		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true)
+		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true),
+		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
 	);
 }
 
@@ -172,7 +177,8 @@ function zbx_locale_variants_win($language) {
 		'es_es' => array('Spanish_Spain.1252', 'spanish'),
 		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
 		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian')
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
+		'vi_vn' => array('Vietnamese_Viet Nam.1258', 'vietnamese')
 	);
 	return $winLanguageName[strtolower($language)];
 }

@@ -31,49 +31,50 @@
 #	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
-/*
- * 0 - NOT OK
- * 1 - OK
- * */
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int)
+		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
-	char		*buf;
-	int		net, val = SUCCEED;
+	const char	*buf;
+	int		net, val = ZBX_TCP_EXPECT_OK;
 
 	*value_int = 0;
 
-	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
-	{
-		if (NULL != request)
-			net = zbx_tcp_send_raw(&s, request);
+	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+		goto out;
 
-		if (NULL != expect && SUCCEED == net)
+	if (NULL != request)
+		net = zbx_tcp_send_raw(&s, request);
+
+	if (NULL != validate_func && SUCCEED == net)
+	{
+		val = ZBX_TCP_EXPECT_FAIL;
+
+		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
-			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
+			val = validate_func(buf);
+
+			if (ZBX_TCP_EXPECT_OK == val)
+				break;
+
+			if (ZBX_TCP_EXPECT_FAIL == val)
 			{
-				if (0 != strncmp(buf, expect, strlen(expect)))
-				{
-					val = FAIL;
-				}
+				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error, received [%s]", buf);
+				break;
 			}
 		}
-
-		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
-			zbx_tcp_send_raw(&s, sendtoclose);
-
-		if (SUCCEED == net && SUCCEED == val)
-			*value_int = 1;
-
-		zbx_tcp_close(&s);
 	}
 
-	if (FAIL == net)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
+	if (NULL != sendtoclose && SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
+		zbx_tcp_send_raw(&s, sendtoclose);
 
-	if (FAIL == val)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, buf);
+	if (SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
+		*value_int = 1;
+
+	zbx_tcp_close(&s);
+out:
+	if (SUCCEED != net)
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
 
 	return SYSINFO_RET_OK;
 }
@@ -85,7 +86,10 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*ip_str, ip[64], *port_str;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	ip_str = get_rparam(request, 0);
 	port_str = get_rparam(request, 1);
@@ -96,7 +100,10 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(ip, ip_str);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
@@ -108,7 +115,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static const char	*decode_type(int q_type)
 {
-	static char	buf[16];
+	ZBX_THREAD_LOCAL static char	buf[16];
 
 	switch (q_type)
 	{
@@ -215,7 +222,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 #ifdef _WINDOWS
 	PDNS_RECORD	pQueryResults, pDnsRecord;
-	LPTSTR		wzone;
+	wchar_t		*wzone;
 	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 #else
 	char		*name;
@@ -249,7 +256,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	*buffer = '\0';
 
 	if (5 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	ip = get_rparam(request, 0);
 	zone_str = get_rparam(request, 1);
@@ -275,7 +285,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		}
 
 		if (NULL == qt[i].name)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	param = get_rparam(request, 3);
@@ -283,14 +296,20 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (NULL == param || '\0' == *param)
 		retrans = 1;
 	else if (SUCCEED != is_uint31(param, &retrans) || 0 == retrans)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	param = get_rparam(request, 4);
 
 	if (NULL == param || '\0' == *param)
 		retry = 2;
 	else if (SUCCEED != is_uint31(param, &retry) || 0 == retry)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
@@ -305,7 +324,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 
 	if (DNS_RCODE_NOERROR != res)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform DNS query: [%d]", res));
 		return SYSINFO_RET_FAIL;
+	}
 
 	pDnsRecord = pQueryResults;
 
@@ -423,15 +445,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 #else	/* not _WINDOWS */
 	if (-1 == res_init())	/* initialize always, settings might have changed */
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize DNS subsystem: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL != ip && '\0' != *ip)
 	{
 		if (0 == inet_aton(ip, &inaddr))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IP address."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in));
 		saved_nscount = _res.nscount;
@@ -468,7 +499,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	msg_end = answer.buffer + res;
 
@@ -484,7 +518,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	for (; 0 < num_answers && msg_ptr < msg_end; num_answers--)
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", name);
 
@@ -520,7 +557,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_MR:
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			case T_MX:
@@ -528,17 +568,26 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				break;
 			case T_SOA:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				GETLONG(value, msg_ptr);	/* serial number */
@@ -563,7 +612,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				break;
 			case T_WKS:
 				if (INT32SZ + 1 > q_len)
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 
 				p = msg_ptr + q_len;
 
@@ -626,11 +678,17 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				break;
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				break;
@@ -658,7 +716,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
+				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				break;

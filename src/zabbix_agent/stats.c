@@ -452,11 +452,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	if (CPU_COLLECTOR_STARTED(collector))
+	if (0 != CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
 
 	ZBX_DO_EXIT();
 
-	zbx_thread_exit(0);
+	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }
