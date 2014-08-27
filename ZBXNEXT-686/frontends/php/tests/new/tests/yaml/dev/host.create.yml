@@ -23,9 +23,12 @@ steps:
     expect: response
 
     response:
-      _keys: sequence
-      hostids:
-        _assert: arr|length(1)
+      _fields:
+        hostids:
+          _assert: arr|length(1)
+          _keys: sequence
+          _each:
+            _assert: string
 
   step2:
     request:

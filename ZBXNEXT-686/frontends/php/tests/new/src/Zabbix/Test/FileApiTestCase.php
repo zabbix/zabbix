@@ -476,10 +476,13 @@ class FileApiTestCase extends ApiTestCase {
 				continue;
 			}
 
-			if (is_array($data) && array_key_exists($key, $data)) {
-				$path[] = $key;
+			if ($key == '_fields') {
+				foreach ($data['_fields'] as $field => $fieldRules) {
+					$subPath = $path;
+					$subPath[] = '_each['.$field.']';
 
-				$this->validate($rules, $data[$key], $path);
+					$this->validate($rules, $data[$field], $path);
+				}
 
 				continue;
 			}
