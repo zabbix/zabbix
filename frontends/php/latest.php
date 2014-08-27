@@ -435,7 +435,8 @@ $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('ful
 
 $form = new CForm('GET', 'history.php');
 $form->setName('items');
-$form->addVar('action', HISTORY_BATCH_GRAPH);
+// set an ID for the hidden input so that it wouldn't conflict with the ID of the "Go" button list
+$form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
 $table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
@@ -890,7 +891,7 @@ $goBox = new CComboBox('graphtype', GRAPH_TYPE_STACKED, null, array(
 	GRAPH_TYPE_STACKED => _('Display stacked graph'),
 	GRAPH_TYPE_NORMAL => _('Display graph')
 ));
-$goBox->setAttribute('id', 'go');
+$goBox->setAttribute('id', 'action');
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 
 $form->addItem(array($table, get_table_header(array($goBox, $goButton))));

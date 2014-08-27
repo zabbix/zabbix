@@ -435,28 +435,28 @@ input.input.formlist[type="button"][disabled], input.input.formlist[type="submit
 	color: #dfdfdf;
 }
 
-/* disabled <select> font color for IE 9+ */
-select[disabled="disabled"]::-ms-value {
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
 	background-color: #2f2f2f;
 	color: #dfdfdf;
 	border-color: #333;
 }
 
-select[disabled="disabled"] option { background-color: #2f2f2f; }
+select[disabled] option { background-color: #2f2f2f; }
 
 .input.link_menu[disabled], .input.link_menu[disabled]:focus, .input.link_menu[disabled]:hover {
 	background-color: transparent;
 }
 
 /* disabled form buttons */
-.input.button[disabled]:hover {
+.formtable .input.button[disabled]:hover {
 	background-color: #2f2f2f;
 	border-color: #dfdfdf;
 	color: #dfdfdf;
 }
 
 /* disabled save button */
-.jqueryinput.input.button[disabled]:hover {
+.formtable .jqueryinput.input.button[disabled]:hover {
 	border-color: #ff5500;
 	color: #dfdfdf;
 }

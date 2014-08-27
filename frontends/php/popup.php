@@ -33,7 +33,7 @@ $srctbl = getRequest('srctbl', ''); // source table name
 switch ($srctbl) {
 	case 'hosts':
 		$page['title'] = _('Hosts');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
 	case 'templates':
 		$page['title'] = _('Templates');
@@ -1223,8 +1223,7 @@ elseif ($srctbl == 'applications') {
 
 	$options = array(
 		'output' => array('applicationid', 'name'),
-		'hostids' => $hostid,
-		'expandData' => true
+		'hostids' => $hostid
 	);
 	if (is_null($hostid)) {
 		$options['groupids'] = $groupid;
