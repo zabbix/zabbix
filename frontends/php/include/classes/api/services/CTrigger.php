@@ -118,6 +118,8 @@ class CTrigger extends CTriggerGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'expandData');
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -482,20 +484,24 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Get triggerid by host.host and trigger.expression.
+	 * Get trigger by host name, host ID, trigger expression and trigger description.
 	 *
-	 * @param array $triggerData multidimensional array with trigger objects
-	 * @param array $triggerData[0,...]['expression']
-	 * @param array $triggerData[0,...]['host']
-	 * @param array $triggerData[0,...]['hostid'] OPTIONAL
-	 * @param array $triggerData[0,...]['description'] OPTIONAL
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return array|int
+	 * @param array  $triggerData multidimensional array with trigger objects
+	 * @param string $triggerData[0,...]['expression']
+	 * @param array  $triggerData[0,...]['host']
+	 * @param string $triggerData[0,...]['hostid'] OPTIONAL
+	 * @param string $triggerData[0,...]['description'] OPTIONAL
+	 *
+	 * @return array
 	 */
 	public function getObjects(array $triggerData) {
+		$this->deprecated('trigger.getobjects method is deprecated.');
+
 		$options = array(
-			'filter' => $triggerData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $triggerData
 		);
 
 		// expression is checked later
@@ -528,13 +534,7 @@ class CTrigger extends CTriggerGeneral {
 	public function exists(array $object) {
 		$this->deprecated('trigger.exists method is deprecated.');
 
-		$keyFields = array(
-			array(
-				'hostid',
-				'host'
-			),
-			'description'
-		);
+		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
 
@@ -1706,9 +1706,8 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$dependencies = $this->get(array(
-				'triggerids' => $relationMap->getRelatedIds(),
 				'output' => $options['selectDependencies'],
-				'expandData' => true,
+				'triggerids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
@@ -1811,6 +1810,12 @@ class CTrigger extends CTriggerGeneral {
 				}
 
 				$lastEvents[$triggerId][$ns] = $dbEvent;
+			}
+
+			foreach ($lastEvents as $triggerId => $events) {
+				// find max 'ns' for each trigger and that will be the 'lastEvent'
+				$maxNs = max(array_keys($events));
+				$result[$triggerId]['lastEvent'] = $events[$maxNs];
 			}
 
 			foreach ($lastEvents as $triggerId => $events) {

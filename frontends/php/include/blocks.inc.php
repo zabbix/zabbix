@@ -498,7 +498,6 @@ function make_hoststat_summary($filter) {
 	$triggers = API::Trigger()->get(array(
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'expandData' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
