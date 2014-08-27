@@ -48,7 +48,7 @@ $applicationForm->addItem($applicationTab);
 // append buttons to form
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete application?'), url_params(array('config', 'hostid', 'form', 'applicationid'))),
@@ -58,7 +58,7 @@ if (!empty($this->data['applicationid'])) {
 }
 else {
 	$applicationForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('add', _('Add')),
 		new CButtonCancel(url_param('config').url_param('hostid'))
 	));
 }

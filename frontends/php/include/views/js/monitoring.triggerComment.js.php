@@ -6,7 +6,7 @@
 			jQuery('#comments').val(<?php echo CJs::encodeJson($this->data['trigger']['comments']); ?>);
 			jQuery('#comments').removeAttr('readonly');
 			jQuery('#edit').button('disable');
-			jQuery('#save').button('enable');
+			jQuery('#update').button('enable');
 		});
 	});
 </script>

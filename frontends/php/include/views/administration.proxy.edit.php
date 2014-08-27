@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $proxyWidget = new CWidget();
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 
@@ -95,7 +94,7 @@ $proxyForm->addItem($proxyTab);
 // append buttons to form
 if ($this->data['proxyid']) {
 	$proxyForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete proxy?'), url_param('form').url_param('proxyid')),
@@ -105,7 +104,7 @@ if ($this->data['proxyid']) {
 }
 else {
 	$proxyForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('add', _('Add')),
 		new CButtonCancel()
 	));
 }
