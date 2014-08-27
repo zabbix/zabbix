@@ -65,8 +65,9 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_CONNECT_ONCE	2
 
 /* kind of data base */
-#define ZBX_SERVER_DB	1
-#define ZBX_PROXY_DB	2
+#define ZBX_DB_UNKNOWN	0
+#define ZBX_DB_SERVER	1
+#define ZBX_DB_PROXY	2
 
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
@@ -420,7 +421,6 @@ DB_ESCALATION;
 
 int	DBconnect(int flag);
 void	DBinit(void);
-int	DBserver_or_proxy(void);
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE
@@ -600,5 +600,6 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+int	zbx_db_get_database_type(void);
 
 #endif

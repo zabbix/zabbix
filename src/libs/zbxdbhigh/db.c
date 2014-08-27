@@ -2547,49 +2547,41 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBserver_or_proxy                                                *
+ * Function: zbx_db_get_database_type                                         *
  *                                                                            *
  * Purpose: determine is it a server or a proxy data base                     *
  *                                                                            *
- * Return value: ZBX_SERVER_DB - server data base                             *
- *               ZBX_PROXY_DB - proxy data base                               *
- *               FAIL - an error occured                                      *
+ * Return value: ZBX_DB_SERVER - server data base                             *
+ *               ZBX_DB_PROXY - proxy data base                               *
+ *               ZBX_DB_UNKNOWN - an error occured                            *
  *                                                                            *
  ******************************************************************************/
-int	DBserver_or_proxy(void)
+int	zbx_db_get_database_type(void)
 {
-	const char	*__function_name = "DBserver_or_proxy", *result_string;
+	const char	*__function_name = "zbx_db_get_database_type", *result_string;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		ret = FAIL;
+	int		ret = ZBX_DB_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED != DBtable_exists("users"))
+	if (NULL == (result = DBselectN("select userid from users", 1)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "table \"users\" does not exist");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot select records from \"users\" table");
 		goto out;
 	}
-
-	if (SUCCEED != DBfield_exists("users", "userid"))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "table \"users\" has no field \"userid\"");
-		goto out;
-	}
-
-	result = DBselectN("select userid from users", 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
-		ret = ZBX_SERVER_DB;
+		ret = ZBX_DB_SERVER;
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no records in \"users\" table");
-		ret = ZBX_PROXY_DB;
+		ret = ZBX_DB_PROXY;
 	}
 
 	DBfree_result(result);
@@ -2598,17 +2590,15 @@ out:
 
 	switch (ret)
 	{
-		case ZBX_SERVER_DB:
-			result_string = "ZBX_SERVER_DB";
+		case ZBX_DB_SERVER:
+			result_string = "ZBX_DB_SERVER";
 			break;
-		case ZBX_PROXY_DB:
-			result_string = "ZBX_PROXY_DB";
+		case ZBX_DB_PROXY:
+			result_string = "ZBX_DB_PROXY";
 			break;
-		case FAIL:
-			result_string = "FAIL";
+		case ZBX_DB_UNKNOWN:
+			result_string = "ZBX_DB_UNKNOWN";
 			break;
-		default:
-			result_string = "Unknown";
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
