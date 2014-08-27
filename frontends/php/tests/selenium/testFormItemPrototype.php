@@ -1316,8 +1316,8 @@ class testFormItemPrototype extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('add');
+		$this->assertAttribute("//input[@id='add']/@value", 'Add');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -1353,7 +1353,7 @@ class testFormItemPrototype extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array(
 			'Item prototype updated', $data['name'],
@@ -2615,7 +2615,7 @@ class testFormItemPrototype extends CWebTest {
 		$data_type = $this->getSelectedLabel('data_type');
 
 		if ($itemFlexFlag == true) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
