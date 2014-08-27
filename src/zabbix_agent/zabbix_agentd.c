@@ -194,7 +194,7 @@ int	CONFIG_COLLECTOR_FORKS		= 1;
 int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
 
-char		*opt = NULL;
+char	*opt = NULL;
 
 #ifdef _WINDOWS
 void zbx_co_uninitialize();
@@ -226,9 +226,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }

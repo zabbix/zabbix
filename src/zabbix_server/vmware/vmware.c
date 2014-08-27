@@ -2937,8 +2937,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 			if (ZBX_VMWARE_SERVICE_UPDATE == state)
 				vmware_service_update(service);
-
-		} while (ZBX_VMWARE_SERVICE_IDLE != state);
+		}
+		while (ZBX_VMWARE_SERVICE_IDLE != state);
 
 		total_sec += zbx_time() - sec;
 		now = time(NULL);

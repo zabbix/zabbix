@@ -41,8 +41,8 @@ typedef struct
 }
 ZBX_RECIPIENT;
 
-static		zbx_vector_ptr_t recipients;
-static int	lastsent = 0;
+static zbx_vector_ptr_t	recipients;
+static int		lastsent = 0;
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type;

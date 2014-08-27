@@ -47,7 +47,7 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
-	double		sec = 0.0;
+	double	sec = 0.0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
