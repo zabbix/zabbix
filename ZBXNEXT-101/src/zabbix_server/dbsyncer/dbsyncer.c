@@ -44,9 +44,9 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int		sleeptime = -1, num = 0, old_num = 0, retry_up = 0, retry_dn = 0;
-	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
+	int	sleeptime = -1, num = 0, old_num = 0, retry_up = 0, retry_dn = 0;
+	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t	last_stat_time;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

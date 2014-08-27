@@ -421,6 +421,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 					ZBX_JSON_TYPE_STRING);
 			queue_stats_export(&queue_stats, "proxyid", &json);
 			zbx_hashset_destroy(&queue_stats);
+
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);

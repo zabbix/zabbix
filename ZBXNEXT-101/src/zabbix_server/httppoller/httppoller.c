@@ -27,8 +27,7 @@
 #include "httptest.h"
 #include "httppoller.h"
 
-extern int	CONFIG_HTTPPOLLER_FORKS;
-
+extern int		CONFIG_HTTPPOLLER_FORKS;
 extern unsigned char	process_type;
 extern int		server_num, process_num;
 
