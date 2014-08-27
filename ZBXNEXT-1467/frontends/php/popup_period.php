@@ -141,7 +141,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$frmPd->addVar('color',$color);
 
 
-		if ( hasRequest('period_id')) {
+		if (hasRequest('period_id')) {
 			$frmPd->addItemToBottomRow(new CSubmit('update', _('Update')));
 		}
 		else {
