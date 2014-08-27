@@ -49,12 +49,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 			throw new \Exception(sprintf('Can not find config file "%s" for config "%s"', $configFileName, $this->config));
 		}
 
-		$config = parse_ini_file($configFileName);
-
-		$this->username = $config['username'];
-		$this->password = $config['password'];
-
-		$this->parsedConfig = $config;
+		$this->parsedConfig = parse_ini_file($configFileName);
 
 		$this->database = new TestDatabase($this->getPdo());
 	}
@@ -67,21 +62,6 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		$gateway->configure($this->gatewayConfiguration, $this->parsedConfig);
 
 		return $gateway;
-	}
-
-	protected function setUp() {
-		$annotations = $this->getAnnotations();
-
-		if (isset($annotations['method']['fixtures'])) {
-			$fixtures = explode(' ', implode(' ', $annotations['method']['fixtures']));
-			$fixtures = array_map(function ($value) {
-				return trim($value);
-			}, $fixtures);
-
-			foreach ($fixtures as $file) {
-				$this->database->loadFixtures($file);
-			}
-		}
 	}
 
 	protected function tearDown() {
@@ -102,6 +82,12 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		}
 
 		return self::$pdo;
+	}
+
+	protected function loadFixtures(array $fixtures) {
+		foreach ($fixtures as $file) {
+			$this->database->loadFixtures($file);
+		}
 	}
 
 }

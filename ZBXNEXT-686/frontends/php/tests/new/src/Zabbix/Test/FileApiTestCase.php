@@ -25,28 +25,27 @@ class FileApiTestCase extends ApiTestCase {
 	 */
 	protected $stepStack;
 
-	/**
-	 * Executes test by file-based scenarios.
-	 *
-	 * @param string $name filename relative to ./tests/data/file, with no extension.
-	 * @throws \Exception
-	 */
-	protected function processFileTest($name) {
+	protected function parseTestFile($name) {
 		$path = ZABBIX_NEW_TEST_DIR . '/tests/yaml/'.$name.'.yml';
 
 		if (!is_readable($path)) {
 			throw new \Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
 		}
 
-		$this->stepData = Yaml::parse(file_get_contents($path));
+		return Yaml::parse(file_get_contents($path));
+	}
 
+	/**
+	 * Executes test by file-based scenarios.
+	 *
+	 * @param array $steps
+	 *
+	 * @throws \Exception
+	 */
+	protected function runSteps(array $steps) {
 		$gateway = $this->getGateway();
 
-		if (!isset($this->stepData['steps']) || !is_array($this->stepData['steps'])) {
-			throw new \Exception('Each test file should have top-level array "steps", can not find one in yours');
-		}
-
-		foreach ($this->stepData['steps'] as $stepName => $definition) {
+		foreach ($steps as $stepName => $definition) {
 			$this->stepStack[$stepName] = array();
 
 			if (!isset($definition['request'])) {

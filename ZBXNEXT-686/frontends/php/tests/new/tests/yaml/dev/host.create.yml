@@ -1,5 +1,7 @@
 # Create a host, link it to a template and verify the result using host.get.
 
+fixtures: [base_users, base_hostgroups]
+
 steps:
   step1:
     request:
