@@ -677,7 +677,10 @@ class CXmlImport18 {
 				'limit' => 1
 			));
 			if ($mapExists && $rules['maps']['updateExisting']) {
-				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
+				$db_maps = API::Map()->get(array(
+					'filter' => array('name' => $sysmap['name']),
+					'output' => array('sysmapid')
+				));
 				if (empty($db_maps)) {
 					throw new Exception(_s('No permissions for map "%1$s".', $sysmap['name']));
 				}
@@ -727,7 +730,10 @@ class CXmlImport18 {
 				}
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
+						$db_sysmaps = API::Map()->get(array(
+							'filter' => array($selement['elementid']),
+							'output' => array('sysmapid')
+						));
 						if (empty($db_sysmaps)) {
 							$error = _s('Cannot find map "%1$s" used in exported map "%2$s".',
 									$selement['elementid']['name'], $sysmap['name']);
@@ -738,7 +744,10 @@ class CXmlImport18 {
 						$selement['elementid'] = $tmp['sysmapid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
+						$db_hostgroups = API::HostGroup()->get(array(
+							'filter' => array($selement['elementid']),
+							'output' => array('groupid')
+						));
 						if (empty($db_hostgroups)) {
 							$error = _s('Cannot find group "%1$s" used in map "%2$s".',
 									$selement['elementid']['name'], $sysmap['name']);
@@ -749,7 +758,10 @@ class CXmlImport18 {
 						$selement['elementid'] = $tmp['groupid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$db_hosts = API::Host()->getObjects($selement['elementid']);
+						$db_hosts = API::Host()->get(array(
+							'filter' => array($selement['elementid']),
+							'output' => array('hostid')
+						));
 						if (empty($db_hosts)) {
 							$error = _s('Cannot find host "%1$s" used in map "%2$s".',
 									$selement['elementid']['host'], $sysmap['name']);
@@ -760,7 +772,10 @@ class CXmlImport18 {
 						$selement['elementid'] = $tmp['hostid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
+						$db_triggers = API::Trigger()->get(array(
+							'filter' => array($selement['elementid']),
+							'output' => array('triggerid')
+						));
 						if (empty($db_triggers)) {
 							$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
 									$selement['elementid']['host'].':'.$selement['elementid']['description'], $sysmap['name']);
@@ -802,7 +817,10 @@ class CXmlImport18 {
 				}
 
 				foreach ($link['linktriggers'] as &$linktrigger) {
-					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
+					$db_triggers = API::Trigger()->get(array(
+						'filter' => array($linktrigger['triggerid']),
+						'output' => array('triggerid')
+					));
 					if (empty($db_triggers)) {
 						$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
 								$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);

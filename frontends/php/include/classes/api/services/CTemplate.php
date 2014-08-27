@@ -292,18 +292,22 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get template ID by template name.
+	 * Get template by template name and ID.
 	 *
-	 * @param array $templateData
-	 * @param array $templateData['host']
-	 * @param array $templateData['templateid']
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return string
+	 * @param array  $templateData
+	 * @param string $templateData['host']
+	 * @param string $templateData['templateid']
+	 *
+	 * @return array
 	 */
-	public function getObjects($templateData) {
+	public function getObjects(array $templateData) {
+		$this->deprecated('template.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $templateData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $templateData
 		));
 	}
 
@@ -316,16 +320,16 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('template.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
+		$template = $this->get(array(
 			'output' => array('templateid'),
+			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $template;
 	}
 
 	/**
