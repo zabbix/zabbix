@@ -95,9 +95,7 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	command = get_rparam(request, 0);
 
-	ret = EXECUTE_STR(command, result);
-
-	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
+	if (SYSINFO_RET_FAIL == (ret = EXECUTE_STR(command, result)) && 0 == result->type)
 	{
 		/* only whitespace */
 
@@ -129,10 +127,7 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 			command, strlen(cmd_result), cmd_result);
 
 	if ('\0' == *cmd_result)	/* we got whitespace only */
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Non-empty output is expected."));
 		goto lbl_exit;
-	}
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
@@ -203,7 +198,17 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		return EXECUTE_STR(command, result);
+		int	ret;
+
+		if (SYSINFO_RET_FAIL == (ret = EXECUTE_STR(command, result)) && 0 == result->type)
+		{
+			/* only whitespace */
+
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+			ret = SYSINFO_RET_OK;
+		}
+
+		return ret;
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
