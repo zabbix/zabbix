@@ -41,7 +41,7 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
-const char	*get_debug_level_string()
+const char	*zabbix_get_log_level_string()
 {
 	switch (log_level)
 	{
@@ -63,9 +63,9 @@ const char	*get_debug_level_string()
 	exit(EXIT_FAILURE);
 }
 
-int	set_debug_level_up()
+int	zabbix_increase_log_level()
 {
-	if (log_level == LOG_LEVEL_TRACE)
+	if (LOG_LEVEL_TRACE == log_level)
 		return FAIL;
 
 	log_level = log_level + 1;
@@ -73,9 +73,9 @@ int	set_debug_level_up()
 	return SUCCEED;
 }
 
-int	set_debug_level_down()
+int	zabbix_decrease_log_level()
 {
-	if (log_level == LOG_LEVEL_EMPTY)
+	if (LOG_LEVEL_EMPTY == log_level)
 		return FAIL;
 
 	log_level = log_level - 1;

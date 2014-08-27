@@ -59,9 +59,9 @@ void		__zbx_zabbix_log(int level, const char *fmt, ...);
 void		zabbix_close_log();
 
 void		zabbix_set_log_level(int level);
-int		set_debug_level_up();
-int		set_debug_level_down();
-const char	*get_debug_level_string();
+int		zabbix_increase_log_level();
+int		zabbix_decrease_log_level();
+const char	*zabbix_get_log_level_string();
 int		zabbix_check_log_level(int level);
 
 char		*zbx_strerror(int errnum);
