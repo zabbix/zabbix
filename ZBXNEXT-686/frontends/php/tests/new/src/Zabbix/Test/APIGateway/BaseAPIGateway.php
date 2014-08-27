@@ -50,7 +50,7 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 			))
 		);
 
-		if ($result->isException()) {
+		if ($result->isError()) {
 			throw new \RuntimeException(
 				sprintf('API authentication error: "%s"', $result->getMessage())
 			);

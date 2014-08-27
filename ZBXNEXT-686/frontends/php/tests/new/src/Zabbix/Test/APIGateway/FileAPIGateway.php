@@ -40,21 +40,18 @@ class FileAPIGateway extends BaseAPIGateway {
 
 		$this->restoreStreamWrapper();
 
-		if (isset($json['result']) && !isset($json['error'])) {
-			return APITestResponse::createTestResponse($json['result'], $json['id']);
-		}
-		elseif (isset($json['error']) && !isset($json['result'])) {
-			return APITestResponse::createTestException($json['error']['message'],
-				$json['error']['data'],
-				$json['error']['code'],
-				$json['id']
-			);
+		if (isset($json['result']) || isset($json['error'])) {
+			return $this->createResponse($json);
 		}
 		else {
 			throw new \Exception(
 				sprintf('Wow. The API response does not look like both response and error, "%s" given', $contents)
 			);
 		}
+	}
+
+	protected function createResponse(array $contents) {
+		return new APITestResponse($contents);
 	}
 
 	/**

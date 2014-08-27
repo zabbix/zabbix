@@ -20,7 +20,7 @@ steps:
           -
             groupid: "1"
 
-    expect: response
+    expect: result
 
     response:
       _fields:
@@ -39,7 +39,7 @@ steps:
         selectInterfaces: [ip]
         selectParentTemplate: [templateid]
 
-    expect: response
+    expect: result
 
     response:
       _equals:

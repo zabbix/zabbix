@@ -21,7 +21,8 @@ steps:
 
     expect: error
 
-    error:
-      message: "Invalid params."
-      data: "Wrong fields for host \"\"."
-      code: -32602
+    response:
+      _fields:
+        message: { _equals: "Invalid params." }
+        data: { _equals: "Wrong fields for host \"\"." }
+        code: { _equals: -32602 }

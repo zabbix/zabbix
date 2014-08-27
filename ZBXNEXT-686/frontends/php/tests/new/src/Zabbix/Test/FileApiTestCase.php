@@ -79,70 +79,29 @@ class FileApiTestCase extends ApiTestCase {
 			$this->stepStack[$stepName]['response'] = $apiResponse;
 
 			// now we verify that the response is what we expected
-			if (!isset($definition['expect']) || !in_array($definition['expect'], array('response', 'error'))) {
-				throw new \Exception('Wrong step definition: do not know what to expect, must be "expect: response|error"');
+			if (!isset($definition['expect']) || !in_array($definition['expect'], array('result', 'error'))) {
+				throw new \Exception('Wrong step definition: do not know what to expect, must be "expect: result|error"');
 			}
 
 			$expectation = $definition['expect'];
 
-			if ($expectation == 'response' && !$apiResponse->isResponse()) {
+			if ($apiResponse->isError() && $expectation !== 'error' || !$apiResponse->isError() && $expectation === 'error') {
 				throw new \Exception(
-					sprintf('Expected plain response from api on step "%s", did not get one, got exception "%s" data "%s".',
+					sprintf('Expected "%s" from api on step "%s", got "%s" instead.',
+						$expectation,
 						$stepName,
-						$apiResponse->getMessage(),
-						$apiResponse->getData()
+						$apiResponse->isError() ? 'error' : 'result'
 					))
 				;
 			}
 
-			if ($expectation == 'exception' && !$apiResponse->isException()) {
-				throw new \Exception(sprintf('Expected exception response from api on step "%s", did not get one', $stepName));
-			}
-
-			if ($expectation == 'response') {
+			if ($expectation == 'result' || $expectation == 'error') {
 				$responseExpectation = $definition['response'];
 				$responseExpectation = $this->expandStepVariables($responseExpectation);
 
 				reset($responseExpectation);
 
-				$this->validate($responseExpectation, $apiResponse->getResult());
-			}
-			elseif ($expectation == 'error') {
-				$errorExpectation = $definition['error'];
-				$errorExpectation = $this->expandStepVariables($errorExpectation);
-
-				if (!isset($errorExpectation['message']) || !isset($errorExpectation['code'])) {
-					throw new \Exception('Error expectation should have at least "message" and "code" fields');
-				}
-
-				if ($errorExpectation['message'] != $apiResponse->getMessage()) {
-					throw new \Exception(sprintf(
-						'Expected error message "%s", "%s" given in step "%s"',
-						$errorExpectation['message'],
-						$apiResponse->getMessage(),
-						$stepName
-					));
-				}
-
-				if ($errorExpectation['code'] != $apiResponse->getCode()) {
-					throw new \Exception(sprintf(
-						'Expected error code "%d", "%d" given in step "%s"',
-						$errorExpectation['code'],
-						$apiResponse->getCode(),
-						$stepName
-					));
-				}
-
-				if (isset($errorExpectation['data']) &&
-					$errorExpectation['data'] != $apiResponse->getData()
-				) {
-					throw new \Exception(sprintf(
-						'Expected error data "%s", "%s" given in step "%s"',
-						$errorExpectation['data'],
-						$apiResponse->getData(),
-						$stepName
-					));
-				}
+				$this->validate($responseExpectation, $apiResponse->getResponseData());
 			}
 			else {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
