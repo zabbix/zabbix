@@ -69,7 +69,7 @@ int	zbx_child_fork()
 #else
 int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
 
-static ZBX_THREAD_ENTRY(zbx_thread_common_entry, args)
+static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
 	__try
 	{
@@ -112,7 +112,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 
 	thread_args->entry = handler;
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
-	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_thread_common_entry, thread_args, 0, &thrdaddr)))
+	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
 	{
 		zbx_error("failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
