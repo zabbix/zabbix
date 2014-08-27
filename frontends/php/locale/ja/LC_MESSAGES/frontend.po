@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-27 17:23+0300\n"
-"PO-Revision-Date: 2014-08-25 02:59+0300\n"
+"POT-Creation-Date: 2014-08-27 19:44+0300\n"
+"PO-Revision-Date: 2014-08-26 05:02+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408928376.0\n"
+"X-POOTLE-MTIME: 1409022150.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2035,7 +2035,7 @@ msgstr "グラフ\"%3$s\"内で利用されている\"%2$s\"上のアイテム\"
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"で利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
@@ -2045,7 +2045,7 @@ msgstr "トリガー\"%3$s\"内で利用されている\"%2$s\"上のアイテ�
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のトリガーのプロトタイプ\"%3$s\"で利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -6153,7 +6153,7 @@ msgstr "無効なトリガーを非表示"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
-msgstr "非表示フィルター"
+msgstr "フィルターを非表示"
 
 #: include/views/monitoring.history.php:130
 msgid "Hide selected"
@@ -7266,7 +7266,7 @@ msgstr "ディスカバリルール\"%1$s\"の条件式が正しくありませ�
 #: include/classes/api/services/CAction.php:2018
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
-msgstr ""
+msgstr "アクション\"%1$s\"のカスタム条件式\"%2$s\"が正しくありません： %3$s。"
 
 #: include/classes/api/services/CDiscoveryRule.php:858
 #, c-format
@@ -7605,7 +7605,7 @@ msgstr "プロキシIDが正しくありません。"
 #: adm.regexps.php:69 include/regexp.inc.php:120
 #, c-format
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
-msgstr ""
+msgstr "正規表現\"%1$s\"が正しくありません： \"%2$s\""
 
 #: include/classes/api/services/CScreenItem.php:456
 msgid "Incorrect resource type provided for screen item."
