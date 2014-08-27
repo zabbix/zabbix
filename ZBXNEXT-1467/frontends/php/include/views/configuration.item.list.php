@@ -268,7 +268,7 @@ $goOption = new CComboItem('item.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected items?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('item.massupdate', _('Mass update'));
+$goOption = new CComboItem('item.massupdateform', _('Mass update'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('item.masscopyto', _('Copy selected to ...'));

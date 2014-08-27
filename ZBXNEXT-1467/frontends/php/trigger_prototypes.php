@@ -35,8 +35,6 @@ $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
-	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
 	'expression' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')),
@@ -51,8 +49,6 @@ $fields = array(
 	'new_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'),
 	'rem_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && ({copy_type} == 0))'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -79,7 +75,7 @@ $fields = array(
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'mass_save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -190,7 +186,7 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	}
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
 	$visible = getRequest('visible');
 
@@ -212,7 +208,7 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massup
 	}
 
 	if ($result) {
-		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
+		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));

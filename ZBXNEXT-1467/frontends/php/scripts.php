@@ -42,7 +42,7 @@ $fields = array(
 	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
 	'host_access' =>		array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({add}) || isset({update})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,			DB_ID,		'(isset({add}) || isset({update}) && {hgstype} != 0'),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,			DB_ID,		'(isset({add}) || isset({update})) && {hgstype} != 0'),
 	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({add}) || isset({update})'),
 	'hgstype' =>			array(T_ZBX_INT, O_OPT, null,			null,		null),
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),

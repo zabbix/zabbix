@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'config' =>			array(T_ZBX_INT, O_OPT, null, IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP), null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,			null, null),
+	// actions
 	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
 	'test' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
 	// LDAP
@@ -55,9 +56,9 @@ check_fields($fields);
 
 $config = select_config();
 
-if (isset($_REQUEST['config'])) {
-	$isAuthenticationTypeChanged = ($config['authentication_type'] != $_REQUEST['config']);
-	$config['authentication_type'] = $_REQUEST['config'];
+if (hasRequest('config')) {
+	$isAuthenticationTypeChanged = ($config['authentication_type'] != getRequest('config'));
+	$config['authentication_type'] = getRequest('config');
 }
 else {
 	$isAuthenticationTypeChanged = false;
@@ -159,7 +160,7 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 			}
 		}
 	}
-	elseif (isset($_REQUEST['test'])) {
+	elseif (hasRequest('test')) {
 		show_messages($login, _('LDAP login successful'), _('LDAP login was not successful'));
 	}
 }

@@ -441,25 +441,42 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$buttons = array();
-	array_push($buttons, new CSubmit('clone', _('Clone')));
-
 	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
-		array_push($buttons,
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
+		$buttonDelHistory = new CButtonQMessage(
+			'del_history',
+			_('Clear history and trends'),
+			_('History clearing can take a long time. Continue?')
 		);
 	}
+	else {
+		$buttonDelHistory = null;
+	}
+
 	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(
+		$buttonDelete = new CButtonDelete(
 			$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
-	array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	else {
+		$buttonDelete = null;
+	}
+
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$buttonDelHistory,
+			$buttonDelete,
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		)
+	));
 }
 else {
-	$itemForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))));
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+	));
 }
 $itemWidget->addItem($itemForm);
 

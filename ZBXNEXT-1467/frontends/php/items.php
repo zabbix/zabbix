@@ -117,7 +117,7 @@ $fields = array(
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		    array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && ({copy_type} == 0))'),
+	'copy_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -127,7 +127,7 @@ $fields = array(
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-										'"item.massdisable","item.massenable","item.massupdate"'
+										'"item.massdisable","item.massenable","item.massupdateform"'
 									),
 									null
 								),
@@ -136,9 +136,9 @@ $fields = array(
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'copy' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -520,7 +520,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 // mass update
-elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
+elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$visible = getRequest('visible', array());
 	if (isset($visible['delay_flex_visible'])) {
 		$delay_flex = getRequest('delay_flex');
@@ -681,7 +681,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	$result = DBend($result);
 
 	if ($result) {
-		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
+		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['form']);
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Items updated'), _('Cannot update items'));
@@ -834,7 +834,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$itemView->render();
 	$itemView->show();
 }
-elseif ((hasRequest('action') && getRequest('action') == 'item.massupdate') || hasRequest('massupdate') && hasRequest('group_itemid')) {
+elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform') || hasRequest('massupdate')) && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),

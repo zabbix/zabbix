@@ -85,7 +85,8 @@ else {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel())
+			new CButtonCancel()
+		)
 	));
 }
 

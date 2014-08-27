@@ -51,9 +51,8 @@ $fields = array(
 	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && ({copy_type}==0))'),
+	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -77,7 +76,7 @@ $fields = array(
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'mass_save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -218,7 +217,7 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
 	$visible = getRequest('visible', array());
 
 	// update triggers
@@ -242,7 +241,7 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && 
 	$result = DBend($result);
 
 	if ($result) {
-		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
+		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));

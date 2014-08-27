@@ -48,7 +48,7 @@ $fields = array(
 	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
-	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, P_SYS, null, null, 'isset({update})'),
+	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, null, IN('1'), null),
 	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({update})'),
 	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({update})', _('Refresh (in seconds)')),
 	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')),
@@ -99,7 +99,7 @@ elseif (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 	redirect(CWebUser::$data['last_page']['url']);
 }
-elseif (isset($_REQUEST['update'])) {
+elseif (hasRequest('update')) {
 	$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
 
 	if ($auth_type != ZBX_AUTH_INTERNAL) {

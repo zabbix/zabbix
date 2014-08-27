@@ -198,7 +198,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.getRequest('gname').']');
+		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$userGroup['name'].']');
 		unset($_REQUEST['form']);
 	}
 
