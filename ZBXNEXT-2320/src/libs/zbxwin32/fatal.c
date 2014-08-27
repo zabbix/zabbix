@@ -116,7 +116,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	BOOL			bPrintSymbols = FALSE;
 	DWORD64			offset;
 	wchar_t			szProcessName[MAX_PATH];
-	char			*process_name = NULL, *process_path = NULL;
+	char			*process_name = NULL;
 	char			*frame = NULL;
 	size_t			frame_alloc = 0, frame_offset;
 	int			nframes = 0;
@@ -144,21 +144,11 @@ static void	print_backtrace(CONTEXT *pctx)
 	hThread = GetCurrentThread();
 
 	if (0 != GetModuleFileNameEx(hProcess, NULL, szProcessName, ARRSIZE(szProcessName)))
-	{
-		char			*ptr;
-		extern const char	*progname;
-		int			path_alloc = 0, path_offset = 0;
-
 		process_name = zbx_unicode_to_utf8(szProcessName);
-
-		if (NULL != (ptr = strstr(process_name, progname)))
-			zbx_strncpy_alloc(&process_path, &path_alloc, &path_offset, process_name, ptr - process_name);
-	}
 
 	if (NULL != (hModule = GetModuleHandle(TEXT("DbgHelp.DLL"))))
 	{
-		zbx_SymGetLineFromAddrW64 = (SymGetLineFromAddrW64_func_t)GetProcAddress(hModule,
-				"SymGetLineFromAddr64");
+		zbx_SymGetLineFromAddrW64 = (SymGetLineFromAddrW64_func_t)GetProcAddress(hModule, "SymGetLineFromAddr64");
 		zbx_SymFromAddr = (SymFromAddr_func_t)GetProcAddress(hModule, "SymFromAddr");
 	}
 
@@ -166,7 +156,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	{
 		SymSetOptions(SymGetOptions() | SYMOPT_LOAD_LINES);
 
-		if (FALSE != SymInitialize(hProcess, process_path, TRUE))
+		if (FALSE != SymInitialize(hProcess, NULL, TRUE))
 		{
 			bPrintSymbols = TRUE;
 
@@ -224,7 +214,6 @@ static void	print_backtrace(CONTEXT *pctx)
 	SymCleanup(hProcess);
 
 	zbx_free(frame);
-	zbx_free(process_path);
 	zbx_free(process_name);
 	zbx_free(pSym);
 }
