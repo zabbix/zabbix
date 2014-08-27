@@ -110,8 +110,8 @@ const char	*help_message[] = {
 	"",
 	"Log level control targets:",
 	"  <pid>                           Process identifier",
-	"  <process type>                  All processes of specified type (e.g. poller)",
-	"  <process type,N>                Process type and number (e.g. poller,3)",
+	"  <process type>                  All processes of specified type (e.g., listener)",
+	"  <process type,N>                Process type and number (e.g., listener,3)",
 #endif
 #ifdef _WINDOWS
 	"",

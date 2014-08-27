@@ -37,12 +37,12 @@ Process identifier
 .RS 4
 .TP 4
 <process type>
-All processes of specified type (e.g. poller)
+All processes of specified type (e.g., listener)
 .RE
 .RS 4
 .TP 4
 <process type>,N
-Process type and number (e.g. poller,3)
+Process type and number (e.g., listener,3)
 .RE
 .RE
 .IP "-p, --print"
