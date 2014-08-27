@@ -143,7 +143,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		add_audit(!hasRequest('regexpid') ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+		add_audit(hasRequest('update') ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
 			AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.getRequest('name'));
 
 		unset($_REQUEST['form']);

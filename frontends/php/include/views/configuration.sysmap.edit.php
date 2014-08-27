@@ -185,7 +185,6 @@ $sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
 $sysmapForm->addItem($sysmapTab);
 
 // append buttons to form
-$others = array();
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	$sysmapForm->addItem(makeFormFooter(
 			new CSubmit('update', _('Update')),

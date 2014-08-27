@@ -82,16 +82,24 @@ $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
 
 // footer
-$secondaryActions = array(new CButtonCancel());
 if (isset($this->data['regexpid'])) {
-	array_unshift($secondaryActions,
-		new CButton('clone', _('Clone')),
-		new CButtonDelete(_('Delete regular expression?'), url_param('regexpid').url_param('regexp.massdelete', false, 'action'))
-	);
-	$form->addItem(makeFormFooter(new CSubmit('update', _('Update')), $secondaryActions));
+	$form->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(
+				_('Delete regular expression?'),
+				url_param('regexpid').url_param('regexp.massdelete', false, 'action')
+			),
+			new CButtonCancel()
+		)
+	));
 }
 else {
-	$form->addItem(makeFormFooter(new CSubmit('add', _('Add')), $secondaryActions));
+	$form->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
 }
 
 return $form;

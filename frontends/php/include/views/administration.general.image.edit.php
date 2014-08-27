@@ -22,7 +22,9 @@
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
 $imageForm->addVar('form', $this->data['form']);
-$imageForm->addVar('imageid', $this->data['imageid']);
+if (isset($this->data['imageid'])) {
+	$imageForm->addVar('imageid', $this->data['imageid']);
+}
 $imageForm->addVar('imagetype', $this->data['imagetype']);
 
 // append form list
@@ -32,7 +34,7 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $imageFormList->addRow(_('Name'), $nameTextBox);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 
-if (!empty($this->data['imageid'])) {
+if (isset($this->data['imageid'])) {
 	if ($this->data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
 		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
 	}
@@ -47,10 +49,7 @@ $imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _(
 $imageForm->addItem($imageTab);
 
 // append buttons
-if (empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
-}
-else {
+if (isset($this->data['imageid'])) {
 	$imageForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
@@ -58,6 +57,9 @@ else {
 			new CButtonCancel()
 		)
 	));
+}
+else {
+	$imageForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
 }
 
 return $imageForm;

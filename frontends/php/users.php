@@ -59,7 +59,7 @@ $fields = array(
 	'theme' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $themes).'"'), 'isset({add}) || isset({update})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'autologout' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
-	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, P_SYS, null, null, 'isset({add}) || isset({update})'),
+	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, null,	IN('1'),	null),
 	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
 	'refresh' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_HOUR), 'isset({add}) || isset({update})', _('Refresh (in seconds)')),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),'isset({add}) || isset({update})', _('Rows per page')),
@@ -227,8 +227,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		DBstart();
 
-		if (isset($_REQUEST['userid'])) {
-			$user['userid'] = $_REQUEST['userid'];
+		if (hasRequest('userid')) {
+			$user['userid'] = getRequest('userid');
 			$result = API::User()->update(array($user));
 
 			if ($result) {

@@ -305,25 +305,32 @@ $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 $graphForm->addItem($graphTab);
 
 // append buttons to form
-$cancelButton = new CButtonCancel(url_param('parent_discoveryid'));
 if (!empty($this->data['graphid'])) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		$this->data['parent_discoveryid'] ? _('Delete graph prototype?') : _('Delete graph?'),
 		url_params(array('graphid', 'parent_discoveryid', 'hostid'))
 	);
-	$cloneButton = new CSubmit('clone', _('Clone'));
 
 	if (!empty($this->data['templateid'])) {
 		$updateButton->setEnabled(false);
 		$deleteButton->setEnabled(false);
 	}
 
-	$graphForm->addItem(makeFormFooter($updateButton, array($cloneButton, $deleteButton, $cancelButton)));
+	$graphForm->addItem(makeFormFooter(
+		$updateButton,
+		array(
+			new CSubmit('clone', _('Clone')),
+			$deleteButton,
+			new CButtonCancel(url_param('parent_discoveryid'))
+		)
+	));
 }
 else {
-	$addButton = new CSubmit('add', _('Add'));
-	$graphForm->addItem(makeFormFooter($addButton, $cancelButton));
+	$graphForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('parent_discoveryid'))
+	));
 }
 
 // insert js (depended from some variables inside the file)

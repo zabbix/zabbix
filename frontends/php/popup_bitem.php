@@ -173,7 +173,7 @@ else {
 		$frmGItem->addVar('color', $color);
 	}
 
-	if(isset($gid)) {
+	if (isset($gid)) {
 		$frmGItem->addItemToBottomRow(new CSubmit('update', _('Update')));
 	} else {
 		$frmGItem->addItemToBottomRow(new CSubmit('add', _('Add')));
