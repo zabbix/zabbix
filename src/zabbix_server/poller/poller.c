@@ -46,7 +46,8 @@
 extern unsigned char	process_type;
 extern int		server_num, process_num;
 
-static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
+static void	update_triggers_status_to_unknown(zbx_uint64_t hostid,
+		zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
