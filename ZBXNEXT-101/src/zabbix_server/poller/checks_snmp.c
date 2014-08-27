@@ -479,7 +479,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	{
 		SOCK_CLEANUP;
 
-		zbx_strlcpy(error, "Cannot open snmp session", max_error_len);
+		zbx_strlcpy(error, "Cannot open SNMP session", max_error_len);
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -597,11 +597,15 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	else if (ASN_INTEGER == var->type)
 #endif
 	{
-		/* negative integer values are converted to double */
-		if (0 > *var->val.integer)
-			SET_DBL_RESULT(result, (double)*var->val.integer);
+		if (ITEM_VALUE_TYPE_UINT64 == value_type && 0 > *var->val.integer)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%d]"
+					" is not suitable for value type [%s].",
+					*var->val.integer, zbx_item_value_type_string(value_type)));
+			ret = NOTSUPPORTED;
+		}
 		else
-			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
+			SET_DBL_RESULT(result, *var->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_FLOAT == var->type)
@@ -632,17 +636,135 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	return ret;
 }
 
+#define ZBX_OID_INDEX_STRING	0
+#define ZBX_OID_INDEX_NUMERIC	1
+
+static int	zbx_snmp_print_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len, int format)
+{
+	if (SNMPERR_SUCCESS != netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_BREAKDOWN_OIDS,
+			format))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set \"dontBreakdownOids\" option to %d for Net-SNMP", format);
+		return -1;
+	}
+
+	return snprint_objid(buffer, buffer_len, objid, objid_len);
+}
+
+static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len,
+		size_t root_string_len, size_t root_numeric_len)
+{
+	const char	*__function_name = "zbx_snmp_choose_index";
+
+	oid	parsed_oid[MAX_OID_LEN];
+	size_t	parsed_oid_len = MAX_OID_LEN;
+	char	printed_oid[MAX_STRING_LEN];
+
+	/**************************************************************************************************************/
+	/*                                                                                                            */
+	/* When we are providing a value for {#SNMPINDEX}, we would like to provide a pretty value. This is only a    */
+	/* concern for OIDs with string indices. For instance, suppose we are walking the following OID:              */
+	/*                                                                                                            */
+	/*   SNMP-VIEW-BASED-ACM-MIB::vacmGroupName                                                                   */
+	/*                                                                                                            */
+	/* Suppose also that we are currently looking at this OID:                                                    */
+	/*                                                                                                            */
+	/*   SNMP-VIEW-BASED-ACM-MIB::vacmGroupName.3."authOnlyUser"                                                  */
+	/*                                                                                                            */
+	/* Then, we would like to provide {#SNMPINDEX} with this value:                                               */
+	/*                                                                                                            */
+	/*   3."authOnlyUser"                                                                                         */
+	/*                                                                                                            */
+	/* An alternative approach would be to provide {#SNMPINDEX} with numeric value. While it is equivalent to the */
+	/* string representation above, the string representation is more readable and thus more useful to users:     */
+	/*                                                                                                            */
+	/*   3.12.97.117.116.104.79.110.108.121.85.115.101.114                                                        */
+	/*                                                                                                            */
+	/* Here, 12 is the length of "authOnlyUser" and the rest is the string encoding using ASCII characters.       */
+	/*                                                                                                            */
+	/* There are two problems with always providing {#SNMPINDEX} that has an index representation as a string.    */
+	/*                                                                                                            */
+	/* The first problem is indices of type InetAddress. The Net-SNMP library has code for pretty-printing IP     */
+	/* addresses, but no way to parse them back. As an example, consider the following OID:                       */
+	/*                                                                                                            */
+	/*   .1.3.6.1.2.1.4.34.1.4.1.4.192.168.3.255                                                                  */
+	/*                                                                                                            */
+	/* Its pretty representation is like this:                                                                    */
+	/*                                                                                                            */
+	/*   IP-MIB::ipAddressType.ipv4."192.168.3.255"                                                               */
+	/*                                                                                                            */
+	/* However, when trying to parse it, it turns into this OID:                                                  */
+	/*                                                                                                            */
+	/*   .1.3.6.1.2.1.4.34.1.4.1.13.49.57.50.46.49.54.56.46.51.46.50.53.53                                        */
+	/*                                                                                                            */
+	/* Apparently, this is different than the original.                                                           */
+	/*                                                                                                            */
+	/* The second problem is indices of type OCTET STRING, which might contain unprintable characters:            */
+	/*                                                                                                            */
+	/*   1.3.6.1.2.1.17.4.3.1.1.0.0.240.122.113.21                                                                */
+	/*                                                                                                            */
+	/* Its pretty representation is like this (note the single quotes which stand for a fixed-length string):     */
+	/*                                                                                                            */
+	/*   BRIDGE-MIB::dot1dTpFdbAddress.'...zq.'                                                                   */
+	/*                                                                                                            */
+	/* Here, '...zq.' stands for 0.0.240.122.113.21, where only 'z' (122) and 'q' (113) are printable.            */
+	/*                                                                                                            */
+	/* Apparently, this cannot be turned back into the numeric representation.                                    */
+	/*                                                                                                            */
+	/* So what we try to do is first print it pretty. If there is no string-looking index, return it as output.   */
+	/* If there is such an index, we check that it can be parsed and that the result is the same as the original. */
+	/*                                                                                                            */
+	/**************************************************************************************************************/
+
+	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_STRING))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print OID with string indices", __function_name);
+		goto numeric;
+	}
+
+	if (NULL == strchr(printed_oid, '"') && NULL == strchr(printed_oid, '\''))
+	{
+		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		return SUCCEED;
+	}
+
+	if (NULL == snmp_parse_oid(printed_oid, parsed_oid, &parsed_oid_len))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __function_name, printed_oid);
+		goto numeric;
+	}
+
+	if (parsed_oid_len == objid_len && 0 == memcmp(parsed_oid, objid, parsed_oid_len * sizeof(oid)))
+	{
+		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		return SUCCEED;
+	}
+numeric:
+	if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), objid, objid_len, ZBX_OID_INDEX_NUMERIC))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print OID with numeric indices", __function_name);
+		return FAIL;
+	}
+
+	zbx_strlcpy(buffer, printed_oid + root_numeric_len + 1, buffer_len);
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_snmp_walk                                                    *
  *                                                                            *
  * Purpose: retrieve information by walking an OID tree                       *
  *                                                                            *
- * Parameters: ss    - [IN] SNMP session handle                               *
- *             item  - [IN] configuration of Zabbix item                      *
- *             OID   - [IN] OID of table with values of interest              *
- *             mode  - [IN] mode to operate in                                *
- *             value - [OUT] result structure                                 *
+ * Parameters: ss          - [IN] SNMP session handle                         *
+ *             item        - [IN] configuration of Zabbix item                *
+ *             OID         - [IN] OID of table with values of interest        *
+ *             mode        - [IN] mode to operate in                          *
+ *             result      - [OUT] result structure                           *
+ *             max_succeed - [OUT] value of "max_repetitions" that succeeded  *
+ *             min_fail    - [OUT] value of "max_repetitions" that failed     *
+ *             max_vars    - [IN] suggested value of "max_repetitions"        *
+ *             bulk        - [IN] whether GetBulkRequest-PDU should be used   *
  *                                                                            *
  * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
  *               NETWORK_ERROR - recoverable network error                    *
@@ -667,22 +789,24 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
 static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars)
+		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars, int bulk)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
-	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
+	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			bulk, status, level, running, num_vars, ret = SUCCEED;
+	int			status, level, running, num_vars, ret = SUCCEED;
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
-	bulk = (ITEM_TYPE_SNMPv1 == item->type ? 0 : 1);	/* GetBulkRequest-PDU available since SNMPv2 */
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' mode:%d bulk:%d", __function_name, (int)item->type, OID,
+			(int)mode, bulk);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' bulk:%d mode:%d", __function_name, OID, bulk, (int)mode);
+	if (ITEM_TYPE_SNMPv1 == item->type)	/* GetBulkRequest-PDU available since SNMPv2 */
+		bulk = SNMP_BULK_DISABLED;
 
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
@@ -692,14 +816,25 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		goto out;
 	}
 
-	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
+	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_STRING))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
+				" cannot print OID \"%s\" with string indices.", OID));
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
-	OID_len = strlen(snmp_oid);
+	root_string_len = strlen(snmp_oid);
+
+	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_NUMERIC))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
+				" cannot print OID \"%s\" with numeric indices.", OID));
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	root_numeric_len = strlen(snmp_oid);
 
 	/* copy rootOID to anOID */
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
@@ -721,7 +856,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 	while (1 == running)
 	{
-		if (NULL == (pdu = snmp_pdu_create(0 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK)))	/* create PDU */
+		/* create PDU */
+		if (NULL == (pdu = snmp_pdu_create(SNMP_BULK_ENABLED == bulk ? SNMP_MSG_GETBULK : SNMP_MSG_GETNEXT)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
 			ret = CONFIG_ERROR;
@@ -736,7 +872,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			break;
 		}
 
-		if (1 == bulk)
+		if (SNMP_BULK_ENABLED == bulk)
 		{
 			pdu->non_repeaters = 0;
 			pdu->max_repetitions = max_vars;
@@ -801,11 +937,12 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
-				if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), var->name, var->name_length))
+				if (SUCCEED != zbx_snmp_choose_index(snmp_oid, sizeof(snmp_oid), var->name,
+						var->name_length, root_string_len, root_numeric_len))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-							"snprint_objid(): buffer is not large enough:"
-							" OID: \"%s\" snmp_oid: \"%s\".", OID, snmp_oid));
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_choose_index():"
+							" cannot choose appropriate index while walking for"
+							" OID \"%s\".", OID));
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -818,14 +955,12 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				{
 					if (ZBX_SNMP_WALK_MODE_CACHE == mode)
 					{
-						cache_put_snmp_index(item, (char *)OID, snmp_result.str,
-								&snmp_oid[OID_len + 1]);
+						cache_put_snmp_index(item, (char *)OID, snmp_result.str, snmp_oid);
 					}
 					else
 					{
 						zbx_json_addobject(&j, NULL);
-						zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
-								ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&j, "{#SNMPINDEX}", snmp_oid, ZBX_JSON_TYPE_STRING);
 						zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
 								ZBX_JSON_TYPE_STRING);
 						zbx_json_close(&j);
@@ -837,7 +972,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 					msg = GET_MSG_RESULT(&snmp_result);
 
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot get OID '%s' string value: %s",
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							snmp_oid, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
 
@@ -1135,7 +1270,8 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 }
 
 static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars,
+		int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
@@ -1151,7 +1287,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		case 0:
 			zbx_snmp_translate(oid_translated, items[0].snmp_oid, sizeof(oid_translated));
 			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, ZBX_SNMP_WALK_MODE_DISCOVERY,
-					&results[0], max_succeed, min_fail, max_vars);
+					&results[0], max_succeed, min_fail, max_vars, bulk);
 			break;
 		default:
 			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
@@ -1168,7 +1304,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
 
@@ -1301,7 +1437,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			init_result(&result);
 
 			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result,
-					max_succeed, min_fail, num);
+					max_succeed, min_fail, num, bulk);
 
 			if (NETWORK_ERROR == errcode)
 			{
@@ -1425,7 +1561,8 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
-	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = MAX_SNMP_ITEMS + 1;
+	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = MAX_SNMP_ITEMS + 1,
+				bulk = SNMP_BULK_ENABLED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
@@ -1449,21 +1586,17 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	{
 		int	max_vars;
 
-		if (SUCCEED == DCconfig_get_interface_snmp_stats(items[j].interface.interfaceid,
-				&max_succeed, &min_fail))
-		{
-			max_vars = DCconfig_get_suggested_snmp_vars(max_succeed, min_fail);
-		}
-		else
-			max_vars = 1;
+		max_vars = DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
 		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail, max_vars);
+				&max_succeed, &min_fail, max_vars, bulk);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
+		(void)DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
+
 		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail);
+				&max_succeed, &min_fail, bulk);
 	}
 	else
 	{
@@ -1486,7 +1619,7 @@ exit:
 			errcodes[i] = err;
 		}
 	}
-	else if (0 != max_succeed || MAX_SNMP_ITEMS + 1 != min_fail)
+	else if (SNMP_BULK_ENABLED == bulk && (0 != max_succeed || MAX_SNMP_ITEMS + 1 != min_fail))
 	{
 		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
 	}

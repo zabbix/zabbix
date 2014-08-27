@@ -43,7 +43,7 @@ $fields = array(
 
 check_fields($fields);
 
-$config = get_request('config', CProfile::get('web.queue.config', 0));
+$config = getRequest('config', CProfile::get('web.queue.config', 0));
 CProfile::update('web.queue.config', $config, PROFILE_TYPE_INT);
 
 // fetch data
@@ -197,6 +197,32 @@ elseif ($config == QUEUE_DETAILS) {
 
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 
+	// get hosts for queue items
+	$hostIds = zbx_objectValues($items, 'hostid');
+	$hostIds = array_keys(array_flip($hostIds));
+
+	$hosts = API::Host()->get(array(
+		'output' => array('hostid', 'proxy_hostid'),
+		'hostids' => $hostIds,
+		'preservekeys' => true
+	));
+
+	// get proxies for those hosts
+	$proxyHostIds = array();
+	foreach ($hosts as $host) {
+		if ($host['proxy_hostid']) {
+			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
+		}
+	}
+
+	if ($proxyHostIds) {
+		$proxies = API::Proxy()->get(array(
+			'proxyids' => $proxyHostIds,
+			'output' => array('proxyid', 'host'),
+			'preservekeys' => true
+		));
+	}
+
 	$table->setHeader(array(
 		_('Scheduled check'),
 		_('Delayed by'),
@@ -220,9 +246,11 @@ elseif ($config == QUEUE_DETAILS) {
 		$host = reset($item['hosts']);
 
 		$table->addRow(array(
-			zbx_date2str(QUEUE_NODES_DATE_FORMAT, $itemData['nextcheck']),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $itemData['nextcheck']),
 			zbx_date2age($itemData['nextcheck']),
-			$host['name'],
+			(isset($proxies[$hosts[$item['hostid']]['proxy_hostid']]))
+				? $proxies[$hosts[$item['hostid']]['proxy_hostid']]['host'].NAME_DELIMITER.$host['name']
+				: $host['name'],
 			$item['name_expanded']
 		));
 	}

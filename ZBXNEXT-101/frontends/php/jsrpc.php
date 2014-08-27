@@ -21,10 +21,10 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$requestType = get_request('type', PAGE_TYPE_JSON);
+$requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
-	$http_request = new CHTTP_request();
-	$json = new CJSON();
+	$http_request = new CHttpRequest();
+	$json = new CJson();
 	$data = $json->decode($http_request->body(), true);
 }
 else {
@@ -130,10 +130,11 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'color' => getSeverityColor($trigger['priority'], $event['value']),
-						'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
+						'title' => $title.' [url='.$url_tr_status.']'.$host['name'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
-							_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
+							_('Date').': [b][url='.$url_tr_events.']'.
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url][/b]',
 						),
 						'timeout' => $msgsettings['timeout']
 					);
@@ -180,6 +181,7 @@ switch ($data['method']) {
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
 			'timestamp' => !empty($data['timestamp']) ? $data['timestamp'] : time(),
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
+			'screenid' => (isset($data['screenid']) && $data['screenid'] != 0) ? $data['screenid'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
 			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
@@ -393,7 +395,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 	}
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
-	$json = new CJSON();
+	$json = new CJson();
 
 	echo $json->encode(array(
 		'jsonrpc' => '2.0',

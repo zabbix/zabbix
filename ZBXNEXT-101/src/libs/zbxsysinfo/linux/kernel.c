@@ -41,28 +41,28 @@ static int	read_uint64_from_procfs(const char *path, zbx_uint64_t *value)
 
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value;
 
-	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/fs/file-max", &value))
+	if (SYSINFO_RET_FAIL == read_uint64_from_procfs("/proc/sys/fs/file-max", &value))
 	{
-		SET_UI64_RESULT(result, value);
-		ret = SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain data from /proc/sys/fs/file-max."));
+		return SYSINFO_RET_FAIL;
 	}
 
-	return ret;
+	SET_UI64_RESULT(result, value);
+	return SYSINFO_RET_OK;
 }
 
 int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value;
 
-	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/kernel/pid_max", &value))
+	if (SYSINFO_RET_FAIL == read_uint64_from_procfs("/proc/sys/kernel/pid_max", &value))
 	{
-		SET_UI64_RESULT(result, value);
-		ret = SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain data from /proc/sys/kernel/pid_max."));
+		return SYSINFO_RET_FAIL;
 	}
 
-	return ret;
+	SET_UI64_RESULT(result, value);
+	return SYSINFO_RET_OK;
 }

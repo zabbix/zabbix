@@ -41,7 +41,7 @@ $fields = array(
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,			IN('0,1'),				null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,			null,					null),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,			null,					null),
-	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,			IN("'add','remove'"),	null)
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,			IN('"add","remove"'),	null)
 );
 check_fields($fields);
 
@@ -91,7 +91,7 @@ $maps = API::Map()->get(array(
 ));
 order_result($maps, 'name');
 
-if ($mapName = get_request('mapname')) {
+if ($mapName = getRequest('mapname')) {
 	unset($_REQUEST['sysmapid']);
 
 	foreach ($maps as $map) {
@@ -140,7 +140,7 @@ $data['pageFilter'] = new CPageFilter(array(
 		'default' => $data['map']['severity_min'],
 		'mapId' => $data['sysmapid']
 	),
-	'severityMin' => get_request('severity_min')
+	'severityMin' => getRequest('severity_min')
 ));
 $data['severity_min'] = $data['pageFilter']->severityMin;
 

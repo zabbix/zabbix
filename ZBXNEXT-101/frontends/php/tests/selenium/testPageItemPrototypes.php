@@ -61,7 +61,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestTextNotPresent('Error');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->zbxTestDropdownHasOptions('go', array(
+		$this->zbxTestDropdownHasOptions('action', array(
 			'Activate selected',
 			'Disable selected',
 			'Delete selected'
@@ -87,7 +87,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 
@@ -144,7 +144,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		sleep(1);
 		$this->zbxTestClickWait('goButton');
 

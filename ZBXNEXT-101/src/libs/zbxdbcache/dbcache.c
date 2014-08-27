@@ -439,8 +439,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
-						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg="
+						ZBX_FS_DBL ",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64
+						" and clock=%d;\n",
 						trend->num,
 						trend->value_min.dbl,
 						trend->value_avg.dbl,
@@ -469,8 +470,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
-						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg="
+						ZBX_FS_UI64 ",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64
+						" and clock=%d;\n",
 						trend->num,
 						trend->value_min.ui64,
 						avg.lo,
@@ -646,7 +648,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
  *                                                                            *
  * Function: DCmass_update_trends                                             *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -732,7 +734,7 @@ static void	DCsync_trends()
  *                                                                            *
  * Purpose: re-calculate and update values of triggers related to the items   *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
@@ -1064,6 +1066,13 @@ notsupported:
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
+
+			if (ITEM_STATE_NOTSUPPORTED == item->db_state)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
+						item->key_orig, h->value_orig.err);
+			}
+
 			zbx_free(value_esc);
 
 			update_cache = 1;
@@ -1078,7 +1087,8 @@ notsupported:
 	{
 		if (ITEM_STATE_NOTSUPPORTED == item->db_state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\" became supported", item->host.host, item->key_orig);
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became supported",
+					item->host.host, item->key_orig);
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
@@ -1172,7 +1182,7 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
@@ -1215,6 +1225,12 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		for (j = 0; j < history_num; j++)
@@ -1285,7 +1301,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
@@ -1511,7 +1527,7 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -1725,7 +1741,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history - array of history data                                *
+ * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -2239,7 +2255,7 @@ retry:
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for text cache");
-			exit(-1);
+			exit(EXIT_FAILURE);
 		}
 
 		free_len = CONFIG_TEXT_CACHE_SIZE - (cache->last_text - cache->text);
@@ -2797,13 +2813,13 @@ static void	init_trend_cache()
 	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
 		zbx_error("cannot create mutex for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
@@ -2850,19 +2866,19 @@ void	init_database_cache()
 			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("cannot create mutex for history cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("cannot create mutex for IDs cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	itemids_alloc = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
@@ -3023,7 +3039,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	if (i == ZBX_IDS_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));

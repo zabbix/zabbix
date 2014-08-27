@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['templates'])) {
+if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
 	$exportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -64,7 +64,10 @@ $fields = array(
 	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	// actions
-	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"template.export","template.massdelete","template.massdeleteclear"'),
+								null
+							),
 	'unlink'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -74,24 +77,24 @@ $fields = array(
 	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT, null,		null,	null)
+	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,		null,	null),
+	// sort and sortorder
+	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null),
+	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
-$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
+if (getRequest('templateid') && !API::Template()->isWritable(array($_REQUEST['templateid']))) {
 	access_deny();
 }
 
-$templateIds = get_request('templates', array());
+$templateIds = getRequest('templates', array());
 
 if ($exportData) {
 	$export = new CConfigurationExport(array('templates' => $templateIds));
@@ -167,7 +170,7 @@ elseif (hasRequest('save')) {
 			}
 			else {
 				// transform macros to uppercase {$aaa} => {$AAA}
-				$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
+				$macros[$key]['macro'] = mb_strtoupper($macro['macro']);
 			}
 		}
 
@@ -262,6 +265,11 @@ elseif (hasRequest('save')) {
 				throw new Exception();
 			}
 
+			// copy web scenarios
+			if (!copyHttpTests($cloneTemplateId, $templateId)) {
+				throw new Exception();
+			}
+
 			// copy triggers
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid'),
@@ -333,8 +341,11 @@ elseif (hasRequest('save')) {
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -346,8 +357,6 @@ elseif (hasRequest('save')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
-
 	$result = API::Template()->massUpdate(array(
 		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 		'hosts' => array()
@@ -358,52 +367,51 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$goResult = true;
 	$result = API::Template()->delete(array(getRequest('templateid')));
 
 	$result = DBend($result);
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($result);
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		uncheckTableRows();
 	}
 	unset($_REQUEST['delete']);
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
-elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
-	$templates = get_request('templates', array());
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('template.massdelete', 'template.massdeleteclear')) && hasRequest('templates')) {
+	$templates = getRequest('templates');
 
 	DBstart();
 
-	$goResult = true;
+	$result = true;
 
-	if ($_REQUEST['go'] == 'delete') {
-		$goResult = API::Template()->massUpdate(array(
+	if (getRequest('action') == 'action.massdelete') {
+		$result = API::Template()->massUpdate(array(
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => array()
 		));
 	}
 
-	if ($goResult) {
-		$goResult = API::Template()->delete($templates);
+	if ($result) {
+		$result = API::Template()->delete($templates);
 	}
 
-	$goResult = DBend($goResult);
+	$result = DBend($result);
 
-	show_messages($goResult, _('Template deleted'), _('Cannot delete template'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 
 /*
@@ -419,14 +427,14 @@ $pageFilter = new CPageFilter(array(
 		'templated_hosts' => true,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null)
+	'groupid' => getRequest('groupid')
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
-	if ($templateId = get_request('templateid', 0)) {
+	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 
@@ -470,6 +478,12 @@ if (isset($_REQUEST['form'])) {
 	$templateWidget->addItem($templateForm->render());
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -492,7 +506,7 @@ else {
 	$table = new CTableInfo(_('No templates found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-		make_sorting_header(_('Templates'), 'name'),
+		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -507,22 +521,19 @@ else {
 	// get templates
 	$templates = array();
 
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
-
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get(array(
 			'output' => array('templateid', 'name'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
-			'sortfield' => $sortfield,
+			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		));
 	}
 
 	// sorting && paging
-	order_result($templates, $sortfield, $sortorder);
-	$paging = getPagingLine($templates, array('templateid'));
+	order_result($templates, $sortField, $sortOrder);
+	$paging = getPagingLine($templates);
 
 	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
@@ -541,7 +552,7 @@ else {
 		'nopermissions' => true
 	));
 
-	order_result($templates, $sortfield, $sortorder);
+	order_result($templates, $sortField, $sortOrder);
 
 	foreach ($templates as $template) {
 		$templatesOutput = array();
@@ -652,14 +663,18 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('go');
-	$goBox->addItem('export', _('Export selected'));
-	$goOption = new CComboItem('delete', _('Delete selected'));
+	$goBox = new CComboBox('action');
+
+	$goBox->addItem('template.export', _('Export selected'));
+
+	$goOption = new CComboItem('template.massdelete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected templates?'));
 	$goBox->addItem($goOption);
-	$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
+
+	$goOption = new CComboItem('template.massdeleteclear', _('Delete selected with linked elements'));
 	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
 	$goBox->addItem($goOption);
+
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 

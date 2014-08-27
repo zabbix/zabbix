@@ -44,7 +44,7 @@ typedef struct perf_counter_id
 {
 	struct perf_counter_id	*next;
 	unsigned long		pdhIndex;
-	TCHAR			name[PDH_MAX_COUNTER_NAME];
+	wchar_t			name[PDH_MAX_COUNTER_NAME];
 }
 PERF_COUNTER_ID;
 
@@ -73,7 +73,7 @@ PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath
 PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
 
 PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, double *value);
-LPTSTR		get_counter_name(DWORD pdhIndex);
+wchar_t		*get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */

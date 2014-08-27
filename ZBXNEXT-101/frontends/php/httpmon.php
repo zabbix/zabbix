@@ -33,21 +33,28 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'fullscreen' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	IN('0,1'),	null),
 	'groupid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
-	'hostid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+	'hostid' =>			array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name"'),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 $options = array(
 	'groups' => array(
@@ -58,8 +65,8 @@ $options = array(
 		'with_monitored_items' => true,
 		'with_httptests' => true
 	),
-	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null),
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid'),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
@@ -81,8 +88,8 @@ $httpmon_wdgt->addHeaderRowNumber();
 // TABLE
 $table = new CTableInfo(_('No web scenarios found.'));
 $table->SetHeader(array(
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
-	make_sorting_header(_('Name'), 'name'),
+	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
+	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
 	_('Number of steps'),
 	_('Last check'),
 	_('Status')
@@ -124,7 +131,7 @@ if ($pageFilter->hostsSelected) {
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 
-	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
+	order_result($httpTests, $sortField, $sortOrder);
 
 	// fetch the latest results of the web scenario
 	$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httpTests));
@@ -134,7 +141,7 @@ if ($pageFilter->hostsSelected) {
 				&& $lastHttpTestData[$httpTest['httptestid']]['lastfailedstep'] !== null) {
 			$lastData = $lastHttpTestData[$httpTest['httptestid']];
 
-			$lastcheck = zbx_date2str(_('d M Y H:i:s'), $lastData['lastcheck']);
+			$lastcheck = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastData['lastcheck']);
 
 			if ($lastData['lastfailedstep'] != 0) {
 				$stepData = get_httpstep_by_no($httpTest['httptestid'], $lastData['lastfailedstep']);

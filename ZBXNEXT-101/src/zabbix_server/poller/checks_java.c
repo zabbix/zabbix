@@ -134,7 +134,6 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 	zbx_sock_t	s;
 	struct zbx_json	json;
 	char		error[MAX_STRING_LEN];
-	char		*buffer = NULL;
 	int		i, j, err = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
@@ -209,11 +208,11 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 
 		if (SUCCEED == (err = zbx_tcp_send(&s, json.buffer)))
 		{
-			if (SUCCEED == (err = zbx_tcp_recv(&s, &buffer)))
+			if (SUCCEED == (err = zbx_tcp_recv(&s)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", buffer);
+				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", s.buffer);
 
-				err = parse_response(items, results, errcodes, num, buffer, error, sizeof(error));
+				err = parse_response(items, results, errcodes, num, s.buffer, error, sizeof(error));
 			}
 		}
 

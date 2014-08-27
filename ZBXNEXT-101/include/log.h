@@ -58,14 +58,16 @@ int		zabbix_open_log(int type,int level, const char *filename);
 void		zabbix_errlog(zbx_err_codes_t err, ...);
 void		__zbx_zabbix_log(int level, const char *fmt, ...);
 void		zabbix_close_log();
+void		zabbix_set_log_level(int level);
 int		set_debug_level_up();
 int		set_debug_level_down();
 const char	*get_debug_level_string();
 int		zabbix_check_log_level(int level);
 char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
+
 #ifdef _WINDOWS
-char		*strerror_from_module(unsigned long error, LPCTSTR module);
+char		*strerror_from_module(unsigned long error, const wchar_t *module);
 #endif
 
 #if defined(_WINDOWS)

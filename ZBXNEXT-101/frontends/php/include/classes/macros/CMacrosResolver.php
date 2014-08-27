@@ -71,6 +71,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => array('graphFunctionalItem'),
 			'source' => 'name',
 			'method' => 'resolveGraph'
+		),
+		'screenElementURL' => array(
+			'types' => array('host', 'hostId', 'interfaceWithoutPort', 'user'),
+			'source' => 'url',
+			'method' => 'resolveTexts'
+		),
+		'screenElementURLUser' => array(
+			'types' => array('user'),
+			'source' => 'url',
+			'method' => 'resolveTexts'
 		)
 	);
 
@@ -115,7 +125,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$macros = array();
 
-		$hostMacrosAvailable = $agentInterfaceAvailable = $interfaceWithoutPortMacrosAvailable = false;
+		$hostMacrosAvailable = false;
+		$agentInterfaceAvailable = false;
+		$interfaceWithoutPortMacrosAvailable = false;
 
 		if ($this->isTypeAvailable('host')) {
 			foreach ($data as $hostId => $texts) {
@@ -125,6 +137,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 
 					$hostMacrosAvailable = true;
+				}
+			}
+		}
+
+		if ($this->isTypeAvailable('hostId')) {
+			foreach ($data as $hostId => $texts) {
+				if ($hostId != 0) {
+					$hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts);
+					if ($hostIdMacros) {
+						foreach ($hostIdMacros as $hostMacro) {
+							$macros[$hostId][$hostMacro] = $hostId;
+						}
+					}
 				}
 			}
 		}
@@ -322,10 +347,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// replace macros to value
 		if ($macros) {
+			$pattern = '/'.self::PATTERN_HOST.'|'.self::PATTERN_HOST_ID.'|'.self::PATTERN_INTERFACE.'|'.
+				ZBX_PREG_EXPRESSION_USER_MACROS.'/';
+
 			foreach ($data as $hostId => $texts) {
 				if (isset($macros[$hostId])) {
 					foreach ($texts as $tnum => $text) {
-						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_INTERFACE.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
+						preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
 
 						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 							$matche = $matches[0][$i];
@@ -1105,11 +1133,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro = $expr;
 
 			if ($replaceHosts !== null) {
-				// search for macros with all possible indecies
+				// search for macros with all possible indices
 				foreach ($replaceHosts as $i => $host) {
 					$macroTmp = $macro;
 
-					// repalce only macro in first position
+					// replace only macro in first position
 					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 
 					// only one simple macro possible inside functional macro
@@ -1126,13 +1154,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				continue;
 			}
 
-			// look in DB for coressponding item
+			// look in DB for corresponding item
 			$itemHost = $expressionData->expressions[0]['host'];
 			$key = $expressionData->expressions[0]['item'];
 			$function = $expressionData->expressions[0]['functionName'];
 
 			$item = API::Item()->get(array(
-				'output' => array('itemid', 'lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid'),
+				'output' => array('itemid', 'value_type', 'units', 'valuemapid'),
 				'webitems' => true,
 				'filter' => array(
 					'host' => $itemHost,
@@ -1147,6 +1175,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 
 				continue;
+			}
+
+			$lastValue = Manager::History()->getLast(array($item));
+			if ($lastValue) {
+				$lastValue = reset($lastValue[$item['itemid']]);
+				$item['lastvalue'] = $lastValue['value'];
+				$item['lastclock'] = $lastValue['clock'];
+			}
+			else {
+				$item['lastvalue'] = '0';
+				$item['lastclock'] = '0';
 			}
 
 			// do function type (last, min, max, avg) related actions
@@ -1181,14 +1220,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// for host and trigger items expand macros if they exists
 		if (($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST || $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-				&& (zbx_strpos($label, 'HOST.NAME') !== false
-						|| zbx_strpos($label, 'HOSTNAME') !== false /* deprecated */
-						|| zbx_strpos($label, 'HOST.HOST') !== false
-						|| zbx_strpos($label, 'HOST.DESCRIPTION') !== false
-						|| zbx_strpos($label, 'HOST.DNS') !== false
-						|| zbx_strpos($label, 'HOST.IP') !== false
-						|| zbx_strpos($label, 'IPADDRESS') !== false /* deprecated */
-						|| zbx_strpos($label, 'HOST.CONN') !== false)) {
+				&& (strpos($label, 'HOST.NAME') !== false
+						|| strpos($label, 'HOSTNAME') !== false /* deprecated */
+						|| strpos($label, 'HOST.HOST') !== false
+						|| strpos($label, 'HOST.DESCRIPTION') !== false
+						|| strpos($label, 'HOST.DNS') !== false
+						|| strpos($label, 'HOST.IP') !== false
+						|| strpos($label, 'IPADDRESS') !== false /* deprecated */
+						|| strpos($label, 'HOST.CONN') !== false)) {
 			// priorities of interface types doesn't match interface type ids in DB
 			$priorities = array(
 				INTERFACE_TYPE_AGENT => 4,
@@ -1293,40 +1332,40 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				if (zbx_strpos($label, '{TRIGGERS.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.UNACK}') !== false) {
 					$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}',
 						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}',
 						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.ACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.ACK}') !== false) {
 					$label = str_replace('{TRIGGERS.ACK}',
 						get_triggers_unacknowledged($selement, null, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGERS.PROBLEM.ACK}',
 						get_triggers_unacknowledged($selement, true, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.ACK}',
 						get_events_unacknowledged($selement, null, null, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}',
 						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
 						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
 				}

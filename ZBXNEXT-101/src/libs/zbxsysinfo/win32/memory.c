@@ -29,14 +29,20 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*mode;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
 	if (NULL != mode && 0 == strcmp(mode, "cached"))
 	{
 		if (NULL == zbx_GetPerformanceInfo)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		zbx_GetPerformanceInfo(&pfi, sizeof(PERFORMANCE_INFORMATION));
 
@@ -64,7 +70,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "pavailable") && 0 != ms_ex.ullTotalPhys)
 			SET_DBL_RESULT(result, ms_ex.ullAvailPhys / (double)ms_ex.ullTotalPhys * 100);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
@@ -83,7 +92,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "pavailable") && 0 != ms.dwTotalPhys)
 			SET_DBL_RESULT(result, ms.dwAvailPhys / (double)ms.dwTotalPhys * 100);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	return SYSINFO_RET_OK;

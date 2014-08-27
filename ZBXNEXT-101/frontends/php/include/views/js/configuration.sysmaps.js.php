@@ -90,9 +90,7 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div>
-						<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
-					</div>
+					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
@@ -106,7 +104,7 @@
 				<td>
 					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&monitored_hosts=1&with_triggers=1',450,450)"><?php echo _('Select'); ?></span>
+					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1',450,450)"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
@@ -120,7 +118,7 @@
 				<td><?php echo _('Application'); ?></td>
 				<td>
 					<input size="50" id="application" name="application" class="input">
-					<span id="application-select" class="link"><?php echo _('Select'); ?></span>
+					<input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
 				</td>
 			</tr>
 
@@ -404,7 +402,7 @@
 							<tfoot>
 							<tr>
 								<td colspan="4">
-									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&monitored_hosts=1&with_triggers=1');"><?php echo _('Add'); ?></span>
+									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?php echo _('Add'); ?></span>
 								</td>
 							</tr>
 							</tfoot>
@@ -488,4 +486,16 @@ jQuery(document).ready(function() {
 		return false;
 	});
 })
+
+/**
+ * @see init.js add.popup event
+ */
+function addPopupValues(data) {
+	if (data.object === 'name') {
+		jQuery('#application').val(data.values[0].name);
+	}
+	else if (data.object === 'linktrigger') {
+		ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
+	}
+}
 </script>

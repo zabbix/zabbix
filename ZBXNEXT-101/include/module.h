@@ -27,7 +27,7 @@
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
-#define get_rparam(request, num)	(request->nparam > num ? request->params[num] : NULL)
+#define get_rparam(request, num)	((request)->nparam > num ? (request)->params[num] : NULL)
 
 /* flags for command */
 #define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */

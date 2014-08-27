@@ -494,6 +494,7 @@ class CConfigurationExportBuilder {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
+				'bulk' => $interface['bulk'],
 				'interface_ref' => $interface['interface_ref']
 			);
 		}
@@ -571,7 +572,8 @@ class CConfigurationExportBuilder {
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
-				'valuemap' => $item['valuemap']
+				'valuemap' => $item['valuemap'],
+				'logtimefmt' => $item['logtimefmt']
 			);
 
 			if (isset($item['interface_ref'])) {
@@ -698,6 +700,7 @@ class CConfigurationExportBuilder {
 				'dynamic' => $screenItem['dynamic'],
 				'sort_triggers' => $screenItem['sort_triggers'],
 				'resource' => $screenItem['resourceid'],
+				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
 			);
 		}
@@ -845,6 +848,7 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
+				'application' => $element['application'],
 				'urls' => $this->formatMapElementUrls($element['urls'])
 			);
 		}

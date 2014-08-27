@@ -19,9 +19,9 @@
 **/
 
 
-$action = 'screenedit.php?form=update&screenid='.get_request('screenid');
+$action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
-	$action .= '&screenitemid='.get_request('screenitemid');
+	$action .= '&screenitemid='.getRequest('screenitemid');
 }
 
 // create screen form
@@ -57,22 +57,24 @@ if (isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])) {
 	$dynamic		= $screenItem['dynamic'];
 	$sortTriggers	= $screenItem['sort_triggers'];
 	$application	= $screenItem['application'];
+	$maxColumns		= $screenItem['max_columns'];
 }
 else {
-	$resourceType	= get_request('resourcetype', 0);
-	$resourceId		= get_request('resourceid', 0);
-	$width			= get_request('width', 500);
-	$height			= get_request('height', 100);
-	$colspan		= get_request('colspan', 1);
-	$rowspan		= get_request('rowspan', 1);
-	$elements		= get_request('elements', 25);
-	$valign			= get_request('valign', VALIGN_DEFAULT);
-	$halign			= get_request('halign', HALIGN_DEFAULT);
-	$style			= get_request('style', 0);
-	$url			= get_request('url', '');
-	$dynamic		= get_request('dynamic', SCREEN_SIMPLE_ITEM);
-	$sortTriggers	= get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
-	$application	= get_request('application', '');
+	$resourceType	= getRequest('resourcetype', 0);
+	$resourceId		= getRequest('resourceid', 0);
+	$width			= getRequest('width', 500);
+	$height			= getRequest('height', 100);
+	$colspan		= getRequest('colspan', 1);
+	$rowspan		= getRequest('rowspan', 1);
+	$elements		= getRequest('elements', 25);
+	$valign			= getRequest('valign', VALIGN_DEFAULT);
+	$halign			= getRequest('halign', HALIGN_DEFAULT);
+	$style			= getRequest('style', 0);
+	$url			= getRequest('url', '');
+	$dynamic		= getRequest('dynamic', SCREEN_SIMPLE_ITEM);
+	$sortTriggers	= getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
+	$application	= getRequest('application', '');
+	$maxColumns		= getRequest('max_columns', 3);
 }
 
 // append resource types to form list
@@ -133,9 +135,59 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Graph name'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
+}
+
+/*
+ * Screen item: Graph prototype
+ */
+elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
+	$caption = '';
+	$id = 0;
+
+	$graphPrototypes = API::GraphPrototype()->get(array(
+		'output' => array('name'),
+		'graphids' => $resourceId,
+		'selectHosts' => array('name')
+	));
+
+	if ($graphPrototypes) {
+		$id = $resourceId;
+		$graphPrototype = reset($graphPrototypes);
+
+		order_result($graphPrototype['hosts'], 'name');
+		$graphPrototype['host'] = reset($graphPrototype['hosts']);
+
+		$caption = $graphPrototype['host']['name'].NAME_DELIMITER.$graphPrototype['name'];
+	}
+
+	if ($this->data['screen']['templateid']) {
+		$selectButton = new CButton('select', _('Select'),
+			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
+			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+			'&only_hostid='.$this->data['screen']['templateid'].
+			'&templated_hosts=1&writeonly=1", 800, 450);',
+			'formlist'
+		);
+	}
+	else {
+		$selectButton = new CButton('select', _('Select'),
+			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
+			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+			'&real_hosts=1&writeonly=1", 800, 450);',
+			'formlist'
+		);
+	}
+
+	$screenFormList->addVar('resourceid', $id);
+	$screenFormList->addRow(_('Graph name'), array(
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		$selectButton
+	));
+
+	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
 }
 
 /*
@@ -166,23 +218,73 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&templated=1&writeonly=1&numeric=1", 800, 450);', 'formlist'
+				'&writeonly=1&numeric=1", 800, 450);', 'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&templated=0&numeric=1", 800, 450);',
+				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&numeric=1", 800, 450);',
 			'formlist'
 		);
 	}
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
+}
+
+/*
+ * Screen item: Simple graph prototype
+ */
+elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
+	$caption = '';
+	$id = 0;
+
+	$items = API::ItemPrototype()->get(array(
+		'output' => array('hostid', 'key_', 'name'),
+		'itemids' => $resourceId,
+		'selectHosts' => array('name')
+	));
+
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+
+		$id = $resourceId;
+		$item = reset($items);
+		$item['host'] = reset($item['hosts']);
+
+		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
+	}
+
+	if ($this->data['screen']['templateid']) {
+		$selectButton = new CButton('select', _('Select'),
+			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
+				'&writeonly=1&numeric=1", 800, 450);',
+			'formlist'
+		);
+	}
+	else {
+		$selectButton = new CButton('select', _('Select'),
+			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&numeric=1", 800, 450);',
+			'formlist'
+		);
+	}
+
+	$screenFormList->addVar('resourceid', $id);
+	$screenFormList->addRow(_('Parameter'), array(
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		$selectButton
+	));
+
+	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
 }
 
 /*
@@ -204,7 +306,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -248,15 +350,15 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
-				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&writeonly=1&templated=0", 800, 450);',
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption&real_hosts=1'.
+				'&writeonly=1", 800, 450);',
 			'formlist'
 		);
 	}
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	));
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
@@ -288,7 +390,13 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
-			'selectedLimit' => 1
+			'selectedLimit' => 1,
+			'popup' => array(
+				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=groupid&writeonly=1',
+				'width' => 450,
+				'height' => 450
+			)
 		)));
 	}
 	else {
@@ -310,7 +418,13 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
-			'selectedLimit' => 1
+			'selectedLimit' => 1,
+			'popup' => array(
+				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=hostid&writeonly=1',
+				'width' => 450,
+				'height' => 450
+			)
 		)));
 	}
 
@@ -377,7 +491,13 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
-		'selectedLimit' => 1
+		'selectedLimit' => 1,
+		'popup' => array(
+			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+				'&srcfld1=groupid&writeonly=1',
+			'width' => 450,
+			'height' => 450
+		)
 	)));
 	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
 }
@@ -411,7 +531,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Parameter'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
@@ -445,7 +565,13 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 		'defaultValue' => 0,
-		'selectedLimit' => 1
+		'selectedLimit' => 1,
+		'popup' => array(
+			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+				'&srcfld1=groupid&writeonly=1',
+			'width' => 450,
+			'height' => 450
+		)
 	)));
 }
 
@@ -453,7 +579,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
  * Screen item: Clock
  */
 elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
-	$caption = get_request('caption', '');
+	$caption = getRequest('caption', '');
 
 	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
 		$items = API::Item()->get(array(
@@ -494,7 +620,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 			);
 		}
 		$screenFormList->addRow(_('Parameter'), array(
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			$selectButton
 		));
 	}
@@ -511,8 +637,8 @@ else {
  */
 if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_HORISONTAL, null, 'style_'.STYLE_HORISONTAL, $style == STYLE_HORISONTAL),
-		new CLabel(_('Horizontal'), 'style_'.STYLE_HORISONTAL),
+		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style == STYLE_HORIZONTAL),
+		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
 		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
 		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
 	);
@@ -532,13 +658,21 @@ else {
 }
 
 if (in_array($resourceType, array(SCREEN_RESOURCE_URL))) {
-	$screenFormList->addRow(_('Url'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
+	$screenFormList->addRow(_('URL'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
 }
 else {
 	$screenFormList->addVar('url', '');
 }
 
-if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_URL))) {
+$resourcesWithWidthAndHeight = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if (in_array($resourceType, $resourcesWithWidthAndHeight)) {
 	$screenFormList->addRow(_('Width'), new CNumericBox('width', $width, 5));
 	$screenFormList->addRow(_('Height'), new CNumericBox('height', $height, 5));
 }
@@ -547,8 +681,17 @@ else {
 	$screenFormList->addVar('height', 100);
 }
 
-if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_MAP, SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_URL))) {
-	$hightAlignRadioButton = array(
+$resourcesWithHAlign = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_MAP,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if (in_array($resourceType, $resourcesWithHAlign)) {
+	$hAlignRadioButton = array(
 		new CRadioButton('halign', HALIGN_LEFT, null, 'halign_'.HALIGN_LEFT, $halign == HALIGN_LEFT),
 		new CLabel(_('Left'), 'halign_'.HALIGN_LEFT),
 		new CRadioButton('halign', HALIGN_CENTER, null, 'halign_'.HALIGN_CENTER, $halign == HALIGN_CENTER),
@@ -556,13 +699,13 @@ if (in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_
 		new CRadioButton('halign', HALIGN_RIGHT, null, 'halign_'.HALIGN_RIGHT, $halign == HALIGN_RIGHT),
 		new CLabel(_('Right'), 'halign_'.HALIGN_RIGHT)
 	);
-	$screenFormList->addRow(_('Horizontal align'), new CDiv($hightAlignRadioButton, 'jqueryinputset'));
+	$screenFormList->addRow(_('Horizontal align'), new CDiv($hAlignRadioButton, 'jqueryinputset'));
 }
 else {
 	$screenFormList->addVar('halign', 0);
 }
 
-$verticalAlignRadioButton = array(
+$vAlignRadioButton = array(
 	new CRadioButton('valign', VALIGN_TOP, null, 'valign_'.VALIGN_TOP, $valign == VALIGN_TOP),
 	new CLabel(_('Top'), 'valign_'.VALIGN_TOP),
 	new CRadioButton('valign', VALIGN_MIDDLE, null, 'valign_'.VALIGN_MIDDLE, $valign == VALIGN_MIDDLE),
@@ -570,12 +713,20 @@ $verticalAlignRadioButton = array(
 	new CRadioButton('valign', VALIGN_BOTTOM, null, 'valign_'.VALIGN_BOTTOM, $valign == VALIGN_BOTTOM),
 	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
 );
-$screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton, 'jqueryinputset'));
+$screenFormList->addRow(_('Vertical align'), new CDiv($vAlignRadioButton, 'jqueryinputset'));
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
 // dynamic addon
-if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
+$resourcesWithDynamic = array(
+	SCREEN_RESOURCE_GRAPH,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_PLAIN_TEXT,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_LLD_GRAPH,
+	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+);
+if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourcesWithDynamic)) {
 	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
 }
 

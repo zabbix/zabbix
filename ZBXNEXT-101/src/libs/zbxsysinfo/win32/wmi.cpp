@@ -35,8 +35,6 @@ static int	com_initialized = 0;
 
 extern "C" int	zbx_co_initialize()
 {
-	static int	initialized = 0;
-
 	if (0 == com_initialized)
 	{
 		HRESULT	hres;
@@ -86,10 +84,16 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int			ret = SYSINFO_RET_FAIL;
 
 	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (SUCCEED != zbx_co_initialize())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize COM library."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	wmi_namespace = get_rparam(request, 0);
 	wmi_query = get_rparam(request, 1);
@@ -227,5 +231,9 @@ out:
 	if (0 != pLoc)
 		pLoc->Release();
 
+
+	if (SYSINFO_RET_FAIL == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain WMI information."));
+
 	return ret;
-};
+}

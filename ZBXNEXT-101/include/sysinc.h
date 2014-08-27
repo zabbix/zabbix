@@ -56,7 +56,7 @@
 
 #ifdef HAVE_WINDOWS_H
 /* to speed build process and reduce size of the Win32 header files */
-#define WIN32_LEAN_AND_MEAN	1
+#	define WIN32_LEAN_AND_MEAN	1
 #	include <windows.h>
 #endif
 
@@ -131,9 +131,9 @@
 #endif
 
 #ifdef HAVE_ARPA_NAMESER_H
-#ifdef MAC_OS_X
-#	define BIND_8_COMPAT 1
-#endif
+#	ifdef MAC_OS_X
+#		define BIND_8_COMPAT 1
+#	endif
 #	include <arpa/nameser.h>
 #endif
 
@@ -382,6 +382,10 @@
 #	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
 #		define curl_easy_escape(handle, string, length) curl_escape(string, length)
 #	endif
+#	if 0x071004 >= LIBCURL_VERSION_NUM	/* version 7.16.4 */
+#		define CURLOPT_KEYPASSWD	CURLOPT_SSLKEYPASSWD
+#	endif
+#	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
 /* Net-SNMP is used */

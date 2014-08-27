@@ -202,6 +202,13 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+/* web monitoring */
+#ifdef HAVE_LIBCURL
+char	*CONFIG_SSL_CA_LOCATION		= NULL;
+char	*CONFIG_SSL_CERT_LOCATION	= NULL;
+char	*CONFIG_SSL_KEY_LOCATION	= NULL;
+#endif
+
 int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
 {
 	int	server_count = 0;
@@ -357,18 +364,22 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_FPING_LOCATION)
 		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
-
 #ifdef HAVE_IPV6
 	if (NULL == CONFIG_FPING6_LOCATION)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
-
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+#ifdef HAVE_LIBCURL
+	if (NULL == CONFIG_SSL_CERT_LOCATION)
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
 
+	if (NULL == CONFIG_SSL_KEY_LOCATION)
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+#endif
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
 
@@ -390,15 +401,27 @@ static void	zbx_set_defaults()
  ******************************************************************************/
 static void	zbx_validate_config(void)
 {
+	char	*ch_error;
+
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter '%s': %s", CONFIG_HOSTNAME,
+				ch_error);
+		zbx_free(ch_error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_IPMIPOLLER_FORKS +
+			CONFIG_JAVAPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
+				" if regular, IPMI or Java pollers are started");
 		exit(EXIT_FAILURE);
 	}
 
@@ -568,6 +591,14 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
+#ifdef HAVE_LIBCURL
+		{"SSLCALocation",		&CONFIG_SSL_CA_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"SSLCertLocation",		&CONFIG_SSL_CERT_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
 		{NULL}
 	};
 
@@ -668,15 +699,15 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			default:
 				usage();
-				exit(-1);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -799,7 +830,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -956,5 +987,5 @@ void	zbx_on_exit()
 	setproctitle_free_env();
 #endif
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }

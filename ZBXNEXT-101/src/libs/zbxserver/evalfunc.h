@@ -26,8 +26,6 @@
 #define ZBX_FLAG_SEC	0
 #define ZBX_FLAG_VALUES	1
 
-int	cmp_double(double a, double b);
-
 int	evaluate_macro_function(char *value, const char *host, const char *key,
 		const char *function, const char *parameter);
 

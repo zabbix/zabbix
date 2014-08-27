@@ -54,7 +54,10 @@ $fields = array(
 	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -94,8 +97,8 @@ $pageFilter = new CPageFilter(array(
 		'monitored_hosts' => true,
 		'with_monitored_triggers' => true
 	),
-	'hostid' => getRequest('hostid', null),
-	'groupid' => getRequest('groupid', null)
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
@@ -123,51 +126,28 @@ if (hasRequest('filter_set')) {
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
-
-	if (hasRequest('show_events')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			if (!str_in_array($showEvents, array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
-				$showEvents = EVENTS_OPTION_NOEVENT;
-			}
-		}
-
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED || $showEvents != EVENTS_OPTION_NOT_ACK) {
 		CProfile::update('web.tr_status.filter.show_events', $showEvents, PROFILE_TYPE_INT);
 	}
 
 	// ack status
-	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
-
-	if (hasRequest('ack_status')) {
-		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-			$ackStatus = ZBX_ACK_STS_ANY;
-		}
-
-		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
+	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
+		CProfile::update('web.tr_status.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
 	}
 
 	// update host inventory filter
-	$i = 0;
+	$inventoryFields = array();
+	$inventoryValues = array();
 	foreach (getRequest('inventory', array()) as $field) {
 		if ($field['value'] === '') {
 			continue;
 		}
 
-		CProfile::update('web.tr_status.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
-		CProfile::update('web.tr_status.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
-
-		$i++;
+		$inventoryFields[] = $field['field'];
+		$inventoryValues[] = $field['value'];
 	}
-
-	// delete remaining old values
-	$idx2 = array();
-	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
-		$idx2[] = $i;
-
-		$i++;
-	}
-
-	CProfile::delete('web.tr_status.filter.inventory.field', $idx2);
-	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
+	CProfile::updateArray('web.tr_status.filter.inventory.field', $inventoryFields, PROFILE_TYPE_STR);
+	CProfile::updateArray('web.tr_status.filter.inventory.value', $inventoryValues, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -212,25 +192,27 @@ $filter = array(
 	'application' => CProfile::get('web.tr_status.filter.application', ''),
 	'inventory' => array()
 );
-$i = 0;
-while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+
+foreach (CProfile::getArray('web.tr_status.filter.inventory.field', array()) as $i => $field) {
 	$filter['inventory'][] = array(
-		'field' => CProfile::get('web.tr_status.filter.inventory.field', null, $i),
+		'field' => $field,
 		'value' => CProfile::get('web.tr_status.filter.inventory.value', null, $i)
 	);
-
-	$i++;
 }
 
 /*
  * Page sorting
  */
-validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'lastchange'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_DOWN));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 /*
  * Display
  */
-$triggerWidget = new CWidget(null, 'trigger-mon');
+$triggerWidget = new CWidget();
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
@@ -238,112 +220,33 @@ $rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $triggerWidget->addPageHeader(
-	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
+	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $triggerWidget->addHeader(_('Triggers'), $rightForm);
 $triggerWidget->addHeaderRowNumber();
 
-/*
- * Filter
- */
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
-$filterForm->addVar('groupid', $_REQUEST['groupid']);
-$filterForm->addVar('hostid', $_REQUEST['hostid']);
-
-$statusComboBox = new CComboBox('show_triggers', $showTriggers);
-$statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_RECENT_PROBLEM, _('Recent problem'));
-$statusComboBox->additem(TRIGGERS_OPTION_IN_PROBLEM, _('Problem'));
-$filterForm->addRow(_('Triggers status'), $statusComboBox);
-
-if ($config['event_ack_enable']) {
-	$ackStatusComboBox = new CComboBox('ack_status', $ackStatus);
-	$ackStatusComboBox->addItem(ZBX_ACK_STS_ANY, _('Any'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_UNACK, _('With unacknowledged events'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_LAST_UNACK, _('With last event unacknowledged'));
-	$filterForm->addRow(_('Acknowledge status'), $ackStatusComboBox);
-}
-
-$eventsComboBox = new CComboBox('show_events', $showEvents);
-$eventsComboBox->addItem(EVENTS_OPTION_NOEVENT, _('Hide all'));
-$eventsComboBox->addItem(EVENTS_OPTION_ALL, _('Show all').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-if ($config['event_ack_enable']) {
-	$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-}
-$filterForm->addRow(_('Events'), $eventsComboBox);
-
-$severityComboBox = new CComboBox('show_severity', $showSeverity);
-$severityComboBox->addItems(array(
-	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
-));
-$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
-
-$statusChangeDays = new CNumericBox('status_change_days', $statusChangeBydays, 3, false, false, false);
-if (!$showChange) {
-	$statusChangeDays->setAttribute('disabled', 'disabled');
-}
-$statusChangeDays->addStyle('vertical-align: middle;');
-
-$statusChangeCheckBox = new CCheckBox('status_change', $showChange, 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1);
-$statusChangeCheckBox->addStyle('vertical-align: middle;');
-
-$daysSpan = new CSpan(_('days'));
-$daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $showDetails, null, 1));
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $txtSelect, 40));
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $filter['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-			'&dstfrm='.$filterForm->getName().'");',
-		'filter-button'
+// filter
+$filterFormView = new CView('common.filter.trigger', array(
+	'overview' => false,
+	'filter' => array(
+		'showTriggers' => $showTriggers,
+		'ackStatus' => $ackStatus,
+		'showEvents' => $showEvents,
+		'showSeverity' => $showSeverity,
+		'statusChange' => $showChange,
+		'statusChangeDays' => $statusChangeBydays,
+		'showDetails' => $showDetails,
+		'txtSelect' => $txtSelect,
+		'application' => $filter['application'],
+		'inventory' => $filter['inventory'],
+		'showMaintenance' => $showMaintenance,
+		'hostId' => getRequest('hostid'),
+		'groupId' => getRequest('groupid'),
+		'fullScreen' => getRequest('fullscreen')
 	)
 ));
-
-// inventory filter
-$inventoryFilters = $filter['inventory'];
-if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
-	);
-}
-$inventoryFields = array();
-foreach (getHostInventories() as $inventory) {
-	$inventoryFields[$inventory['db_field']] = $inventory['title'];
-}
-
-$inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
-$i = 0;
-foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
-
-	$i++;
-}
-$inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
-);
-$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
-
-// maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $showMaintenance, null, 1));
-
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm = $filterFormView->render();
 
 $triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 
@@ -383,28 +286,25 @@ $triggerTable = new CTableInfo(_('No triggers found.'));
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
-	make_sorting_header(_('Severity'), 'priority'),
+	make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 	_('Status'),
 	_('Info'),
-	make_sorting_header(_('Last change'), 'lastchange'),
+	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
 	_('Host'),
-	make_sorting_header(_('Name'), 'description'),
-	_('Comments')
+	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
+	_('Description')
 ));
 
 // get triggers
-$sortfield = getPageSortField('description');
-$sortorder = getPageSortOrder();
 $options = array(
-	'output' => array('triggerid', $sortfield),
-	'output' => array('triggerid', $sortfield),
+	'output' => array('triggerid', $sortField),
 	'monitored' => true,
 	'skipDependent' => true,
-	'sortfield' => $sortfield,
-	'sortorder' => $sortorder,
+	'sortfield' => $sortField,
+	'sortorder' => $sortOrder,
 	'limit' => $config['search_limit'] + 1
 );
 
@@ -471,14 +371,22 @@ if (!$showMaintenance) {
 }
 $triggers = API::Trigger()->get($options);
 
-order_result($triggers, $sortfield, $sortorder);
+order_result($triggers, $sortField, $sortOrder);
 $paging = getPagingLine($triggers);
 
 
 $triggers = API::Trigger()->get(array(
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
-	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
+	'selectHosts' => array(
+		'hostid',
+		'name',
+		'description',
+		'status',
+		'maintenanceid',
+		'maintenance_status',
+		'maintenance_type'
+	),
 	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
@@ -486,7 +394,7 @@ $triggers = API::Trigger()->get(array(
 	'preservekeys' => true
 ));
 
-order_result($triggers, $sortfield, $sortorder);
+order_result($triggers, $sortField, $sortOrder);
 
 // sort trigger hosts by name
 foreach ($triggers as &$trigger) {
@@ -508,7 +416,7 @@ $triggerEditable = API::Trigger()->get(array(
 
 // get events
 if ($config['event_ack_enable']) {
-	// get all unacknowledged events, if trigger has unacknowledged even => it has events
+	// get all unacknowledged events, if trigger has unacknowledged event => it has events
 	$eventCounts = API::Event()->get(array(
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -592,7 +500,7 @@ foreach ($triggers as $tnum => $trigger) {
 
 // get hosts
 $hosts = API::Host()->get(array(
-	'output' => array('hostid'),
+	'output' => array('hostid', 'status'),
 	'hostids' => $hostIds,
 	'preservekeys' => true,
 	'selectGraphs' => API_OUTPUT_COUNT,
@@ -630,7 +538,7 @@ foreach ($triggers as $trigger) {
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? 'showgraph' : 'showvalues'
+					? HISTORY_GRAPH : HISTORY_VALUES
 			)
 		);
 	}
@@ -639,7 +547,11 @@ foreach ($triggers as $trigger) {
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
 
 	if ($showDetails) {
-		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
+		$description = array(
+			$description,
+			BR(),
+			new CDiv(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+		);
 	}
 
 	if (!empty($trigger['dependencies'])) {
@@ -651,7 +563,7 @@ foreach ($triggers as $trigger) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 
@@ -672,7 +584,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
 		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 		$img->setHint($dependenciesTable);
 
@@ -748,7 +660,7 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
-	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
+	$lastChangeDate = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']);
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
@@ -812,7 +724,7 @@ foreach ($triggers as $trigger) {
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], '', 'on');
+		$unknown->setHint($trigger['error'], 'on');
 	}
 
 	// comments
@@ -865,7 +777,7 @@ foreach ($triggers as $trigger) {
 				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])
 				: SPACE;
 
-			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $event['clock']),
+			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']);
 
 			$nextClock = isset($trigger['events'][$enum - 1]) ? $trigger['events'][$enum - 1]['clock'] : time();
@@ -901,8 +813,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$goComboBox = new CComboBox('go');
-	$goComboBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
+	$goComboBox = new CComboBox('action');
+	$goComboBox->addItem('trigger.bulkacknowledge', _('Bulk acknowledge'));
 
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
@@ -920,7 +832,5 @@ $triggerWidget->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
-
-require_once dirname(__FILE__).'/include/views/js/monitoring.triggers.js.php';
 
 require_once dirname(__FILE__).'/include/page_footer.php';

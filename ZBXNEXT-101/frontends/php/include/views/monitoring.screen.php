@@ -85,10 +85,10 @@ else {
 			'hosts' => array(
 				'monitored_hosts' => true,
 				'with_items' => true,
-				'DDFirstLabel' => _('Default')
+				'DDFirstLabel' => _('not selected')
 			),
-			'hostid' => get_request('hostid', null),
-			'groupid' => get_request('groupid', null)
+			'hostid' => getRequest('hostid'),
+			'groupid' => getRequest('groupid')
 		));
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
@@ -105,8 +105,8 @@ else {
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $screen['screenid'],
-		'groupid' => get_request('groupid'),
-		'hostid' => get_request('hostid'),
+		'groupid' => getRequest('groupid'),
+		'hostid' => getRequest('hostid'),
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime']
 	));

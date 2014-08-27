@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['hosts'])) {
+if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
 	$page['file'] = 'zbx_export_hosts.xml';
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
@@ -77,10 +77,14 @@ $fields = array(
 	'macro_new' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
 	'value_new' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		'isset({macro_add})'),
 	'macro_add' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'massupdate' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN('"host.export","host.massdelete","host.massdisable","host.massenable","host.massupdate"'.
+								',"host.massupdateform"'
+							),
+							null
+						),
 	'add_to_group' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
 	'delete_from_group' => array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
 	'unlink' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
@@ -92,7 +96,7 @@ $fields = array(
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,			null),
 	// filter
 	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
@@ -101,20 +105,20 @@ $fields = array(
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
-$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
 
@@ -129,7 +133,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit;
 }
 
-$hostIds = get_request('hosts', array());
+$hostIds = getRequest('hosts', array());
 
 /*
  * Export
@@ -177,11 +181,11 @@ $filter['port'] = CProfile::get('web.hosts.filter_port', '');
  * Actions
  */
 if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
-	$_REQUEST['templates'] = get_request('templates', array());
+	$_REQUEST['templates'] = getRequest('templates', array());
 	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
 }
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
-	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
+	$_REQUEST['clear_templates'] = getRequest('clear_templates', array());
 
 	$unlinkTemplates = array();
 
@@ -210,11 +214,11 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'full_clone';
 }
-elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQUEST['masssave'])) {
-	$hostIds = get_request('hosts', array());
-	$visible = get_request('visible', array());
-	$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
-	$_REQUEST['templates'] = get_request('templates', array());
+elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
+	$hostIds = getRequest('hosts', array());
+	$visible = getRequest('visible', array());
+	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
+	$_REQUEST['templates'] = getRequest('templates', array());
 
 	try {
 		DBstart();
@@ -243,13 +247,13 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		if (isset($visible['inventory_mode'])) {
-			$newValues['inventory_mode'] = get_request('inventory_mode', HOST_INVENTORY_DISABLED);
+			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
-				? array() : get_request('host_inventory', array());
+				? array() : getRequest('host_inventory', array());
 		}
 
 		$templateIds = array();
-		if (isset($visible['template_table'])) {
+		if (isset($visible['templates'])) {
 			$templateIds = $_REQUEST['templates'];
 		}
 
@@ -332,7 +336,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if ($templateIds && isset($visible['template_table'])) {
+		if ($templateIds && isset($visible['templates'])) {
 			$add['templates'] = $templateIds;
 		}
 
@@ -353,8 +357,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 
 		DBend(true);
 
+		uncheckTableRows();
 		show_message(_('Hosts updated'));
-		clearCookies(true);
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
 	}
@@ -395,6 +399,7 @@ elseif (hasRequest('save')) {
 			$host = array(
 				'hostid' => $hostId,
 				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+				'description' => getRequest('description', ''),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? array()
 					: getRequest('host_inventory', array())
@@ -415,6 +420,13 @@ elseif (hasRequest('save')) {
 				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 					unset($interface[$key]);
 					continue;
+				}
+
+				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
+					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
+				}
+				else {
+					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
 				}
 
 				if ($interface['isNew']) {
@@ -442,7 +454,7 @@ elseif (hasRequest('save')) {
 				}
 				else {
 					// transform macros to uppercase {$aaa} => {$AAA}
-					$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
+					$macros[$key]['macro'] = mb_strtoupper($macro['macro']);
 				}
 			}
 
@@ -532,6 +544,11 @@ elseif (hasRequest('save')) {
 				throw new Exception();
 			}
 
+			// copy web scenarios
+			if (!copyHttpTests($srcHostId, $hostId)) {
+				throw new Exception();
+			}
+
 			// copy triggers
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid'),
@@ -590,8 +607,10 @@ elseif (hasRequest('save')) {
 
 		$result = DBend(true);
 
+		if ($result) {
+			uncheckTableRows();
+		}
 		show_messages($result, $msgOk, $msgFail);
-		clearCookies($result);
 
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 	}
@@ -602,39 +621,37 @@ elseif (hasRequest('save')) {
 
 	unset($_REQUEST['save']);
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
+elseif (hasRequest('delete') && hasRequest('hostid')) {
 	DBstart();
 
-	$result = API::Host()->delete(array($_REQUEST['hostid']));
+	$result = API::Host()->delete(array(getRequest('hostid')));
 	$result = DBend($result);
-
-	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
+		uncheckTableRows();
 	}
+	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 
 	unset($_REQUEST['delete']);
-	clearCookies($result);
 }
-elseif ($_REQUEST['go'] == 'delete') {
-	$hostIds = get_request('hosts', array());
-
+elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && hasRequest('hosts')) {
 	DBstart();
 
-	$goResult = API::Host()->delete($hostIds);
-	$goResult = DBend($goResult);
+	$result = API::Host()->delete(getRequest('hosts'));
+	$result = DBend($result);
 
-	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
-	clearCookies($goResult);
+	if ($result) {
+		uncheckTableRows();
+	}
+	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
-	$enable =(getRequest('go') == 'activate');
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.massenable', 'host.massdisable')) && hasRequest('hosts')) {
+	$enable =(getRequest('action') == 'host.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-	$hosts = getRequest('hosts', array());
 
 	$actHosts = API::Host()->get(array(
-		'hostids' => $hosts,
+		'hostids' => getRequest('hosts'),
 		'editable' => true,
 		'templated_hosts' => true,
 		'output' => array('hostid')
@@ -647,6 +664,10 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 		$result = updateHostStatus($actHosts, $status);
 		$result = DBend($result);
 
+		if ($result) {
+			uncheckTableRows();
+		}
+
 		$updated = count($actHosts);
 
 		$messageSuccess = $enable
@@ -657,7 +678,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 			: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 }
 
@@ -671,32 +691,32 @@ $pageFilter = new CPageFilter(array(
 		'real_hosts' => true,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null)
+	'groupid' => getRequest('groupid')
 ));
 
 $_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = get_request('hostid', 0);
+$_REQUEST['hostid'] = getRequest('hostid', 0);
 
-if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
+if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && hasRequest('hosts')) {
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
 	$data = array(
-		'hosts' => get_request('hosts', array()),
-		'visible' => get_request('visible', array()),
-		'mass_replace_tpls' => get_request('mass_replace_tpls'),
-		'mass_clear_tpls' => get_request('mass_clear_tpls'),
-		'groups' => get_request('groups', array()),
-		'newgroup' => get_request('newgroup', ''),
-		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+		'hosts' => getRequest('hosts'),
+		'visible' => getRequest('visible', array()),
+		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
+		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
+		'groups' => getRequest('groups', array()),
+		'newgroup' => getRequest('newgroup', ''),
+		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
-		'proxy_hostid' => get_request('proxy_hostid', ''),
-		'ipmi_authtype' => get_request('ipmi_authtype', -1),
-		'ipmi_privilege' => get_request('ipmi_privilege', 2),
-		'ipmi_username' => get_request('ipmi_username', ''),
-		'ipmi_password' => get_request('ipmi_password', ''),
-		'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED),
-		'host_inventory' => get_request('host_inventory', array()),
-		'templates' => get_request('templates', array())
+		'proxy_hostid' => getRequest('proxy_hostid', ''),
+		'ipmi_authtype' => getRequest('ipmi_authtype', -1),
+		'ipmi_privilege' => getRequest('ipmi_privilege', 2),
+		'ipmi_username' => getRequest('ipmi_username', ''),
+		'ipmi_password' => getRequest('ipmi_password', ''),
+		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
+		'host_inventory' => getRequest('host_inventory', array()),
+		'templates' => getRequest('templates', array())
 	);
 
 	// sort templates
@@ -746,7 +766,7 @@ elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
 	$data = array();
-	if ($hostId = get_request('hostid', 0)) {
+	if ($hostId = getRequest('hostid', 0)) {
 		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
 
 		$dbHosts = API::Host()->get(array(
@@ -775,12 +795,18 @@ elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->addItem($hostForm->render());
 
 	$rootClass = 'host-edit';
-	if (get_request('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	if (getRequest('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		$rootClass .= ' host-edit-discovered';
 	}
 	$hostsWidget->setRootClass($rootClass);
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -799,7 +825,7 @@ else {
 	$hostsWidget->setRootClass('host-list');
 
 	// filter
-	$filterTable = new CTable('', 'filter');
+	$filterTable = new CTable('', 'filter filter-center');
 	$filterTable->addRow(array(
 		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
 		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
@@ -816,7 +842,7 @@ else {
 	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');
 
-	$filterTable->addRow(new CCol($divButtons, 'center', 4));
+	$filterTable->addRow(new CCol($divButtons, 'controls', 4));
 
 	$filterForm = new CForm('get');
 	$filterForm->setAttribute('name', 'zbx_filter');
@@ -832,7 +858,7 @@ else {
 	$table = new CTableInfo(_('No hosts found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-		make_sorting_header(_('Name'), 'name'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -841,23 +867,20 @@ else {
 		_('Web'),
 		_('Interface'),
 		_('Templates'),
-		make_sorting_header(_('Status'), 'status'),
+		make_sorting_header(_('Status'), 'status', $sortField, $sortOrder),
 		_('Availability')
 	));
 
 	// get Hosts
 	$hosts = array();
 
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
-
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid', 'name', 'status'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
+			'sortfield' => $sortField,
+			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
 				'name' => ($filter['host'] === '') ? null : $filter['host'],
@@ -874,8 +897,8 @@ else {
 	}
 
 	// sorting && paging
-	order_result($hosts, $sortfield, $sortorder);
-	$paging = getPagingLine($hosts, array('hostid'));
+	order_result($hosts, $sortField, $sortOrder);
+	$paging = getPagingLine($hosts);
 
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
@@ -891,7 +914,7 @@ else {
 		'selectDiscoveryRule' => array('itemid', 'name'),
 		'selectHostDiscovery' => array('ts_delete')
 	));
-	order_result($hosts, $sortfield, $sortorder);
+	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
 	$templateIds = array();
@@ -955,33 +978,24 @@ else {
 
 		$statusScript = null;
 
-		switch ($host['status']) {
-			case HOST_STATUS_MONITORED:
-				if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					$statusCaption = _('In maintenance');
-					$statusClass = 'orange';
-				}
-				else {
-					$statusCaption = _('Enabled');
-					$statusClass = 'enabled';
-				}
+		if ($host['status'] == HOST_STATUS_MONITORED) {
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$statusCaption = _('In maintenance');
+				$statusClass = 'orange';
+			}
+			else {
+				$statusCaption = _('Enabled');
+				$statusClass = 'enabled';
+			}
 
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=disable'.url_param('groupid');
-				break;
-
-			case HOST_STATUS_NOT_MONITORED:
-				$statusCaption = _('Disabled');
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=activate'.url_param('groupid');
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
-				$statusClass = 'disabled';
-				break;
-
-			default:
-				$statusCaption = _('Unknown');
-				$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
-				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=disable'.url_param('groupid');
-				$statusClass = 'unknown';
+			$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
+			$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
+		}
+		else {
+			$statusCaption = _('Disabled');
+			$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
+			$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
+			$statusClass = 'disabled';
 		}
 
 		$status = new CLink($statusCaption, $statusUrl, $statusClass, $statusScript);
@@ -1047,18 +1061,23 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('go');
-	$goBox->addItem('export', _('Export selected'));
-	$goBox->addItem('massupdate', _('Mass update'));
-	$goOption = new CComboItem('activate', _('Enable selected'));
+	$goBox = new CComboBox('action');
+
+	$goBox->addItem('host.export', _('Export selected'));
+
+	$goBox->addItem('host.massupdateform', _('Mass update'));
+	$goOption = new CComboItem('host.massenable', _('Enable selected'));
 	$goOption->setAttribute('confirm', _('Enable selected hosts?'));
 	$goBox->addItem($goOption);
-	$goOption = new CComboItem('disable', _('Disable selected'));
+
+	$goOption = new CComboItem('host.massdisable', _('Disable selected'));
 	$goOption->setAttribute('confirm', _('Disable selected hosts?'));
 	$goBox->addItem($goOption);
-	$goOption = new CComboItem('delete', _('Delete selected'));
+
+	$goOption = new CComboItem('host.massdelete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected hosts?'));
 	$goBox->addItem($goOption);
+
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 

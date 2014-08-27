@@ -146,6 +146,16 @@ jQuery(function($) {
 				this.refreshProfile(id, ajaxUrl);
 			}
 
+			// SCREEN_RESOURCE_LLD_GRAPH
+			else if (screen.resourcetype == 20) {
+				this.refreshProfile(id, ajaxUrl);
+			}
+
+			// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+			else if (screen.resourcetype == 19) {
+				this.refreshProfile(id, ajaxUrl);
+			}
+
 			// SCREEN_RESOURCE_PLAIN_TEXT
 			else if (screen.resourcetype == 3) {
 				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
@@ -390,7 +400,7 @@ jQuery(function($) {
 		},
 
 		getCalculatedSTime: function(screen) {
-			if (!empty(timeControl.timeline) && screen.timeline.period >= timeControl.timeline.maxperiod) {
+			if (!empty(timeControl.timeline) && screen.timeline.period > timeControl.timeline.maxperiod) {
 				return new CDate(timeControl.timeline.starttime() * 1000).getZBXDate();
 			}
 

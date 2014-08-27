@@ -58,6 +58,8 @@ typedef enum
 }
 zbx_graph_item_type;
 
+struct	_DC_TRIGGER;
+
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -76,7 +78,7 @@ zbx_graph_item_type;
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
-#define HOST_NAME_LEN			64
+#define HOST_NAME_LEN			128
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		(HOST_ERROR_LEN + 1)
 #define HOST_IPMI_USERNAME_LEN		16
@@ -99,7 +101,7 @@ zbx_graph_item_type;
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
-#define ITEM_ERROR_LEN			128
+#define ITEM_ERROR_LEN			2048
 #define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
 #define ITEM_TRAPPER_HOSTS_LEN		255
 #define ITEM_TRAPPER_HOSTS_LEN_MAX	(ITEM_TRAPPER_HOSTS_LEN + 1)
@@ -162,12 +164,9 @@ zbx_graph_item_type;
 
 #define DSERVICE_KEY_LEN		255
 #define DSERVICE_VALUE_LEN		255
-#define DSERVICE_VALUE_LEN_MAX		(DSERVICE_VALUE_LEN + 1)
 
 #define HTTPTEST_HTTP_USER_LEN		64
-#define HTTPTEST_HTTP_USER_LEN_MAX	(HTTPTEST_HTTP_USER_LEN + 1)
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
-#define HTTPTEST_HTTP_PASSWORD_LEN_MAX	(HTTPTEST_HTTP_PASSWORD_LEN + 1)
 
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
@@ -251,7 +250,7 @@ typedef struct
 	int		status;
 	int		lastup;
 	int		lastdown;
-	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		*value;
 }
 DB_DSERVICE;
 
@@ -368,12 +367,18 @@ typedef struct
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*variables;
+	char		*headers;
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
 	char		*http_proxy;
+	char		*ssl_cert_file;
+	char		*ssl_key_file;
+	char		*ssl_key_password;
 	int		authentication;
 	int		retries;
+	int		verify_peer;
+	int		verify_host;
 }
 DB_HTTPTEST;
 
@@ -389,6 +394,9 @@ typedef struct
 	int		no;
 	int		timeout;
 	char		*variables;
+	int		follow_redirects;
+	int		retrieve_mode;
+	char		*headers;
 }
 DB_HTTPSTEP;
 
@@ -407,9 +415,9 @@ typedef struct
 DB_ESCALATION;
 
 int	DBconnect(int flag);
-void	DBinit();
+void	DBinit(void);
 
-void	DBclose();
+void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
@@ -470,8 +478,10 @@ typedef struct
 }
 ZBX_GRAPH_ITEMS;
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	process_triggers(zbx_vector_ptr_t *triggers);
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
+
+int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
@@ -498,7 +508,6 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 
@@ -513,10 +522,11 @@ void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
+void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char **values, const int num);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
-const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,

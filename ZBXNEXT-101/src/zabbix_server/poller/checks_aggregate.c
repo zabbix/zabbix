@@ -367,7 +367,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	{
 		if (FAIL == is_uint_suffix(param, &seconds))
 		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
+			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto clean2;
 		}
 		count = 0;
@@ -376,6 +376,12 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	for (i = 0; i < itemids.values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type)
@@ -480,7 +486,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (4 != num_param(params))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		return NOTSUPPORTED;
 	}
 
@@ -507,7 +513,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		item_func = ZBX_VALUE_FUNC_LAST;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return NOTSUPPORTED;
 	}
 

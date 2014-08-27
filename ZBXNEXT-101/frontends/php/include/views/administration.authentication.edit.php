@@ -60,7 +60,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	else {
-		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes');
+		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, true);
 	}
 
 	$authenticationFormList->addRow(
@@ -83,7 +83,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 				? 'uid'
 				: $this->data['config']['ldap_search_attribute'],
 			ZBX_TEXTBOX_STANDARD_SIZE,
-			'no',
+			false,
 			128
 		)
 	);
@@ -122,9 +122,9 @@ $authenticationForm->addItem($authenticationTab);
 // create save button
 $saveButton = new CSubmit('save', _('Save'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: '.
-		'if (Confirm("'._('Switching authentication method will reset all except this session! Continue?').'")) {'.
-			'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
+	$saveButton->addAction('onclick', 'javascript: if (confirm('.
+		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).')) {'.
+		'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
 	);
 }
 elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {

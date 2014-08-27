@@ -190,9 +190,10 @@ class ZBase {
 	 */
 	private function getIncludePaths() {
 		return array(
-			$this->rootDir.'/include/classes',
 			$this->rootDir.'/include/classes/core',
 			$this->rootDir.'/include/classes/api',
+			$this->rootDir.'/include/classes/api/services',
+			$this->rootDir.'/include/classes/api/managers',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
 			$this->rootDir.'/include/classes/db',
@@ -214,18 +215,27 @@ class ZBase {
 			$this->rootDir.'/include/classes/import/readers',
 			$this->rootDir.'/include/classes/import/formatters',
 			$this->rootDir.'/include/classes/items',
+			$this->rootDir.'/include/classes/triggers',
 			$this->rootDir.'/include/classes/server',
 			$this->rootDir.'/include/classes/screens',
+			$this->rootDir.'/include/classes/services',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/macros',
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
+			$this->rootDir.'/include/classes/html/pageheader',
+			$this->rootDir.'/include/classes/html/widget',
 			$this->rootDir.'/include/classes/parsers',
-			$this->rootDir.'/api/classes',
-			$this->rootDir.'/api/classes/managers',
-			$this->rootDir.'/api/rpc'
+			$this->rootDir.'/include/classes/parsers/results',
+			$this->rootDir.'/include/classes/routing',
+			$this->rootDir.'/include/classes/json',
+			$this->rootDir.'/include/classes/user',
+			$this->rootDir.'/include/classes/setup',
+			$this->rootDir.'/include/classes/regexp',
+			$this->rootDir.'/include/classes/ldap',
+			$this->rootDir.'/include/classes/pagefilter'
 		);
 	}
 
@@ -312,7 +322,7 @@ class ZBase {
 	}
 
 	/**
-	 * Initilaize translations.
+	 * Initialize translations.
 	 */
 	protected function initLocales() {
 		init_mbstrings();
@@ -365,12 +375,14 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
+		$sessionId = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+
+		if (!$sessionId) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = get_cookie('zbx_sessionid');
+		API::getWrapper()->auth = $sessionId;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();

@@ -36,7 +36,7 @@ $auditWidget->addHeaderRowNumber();
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter filter-center');
 
 $actionComboBox = new CComboBox('action', $this->data['action']);
 $actionComboBox->addItem(-1, _('All'));
@@ -103,7 +103,7 @@ foreach ($this->data['actions'] as $action) {
 	}
 
 	$auditTable->addRow(array(
-		zbx_date2str(_('d M Y H:i:s'), $action['clock']),
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 		$action['alias'],
 		$action['ip'],
 		$action['resourcetype'],

@@ -36,7 +36,7 @@ $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar($this->data['elements_field'], $this->data['elements']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('go', 'copy_to');
+$triggersForm->addVar('action', $this->data['action']);
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
@@ -106,7 +106,11 @@ $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form
 $triggersTab = new CTabView();
-$triggersTab->addTab('triggersTab', count($this->data['elements']).SPACE._('elements copy to ...'), $triggersFormList);
+
+$triggersTab->addTab('triggersTab',
+	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
+	$triggersFormList
+);
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form

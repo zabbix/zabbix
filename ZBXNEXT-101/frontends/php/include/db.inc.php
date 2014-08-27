@@ -48,7 +48,7 @@ function DBconnect(&$error) {
 		$result = false;
 	}
 	else {
-		$DB['TYPE'] = zbx_strtoupper($DB['TYPE']);
+		$DB['TYPE'] = strtoupper($DB['TYPE']);
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
@@ -78,10 +78,21 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database.';
 					$result = false;
 				}
-				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-					if ((int) $pgsql_version >= 9) {
-						// change the output format for values of type bytea from hex (the default) to escape
-						DBexecute('SET bytea_output = escape');
+				else {
+					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
+
+					if(!$schemaSet) {
+						clear_messages();
+						$error = pg_last_error();
+						$result = false;
+					}
+					else {
+						if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
+							if ((int) $pgsql_version >= 9) {
+								// change the output format for values of type bytea from hex (the default) to escape
+								DBexecute('SET bytea_output = escape');
+							}
+						}
 					}
 				}
 
@@ -424,7 +435,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 			break;
 	}
 
-	// $result is false only if an error occured
+	// $result is false only if an error occurred
 	if ($DB['TRANSACTION_NO_FAILED_SQLS'] && !$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
@@ -589,15 +600,15 @@ function DBfetch($cursor, $convertNulls = true) {
 			if ($row = oci_fetch_assoc($cursor)) {
 				$result = array();
 				foreach ($row as $key => $value) {
-					$field_type = zbx_strtolower(oci_field_type($cursor, $key));
+					$field_type = strtolower(oci_field_type($cursor, $key));
 					// Oracle does not support NULL values for string fields, so if the string is empty, it will return NULL
 					// convert it to an empty string to be consistent with other databases
 					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? '' : $value;
 
-					if (is_object($value) && (zbx_stristr($field_type, 'lob') !== false)) {
+					if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
 						$value = $value->load();
 					}
-					$result[zbx_strtolower($key)] = $value;
+					$result[strtolower($key)] = $value;
 				}
 			}
 			break;
@@ -767,7 +778,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$fieldSearch[] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+					zbx_dbstr($start.mb_strtoupper($pattern).'%').
 					" ESCAPE '!'";
 			}
 			else {
@@ -775,7 +786,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$fieldSearch[] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr(zbx_strtoupper($pattern)).
+					zbx_dbstr(mb_strtoupper($pattern)).
 					" ESCAPE '!'";
 			}
 		}

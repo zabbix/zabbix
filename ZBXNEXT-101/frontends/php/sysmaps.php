@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['maps'])) {
+if (hasRequest('action') && getRequest('action') == 'map.export' && hasRequest('maps')) {
 	$page['file'] = 'zbx_export_maps.xml';
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
@@ -70,16 +70,18 @@ $fields = array(
 	'urls' =>					array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'severity_min' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null),
 	// actions
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	// form
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null)
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,			null),
+	// sort and sortorder
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 /*
  * Permissions
@@ -103,7 +105,7 @@ else {
 }
 
 if ($isExportData) {
-	$export = new CConfigurationExport(array('maps' => get_request('maps', array())));
+	$export = new CConfigurationExport(array('maps' => getRequest('maps', array())));
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
@@ -118,8 +120,6 @@ if ($isExportData) {
 	exit;
 }
 
-$_REQUEST['go'] = get_request('go', 'none');
-
 /*
  * Actions
  */
@@ -130,25 +130,25 @@ if (isset($_REQUEST['save'])) {
 		'height' => $_REQUEST['height'],
 		'backgroundid' => $_REQUEST['backgroundid'],
 		'iconmapid' => $_REQUEST['iconmapid'],
-		'highlight' => get_request('highlight', 0),
-		'markelements' => get_request('markelements', 0),
-		'expandproblem' => get_request('expandproblem', 0),
-		'label_format' => get_request('label_format', 0),
-		'label_type_host' => get_request('label_type_host', 2),
-		'label_type_hostgroup' => get_request('label_type_hostgroup', 2),
-		'label_type_trigger' => get_request('label_type_trigger', 2),
-		'label_type_map' => get_request('label_type_map', 2),
-		'label_type_image' => get_request('label_type_image', 2),
-		'label_string_host' => get_request('label_string_host', ''),
-		'label_string_hostgroup' => get_request('label_string_hostgroup', ''),
-		'label_string_trigger' => get_request('label_string_trigger', ''),
-		'label_string_map' => get_request('label_string_map', ''),
-		'label_string_image' => get_request('label_string_image', ''),
+		'highlight' => getRequest('highlight', 0),
+		'markelements' => getRequest('markelements', 0),
+		'expandproblem' => getRequest('expandproblem', 0),
+		'label_format' => getRequest('label_format', 0),
+		'label_type_host' => getRequest('label_type_host', 2),
+		'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
+		'label_type_trigger' => getRequest('label_type_trigger', 2),
+		'label_type_map' => getRequest('label_type_map', 2),
+		'label_type_image' => getRequest('label_type_image', 2),
+		'label_string_host' => getRequest('label_string_host', ''),
+		'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
+		'label_string_trigger' => getRequest('label_string_trigger', ''),
+		'label_string_map' => getRequest('label_string_map', ''),
+		'label_string_image' => getRequest('label_string_image', ''),
 		'label_type' => $_REQUEST['label_type'],
 		'label_location' => $_REQUEST['label_location'],
-		'show_unack' => get_request('show_unack', 0),
-		'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		'urls' => get_request('urls', array())
+		'show_unack' => getRequest('show_unack', 0),
+		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		'urls' => getRequest('urls', array())
 	);
 
 	foreach ($map['urls'] as $unum => $url) {
@@ -182,10 +182,13 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result);
 }
-elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 'delete') {
+elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
 	$sysmapIds = getRequest('maps', array());
 
 	if (hasRequest('sysmapid')) {
@@ -196,7 +199,7 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 
 	$maps = API::Map()->get(array(
 		'sysmapids' => $sysmapIds,
-		'output' => array('name'),
+		'output' => array('sysmapid', 'name'),
 		'editable' => true
 	));
 	$result = API::Map()->delete($sysmapIds);
@@ -210,8 +213,11 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows();
+	}
 	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
-	clearCookies($result);
 }
 
 /*
@@ -222,30 +228,30 @@ if (isset($_REQUEST['form'])) {
 		$data = array(
 			'sysmap' => array(
 				'sysmapid' => getRequest('sysmapid'),
-				'name' => get_request('name', ''),
-				'width' => get_request('width', 800),
-				'height' => get_request('height', 600),
-				'backgroundid' => get_request('backgroundid', 0),
-				'iconmapid' => get_request('iconmapid', 0),
-				'label_format' => get_request('label_format', 0),
-				'label_type_host' => get_request('label_type_host', 2),
-				'label_type_hostgroup' => get_request('label_type_hostgroup', 2),
-				'label_type_trigger' => get_request('label_type_trigger', 2),
-				'label_type_map' => get_request('label_type_map', 2),
-				'label_type_image' => get_request('label_type_image', 2),
-				'label_string_host' => get_request('label_string_host', ''),
-				'label_string_hostgroup' => get_request('label_string_hostgroup', ''),
-				'label_string_trigger' => get_request('label_string_trigger', ''),
-				'label_string_map' => get_request('label_string_map', ''),
-				'label_string_image' => get_request('label_string_image', ''),
-				'label_type' => get_request('label_type', 0),
-				'label_location' => get_request('label_location', 0),
-				'highlight' => get_request('highlight', 0),
-				'markelements' => get_request('markelements', 0),
-				'expandproblem' => get_request('expandproblem', 0),
-				'show_unack' => get_request('show_unack', 0),
-				'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'urls' => get_request('urls', array())
+				'name' => getRequest('name', ''),
+				'width' => getRequest('width', 800),
+				'height' => getRequest('height', 600),
+				'backgroundid' => getRequest('backgroundid', 0),
+				'iconmapid' => getRequest('iconmapid', 0),
+				'label_format' => getRequest('label_format', 0),
+				'label_type_host' => getRequest('label_type_host', 2),
+				'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
+				'label_type_trigger' => getRequest('label_type_trigger', 2),
+				'label_type_map' => getRequest('label_type_map', 2),
+				'label_type_image' => getRequest('label_type_image', 2),
+				'label_string_host' => getRequest('label_string_host', ''),
+				'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
+				'label_string_trigger' => getRequest('label_string_trigger', ''),
+				'label_string_map' => getRequest('label_string_map', ''),
+				'label_string_image' => getRequest('label_string_image', ''),
+				'label_type' => getRequest('label_type', 0),
+				'label_location' => getRequest('label_location', 0),
+				'highlight' => getRequest('highlight', 0),
+				'markelements' => getRequest('markelements', 0),
+				'expandproblem' => getRequest('expandproblem', 0),
+				'show_unack' => getRequest('show_unack', 0),
+				'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+				'urls' => getRequest('urls', array())
 			)
 		);
 	}
@@ -265,8 +271,8 @@ if (isset($_REQUEST['form'])) {
 
 	// images
 	$data['images'] = API::Image()->get(array(
-		'filter' => array('imagetype' => 2),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('imageid', 'name'),
+		'filter' => array('imagetype' => IMAGE_TYPE_BACKGROUND)
 	));
 	order_result($data['images'], 'name');
 
@@ -283,12 +289,18 @@ if (isset($_REQUEST['form'])) {
 	$mapView->show();
 }
 else {
-	$data = array();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	// get maps
-	$sortField = getPageSortField('name');
-	$sortOrder = getPageSortOrder();
-
 	$data['maps'] = API::Map()->get(array(
 		'editable' => true,
 		'output' => array('sysmapid', 'name', 'width', 'height'),
@@ -299,7 +311,7 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
+	$data['paging'] = getPagingLine($data['maps']);
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

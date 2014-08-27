@@ -218,8 +218,9 @@ class CMenuPopupHelper {
 	 *
 	 * @param array  $host						host data
 	 * @param string $host['hostid']			host id
-	 * @param array  $host['graphs']			host graphs (optional)
-	 * @param array  $host['screens']			host screens (optional)
+	 * @param string $host['status']			host status
+	 * @param array  $host['graphs']			host graphs
+	 * @param array  $host['screens']			host screens
 	 * @param array  $scripts					host scripts (optional)
 	 * @param string $scripts[]['name']			script name
 	 * @param string $scripts[]['scriptid']		script id
@@ -232,8 +233,9 @@ class CMenuPopupHelper {
 		$data = array(
 			'type' => 'host',
 			'hostid' => $host['hostid'],
-			'hasGraphs' => (isset($host['graphs']) && $host['graphs']),
-			'hasScreens' => (isset($host['screens']) && $host['screens']),
+			'showGraphs' => (bool) $host['graphs'],
+			'showScreens' => (bool) $host['screens'],
+			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $hasGoTo
 		);
 
@@ -380,12 +382,14 @@ class CMenuPopupHelper {
 			'url' => resolveTriggerUrl($trigger)
 		);
 
+		$host = reset($trigger['hosts']);
+
 		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$host = reset($trigger['hosts']);
-
 			$data['configuration'] = array('hostid' => $host['hostid']);
 		}
+
+		$data['showEvents'] = ($host['status'] == HOST_STATUS_MONITORED);
 
 		return $data;
 	}

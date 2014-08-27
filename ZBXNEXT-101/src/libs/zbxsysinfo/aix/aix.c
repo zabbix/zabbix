@@ -27,6 +27,9 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
+	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"hdisk0,operations"},
+	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"hdisk0,operations"},
+
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo0,bytes"},
@@ -43,6 +46,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
+	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},
 
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 

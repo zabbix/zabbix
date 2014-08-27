@@ -27,18 +27,19 @@
  * @return object $reportForm
  */
 function valueDistributionFormForMultiplePeriods($items = array()) {
-	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
-	$title = get_request('title', _('Report 1'));
-	$xlabel = get_request('xlabel', '');
-	$ylabel = get_request('ylabel', '');
-	$showlegend = get_request('showlegend', 0);
+	$title = getRequest('title', _('Report 1'));
+	$xlabel = getRequest('xlabel', '');
+	$ylabel = getRequest('ylabel', '');
+	$showlegend = getRequest('showlegend', 0);
 
 	$report_timesince = $_REQUEST['report_timesince'];
 	$report_timetill = $_REQUEST['report_timetill'];
 
 	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name', 'zbx_report');
 	$reportForm->setAttribute('id', 'zbx_report');
 
@@ -137,16 +138,17 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
  * @return object $reportForm
  */
 function valueDistributionFormForMultipleItems($items = array(), $periods = array()){
-	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
+	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
-	$title = get_request('title', _('Report 2'));
-	$xlabel = get_request('xlabel', '');
-	$ylabel = get_request('ylabel', '');
+	$title = getRequest('title', _('Report 2'));
+	$xlabel = getRequest('xlabel', '');
+	$ylabel = getRequest('ylabel', '');
 
-	$sorttype = get_request('sorttype', 0);
-	$showlegend = get_request('showlegend', 0);
+	$sorttype = getRequest('sorttype', 0);
+	$showlegend = getRequest('showlegend', 0);
 
 	$reportForm = new CFormTable(null, null, 'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name', 'zbx_report');
 	$reportForm->setAttribute('id', 'zbx_report');
 
@@ -179,7 +181,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$color = new CColorCell(null, $period['color']);
 
 			$edit_link = 'popup_period.php?period_id='.$pid.'&config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
-				'&dstfrm='.$reportForm->getName().'&caption='.$period['caption'].'&report_timesince='.
+				'&dstfrm='.$reportForm->getName().url_param($period['caption'], false, 'caption').'&report_timesince='.
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
@@ -188,8 +190,8 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),
 				$caption,
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']),
 				$color
 			));
 		}
@@ -266,28 +268,29 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
  * @return object $reportForm
  */
 function valueComparisonFormForMultiplePeriods() {
-	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
+	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
-	$title = get_request('title', _('Report 3'));
-	$xlabel = get_request('xlabel', '');
-	$ylabel = get_request('ylabel', '');
+	$title = getRequest('title', _('Report 3'));
+	$xlabel = getRequest('xlabel', '');
+	$ylabel = getRequest('ylabel', '');
 
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
-	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$avgperiod = getRequest('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-	$report_timesince = get_request('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY));
-	$report_timetill = get_request('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME));
+	$report_timesince = getRequest('report_timesince', date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY));
+	$report_timetill = getRequest('report_timetill', date(TIMESTAMP_FORMAT_ZERO_TIME));
 
-	$itemId = get_request('itemid', 0);
+	$itemId = getRequest('itemid', 0);
 
-	$hostids = get_request('hostids', array());
+	$hostids = getRequest('hostids', array());
 	$hostids = zbx_toHash($hostids);
-	$showlegend = get_request('showlegend', 0);
+	$showlegend = getRequest('showlegend', 0);
 
-	$palette = get_request('palette', 0);
-	$palettetype = get_request('palettetype', 0);
+	$palette = getRequest('palette', 0);
+	$palettetype = getRequest('palettetype', 0);
 
 	$reportForm = new CFormTable(null,null,'get');
+	$reportForm->setTableClass('formtable old-filter');
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
@@ -306,7 +309,7 @@ function valueComparisonFormForMultiplePeriods() {
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 	$reportForm->addVar('sortorder', 0);
 
-	$groupids = get_request('groupids', array());
+	$groupids = getRequest('groupids', array());
 	$group_tb = new CTweenBox($reportForm, 'groupids', $groupids, 10);
 
 	$db_groups = API::HostGroup()->get(array(
@@ -321,7 +324,7 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
 
-	$groupid = get_request('groupid', 0);
+	$groupid = getRequest('groupid', 0);
 	$cmbGroups = new CComboBox('groupid', $groupid, 'submit()');
 	$cmbGroups->addItem(0, _('All'));
 	foreach ($db_groups as $group) {
@@ -405,7 +408,7 @@ function valueComparisonFormForMultiplePeriods() {
 	$itemidVar = new CVar('itemid', $itemId, 'itemid');
 	$reportForm->addItem($itemidVar);
 
-	$txtCondVal = new CTextBox('item_name', $itemName, 50, 'yes');
+	$txtCondVal = new CTextBox('item_name', $itemName, 50, true);
 	$txtCondVal->setAttribute('id', 'item_name');
 
 	$btnSelect = new CButton('btn1', _('Select'),
@@ -450,7 +453,7 @@ function valueComparisonFormForMultiplePeriods() {
  * @return mixed	valid items array on success or false on failure
  */
 function validateBarReportItems($items = array()) {
-	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
+	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	if (!isset($items) || !$items) {
 		return false;
@@ -509,10 +512,10 @@ function validateBarReportItems($items = array()) {
 	unset($item);
 
 	// check axis value. 0 = count
-	$calcFncValidator = new CSetValidator(array(
+	$calcFncValidator = new CLimitedSetValidator(array(
 		'values' => array(0, CALC_FNC_MIN, CALC_FNC_AVG, CALC_FNC_MAX)
 	));
-	$axisValidator = new CSetValidator(array(
+	$axisValidator = new CLimitedSetValidator(array(
 		'values' => array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT)
 	));
 
@@ -579,8 +582,8 @@ function validateBarReportPeriods($periods = array()) {
 			return false;
 		}
 		if (!isset($period['caption']) || zbx_empty($period['caption'])) {
-			$period['caption'] = zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']).' - '.
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']);
+			$period['caption'] = zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']).' - '.
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']);
 		}
 
 	}

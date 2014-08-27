@@ -32,12 +32,12 @@ $discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
 $discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
 $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 
-// craete table
+// create table
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));
 $discoveryTable->makeVerticalRotation();
 
 $header = array(
-	make_sorting_header(_('Discovered device'), 'ip'),
+	make_sorting_header(_('Discovered device'), 'ip', $this->data['sort'], $this->data['sortorder']),
 	new CCol(_('Monitored host'), 'left'),
 	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 );

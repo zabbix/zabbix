@@ -19,13 +19,17 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * info.mem_unit);
 
@@ -37,7 +41,10 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * info.mem_unit);
 
@@ -49,7 +56,10 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * info.mem_unit);
 
@@ -63,7 +73,10 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 	zbx_uint64_t	res = 0;
 
 	if (NULL == (f = fopen("/proc/meminfo", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/meminfo: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != fgets(c, sizeof(c), f))
 	{
@@ -98,7 +111,10 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)(info.totalram - info.freeram) * info.mem_unit);
 
@@ -109,8 +125,17 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
-	if (0 != sysinfo(&info) || 0 == info.totalram)
+	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 == info.totalram)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, (info.totalram - info.freeram) / (double)info.totalram * 100);
 
@@ -121,20 +146,26 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	AGENT_RESULT	result_tmp;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	init_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(&result_tmp))
-		return SYSINFO_RET_FAIL;
+	ret = VM_MEMORY_CACHED(&result_tmp);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
+	if (SYSINFO_RET_OK == ret)
+		SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 
 	free_result(&result_tmp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
@@ -142,26 +173,39 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	struct sysinfo	info;
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	available, total;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	init_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(&result_tmp))
-		return SYSINFO_RET_FAIL;
+	ret = VM_MEMORY_CACHED(&result_tmp);
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
+		goto clean;
+	}
 
 	available = (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64;
 	total = (zbx_uint64_t)info.totalram * info.mem_unit;
 
 	if (0 == total)
-		return SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
 
 	SET_DBL_RESULT(result, available / (double)total * 100);
-
+clean:
 	free_result(&result_tmp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
@@ -170,12 +214,16 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * info.mem_unit);
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Supported for Linux 2.4 only."));
 	return SYSINFO_RET_FAIL;
 #endif
 }
@@ -186,7 +234,10 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
@@ -209,7 +260,10 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		ret = SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }

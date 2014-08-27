@@ -135,6 +135,9 @@
 		userscript: <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>
 	};
 
+	/**
+	 * @see init.js add.popup event
+	 */
 	function addPopupValues(list) {
 		var i,
 			value,
@@ -237,8 +240,15 @@
 	}
 
 	function removeOperation(index) {
-		jQuery('#operations_' + index).find('*').remove();
-		jQuery('#operations_' + index).remove();
+		var row = jQuery('#operations_' + index);
+		var rowParent = row.parent();
+
+		row.find('*').remove();
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOperationCondition(index) {
@@ -249,11 +259,25 @@
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
-		jQuery('#opmsgUsrgrpRow_' + usrgrpid).remove();
+		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
+		var rowParent = row.parent();
+
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpmsgUserRow(userid) {
-		jQuery('#opmsgUserRow_' + userid).remove();
+		var row = jQuery('#opmsgUserRow_' + userid);
+		var rowParent = row.parent();
+
+		row.remove();
+
+		if (IE8) {
+			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+		}
 	}
 
 	function removeOpGroupRow(groupid) {
@@ -309,7 +333,7 @@
 
 		// host group
 		if (object.target == 'hostGroup') {
-			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
+			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
 			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -343,7 +367,7 @@
 
 		// host
 		else if (object.target == 'host') {
-			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
+			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
 			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -399,7 +423,7 @@
 
 		// multiselect
 		if (opCmdTarget != 'current') {
-			jQuery('#opCmdTargetObject').remove();
+			jQuery('.multiselect-wrapper').remove();
 
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
@@ -408,11 +432,21 @@
 
 			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);
 
+			var srctbl = (opCmdTarget == 'host') ? 'hosts' : 'host_groups',
+				srcfld1 = (opCmdTarget == 'host') ? 'hostid' : 'groupid';
+
 			jQuery(opCmdTargetObject).multiSelectHelper({
+				id: 'opCmdTargetObject',
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {
 					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=' + srctbl + '&dstfrm=action.edit&dstfld1=opCmdTargetObject&srcfld1=' +
+						srcfld1 + '&writeonly=1&multiselect=1',
+					width: 450,
+					height: 450
 				}
 			});
 		}
@@ -497,6 +531,15 @@
 	}
 
 	function processTypeOfCalculation() {
+		if(jQuery('#evaltype').val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+			jQuery('#conditionLabel').hide();
+			jQuery('#formula').show();
+		}
+		else {
+			jQuery('#conditionLabel').show();
+			jQuery('#formula').hide();
+		}
+
 		var labels = jQuery('#conditionTable .label');
 
 		if (labels.length > 1) {
@@ -543,7 +586,7 @@
 	}
 
 	function addDiscoveryTemplates() {
-		var values = jQuery('#discoveryTemplates').multiSelect.getData();
+		var values = jQuery('#discoveryTemplates').multiSelect('getData');
 
 		for (var key in values) {
 			var data = values[key];
@@ -559,11 +602,11 @@
 			}
 		}
 
-		jQuery('#dsc_templateid').multiSelect.clean();
+		jQuery('#discoveryTemplates').multiSelect('clean');
 	}
 
 	function addDiscoveryHostGroup() {
-		var values = jQuery('#discoveryHostGroup').multiSelect.getData();
+		var values = jQuery('#discoveryHostGroup').multiSelect('getData');
 
 		for (var key in values) {
 			var data = values[key];
@@ -579,13 +622,21 @@
 			}
 		}
 
-		jQuery('#dsc_groupid').multiSelect.clean();
+		jQuery('#discoveryHostGroup').multiSelect('clean');
 	}
 
 	jQuery(document).ready(function() {
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
+
+			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=operations]').each(function() {
+				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();

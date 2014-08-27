@@ -636,12 +636,10 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 
 static void	process_trapper_child(zbx_sock_t *sock)
 {
-	char	*data;
-
-	if (SUCCEED != zbx_tcp_recv_to(sock, &data, CONFIG_TRAPPER_TIMEOUT))
+	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
 		return;
 
-	process_trap(sock, data);
+	process_trap(sock, sock->buffer);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)

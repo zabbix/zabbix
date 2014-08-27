@@ -67,7 +67,6 @@
 #endif
 #define strncasecmp	ERROR_DO_NOT_USE_STRNCASECMP_FUNCTION_TRY_TO_USE_ZBX_STRNCASECMP
 
-
 #define ON	1
 #define OFF	0
 
@@ -94,7 +93,7 @@ const char	*zbx_result_string(int result);
 #define MAX_ID_LEN		21
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
-#define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
@@ -109,6 +108,9 @@ zbx_timespec_t;
 
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
+
+#define ZBX_DOUBLE_EPSILON	0.000001
+int	zbx_double_compare(double a, double b);
 
 /* item types */
 typedef enum
@@ -149,6 +151,9 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
+
+#define SNMP_BULK_DISABLED	0
+#define SNMP_BULK_ENABLED	1
 
 #define ZBX_FLAG_DISCOVERY_NORMAL	0x00
 #define ZBX_FLAG_DISCOVERY_RULE		0x01
@@ -633,6 +638,8 @@ zbx_script_t;
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
+#define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
+
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
@@ -789,9 +796,7 @@ void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
-#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
-void	compress_signs(char *str);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
@@ -808,7 +813,7 @@ char	*get_param_dyn(const char *param, int num);
  *                       for their parameters - 1 or higher (for arrays)      *
  *      num       - [IN] parameter number; for item keys and OIDs the level   *
  *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - othetwise              *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
  *      cb_data   - [IN] callback function custom data                        *
  *                                                                            *
  * Return value: NULL if parameter doesn't change; a new string - otherwise   *
@@ -824,7 +829,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 		size_t maxerrlen);
 
 void	remove_param(char *param, int num);
-const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -897,7 +901,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
-size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
+void	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
@@ -936,11 +940,12 @@ void	zbx_on_exit(); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
-int	ip_in_list(char *list, char *ip);
+int	ip_in_list(char *list, const char *ip);
 
-int	expand_ipv6(const char *ip, char *str, size_t str_len);
+int	ip4_str2dig(const char *ip, unsigned int *ip_dig);
+int	ip6_str2dig(const char *ip, unsigned short *groups);
 #ifdef HAVE_IPV6
-char	*collapse_ipv6(char *str, size_t str_len);
+void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len);
 #endif
 
 /* time related functions */
@@ -967,13 +972,14 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
-LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
-int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
-LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
-LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
-LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
-int	_wis_uint(LPCTSTR wide_string);
+const OSVERSIONINFOEX	*zbx_win_getversion();
+wchar_t	*zbx_acp_to_unicode(const char *acp_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
+int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
+char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
+char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);
+int	_wis_uint(const wchar_t *wide_string);
 #endif
 void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
@@ -994,6 +1000,8 @@ void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
+zbx_uint64_t	suffix2factor(char c);
+
 #if defined(_WINDOWS)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
@@ -1003,7 +1011,8 @@ typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
-		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
+		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+		unsigned char);
 
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
@@ -1014,7 +1023,7 @@ int	MAIN_ZABBIX_ENTRY();
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
-int	zbx_check_hostname(const char *hostname);
+int	zbx_check_hostname(const char *hostname, char **error);
 
 int	is_hostname_char(char c);
 int	is_key_char(char c);

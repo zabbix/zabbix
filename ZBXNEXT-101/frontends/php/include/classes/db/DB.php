@@ -326,7 +326,7 @@ class DB {
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
 					case self::FIELD_TYPE_CHAR:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
 						if ($length > $tableSchema['fields'][$field]['length']) {
@@ -354,10 +354,10 @@ class DB {
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
 					case self::FIELD_TYPE_TEXT:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
-						if ($DB['TYPE'] == ZBX_DB_DB2) {
+						if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_ORACLE) {
 							if ($length > 2048) {
 								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
 									$values[$field], $field, $length));
@@ -527,14 +527,14 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
 			}
 
-			// where condition proccess
+			// where condition processing
 			$sqlWhere = array();
 			foreach ($row['where'] as $field => $values) {
 				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
 					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 				}
 				$values = zbx_toArray($values);
-				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
+				sort($values); // sorting ids to prevent deadlocks when two transactions depend on each other
 
 				$sqlWhere[] = dbConditionString($field, $values);
 			}

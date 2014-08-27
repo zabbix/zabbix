@@ -55,9 +55,14 @@ $fields = array(
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
+									'"triggerprototype.massenable","triggerprototype.massupdate",'.
+									'"triggerprototype.massupdateform"'
+								),
+								null
+							),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_expression' => 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'and_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -77,19 +82,20 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
+$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
-validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
-$_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
-if (get_request('parent_discoveryid')) {
+if (getRequest('parent_discoveryid')) {
 	$discovery_rule = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -117,27 +123,28 @@ else {
 	access_deny();
 }
 
-$showdisabled = get_request('showdisabled', 0);
+$showdisabled = getRequest('showdisabled', 0);
 CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
 /*
  * Actions
  */
+$exprAction = null;
 if (isset($_REQUEST['add_expression'])) {
 	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
 	$_REQUEST['expr_temp'] = '';
 }
 elseif (isset($_REQUEST['and_expression'])) {
-	$_REQUEST['expr_action'] = '&';
+	$exprAction = 'and';
 }
 elseif (isset($_REQUEST['or_expression'])) {
-	$_REQUEST['expr_action'] = '|';
+	$exprAction = 'or';
 }
 elseif (isset($_REQUEST['replace_expression'])) {
-	$_REQUEST['expr_action'] = 'r';
+	$exprAction = 'r';
 }
-elseif (isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])) {
-	$_REQUEST['expr_action'] = 'R';
+elseif (getRequest('remove_expression')) {
+	$exprAction = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
@@ -170,7 +177,7 @@ elseif (hasRequest('save')) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result, getRequest('parent_discoveryid'));
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 
 	unset($_REQUEST['save']);
@@ -178,14 +185,13 @@ elseif (hasRequest('save')) {
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));
 
-	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
-	clearCookies($result, getRequest('parent_discoveryid'));
-
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
+	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
-elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('mass_save') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
 	$visible = getRequest('visible');
 
@@ -206,15 +212,14 @@ elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasReques
 		$result = true;
 	}
 
-	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
-	clearCookies($result, getRequest('parent_discoveryid'));
-
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
+		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
+	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('go') == 'activate');
+elseif (getRequest('action') && str_in_array(getRequest('action'), array('triggerprototype.massenable', 'triggerprototype.massdisable')) && hasRequest('g_triggerid')) {
+	$enable = (getRequest('action') == 'triggerprototype.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = array();
 
@@ -239,7 +244,12 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		$result = true;
 	}
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
+
 	$updated = count($update);
+
 	$messageSuccess = $enable
 		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
 		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
@@ -248,46 +258,56 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
-elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
-	clearCookies($result, getRequest('parent_discoveryid'));
 }
 
 /*
  * Display
  */
-if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
+if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
+	$data = getTriggerMassupdateFormData();
+	$data['action'] = 'triggerprototype.massupdate';
+	$triggersView = new CView('configuration.triggers.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
+	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
 	$triggersView->render();
 	$triggersView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
-		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'showInfoColumn' => false,
 		'discovery_rule' => $discovery_rule,
-		'hostid' => get_request('hostid'),
-		'showdisabled' => get_request('showdisabled', 1),
-		'triggers' => array()
+		'hostid' => getRequest('hostid'),
+		'showdisabled' => getRequest('showdisabled', 1),
+		'triggers' => array(),
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
-	$sortfield = getPageSortField('description');
 	$options = array(
 		'editable' => true,
 		'output' => array('triggerid'),
 		'discoveryids' => $data['parent_discoveryid'],
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	);
 	if (empty($data['showdisabled'])) {
@@ -296,14 +316,7 @@ else {
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 
 	// paging
-	$data['paging'] = getPagingLine(
-		$data['triggers'],
-		array('triggerid'),
-		array(
-			'hostid' => get_request('hostid', $data['discovery_rule']['hostid']),
-			'parent_discoveryid' => get_request('parent_discoveryid')
-		)
-	);
+	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
@@ -312,7 +325,7 @@ else {
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND
 	));
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+	order_result($data['triggers'], $sortField, $sortOrder);
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);

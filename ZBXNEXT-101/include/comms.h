@@ -52,13 +52,6 @@ typedef int	ZBX_SOCKET;
 
 typedef enum
 {
-	ZBX_TCP_ERR_NETWORK = 1,
-	ZBX_TCP_ERR_TIMEOUT
-}
-zbx_tcp_errors;
-
-typedef enum
-{
 	ZBX_BUF_TYPE_STAT = 0,
 	ZBX_BUF_TYPE_DYN
 }
@@ -73,16 +66,18 @@ typedef struct
 	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket_orig;
-	char		buf_stat[ZBX_STAT_BUF_LEN];
-	char		*buf_dyn;
+	size_t		read_bytes;
 	zbx_buf_type_t	buf_type;
+	char		buf_stat[ZBX_STAT_BUF_LEN];
+	char		*buffer;
 	unsigned char	accepted;
 	char		*error;
+	char		*next_line;
 	int		timeout;
 }
 zbx_sock_t;
 
-const char	*zbx_tcp_strerror();
+const char	*zbx_tcp_strerror(void);
 
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
@@ -93,11 +88,12 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 
 #define ZBX_TCP_PROTOCOL	0x01
 
-#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)	zbx_tcp_send_ext((s), (d), ZBX_TCP_PROTOCOL, timeout)
-#define zbx_tcp_send_raw(s, d)		zbx_tcp_send_ext((s), (d), 0, 0)
+#define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0)
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout);
+int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout);
 
 void    zbx_tcp_close(zbx_sock_t *s);
 
@@ -114,10 +110,11 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, 0))
-#define	zbx_tcp_recv_to(s, data, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, timeout))
+#define	zbx_tcp_recv(s) 		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
+#define	zbx_tcp_recv_to(s, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, timeout))
 
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout);
+const char	*zbx_tcp_recv_line(zbx_sock_t *s);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);

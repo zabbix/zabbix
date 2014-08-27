@@ -37,9 +37,12 @@ ZBX_METRIC	parameters_agent[] =
 
 static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	/* zabbix_agent standalone does not support the Hostname in the configuration file */
 	if (NULL == CONFIG_HOSTNAME)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Hostname parameter is not supported"
+					" in the zabbix_agent configuration file."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
 

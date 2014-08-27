@@ -150,277 +150,6 @@ var MMenu = {
 };
 
 /*
- * Automatic checkbox range selection
- */
-var chkbxRange = {
-	startbox:		null,	// start checkbox obj
-	startboxName:	null,	// start checkbox name
-	chkboxes:		{},		// ckbx list
-	prefix:			null,	// prefix for cookie name
-	pageGoName:		null,	// which checkboxes should be counted by Go button
-	pageGoCount:	0,		// selected checkboxes
-	selectedIds:	{},		// ids of selected checkboxes
-	goButton:		null,
-	cookieName:		null,
-
-	init: function() {
-		var path = new Curl();
-		var filename = basename(path.getPath(), '.php');
-		this.cookieName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
-		this.selectedIds = cookie.readJSON(this.cookieName);
-
-		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
-		if (chkboxes.length > 0) {
-			for (var i = 0; i < chkboxes.length; i++) {
-				this.implement(chkboxes[i]);
-			}
-		}
-
-		this.selectMainCheckbox();
-
-		this.goButton = $('goButton');
-		if (!is_null(this.goButton)) {
-			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
-		}
-
-		this.setGo();
-	},
-
-	implement: function(obj) {
-		var objName = obj.name.split('[')[0];
-
-		if (typeof(this.chkboxes[objName]) === 'undefined') {
-			this.chkboxes[objName] = [];
-		}
-		this.chkboxes[objName].push(obj);
-
-		addListener(obj, 'click', this.check.bindAsEventListener(this), false);
-
-		if (objName == this.pageGoName) {
-			var objId = jQuery(obj).val();
-			if (isset(objId, this.selectedIds)) {
-				obj.checked = true;
-			}
-		}
-	},
-
-	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
-	selectMainCheckbox: function() {
-		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)');
-		if (!mainCheckbox.length) {
-			return;
-		}
-
-		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
-
-		if (countAvailable > 0) {
-			var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
-
-			mainCheckbox = mainCheckbox[0];
-			mainCheckbox.checked = (countChecked == countAvailable);
-
-			if (mainCheckbox.checked) {
-				jQuery('.tableinfo .header').addClass('selectedMain');
-			}
-			else {
-				jQuery('.tableinfo .header').removeClass('selectedMain');
-			}
-		}
-		else {
-			mainCheckbox.disabled = true;
-		}
-	},
-
-	check: function(e) {
-		e = e || window.event;
-		var obj = Event.element(e);
-
-		PageRefresh.restart();
-
-		if (typeof(obj) === 'undefined' || obj.type.toLowerCase() != 'checkbox' || obj.disabled === true) {
-			return true;
-		}
-
-		this.setGo();
-
-		if (obj.name.indexOf('all_') > -1 || obj.name.indexOf('_single') > -1) {
-			return true;
-		}
-		var objName = obj.name.split('[')[0];
-
-		// check range selection
-		if (e.ctrlKey || e.shiftKey) {
-			if (!is_null(this.startbox) && this.startboxName == objName && obj.name != this.startbox.name) {
-				var chkboxes = this.chkboxes[objName];
-				var flag = false;
-
-				for (var i = 0; i < chkboxes.length; i++) {
-					if (typeof(chkboxes[i]) !== 'undefined') {
-						if (flag) {
-							chkboxes[i].checked = this.startbox.checked;
-						}
-						if (obj.name == chkboxes[i].name) {
-							break;
-						}
-						if (this.startbox.name == chkboxes[i].name) {
-							flag = true;
-						}
-					}
-				}
-
-				if (flag) {
-					this.setGo();
-					this.selectMainCheckbox();
-					return true;
-				}
-				else {
-					for (var i = chkboxes.length - 1; i >= 0; i--) {
-						if (typeof(chkboxes[i]) !== 'undefined') {
-							if (flag) {
-								chkboxes[i].checked = this.startbox.checked;
-							}
-
-							if (obj.name == chkboxes[i].name) {
-								this.setGo();
-								this.selectMainCheckbox();
-								return true;
-							}
-
-							if (this.startbox.name == chkboxes[i].name) {
-								flag = true;
-							}
-						}
-					}
-				}
-			}
-
-			this.setGo();
-		}
-		else {
-			this.selectMainCheckbox();
-		}
-
-		this.startbox = obj;
-		this.startboxName = objName;
-	},
-
-	checkAll: function(name, value) {
-		if (typeof(this.chkboxes[name]) === 'undefined') {
-			return false;
-		}
-
-		var chkboxes = this.chkboxes[name];
-		for (var i = 0; i < chkboxes.length; i++) {
-			if (typeof(chkboxes[i]) !== 'undefined' && chkboxes[i].disabled !== true) {
-				var objName = chkboxes[i].name.split('[')[0];
-				if (objName == name) {
-					chkboxes[i].checked = value;
-				}
-			}
-		}
-
-		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
-		if (mainCheckbox.checked) {
-			jQuery('.tableinfo .header').addClass('selectedMain');
-		}
-		else {
-			jQuery('.tableinfo .header').removeClass('selectedMain');
-		}
-	},
-
-	clearSelectedOnFilterChange: function() {
-		cookie.eraseArray(this.cookieName);
-	},
-
-	setGo: function() {
-		if (!is_null(this.pageGoName)) {
-			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
-				var chkboxes = this.chkboxes[this.pageGoName];
-				for (var i = 0; i < chkboxes.length; i++) {
-					if (typeof(chkboxes[i]) !== 'undefined') {
-						var box = chkboxes[i];
-						var objName = box.name.split('[')[0];
-						var objId = box.name.split('[')[1];
-						objId = objId.substring(0, objId.lastIndexOf(']'));
-						var crow = getParent(box, 'tr');
-
-						if (box.checked) {
-							if (!is_null(crow)) {
-								var origClass = crow.getAttribute('origClass');
-								if (is_null(origClass)) {
-									crow.setAttribute('origClass', crow.className);
-								}
-								crow.className = 'selected';
-							}
-							if (objName == this.pageGoName) {
-								this.selectedIds[objId] = objId;
-							}
-						}
-						else {
-							if (!is_null(crow)) {
-								var origClass = crow.getAttribute('origClass');
-
-								if (!is_null(origClass)) {
-									crow.className = origClass;
-									crow.removeAttribute('origClass');
-								}
-							}
-							if (objName == this.pageGoName) {
-								delete(this.selectedIds[objId]);
-							}
-						}
-					}
-				}
-
-			}
-
-			var countChecked = 0;
-			for (var key in this.selectedIds) {
-				if (!empty(this.selectedIds[key])) {
-					countChecked++;
-				}
-			}
-
-			if (!is_null(this.goButton)) {
-				var tmp_val = this.goButton.value.split(' ');
-				this.goButton.value = tmp_val[0] + ' (' + countChecked + ')';
-			}
-
-			cookie.createJSON(this.cookieName, this.selectedIds);
-
-			if (jQuery('#go').length) {
-				jQuery('#go')[0].disabled = (countChecked == 0);
-			}
-			if (jQuery('#goButton').length) {
-				jQuery('#goButton')[0].disabled = (countChecked == 0);
-			}
-
-			this.pageGoCount = countChecked;
-		}
-	},
-
-	submitGo: function(e) {
-		e = e || window.event;
-
-		var goSelect = $('go');
-		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
-
-		if (!is_null(confirmText) && !confirm(confirmText)) {
-			Event.stop(e);
-			return false;
-		}
-
-		var form = getParent(this.goButton, 'form');
-		for (var key in this.selectedIds) {
-			if (!empty(this.selectedIds[key])) {
-				create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
-			}
-		}
-		return true;
-	}
-};
-
-/*
  * Audio control system
  */
 var AudioControl = {
@@ -632,7 +361,7 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, width, className, isStatic) {
+	createBox: function(e, target, hintText, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (typeof hintText === 'string') {
@@ -644,10 +373,6 @@ var hintBox = {
 		}
 		else {
 			box.html(hintText);
-		}
-
-		if (!empty(width)) {
-			box.css('width', width + 'px');
 		}
 
 		if (isStatic) {
@@ -667,14 +392,14 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, width, className) {
+	HintWraper: function(e, target, hintText, className) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
 				e = d;
 			}
-			hintBox.showHint(e, target, hintText, width, className, false);
+			hintBox.showHint(e, target, hintText, className, false);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
@@ -687,13 +412,13 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, className, resizeAfterLoad) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, width, className, true);
+			hintBox.showHint(e, target, hint, className, true);
 
 			if (resizeAfterLoad) {
 				hint.one('load', function(e) {
@@ -703,12 +428,12 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, width, className, isStatic) {
+	showHint: function(e, target, hintText, className, isStatic) {
 		if (target.hintBoxItem) {
 			return;
 		}
 
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
 	},
@@ -726,7 +451,7 @@ var hintBox = {
 			target.clientY = e.clientY;
 		}
 
-		// doesn't fit in the screen horizontaly
+		// doesn't fit in the screen horizontally
 		if (target.hintBoxItem.width() + 10 > wWidth) {
 			left = scrollLeft + 2;
 		}
@@ -752,7 +477,7 @@ var hintBox = {
 			top = scrollTop + target.clientY + 10;
 		}
 
-		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
+		// fallback if doesn't fit verticaly but could fit if aligned to right or left
 		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
 				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
 
@@ -905,13 +630,9 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 		}
 	});
 
-	// resize multiselect
-	if (typeof flickerResizeMultiselect === 'undefined' && state == 1) {
-		flickerResizeMultiselect = true;
-
-		if (jQuery('.multiselect').length > 0) {
-			jQuery('#' + id).multiSelect.resize();
-		}
+	// resize multiselects in the flicker
+	if (jQuery('.multiselect').length > 0 && state == 1) {
+		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
 	}
 }
 
@@ -961,32 +682,47 @@ function sendAjaxData(options) {
  */
 function createPlaceholders() {
 	if (IE) {
-		jQuery('[placeholder]')
-			.focus(function() {
-				var obj = jQuery(this);
+		jQuery('[placeholder]').each(function() {
+			var placeholder = jQuery(this);
 
-				if (obj.val() == obj.attr('placeholder')) {
-					obj.val('');
-					obj.removeClass('placeholder');
-				}
-			})
-			.blur(function() {
-				var obj = jQuery(this);
+			if (!placeholder.data('has-placeholder-handlers')) {
+				placeholder
+					.data('has-placeholder-handlers', true)
+					.focus(function() {
+						var obj = jQuery(this);
 
-				if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
-					obj.val(obj.attr('placeholder'));
-					obj.addClass('placeholder');
-				}
-			})
-			.blur();
+						if (!obj.attr('placeholder')) {
+							return;
+						}
 
-		jQuery('form').submit(function() {
-			jQuery('.placeholder').each(function() {
-				var obj = jQuery(this);
+						if (obj.val() == obj.attr('placeholder')) {
+							obj.val('');
+							obj.removeClass('placeholder');
+						}
+					})
+					.blur(function() {
+						var obj = jQuery(this);
 
-				if (obj.val() == obj.attr('placeholder')) {
-					obj.val('');
-				}
+						if (!obj.attr('placeholder')) {
+							return;
+						}
+
+						if (obj.val() == '' ||  obj.val() == obj.attr('placeholder')) {
+							obj.val(obj.attr('placeholder'));
+							obj.addClass('placeholder');
+						}
+					})
+					.blur();
+			}
+
+			jQuery('form').submit(function() {
+				jQuery('.placeholder').each(function() {
+					var obj = jQuery(this);
+
+					if (obj.val() == obj.attr('placeholder')) {
+						obj.val('');
+					}
+				});
 			});
 		});
 	}
@@ -1191,3 +927,120 @@ function getConditionFormula(conditions, evalType) {
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));
+
+jQuery(function ($) {
+	var verticalHeaderTables = {};
+
+	var tablesWidthChangeChecker = function() {
+		for (var tableId in verticalHeaderTables) {
+			if (verticalHeaderTables.hasOwnProperty(tableId)) {
+				var table = verticalHeaderTables[tableId];
+
+				if (table && table.width() != table.data('last-width')) {
+					centerVerticalCellContents(table);
+				}
+			}
+		}
+		setTimeout(tablesWidthChangeChecker, 100);
+	};
+
+	var centerVerticalCellContents = function(table) {
+		var verticalCells = $('.vertical_rotation', table);
+
+		verticalCells.each(function() {
+			var cell = $(this),
+				cellWidth = cell.width();
+
+			if (cellWidth > 30) {
+				cell.children().css({
+					position: 'relative',
+					left: (cellWidth / 2 - 12) + 'px'
+				});
+			}
+		});
+
+		table.data('last-width', table.width());
+	};
+
+	tablesWidthChangeChecker();
+
+	$.fn.makeVerticalRotation = function() {
+		this.each(function(i) {
+			var table = $(this);
+
+			if (table.data('rotated') == 1) {
+				return;
+			}
+			table.data('rotated', 1);
+
+			var cellsToRotate = $('.vertical_rotation', table),
+				betterCells = [];
+
+			// insert spans
+			cellsToRotate.each(function() {
+				var cell = $(this);
+
+				var text = $('<span>', {
+					text: cell.html()
+				});
+
+				if (IE) {
+					text.css({'font-family': 'monospace'});
+				}
+
+				cell.text('').append(text);
+			});
+
+			// rotate cells
+			cellsToRotate.each(function() {
+				var cell = $(this),
+					span = cell.children(),
+					height = cell.height(),
+					width = span.width(),
+					transform = (width / 2) + 'px ' + (width / 2) + 'px';
+
+				var css = {
+					"transform-origin": transform,
+					"-webkit-transform-origin": transform,
+					"-moz-transform-origin": transform,
+					"-o-transform-origin": transform
+				};
+
+				if (IE) {
+					css['font-family'] = 'monospace';
+					css['-ms-transform-origin'] = '50% 50%';
+				}
+
+				if (IE9) {
+					css['-ms-transform-origin'] = transform;
+				}
+
+				var divInner = $('<div>', {
+					'class': 'vertical_rotation_inner'
+				})
+					.css(css)
+					.append(span.text());
+
+				var div = $('<div>', {
+					height: width,
+					width: height
+				})
+					.append(divInner);
+
+				betterCells.push(div);
+			});
+
+			cellsToRotate.each(function(i) {
+				$(this).html(betterCells[i]);
+			});
+
+			centerVerticalCellContents(table);
+
+			table.on('remove', function() {
+				delete verticalHeaderTables[table.attr('id')];
+			});
+
+			verticalHeaderTables[table.attr('id')] = table;
+		});
+	};
+});

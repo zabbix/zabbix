@@ -618,19 +618,19 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param array  $hostIds
- * @param string $application name of application to filter
- * @param int    $viewMode
+ * @param array  		$hostIds
+ * @param array|null	$applicationIds		IDs of applications to filter items by
+ * @param int    		$viewMode
  *
  * @return CTableInfo
  */
-function getItemsDataOverview($hostIds, $application, $viewMode) {
+function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
 
-	if ($application !== '') {
-		$sqlFrom = 'applications a,items_applications ia,';
-		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
+	if ($applicationIds !== null) {
+		$sqlFrom = 'items_applications ia,';
+		$sqlWhere = ' AND i.itemid=ia.itemid AND '.dbConditionInt('ia.applicationid', $applicationIds);
 	}
 
 	$dbItems = DBfetchArray(DBselect(
@@ -655,7 +655,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'));
+	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'), 1, ZBX_HISTORY_PERIOD);
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
@@ -777,25 +777,33 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	return $tableRow;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function get_same_applications_for_host($applications, $hostid) {
-	$child_applications = array();
-	$db_apps = DBselect(
-		'SELECT a1.applicationid'.
+/**
+ * Get same application IDs on destination host and return array with keys as source application IDs
+ * and values as destination application IDs.
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ * @param array  $applicationIds
+ * @param string $hostId
+ *
+ * @return array
+ */
+function get_same_applications_for_host(array $applicationIds, $hostId) {
+	$applications = array();
+
+	$dbApplications = DBselect(
+		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
 		' FROM applications a1,applications a2'.
 		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.zbx_dbstr($hostid).
-			' AND '.dbConditionInt('a2.applicationid', $applications)
+			' AND a1.hostid='.zbx_dbstr($hostId).
+			' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 	);
-	while ($app = DBfetch($db_apps)) {
-		$child_applications[] = $app['applicationid'];
+
+	while ($dbApplication = DBfetch($dbApplications)) {
+		$applications[$dbApplication['srcappid']] = $dbApplication['dstappid'];
 	}
 
-	return $child_applications;
+	return $applications;
 }
 
 /******************************************************************************
@@ -895,8 +903,8 @@ function formatHistoryValue($value, array $item, $trim = true) {
 		// break; is not missing here
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-			if ($trim && zbx_strlen($value) > 20) {
-				$value = zbx_substr($value, 0, 20).'...';
+			if ($trim && mb_strlen($value) > 20) {
+				$value = mb_substr($value, 0, 20).'...';
 			}
 
 			if ($mapping !== false) {
@@ -912,7 +920,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
  *
  * @param array		$item
  * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
@@ -1201,68 +1209,55 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         mm      - minutes (0-59)
  *
  * @param string $seed               seed value applied to delay to spread item checks over the delay period
- * @param int $itemType
- * @param int $delay                 default delay, can be overriden
+ * @param int $delay                 default delay, can be overridden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
  * @return array
  */
-function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
-	// special processing of active items to see better view in queue
-	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
-		if ($delay != 0) {
-			$nextcheck = $now + $delay;
+function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
+	// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+	// if it is not possible to check the item within a year, fail
+	$arrOfFlexIntervals = explode(';', $flexIntervals);
+	$t = $now;
+	$tMax = $now + SEC_PER_YEAR;
+	$try = 0;
+
+	while ($t < $tMax) {
+		// calculate 'nextcheck' value for the current interval
+		$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
+
+		if ($currentDelay != 0) {
+			$nextCheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
+
+			if ($try == 0) {
+				while ($nextCheck <= $t) {
+					$nextCheck += $currentDelay;
+				}
+			}
+			else {
+				while ($nextCheck < $t) {
+					$nextCheck += $currentDelay;
+				}
+			}
 		}
 		else {
-			$nextcheck = ZBX_JAN_2038;
+			$nextCheck = ZBX_JAN_2038;
 		}
-	}
-	else {
-		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
-		// if it is not possible to check the item within a year, fail
 
-		$arrOfFlexIntervals = explode(';', $flexIntervals);
-		$t = $now;
-		$tmax = $now + SEC_PER_YEAR;
-		$try = 0;
-
-		while ($t < $tmax) {
-			// calculate 'nextcheck' value for the current interval
-			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
-
-			if ($currentDelay != 0) {
-				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
-
-				if ($try == 0) {
-					while ($nextcheck <= $t) {
-						$nextcheck += $currentDelay;
-					}
-				}
-				else {
-					while ($nextcheck < $t) {
-						$nextcheck += $currentDelay;
-					}
-				}
-			}
-			else {
-				$nextcheck = ZBX_JAN_2038;
-			}
-
-			// 'nextcheck' < end of the current interval ?
-			// the end of the current interval is the beginning of the next interval - 1
-			if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextcheck >= $nextInterval) {
-				// 'nextcheck' is beyond the current interval
-				$t = $nextInterval;
-				$try++;
-			}
-			else {
-				break;
-			}
+		// 'nextcheck' < end of the current interval ?
+		// the end of the current interval is the beginning of the next interval - 1
+		if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextCheck >= $nextInterval) {
+			// 'nextcheck' is beyond the current interval
+			$t = $nextInterval;
+			$try++;
+		}
+		else {
+			break;
 		}
 	}
 
-	return $nextcheck;
+	return $nextCheck;
 }
 
 /**

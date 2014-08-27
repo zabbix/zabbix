@@ -43,7 +43,7 @@ function getMenuPopupFavouriteGraphs(options) {
 			t('Favourite simple graphs'),
 			options.simpleGraphs,
 			'itemid',
-			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1&templated=0'
+			'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&multiselect=1&numeric=1'
 				+ '&with_simple_graph_items=1&real_hosts=1'
 		);
 	}
@@ -172,24 +172,24 @@ function getMenuPopupHistory(options) {
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		items[items.length] = {
 			label: t('Last hour graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=3600').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last week graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=604800').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last month graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
 		};
 	}
 
 	// latest values
 	items[items.length] = {
 		label: t('Latest values'),
-		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
+		url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showvalues&period=3600').getUrl()
 	};
 
 	return [{
@@ -206,8 +206,9 @@ function getMenuPopupHistory(options) {
  * @param string options[]['name']			script name
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
- * @param bool   options['hasGraphs']		link to host graphs page
- * @param bool   options['hasScreens']		link to host screen page
+ * @param bool   options['showGraphs']		link to host graphs page
+ * @param bool   options['showScreens']		link to host screen page
+ * @param bool   options['showTriggers']	link to "Status of triggers" page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
@@ -236,30 +237,29 @@ function getMenuPopupHost(options) {
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+			url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
 		};
 
-		// trigger status
+		// triggers
 		gotos[gotos.length] = {
 			label: t('Triggers'),
+			css: options.showTriggers ? '' : 'ui-state-disabled',
 			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
 
 		// graphs
-		if (options.hasGraphs) {
-			gotos[gotos.length] = {
-				label: t('Graphs'),
-				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Graphs'),
+			css: options.showGraphs ? '' : 'ui-state-disabled',
+			url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// screens
-		if (options.hasScreens) {
-			gotos[gotos.length] = {
-				label: t('Host screens'),
-				url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			css: options.showScreens ?  '' : 'ui-state-disabled',
+			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
+		};
 
 		sections[sections.length] = {
 			label: t('Go to'),
@@ -282,10 +282,14 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showGraphs']		display "Graphs" link enabled or disabled
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showScreens']	display "Screens" link enabled or disabled
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
@@ -347,6 +351,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Triggers'),
+				css: options.gotos.showTriggers ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -361,6 +366,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Graphs'),
+				css: options.gotos.showGraphs ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -375,6 +381,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host screens'),
+				css: options.gotos.showScreens ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -403,6 +410,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Latest events'),
+				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -586,6 +594,7 @@ function getMenuPopupTrigger(options) {
 
 	items[items.length] = {
 		label: t('Events'),
+		css: options.showEvents ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -633,10 +642,8 @@ function getMenuPopupTrigger(options) {
 
 		jQuery.each(options.items, function(i, item) {
 			var url = new Curl('history.php');
-
-			jQuery.each(item.params, function(key, value) {
-				url.setArgument(key, value);
-			});
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
 
 			items[items.length] = {
 				label: item.name,
@@ -723,43 +730,34 @@ function getMenuPopupTriggerLog(options) {
 }
 
 /**
- * Get menu popup trigger macro section data.
+ * Get data for the "Insert expression" menu in the trigger expression constructor.
  *
  * @return array
  */
 function getMenuPopupTriggerMacro(options) {
 	var items = [],
-		data = {
-			'TRIGGER.VALUE=0': 0,
-			'TRIGGER.VALUE=1': 1,
-			'TRIGGER.VALUE=2': 2,
-			'TRIGGER.VALUE#0': 10,
-			'TRIGGER.VALUE#1': 11,
-			'TRIGGER.VALUE#2': 12
-		};
+		expressions = [
+			{
+				label: t('Trigger status "OK"'),
+				string: '{TRIGGER.VALUE}=0'
+			},
+			{
+				label: t('Trigger status "Problem"'),
+				string: '{TRIGGER.VALUE}=1'
+			}
+		];
 
-	jQuery.each(data, function(label, value) {
+	jQuery.each(expressions, function(key, expression) {
 		items[items.length] = {
-			label: label,
+			label: expression.label,
 			clickCallback: function() {
-				var expression = jQuery('#expr_temp');
+				var expressionInput = jQuery('#expr_temp');
 
-				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+				if (expressionInput.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 					return false;
 				}
 
-				var sign, valueString;
-
-				if (value >= 10) {
-					valueString = value % 10;
-					sign = '#';
-				}
-				else {
-					valueString = value;
-					sign = '=';
-				}
-
-				expression.val('{TRIGGER.VALUE}' + sign + valueString);
+				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menuPopup').fadeOut(100);
 			}
@@ -767,7 +765,7 @@ function getMenuPopupTriggerMacro(options) {
 	});
 
 	return [{
-		label: t('Insert macro'),
+		label: t('Insert expression'),
 		items: items
 	}];
 }

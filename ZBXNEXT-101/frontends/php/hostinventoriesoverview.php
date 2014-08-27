@@ -33,17 +33,24 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 	'groupby' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,	NULL),
+	// sort and sortorder
+	'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"host_count","inventory_field"'),		null),
+	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
+
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'host_count'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_DOWN));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 	access_deny();
 }
-
-validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN);
 
 if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -54,11 +61,11 @@ $options = array(
 	'groups' => array(
 		'real_hosts' => 1,
 	),
-	'groupid' => get_request('groupid', null),
+	'groupid' => getRequest('groupid'),
 );
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['groupby'] = get_request('groupby', '');
+$_REQUEST['groupby'] = getRequest('groupby', '');
 $groupFieldTitle = '';
 
 $hostinvent_wdgt = new CWidget();
@@ -88,8 +95,10 @@ $hostinvent_wdgt->addItem(BR());
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(
 	array(
-		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),
-		make_sorting_header(_('Host count'), 'host_count'),
+		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field',
+			$sortField, $sortOrder
+		),
+		make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
 	)
 );
 
@@ -108,22 +117,24 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	// aggregating data by chosen field value
 	$report = array();
-	foreach($hosts as $host){
-		if($host['inventory'][$_REQUEST['groupby']] !== ''){
-			$lowerValue = zbx_strtolower($host['inventory'][$_REQUEST['groupby']]);
-			if(!isset($report[$lowerValue])){
+	foreach($hosts as $host) {
+		if ($host['inventory'][$_REQUEST['groupby']] !== '') {
+			// same names with different letter casing are considered the same
+			$lowerValue = mb_strtolower($host['inventory'][$_REQUEST['groupby']]);
+
+			if (!isset($report[$lowerValue])) {
 				$report[$lowerValue] = array(
 					'inventory_field' => $host['inventory'][$_REQUEST['groupby']],
 					'host_count' => 1
 				);
 			}
-			else{
+			else {
 				$report[$lowerValue]['host_count'] += 1;
 			}
 		}
 	}
 
-	order_result($report, getPageSortField('host_count'), getPageSortOrder());
+	order_result($report, $sortField, $sortOrder);
 
 	foreach($report as $rep){
 		$row = array(

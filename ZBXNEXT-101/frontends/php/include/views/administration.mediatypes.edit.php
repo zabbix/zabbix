@@ -26,12 +26,11 @@ $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
 $mediaTypeForm = new CForm();
 $mediaTypeForm->setName('mediaTypeForm');
 $mediaTypeForm->addVar('form', $this->data['form']);
-$mediaTypeForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100);
+$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100);
 $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 

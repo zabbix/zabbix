@@ -31,13 +31,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'druleid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null)
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
+	// sort and sortorder
+	'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"ip"'),									null),
+	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('ip', ZBX_SORT_UP);
+
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'ip'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 // check discovery for existing if defined druleid
-if ($druleid = get_request('druleid')) {
+if ($druleid = getRequest('druleid')) {
 	$dbDRule = API::DRule()->get(array(
 			'druleids' => $druleid,
 			'countOutput' => true
@@ -52,16 +60,16 @@ if ($druleid = get_request('druleid')) {
  */
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
-	'druleid' => get_request('druleid', 0),
-	'sort' => get_request('sort'),
-	'sortorder' => get_request('sortorder'),
+	'druleid' => getRequest('druleid', 0),
+	'sort' => $sortField,
+	'sortorder' => $sortOrder,
 	'services' => array(),
 	'drules' => array()
 );
 
 $data['pageFilter'] = new CPageFilter(array(
 	'drules' => array('filter' => array('status' => DRULE_STATUS_ACTIVE)),
-	'druleid' => get_request('druleid', null)
+	'druleid' => getRequest('druleid')
 ));
 
 if ($data['pageFilter']->drulesSelected) {
@@ -86,8 +94,8 @@ if ($data['pageFilter']->drulesSelected) {
 	$options = array(
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => getPageSortField('ip'),
-		'sortorder' => getPageSortOrder(),
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limitSelects' => 1
 	);
 	if (!empty($data['druleid'])) {
