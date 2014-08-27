@@ -85,6 +85,13 @@ if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))
 	access_deny();
 }
 
+$pageFilter = new CPageFilter(array(
+	'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
+	'hosts' => array('editable' => true, 'templated_hosts' => true),
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
+));
+
 /*
  * Actions
  */
@@ -203,42 +210,46 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 		_n('Cannot delete application', 'Cannot delete applications', $deleted)
 	);
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable')) && hasRequest('applications')) {
-	$result = true;
-	$hostId = getRequest('hostid');
-	$enable = (getRequest('action') == 'application.massenable');
-	$updated = 0;
+elseif (hasRequest('applications')
+		&& str_in_array(getRequest('action'), array('application.massenable', 'application.massdisable'))) {
+	$enableApplicationItems = (getRequest('action') === 'application.massenable');
+
+	$applications = API::Application()->get(array(
+		'output' => array(),
+		'applicationids' => getRequest('applications', array()),
+		'selectItems' => array('itemid'),
+		'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null
+	));
+
+	$actionSuccessful = true;
+	$updatedItemCount = 0;
 
 	DBstart();
 
-	foreach (getRequest('applications') as $id => $appid) {
-		$dbItems = DBselect(
-			'SELECT ia.itemid,i.hostid,i.key_'.
-			' FROM items_applications ia'.
-				' LEFT JOIN items i ON ia.itemid=i.itemid'.
-			' WHERE ia.applicationid='.zbx_dbstr($appid).
-				' AND i.hostid='.zbx_dbstr($hostId).
-				' AND i.type<>'.ITEM_TYPE_HTTPTEST
-		);
+	foreach ($applications as $application) {
+		foreach($application['items'] as $item) {
+			$actionSuccessful &= $enableApplicationItems
+				? activate_item($item['itemid'])
+				: disable_item($item['itemid']);
 
-		while ($item = DBfetch($dbItems)) {
-			$result &= $enable ? activate_item($item['itemid']) : disable_item($item['itemid']);
-			$updated++;
+			$updatedItemCount++;
 		}
 	}
-	$result = DBend($result);
 
-	$messageSuccess = $enable
-		? _n('Item enabled', 'Items enabled', $updated)
-		: _n('Item disabled', 'Items disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable item', 'Cannot enable items', $updated)
-		: _n('Cannot disable item', 'Cannot disable items', $updated);
+	$actionSuccessful = DBend($actionSuccessful);
 
-	if ($result) {
-		uncheckTableRows($hostId);
+	if ($actionSuccessful) {
+		uncheckTableRows($pageFilter->hostid);
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
+
+	$messageSuccess = $enableApplicationItems
+		? _n('Item enabled', 'Items enabled', $updatedItemCount)
+		: _n('Item disabled', 'Items disabled', $updatedItemCount);
+	$messageFailed = $enableApplicationItems
+		? _n('Cannot enable item', 'Cannot enable items', $updatedItemCount)
+		: _n('Cannot disable item', 'Cannot disable items', $updatedItemCount);
+
+	show_messages($actionSuccessful, $messageSuccess, $messageFailed);
 }
 
 /*
@@ -247,7 +258,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('applic
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'applicationid' => getRequest('applicationid'),
-		'groupid' => getRequest('groupid', 0),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0)
 	);
@@ -276,42 +286,45 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$data = array(
-		'pageFilter' => new CPageFilter(array(
-			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
-			'hosts' => array('editable' => true, 'templated_hosts' => true),
-			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid')
-		)),
-		'sort' => $sortField,
-		'sortorder' => $sortOrder
-	);
-	$data['groupid'] = $data['pageFilter']->groupid;
-	$data['hostid'] = $data['pageFilter']->hostid;
+	$pageFilter = new CPageFilter(array(
+		'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
+		'hosts' => array('editable' => true, 'templated_hosts' => true),
+		'hostid' => getRequest('hostid'),
+		'groupid' => getRequest('groupid')
+	));
 
-	if ($data['pageFilter']->hostsSelected) {
+	$data = array(
+		'pageFilter' => $pageFilter,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder,
+		'hostid' => $pageFilter->hostid,
+		'groupid' => $pageFilter->groupid
+	);
+
+	if ($pageFilter->hostsSelected) {
 		// get application ids
-		$data['applications'] = API::Application()->get(array(
-			'hostids' => ($data['pageFilter']->hostid > 0) ? $data['pageFilter']->hostid : null,
-			'groupids' => ($data['pageFilter']->groupid > 0) ? $data['pageFilter']->groupid : null,
+		$applications = API::Application()->get(array(
+			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
+			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'output' => array('applicationid'),
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		));
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
 
 		// get applications
 		$data['applications'] = API::Application()->get(array(
-			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
+			'applicationids' => $applicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('itemid'),
-			'expandData' => true
+			'selectHost' => array('hostid', 'name')
 		));
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
 		// fetch template application source parents
-		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));
+		$applicationSourceParentIds = getApplicationSourceParentIds($applicationIds);
 		$parentAppIds = array();
 
 		foreach ($applicationSourceParentIds as $applicationParentIds) {
