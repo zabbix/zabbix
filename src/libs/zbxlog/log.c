@@ -185,6 +185,11 @@ void	zabbix_close_log()
 	}
 }
 
+void	zabbix_set_log_level(int level)
+{
+	log_level = level;
+}
+
 void	zabbix_errlog(zbx_err_codes_t err, ...)
 {
 	const char	*msg;
