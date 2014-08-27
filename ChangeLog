@@ -13,7 +13,7 @@ Bug fixes:
 ..F....... [ZBX-8377] fixed style and hover effect for disabled bulk action buttons and improved readability for readonly input fields (Ivo)
 A......... [ZBX-8568] fixed item.delete and itemprototype.delete to also remove trigger prototypes using them (Krists)
 A......... [ZBX-8636] fixed user accounts not being disabled after exceeding number of unsuccessful login attempts (Krists)
-........S. [ZBX-7721] added support for discovering more than 100 hypervisors on large vcenter installations to vmware collector (wiper, dimir)
+........S. [ZBX-7721] added support for discovering more than 100 hypervisors on large vcenter installations to vmware collector (dimir, wiper)
 ...G....S. [ZBX-8564] added standard error output while running remote script (Arturs)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
