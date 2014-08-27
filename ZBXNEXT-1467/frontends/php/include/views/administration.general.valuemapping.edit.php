@@ -65,7 +65,10 @@ if (!empty($this->data['valuemapid'])) {
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
+	$valueMappingForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
 }
 
 return $valueMappingForm;

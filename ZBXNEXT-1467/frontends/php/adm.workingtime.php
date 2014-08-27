@@ -78,9 +78,8 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
 
 $data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
 
-if ($data['form_refresh']) {
+if (hasRequest('form_refresh')) {
 	$data['config']['work_period'] = getRequest('work_period');
 }
 else {

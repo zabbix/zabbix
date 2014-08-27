@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'shows' =>			array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
-	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'(isset({form}) && {form} == "update")'),
+	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'),
 	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
 	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')),
 	'slides' =>			array(null,		 O_OPT, null,		null,	null),

@@ -347,19 +347,28 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$buttons = array();
-	array_push($buttons, new CSubmit('clone', _('Clone')));
-
 	if (!$this->data['limited']) {
-		array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
+		$btnDelete = new CButtonDelete(
+			_('Delete discovery rule?'),
+			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
-	array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	else {
+		$btnDelete = null;
+	}
+
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$btnDelete,
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		)
+	));
 }
 else {
-	$itemForm->addItem(makeFormFooter(new CSubmit('add', _('Add')),
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
 		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
 	));
 }

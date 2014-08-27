@@ -83,13 +83,11 @@ $discoveryForm->addItem($discoveryTabs);
 // append buttons to form
 if (isset($this->data['druleid']))
 {
-	$addButton = new CSubmit('add', _('Add'));
-	$deleteButton = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
 	$discoveryForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			$deleteButton,
+			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
 			new CButtonCancel()
 		)
 	));

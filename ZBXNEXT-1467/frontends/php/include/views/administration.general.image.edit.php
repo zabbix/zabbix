@@ -59,7 +59,10 @@ if (isset($this->data['imageid'])) {
 	));
 }
 else {
-	$imageForm->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel()));
+	$imageForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
 }
 
 return $imageForm;

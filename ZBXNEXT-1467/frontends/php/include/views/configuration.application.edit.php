@@ -52,7 +52,10 @@ if (!empty($this->data['applicationid'])) {
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_params(array('config', 'hostid', 'groupid', 'form', 'applicationid'))),
+			new CButtonDelete(
+				_('Delete application?'),
+				url_params(array('config', 'hostid', 'groupid', 'form', 'applicationid')
+			)),
 			new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid'))
 		)
 	));
