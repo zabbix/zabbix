@@ -49,10 +49,11 @@ PROXY_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxself
-endif
+else
 if AGENT
 AGENT_SUBDIRS = \
-	zbxself
+zbxself
+endif
 endif
 endif
 
