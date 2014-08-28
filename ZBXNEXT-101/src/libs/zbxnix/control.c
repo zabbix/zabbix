@@ -55,7 +55,7 @@ int	get_log_level_message(const char *opt, int command, int *message)
 	{
 		if (FAIL == is_ushort(opt, &num))
 		{
-			zbx_error("invalid log level control option: proccess identifier must be unsigned short value");
+			zbx_error("invalid log level control option: process identifier must be unsigned short value");
 			return FAIL;
 		}
 
@@ -72,16 +72,17 @@ int	get_log_level_message(const char *opt, int command, int *message)
 		if (NULL != (ptr = strchr(proc_name, ',')))
 		{
 			*ptr++ = '\0';
+
 			if (FAIL == is_ushort(ptr, &num))
 			{
-				zbx_error("invalid log level control option: proccess number must be unsigned short"
+				zbx_error("invalid log level control option: process number must be unsigned short"
 						" value");
 				return FAIL;
 			}
 
 			if (0 == num)
 			{
-				zbx_error("invalid log level control option: proccess number cannot be zero");
+				zbx_error("invalid log level control option: process number cannot be zero");
 				return FAIL;
 			}
 		}

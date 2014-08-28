@@ -89,10 +89,11 @@ static void	common_worker_sigusr_handler(int flags)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+#ifdef HAVE_SIGQUEUE
 	int		flags, process_num, found = 0, i;
 	union sigval	s;
 	unsigned char	process_type;
-
+#endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%u,value_int:%d].",
@@ -101,7 +102,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
-
 	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
 
 	if (!SIG_PARENT_PROCESS)
@@ -139,8 +139,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal to configuration syncer: "
-					"process not found");
+			zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal to configuration syncer:"
+					" process not found");
 		}
 	}
 	else if (ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
@@ -152,7 +152,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			for (i = 0; i < threads_num; i++)
 			{
-				if (0 !=  ZBX_RTC_GET_DATA(flags) &&  threads[i] != ZBX_RTC_GET_DATA(flags))
+				if (0 != ZBX_RTC_GET_DATA(flags) && threads[i] != ZBX_RTC_GET_DATA(flags))
 					continue;
 
 				found = 1;
@@ -163,9 +163,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 							threads[i]);
 				}
 				else
-				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
-				}
 			}
 
 			if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
@@ -201,17 +199,15 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 							" pid:%d", get_process_type_string(process_type), threads[i]);
 				}
 				else
-				{
 					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
-				}
 			}
 
 			if (0 == found)
 			{
 				if (0 == ZBX_RTC_GET_DATA(flags))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: \"%s\" process"
-							" does not exist",
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+							" \"%s\" process does not exist",
 							get_process_type_string(ZBX_RTC_GET_SCOPE(flags)));
 				}
 				else
@@ -409,7 +405,6 @@ int	zbx_sigusr_send(int flags)
 #else
 	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
 #endif
-
 	if (SUCCEED != ret)
 		zbx_error("%s", error);
 

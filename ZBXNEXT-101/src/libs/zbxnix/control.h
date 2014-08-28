@@ -24,4 +24,5 @@
 #include "zbxself.h"
 
 int	get_log_level_message(const char *opt, int command, int *message);
-#endif	/* ZABBIX_CONTROL_H */
+
+#endif
