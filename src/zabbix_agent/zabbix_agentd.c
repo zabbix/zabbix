@@ -900,7 +900,7 @@ int	main(int argc, char **argv)
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
-			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
