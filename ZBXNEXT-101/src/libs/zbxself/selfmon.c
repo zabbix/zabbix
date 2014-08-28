@@ -76,8 +76,8 @@ extern int	CONFIG_HEARTBEAT_FORKS;
 extern int	CONFIG_SELFMON_FORKS;
 extern int	CONFIG_VMWARE_FORKS;
 extern int	CONFIG_COLLECTOR_FORKS;
-extern int	CONFIG_ACTIVE_FORKS;
 extern int	CONFIG_PASSIVE_FORKS;
+extern int	CONFIG_ACTIVE_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;

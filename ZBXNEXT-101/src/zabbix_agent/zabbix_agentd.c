@@ -28,11 +28,9 @@
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
-#endif
-
-#ifndef _WINDOWS
 #	include "zbxmodules.h"
 #endif
+
 #include "comms.h"
 #include "alias.h"
 
@@ -95,7 +93,6 @@ const char	usage_message[] =
 /* application HELP message */
 const char	*help_message[] = {
 	"Options:",
-	"",
 	"  -c --config <config-file>       Absolute path to the configuration file",
 	"  -p --print                      Print known items and exit",
 	"  -t --test <item key>            Test specified item and exit",
@@ -112,8 +109,7 @@ const char	*help_message[] = {
 	"  <pid>                           Process identifier",
 	"  <process type>                  All processes of specified type (e.g., listener)",
 	"  <process type,N>                Process type and number (e.g., listener,3)",
-#endif
-#ifdef _WINDOWS
+#else
 	"",
 	"Functions:",
 	"",
@@ -163,9 +159,9 @@ ZBX_THREAD_HANDLE	*threads = NULL;
 
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
-ZBX_THREAD_LOCAL	unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-ZBX_THREAD_LOCAL	int process_num;
-ZBX_THREAD_LOCAL	int server_num			= 0;
+ZBX_THREAD_LOCAL unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL int process_num;
+ZBX_THREAD_LOCAL int server_num			= 0;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 
@@ -191,13 +187,13 @@ int	CONFIG_HISTSYNCER_FORKS		= 0;
 int	CONFIG_CONFSYNCER_FORKS		= 0;
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 1;
-int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
+int	CONFIG_ACTIVE_FORKS		= 0;
 
 char	*opt = NULL;
 
 #ifdef _WINDOWS
-void zbx_co_uninitialize();
+void	zbx_co_uninitialize();
 #endif
 
 int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
@@ -233,7 +229,8 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char	ch = '\0';
+	char	ch;
+	int	offset;
 
 	t->task = ZBX_TASK_START;
 
@@ -247,20 +244,21 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 			case 'R':
 #ifndef _WINDOWS
-				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE, strlen(ZBX_LOG_LEVEL_INCREASE)))
+				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
+						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_INCREASE),
-						ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
 					}
 
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						strlen(ZBX_LOG_LEVEL_DECREASE)))
+						offset = strlen(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + strlen(ZBX_LOG_LEVEL_DECREASE),
-						ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
+					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
 					}
@@ -663,12 +661,11 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_sock_t		listen_sock;
-	int			i, j = 0;
+	zbx_sock_t	listen_sock;
+	int		i, j = 0;
 #ifdef _WINDOWS
-	DWORD			res;
+	DWORD		res;
 #endif
-
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
@@ -705,7 +702,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* --- START THREADS ---*/
 
-	/* allocate memory for a collector, all listeners and an active check */
+	/* allocate memory for a collector, all listeners and active checks */
 	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
 #ifdef _WINDOWS
@@ -716,7 +713,6 @@ int	MAIN_ZABBIX_ENTRY()
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	for (i = 0; i < threads_num; i++)

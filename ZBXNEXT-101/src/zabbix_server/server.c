@@ -41,7 +41,6 @@
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
-#include "httppoller/httptest.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
@@ -74,9 +73,9 @@ const char	*help_message[] = {
 	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
 	"",
 	"Log level control targets:",
-	"  <pid>                            Process identifier",
-	"  <process type>                   All processes of specified type (e.g., poller)",
-	"  <process type,N>                 Process type and number (e.g., poller,3)",
+	"  <pid>                           Process identifier",
+	"  <process type>                  All processes of specified type (e.g., poller)",
+	"  <process type,N>                Process type and number (e.g., poller,3)",
 	"",
 	"Other options:",
 	"  -h --help                       Display help information",
@@ -127,8 +126,8 @@ int	CONFIG_WATCHDOG_FORKS		= 1;
 int	CONFIG_DATASENDER_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 0;
-int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
+int	CONFIG_ACTIVE_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -309,9 +308,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 		*process_num = server_num - server_count + CONFIG_VMWARE_FORKS;
 	}
 	else
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
@@ -686,9 +683,7 @@ int	main(int argc, char **argv)
 	zbx_load_config();
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-	{
 		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
-	}
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

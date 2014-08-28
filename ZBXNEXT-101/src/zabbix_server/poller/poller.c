@@ -46,8 +46,8 @@
 extern unsigned char	process_type;
 extern int		server_num, process_num;
 
-static void	update_triggers_status_to_unknown(zbx_uint64_t hostid,
-		zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
+static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts,
+		char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
@@ -768,12 +768,10 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
 			server_num, get_process_type_string(process_type), process_num);
-
 #ifdef HAVE_SNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		init_snmp("zabbix_server");
 #endif
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
