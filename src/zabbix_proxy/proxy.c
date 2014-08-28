@@ -40,7 +40,6 @@
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
-#include "../zabbix_server/httppoller/httptest.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
@@ -70,9 +69,9 @@ const char	*help_message[] = {
 	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
 	"",
 	"Log level control targets:",
-	"  <pid>                            Process identifier",
-	"  <process type>                   All processes of specified type (e.g., poller)",
-	"  <process type,N>                 Process type and number (e.g., poller,3)",
+	"  <pid>                           Process identifier",
+	"  <process type>                  All processes of specified type (e.g., poller)",
+	"  <process type,N>                Process type and number (e.g., poller,3)",
 	"",
 	"Other options:",
 	"  -h --help                       Display help information",
@@ -102,8 +101,8 @@ pid_t	*threads = NULL;
 
 unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
-int		process_num		= 0;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
+int		process_num		= 0;
 int		server_num		= 0;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
@@ -126,8 +125,8 @@ int	CONFIG_TIMER_FORKS		= 0;
 int	CONFIG_WATCHDOG_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 1;
 int	CONFIG_COLLECTOR_FORKS		= 0;
-int	CONFIG_ACTIVE_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
+int	CONFIG_ACTIVE_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -275,7 +274,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 	}
 	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
+		*process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
 		*process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
 	}
 	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
@@ -299,9 +298,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 		*process_num = server_num - server_count + CONFIG_VMWARE_FORKS;
 	}
 	else
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
@@ -721,9 +718,7 @@ int	main(int argc, char **argv)
 	zbx_load_config();
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-	{
 		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
-	}
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -825,7 +820,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
-	if (0 < CONFIG_TRAPPER_FORKS)
+	if (0 != CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{

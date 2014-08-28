@@ -132,7 +132,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 		if (local_request_failed++ > 1000)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "too many failures to accept an icoming connection");
+			zabbix_log(LOG_LEVEL_WARNING, "too many failures to accept an incoming connection");
 			local_request_failed = 0;
 		}
 

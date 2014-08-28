@@ -607,8 +607,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			else if ('\0' != *httpstep.status_codes &&
 					FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 			{
-				err_str = zbx_dsprintf(err_str, "status code \"%s\" did not match with"
-						" response code \"%d\"", httpstep.status_codes, stat.rspcode);
+				err_str = zbx_dsprintf(err_str, "response code \"%ld\" did not match any of the"
+						" required status codes \"%s\"", stat.rspcode, httpstep.status_codes);
 			}
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)) &&
