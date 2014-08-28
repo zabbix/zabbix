@@ -23,8 +23,7 @@
 extern int	sig_parent_pid;
 extern int	sig_exiting;
 
-#define SIG_CHECKED_FIELD(siginfo, field)		(NULL == siginfo ? -1 : siginfo->field)
-#define SIG_CHECKED_FIELD_UINT(siginfo, field)		(NULL == siginfo ? (unsigned)-1 : siginfo->field)
+#define SIG_CHECKED_FIELD(siginfo, field)		(NULL == siginfo ? -1 : (int)siginfo->field)
 #define SIG_CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
 #define SIG_PARENT_PROCESS				(sig_parent_pid == (int)getpid())
 
