@@ -37,7 +37,9 @@ extern int	threads_num;
 
 extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
 
+#ifdef HAVE_SIGQUEUE
 extern void	zbx_sigusr_handler(int flags);
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -46,6 +48,7 @@ extern void	zbx_sigusr_handler(int flags);
  * Purpose: common SIGUSR1 handler for Zabbix processes                       *
  *                                                                            *
  ******************************************************************************/
+#ifdef HAVE_SIGQUEUE
 static void	common_sigusr_handler(int flags)
 {
 	switch (ZBX_RTC_GET_MSG(flags))
@@ -79,6 +82,7 @@ static void	common_sigusr_handler(int flags)
 			break;
 	}
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
