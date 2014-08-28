@@ -64,7 +64,7 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
 
-/* kind of data base */
+/* type of database */
 #define ZBX_DB_UNKNOWN	0
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
