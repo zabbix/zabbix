@@ -965,7 +965,7 @@ static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
 	if (0 != ISSET_LOG(result))
 		return result->logs;
 
-	if (0 != ISSET_STR(result) || ISSET_TEXT(result) || ISSET_UI64(result) || ISSET_DBL(result))
+	if (0 != ISSET_STR(result) || 0 != ISSET_TEXT(result) || 0 != ISSET_UI64(result) || 0 != ISSET_DBL(result))
 	{
 		zbx_log_t	*log;
 		size_t		i;
