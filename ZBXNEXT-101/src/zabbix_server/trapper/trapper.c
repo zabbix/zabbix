@@ -37,8 +37,7 @@
 
 #include "daemon.h"
 
-extern unsigned char	daemon_type;
-extern unsigned char	process_type;
+extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
 /******************************************************************************
@@ -652,7 +651,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));

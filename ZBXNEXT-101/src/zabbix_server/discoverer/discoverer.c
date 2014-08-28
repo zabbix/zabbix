@@ -33,8 +33,7 @@
 #include "../poller/checks_snmp.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
-extern unsigned char	daemon_type;
-extern unsigned char	process_type;
+extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
 /******************************************************************************
@@ -842,10 +841,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 #ifdef HAVE_SNMP
-	init_snmp("zabbix_server");
+	init_snmp(progname);
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */

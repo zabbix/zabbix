@@ -63,6 +63,7 @@
 int		get_process_type_by_name(const char *proc_type_str);
 int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
+const char	*get_daemon_type_string(int type);
 
 #ifndef _WINDOWS
 void		init_selfmon_collector(void);
