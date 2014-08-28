@@ -56,12 +56,12 @@ extern int	CONFIG_LOG_FILE_SIZE;
 int		zabbix_open_log(int type, int level, const char *filename);
 void		zabbix_errlog(zbx_err_codes_t err, ...);
 void		__zbx_zabbix_log(int level, const char *fmt, ...);
-void		zabbix_close_log();
+void		zabbix_close_log(void);
 
 void		zabbix_set_log_level(int level);
-int		zabbix_increase_log_level();
-int		zabbix_decrease_log_level();
-const char	*zabbix_get_log_level_string();
+int		zabbix_increase_log_level(void);
+int		zabbix_decrease_log_level(void);
+const char	*zabbix_get_log_level_string(void);
 int		zabbix_check_log_level(int level);
 
 char		*zbx_strerror(int errnum);
