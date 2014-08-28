@@ -96,10 +96,11 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%u,value_int:%d].",
+	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s), sender_pid:%d, sender_uid:%d, value_int:%d (0x%x)].",
 			sig, get_signal_name(sig),
 			SIG_CHECKED_FIELD(siginfo, si_pid),
 			SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
+			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT),
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
 	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
