@@ -83,8 +83,7 @@ const char	syslog_app_name[] = "zabbix_agentd";
 const char	usage_message[] =
 #ifndef _WINDOWS
 	"[-Vhp] [-R <runtime option>]"
-#endif
-#ifdef _WINDOWS
+#else
 	"[-Vhp] [-idsx] [-m]"
 #endif
 	" [-c <config-file>] [-t <item key>]";
@@ -133,7 +132,9 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
 	{"test",		1,	NULL,	't'},
-#ifdef _WINDOWS
+#ifndef _WINDOWS
+	{"runtime-control",	1,	NULL,	'R'},
+#else
 	{"install",		0,	NULL,	'i'},
 	{"uninstall",		0,	NULL,	'd'},
 
@@ -141,18 +142,16 @@ static struct zbx_option	longopts[] =
 	{"stop",		0,	NULL,	'x'},
 
 	{"multiple-agents",	0,	NULL,	'm'},
-#else
-	{"runtime-control",	1,	NULL,	'R'},
 #endif
 	{NULL}
 };
 
 static char	shortopts[] =
 	"c:hVpt:"
-#ifdef _WINDOWS
-	"idsxm"
-#else
+#ifndef _WINDOWS
 	"R:"
+#else
+	"idsxm"
 #endif
 	;
 
@@ -274,8 +273,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					exit(EXIT_FAILURE);
 				}
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
-#endif
 				break;
+#endif
 			case 'h':
 				help();
 				exit(EXIT_SUCCESS);
