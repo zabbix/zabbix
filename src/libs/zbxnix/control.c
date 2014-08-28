@@ -77,12 +77,14 @@ int	get_log_level_message(const char *opt, int command, int *message)
 			{
 				zbx_error("invalid log level control option: process number must be unsigned short"
 						" value");
+				zbx_free(proc_name);
 				return FAIL;
 			}
 
 			if (0 == num)
 			{
 				zbx_error("invalid log level control option: process number cannot be zero");
+				zbx_free(proc_name);
 				return FAIL;
 			}
 		}
@@ -90,6 +92,7 @@ int	get_log_level_message(const char *opt, int command, int *message)
 		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
 		{
 			zbx_error("invalid log level control option: unknown process type");
+			zbx_free(proc_name);
 			return FAIL;
 		}
 
