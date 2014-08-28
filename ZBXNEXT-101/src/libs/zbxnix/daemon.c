@@ -39,7 +39,6 @@ extern int	get_process_info_by_thread(int server_num, unsigned char *process_typ
 
 #ifdef HAVE_SIGQUEUE
 extern void	zbx_sigusr_handler(int flags);
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -48,7 +47,6 @@ extern void	zbx_sigusr_handler(int flags);
  * Purpose: common SIGUSR1 handler for Zabbix processes                       *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_SIGQUEUE
 static void	common_sigusr_handler(int flags)
 {
 	switch (ZBX_RTC_GET_MSG(flags))
@@ -61,7 +59,7 @@ static void	common_sigusr_handler(int flags)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to \"%s\"",
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
 						zabbix_get_log_level_string());
 			}
 			break;
@@ -73,7 +71,7 @@ static void	common_sigusr_handler(int flags)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to \"%s\"",
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
 						zabbix_get_log_level_string());
 			}
 			break;
