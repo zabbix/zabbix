@@ -35,7 +35,6 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	zbx_sock_t	sock;
 	int		ret, i;
 	struct zbx_json	json;
-	char		*answer = NULL;
 
 	if (1 > count)
 	{
