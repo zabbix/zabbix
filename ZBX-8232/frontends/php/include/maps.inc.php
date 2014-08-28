@@ -1127,13 +1127,20 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	$all_triggers = array();
 
 	if (!empty($triggers_map)) {
-		$triggers = API::Trigger()->get(array(
+		$triggerOptions = array(
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('state' => null),
-			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
-		));
+		);
+
+		if ($show_unack) {
+			$triggerOptions['selectLastEvent'] = array('acknowledged');
+		}
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1145,14 +1152,22 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from submaps, skip dependent
 	if (!empty($triggers_map_submaps)) {
-		$triggers = API::Trigger()->get(array(
+		$triggerOptions = array(
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
-		));
+			'nopermissions' => true,
+			'only_true' => true
+		);
+
+		if ($show_unack) {
+			$triggerOptions['selectLastEvent'] = array('acknowledged');
+		}
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1164,7 +1179,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if (!empty($monitored_hostids)) {
-		$triggers = API::Trigger()->get(array(
+		$triggerOptions = array(
 			'hostids' => $monitored_hostids,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
@@ -1172,8 +1187,16 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
-			'skipDependent' => true
-		));
+			'skipDependent' => true,
+			'only_true' => true
+		);
+
+		if ($show_unack) {
+			$triggerOptions['selectLastEvent'] = array('acknowledged');
+		}
+
+		$triggers = API::Trigger()->get($triggerOptions);
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1187,17 +1210,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		}
 	}
 	$all_triggers = zbx_toHash($all_triggers, 'triggerid');
-
-	$unackTriggerIds = API::Trigger()->get(array(
-		'triggerids' => array_keys($all_triggers),
-		'withLastEventUnacknowledged' => true,
-		'output' => array('triggerid'),
-		'nodeids' => get_current_nodeid(true),
-		'nopermissions' => true,
-		'monitored' => true,
-		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'state' => null)
-	));
-	$unackTriggerIds = zbx_toHash($unackTriggerIds, 'triggerid');
 
 	$info = array();
 	foreach ($selements as $selementId => $selement) {
@@ -1241,7 +1253,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						}
 					}
 
-					if (isset($unackTriggerIds[$triggerId])) {
+					if ($show_unack && $trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
 						$i['problem_unack']++;
 					}
 
