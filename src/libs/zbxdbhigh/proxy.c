@@ -2651,7 +2651,7 @@ exit:
  * Return value: the number of history values                                 *
  *                                                                            *
  ******************************************************************************/
-int	proxy_get_history_count()
+int	proxy_get_history_count(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
