@@ -168,7 +168,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	return SUCCEED;
 }
 
-void	zabbix_close_log()
+void	zabbix_close_log(void)
 {
 	if (LOG_TYPE_SYSLOG == log_type)
 	{
