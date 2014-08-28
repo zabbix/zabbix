@@ -67,6 +67,8 @@ class CGraphItem extends CApiService {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'expandData');
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -83,7 +85,7 @@ class CGraphItem extends CApiService {
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY i.itemid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 

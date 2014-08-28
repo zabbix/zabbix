@@ -26,7 +26,7 @@ $rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
-$filterTable = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter filter-center');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 $inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
@@ -71,15 +71,15 @@ $hostInventoryWidget->addHeaderRowNumber();
 
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
-	make_sorting_header(_('Host'), 'name'),
+	make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Group'),
-	make_sorting_header(_('Name'), 'pr_name'),
-	make_sorting_header(_('Type'), 'pr_type'),
-	make_sorting_header(_('OS'), 'pr_os'),
-	make_sorting_header(_('Serial number A'), 'pr_serialno_a'),
-	make_sorting_header(_('Tag'), 'pr_tag'),
-	make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
-);
+	make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
+));
 
 foreach ($this->data['hosts'] as $host) {
 	$hostGroups = array();

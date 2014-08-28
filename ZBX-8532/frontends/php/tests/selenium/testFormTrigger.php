@@ -339,8 +339,8 @@ class testFormTrigger extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -385,7 +385,7 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 		$this->zbxTestClickWait('link='.$data['description']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('Trigger updated');
 		$this->zbxTestTextPresent($data['description']);
@@ -848,7 +848,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger added');

@@ -37,19 +37,19 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'copy_type' => array(T_ZBX_INT, O_OPT, P_SYS, IN(array(COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_TEMPLATE)), 'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
-	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form})&&{form}=="update"'),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
-	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Width').' (min:20, max:65535)'),
-	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Height').' (min:20, max:65535)'),
-	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({save})'),
+	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && {form} == "update"'),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')),
+	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width').' (min:20, max:65535)'),
+	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height').' (min:20, max:65535)'),
+	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({add}) || isset({update})'),
 	'show_3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'show_legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
 	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
-	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&({graphtype}==0||{graphtype}==1)'),
-	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&({graphtype}==0||{graphtype}==1)'),
-	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&{ymin_type}==3'),
-	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&{ymax_type}==3'),
+	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && ({graphtype} == 0 || {graphtype} == 1)'),
+	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && ({graphtype} == 0 || {graphtype} == 1)'),
+	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymin_type}) && {ymin_type} == 3'),
+	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == 3'),
 	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')),
 	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')),
 	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
@@ -58,16 +58,20 @@ $fields = array(
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
-	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
+	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy}) && isset({copy_type}) && {copy_type} == 0'),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete"'),	null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name"'),					null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 $percentVisible = getRequest('visible');
 if (!isset($percentVisible['percent_left'])) {
@@ -83,9 +87,7 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'graphtype'));
 
-$_REQUEST['go'] = getRequest('go', 'none');
 $_REQUEST['items'] = getRequest('items', array());
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
@@ -170,8 +172,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	$graph['items'] = API::GraphItem()->get(array(
 		'graphids' => $_REQUEST['graphid'],
 		'sortfield' => 'gitemid',
-		'output' => API_OUTPUT_EXTEND,
-		'expandData' => true
+		'output' => API_OUTPUT_EXTEND
 	));
 
 	if($graph['templateid']) {
@@ -185,7 +186,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 
 	$_REQUEST['form'] = 'clone';
 }
-elseif (hasRequest('save')) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	$items = getRequest('items', array());
 
 	// remove passing "gitemid" to API if new items added via pop-up
@@ -301,7 +302,7 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
+elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
 
 	if (hasRequest('parent_discoveryid')) {
@@ -320,7 +321,7 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
-} elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
+} elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$result = true;
 
@@ -368,10 +369,9 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 			uncheckTableRows(
 				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
 			);
+			unset($_REQUEST['group_graphid']);
 		}
 		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
-
-		$_REQUEST['go'] = 'none2';
 	}
 	else {
 		error(_('No target selected.'));
@@ -404,9 +404,11 @@ if (empty($_REQUEST['parent_discoveryid'])) {
 	}
 }
 
-if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
+if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
+	$data = getCopyElementsFormData('group_graphid');
+	$data['action'] = 'graph.masscopyto';
+	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
 }
@@ -607,16 +609,21 @@ elseif (isset($_REQUEST['form'])) {
 	$graphView->show();
 }
 else {
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
 	$data = array(
 		'pageFilter' => $pageFilter,
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
 	);
-
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
 
 	// get graphs
 	$options = array(
@@ -632,13 +639,13 @@ else {
 		? API::Graph()->get($options)
 		: API::GraphPrototype()->get($options);
 
-	if ($sortfield == 'graphtype') {
+	if ($sortField == 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	$data['paging'] = getPagingLine($data['graphs']);
 
@@ -659,7 +666,7 @@ else {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
-	order_result($data['graphs'], $sortfield, $sortorder);
+	order_result($data['graphs'], $sortField, $sortOrder);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);

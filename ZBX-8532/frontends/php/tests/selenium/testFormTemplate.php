@@ -29,7 +29,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $this->template);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 		$this->zbxTestTextPresent($this->template);
@@ -42,7 +42,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $template);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 		$this->zbxTestTextPresent($template);
@@ -52,7 +52,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickWait('link=Template OS Linux');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($this->template);
@@ -64,7 +64,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->input_type('template_name', $this->template_tmp);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 	}
@@ -82,7 +82,7 @@ class testFormTemplate extends CWebTest {
 		$this->verifyElementPresent('macros_1_macro');
 		$this->input_type('macros_1_macro', '{$TEST_MACRO2}');
 		$this->input_type('macros_1_value', '2');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Template updated');
 	}
 
@@ -93,7 +93,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', 'Template OS Linux');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('No groups for template');
 		$this->assertEquals(1, DBcount("select * from hosts where host='Template OS Linux'"));
@@ -127,7 +127,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('clone');
 		$this->input_type('template_name', $this->template_tmp);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 	}
@@ -152,7 +152,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('full_clone');
 		$this->input_type('template_name', $this->template.'_fullclone');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template added');
 	}

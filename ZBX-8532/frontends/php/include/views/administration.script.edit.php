@@ -69,7 +69,7 @@ $scriptFormList->addRow(
 $scriptFormList->addRow(_('Description'), new CTextArea('description', $this->get('description')));
 
 // user groups
-$userGroups = new CCombobox('usrgrpid', $this->get('usrgrpid'));
+$userGroups = new CComboBox('usrgrpid', $this->get('usrgrpid'));
 $userGroups->addItem(0, _('All'));
 foreach ($this->getArray('usergroups') as $userGroup){
 	$userGroups->addItem($userGroup['usrgrpid'], $userGroup['name']);
@@ -77,7 +77,7 @@ foreach ($this->getArray('usergroups') as $userGroup){
 $scriptFormList->addRow(_('User group'), $userGroups);
 
 // host groups
-$hostGroups = new CCombobox('hgstype', $this->get('hgstype'));
+$hostGroups = new CComboBox('hgstype', $this->get('hgstype'));
 $hostGroups->addItem(0, _('All'));
 $hostGroups->addItem(1, _('Selected'));
 $scriptFormList->addRow(_('Host group'), $hostGroups);
@@ -94,7 +94,7 @@ $scriptFormList->addRow(null, new CMultiSelect(array(
 )), null, 'hostGroupSelection');
 
 // access
-$accessComboBox = new CCombobox('host_access', $this->get('host_access'));
+$accessComboBox = new CComboBox('host_access', $this->get('host_access'));
 $accessComboBox->addItem(PERM_READ, _('Read'));
 $accessComboBox->addItem(PERM_READ_WRITE, _('Write'));
 $scriptFormList->addRow(_('Required host permissions'), $accessComboBox);
@@ -113,13 +113,23 @@ $scriptView->addTab('scripts', _('Script'), $scriptFormList);
 $scriptForm->addItem($scriptView);
 
 // footer
-$others = array();
 if (isset($_REQUEST['scriptid'])) {
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid'));
+	$scriptForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(_('Delete script?'), url_param('form').url_param('scriptid')),
+			new CButtonCancel()
+		)
+	));
 }
-$others[] = new CButtonCancel();
-$scriptForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
+else {
+	$scriptForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
+}
+
 $scriptsWidget->addItem($scriptForm);
 
 return $scriptsWidget;

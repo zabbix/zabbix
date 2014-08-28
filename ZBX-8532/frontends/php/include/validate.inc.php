@@ -108,7 +108,7 @@ function validate_ip($str, &$arr) {
 
 /**
  * Validate IP mask. IP/bits.
- * bits range for IPv4: 16 - 32
+ * bits range for IPv4: 16 - 30
  * bits range for IPv6: 112 - 128
  *
  * @param string $ip_range
@@ -125,7 +125,7 @@ function validate_ip_range_mask($ip_range) {
 	$bits = $parts[1];
 
 	if (validate_ipv4($ip, $arr)) {
-		return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
+		return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 30;
 	}
 	elseif (ZBX_HAVE_IPV6 && validate_ipv6($ip, $arr)) {
 		return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
@@ -239,7 +239,6 @@ function calc_exp2($fields, $expression) {
 	foreach ($fields as $field => $checks) {
 		$expression = str_replace('{'.$field.'}', '$_REQUEST["'.$field.'"]', $expression);
 	}
-
 	return eval('return ('.trim($expression, '& ').') ? 1 : 0;');
 }
 
@@ -518,8 +517,6 @@ function check_fields(&$fields, $show_messages = true) {
 		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
 		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'page' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
 		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);

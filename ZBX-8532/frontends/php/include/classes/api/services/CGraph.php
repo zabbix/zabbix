@@ -90,6 +90,7 @@ class CGraph extends CGraphGeneral {
 			'selectItems'				=> null,
 			'selectGraphItems'			=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectGraphDiscovery'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -116,7 +117,7 @@ class CGraph extends CGraphGeneral {
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 				')';
@@ -131,7 +132,7 @@ class CGraph extends CGraphGeneral {
 					' AND g.ymin_itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 				')';
@@ -146,7 +147,7 @@ class CGraph extends CGraphGeneral {
 					' AND g.ymax_itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 				')';
@@ -361,7 +362,8 @@ class CGraph extends CGraphGeneral {
 			$tmpGraph = $graph;
 			$tmpGraph['templateid'] = $graph['graphid'];
 
-			if (!$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid'])) {
+			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
+			if (!$tmpGraph['gitems']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s".', $tmpGraph['name'], $chdHost['host']));
 			}
 
@@ -436,18 +438,18 @@ class CGraph extends CGraphGeneral {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist.'));
 					}
 
-					$chdGraphItems = API::GraphItem()->get(array(
-						'graphids' => $chdGraph['graphid'],
-						'output' => API_OUTPUT_EXTEND,
-						'preservekeys' => true,
-						'expandData' => true,
-						'nopermissions' => true
+					$chdGraphItemItems = API::Item()->get(array(
+						'output' => array('itemid', 'key_', 'hostid'),
+						'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
+						'preservekeys' => true
 					));
 
-					if (count($chdGraphItems) == count($tmpGraph['gitems'])) {
+					if (count($chdGraph['gitems']) == count($tmpGraph['gitems'])) {
 						foreach ($tmpGraph['gitems'] as $gitem) {
-							foreach ($chdGraphItems as $chdItem) {
-								if ($gitem['key_'] == $chdItem['key_'] && bccomp($chdHost['hostid'], $chdItem['hostid']) == 0) {
+							foreach ($chdGraph['gitems'] as $chdGraphItem) {
+								$chdGraphItemItem = $chdGraphItemItems[$chdGraphItem['itemid']];
+								if ($gitem['key_'] == $chdGraphItemItem['key_']
+										&& bccomp($chdHost['hostid'], $chdGraphItemItem['hostid']) == 0) {
 									continue 2;
 								}
 							}
@@ -621,6 +623,21 @@ class CGraph extends CGraphGeneral {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding graph discovery
+		if ($options['selectGraphDiscovery'] !== null) {
+			$graphDiscoveries = API::getApiService()->select('graph_discovery', array(
+				'output' => $this->outputExtend($options['selectGraphDiscovery'], array('graphid')),
+				'filter' => array('graphid' => array_keys($result)),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($graphDiscoveries, 'graphid', 'graphid');
+
+			$graphDiscoveries = $this->unsetExtraFields($graphDiscoveries, array('graphid'),
+				$options['selectGraphDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $graphDiscoveries, 'graphDiscovery');
 		}
 
 		return $result;

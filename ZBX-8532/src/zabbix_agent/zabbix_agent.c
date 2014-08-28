@@ -117,7 +117,7 @@ static void	zbx_load_config(int optional)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
@@ -271,7 +271,7 @@ int	main(int argc, char **argv)
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	unload_modules();
 	zabbix_close_log();

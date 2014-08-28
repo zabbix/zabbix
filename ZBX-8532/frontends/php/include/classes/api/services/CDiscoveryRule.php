@@ -111,7 +111,7 @@ class CDiscoveryRule extends CItemGeneral {
 				' WHERE i.hostid=hgg.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 
@@ -281,25 +281,26 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('discoveryrule.exists method is deprecated.');
 
 		$options = array(
-			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
+			'filter' => array('key_' => $object['key_']),
 			'limit' => 1
 		);
 
 		if (isset($object['hostid'])) {
 			$options['hostids'] = $object['hostid'];
 		}
+
 		if (isset($object['host'])) {
 			$options['filter']['host'] = $object['host'];
 		}
 
-		$objs = $this->get($options);
+		$dicoveryRule = $this->get($options);
 
-		return !empty($objs);
+		return (bool) $dicoveryRule;
 	}
 
 	/**

@@ -108,7 +108,7 @@ class CHostGroup extends CApiService {
 					' AND '.dbConditionInt('r.groupid', $userGroups).
 				' GROUP BY r.id'.
 				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 
@@ -365,17 +365,21 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Get host group id by name.
+	 * Get host groups by name.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
 	 * @param array $hostgroupData
 	 * @param array $hostgroupData['name']
 	 *
-	 * @return string|boolean host group id or false if error
+	 * @return array
 	 */
-	public function getObjects($hostgroupData) {
+	public function getObjects(array $hostgroupData) {
+		$this->deprecated('hostgroup.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $hostgroupData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $hostgroupData
 		));
 	}
 
@@ -388,16 +392,16 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('hostgroup.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array('name', 'groupid'), $object),
+		$hostGroup = $this->get(array(
 			'output' => array('groupid'),
+			'filter' => zbx_array_mintersect(array('name', 'groupid'), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $hostGroup;
 	}
 
 	/**

@@ -47,7 +47,7 @@ if (!empty($this->data['maps'])) {
 		// check for permissions
 		if (isset($this->data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen'].'&severity_min='.$this->data['severity_min']);
+			$parentMaps[] = new CLink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen'].'&severity_min='.$this->data['severity_min']);
 		}
 	}
 	if (!empty($parentMaps)) {

@@ -38,7 +38,7 @@ $slideFormList = new CFormList('slideFormList');
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $slideFormList->addRow(_('Name'), $nameTextBox);
-$slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
+$slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
 $slideTable = new CTableInfo(null, 'formElementTable');
@@ -62,7 +62,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 		}
 	}
 
-	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
+	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false);
 	$delay->setAttribute('placeholder', _('default'));
 
 	$removeButton = new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
@@ -103,20 +103,20 @@ $slideTab->addTab('slideTab', _('Slide'), $slideFormList);
 $slideForm->addItem($slideTab);
 
 // append buttons to form
-if (empty($this->data['slideshowid'])) {
+if (isset($this->data['slideshowid'])) {
 	$slideForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel()
-	));
-}
-else {
-	$slideForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete slide show?'), url_params(array('form', 'slideshowid'))),
 			new CButtonCancel()
 		)
+	));
+}
+else {
+	$slideForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
 	));
 }
 

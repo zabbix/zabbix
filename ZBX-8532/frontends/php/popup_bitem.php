@@ -36,16 +36,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
 	'config' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1,2,3'),		null),
-	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({}!=0)',	null),
-	'list_name' =>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
+	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({} != 0)',	null),
+	'list_name' =>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'(isset({add}) || isset({update})) && isset({gid})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT,	 null,	null,				null),
-	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),
-	'color' =>			array(T_ZBX_CLR, O_OPT,	 null,	null, 'isset({save})', _('Colour')),
-	'calc_fnc' =>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
+	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({} != 0)', 'isset({add}) || isset({update})', _('Parameter')),
+	'color' =>			array(T_ZBX_CLR, O_OPT,	 null,	null, 'isset({add}) || isset({update})', _('Colour')),
+	'calc_fnc' =>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({add}) || isset({update})'),
 	'axisside' =>		array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT), null),
 	// actions
 	'add' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT,	 P_SYS,	null,	null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 null,	null,	null),
@@ -73,27 +73,27 @@ if (getRequest('itemid') > 0) {
 insert_js_function('add_bitem');
 insert_js_function('update_bitem');
 
-if (isset($_REQUEST['save']) && !isset($_REQUEST['gid'])) {
+if (hasRequest('add') && !hasRequest('gid')) {
 	insert_js("add_bitem(".
-		zbx_jsvalue($_REQUEST['dstfrm']).",".
+		zbx_jsvalue(getRequest('dstfrm')).",".
 		zbx_jsvalue($caption).",'".
-		$_REQUEST['itemid']."','".
-		$_REQUEST['color']."',".
-		$_REQUEST['calc_fnc'].",".
-		$_REQUEST['axisside'].");\n"
+		getRequest('itemid')."','".
+		getRequest('color')."',".
+		getRequest('calc_fnc').",".
+		getRequest('axisside').");\n"
 	);
 }
 
-if (isset($_REQUEST['save']) && isset($_REQUEST['gid'])) {
+if (hasRequest('update') && hasRequest('gid')) {
 	insert_js("update_bitem(".
-		zbx_jsvalue($_REQUEST['dstfrm']).",".
-		zbx_jsvalue($_REQUEST['list_name']).",'".
-		$_REQUEST['gid']."',".
+		zbx_jsvalue(getRequest('dstfrm')).",".
+		zbx_jsvalue(getRequest('list_name')).",'".
+		getRequest('gid')."',".
 		zbx_jsvalue($caption).",'".
-		$_REQUEST['itemid']."','".
-		$_REQUEST['color']."',".
-		$_REQUEST['calc_fnc'].",".
-		$_REQUEST['axisside'].");\n"
+		getRequest('itemid')."','".
+		getRequest('color')."',".
+		getRequest('calc_fnc').",".
+		getRequest('axisside').");\n"
 	);
 }
 else {
@@ -133,7 +133,7 @@ else {
 		$caption = $host['name'].NAME_DELIMITER.$itemName;
 	}
 
-	$txtCondVal = new CTextBox('name', $caption, 50, 'yes');
+	$txtCondVal = new CTextBox('name', $caption, 50, true);
 
 	$btnSelect = new CSubmit('btn1', _('Select'),
 		'return PopUp("popup.php?'.
@@ -173,7 +173,11 @@ else {
 		$frmGItem->addVar('color', $color);
 	}
 
-	$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid) ? _('Save') : _('Add')));
+	if (isset($gid)) {
+		$frmGItem->addItemToBottomRow(new CSubmit('update', _('Update')));
+	} else {
+		$frmGItem->addItemToBottomRow(new CSubmit('add', _('Add')));
+	}
 
 	$frmGItem->addItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 	$frmGItem->Show();

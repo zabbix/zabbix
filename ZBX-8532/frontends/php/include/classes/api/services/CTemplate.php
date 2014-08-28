@@ -121,7 +121,7 @@ class CTemplate extends CHostGeneral {
 					' WHERE h.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 
@@ -292,18 +292,22 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get template ID by template name.
+	 * Get template by template name and ID.
 	 *
-	 * @param array $templateData
-	 * @param array $templateData['host']
-	 * @param array $templateData['templateid']
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return string
+	 * @param array  $templateData
+	 * @param string $templateData['host']
+	 * @param string $templateData['templateid']
+	 *
+	 * @return array
 	 */
-	public function getObjects($templateData) {
+	public function getObjects(array $templateData) {
+		$this->deprecated('template.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $templateData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $templateData
 		));
 	}
 
@@ -316,16 +320,16 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('template.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
+		$template = $this->get(array(
 			'output' => array('templateid'),
+			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $template;
 	}
 
 	/**
@@ -613,9 +617,6 @@ class CTemplate extends CHostGeneral {
 		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
-
-		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.dbConditionInt('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {

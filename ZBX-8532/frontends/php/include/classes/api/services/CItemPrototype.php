@@ -109,7 +109,7 @@ class CItemPrototype extends CItemGeneral {
 					' WHERE i.hostid=hgg.hostid'.
 					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
+						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
 		}
 
@@ -273,21 +273,26 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('itemprototype.exists method is deprecated.');
 
 		$options = array(
-			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
+			'filter' => array('key_' => $object['key_']),
 			'limit' => 1
 		);
 
-		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
-		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
+		if (isset($object['hostid'])) {
+			$options['hostids'] = $object['hostid'];
+		}
 
-		$objs = $this->get($options);
+		if (isset($object['host'])) {
+			$options['filter']['host'] = $object['host'];
+		}
 
-		return !empty($objs);
+		$itemPrototype = $this->get($options);
+
+		return (bool) $itemPrototype;
 	}
 
 	/**
@@ -484,7 +489,7 @@ class CItemPrototype extends CItemGeneral {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parentItemids));
+		} while ($parentItemids);
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -500,16 +505,13 @@ class CItemPrototype extends CItemGeneral {
 
 		// delete graphs with this item prototype
 		$delGraphPrototypes = API::GraphPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('graphid'),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($delGraphPrototypes)) {
-			$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
-			}
+		if ($delGraphPrototypes) {
+			API::GraphPrototype()->delete(array_keys($delGraphPrototypes), true);
 		}
 
 		// check if any graphs are referencing this item
@@ -522,28 +524,27 @@ class CItemPrototype extends CItemGeneral {
 		while ($item = DBfetch($dbItems)) {
 			$createdItems[$item['itemid']] = $item['itemid'];
 		}
-		if (!empty($createdItems)) {
-			$result = API::Item()->delete($createdItems, true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete items created by low level discovery.'));
-			}
+		if ($createdItems) {
+			API::Item()->delete($createdItems, true);
 		}
 
 
 // TRIGGER PROTOTYPES
 		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'output' => array(),
 			'itemids' => $prototypeids,
-			'output' => array('triggerid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
-		if (!empty($delTriggerPrototypes)) {
-			$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger prototype'));
-			}
+		if ($delTriggerPrototypes) {
+			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
 		}
 
+		// screen items
+		DB::delete('screens_items', array(
+			'resourceid' => $prototypeids,
+			'resourcetype' => array(SCREEN_RESOURCE_LLD_SIMPLE_GRAPH)
+		));
 
 // ITEM PROTOTYPES
 		DB::delete('items', array('itemid' => $prototypeids));

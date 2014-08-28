@@ -91,11 +91,11 @@ $frmHost->addVar('clear_templates', $clear_templates);
 $templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54, 'no', 128);
+$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
 $template_nameTB->attr('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, 'no', 128);
+$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
 $templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
@@ -371,6 +371,28 @@ if ($_REQUEST['form'] == 'full_clone') {
 
 		$templateList->addRow(_('Screens'), $listBox);
 	}
+
+	// web scenarios
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('httptestid', 'name'),
+		'hostids' => $templateid,
+		'inherited' => false
+	));
+
+	if ($httpTests) {
+		$httpTestList = array();
+
+		foreach ($httpTests as $httpTest) {
+			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
+		}
+
+		order_result($httpTestList);
+
+		$listBox = new CListBox('httpTests', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($httpTestList);
+		$templateList->addRow(_('Web scenarios'), $listBox);
+	}
 }
 
 $divTabs->addTab('templateTab', _('Template'), $templateList);
@@ -452,15 +474,26 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $frmHost->addItem($divTabs);
 
 // Footer
-$others = array();
 if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
-	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = new CSubmit('full_clone', _('Full clone'));
-	$others[] = new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid'));
-	$others[] = new CButtonQMessage('delete_and_clear', _('Delete and clear'), _('Delete and clear template? (Warning: all linked hosts will be cleared!)'), url_param('form').url_param('templateid').url_param('groupid'));
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			new CSubmit('full_clone', _('Full clone')),
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid')),
+			new CButtonQMessage(
+				'delete_and_clear',
+				_('Delete and clear'),
+				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
+				url_param('form').url_param('templateid').url_param('groupid')
+			),
+			new CButtonCancel(url_param('groupid'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('groupid'));
+else {
+	$frmHost->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('groupid'))));
+}
 
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

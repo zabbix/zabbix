@@ -326,7 +326,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->zbxTestClick('select');
 		$this->selectWindow();
 		$this->wait();
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 		// no entities should be deleted, they all should be updated
