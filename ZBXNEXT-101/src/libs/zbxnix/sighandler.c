@@ -77,7 +77,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				"reason:%d]. Exiting ...",
 				sig, get_signal_name(sig),
 				SIG_CHECKED_FIELD(siginfo, si_pid),
-				SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
+				SIG_CHECKED_FIELD(siginfo, si_uid),
 				SIG_CHECKED_FIELD(siginfo, si_code));
 		exit(EXIT_FAILURE);
 	}
@@ -92,7 +92,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					"reason:%d]. Exiting ...",
 					sig, get_signal_name(sig),
 					SIG_CHECKED_FIELD(siginfo, si_pid),
-					SIG_CHECKED_FIELD_UINT(siginfo, si_uid),
+					SIG_CHECKED_FIELD(siginfo, si_uid),
 					SIG_CHECKED_FIELD(siginfo, si_code));
 			zbx_on_exit();
 		}
