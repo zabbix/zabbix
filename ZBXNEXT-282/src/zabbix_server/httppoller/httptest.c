@@ -384,12 +384,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		goto clean;
-	}
-
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
@@ -398,7 +392,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
-					0 == httptest->httptest.verify_host ? 0L : 2L)))
+					0 == httptest->httptest.verify_host ? 0L : 2L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
