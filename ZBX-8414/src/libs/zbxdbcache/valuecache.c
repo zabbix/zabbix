@@ -341,9 +341,18 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
 			" from %s"
-			" where itemid=" ZBX_FS_UI64
-				" and clock>%d and clock<=%d",
-			table->fields, table->name, itemid, end_timestamp - seconds, end_timestamp);
+			" where itemid=" ZBX_FS_UI64,
+			table->fields, table->name, itemid);
+
+	if (1 == seconds)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
+				end_timestamp - seconds, end_timestamp);
+	}
 
 	result = DBselect("%s", sql);
 
@@ -1932,7 +1941,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  ******************************************************************************/
 static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int timestamp)
 {
-	int	ret = SUCCEED, cache_records = 0, update_end;
+	int	ret = SUCCEED, cached_records = 0, update_end;
 
 	/* find if the cache should be updated to cover the required count */
 	if (NULL != item->head)
@@ -1942,39 +1951,39 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 		if (SUCCEED == vch_item_get_last_value(item, timestamp, &chunk, &index))
 		{
-			cache_records = index - chunk->first_value + 1;
+			cached_records = index - chunk->first_value + 1;
 
-			while (NULL != (chunk = chunk->prev) && cache_records < count)
-				cache_records += chunk->last_value - chunk->first_value + 1;
+			while (NULL != (chunk = chunk->prev) && cached_records < count)
+				cached_records += chunk->last_value - chunk->first_value + 1;
+
+			if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status && cached_records < count)
+				cached_records -= vch_item_drop_first_second(item);
 		}
-
-		/* We need to get item values before the first cached value, but not including it     */
-		/* unless reload first flag is set (in which case we need to include the first cached */
-		/* value).                                                                            */
-		update_end = item->tail->slots[item->tail->first_value].timestamp.sec;
-
-		if (ZBX_ITEM_STATUS_RELOAD_FIRST != item->status)
-			update_end--;
 	}
-	else
-		update_end = ZBX_VC_TIME();
 
 	/* update cache if necessary */
-	if (ZBX_ITEM_STATUS_CACHED_ALL != item->status && cache_records < count)
+	if (ZBX_ITEM_STATUS_CACHED_ALL != item->status && cached_records < count)
 	{
 		zbx_vector_history_record_t	records;
 
-		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
+		if (NULL != item->head)
 		{
-			if (0 > (cache_records -= vch_item_drop_first_second(item)))
-				cache_records = 0;
+			/* We need to get item values before the first cached value, but not including it     */
+			/* unless reload first flag is set (in which case we need to include the first cached */
+			/* value).                                                                            */
+			update_end = item->tail->slots[item->tail->first_value].timestamp.sec;
+
+			if (ZBX_ITEM_STATUS_RELOAD_FIRST != item->status)
+				update_end--;
 		}
+		else
+			update_end = ZBX_VC_TIME();
 
 		zbx_vector_history_record_create(&records);
 
 		vc_try_unlock();
 
-		ret = vc_db_read_values_by_count(item->itemid, item->value_type, &records, count - cache_records,
+		ret = vc_db_read_values_by_count(item->itemid, item->value_type, &records, count - cached_records,
 				timestamp < update_end ? timestamp : update_end);
 
 		if (SUCCEED == ret && update_end > timestamp)
@@ -2024,11 +2033,11 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 	int	ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0;
 	int	start = ts->sec - 1;
 
-	now = ZBX_VC_TIME();
-
 	/* find if the cache should be updated to cover the required range */
 	if (NULL == item->tail)
 	{
+		now = ZBX_VC_TIME();
+
 		update_seconds = now - start;
 		update_end = now;
 	}
