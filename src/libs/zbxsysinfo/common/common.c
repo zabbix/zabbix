@@ -84,7 +84,6 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret;
 	char	*command;
 
 	if (1 != request->nparam)
@@ -95,15 +94,7 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	command = get_rparam(request, 0);
 
-	if (SYSINFO_RET_FAIL == (ret = EXECUTE_STR(command, result)) && 0 == result->type)
-	{
-		/* only whitespace */
-
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-		ret = SYSINFO_RET_OK;
-	}
-
-	return ret;
+	return EXECUTE_STR(command, result);
 }
 
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
@@ -111,28 +102,23 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 	char	*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	assert(result);
-
 	init_result(result);
 
 	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		goto lbl_exit;
+		goto out;
 	}
 
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
+	zabbix_log(LOG_LEVEL_DEBUG, "run remote command [%s] result [len:%d] [%.20s]...",
 			command, strlen(cmd_result), cmd_result);
-
-	if ('\0' == *cmd_result)	/* we got whitespace only */
-		goto lbl_exit;
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
 	ret = SYSINFO_RET_OK;
-lbl_exit:
+out:
 	zbx_free(cmd_result);
 
 	return ret;
@@ -198,17 +184,7 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		int	ret;
-
-		if (SYSINFO_RET_FAIL == (ret = EXECUTE_STR(command, result)) && 0 == result->type)
-		{
-			/* only whitespace */
-
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-			ret = SYSINFO_RET_OK;
-		}
-
-		return ret;
+		return EXECUTE_STR(command, result);
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
