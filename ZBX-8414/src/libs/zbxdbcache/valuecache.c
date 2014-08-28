@@ -2898,4 +2898,3 @@ void	zbx_vc_unlock(void)
 	vc_locked = 0;
 	zbx_mutex_unlock(&vc_lock);
 }
-
