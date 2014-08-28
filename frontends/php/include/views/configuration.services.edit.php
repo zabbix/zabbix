@@ -283,16 +283,21 @@ $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 $servicesForm->addItem($servicesTab);
 
 // append buttons to form
-$buttons = array();
 if ($service['serviceid'] && !$service['dependencies']) {
-	$buttons[] = new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1');
+	$servicesForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		array (
+			new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1'),
+			new CButtonCancel()
+		)
+	));
 }
-$buttons[] = new CButtonCancel();
-
-$servicesForm->addItem(makeFormFooter(
-	new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'),
-	$buttons
-));
+else {
+	$servicesForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		new CButtonCancel()
+	));
+}
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);

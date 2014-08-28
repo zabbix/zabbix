@@ -43,6 +43,6 @@ $otherView->addTab('other', _('Other parameters'), $otherTab);
 $otherForm = new CForm();
 $otherForm->setName('otherForm');
 $otherForm->addItem($otherView);
-$otherForm->addItem(makeFormFooter(new CSubmit('save', _('Save'))));
+$otherForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $otherForm;

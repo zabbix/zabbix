@@ -29,8 +29,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'work_period' =>	array(T_ZBX_STR, O_NO,	null,			null,	'isset({save})'),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'work_period' =>	array(T_ZBX_STR, O_NO,	null,			null,	'isset({update})'),
+	// actions
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,	null)
 );
 check_fields($fields);
@@ -38,7 +39,7 @@ check_fields($fields);
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	$workPeriod = getRequest('work_period');
 
 	DBstart();
@@ -77,9 +78,8 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
 
 $data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
 
-if ($data['form_refresh']) {
+if (hasRequest('form_refresh')) {
 	$data['config']['work_period'] = getRequest('work_period');
 }
 else {

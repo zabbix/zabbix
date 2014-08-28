@@ -112,7 +112,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
 		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=700';
@@ -130,7 +130,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
 		$this->zbxTestCheckboxSelect('snmptrap_logging', false);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=65535';
@@ -143,7 +143,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
 		$this->zbxTestTextPresent('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.'));
 	}
 

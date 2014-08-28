@@ -463,17 +463,21 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Get Host ID by Host name.
+	 * Get hosts by name.
 	 *
-	 * @param array $host_data
-	 * @param string $host_data['host']
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array  $hostData
+	 * @param string $hostData['host']
 	 *
 	 * @return array
 	 */
-	public function getObjects($hostData) {
+	public function getObjects(array $hostData) {
+		$this->deprecated('host.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $hostData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $hostData
 		));
 	}
 
@@ -486,16 +490,16 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('host.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
+		$host = $this->get(array(
 			'output' => array('hostid'),
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $host;
 	}
 
 	protected function checkInput(&$hosts, $method) {

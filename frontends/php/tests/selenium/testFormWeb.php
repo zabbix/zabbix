@@ -528,9 +528,9 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
-		$this->assertAttribute("//input[@id='save']/@role", 'button');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
+		$this->assertAttribute("//input[@id='update']/@role", 'button');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -597,7 +597,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Web scenarios');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent('Scenario updated');
 		$this->zbxTestTextPresent("$name");
@@ -1533,7 +1533,7 @@ class testFormWeb extends CWebTest {
 				$this->input_type('name',$step);
 				$url = $step." url";
 				$this->input_type('url', $url);
-				$this->zbxTestClick('save');
+				$this->zbxTestClick('add');
 				$this->selectWindow(null);
 
 				if(isset($item['remove'])) {
@@ -1547,7 +1547,7 @@ class testFormWeb extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
@@ -1603,7 +1603,7 @@ class testFormWeb extends CWebTest {
 				$this->input_type('description', $trigger);
 				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
 				$this->input_type('expression', $expressionTrigger);
-				$this->zbxTestClickWait('save');
+				$this->zbxTestClickWait('add');
 
 				$this->zbxTestTextPresent('Trigger added');
 				$this->zbxTestCheckTitle('Configuration of triggers');

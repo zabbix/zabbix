@@ -136,7 +136,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->assertElementPresent('severity_name_5');
 		$this->assertElementPresent('severity_color_5');
 		$this->assertElementPresent('lbl_severity_color_5');
-		$this->assertElementPresent('save');
+		$this->assertElementPresent('update');
 
 		$this->assertElementPresent('color_picker');
 		$this->assertNotVisible('color_picker');
@@ -161,7 +161,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 			$DBhash = DBhash($sql);
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		if ($resultSave) {
 			$this->zbxTestTextPresent('Configuration updated');

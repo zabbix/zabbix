@@ -37,13 +37,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		'period_id'=>			array(T_ZBX_INT, O_OPT,  null,	null,			null),
 		'caption'=>				array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
-		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
+		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
+		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
 
-		'color'=>				array(T_ZBX_CLR, O_OPT,  null,	null,		'isset({save})'),
+		'color'=>				array(T_ZBX_CLR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
 
 /* actions */
-		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'update'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT, null,	null,	null)
@@ -70,23 +71,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$caption = $autoCaption;
 	}
 
-	if(isset($_REQUEST['save'])){
-		if(isset($_REQUEST['period_id'])){
+	if(hasRequest('add') || hasRequest('update')) {
+		if(hasRequest('period_id')) {
 			insert_js("update_period('".
-				$_REQUEST['period_id']."',".
-				zbx_jsvalue($_REQUEST['dstfrm']).",".
+				getRequest('period_id')."',".
+				zbx_jsvalue(getRequest('dstfrm')).",".
 				zbx_jsvalue($caption).",'".
-				$_REQUEST['report_timesince']."','".
-				$_REQUEST['report_timetill']."','".
-				$_REQUEST['color']."');\n");
+				getRequest('report_timesince')."','".
+				getRequest('report_timetill')."','".
+				getRequest('color')."');\n");
 		}
 		else{
 			insert_js("add_period(".
-				zbx_jsvalue($_REQUEST['dstfrm']).",".
+				zbx_jsvalue(getRequest('dstfrm')).",".
 				zbx_jsvalue($caption).",'".
-				$_REQUEST['report_timesince']."','".
-				$_REQUEST['report_timetill']."','".
-				$_REQUEST['color']."');\n");
+				getRequest('report_timesince')."','".
+				getRequest('report_timetill')."','".
+				getRequest('color')."');\n");
 		}
 	}
 	else{
@@ -140,7 +141,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$frmPd->addVar('color',$color);
 
 
-		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id']) ? _('Update') : _('Add')));
+		if (hasRequest('period_id')) {
+			$frmPd->addItemToBottomRow(new CSubmit('update', _('Update')));
+		}
+		else {
+			$frmPd->addItemToBottomRow(new CSubmit('add', _('Add')));
+		}
 
 		$frmPd->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmPd->Show();

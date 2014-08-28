@@ -50,8 +50,6 @@ $applicationWidget->addHeaderRowNumber();
 // create form
 $applicationForm = new CForm();
 $applicationForm->setName('applicationForm');
-$applicationForm->addVar('groupid', $this->data['groupid']);
-$applicationForm->addVar('hostid', $this->data['hostid']);
 
 // create table
 $applicationTable = new CTableInfo(_('No applications found.'));
@@ -83,14 +81,13 @@ foreach ($this->data['applications'] as $application) {
 			'applications.php?'.
 				'form=update'.
 				'&applicationid='.$application['applicationid'].
-				'&hostid='.$application['hostid'].
-				'&groupid='.$this->data['groupid']
+				'&hostid='.$application['hostid']
 		);
 	}
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
-		($this->data['hostid'] > 0) ? null : $application['host'],
+		($this->data['hostid'] > 0) ? null : $application['host']['name'],
 		$name,
 		array(
 			new CLink(

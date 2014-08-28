@@ -682,7 +682,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
@@ -1616,7 +1616,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if ($itemFlexFlag == true) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
