@@ -2558,7 +2558,8 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
  ******************************************************************************/
 int	zbx_db_get_database_type(void)
 {
-	const char	*__function_name = "zbx_db_get_database_type", *result_string;
+	const char	*__function_name = "zbx_db_get_database_type";
+	const char	*result_string;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
