@@ -592,7 +592,6 @@ void	zbx_sigusr_handler(int flags)
 }
 #endif
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_free_config                                                  *
