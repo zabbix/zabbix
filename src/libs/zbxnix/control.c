@@ -53,9 +53,10 @@ int	get_log_level_message(const char *opt, int command, int *message)
 	}
 	else if (0 != isdigit(*(++opt)))
 	{
-		if (FAIL == is_ushort(opt, &num))
+		if (FAIL == is_ushort(opt, &num) || 0 == num)
 		{
-			zbx_error("invalid log level control option: process identifier must be unsigned short value");
+			zbx_error("invalid log level control option: process identifier must be unsigned short"
+					" non-zero value");
 			return FAIL;
 		}
 
