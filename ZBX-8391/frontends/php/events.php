@@ -64,10 +64,6 @@ $fields = array(
 	'hostid'=>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'period'=>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'dec'=>				array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'inc'=>				array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'left'=>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'right'=>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'stime'=>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'load'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		null),
 	'fullscreen'=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
@@ -788,7 +784,7 @@ else {
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-								? 'showgraph' : 'showvalues'
+								? HISTORY_GRAPH : HISTORY_VALUES
 						)
 					);
 				}

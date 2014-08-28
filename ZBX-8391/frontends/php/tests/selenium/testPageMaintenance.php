@@ -67,7 +67,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of maintenance');
 		$this->zbxTestTextPresent('Maintenance updated');
 		$this->zbxTestTextPresent("$name");

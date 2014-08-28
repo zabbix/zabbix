@@ -376,57 +376,66 @@ class CPageFilter {
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param int   $groupid
-	 * @param array $options
-	 * @param int   $hostid
+	 * @param string $groupId
+	 * @param array  $options
+	 * @param string $hostId
 	 */
-	private function _initGroups($groupid, array $options, $hostid) {
-		$def_options = array(
-			'output' => array('groupid', 'name')
+	private function _initGroups($groupId, array $options, $hostId) {
+		$defaultOptions = array(
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true,
+			'sortfield' => array('name')
 		);
-		$options = zbx_array_merge($def_options, $options);
-		$groups = API::HostGroup()->get($options);
-		order_result($groups, 'name');
-
-		$this->data['groups'] = array();
-		foreach ($groups as $group) {
-			$this->data['groups'][$group['groupid']] = $group;
-		}
+		$options = zbx_array_merge($defaultOptions, $options);
+		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if (is_null($groupid) && $this->_profileIds['groupid']) {
+		if ($groupId === null && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
-			if ($hostid) {
+			$host = null;
+			$template = null;
+			if ($hostId) {
 				$host = API::Host()->get(array(
 					'output' => array('hostid'),
-					'hostids' => $hostid,
+					'hostids' => $hostId,
 					'groupids' => $this->_profileIds['groupid']
 				));
+				if (!$host) {
+					$template = API::Template()->get(array(
+						'output' => array('hostid'),
+						'templateids' => $hostId,
+						'groupids' => $this->_profileIds['groupid']
+					));
+				}
+
 			}
-			if (!$hostid || !empty($host)) {
-				$groupid = $this->_profileIds['groupid'];
+			if (!$hostId || $host || $template) {
+				$groupId = $this->_profileIds['groupid'];
 			}
 		}
 
 		// nonexisting or unset $groupid
-		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
+		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || $groupId === null) {
 			// for popup select first group in the list
-			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
+			if ($this->config['popupDD'] && $this->data['groups']) {
 				reset($this->data['groups']);
-				$groupid = key($this->data['groups']);
+				$groupId = key($this->data['groups']);
 			}
 			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
 			else {
-				$groupid = 0;
+				$groupId = 0;
 			}
 		}
 
-		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
-		CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
+		CProfile::update($this->_profileIdx['groups'], $groupId, PROFILE_TYPE_ID);
+		CProfile::update(self::GROUP_LATEST_IDX, $groupId, PROFILE_TYPE_ID);
 
-		$this->isSelected['groupsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups'])) || $groupid > 0;
-		$this->isSelected['groupsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups']) && $groupid == 0;
-		$this->ids['groupid'] = $groupid;
+		$firstIsAllAndHaveGroups = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && $this->data['groups']);
+
+		$this->isSelected['groupsSelected'] = ($firstIsAllAndHaveGroups || $groupId > 0);
+		$this->isSelected['groupsAll'] = ($firstIsAllAndHaveGroups && $groupId == 0);
+
+		$this->ids['groupid'] = $groupId;
 	}
 
 	/**

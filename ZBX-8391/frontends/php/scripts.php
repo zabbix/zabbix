@@ -35,21 +35,22 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'scriptid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'scripts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})'),
-	'type' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1'),	'isset({save})'),
-	'execute_on' =>			array(T_ZBX_INT, O_OPT, null,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT),
-	'command' =>			array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
-	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
-	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
-	'host_access' =>		array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({save})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,			DB_ID,		'isset({save})&&{hgstype}!=0'),
-	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'),
+	'type' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1'),	'isset({add}) || isset({update})'),
+	'execute_on' =>			array(T_ZBX_INT, O_OPT, null,			IN('0,1'),	'(isset({add}) || isset({update})) && {type} == '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT),
+	'command' =>			array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
+	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
+	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
+	'host_access' =>		array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({add}) || isset({update})'),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,			DB_ID,		'(isset({add}) || isset({update})) && {hgstype} != 0'),
+	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({add}) || isset({update})'),
 	'hgstype' =>			array(T_ZBX_INT, O_OPT, null,			null,		null),
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'enableConfirmation' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
 	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"script.massdelete"'),		null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_ACT,			null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,		null),
@@ -75,7 +76,7 @@ if ($scriptId = getRequest('scriptid')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$confirmation = getRequest('confirmation', '');
 	$enableConfirmation = getRequest('enableConfirmation', false);
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
@@ -107,8 +108,8 @@ if (isset($_REQUEST['save'])) {
 
 		DBstart();
 
-		if (isset($_REQUEST['scriptid'])) {
-			$script['scriptid'] = $_REQUEST['scriptid'];
+		if (hasRequest('update')) {
+			$script['scriptid'] = getRequest('scriptid');
 			$result = API::Script()->update($script);
 
 			$messageSuccess = _('Script updated');

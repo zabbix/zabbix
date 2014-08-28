@@ -289,18 +289,22 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Get Sysmap IDs by Sysmap params.
+	 * Get maps by map name and ID.
 	 *
-	 * @param array $sysmapData
-	 * @param array $sysmapData['name']
-	 * @param array $sysmapData['sysmapid']
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array  $sysmapData
+	 * @param string $sysmapData['name']
+	 * @param string $sysmapData['sysmapid']
 	 *
 	 * @return array
 	 */
 	public function getObjects(array $sysmapData) {
+		$this->deprecated('map.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $sysmapData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $sysmapData
 		));
 	}
 
@@ -313,16 +317,16 @@ class CMap extends CMapElement {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('map.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
+		$map = $this->get(array(
 			'output' => array('sysmapid'),
+			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $map;
 	}
 
 	public function checkInput(&$maps, $method) {

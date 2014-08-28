@@ -645,7 +645,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, proxy_num = 0, proxy_count = 0;
+	int		i, proxy_num = 0, proxy_count = 0, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -720,6 +720,20 @@ int	MAIN_ZABBIX_ENTRY()
 		zbx_vmware_init();
 
 	DBinit();
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_PROXY != db_type)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
@@ -887,7 +901,7 @@ int	MAIN_ZABBIX_ENTRY()
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
