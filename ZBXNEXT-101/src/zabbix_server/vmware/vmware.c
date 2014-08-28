@@ -2971,8 +2971,9 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 #undef STAT_INTERVAL
+#else
+	zbx_thread_exit(EXIT_SUCCESS);
 #endif
-	return SUCCEED;
 }
 
 /******************************************************************************
