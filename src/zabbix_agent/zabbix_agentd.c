@@ -82,7 +82,7 @@ const char	syslog_app_name[] = "zabbix_agentd";
 /* application USAGE message */
 const char	usage_message[] =
 #ifndef _WINDOWS
-	"[-VRhp]"
+	"[-Vhp] [-R <runtime option>]"
 #endif
 #ifdef _WINDOWS
 	"[-Vhp] [-idsx] [-m]"
@@ -129,7 +129,6 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
-	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
@@ -142,16 +141,21 @@ static struct zbx_option	longopts[] =
 	{"stop",		0,	NULL,	'x'},
 
 	{"multiple-agents",	0,	NULL,	'm'},
+#else
+	{"runtime-control",	1,	NULL,	'R'},
 #endif
 	{NULL}
 };
 
 static char	shortopts[] =
-	"c:hVR:pt:"
+	"c:hVpt:"
 #ifdef _WINDOWS
 	"idsxm"
+#else
+	"R:"
 #endif
 	;
+
 /* end of COMMAND LINE OPTIONS */
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
@@ -242,8 +246,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
-			case 'R':
 #ifndef _WINDOWS
+			case 'R':
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
 				{
@@ -269,9 +273,6 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					exit(EXIT_FAILURE);
 				}
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
-#else
-				zbx_error("process runtime control is not supported on Windows platform");
-				exit(EXIT_FAILURE);
 #endif
 				break;
 			case 'h':
