@@ -170,7 +170,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
-						" process", ZBX_RTC_GET_DATA(flags));
+						" child process", ZBX_RTC_GET_DATA(flags));
 			}
 		}
 		else
