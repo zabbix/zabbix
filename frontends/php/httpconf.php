@@ -552,6 +552,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
+		'httpTestsLastData' => array(),
 		'paging' => null,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
