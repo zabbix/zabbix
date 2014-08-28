@@ -23,12 +23,11 @@ steps:
     expect: result
 
     response:
-      _fields:
-        hostids:
-          _assert: arr|length(1)
-          _keys: sequence
-          _each:
-            _assert: string
+      hostids:
+        _assert: arr|length(1)
+        _keys: sequence
+        _each:
+          _assert: string
 
   step2:
     request:
@@ -42,44 +41,43 @@ steps:
     expect: result
 
     response:
-      _equals:
-        -
-          hostid: @step1.response.hostids[0]@
-          host: @step1.request.params.host@
-          name: @step1.request.params.host@
-          proxy_hostid: "0"
-          status: "0"
-          disable_until: "0"
-          error: ""
-          available: "0"
-          errors_from: "0"
-          lastaccess: "0"
-          ipmi_authtype: "0"
-          ipmi_privilege: "2"
-          ipmi_username: ""
-          ipmi_password: ""
-          ipmi_disable_until: "0"
-          ipmi_available: "0"
-          snmp_disable_until: "0"
-          snmp_available: "0"
-          maintenanceid: "0"
-          maintenance_status: "0"
-          maintenance_type: "0"
-          maintenance_from: "0"
-          ipmi_errors_from: "0"
-          snmp_errors_from: "0"
-          ipmi_error: ""
-          snmp_error: ""
-          jmx_disable_until: "0"
-          jmx_available: "0"
-          jmx_errors_from: "0"
-          jmx_error: ""
-          flags: "0"
-          templateid: "0"
-          description: ""
-          groups:
-            -
-              groupid: @step1.request.params.groups[0].groupid@
-          interfaces:
-            -
-              ip: @step1.request.params.interfaces[0].ip@
+      -
+        hostid: @step1.response.hostids[0]@
+        host: @step1.request.params.host@
+        name: @step1.request.params.host@
+        proxy_hostid: "0"
+        status: "0"
+        disable_until: "0"
+        error: ""
+        available: "0"
+        errors_from: "0"
+        lastaccess: "0"
+        ipmi_authtype: "0"
+        ipmi_privilege: "2"
+        ipmi_username: ""
+        ipmi_password: ""
+        ipmi_disable_until: "0"
+        ipmi_available: "0"
+        snmp_disable_until: "0"
+        snmp_available: "0"
+        maintenanceid: "0"
+        maintenance_status: "0"
+        maintenance_type: "0"
+        maintenance_from: "0"
+        ipmi_errors_from: "0"
+        snmp_errors_from: "0"
+        ipmi_error: ""
+        snmp_error: ""
+        jmx_disable_until: "0"
+        jmx_available: "0"
+        jmx_errors_from: "0"
+        jmx_error: ""
+        flags: "0"
+        templateid: "0"
+        description: ""
+        groups:
+          -
+            groupid: @step1.request.params.groups[0].groupid@
+        interfaces:
+          -
+            ip: @step1.request.params.interfaces[0].ip@

@@ -52,14 +52,14 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 
 		if ($result->isError()) {
 			throw new \RuntimeException(
-				sprintf('API authentication error: "%s"', $result->getMessage())
+				sprintf('API authentication error: "%s"', json_encode($result->getResponseData()))
 			);
 		}
 
 		if (!preg_match('/^[a-z0-9]{32}$/', $result->getResult())) {
 			throw new \RuntimeException(
 				sprintf('API auth token does not much expected format, "%s" given',
-					json_encode($result->getResult())
+					json_encode($result->getResponseData())
 				)
 			);
 		}
