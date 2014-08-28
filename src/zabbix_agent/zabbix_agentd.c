@@ -234,8 +234,9 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch;
+#ifndef _WINDOWS
 	int	offset;
-
+#endif
 	t->task = ZBX_TASK_START;
 
 	/* parse the command-line */
