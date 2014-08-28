@@ -829,6 +829,8 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t	thread_args;

@@ -717,6 +717,8 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
+
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t	*thread_args;
