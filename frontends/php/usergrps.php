@@ -35,12 +35,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// group
-	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
 	'group_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'selusrgrp' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
+	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')),
 	'users' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save})'),
+	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'),
 	'users_status' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'debug_mode' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'new_right' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -59,7 +59,8 @@ $fields = array(
 								null
 							),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete_selected' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'del_user_group' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -168,20 +169,20 @@ elseif (isset($_REQUEST['new_right'])) {
 		);
 	}
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	$userGroup = array(
-		'name' => $_REQUEST['gname'],
-		'users_status' => $_REQUEST['users_status'],
-		'gui_access' => $_REQUEST['gui_access'],
-		'debug_mode' => $_REQUEST['debug_mode'],
+		'name' => getRequest('gname'),
+		'users_status' => getRequest('users_status'),
+		'gui_access' => getRequest('gui_access'),
+		'debug_mode' => getRequest('debug_mode'),
 		'userids' => getRequest('group_users', array()),
 		'rights' => array_values(getRequest('group_rights', array()))
 	);
 
 	DBstart();
 
-	if (isset($_REQUEST['usrgrpid'])) {
-		$userGroup['usrgrpid'] = $_REQUEST['usrgrpid'];
+	if (hasRequest('update')) {
+		$userGroup['usrgrpid'] = getRequest('usrgrpid');
 		$result = API::UserGroup()->update($userGroup);
 
 		$messageSuccess = _('Group updated');
@@ -197,7 +198,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$_REQUEST['gname'].']');
+		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$userGroup['name'].']');
 		unset($_REQUEST['form']);
 	}
 

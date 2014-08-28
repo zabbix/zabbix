@@ -316,7 +316,7 @@ int	main(int argc, char **argv)
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	unload_modules();
 	zabbix_close_log();

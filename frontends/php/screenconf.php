@@ -45,15 +45,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
+	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
-	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
-	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Rows')),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')),
+	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({add}) || isset({update})', _('Columns')),
+	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({add}) || isset({update})', _('Rows')),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"screen.export","screen.massdelete"'),		null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
@@ -118,23 +119,23 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])) {
 	unset($_REQUEST['screenid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
-	if (isset($_REQUEST['screenid'])) {
+	if (hasRequest('update')) {
 		$screen = array(
-			'screenid' => $_REQUEST['screenid'],
-			'name' => $_REQUEST['name'],
-			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize']
+			'screenid' => getRequest('screenid'),
+			'name' => getRequest('name'),
+			'hsize' => getRequest('hsize'),
+			'vsize' => getRequest('vsize')
 		);
 
 		$messageSuccess = _('Screen updated');
 		$messageFailed = _('Cannot update screen');
 
-		if (isset($_REQUEST['templateid'])) {
+		if (hasRequest('templateid')) {
 			$screenOld = API::TemplateScreen()->get(array(
-				'screenids' => $_REQUEST['screenid'],
+				'screenids' => getRequest('screenid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true
 			));
@@ -144,7 +145,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 		else {
 			$screenOld = API::Screen()->get(array(
-				'screenids' => $_REQUEST['screenid'],
+				'screenids' => getRequest('screenid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true
 			));
@@ -159,15 +160,15 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	else {
 		$screen = array(
-			'name' => $_REQUEST['name'],
-			'hsize' => $_REQUEST['hsize'],
-			'vsize' => $_REQUEST['vsize']
+			'name' => getRequest('name'),
+			'hsize' => getRequest('hsize'),
+			'vsize' => getRequest('vsize')
 		);
 
 		$messageSuccess = _('Screen added');
 		$messageFailed = _('Cannot add screen');
 
-		if (isset($_REQUEST['templateid'])) {
+		if (hasRequest('templateid')) {
 			$screen['templateid'] = getRequest('templateid');
 			$screenids = API::TemplateScreen()->create($screen);
 		}

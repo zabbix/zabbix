@@ -82,10 +82,10 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
 		$this->zbxTestClickWait('link='.$icon_name['name']);
 		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
-		$this->assertElementPresent('save');
+		$this->assertElementPresent('update');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Image updated');
 
 		$newHashIconImages = DBhash($sqlIconImages);
@@ -105,10 +105,10 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('link='.$bgimage_name['name']);
 		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
-		$this->assertElementPresent('save');
+		$this->assertElementPresent('update');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Image updated');
 
 		$newHashBgImages = DBhash($sqlBgImages);

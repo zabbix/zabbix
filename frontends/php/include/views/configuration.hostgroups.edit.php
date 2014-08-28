@@ -70,7 +70,7 @@ $hostGroupForm->addItem($hostGroupTab);
 // append buttons to form
 if ($this->data['groupid'] == 0) {
 	$hostGroupForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('add', _('Add')),
 		new CButtonCancel()
 	));
 }
@@ -81,11 +81,12 @@ else {
 	}
 
 	$hostGroupForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel())
+			new CButtonCancel()
+		)
 	));
 }
 

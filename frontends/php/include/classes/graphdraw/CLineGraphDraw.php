@@ -100,6 +100,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
+		// TODO: graphs shouldn't retrieve items and resolve macros themselves
+		// all of the data must be passed as parameters
 		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
 		$item = reset($items);
 
@@ -1931,6 +1933,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$rowNum++;
 
+			// legends for stacked graphs are written in reverse order so that the order of items
+			// matches the order of lines on the graphs
 			if ($this->type == GRAPH_TYPE_STACKED) {
 				$i--;
 			}
