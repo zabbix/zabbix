@@ -192,8 +192,10 @@ else {
 		));
 
 		// try to find matching trigger when host is changed
-		if ($triggerId != 0 && hasRequest('hostid') == $pageFilter->hostid) {
-			$hostId = getRequest('hostid');
+		// use the host ID from the page filter since it may not be present in the request
+		// if all hosts are selected, preserve the selected trigger
+		if ($triggerId != 0 && $pageFilter->hostid != 0) {
+			$hostId = $pageFilter->hostid;
 
 			$oldTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'description', 'expression'),
@@ -202,17 +204,17 @@ else {
 				'selectFunctions' => API_OUTPUT_EXTEND,
 				'triggerids' => $triggerId
 			));
+			$oldTrigger = reset($oldTriggers);
 
-			foreach ($oldTriggers as $oldTrigger) {
+			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
+
+			// if the trigger doesn't belong to the selected host - find a new one on that host
+			if (!isset($oldTrigger['hosts'][$hostId])) {
 				$triggerId = 0;
-				$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
+
 				$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
 				$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
 				$oldExpression = triggerExpression($oldTrigger);
-
-				if (isset($oldTrigger['hosts'][$hostId])) {
-					break;
-				}
 
 				$newTriggers = API::Trigger()->get(array(
 					'output' => array('triggerid', 'description', 'expression'),
@@ -387,7 +389,7 @@ else {
 						'&real_hosts=1'.
 						'&monitored_hosts=1'.
 						'&with_monitored_triggers=1'.
-						(getRequest('hostid') ? '&only_hostid='.getRequest('hostid') : '').
+						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
 						'");',
 					'T'
 				)
