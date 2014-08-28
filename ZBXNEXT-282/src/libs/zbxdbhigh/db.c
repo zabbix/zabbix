@@ -143,7 +143,7 @@ static void	DBtxn_operation(int (*txn_operation)())
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin()
+void	DBbegin(void)
 {
 	DBtxn_operation(zbx_db_begin);
 }
@@ -159,7 +159,7 @@ void	DBbegin()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit()
+void	DBcommit(void)
 {
 	DBtxn_operation(zbx_db_commit);
 }
@@ -175,7 +175,7 @@ void	DBcommit()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback()
+void	DBrollback(void)
 {
 	DBtxn_operation(zbx_db_rollback);
 }
@@ -1702,12 +1702,12 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 
 #undef ZBX_MAX_INVENTORY_FIELDS
 
-int	DBtxn_status()
+int	DBtxn_status(void)
 {
 	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
 }
 
-int	DBtxn_ongoing()
+int	DBtxn_ongoing(void)
 {
 	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
@@ -2545,3 +2545,63 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	exit(EXIT_FAILURE);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_database_type                                         *
+ *                                                                            *
+ * Purpose: determine is it a server or a proxy data base                     *
+ *                                                                            *
+ * Return value: ZBX_DB_SERVER - server data base                             *
+ *               ZBX_DB_PROXY - proxy data base                               *
+ *               ZBX_DB_UNKNOWN - an error occured                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_database_type(void)
+{
+	const char	*__function_name = "zbx_db_get_database_type", *result_string;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = ZBX_DB_UNKNOWN;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (NULL == (result = DBselectN("select userid from users", 1)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot select records from \"users\" table");
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
+		ret = ZBX_DB_SERVER;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no records in \"users\" table");
+		ret = ZBX_DB_PROXY;
+	}
+
+	DBfree_result(result);
+out:
+	DBclose();
+
+	switch (ret)
+	{
+		case ZBX_DB_SERVER:
+			result_string = "ZBX_DB_SERVER";
+			break;
+		case ZBX_DB_PROXY:
+			result_string = "ZBX_DB_PROXY";
+			break;
+		case ZBX_DB_UNKNOWN:
+			result_string = "ZBX_DB_UNKNOWN";
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
+
+	return ret;
+}

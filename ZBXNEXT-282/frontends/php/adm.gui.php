@@ -32,16 +32,16 @@ $themes = array_keys(Z::getThemes());
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        IN('"'.implode('","', $themes).'"'),
-		'isset({save})'),
+		'isset({update})'),
 	'event_ack_enable'        => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
-	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Show events not older than (in days)')),
-	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Max count of events per trigger to show')),
-	'dropdown_first_entry'    => array(T_ZBX_INT, O_OPT, null,        IN('0,1,2'),        'isset({save})'),
+	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Show events not older than (in days)')),
+	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Max count of events per trigger to show')),
+	'dropdown_first_entry'    => array(T_ZBX_INT, O_OPT, null,        IN('0,1,2'),        'isset({update})'),
 	'dropdown_first_remember' => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
-	'max_in_table'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Max count of elements to show inside table cell')),
-	'search_limit'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 999999), 'isset({save})', _('Search/Filter elements limit')),
+	'max_in_table'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Max count of elements to show inside table cell')),
+	'search_limit'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 999999), 'isset({update})', _('Search/Filter elements limit')),
 	'server_check_interval'   => array(T_ZBX_INT, O_OPT, null,        null,               null, _('Zabbix server activity check interval')),
-	'save'                    => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,               null),
+	'update'                  => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,               null),
 	'form_refresh'            => array(T_ZBX_INT, O_OPT, null,        null,               null)
 );
 check_fields($fields);
@@ -49,7 +49,7 @@ check_fields($fields);
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	DBstart();
 
 	$configs = array(

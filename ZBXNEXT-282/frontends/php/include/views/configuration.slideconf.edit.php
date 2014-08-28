@@ -103,20 +103,20 @@ $slideTab->addTab('slideTab', _('Slide'), $slideFormList);
 $slideForm->addItem($slideTab);
 
 // append buttons to form
-if (empty($this->data['slideshowid'])) {
+if (isset($this->data['slideshowid'])) {
 	$slideForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel()
-	));
-}
-else {
-	$slideForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete slide show?'), url_params(array('form', 'slideshowid'))),
 			new CButtonCancel()
 		)
+	));
+}
+else {
+	$slideForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
 	));
 }
 

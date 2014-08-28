@@ -1074,12 +1074,25 @@ $actionForm->addItem($actionTabs);
 // append buttons to form
 $others = array();
 if (!empty($this->data['actionid'])) {
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete current action?'), url_param('form').url_param('eventsource').url_param('actionid'));
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(
+				_('Delete current action?'),
+				url_param('form').url_param('eventsource').url_param('actionid')
+			),
+			new CButtonCancel(url_param('actiontype'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('actiontype'));
+else {
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('actiontype'))
+	));
+}
 
-$actionForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 // append form to widget
 $actionWidget->addItem($actionForm);

@@ -73,6 +73,6 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
 
 void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts);
 
-int	proxy_get_history_count();
+int	proxy_get_history_count(void);
 
 #endif

@@ -506,16 +506,16 @@ class CAction extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('action.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
+		$action = $this->get(array(
 			'output' => array('actionid'),
+			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $action;
 	}
 
 	/**
