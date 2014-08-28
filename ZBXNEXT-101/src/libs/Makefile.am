@@ -52,7 +52,7 @@ PROXY_SUBDIRS = \
 else
 if AGENT
 AGENT_SUBDIRS = \
-zbxself
+	zbxself
 endif
 endif
 endif
