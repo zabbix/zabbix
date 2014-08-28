@@ -58,6 +58,7 @@ void	DBclose(void)
 int	DBconnect(int flag)
 {
 	const char	*__function_name = "DBconnect";
+
 	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
@@ -663,6 +664,7 @@ out:
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	const char	*__function_name = "DBadd_trend";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
@@ -711,6 +713,7 @@ void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	const char	*__function_name = "DBadd_trend_uint";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
@@ -759,6 +762,7 @@ void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 int	DBget_row_count(const char *table_name)
 {
 	const char	*__function_name = "DBget_row_count";
+
 	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -779,6 +783,7 @@ int	DBget_row_count(const char *table_name)
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
 	const char	*__function_name = "DBget_proxy_lastaccess";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
@@ -898,6 +903,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
@@ -1495,7 +1501,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *                                                                            *
  * Parameters: host_name_sample - a host name to start constructing from      *
  *                                                                            *
- * Return value: unique host name which does not exist in the data base       *
+ * Return value: unique host name which does not exist in the database        *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
@@ -1508,6 +1514,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 {
 	const char		*__function_name = "DBget_unique_hostname_by_sample";
+
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			full_match = 0, i;
@@ -2549,16 +2556,18 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
  *                                                                            *
  * Function: zbx_db_get_database_type                                         *
  *                                                                            *
- * Purpose: determine is it a server or a proxy data base                     *
+ * Purpose: determine is it a server or a proxy database                      *
  *                                                                            *
- * Return value: ZBX_DB_SERVER - server data base                             *
- *               ZBX_DB_PROXY - proxy data base                               *
+ * Return value: ZBX_DB_SERVER - server database                              *
+ *               ZBX_DB_PROXY - proxy database                                *
  *               ZBX_DB_UNKNOWN - an error occured                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_get_database_type(void)
 {
-	const char	*__function_name = "zbx_db_get_database_type", *result_string;
+	const char	*__function_name = "zbx_db_get_database_type";
+
+	const char	*result_string;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
