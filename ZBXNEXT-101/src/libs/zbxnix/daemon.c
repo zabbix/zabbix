@@ -41,12 +41,12 @@ extern void	zbx_sigusr_handler(int flags);
 
 /******************************************************************************
  *                                                                            *
- * Function: common_worker_sigusr_handler                                     *
+ * Function: common_sigusr_handler                                            *
  *                                                                            *
- * Purpose: common SIGUSR1 handler for worker processes                       *
+ * Purpose: common SIGUSR1 handler for Zabbix processes                       *
  *                                                                            *
  ******************************************************************************/
-static void	common_worker_sigusr_handler(int flags)
+static void	common_sigusr_handler(int flags)
 {
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
@@ -107,7 +107,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		common_worker_sigusr_handler(flags);
+		common_sigusr_handler(flags);
 	}
 	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
@@ -170,7 +170,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
-						" worker process", ZBX_RTC_GET_DATA(flags));
+						" process", ZBX_RTC_GET_DATA(flags));
 			}
 		}
 		else
