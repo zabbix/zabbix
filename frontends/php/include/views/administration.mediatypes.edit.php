@@ -30,7 +30,7 @@ $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 100);
+$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100);
 $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
@@ -102,11 +102,23 @@ $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 $mediaTypeForm->addItem($mediaTypeTab);
 
 // append buttons to form
-if (empty($this->data['mediatypeid'])) {
-	$mediaTypeForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonCancel(url_param('config')))));
+if (!empty($this->data['mediatypeid'])) {
+	$mediaTypeForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButtonDelete(
+				_('Delete selected media type?'),
+				url_param('form').url_param('mediatypeid').url_param('config')
+			),
+			new CButtonCancel(url_param('config'))
+		)
+	));
 }
 else {
-	$mediaTypeForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$mediaTypeForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('config'))
+	));
 }
 
 // append form to widget

@@ -142,7 +142,7 @@ $i = 0;
 foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
-	$urlEtype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
+	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype']);
 	$urlEtype->addItems(sysmap_element_types());
 	$removeButton = new CSpan(_('Remove'), 'link_menu');
 	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
@@ -159,7 +159,7 @@ $templateUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
 $templateUrlLabel->setAttribute('disabled', 'disabled');
 $templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
 $templateUrlLink->setAttribute('disabled', 'disabled');
-$templateUrlEtype = new CCombobox('urls[#{id}][elementtype]');
+$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]');
 $templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateUrlEtype->addItems(sysmap_element_types());
 $templateRemoveButton = new CSpan(_('Remove'), 'link_menu');
@@ -185,14 +185,23 @@ $sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
 $sysmapForm->addItem($sysmapTab);
 
 // append buttons to form
-$others = array();
-if (isset($_REQUEST['sysmapid']) && $_REQUEST['sysmapid'] > 0) {
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid'));
+if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
+	$sysmapForm->addItem(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			array (
+				new	CButton('clone', _('Clone')),
+				new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
+				new CButtonCancel()
+			)
+	));
 }
-$others[] = new CButtonCancel();
+else {
+	$sysmapForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
+}
 
-$sysmapForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

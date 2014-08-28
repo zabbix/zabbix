@@ -191,16 +191,16 @@ class CDHost extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('dhost.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('dhostid')), $object),
+		$dHost = $this->get(array(
 			'output' => array('dhostid'),
+			'filter' => zbx_array_mintersect(array(array('dhostid')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $dHost;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

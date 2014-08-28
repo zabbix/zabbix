@@ -72,7 +72,7 @@ $expressionTextBox = new CTextArea(
 		'readonly' => $this->data['expression_field_readonly']
 	)
 );
-if ($this->data['expression_field_readonly'] == 'yes') {
+if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
 
@@ -84,7 +84,7 @@ $addExpressionButton = new CButton(
 		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 265);',
 	'formlist'
 );
-if ($this->data['limited'] == 'yes') {
+if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
 $expressionRow = array($expressionTextBox, $addExpressionButton);
@@ -102,7 +102,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	if (empty($this->data['outline'])) {
 		// add button
 		$addExpressionButton = new CSubmit('add_expression', _('Add'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
@@ -110,21 +110,21 @@ if ($this->data['input_method'] == IM_TREE) {
 	else {
 		// add button
 		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
 		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $orExpressionButton);
 
 		// replace button
 		$replaceExpressionButton = new CSubmit('replace_expression', _('Replace'), null, 'formlist');
-		if ($this->data['limited'] == 'yes') {
+		if ($this->data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $replaceExpressionButton);
@@ -149,16 +149,16 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader(array(
-		($this->data['limited'] == 'yes') ? null : _('Target'),
+		$this->data['limited'] ? null : _('Target'),
 		_('Expression'),
 		empty($this->data['parent_discoveryid']) ? _('Error') : null,
-		($this->data['limited'] == 'yes') ? null : _('Action')
+		$this->data['limited'] ? null : _('Action')
 	));
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
-			if ($this->data['limited'] != 'yes') {
+			if (!$this->data['limited']) {
 				$deleteUrl = new CSpan(_('Delete'), 'link');
 				$deleteUrl->setAttribute('onclick', 'javascript:'.
 					' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
@@ -166,7 +166,7 @@ if ($this->data['input_method'] == IM_TREE) {
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
 				);
-				$triggerCheckbox = new CCheckbox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
+				$triggerCheckbox = new CCheckBox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
 			}
 			else {
 				$triggerCheckbox = null;
@@ -198,7 +198,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			// templated trigger
-			if ($this->data['limited'] == 'yes') {
+			if ($this->data['limited']) {
 				// make all links inside inactive
 				$listSize = count($e['list']);
 				for ($i = 0; $i < $listSize; $i++) {
@@ -335,10 +335,7 @@ if (empty($this->data['parent_discoveryid'])) {
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['triggerid'])) {
-	$buttons[] = new CSubmit('clone', _('Clone'));
-
 	$deleteButton = new CButtonDelete(
 		$this->data['parent_discoveryid'] ? _('Delete trigger prototype?') : _('Delete trigger?'),
 		url_params(array('form', 'groupid', 'hostid', 'triggerid', 'parent_discoveryid'))
@@ -346,13 +343,22 @@ if (!empty($this->data['triggerid'])) {
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
-	$buttons [] = $deleteButton;
+
+	$triggersForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$deleteButton,
+			new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+		)
+	));
 }
-$buttons[] = new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')));
-$triggersForm->addItem(makeFormFooter(
-	new CSubmit('save', _('Save')),
-	array($buttons)
-));
+else {
+	$triggersForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+	));
+}
 
 $triggersWidget->addItem($triggersForm);
 

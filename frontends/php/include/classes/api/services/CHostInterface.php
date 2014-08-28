@@ -104,7 +104,7 @@ class CHostInterface extends CApiService {
 				' WHERE hi.hostid=hgg.hostid'.
 				' GROUP BY hgg.hostid'.
 				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.$permission.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 
@@ -201,13 +201,13 @@ class CHostInterface extends CApiService {
 	public function exists(array $object) {
 		$this->deprecated('hostinterface.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
+		$hostInterface = $this->get(array(
 			'output' => array('interfaceid'),
+			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $hostInterface;
 	}
 
 	/**

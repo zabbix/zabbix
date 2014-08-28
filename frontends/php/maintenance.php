@@ -39,13 +39,13 @@ $fields = array(
 	'groupids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupid' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// maintenance
-	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
 	'maintenanceids' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
-	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
-	'description' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'active_since' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
-	'active_till' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
+	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'),
+	'description' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
+	'active_since' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'),
+	'active_till' =>						array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'),
 	'active_since_day' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_month' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'active_since_year' =>					array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
@@ -67,21 +67,28 @@ $fields = array(
 	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
 	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'go' =>									array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null),
 	'add_timeperiod' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_timeperiod' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>								array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>								array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'form_refresh' =>						array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>								array(T_ZBX_STR, O_OPT, P_SYS,
+												IN('"active_since","active_till","maintenance_type","name"'),
+												null
+											),
+	'sortorder' =>							array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),
+												null
+											)
 );
 
 check_fields($fields);
-
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'maintenance_type', 'active_since', 'active_till'));
 
 /*
  * Permissions
@@ -100,10 +107,9 @@ if (isset($_REQUEST['maintenanceid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go']) && (!isset($_REQUEST['maintenanceids']) || !is_array($_REQUEST['maintenanceids']))) {
+if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getRequest('maintenanceids')))) {
 	access_deny();
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -115,8 +121,8 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
-elseif (isset($_REQUEST['save'])) {
-	if (isset($_REQUEST['maintenanceid'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
+	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
 		$auditAction = AUDIT_ACTION_UPDATE;
@@ -212,10 +218,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
+elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') == 'maintenance.massdelete')) {
 	$maintenanceids = getRequest('maintenanceid', array());
-	if (isset($_REQUEST['maintenanceids'])) {
-		$maintenanceids = $_REQUEST['maintenanceids'];
+	if (hasRequest('maintenanceids')) {
+		$maintenanceids = getRequest('maintenanceids');
 	}
 
 	zbx_value2array($maintenanceids);
@@ -512,14 +518,20 @@ if (!empty($data['form'])) {
 }
 else {
 	// get maintenances
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data['sort'] = $sortField;
+	$data['sortorder'] = $sortOrder;
 
 	$options = array(
 		'output' => array('maintenanceid'),
 		'editable' => true,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	);
 
@@ -552,7 +564,7 @@ else {
 		}
 	}
 
-	order_result($data['maintenances'], $sortfield, $sortorder);
+	order_result($data['maintenances'], $sortField, $sortOrder);
 
 	$data['pageFilter'] = $pageFilter;
 

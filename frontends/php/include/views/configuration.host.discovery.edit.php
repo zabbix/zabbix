@@ -55,7 +55,7 @@ $itemFormList->addRow(_('Name'), $nameTextBox);
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
 	$itemFormList->addRow(_('Type'),
-		new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+		new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, true)
 	);
 }
 else {
@@ -109,11 +109,11 @@ $itemFormList->addRow(_('Context name'),
 	false, 'row_snmpv3_contextname'
 );
 $itemFormList->addRow(_('SNMP community'),
-	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
-	new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_securityname'
 );
 
@@ -134,7 +134,7 @@ $itemFormList->addRow(_('Authentication protocol'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
-	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_authpassphrase'
 );
 $privProtocolRadioButton = array(
@@ -148,11 +148,11 @@ $itemFormList->addRow(_('Privacy protocol'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
-	new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
+	new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64),
 	false, 'row_snmpv3_privpassphrase'
 );
 $itemFormList->addRow(_('Port'),
-	new CTextBox('port', $this->data['port'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_port'
+	new CTextBox('port', $this->data['port'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_port'
 );
 $itemFormList->addRow(_('IPMI sensor'),
 	new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited'], 128),
@@ -165,16 +165,16 @@ $authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 $authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
 $itemFormList->addRow(_('User name'),
-	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_username'
+	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_username'
 );
 $itemFormList->addRow(_('Public key file'),
-	new CTextBox('publickey', $this->data['publickey'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_publickey'
+	new CTextBox('publickey', $this->data['publickey'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_publickey'
 );
 $itemFormList->addRow(_('Private key file'),
-	new CTextBox('privatekey', $this->data['privatekey'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false,  'row_privatekey'
+	new CTextBox('privatekey', $this->data['privatekey'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false,  'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
-	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
+	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
 	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
@@ -228,7 +228,7 @@ $itemFormList->addRow(_('Flexible intervals'),
 $newFlexInt = new CSpan(array(
 	_('Interval (in sec)'),
 	SPACE,
-	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, 'no', false, false),
+	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
 	SPACE,
 	_('Period'),
 	SPACE,
@@ -346,18 +346,32 @@ $itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['itemid'])) {
-	array_push($buttons, new CSubmit('clone', _('Clone')));
-
 	if (!$this->data['limited']) {
-		array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
+		$btnDelete = new CButtonDelete(
+			_('Delete discovery rule?'),
+			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
+	else {
+		$btnDelete = null;
+	}
+
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$btnDelete,
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		)
+	));
 }
-array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
+else {
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+	));
+}
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';

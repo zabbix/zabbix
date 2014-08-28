@@ -35,12 +35,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// group
-	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
 	'group_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'selusrgrp' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
+	'gname' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')),
 	'users' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save})'),
+	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'),
 	'users_status' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'debug_mode' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'new_right' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -52,9 +52,15 @@ $fields = array(
 	'set_gui_access' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null),
 	'set_debug_mode' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
+									'"usergroup.massenable","usergroup.massenabledebug","usergroup.set_gui_access"'
+								),
+								null
+							),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete_selected' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'del_user_group' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -70,10 +76,12 @@ $fields = array(
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
 	// form
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		 null,	null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 $_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
 $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
@@ -91,23 +99,22 @@ if (isset($_REQUEST['usrgrpid'])) {
 		access_deny();
 	}
 }
-elseif (isset($_REQUEST['go'])) {
-	if (!isset($_REQUEST['group_groupid']) || !is_array($_REQUEST['group_groupid'])) {
+elseif (hasRequest('action')) {
+	if (!hasRequest('group_groupid') || !is_array(getRequest('group_groupid'))) {
 		access_deny();
 	}
 	else {
 		$dbUserGroupCount = API::UserGroup()->get(array(
 			'output' => array('usrgrpid'),
-			'usrgrpids' => $_REQUEST['group_groupid'],
+			'usrgrpids' => getRequest('group_groupid'),
 			'countOutput' => true
 		));
 
-		if ($dbUserGroupCount != count($_REQUEST['group_groupid'])) {
+		if ($dbUserGroupCount != count(getRequest('group_groupid'))) {
 			access_deny();
 		}
 	}
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
@@ -162,20 +169,20 @@ elseif (isset($_REQUEST['new_right'])) {
 		);
 	}
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	$userGroup = array(
-		'name' => $_REQUEST['gname'],
-		'users_status' => $_REQUEST['users_status'],
-		'gui_access' => $_REQUEST['gui_access'],
-		'debug_mode' => $_REQUEST['debug_mode'],
+		'name' => getRequest('gname'),
+		'users_status' => getRequest('users_status'),
+		'gui_access' => getRequest('gui_access'),
+		'debug_mode' => getRequest('debug_mode'),
 		'userids' => getRequest('group_users', array()),
 		'rights' => array_values(getRequest('group_rights', array()))
 	);
 
 	DBstart();
 
-	if (isset($_REQUEST['usrgrpid'])) {
-		$userGroup['usrgrpid'] = $_REQUEST['usrgrpid'];
+	if (hasRequest('update')) {
+		$userGroup['usrgrpid'] = getRequest('usrgrpid');
 		$result = API::UserGroup()->update($userGroup);
 
 		$messageSuccess = _('Group updated');
@@ -191,7 +198,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$_REQUEST['gname'].']');
+		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$userGroup['name'].']');
 		unset($_REQUEST['form']);
 	}
 
@@ -221,8 +228,8 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 }
-elseif ($_REQUEST['go'] == 'delete') {
-	$groupIds = getRequest('group_groupid', array());
+elseif (hasRequest('action') && getRequest('action') == 'usergroup.massdelete' && hasRequest('group_groupid')) {
+	$groupIds = getRequest('group_groupid');
 	$groups = array();
 
 	$dbGroups = DBselect(
@@ -253,7 +260,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
 	}
 }
-elseif ($_REQUEST['go'] == 'set_gui_access') {
+elseif (hasRequest('action') && getRequest('action') == 'usergroup.set_gui_access') {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
@@ -270,10 +277,10 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	if ($groups) {
 		DBstart();
 
-		$result = change_group_gui_access($groupIds, $_REQUEST['set_gui_access']);
+		$result = change_group_gui_access($groupIds, getRequest('set_gui_access'));
 
 		if ($result) {
-			$auditAction = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
+			$auditAction = (getRequest('set_gui_access') == GROUP_GUI_ACCESS_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
 
 			foreach ($groups as $groupId => $group) {
 				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'GUI access for group name ['.$group['name'].']');
@@ -288,11 +295,11 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('usergroup.massenabledebug', 'usergroup.massdisabledebug'))) {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
-	$setDebugMode = ($_REQUEST['go'] == 'enable_debug') ? GROUP_DEBUG_MODE_ENABLED : GROUP_DEBUG_MODE_DISABLED;
+	$setDebugMode = (getRequest('action') == 'usergroup.massenabledebug') ? GROUP_DEBUG_MODE_ENABLED : GROUP_DEBUG_MODE_DISABLED;
 
 	$groups = array();
 	$dbGroup = DBselect(
@@ -325,11 +332,11 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
 	}
 }
-elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))) {
+elseif (str_in_array(getRequest('action'), array('usergroup.massenable', 'usergroup.massdisable'))) {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
-	$enable = (getRequest('go') == 'enable_status');
+	$enable = (getRequest('action') == 'usergroup.massenable');
 	$status = $enable ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$groups = array();
@@ -468,21 +475,27 @@ if (isset($_REQUEST['form'])) {
 	$userGroupsView->show();
 }
 else {
-	$data = array(
-		'config' => $config
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortfield = getPageSortField('name');
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'config' => $config,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$data['usergroups'] = API::UserGroup()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'selectUsers' => API_OUTPUT_EXTEND,
-		'sortfield' => $sortfield,
+		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	));
 
 	// sorting & paging
-	order_result($data['usergroups'], $sortfield, getPageSortOrder());
+	order_result($data['usergroups'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['usergroups']);
 
 	// render view

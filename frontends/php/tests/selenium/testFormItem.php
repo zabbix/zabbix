@@ -1227,8 +1227,8 @@ class testFormItem extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -1276,7 +1276,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('Item updated');
 		$this->zbxTestTextPresent("$name");
@@ -2443,7 +2443,7 @@ class testFormItem extends CWebTest {
 		$data_type = $this->getSelectedLabel('data_type');
 
 		if ($itemFlexFlag == true) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
@@ -2560,7 +2560,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
@@ -2580,7 +2580,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global');
 		$this->input_type('hk_trends', 455);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
@@ -2600,7 +2600,7 @@ class testFormItem extends CWebTest {
 		$this->input_type('hk_trends', 365);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);

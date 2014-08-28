@@ -54,7 +54,10 @@ $fields = array(
 	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	// sort and sortorder
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -133,28 +136,18 @@ if (hasRequest('filter_set')) {
 	}
 
 	// update host inventory filter
-	$i = 0;
+	$inventoryFields = array();
+	$inventoryValues = array();
 	foreach (getRequest('inventory', array()) as $field) {
 		if ($field['value'] === '') {
 			continue;
 		}
 
-		CProfile::update('web.tr_status.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
-		CProfile::update('web.tr_status.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
-
-		$i++;
+		$inventoryFields[] = $field['field'];
+		$inventoryValues[] = $field['value'];
 	}
-
-	// delete remaining old values
-	$idx2 = array();
-	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
-		$idx2[] = $i;
-
-		$i++;
-	}
-
-	CProfile::delete('web.tr_status.filter.inventory.field', $idx2);
-	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
+	CProfile::updateArray('web.tr_status.filter.inventory.field', $inventoryFields, PROFILE_TYPE_STR);
+	CProfile::updateArray('web.tr_status.filter.inventory.value', $inventoryValues, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -199,20 +192,22 @@ $filter = array(
 	'application' => CProfile::get('web.tr_status.filter.application', ''),
 	'inventory' => array()
 );
-$i = 0;
-while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+
+foreach (CProfile::getArray('web.tr_status.filter.inventory.field', array()) as $i => $field) {
 	$filter['inventory'][] = array(
-		'field' => CProfile::get('web.tr_status.filter.inventory.field', null, $i),
+		'field' => $field,
 		'value' => CProfile::get('web.tr_status.filter.inventory.value', null, $i)
 	);
-
-	$i++;
 }
 
 /*
  * Page sorting
  */
-validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN, array('priority', 'lastchange', 'description'));
+$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'lastchange'));
+$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_DOWN));
+
+CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 /*
  * Display
@@ -291,27 +286,25 @@ $triggerTable = new CTableInfo(_('No triggers found.'));
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
-	make_sorting_header(_('Severity'), 'priority'),
+	make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 	_('Status'),
 	_('Info'),
-	make_sorting_header(_('Last change'), 'lastchange'),
+	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
 	_('Host'),
-	make_sorting_header(_('Name'), 'description'),
+	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
 	_('Description')
 ));
 
 // get triggers
-$sortfield = getPageSortField('description');
-$sortorder = getPageSortOrder();
 $options = array(
-	'output' => array('triggerid', $sortfield),
+	'output' => array('triggerid', $sortField),
 	'monitored' => true,
 	'skipDependent' => true,
-	'sortfield' => $sortfield,
-	'sortorder' => $sortorder,
+	'sortfield' => $sortField,
+	'sortorder' => $sortOrder,
 	'limit' => $config['search_limit'] + 1
 );
 
@@ -378,7 +371,7 @@ if (!$showMaintenance) {
 }
 $triggers = API::Trigger()->get($options);
 
-order_result($triggers, $sortfield, $sortorder);
+order_result($triggers, $sortField, $sortOrder);
 $paging = getPagingLine($triggers);
 
 
@@ -401,7 +394,7 @@ $triggers = API::Trigger()->get(array(
 	'preservekeys' => true
 ));
 
-order_result($triggers, $sortfield, $sortorder);
+order_result($triggers, $sortField, $sortOrder);
 
 // sort trigger hosts by name
 foreach ($triggers as &$trigger) {
@@ -545,7 +538,7 @@ foreach ($triggers as $trigger) {
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? 'showgraph' : 'showvalues'
+					? HISTORY_GRAPH : HISTORY_VALUES
 			)
 		);
 	}
@@ -820,8 +813,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$goComboBox = new CComboBox('go');
-	$goComboBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
+	$goComboBox = new CComboBox('action');
+	$goComboBox->addItem('trigger.bulkacknowledge', _('Bulk acknowledge'));
 
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');

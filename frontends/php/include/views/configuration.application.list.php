@@ -50,15 +50,13 @@ $applicationWidget->addHeaderRowNumber();
 // create form
 $applicationForm = new CForm();
 $applicationForm->setName('applicationForm');
-$applicationForm->addVar('groupid', $this->data['groupid']);
-$applicationForm->addVar('hostid', $this->data['hostid']);
 
 // create table
 $applicationTable = new CTableInfo(_('No applications found.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
 	($this->data['hostid'] > 0) ? null : _('Host'),
-	make_sorting_header(_('Application'), 'name'),
+	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show')
 ));
 
@@ -83,14 +81,13 @@ foreach ($this->data['applications'] as $application) {
 			'applications.php?'.
 				'form=update'.
 				'&applicationid='.$application['applicationid'].
-				'&hostid='.$application['hostid'].
-				'&groupid='.$this->data['groupid']
+				'&hostid='.$application['hostid']
 		);
 	}
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
-		($this->data['hostid'] > 0) ? null : $application['host'],
+		($this->data['hostid'] > 0) ? null : $application['host']['name'],
 		$name,
 		array(
 			new CLink(
@@ -106,16 +103,17 @@ foreach ($this->data['applications'] as $application) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem('application.massenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected applications?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem('application.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected applications?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('application.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected applications?'));
 $goComboBox->addItem($goOption);
 

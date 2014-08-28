@@ -19,12 +19,12 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.4');
-define('ZABBIX_API_VERSION', '2.3.4');
-define('ZABBIX_DB_VERSION',	 2030117);
+define('ZABBIX_VERSION',		'2.3.4');
+define('ZABBIX_API_VERSION',	'2.3.4');
+define('ZABBIX_DB_VERSION',		2030118);
 
-define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2014');
+define('ZABBIX_COPYRIGHT_FROM',	'2001');
+define('ZABBIX_COPYRIGHT_TO',	'2014');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -520,6 +520,8 @@ define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 // used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
+define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
+define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -543,6 +545,10 @@ define('SCREEN_DYNAMIC_ITEM',	1);
 
 define('SCREEN_REFRESH_TIMEOUT',		30);
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
+
+define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
+define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
+define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
@@ -764,7 +770,13 @@ define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
  */
 define('SPACE',	'&nbsp;');
 
+/**
+ * Symbol used to separate name pairs such as "host: item" or "proxy: host".
+ *
+ * Should not be used as just a colon.
+ */
 define('NAME_DELIMITER', ': ');
+
 define('UNKNOWN_VALUE', '-');
 
 // suffixes
@@ -950,6 +962,11 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 define('COPY_TYPE_TO_HOST', 0);
 define('COPY_TYPE_TO_TEMPLATE', 2);
 define('COPY_TYPE_TO_HOST_GROUP', 1);
+
+define('HISTORY_GRAPH', 'showgraph');
+define('HISTORY_BATCH_GRAPH', 'batchgraph');
+define('HISTORY_VALUES', 'showvalues');
+define('HISTORY_LATEST', 'showlatest');
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');

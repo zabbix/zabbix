@@ -126,7 +126,7 @@ class CTemplateScreen extends CScreen {
 						' WHERE s.templateid=hgg.hostid'.
 						' GROUP BY hgg.hostid'.
 						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.$permission.
+							' AND MAX(r.permission)>='.zbx_dbstr($permission).
 						')';
 			}
 		}
@@ -395,17 +395,17 @@ class CTemplateScreen extends CScreen {
 	 *
 	 * @return bool
 	 */
-	public function exists($data) {
+	public function exists(array $object) {
 		$this->deprecated('templatescreen.exists method is deprecated.');
 
-		$screens = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $data),
-			'preservekeys' => true,
+		$templateScreen = $this->get(array(
 			'output' => array('screenid'),
+			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $object),
+			'preservekeys' => true,
 			'limit' => 1
 		));
 
-		return !empty($screens);
+		return (bool) $templateScreen;
 	}
 
 	public function copy(array $data) {
@@ -431,6 +431,7 @@ class CTemplateScreen extends CScreen {
 					if ($screenItem['resourceid']) {
 						switch ($screenItem['resourcetype']) {
 							case SCREEN_RESOURCE_GRAPH:
+							case SCREEN_RESOURCE_LLD_GRAPH:
 								$resourceGraphIds[] = $screenItem['resourceid'];
 								break;
 							default:
@@ -456,7 +457,7 @@ class CTemplateScreen extends CScreen {
 
 			// get same graphs on destination template
 			$resourceGraphsMap = array();
-			$dbItems = DBselect(
+			$dbGraphs = DBselect(
 				'SELECT src.graphid AS srcid,dest.graphid as destid'.
 				' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
 				' WHERE dest.name=src.name'.
@@ -465,8 +466,8 @@ class CTemplateScreen extends CScreen {
 					' AND desti.hostid='.zbx_dbstr($templateId).
 					' AND '.dbConditionInt('src.graphid', $resourceGraphIds)
 			);
-			while ($dbItem = DBfetch($dbItems)) {
-				$resourceGraphsMap[$dbItem['srcid']] = $dbItem['destid'];
+			while ($dbGraph = DBfetch($dbGraphs)) {
+				$resourceGraphsMap[$dbGraph['srcid']] = $dbGraph['destid'];
 			}
 
 			$newScreenIds = DB::insert('screens', $screens);
@@ -476,35 +477,46 @@ class CTemplateScreen extends CScreen {
 				foreach ($screen['screenitems'] as $screenItem) {
 					$screenItem['screenid'] = $newScreenIds[$snum];
 
-					$rid = $screenItem['resourceid'];
+					$resourceId = $screenItem['resourceid'];
 
 					switch ($screenItem['resourcetype']) {
 						case SCREEN_RESOURCE_GRAPH:
-							if ($rid && !isset($resourceGraphsMap[$rid])) {
-								$graph = DBfetch(DBselect('SELECT g.name FROM graphs g WHERE g.graphid='.zbx_dbstr($rid)));
-								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
+						case SCREEN_RESOURCE_LLD_GRAPH:
+							if ($resourceId && !isset($resourceGraphsMap[$resourceId])) {
+								$graph = DBfetch(DBselect(
+									'SELECT g.name FROM graphs g WHERE g.graphid='.zbx_dbstr($resourceId)
+								));
+								$template = DBfetch(DBselect(
+									'SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)
+								));
 
-								self::exception(
-									ZBX_API_ERROR_PARAMETERS,
-									_s('Graph "%1$s" does not exist on template "%2$s".', $graph['name'], $template['name'])
-								);
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Graph "%1$s" does not exist on template "%2$s".', $graph['name'],
+									$template['name']
+								));
 							}
 
-							$screenItem['resourceid'] = $resourceGraphsMap[$rid];
+							$screenItem['resourceid'] = $resourceGraphsMap[$resourceId];
 							break;
 
 						default:
-							if ($rid && !isset($resourceItemsMap[$rid])) {
-								$item = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($rid)));
-								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
+							if ($resourceId && !isset($resourceItemsMap[$resourceId])) {
+								$item = DBfetch(DBselect(
+									'SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($resourceId)
+								));
+								$template = DBfetch(DBselect(
+									'SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)
+								));
 
-								self::exception(
-									ZBX_API_ERROR_PARAMETERS,
-									_s('Item "%1$s" does not exist on template "%2$s".', $item['name'], $template['name'])
-								);
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Item "%1$s" does not exist on template "%2$s".', $item['name'],
+									$template['name']
+								));
 							}
 
-							$screenItem['resourceid'] = $resourceItemsMap[$rid];
+							if ($resourceId) {
+								$screenItem['resourceid'] = $resourceItemsMap[$resourceId];
+							}
 					}
 
 					$insertScreenItems[] = $screenItem;
@@ -676,7 +688,11 @@ class CTemplateScreen extends CScreen {
 		));
 
 		foreach ($dbExistingScreens as $dbExistingScreen) {
-			$dbTemplate = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$dbExistingScreen['templateid']));
+			$dbTemplate = DBfetch(DBselect(
+				'SELECT h.name'.
+				' FROM hosts h'.
+				' WHERE h.hostid='.zbx_dbstr($dbExistingScreen['templateid'])
+			));
 
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,

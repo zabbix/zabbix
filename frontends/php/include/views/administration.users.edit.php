@@ -378,28 +378,33 @@ if (isset($userMessagingFormList)) {
 $userForm->addItem($userTab);
 
 // append buttons to form
-if (empty($this->data['userid'])) {
-	$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
-}
-else {
+if (isset($this->data['userid'])) {
 	if ($this->data['is_profile']) {
-		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
+		$deleteButton = null;
 	}
 	else {
-		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid').url_param('config'));
-
+		$deleteButton = new CButtonDelete(
+			_('Delete selected user?'),
+			url_param('form').url_param('userid').url_param('config')
+		);
 		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
-
-		$userForm->addItem(makeFormFooter(
-			new CSubmit('save', _('Save')),
-			array(
-				$deleteButton,
-				new CButtonCancel(url_param('config'))
-			)
-		));
 	}
+
+	$userForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			$deleteButton,
+			new CButtonCancel(url_param('config'))
+		)
+	));
+}
+else {
+	$userForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('config'))
+	));
 }
 
 // append form to widget

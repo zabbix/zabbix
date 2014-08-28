@@ -116,7 +116,7 @@ class CGraphPrototype extends CGraphGeneral {
 					' AND gi.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
+				' HAVING MAX(permission)<'.zbx_dbstr($permission).
 					' OR MIN(permission) IS NULL'.
 					' OR MIN(permission)='.PERM_DENY.
 				')';
@@ -365,7 +365,8 @@ class CGraphPrototype extends CGraphGeneral {
 			$tmpGraph = $graph;
 			$tmpGraph['templateid'] = $graph['graphid'];
 
-			if (!$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid'])) {
+			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
+			if (!$tmpGraph['gitems']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" cannot inherit. No required items on "%2$s".', $tmpGraph['name'], $chdHost['host']));
 			}
 
@@ -447,18 +448,22 @@ class CGraphPrototype extends CGraphGeneral {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist.'));
 					}
 
-					$chdGraphItems = API::GraphItem()->get(array(
-						'graphids' => $chdGraph['graphid'],
-						'output' => API_OUTPUT_EXTEND,
-						'preservekeys' => true,
-						'expandData' => true,
-						'nopermissions' => true
-					));
+					$chdGraphItemItems = array();
 
-					if (count($chdGraphItems) == count($tmpGraph['gitems'])) {
+					foreach(array(API::Item(), API::ItemPrototype()) as $api) {
+						$chdGraphItemItems += $api->get(array(
+							'output' => array('key_', 'hostid', 'itemid'),
+							'itemids' => zbx_objectValues($chdGraph['gitems'], 'itemid'),
+							'preservekeys' => true
+						));
+					}
+
+					if (count($chdGraph['gitems']) == count($tmpGraph['gitems'])) {
 						foreach ($tmpGraph['gitems'] as $gitem) {
-							foreach ($chdGraphItems as $chdItem) {
-								if ($gitem['key_'] == $chdItem['key_'] && bccomp($chdHost['hostid'], $chdItem['hostid']) == 0) {
+							foreach ($chdGraph['gitems'] as $chdGraphItem) {
+								$chdGraphItemItem = $chdGraphItemItems[$chdGraphItem['itemid']];
+								if ($gitem['key_'] == $chdGraphItemItem['key_']
+										&& bccomp($chdHost['hostid'], $chdGraphItemItem['hostid']) == 0) {
 									continue 2;
 								}
 							}
@@ -581,6 +586,11 @@ class CGraphPrototype extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graphs created by low level discovery.'));
 			}
 		}
+
+		DB::delete('screens_items', array(
+			'resourceid' => $graphids,
+			'resourcetype' => SCREEN_RESOURCE_LLD_GRAPH
+		));
 
 		DB::delete('graphs', array('graphid' => $graphids));
 
@@ -718,7 +728,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('name', 'value_type', 'flags'),
+			'output' => array('itemid', 'name', 'value_type', 'flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
 			'filter' => array(
@@ -740,9 +750,15 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+				foreach ($dbGraphs as $dbGraph) {
+					$itemIdsInGraphItems = zbx_objectValues($dbGraph['gitems'], 'itemid');
+					if (in_array($item['itemid'], $itemIdsInGraphItems)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+							$item['name'], $dbGraph['name']
+						));
+					}
+				}
 			}
 		}
 	}
