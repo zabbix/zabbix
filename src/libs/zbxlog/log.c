@@ -46,17 +46,17 @@ const char	*zabbix_get_log_level_string(void)
 	switch (log_level)
 	{
 		case LOG_LEVEL_EMPTY:
-			return "0 - none";
+			return "0 (none)";
 		case LOG_LEVEL_CRIT:
-			return "1 - critical";
+			return "1 (critical)";
 		case LOG_LEVEL_ERR:
-			return "2 - error";
+			return "2 (error)";
 		case LOG_LEVEL_WARNING:
-			return "3 - warning";
+			return "3 (warning)";
 		case LOG_LEVEL_DEBUG:
-			return "4 - debug";
+			return "4 (debug)";
 		case LOG_LEVEL_TRACE:
-			return "5 - trace";
+			return "5 (trace)";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
