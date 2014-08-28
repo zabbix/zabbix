@@ -689,13 +689,14 @@ int	MAIN_ZABBIX_ENTRY()
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Database \"%s\" does not look like a Zabbix database.", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Database \"%s\" looks like a Zabbix server database. Zabbix proxy cannot "
-				"work with a Zabbix server database.", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
 		exit(EXIT_FAILURE);
 	}
 
