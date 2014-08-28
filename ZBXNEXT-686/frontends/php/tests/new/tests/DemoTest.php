@@ -16,7 +16,7 @@ class HostCreateTest extends FileApiTestCase {
 	 */
 	public function testFile($file) {
 		$test = $this->parseTestFile($file);
-		$this->loadFixtures($test['fixtures']);
+		$this->database->loadFixtures($test['fixtures']);
 		$this->runSteps($test['steps']);
 	}
 

@@ -84,10 +84,4 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		return self::$pdo;
 	}
 
-	protected function loadFixtures(array $fixtures) {
-		foreach ($fixtures as $file) {
-			$this->database->loadFixtures($file);
-		}
-	}
-
 }

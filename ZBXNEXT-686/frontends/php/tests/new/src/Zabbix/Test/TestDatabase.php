@@ -13,16 +13,58 @@ class TestDatabase {
 	}
 
 	public function clear() {
-		foreach (\DB::getSchema() as $tableName => $tableData) {
-			if ($tableName === 'dbversion') {
-				continue;
+		try {
+			$this->pdo->beginTransaction();
+
+			// TODO: clear the database in the correct order
+			foreach ($this->getTablesToClear() as $tableName) {
+				$this->pdo->query('DELETE FROM '.$tableName);
 			}
 
-			$this->pdo->query('DELETE FROM '.$tableName);
+			$this->pdo->commit();
+		}
+		catch (\Exception $e) {
+			$this->pdo->rollBack();
+
+			throw $e;
 		}
 	}
 
-	public function loadFixtures($file, $loaded = array()) {
+	protected function getTablesToClear() {
+		// TODO: implement a better ordering algorithm
+		$tables = array();
+		foreach (\DB::getSchema() as $tableName => $tableData) {
+			if (in_array($tableName, array('dbversion', 'items'))) {
+				continue;
+			}
+
+			$tables[] = $tableName;
+		}
+
+		// clear the items table first to avoid integrity check errors
+		array_unshift($tables, 'items');
+
+		return $tables;
+	}
+
+	public function loadFixtures(array $files, $loaded = array()) {
+		try {
+			$this->pdo->beginTransaction();
+
+			foreach ($files as $file) {
+				$this->loadFixture($file);
+			}
+
+			$this->pdo->commit();
+		}
+		catch (\Exception $e) {
+			$this->pdo->rollBack();
+
+			throw $e;
+		}
+	}
+
+	protected function loadFixture($file, array $loaded = array()) {
 		if (in_array($file, $loaded)) {
 			return;
 		}
@@ -39,7 +81,7 @@ class TestDatabase {
 
 		foreach ($fixtures as $suite => $data) {
 			foreach ($data['require'] as $fixture) {
-				$this->loadDatabaseFixtures($fixture, $loaded);
+				$this->loadFixture($fixture, $loaded);
 			}
 
 			foreach ($data['rows'] as $table => $rows) {
