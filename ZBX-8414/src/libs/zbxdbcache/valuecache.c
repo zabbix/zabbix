@@ -2692,27 +2692,23 @@ out:
  *             value_type - [IN] the item value type                          *
  *             ts         - [IN] the target timestamp                         *
  *             value      - [OUT] the value found                             *
- *             found      - [OUT] 1 - the value was found, 0 - otherwise      *
  *                                                                            *
- * Return value:  SUCCEED - the item history data was retrieved successfully  *
- *                FAIL    - the item history data was not retrieved           *
+ * Return Value: SUCCEED - the item was retrieved                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: Depending on the value type this function might allocate memory  *
  *           to store value data. To free it use zbx_vc_history_value_clear() *
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value,
-		int *found)
+int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value)
 {
 	const char	*__function_name = "zbx_vc_get_value";
 	zbx_vc_item_t	*item = NULL;
-	int 		ret = FAIL, cache_used = 1;
+	int 		ret = FAIL, cache_used = 1, found = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
 			__function_name, itemid, value_type, ts->sec, ts->ns);
-
-	*found = 0;
 
 	vc_try_lock();
 
@@ -2740,7 +2736,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
 		goto out;
 
-	ret = vch_item_get_value(item, ts, value, found);
+	ret = vch_item_get_value(item, ts, value, &found);
 out:
 	if (FAIL == ret)
 	{
@@ -2758,10 +2754,8 @@ out:
 		if (SUCCEED == ret)
 		{
 			vc_update_statistics(NULL, 0, 1);
-			*found = 1;
+			found = 1;
 		}
-		else
-			ret = SUCCEED;
 	}
 
 	if (NULL != item)
@@ -2769,9 +2763,10 @@ out:
 
 	vc_try_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s cached:%d", __function_name, zbx_result_string(ret), cache_used);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d cached:%d", __function_name, zbx_result_string(ret), found,
+			cache_used);
 
-	return ret;
+	return 1 == found ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
