@@ -11,6 +11,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
 ..F....... [ZBX-8624] fixed inconsistent header layout in Monitoring->Discovery page (Krists)
 ..F....... [ZBX-8524] fixed trigger filter not being reset on the Monitoring->Events page (Krists, Pavels)
 ...G...PS. [ZBX-8494] added check to prevent starting a proxy with a server database and vice versa (Andris)
@@ -323,6 +324,12 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.7rc1
+
+Bug fixes:
+..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.6
