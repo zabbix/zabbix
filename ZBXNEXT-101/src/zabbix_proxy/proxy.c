@@ -649,7 +649,6 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
-	int		offset;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -670,18 +669,20 @@ int	main(int argc, char **argv)
 					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
 							ZBX_RTC_LOG_LEVEL_INCREASE, &t.flags))
 					{
 						exit(EXIT_FAILURE);
 					}
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						offset = strlen(ZBX_LOG_LEVEL_DECREASE)))
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
 							ZBX_RTC_LOG_LEVEL_DECREASE, &t.flags))
 					{
 						exit(EXIT_FAILURE);
