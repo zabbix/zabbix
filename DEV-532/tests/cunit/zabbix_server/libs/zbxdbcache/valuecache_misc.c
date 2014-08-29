@@ -26,7 +26,6 @@
 
 static void	cuvc_suite_misc1_test1()
 {
-	int				found = 0;
 	zbx_history_record_t		record;
 	zbx_timespec_t			ts = {1005, 0};
 	zbx_vc_item_t			*item;
@@ -34,8 +33,7 @@ static void	cuvc_suite_misc1_test1()
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record, &found));
-	ZBX_CU_ASSERT_INT_EQ_FATAL(found, 1);
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
@@ -43,8 +41,7 @@ static void	cuvc_suite_misc1_test1()
 
 	vc_item_addref(item);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_TEXT, &ts, &record, &found));
-	ZBX_CU_ASSERT_INT_EQ_FATAL(found, 0);
+	CU_ASSERT_FATAL(FAIL == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_TEXT, &ts, &record));
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
@@ -60,7 +57,6 @@ static void	cuvc_suite_misc1_test1()
 
 static void	cuvc_suite_misc1_test2()
 {
-	int				found = 0;
 	zbx_history_record_t		record;
 	zbx_timespec_t			ts = {1004, 999};
 	zbx_vc_item_t			*item;
@@ -73,8 +69,7 @@ static void	cuvc_suite_misc1_test2()
 	cuvc_generate_records1(&records, ITEM_VALUE_TYPE_STR);
 	zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record, &found));
-	ZBX_CU_ASSERT_INT_EQ_FATAL(found, 1);
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
@@ -109,7 +104,7 @@ static void	cuvc_suite_misc1_cleanup()
 
 static void	cuvc_suite_misc2_test1()
 {
-	int				i, found = 0;
+	int				i;
 	zbx_history_record_t		record;
 	zbx_timespec_t			ts = {1004, 999};
 	zbx_vc_item_t			*item;
@@ -125,8 +120,7 @@ static void	cuvc_suite_misc2_test1()
 	{
 		itemid = CUVC_ITEMID_BASE + i;
 
-		CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, i, &ts, &record, &found));
-		ZBX_CU_ASSERT_INT_EQ_FATAL(found, 1);
+		CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, i, &ts, &record));
 		zbx_history_record_clear(&record, i);
 	}
 
@@ -138,8 +132,7 @@ static void	cuvc_suite_misc2_test1()
 	{
 		itemid = CUVC_ITEMID_BASE + i;
 
-		CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, i, &ts, &record, &found));
-		ZBX_CU_ASSERT_INT_EQ_FATAL(found, 1);
+		CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, i, &ts, &record));
 		zbx_history_record_clear(&record, i);
 	}
 
@@ -180,13 +173,11 @@ static void	cuvc_suite_misc2_test1()
 
 static void	cuvc_suite_misc2_test2_hittype(int value_type)
 {
-	int			found;
 	zbx_history_record_t	record;
 	zbx_uint64_t		itemid = CUVC_ITEMID_BASE + value_type;
 	zbx_timespec_t		ts = {1004, 999};
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &record, &found));
-	ZBX_CU_ASSERT_INT_EQ_FATAL(found, 1);
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &record));
 	zbx_history_record_clear(&record, value_type);
 }
 

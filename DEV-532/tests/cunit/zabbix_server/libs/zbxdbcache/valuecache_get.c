@@ -576,7 +576,6 @@ static void	cuvc_suite_get4_test1()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 900};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:700"},
 			.timestamp = {.sec = 1004, .ns = 700}
@@ -587,11 +586,10 @@ static void	cuvc_suite_get4_test1()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -617,7 +615,6 @@ static void	cuvc_suite_get4_test2()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 700};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:700"},
 			.timestamp = {.sec = 1004, .ns = 700}
@@ -628,11 +625,10 @@ static void	cuvc_suite_get4_test2()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -658,7 +654,6 @@ static void	cuvc_suite_get4_test3()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 600};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:500"},
 			.timestamp = {.sec = 1004, .ns = 500}
@@ -669,11 +664,10 @@ static void	cuvc_suite_get4_test3()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -699,7 +693,6 @@ static void	cuvc_suite_get4_test4()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 500};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:500"},
 			.timestamp = {.sec = 1004, .ns = 500}
@@ -710,11 +703,10 @@ static void	cuvc_suite_get4_test4()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -740,7 +732,6 @@ static void	cuvc_suite_get4_test5()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 300};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:200"},
 			.timestamp = {.sec = 1004, .ns = 200}
@@ -751,11 +742,10 @@ static void	cuvc_suite_get4_test5()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -782,7 +772,6 @@ static void	cuvc_suite_get4_test6()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 200};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:200"},
 			.timestamp = {.sec = 1004, .ns = 200}
@@ -793,11 +782,10 @@ static void	cuvc_suite_get4_test6()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -824,7 +812,6 @@ static void	cuvc_suite_get4_test7()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1003, 000};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:700"},
 			.timestamp = {.sec = 1002, .ns = 700}
@@ -835,11 +822,10 @@ static void	cuvc_suite_get4_test7()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
@@ -866,7 +852,6 @@ static void	cuvc_suite_get4_test8()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1002, 700};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:700"},
 			.timestamp = {.sec = 1002, .ns = 700}
@@ -877,11 +862,10 @@ static void	cuvc_suite_get4_test8()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 0);
@@ -908,7 +892,6 @@ static void	cuvc_suite_get4_test9()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1002, 600};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:500"},
 			.timestamp = {.sec = 1002, .ns = 500}
@@ -919,11 +902,10 @@ static void	cuvc_suite_get4_test9()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -950,18 +932,16 @@ static void	cuvc_suite_get4_test10()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1001, 000};
-	int			found = 0;
 	zbx_history_record_t	actual;
 
 	ZBX_CU_LEAK_CHECK_START();
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(FAIL == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(0, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
@@ -1010,7 +990,6 @@ static void	cuvc_suite_get5_test1()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1005, 600};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1005:500"},
 			.timestamp = {.sec = 1005, .ns = 500}
@@ -1021,11 +1000,10 @@ static void	cuvc_suite_get5_test1()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -1051,7 +1029,6 @@ static void	cuvc_suite_get5_test2()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1005, 100};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:700"},
 			.timestamp = {.sec = 1004, .ns = 700}
@@ -1062,11 +1039,10 @@ static void	cuvc_suite_get5_test2()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -1129,7 +1105,6 @@ static void	cuvc_suite_get5_test4()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1003, 000};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:700"},
 			.timestamp = {.sec = 1002, .ns = 700}
@@ -1140,11 +1115,10 @@ static void	cuvc_suite_get5_test4()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -1382,18 +1356,16 @@ static void	cuvc_suite_get6_test3()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_UINT64;
 	zbx_timespec_t		ts = {10000000, 100};
-	int			found = 0;
 	zbx_history_record_t	actual;
 
 	ZBX_CU_LEAK_CHECK_START();
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_UINT64, &ts, &actual, &found));
+	CU_ASSERT_FATAL(FAIL == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_UINT64, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(0, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 6);
@@ -1518,7 +1490,6 @@ static void	cuvc_suite_get7_test3()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1005, 500};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1005:500"},
 			.timestamp = {.sec = 1005, .ns = 500}
@@ -1529,11 +1500,10 @@ static void	cuvc_suite_get7_test3()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_TEXT, &ts, &actual, &found));
+	CU_ASSERT_FATAL(FAIL == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_TEXT, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(0, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
@@ -1938,7 +1908,6 @@ static void	cuvc_suite_get10_test1()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 900};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:700"},
 			.timestamp = {.sec = 1004, .ns = 700}
@@ -1949,11 +1918,10 @@ static void	cuvc_suite_get10_test1()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -1974,7 +1942,6 @@ static void	cuvc_suite_get10_test2()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 700};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:700"},
 			.timestamp = {.sec = 1004, .ns = 700}
@@ -1985,11 +1952,10 @@ static void	cuvc_suite_get10_test2()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2010,7 +1976,6 @@ static void	cuvc_suite_get10_test3()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 600};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:500"},
 			.timestamp = {.sec = 1004, .ns = 500}
@@ -2021,11 +1986,10 @@ static void	cuvc_suite_get10_test3()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2046,7 +2010,6 @@ static void	cuvc_suite_get10_test4()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 500};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:500"},
 			.timestamp = {.sec = 1004, .ns = 500}
@@ -2057,11 +2020,10 @@ static void	cuvc_suite_get10_test4()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2082,7 +2044,6 @@ static void	cuvc_suite_get10_test5()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 300};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:200"},
 			.timestamp = {.sec = 1004, .ns = 200}
@@ -2093,11 +2054,10 @@ static void	cuvc_suite_get10_test5()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2119,7 +2079,6 @@ static void	cuvc_suite_get10_test6()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1004, 200};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1004:200"},
 			.timestamp = {.sec = 1004, .ns = 200}
@@ -2130,11 +2089,10 @@ static void	cuvc_suite_get10_test6()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2156,7 +2114,6 @@ static void	cuvc_suite_get10_test7()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1003, 000};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:700"},
 			.timestamp = {.sec = 1002, .ns = 700}
@@ -2167,11 +2124,10 @@ static void	cuvc_suite_get10_test7()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
@@ -2192,7 +2148,6 @@ static void	cuvc_suite_get10_test8()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1002, 700};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:700"},
 			.timestamp = {.sec = 1002, .ns = 700}
@@ -2203,11 +2158,10 @@ static void	cuvc_suite_get10_test8()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2228,7 +2182,6 @@ static void	cuvc_suite_get10_test9()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1002, 600};
-	int			found = 0;
 	zbx_history_record_t	expected = {
 			.value = {.str = "1002:500"},
 			.timestamp = {.sec = 1002, .ns = 500}
@@ -2239,11 +2192,10 @@ static void	cuvc_suite_get10_test9()
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(1, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
@@ -2264,18 +2216,16 @@ static void	cuvc_suite_get10_test10()
 	zbx_vc_item_t		*item;
 	zbx_uint64_t		itemid = CUVC_ITEMID_STR;
 	zbx_timespec_t		ts = {1001, 000};
-	int			found = 0;
 	zbx_history_record_t	actual;
 
 	ZBX_CU_LEAK_CHECK_START();
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual, &found));
+	CU_ASSERT_FATAL(FAIL == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &actual));
 
 	cuvc_snapshot(&s2);
 
-	ZBX_CU_ASSERT_INT_EQ_FATAL(0, found);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
@@ -2291,5 +2241,98 @@ static void	cuvc_suite_get10_cleanup()
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }
 
+/*
+ * value cache test suite: get11
+ *
+ *
+ */
+static void	cuvc_suite_get11_test1()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 
+	ZBX_CU_LEAK_CHECK_START();
 
+	cuvc_time=1065;
+	vc_time = cuvc_time_func;
+
+	zbx_history_record_vector_create(&records);
+
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 0, 1, 1006));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_records_str(&records, "1005:700", NULL);
+	cuvc_check_cache_str(item, "1005:700", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_RELOAD_FIRST);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 60);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 1);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+static void	cuvc_suite_get11_test2()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	zbx_history_record_vector_create(&records);
+
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 1, 0, 1005));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 3);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_records_str(&records, "1005:700", "1005:500", "1005:200", NULL);
+	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 61);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+static void	cuvc_suite_get11_cleanup()
+{
+	zbx_vc_item_t	*item;
+	zbx_uint64_t	itemid = CUVC_ITEMID_STR;
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	vc_remove_item(item);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NULL(item);
+
+	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
+}

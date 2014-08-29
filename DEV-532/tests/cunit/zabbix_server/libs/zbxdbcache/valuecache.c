@@ -43,7 +43,6 @@ static time_t	cuvc_time_func(time_t *ptime)
 	return cuvc_time;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: cuvc_write_history                                               *
@@ -750,7 +749,7 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "get 4 values from 1001 timestamp", cuvc_suite_get9_test3);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get9_cleanup);
 
-	/* test suite: get1                                                                          */
+	/* test suite: get10                                                                         */
 	/*   check if the data is being correctly retrieved (and not cached) by timestamp based      */
 	/*   requests in low memory mode                                                             */
 	if (NULL == (suite = CU_add_suite("valuecache basic timestamp based requests in low memory mode",
@@ -770,6 +769,17 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "get value with 1002.600 timestamp", cuvc_suite_get10_test9);
 	ZBX_CU_ADD_TEST(suite, "get value with 1001.000 timestamp", cuvc_suite_get10_test10);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get10_cleanup);
+
+	/* test suite: get11                                                                         */
+	if (NULL == (suite = CU_add_suite("valuecache reload first flag tests",
+			cuvc_init_str, cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp", cuvc_suite_get11_test1);
+	ZBX_CU_ADD_TEST(suite, "get 1s interval of values from 1005 timestamp", cuvc_suite_get11_test2);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get11_cleanup);
 
 	/* test suite: add1                                                                          */
 	/*   check if all item value types are correctly added to cache                              */
@@ -847,7 +857,7 @@ int	ZBX_CU_MODULE(valuecache)
 		return CU_get_error();
 	}
 
-	ZBX_CU_ADD_TEST(suite, "add value of different type when item is held by other proces", cuvc_suite_misc1_test1);
+	ZBX_CU_ADD_TEST(suite, "add value of different type when item is held by other process", cuvc_suite_misc1_test1);
 	ZBX_CU_ADD_TEST(suite, "load the same value range from multiple proceses", cuvc_suite_misc1_test2);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc1_cleanup);
 
