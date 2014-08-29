@@ -2242,9 +2242,9 @@ static void	cuvc_suite_get10_cleanup()
 }
 
 /*
- * value cache test suite: get11
- *
- *
+ * This suite makes addition 'reload first' flag handling tests:
+ *    1) check if no data is missing when the last item timestamp matches cache range
+ *    2) check if no unnecessary database requests are made
  */
 static void	cuvc_suite_get11_test1()
 {
@@ -2315,6 +2315,88 @@ static void	cuvc_suite_get11_test2()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->range, 61);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+static void	cuvc_suite_get11_test3()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	vc_remove_item(item);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NULL(item);
+
+	cuvc_time=time(NULL);
+	vc_time = cuvc_time_func;
+
+	zbx_history_record_vector_create(&records);
+
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 0, 1, cuvc_time));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 1);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 5);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_records_str(&records, "1005:700", NULL);
+	cuvc_check_cache_str(item, "1005:700", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_RELOAD_FIRST);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 1);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+static void	cuvc_suite_get11_test4()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	zbx_history_record_vector_create(&records);
+
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 0, 2, cuvc_time));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 2);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_records_str(&records, "1005:700", "1005:500", NULL);
+	cuvc_check_cache_str(item, "1005:500", "1005:700", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_RELOAD_FIRST);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 2);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 

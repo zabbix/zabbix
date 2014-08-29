@@ -771,6 +771,8 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get10_cleanup);
 
 	/* test suite: get11                                                                         */
+	/*    check if the 'reload first' flag is handled correctly - no data are missing and no     */
+	/*    unnecessary database requests are made.                                                */
 	if (NULL == (suite = CU_add_suite("valuecache reload first flag tests",
 			cuvc_init_str, cuvc_clean_str)))
 	{
@@ -778,7 +780,9 @@ int	ZBX_CU_MODULE(valuecache)
 	}
 
 	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp", cuvc_suite_get11_test1);
-	ZBX_CU_ADD_TEST(suite, "get 1s interval of values from 1005 timestamp", cuvc_suite_get11_test2);
+	ZBX_CU_ADD_TEST(suite, "get 1s interval of string values from 1005 timestamp", cuvc_suite_get11_test2);
+	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp (2)", cuvc_suite_get11_test3);
+	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp (3)", cuvc_suite_get11_test4);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get11_cleanup);
 
 	/* test suite: add1                                                                          */
