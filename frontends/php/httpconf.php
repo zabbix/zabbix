@@ -109,10 +109,8 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
-if (hasRequest('hostid')) {
-	if (!API::Host()->isReadable(array(getRequest('hostid')))) {
-		access_deny();
-	}
+if (hasRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
+	access_deny();
 }
 
 /*
