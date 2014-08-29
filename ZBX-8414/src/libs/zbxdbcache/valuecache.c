@@ -1867,13 +1867,14 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		return SUCCEED;
 
 	start = timestamp - seconds;
+	update_end = ZBX_VC_TIME();
+
+	/* check if the requested period is in the cached range */
+	if (0 != item->range && update_end - start <= item->range)
+		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required range */
-	if (NULL == item->tail)
-	{
-		update_end = ZBX_VC_TIME();
-	}
-	else
+	if (NULL != item->tail)
 	{
 		/* We need to get item values before the first cached value, but not including it     */
 		/* unless reload first flag is set (in which case we need to include the first cached */
