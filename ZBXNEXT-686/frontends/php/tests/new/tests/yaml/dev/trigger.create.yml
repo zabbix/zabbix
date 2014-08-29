@@ -1,5 +1,5 @@
 
-fixtures: [base_users, base_hostgroups, base_hosts]
+fixtures: [base_users, base_hostgroups, base_hosts, base_host_items]
 
 steps:
 

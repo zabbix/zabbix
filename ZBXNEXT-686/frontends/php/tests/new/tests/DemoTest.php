@@ -9,6 +9,7 @@ class HostCreateTest extends FileApiTestCase {
 			array('dev/host.create'),
 			array('dev/host.create.invalid'),
 			array('dev/trigger.create'),
+			array('dev/hostUnlinkTemplateAndRemoveInterface')
 		);
 	}
 

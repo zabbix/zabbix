@@ -1,0 +1,98 @@
+# https://support.zabbix.com/browse/ZBX-8530
+
+fixtures: [base_users, base_hostgroups, base_hosts, base_host_items, base_templates]
+
+steps:
+  # link the template to the host
+  step1:
+    request:
+      method: host.update
+      params:
+        # using host and template IDs here
+        hostid: 1
+        templates: { templateid: 1000 }
+        interfaces:
+          -
+            interfaceid: 1
+            main: 0
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+          -
+            main: 1
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+
+    expect: result
+
+    response:
+      hostids: [1]
+
+  #intermediate step to make sure that the template has been linked correctly
+#  step1-2:
+#    request:
+#      method: host.get
+#      params:
+#        hostids: 1
+#        selectParentTemplates: [templateid]
+#        output: [host]
+#        selectItems: [name]
+#        selectInterfaces: [interfaceid]
+#
+#    expect: result
+#    response:
+#      -
+#        hostid: 1
+#        host: Zabbix server
+#        parentTemplates: [{ templateid: 1000 }]
+#        items: [{ name: Available memory }]
+#        interfaces: [{ interfaceid: 1 }, { interfaceid: 2 }]
+
+  # unlink and clear the template and remove the interface used by the item
+  step2:
+    request:
+      method: host.update
+      params:
+        hostid: @step1.request.params.hostid@
+        templates_clear: [{ templateid: @step1.request.params.templates.templateid@] }]
+        interfaces:
+          -
+            interfaceid: 2
+            main: 1
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+
+
+    expect: result
+    response:
+      hostids: [@step1.request.params.hostid@]
+
+  # make sure step2 has been executed correctly
+  step3:
+    request:
+      method: host.get
+      params:
+        hostids: 1
+        output: [hostid]
+        selectParentTemplates: [templateid]
+        selectItems: [name]
+        selectInterfaces: [interfaceid]
+
+    expect: result
+    response:
+      -
+        hostid: 1
+        parentTemplates: []
+        items: []
+        interfaces: [{ interfaceid: 2 }]

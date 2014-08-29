@@ -3,7 +3,7 @@ host1:
   rows:
     hosts:
       -
-        hostid: 10116
+        hostid: 1
         host: "Zabbix server"
         status: 0
         disable_until: 0
@@ -35,12 +35,13 @@ host1:
         description: ""
     hosts_groups:
       -
-        hostid: 10116
+        hostgroupid: 1
+        hostid: 1
         groupid: 1
     interface:
       -
-        interfaceid: 9
-        hostid: 10116
+        interfaceid: 1
+        hostid: 1
         main: 1
         type: 1
         useip: 1
@@ -48,50 +49,3 @@ host1:
         dns: ""
         port: 10050
         bulk: 1
-    items:
-      -
-        itemid: 23817
-        type: 0
-        snmp_community: ""
-        snmp_oid: ""
-        hostid: 10116
-        name: "Available memory"
-        key_: "vm.memory.size[available]"
-        delay: 60
-        history: 7
-        trends: 365
-        status: 0
-        value_type: 3
-        trapper_hosts: ""
-        units: "B"
-        multiplier: 0
-        delta: 0
-        snmpv3_securityname: ""
-        snmpv3_securitylevel: 0
-        snmpv3_authpassphrase: ""
-        snmpv3_privpassphrase: ""
-        formula: 1
-        error: ""
-        lastlogsize: 0
-        logtimefmt: ""
-        delay_flex: ""
-        params: ""
-        ipmi_sensor: ""
-        data_type: 0
-        authtype: 0
-        username: ""
-        password: ""
-        publickey: ""
-        privatekey: ""
-        mtime: 0
-        flags: 0
-        interfaceid: 9
-        port: ""
-        description: "Available memory is defined as free+cached+buffers memory."
-        inventory_link: 0
-        lifetime: 30
-        snmpv3_authprotocol: 0
-        snmpv3_privprotocol: 0
-        state: 0
-        snmpv3_contextname: ""
-        evaltype: 0
