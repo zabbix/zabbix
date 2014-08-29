@@ -1,6 +1,6 @@
 # https://support.zabbix.com/browse/ZBX-8530
 
-fixtures: [base_users, base_hostgroups, base_hosts, base_host_items, base_templates]
+fixtures: [users, hostGroups, hosts, hostItems, templates]
 
 steps:
   # link the template to the host
