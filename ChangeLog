@@ -11,6 +11,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8524] fixed trigger filter not being reset on the Monigoring->Events page (Krists, Pavels)
 ...G...PS. [ZBX-8494] added check to prevent starting a proxy with a server database and vice versa (Andris)
 ..F....... [ZBX-8670] fixed undefined index error on the web scenario configuration page when no host is selected (Pavels)
 ..F....... [ZBX-8531] fixed inconsistent group selection dropdown behaviour in application configuration (Krists)
