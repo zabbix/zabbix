@@ -86,9 +86,8 @@ int	zbx_child_fork()
 ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
 {
 	ZBX_THREAD_HANDLE	thread = ZBX_THREAD_HANDLE_NULL;
-
 #ifdef _WINDOWS
-	unsigned	thrdaddr;
+	unsigned		thrdaddr;
 
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
@@ -96,9 +95,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
-
 #else
-
 	if (0 == (thread = zbx_child_fork()))	/* child process */
 	{
 		(*handler)(thread_args);
@@ -114,7 +111,6 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #endif
-
 	return thread;
 }
 

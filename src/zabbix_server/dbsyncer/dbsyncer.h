@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DBSYNCER_H
 #define ZABBIX_DBSYNCER_H
 
-void	main_dbsyncer_loop(void);
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(dbsyncer_thread, args);
 
 #endif

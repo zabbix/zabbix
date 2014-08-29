@@ -17,25 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DAEMON_H
-#define ZABBIX_DAEMON_H
+#ifndef ZABBIX_CONTROL_H
+#define ZABBIX_CONTROL_H
 
-#if defined(_WINDOWS)
-#	error "This module allowed only for Unix OS"
+#include "common.h"
+#include "zbxself.h"
+
+int	get_log_level_message(const char *opt, int command, int *message);
+
 #endif
-
-extern char	*CONFIG_PID_FILE;
-
-#include "threads.h"
-
-int	daemon_start(int allow_root, const char *user);
-void	daemon_stop();
-
-int	zbx_sigusr_send(int flags);
-
-#define ZBX_IS_RUNNING()	1
-#define ZBX_DO_EXIT()
-
-#define START_MAIN_ZABBIX_ENTRY(a, u)	daemon_start(a, u)
-
-#endif	/* ZABBIX_DAEMON_H */

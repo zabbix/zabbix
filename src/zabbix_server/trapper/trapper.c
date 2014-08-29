@@ -37,9 +37,8 @@
 
 #include "daemon.h"
 
-extern unsigned char	daemon_type;
-extern unsigned char	process_type;
-extern int		process_num;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -643,9 +642,19 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, sock->buffer);
 }
 
-void	main_trapper_loop(zbx_sock_t *s)
+ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
+	zbx_sock_t	s;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
+
+	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -658,7 +667,7 @@ void	main_trapper_loop(zbx_sock_t *s)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		if (SUCCEED == zbx_tcp_accept(s))
+		if (SUCCEED == zbx_tcp_accept(&s))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -666,12 +675,15 @@ void	main_trapper_loop(zbx_sock_t *s)
 					process_num);
 
 			sec = zbx_time();
-			process_trapper_child(s);
+			process_trapper_child(&s);
 			sec = zbx_time() - sec;
 
-			zbx_tcp_unaccept(s);
+			zbx_tcp_unaccept(&s);
 		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
+		else if (EINTR != zbx_sock_last_error())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
+					zbx_tcp_strerror());
+		}
 	}
 }
