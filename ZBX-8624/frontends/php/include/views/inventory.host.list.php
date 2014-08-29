@@ -26,7 +26,7 @@ $rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
-$filterTable = new CTable('', 'filter');
+$filterTable = new CTable('', 'filter filter-center');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 $inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);

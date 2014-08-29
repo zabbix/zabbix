@@ -41,7 +41,7 @@ class testPageTemplates extends CWebTest {
 
 		// data
 		$this->zbxTestTextPresent(array($template['name']));
-		$this->zbxTestDropdownHasOptions('go',
+		$this->zbxTestDropdownHasOptions('action',
 				array('Export selected', 'Delete selected', 'Delete selected with linked elements'));
 	}
 
@@ -68,7 +68,7 @@ class testPageTemplates extends CWebTest {
 
 		$this->zbxTestTextPresent($name); // link is present on the screen?
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent("$name");

@@ -737,12 +737,20 @@ $screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList)
 $screenForm->addItem($screenTab);
 
 // append buttons to form
-$buttons = array();
 if (isset($_REQUEST['screenitemid'])) {
-	array_push($buttons, new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')));
+	$screenForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array (
+			new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')),
+			new CButtonCancel(url_param('screenid'))
+		)
+	));
 }
-array_push($buttons, new CButtonCancel(url_param('screenid')));
-
-$screenForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
+else {
+	$screenForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('screenid'))
+	));
+}
 
 return $screenForm;

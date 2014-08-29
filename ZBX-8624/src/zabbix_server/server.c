@@ -207,7 +207,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_set_defaults()
+static void	zbx_set_defaults(void)
 {
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
@@ -312,7 +312,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config()
+static void	zbx_load_config(void)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -484,7 +484,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
 }
@@ -562,7 +562,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, server_num = 0, server_count = 0;
+	int		i, server_num = 0, server_count = 0, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -651,6 +651,19 @@ int	MAIN_ZABBIX_ENTRY()
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex();
 #endif
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_SERVER != db_type)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix server cannot work with a"
+				" Zabbix proxy database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
@@ -843,7 +856,7 @@ int	MAIN_ZABBIX_ENTRY()
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 

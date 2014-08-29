@@ -506,16 +506,16 @@ class CAction extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('action.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
+		$action = $this->get(array(
 			'output' => array('actionid'),
+			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $action;
 	}
 
 	/**
@@ -2352,6 +2352,7 @@ class CAction extends CApiService {
 		$triggerIdsAll = array();
 		$hostIdsAll = array();
 		$discoveryRuleIdsAll = array();
+		$discoveryCheckIdsAll = array();
 		$proxyIdsAll = array();
 
 		foreach ($conditions as $condition) {
@@ -2379,7 +2380,7 @@ class CAction extends CApiService {
 					break;
 
 				case CONDITION_TYPE_DCHECK:
-					$proxyIdsAll[$conditionValue] = $conditionValue;
+					$discoveryCheckIdsAll[$conditionValue] = $conditionValue;
 					break;
 
 				case CONDITION_TYPE_PROXY:
@@ -2415,17 +2416,13 @@ class CAction extends CApiService {
 		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_(
-					'Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.'
-				)
+				_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
 			);
 		}
-		if (!API::DCheck()->isWritable($proxyIdsAll)) {
+		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_(
-					'Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.'
-				)
+				_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
 			);
 		}
 		if (!API::Proxy()->isWritable($proxyIdsAll)) {

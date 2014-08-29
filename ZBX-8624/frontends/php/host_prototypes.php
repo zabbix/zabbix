@@ -35,10 +35,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hostid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
+	'hostid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
 	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-	'host' =>		        	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
-	'name' =>	            	array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'host' =>		        	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')),
+	'name' =>	            	array(T_ZBX_STR, O_OPT, null,		null,		'isset({add}) || isset({update})'),
 	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), null),
 	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
@@ -48,8 +48,15 @@ $fields = array(
 	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'unlink' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	// actions
+	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
+										'"hostprototype.massenable"'
+									),
+									null
+								),
+	'add' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -57,12 +64,10 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
-	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN("'name','status'"),						null),
-	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null),
+	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-
-$_REQUEST['go'] = getRequest('go', 'none');
 
 // permissions
 if (getRequest('parent_discoveryid')) {
@@ -133,7 +138,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($groupPrototype);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	$newHostPrototype = array(
@@ -212,8 +217,8 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 // GO
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_hostid')) {
-	$enable = (getRequest('go') == 'activate');
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('hostprototype.massenable', 'hostprototype.massdisable')) && hasRequest('group_hostid')) {
+	$enable = (getRequest('action') == 'hostprototype.massenable');
 	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$update = array();
 
@@ -242,9 +247,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
+elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelete' && getRequest('group_hostid')) {
 	DBstart();
-	$result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
+	$result = API::HostPrototype()->delete(getRequest('group_hostid'));
 	$result = DBend($result);
 
 	if ($result) {

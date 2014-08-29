@@ -63,7 +63,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$oldHash = DBhash($sqlHash);
 
 		$this->input_type('work_period', '1-7,09:00-20:00');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$result = DBselect('SELECT work_period FROM config');
@@ -80,7 +80,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF WORKING TIME');
 		$this->zbxTestTextPresent('Working time');
 		$this->input_type('work_period', '1-8,09:00-25:00');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 
 		// trying to save empty work period
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 		$this->input_type('work_period', '');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 	}
 }

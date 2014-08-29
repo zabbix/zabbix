@@ -29,10 +29,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form})&&{form}=="update")||isset({delete})'),
-	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({save})'),
+	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'),
+	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'),
 	'mappings' =>		array(T_ZBX_STR, O_OPT,	null,			null,		null),
-	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	// actions
+	'add' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'update' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
@@ -53,13 +55,13 @@ if (isset($_REQUEST['valuemapid'])) {
  * Actions
  */
 try {
-	if (isset($_REQUEST['save'])) {
+	if (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$valueMap = array('name' => getRequest('mapname'));
 		$mappings = getRequest('mappings', array());
 
-		if (isset($_REQUEST['valuemapid'])) {
+		if (hasRequest('update')) {
 			$messageSuccess = _('Value map updated');
 			$messageFailed = _('Cannot update value map');
 			$auditAction = AUDIT_ACTION_UPDATE;
