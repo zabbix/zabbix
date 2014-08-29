@@ -1861,23 +1861,19 @@ out:
  ******************************************************************************/
 static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int timestamp)
 {
-	int	ret = SUCCEED, update_seconds = 0, update_end, now;
-	int	start;
+	int	ret = SUCCEED, update_seconds = 0, update_end, start;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-		goto out;
+		return SUCCEED;
 
 	start = timestamp - seconds;
-
-	now = ZBX_VC_TIME();
 
 	/* find if the cache should be updated to cover the required range */
 	if (NULL == item->tail)
 	{
-		update_seconds = now - start;
-		update_end = now;
+		update_end = ZBX_VC_TIME();
 	}
-	else if (start < now - item->range)
+	else
 	{
 		/* We need to get item values before the first cached value, but not including it     */
 		/* unless reload first flag is set (in which case we need to include the first cached */
@@ -1886,9 +1882,9 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 
 		if (ZBX_ITEM_STATUS_RELOAD_FIRST != item->status)
 			update_end--;
-
-		update_seconds = update_end - start;
 	}
+
+	update_seconds = update_end - start;
 
 	/* update cache if necessary */
 	if (0 < update_seconds)
@@ -1924,7 +1920,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
-out:
+
 	return ret;
 }
 
@@ -1950,7 +1946,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 	int	ret = SUCCEED, cached_records = 0, update_end;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-		goto out;
+		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required count */
 	if (NULL != item->head)
@@ -2016,7 +2012,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
-out:
+
 	return ret;
 }
 
@@ -2038,21 +2034,18 @@ out:
  ******************************************************************************/
 static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 {
-	int				ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0, start;
+	int				ret = SUCCEED, update_seconds = 0, update_end, reload_first = 0, start;
 	zbx_vector_history_record_t	records;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-		goto out;
+		return SUCCEED;
 
 	start = ts->sec - 1;
 
 	/* find if the cache should be updated to cover the required range */
 	if (NULL == item->tail)
 	{
-		now = ZBX_VC_TIME();
-
-		update_seconds = now - start;
-		update_end = now;
+		update_end = ZBX_VC_TIME();
 	}
 	else
 	{
@@ -2063,9 +2056,9 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 
 		if (ZBX_ITEM_STATUS_RELOAD_FIRST != item->status)
 			update_end--;
-
-		update_seconds = update_end - start;
 	}
+
+	update_seconds = update_end - start;
 
 	if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
 		vch_item_drop_first_second(item);
@@ -2110,7 +2103,7 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		}
 	}
 	zbx_history_record_vector_destroy(&records, item->value_type);
-out:
+
 	return ret;
 }
 
@@ -2138,13 +2131,13 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_r
 	int		start = timestamp - seconds;
 	zbx_vc_chunk_t	*chunk;
 
-	now = ZBX_VC_TIME();
-
 	/* Check if maximum request range is not set and all data are cached.  */
 	/* Because that indicates there was a count based request with unknown */
 	/* range which might be greater than the current request range.        */
 	if (0 != item->range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
+		now = ZBX_VC_TIME();
+
 		if (item->range <= seconds + now - timestamp)
 		{
 			item->range = seconds + now - timestamp;
