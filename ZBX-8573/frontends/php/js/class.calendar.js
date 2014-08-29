@@ -308,27 +308,31 @@ calendar.prototype = {
 			case 3:
 			case 5:
 				// day
+				var day = this.sdt.getDate();
+				day = day > 9 ? day : '0' + day;
 				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
-					this.timeobjects[0].value = this.sdt.getDate();
+					this.timeobjects[0].value = day;
 				}
 				else {
 					if (IE) {
-						this.timeobjects[0].innerText = this.sdt.getDate();
+						this.timeobjects[0].innerText = day;
 					}
 					else {
-						this.timeobjects[0].textContent = this.sdt.getDate();
+						this.timeobjects[0].textContent = day;
 					}
 				}
 				// month
+				var month = this.sdt.getMonth() + 1;
+				month = month > 9 ? month : '0' + month;
 				if (this.timeobjects[1].tagName.toLowerCase() == 'input') {
-					this.timeobjects[1].value = this.sdt.getMonth() + 1;
+					this.timeobjects[1].value = month;
 				}
 				else {
 					if(IE) {
-						this.timeobjects[1].innerText = this.sdt.getMonth() + 1;
+						this.timeobjects[1].innerText = month;
 					}
 					else {
-						this.timeobjects[1].textContent = this.sdt.getMonth() + 1;
+						this.timeobjects[1].textContent = month;
 					}
 				}
 				// year
@@ -345,28 +349,32 @@ calendar.prototype = {
 				}
 
 				if (this.timeobjects.length > 4) {
-					// hour
+					// hours
+					var hours = this.sdt.getHours();
+					hours = hours > 9 ? hours : '0' + hours;
 					if (this.timeobjects[3].tagName.toLowerCase() == 'input') {
-						this.timeobjects[3].value = this.sdt.getHours();
+						this.timeobjects[3].value = hours;
 					}
 					else {
 						if (IE) {
-							this.timeobjects[3].innerText = this.sdt.getHours();
+							this.timeobjects[3].innerText = hours;
 						}
 						else {
-							this.timeobjects[3].textContent = this.sdt.getHours();
+							this.timeobjects[3].textContent = hours;
 						}
 					}
-					// minute
+					// minutes
+					var minutes = this.sdt.getMinutes();
+					minutes = minutes > 9 ? minutes : '0' + minutes;
 					if (this.timeobjects[4].tagName.toLowerCase() == 'input') {
-						this.timeobjects[4].value = this.sdt.getMinutes();
+						this.timeobjects[4].value = minutes;
 					}
 					else {
 						if (IE) {
-							this.timeobjects[4].innerText = this.sdt.getMinutes();
+							this.timeobjects[4].innerText = minutes;
 						}
 						else {
-							this.timeobjects[4].textContent = this.sdt.getMinutes();
+							this.timeobjects[4].textContent = minutes;
 						}
 					}
 				}
