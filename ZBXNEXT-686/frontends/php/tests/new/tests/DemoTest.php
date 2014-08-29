@@ -8,6 +8,7 @@ class HostCreateTest extends FileApiTestCase {
 		return array(
 			array('dev/host.create'),
 			array('dev/host.create.invalid'),
+			array('dev/trigger.create'),
 		);
 	}
 

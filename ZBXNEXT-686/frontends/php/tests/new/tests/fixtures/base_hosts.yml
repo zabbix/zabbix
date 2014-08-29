@@ -1,0 +1,97 @@
+host1:
+  require: []
+  rows:
+    hosts:
+      -
+        hostid: 10116
+        host: "Zabbix server"
+        status: 0
+        disable_until: 0
+        error: ""
+        available: 1
+        errors_from: 0
+        lastaccess: 0
+        ipmi_authtype: -1
+        ipmi_privilege: 2
+        ipmi_username: ""
+        ipmi_password: ""
+        ipmi_disable_until: 0
+        ipmi_available: 0
+        snmp_disable_until: 0
+        snmp_available: 0
+        maintenance_status: 0
+        maintenance_type: 0
+        maintenance_from: 0
+        ipmi_errors_from: 0
+        snmp_errors_from: 0
+        ipmi_error: ""
+        snmp_error: ""
+        jmx_disable_until: 0
+        jmx_available: 0
+        jmx_errors_from: 0
+        jmx_error: ""
+        name: "Zabbix server"
+        flags: 0
+        description: ""
+    hosts_groups:
+      -
+        hostid: 10116
+        groupid: 1
+    interface:
+      -
+        interfaceid: 9
+        hostid: 10116
+        main: 1
+        type: 1
+        useip: 1
+        ip: "0.0.0.0"
+        dns: ""
+        port: 10050
+        bulk: 1
+    items:
+      -
+        itemid: 23817
+        type: 0
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 10116
+        name: "Available memory"
+        key_: "vm.memory.size[available]"
+        delay: 60
+        history: 7
+        trends: 365
+        status: 0
+        value_type: 3
+        trapper_hosts: ""
+        units: "B"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: 1
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        interfaceid: 9
+        port: ""
+        description: "Available memory is defined as free+cached+buffers memory."
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0

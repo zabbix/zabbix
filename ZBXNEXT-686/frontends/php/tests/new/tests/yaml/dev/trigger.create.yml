@@ -1,0 +1,77 @@
+
+fixtures: [base_users, base_hostgroups, base_hosts]
+
+steps:
+
+  step1:
+    request:
+      method: trigger.create
+      params:
+        description: "Low memory on {HOST.NAME}"
+        expression: "{Zabbix server:vm.memory.size[available].last()}<1024"
+
+    expect: result
+
+    response:
+      triggerids:
+        _assert: arr|length(1)
+
+  step2:
+    request:
+      method: trigger.get
+      params:
+        selectFunctions: extend
+        selectHosts: [host]
+        triggerids: @step1.response.triggerids[0]@
+
+    expect: result
+    response:
+      -
+        triggerid: @step1.response.triggerids[0]@
+
+        # since we don't know the ID of the function, validate the expression using a regex
+        expression: { _assert: "regex(\"^{[0-9]+}<1024$\")" }
+
+        description: @step1.request.params.description@
+        url: ""
+        status: 0
+        value: 0
+        priority: 0
+        lastchange: 0
+        comments: ""
+        error: ""
+        templateid: 0
+        type: 0
+        state: 0
+        flags: 0
+        functions:
+          -
+            # assert that IDs are strings
+            functionid: { _assert: string }
+            itemid: { _assert: string }
+
+            triggerid: @step1.response.triggerids[0]@
+            function: "last"
+            parameter: ""
+
+        # make sure that the trigger was created on the correct host
+        hosts:
+          -
+            hostid: { _assert: string }
+            host: Zabbix server
+
+  # validate that the expression and descriptions are expanded correctly
+  step3:
+    request:
+      method: trigger.get
+      params:
+        output: [expression, description]
+        expandDescription: true
+        expandExpression: true
+
+    expect: result
+    response:
+      -
+        triggerid: @step1.response.triggerids[0]@
+        expression: @step1.request.params.expression@
+        description: "Low memory on Zabbix server"
