@@ -35,9 +35,9 @@ $fields = array(
 	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{} >= 0',	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
+	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
 	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'batch' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 );

@@ -134,7 +134,7 @@ $cmbStat->addItem(1, _('Disabled'));
 $frmMedia->addRow(_('Status'), $cmbStat);
 
 $frmMedia->addItemToBottomRow(array(
-	new CSubmit('add', ($media > -1) ? _('Save') : _('Add')),
+	new CSubmit('add', ($media > -1) ? _('Update') : _('Add')),
 	new CButtonCancel(null, 'close_window();')
 ));
 $frmMedia->Show();
