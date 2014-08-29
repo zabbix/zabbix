@@ -504,6 +504,11 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 
+			// copy web scenarios
+			if (!copyHttpTests($srcHostId, $hostId)) {
+				throw new Exception();
+			}
+
 			// clone triggers
 			$triggers = API::Trigger()->get(array(
 				'output' => array('triggerid'),

@@ -148,6 +148,106 @@ static int	update_exit_status(int old_status, int new_status)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_string                                                       *
+ *                                                                            *
+ * Purpose: get current string from the quoted or unquoted string list,       *
+ *          delimited by blanks                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
+ *      buf     - [OUT] output buffer                                         *
+ *      bufsize - [IN] output buffer size                                     *
+ *                                                                            *
+ * Return value: pointer to the next string                                   *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_string(const char *p, char *buf, size_t bufsize)
+{
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state;
+	size_t	buf_i = 0;
+
+	bufsize--;	/* '\0' */
+
+	for (state = 0; '\0' != *p; p++)
+	{
+		switch (state)
+		{
+			/* init state */
+			case 0:
+				if (' ' == *p || '\t' == *p)
+				{
+					/* skipping the leading spaces */;
+				}
+				else if ('"' == *p)
+				{
+					state = 1;
+				}
+				else
+				{
+					state = 2;
+					p--;
+				}
+				break;
+			/* quoted */
+			case 1:
+				if ('"' == *p)
+				{
+					if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
+						return NULL;	/* incorrect syntax */
+
+					while (' ' == p[1] || '\t' == p[1])
+						p++;
+
+					buf[buf_i] = '\0';
+					return ++p;
+				}
+				else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
+				{
+					p++;
+					if (buf_i < bufsize)
+						buf[buf_i++] = *p;
+				}
+				else if ('\\' == *p && 'n' == p[1])
+				{
+					p++;
+					if (buf_i < bufsize)
+						buf[buf_i++] = '\n';
+				}
+				else if (buf_i < bufsize)
+				{
+					buf[buf_i++] = *p;
+				}
+				break;
+			/* unquoted */
+			case 2:
+				if (' ' == *p || '\t' == *p)
+				{
+					while (' ' == *p || '\t' == *p)
+						p++;
+
+					buf[buf_i] = '\0';
+					return p;
+				}
+				else if (buf_i < bufsize)
+				{
+					buf[buf_i++] = *p;
+				}
+				break;
+		}
+	}
+
+	/* missing terminating '"' character */
+	if (1 == state)
+		return NULL;
+
+	buf[buf_i] = '\0';
+
+	return p;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_response                                                   *
  *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *

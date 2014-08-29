@@ -25,15 +25,21 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 		zbx_uint64_t *used, double *pfree, double *pused)
 {
 #ifdef HAVE_SYS_STATVFS_H
-#	define ZBX_STATFS	statvfs
+#	ifdef HAVE_SYS_STATVFS64
+#		define ZBX_STATFS	statvfs64
+#	else
+#		define ZBX_STATFS	statvfs
+#	endif
 #	define ZBX_BSIZE	f_frsize
 #else
-#	define ZBX_STATFS	statfs
+#	ifdef HAVE_SYS_STATFS64
+#		define ZBX_STATFS	statfs64
+#	else
+#		define ZBX_STATFS	statfs
+#	endif
 #	define ZBX_BSIZE	f_bsize
 #endif
 	struct ZBX_STATFS	s;
-
-	assert(fs);
 
 	if (0 != ZBX_STATFS(fs, &s))
 		return SYSINFO_RET_FAIL;

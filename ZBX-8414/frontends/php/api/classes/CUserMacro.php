@@ -39,7 +39,7 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $options['hostids'] host ids
 	 * @param array $options['hostmacroids'] host macros ids
 	 * @param array $options['globalmacroids'] global macros ids
-	 * @param array $options['templateids'] tempalate ids
+	 * @param array $options['templateids'] template ids
 	 * @param boolean $options['globalmacro'] only global macros
 	 * @param boolean $options['selectGroups'] select groups
 	 * @param boolean $options['selectHosts'] select hosts

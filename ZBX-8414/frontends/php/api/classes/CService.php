@@ -186,7 +186,7 @@ class CService extends CZBXAPI {
 			$this->addTimes($serviceTimes);
 		}
 
-		update_services_status_all();
+		updateItServices();
 
 		return array('serviceids' => $serviceIds);
 	}
@@ -322,7 +322,7 @@ class CService extends CZBXAPI {
 			$this->addTimes($serviceTimes);
 		}
 
-		update_services_status_all();
+		updateItServices();
 
 		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
 	}
@@ -358,7 +358,7 @@ class CService extends CZBXAPI {
 
 		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
 
-		update_services_status_all();
+		updateItServices();
 
 		return array('serviceids' => $serviceIds);
 	}

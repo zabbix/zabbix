@@ -102,7 +102,7 @@ int	DBis_node_id(zbx_uint64_t id, int nodeid)
 	return min <= id && id <= max ? SUCCEED : FAIL;
 }
 
-void	DBclose()
+void	DBclose(void)
 {
 	zbx_db_close();
 }
@@ -156,7 +156,7 @@ int	DBconnect(int flag)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBinit()
+void	DBinit(void)
 {
 	zbx_db_init(CONFIG_DBNAME, db_schema);
 }

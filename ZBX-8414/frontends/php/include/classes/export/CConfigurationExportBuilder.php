@@ -554,7 +554,8 @@ class CConfigurationExportBuilder {
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
-				'valuemap' => $item['valuemap']
+				'valuemap' => $item['valuemap'],
+				'logtimefmt' => $item['logtimefmt']
 			);
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];

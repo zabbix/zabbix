@@ -422,9 +422,9 @@ const char	*__DBnode(const char *field_name, int nodeid, int op);
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBconnect(int flag);
-void	DBinit();
+void	DBinit(void);
 
-void	DBclose();
+void	DBclose(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
@@ -515,7 +515,6 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 

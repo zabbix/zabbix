@@ -158,17 +158,17 @@
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
-void	zbx_create_sqlite3_mutex(const char *dbname);
-void	zbx_remove_sqlite3_mutex();
+void	zbx_create_sqlite3_mutex(void);
+void	zbx_remove_sqlite3_mutex(void);
 #endif
 void	zbx_db_init(const char *dbname, const char *const db_schema);
-void    zbx_db_close();
+void    zbx_db_close(void);
 
-int	zbx_db_begin();
-int	zbx_db_commit();
-int	zbx_db_rollback();
-int	zbx_db_txn_level();
-int	zbx_db_txn_error();
+int	zbx_db_begin(void);
+int	zbx_db_commit(void);
+int	zbx_db_rollback(void);
+int	zbx_db_txn_level(void);
+int	zbx_db_txn_error(void);
 
 #ifdef HAVE_ORACLE
 int		zbx_db_statement_prepare(const char *sql);
