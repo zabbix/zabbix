@@ -61,7 +61,7 @@ class testPageHosts extends CWebTest {
 		);
 		// Data
 		$this->zbxTestTextPresent(array($host['name']));
-		$this->zbxTestDropdownHasOptions('go',
+		$this->zbxTestDropdownHasOptions('action',
 				array('Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
@@ -114,7 +114,7 @@ class testPageHosts extends CWebTest {
 		);
 
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 
@@ -234,7 +234,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestDropdownSelect('action', 'Enable selected');
 		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
@@ -262,7 +262,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestDropdownSelect('action', 'Enable selected');
 		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
@@ -284,7 +284,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestDropdownSelect('action', 'Disable selected');
 		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 
@@ -312,7 +312,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestDropdownSelect('action', 'Disable selected');
 		$this->assertVisible('goButton');
 		$this->zbxTestClickWait('goButton');
 

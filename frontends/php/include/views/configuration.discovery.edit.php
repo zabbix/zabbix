@@ -81,18 +81,23 @@ $discoveryTabs->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
 $discoveryForm->addItem($discoveryTabs);
 
 // append buttons to form
-$deleteButton = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
-if (empty($this->data['druleid'])) {
-	$deleteButton->setAttribute('disabled', 'disabled');
+if (isset($this->data['druleid']))
+{
+	$discoveryForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
+			new CButtonCancel()
+		)
+	));
 }
-$discoveryForm->addItem(makeFormFooter(
-	new CSubmit('save', _('Save')),
-	array(
-		new CSubmit('clone', _('Clone')),
-		$deleteButton,
+else {
+	$discoveryForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
 		new CButtonCancel()
-	)
-));
+	));
+}
 
 $discoveryWidget->addItem($discoveryForm);
 

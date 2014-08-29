@@ -79,7 +79,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestTextPresent(array('Name', 'Mappings', 'Value', 'Mapped to'));
 
 		$this->assertElementPresent('addMapping');
-		$this->assertElementPresent('save');
+		$this->assertElementPresent('add');
 		$this->assertElementPresent('cancel');
 
 		$this->input_type('mapname', $mapname);
@@ -87,7 +87,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mappings[0][value]', $value);
 		$this->input_type('mappings[0][newvalue]', $newvalue);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Value map added');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
@@ -133,7 +133,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mappings[2][value]', $value3);
 		$this->input_type('mappings[2][newvalue]', $newvalue3);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Value map added');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
@@ -149,7 +149,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestClickWait('link='.$oldVmName);
 		$this->input_type("mapname", $newVmName);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value map name has not been updated in the DB');
@@ -168,7 +168,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mappings[0][value]', 6);
 		$this->input_type('mappings[0][newvalue]', 'six');
 		$this->zbxTestClick('addMapping');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent(array('ERROR: Cannot add value map', 'Value map', 'already exists.'));
 	}
 

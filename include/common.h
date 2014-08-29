@@ -808,7 +808,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 		size_t maxerrlen);
 
 void	remove_param(char *param, int num);
-const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -916,7 +915,7 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 int	is_ip(const char *ip);
 
-void	zbx_on_exit(); /* calls exit() at the end! */
+void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);

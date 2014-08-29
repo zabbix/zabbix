@@ -239,7 +239,6 @@ function calc_exp2($fields, $expression) {
 	foreach ($fields as $field => $checks) {
 		$expression = str_replace('{'.$field.'}', '$_REQUEST["'.$field.'"]', $expression);
 	}
-
 	return eval('return ('.trim($expression, '& ').') ? 1 : 0;');
 }
 

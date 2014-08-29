@@ -41,7 +41,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestTextPresent(array('Name', 'Delay', 'Count of slides'));
 		// Data
 		$this->zbxTestTextPresent(array($slideshow['name']));
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
 	}
 
 	/**
@@ -59,7 +59,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestTextPresent('Slide show updated');
 		$this->zbxTestTextPresent("$name");
@@ -98,7 +98,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestCheckboxSelect('shows['.$slideshowid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
