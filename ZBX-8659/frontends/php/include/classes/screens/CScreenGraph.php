@@ -154,8 +154,8 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.$this->getProfileUrlParams();
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width']
+				.'&height='.$this->screenitem['height'].'&legend='.$legend.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
 				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time())
 				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
