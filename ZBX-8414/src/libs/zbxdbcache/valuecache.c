@@ -2762,10 +2762,12 @@ out:
 
 	vc_try_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d cached:%d", __function_name, zbx_result_string(ret), found,
+	ret = (1 == found ? SUCCEED : FAIL);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s cache_used:%d", __function_name, zbx_result_string(ret),
 			cache_used);
 
-	return 1 == found ? SUCCEED : FAIL;
+	return ret;
 }
 
 /******************************************************************************
