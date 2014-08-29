@@ -226,7 +226,7 @@ if ($this->data['rwHost']) {
 		'hosts.php?form=update&hostid='.$this->data['host']['hostid'].url_param('groupid'));
 	$applicationsLink = new CLink(_('Applications'),
 		'applications.php?hostid='.$this->data['host']['hostid'].url_param('groupid'));
-	$itemsLink = new CLink(_('Items'), 'items.php?hostid='.$this->data['host']['hostid'].url_param('groupid'));
+	$itemsLink = new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$this->data['host']['hostid'].url_param('groupid'));
 	$triggersLink = new CLink(_('Triggers'), 'triggers.php?hostid='.$this->data['host']['hostid'].url_param('groupid'));
 	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$this->data['host']['hostid'].url_param('groupid'));
 	$discoveryLink = new CLink(_('Discovery'),

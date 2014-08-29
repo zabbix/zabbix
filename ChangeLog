@@ -1,3 +1,9 @@
+Changes for 2.2.7rc1
+
+Bug fixes:
+..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.6
 
 New features:
