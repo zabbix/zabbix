@@ -74,7 +74,7 @@ int	get_log_level_message(const char *opt, int command, int *message)
 		{
 			*ptr++ = '\0';
 
-			if (FAIL == is_ushort(proc_name, &num) || 0 == num)
+			if (FAIL == is_ushort(ptr, &num) || 0 == num)
 			{
 				zbx_error("invalid log level control option: process number must be unsigned short"
 						" non-zero value");
