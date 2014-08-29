@@ -1122,7 +1122,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
 		}
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 	zbx_free(logfile_candidate);
 }
@@ -1197,8 +1197,15 @@ clean:
 
 	if (NULL == (dir = opendir(directory)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (0 != access(directory, X_OK))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) to directory "
+				"\"%s\": %s", directory, zbx_strerror(errno));
 		return FAIL;
 	}
 
