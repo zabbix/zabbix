@@ -79,28 +79,40 @@ class TestDatabase {
 
 		// todo: validate here
 
-		foreach ($fixtures as $suite => $data) {
+		foreach ($fixtures as $set => $data) {
 			foreach ($data['require'] as $fixture) {
 				$this->loadFixture($fixture, $loaded);
 			}
 
 			foreach ($data['rows'] as $table => $rows) {
-				foreach ($rows as $objectName => $fields) {
-					$query = 'INSERT INTO '.$table.' (';
-					$query .= implode(', ', array_keys($fields));
-					$query .= ') VALUES (';
-					$query .= implode(', ', array_map(function ($value) {
-						return ':'.$value;
-					}, array_keys($fields)));
-					$query .= ')';
-
-					$query = $this->pdo->prepare($query);
-					$query->execute($fields);
+				foreach ($rows as $i => $fields) {
+					try {
+						$this->insertFixture($table, $fields);
+					}
+					catch (\Exception $e) {
+						throw new \Exception(sprintf(
+							'Cannot load fixture "%1$s" set "%2$s" table "%3$s" row "%4$s": ""%5$s""',
+							$file, $set, $table, $i, $e->getMessage()
+						));
+					}
 				}
 			}
 
 			$loaded[] = $file;
 		}
+	}
+
+	protected function insertFixture($table, $fields) {
+		$query = 'INSERT INTO '.$table.' (';
+		$query .= implode(', ', array_keys($fields));
+		$query .= ') VALUES (';
+		$query .= implode(', ', array_map(function ($value) {
+			return ':'.$value;
+		}, array_keys($fields)));
+		$query .= ')';
+
+		$query = $this->pdo->prepare($query);
+		$query->execute($fields);
 	}
 
 }
