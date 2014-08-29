@@ -26,6 +26,7 @@ class FileAPIGateway extends BaseAPIGateway {
 		$this->setStreamWrapper($request->getBody());
 
 		$_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
+		$_SERVER['REQUEST_METHOD'] = 'POST';
 
 		ob_start();
 		require $this->endpoint;
