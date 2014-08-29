@@ -272,7 +272,7 @@ if (isset($_REQUEST['pservices'])) {
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
-		'sortfield' => array('sortorder', 'name')
+		'sortfield' => array('name')
 	));
 
 	if (isset($service)) {
@@ -313,7 +313,7 @@ elseif (isset($_REQUEST['cservices'])) {
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
-		'sortfield' => array('sortorder', 'name')
+		'sortfield' => array('name')
 	));
 
 	if (isset($service)) {
