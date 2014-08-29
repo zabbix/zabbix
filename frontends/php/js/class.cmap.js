@@ -248,12 +248,12 @@ ZABBIX.apps.map = (function($) {
 					type: 'post',
 					data: {
 						favobj: 'sysmap',
-						action: 'save',
+						action: 'update',
 						sysmapid: this.sysmapid,
 						sysmap: Object.toJSON(this.data) // TODO: remove prototype method
 					},
 					error: function() {
-						throw new Error('Cannot save map.');
+						throw new Error('Cannot update map.');
 					}
 				});
 			},
@@ -421,7 +421,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// save map
-				$('#sysmap_save').click(function() {
+				$('#sysmap_update').click(function() {
 					that.save();
 				});
 

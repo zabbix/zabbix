@@ -135,7 +135,7 @@ $maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
-		$saveLabel = _('Save');
+		$saveLabel = _('Update');
 	}
 	else {
 		$saveLabel = _('Add');
@@ -188,20 +188,20 @@ $maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList)
 $maintenanceForm->addItem($maintenanceTab);
 
 // append buttons to form
-if (empty($this->data['maintenanceid'])) {
+if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel()
-	));
-}
-else {
-	$maintenanceForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
 			new CButtonCancel()
 		)
+	));
+}
+else {
+	$maintenanceForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
 	));
 }
 

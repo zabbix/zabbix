@@ -68,7 +68,7 @@ class testPageTemplates extends CWebTest {
 
 		$this->zbxTestTextPresent($name); // link is present on the screen?
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent("$name");

@@ -114,7 +114,7 @@ class testPageHosts extends CWebTest {
 		);
 
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
 

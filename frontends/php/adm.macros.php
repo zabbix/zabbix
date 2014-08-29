@@ -34,8 +34,8 @@ $fields = array(
 	'macro_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'value_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'macro_add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	// actions
+	'update'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
 );
 check_fields($fields);
@@ -44,7 +44,7 @@ check_fields($fields);
  * Actions
  */
 $result = true;
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	try {
 		DBstart();
 

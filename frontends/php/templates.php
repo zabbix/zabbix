@@ -51,9 +51,9 @@ $fields = array(
 	'templates'			=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'add_templates'		=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
-	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
-	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Template name')),
-	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
+	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'),
+	'template_name'		=> array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')),
+	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'),
 	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'newgroup'			=> array(T_ZBX_STR, O_OPT, null,		null,	null),
@@ -70,7 +70,8 @@ $fields = array(
 							),
 	'unlink'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'add'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'update'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'full_clone'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -143,7 +144,7 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 	$_REQUEST['form'] = 'full_clone';
 	$_REQUEST['hosts'] = array();
 }
-elseif (hasRequest('save')) {
+elseif (hasRequest('add') || hasRequest('update')) {
 	$templateId = getRequest('templateid');
 
 	try {
@@ -351,8 +352,6 @@ elseif (hasRequest('save')) {
 		DBend(false);
 		show_error_message($messageFailed);
 	}
-
-	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();

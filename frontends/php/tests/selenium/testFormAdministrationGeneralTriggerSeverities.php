@@ -121,7 +121,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$this->zbxTestClick('lbl_severity_color_0');
 		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"999999\");']");
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified2');
@@ -179,7 +179,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		);
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClick("//button[@type='button']");
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestTextPresent('CONFIGURATION OF ZABBIX');
 		$this->zbxTestTextPresent('Trigger severities');

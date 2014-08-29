@@ -56,7 +56,7 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 	$hostList->addRow(_('Parent discovery rules'), $parents);
 }
 
-if ($hostPrototype['hostid']) {
+if (isset($hostPrototype['hostid'])) {
 	$frmHost->addVar('hostid', $hostPrototype['hostid']);
 }
 
@@ -326,17 +326,28 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$others = array();
-if ($hostPrototype['hostid']) {
-	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_discoveryid'));
-	$btnDelete->setEnabled(!$hostPrototype['templateid']);
+if (isset($hostPrototype['hostid'])) {
+	$btnDelete = new CButtonDelete(
+		_('Delete selected host prototype?'),
+		url_param('form').url_param('hostid').url_param('parent_discoveryid')
+	);
+	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
-	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = $btnDelete;
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array (
+			new CSubmit('clone', _('Clone')),
+			$btnDelete,
+			new CButtonCancel(url_param('parent_discoveryid'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('parent_discoveryid'));
-
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
+else {
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('parent_discoveryid'))
+	));
+}
 
 $widget->addItem($frmHost);
 
