@@ -95,7 +95,7 @@ class CDecimalValidator extends CValidator {
 		}
 
 		// digits before dot
-		if ($beforeDotLength > $this->maxPrecision - $this->maxScale) {
+		if ($this->maxPrecision !== null && $beforeDotLength > $this->maxPrecision - $this->maxScale) {
 			$this->error($this->messageNatural, $value, $this->maxPrecision - $this->maxScale);
 
 			return false;
