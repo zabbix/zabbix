@@ -51,8 +51,8 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	pd = devname;
 
 	/* skip prefix ZBX_DEV_PFX, if present */
-	if ('\0' != *devname && 0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
-			pd += sizeof(ZBX_DEV_PFX) - 1;
+	if ('\0' != *devname && 0 == strncmp(pd, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
+			pd += ZBX_CONST_STRLEN(ZBX_DEV_PFX);
 
 #if DEVSTAT_USER_API_VER >= 5
 	if (-1 == devstat_getdevs(NULL, si))
@@ -119,8 +119,8 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if ('\0' != *pd)
 	{
 		/* skip prefix ZBX_DEV_PFX, if present */
-		if (0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
-			pd += sizeof(ZBX_DEV_PFX) - 1;
+		if (0 == strncmp(pd, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
+			pd += ZBX_CONST_STRLEN(ZBX_DEV_PFX);
 	}
 
 	tmp = get_rparam(request, 1);

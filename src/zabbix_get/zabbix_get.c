@@ -38,7 +38,7 @@ const char	*help_message[] = {
 	"",
 	"  -k --key <key of metric>             Specify key of item to retrieve value for",
 	"",
-	"  -h --help                            Give this help",
+	"  -h --help                            Display help information",
 	"  -V --version                         Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",

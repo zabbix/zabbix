@@ -233,9 +233,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch;
-#ifndef _WINDOWS
-	int	offset;
-#endif
+
 	t->task = ZBX_TASK_START;
 
 	/* parse the command-line */
@@ -249,9 +247,10 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						offset = strlen(ZBX_LOG_LEVEL_INCREASE)))
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
 							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
@@ -259,9 +258,10 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						offset = strlen(ZBX_LOG_LEVEL_DECREASE)))
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 				{
-					if (SUCCEED != get_log_level_message(zbx_optarg + offset,
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
 							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
 					{
 						exit(EXIT_FAILURE);
