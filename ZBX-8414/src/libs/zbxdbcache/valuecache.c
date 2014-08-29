@@ -1861,7 +1861,12 @@ out:
 static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int timestamp)
 {
 	int	ret = SUCCEED, update_seconds = 0, update_end, now;
-	int	start = timestamp - seconds;
+	int	start;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		goto out;
+
+	start = timestamp - seconds;
 
 	now = ZBX_VC_TIME();
 
@@ -1885,7 +1890,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	}
 
 	/* update cache if necessary */
-	if (0 < update_seconds && ZBX_ITEM_STATUS_CACHED_ALL != item->status)
+	if (0 < update_seconds)
 	{
 		zbx_vector_history_record_t	records;
 
@@ -1918,7 +1923,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
-
+out:
 	return ret;
 }
 
@@ -1943,6 +1948,9 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 {
 	int	ret = SUCCEED, cached_records = 0, update_end;
 
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		goto out;
+
 	/* find if the cache should be updated to cover the required count */
 	if (NULL != item->head)
 	{
@@ -1955,27 +1963,26 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 			while (NULL != (chunk = chunk->prev) && cached_records < count)
 				cached_records += chunk->last_value - chunk->first_value + 1;
-
-			if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status && cached_records < count)
-				cached_records -= vch_item_drop_first_second(item);
 		}
 	}
 
 	/* update cache if necessary */
-	if (ZBX_ITEM_STATUS_CACHED_ALL != item->status && cached_records < count)
+	if (cached_records < count)
 	{
 		zbx_vector_history_record_t	records;
+		int				dropped_records;
 
-		if (NULL != item->head)
+		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
 		{
-			/* We need to get item values before the first cached value, but not including it     */
-			/* unless reload first flag is set (in which case we need to include the first cached */
-			/* value).                                                                            */
-			update_end = item->tail->slots[item->tail->first_value].timestamp.sec;
+			dropped_records = vch_item_drop_first_second(item);
 
-			if (ZBX_ITEM_STATUS_RELOAD_FIRST != item->status)
-				update_end--;
+			if (0 != cached_records)
+				cached_records -= dropped_records;
 		}
+
+		/* get the end timestamp to which (including) the values should be cached */
+		if (NULL != item->head)
+			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
 			update_end = ZBX_VC_TIME();
 
@@ -2008,7 +2015,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
-
+out:
 	return ret;
 }
 
@@ -2030,8 +2037,13 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  ******************************************************************************/
 static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 {
-	int	ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0;
-	int	start = ts->sec - 1;
+	int				ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0, start;
+	zbx_vector_history_record_t	records;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		goto out;
+
+	start = ts->sec - 1;
 
 	/* find if the cache should be updated to cover the required range */
 	if (NULL == item->tail)
@@ -2054,56 +2066,50 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		update_seconds = update_end - start;
 	}
 
-	/* update cache if necessary */
-	if (ZBX_ITEM_STATUS_CACHED_ALL != item->status)
+	if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
+		vch_item_drop_first_second(item);
+
+	zbx_vector_history_record_create(&records);
+
+	vc_try_unlock();
+
+	if (0 < update_seconds)
 	{
-		zbx_vector_history_record_t	records;
+		/* first try to find the requested value in target second interval */
+		ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds,
+				update_end);
 
-		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
-			vch_item_drop_first_second(item);
-
-		zbx_vector_history_record_create(&records);
-
-		vc_try_unlock();
-
-		if (0 < update_seconds)
-		{
-			/* first try to find the requested value in target second interval */
-			ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds,
-					update_end);
-
-			zbx_vector_history_record_sort(&records,
-					(zbx_compare_func_t)vc_history_record_compare_asc_func);
-		}
-
-		/* the target second does not contain the required value, read first value before it */
-		if (0 == records.values_num || 0 > zbx_timespec_compare(ts, &records.values[0].timestamp))
-		{
-			ret = vc_db_read_values_by_count(item->itemid, item->value_type, &records, 1, ts->sec - 1);
-			reload_first = 1;
-		}
-
-		vc_try_lock();
-
-		if (SUCCEED == ret)
-		{
-			if (0 < records.values_num)
-			{
-				zbx_vector_history_record_sort(&records,
-						(zbx_compare_func_t)vc_history_record_compare_asc_func);
-
-				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
-
-				if (SUCCEED == ret)
-					ret = records.values_num;
-
-				if (1 == reload_first)
-					item->status = ZBX_ITEM_STATUS_RELOAD_FIRST;
-			}
-		}
-		zbx_history_record_vector_destroy(&records, item->value_type);
+		zbx_vector_history_record_sort(&records,
+				(zbx_compare_func_t)vc_history_record_compare_asc_func);
 	}
 
+	/* the target second does not contain the required value, read first value before it */
+	if (0 == records.values_num || 0 > zbx_timespec_compare(ts, &records.values[0].timestamp))
+	{
+		ret = vc_db_read_values_by_count(item->itemid, item->value_type, &records, 1, ts->sec - 1);
+		reload_first = 1;
+	}
+
+	vc_try_lock();
+
+	if (SUCCEED == ret)
+	{
+		if (0 < records.values_num)
+		{
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
+
+			ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
+
+			if (SUCCEED == ret)
+				ret = records.values_num;
+
+			if (1 == reload_first)
+				item->status = ZBX_ITEM_STATUS_RELOAD_FIRST;
+		}
+	}
+	zbx_history_record_vector_destroy(&records, item->value_type);
+out:
 	return ret;
 }
 
