@@ -36,8 +36,8 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
-	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
+	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',	null),
+	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',	null),
 	'graph3d' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
 	'legend' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null)
 );
@@ -64,11 +64,11 @@ else {
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
+	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+	'profileIdx2' => getRequest('profileIdx2'),
+	'updateProfile' => getRequest('updateProfile', true),
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
 ));
 
 $graph = new CPieGraphDraw($dbGraph['graphtype']);
@@ -79,12 +79,12 @@ if (isset($_REQUEST['border'])) {
 	$graph->setBorder(0);
 }
 
-$width = get_request('width', 0);
+$width = getRequest('width', 0);
 if ($width <= 0) {
 	$width = $dbGraph['width'];
 }
 
-$height = get_request('height', 0);
+$height = getRequest('height', 0);
 if ($height <= 0) {
 	$height = $dbGraph['height'];
 }

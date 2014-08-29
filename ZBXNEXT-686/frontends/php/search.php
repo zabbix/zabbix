@@ -63,7 +63,7 @@ $rows_per_page = CWebUser::$data['rows_per_page'];
 
 $searchWidget = new CWidget('search_wdgt');
 
-$search = get_request('search', '');
+$search = getRequest('search', '');
 
 // Header
 if (zbx_empty($search)) {
@@ -217,7 +217,7 @@ foreach ($hosts as $hnum => $host) {
 		$hostCell,
 		$hostip,
 		$hostdns,
-		new CLink(_('Latest data'), 'latest.php?'.$link),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$group['groupid'].'&hostids[]='.$hostid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
@@ -232,7 +232,7 @@ foreach ($hosts as $hnum => $host) {
 	));
 }
 
-$searchHostWidget = new CCollapsibleUIWidget('search_hosts', $table);
+$searchHostWidget = new CCollapsibleUiWidget('search_hosts', $table);
 $searchHostWidget->open = (bool) CProfile::get('web.search.hats.search_hosts.state', true);
 $searchHostWidget->setHeader(_('Hosts'));
 $searchHostWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
@@ -324,7 +324,7 @@ foreach ($hostGroups as $hnum => $group) {
 
 	$table->addRow(array(
 		$hgroup_link,
-		new CLink(_('Latest data'), 'latest.php?'.$link),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
@@ -334,7 +334,7 @@ foreach ($hostGroups as $hnum => $group) {
 	));
 }
 
-$searchHostGroupWidget = new CCollapsibleUIWidget('search_hostgroup', $table);
+$searchHostGroupWidget = new CCollapsibleUiWidget('search_hostgroup', $table);
 $searchHostGroupWidget->open = (bool) CProfile::get('web.search.hats.search_hostgroup.state', true);
 $searchHostGroupWidget->setHeader(_('Host groups'));
 $searchHostGroupWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
@@ -480,7 +480,7 @@ if ($admin) {
 		));
 	}
 
-	$searchTemplateWidget = new CCollapsibleUIWidget('search_templates', $table);
+	$searchTemplateWidget = new CCollapsibleUiWidget('search_templates', $table);
 	$searchTemplateWidget->open = (bool) CProfile::get('web.search.hats.search_templates.state', true);
 	$searchTemplateWidget->setHeader(_('Templates'));
 	$searchTemplateWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));

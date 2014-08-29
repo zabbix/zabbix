@@ -34,20 +34,26 @@ $fields = array(
 	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// group
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')),
 	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN('"hostgroup.massdelete","hostgroup.massdisable","hostgroup.massenable"'),
+							null
+						),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// other
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	// sort and sortorder
+	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
+	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name'));
 
 /*
  * Form actions
@@ -56,7 +62,7 @@ if (hasRequest('form')) {
 	if (hasRequest('clone')) {
 		unset($_REQUEST['groupid']);
 	}
-	elseif (hasRequest('save')) {
+	elseif (hasRequest('add') || hasRequest('update')) {
 		$hostIds = getRequest('hosts', array());
 
 		DBstart();
@@ -151,29 +157,27 @@ if (hasRequest('form')) {
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
-		unset($_REQUEST['save']);
-
 		show_messages($result, $messageSuccess, $messageFailed);
-		clearCookies($result);
 	}
 	elseif (hasRequest('delete') && hasRequest('groupid')) {
 		$result = API::HostGroup()->delete(array(getRequest('groupid')));
 
 		if ($result) {
 			unset($_REQUEST['form']);
+			uncheckTableRows();
 		}
-		unset($_REQUEST['delete']);
-
 		show_messages($result, _('Group deleted'), _('Cannot delete group'));
-		clearCookies($result);
+
+		unset($_REQUEST['delete']);
 	}
 }
 /*
  * List actions
  */
-elseif (hasRequest('go')) {
-	if (getRequest('go') == 'delete') {
+elseif (hasRequest('action')) {
+	if (getRequest('action') == 'hostgroup.massdelete') {
 		$groupIds = getRequest('groups', array());
 
 		if ($groupIds) {
@@ -181,16 +185,17 @@ elseif (hasRequest('go')) {
 
 			$updated = count($groupIds);
 
+			if ($result) {
+				uncheckTableRows();
+			}
 			show_messages($result,
 				_n('Group deleted', 'Groups deleted', $updated),
 				_n('Cannot delete group', 'Cannot delete groups', $updated)
 			);
 		}
-
-		clearCookies($result);
 	}
-	elseif (getRequest('go') == 'activate' || getRequest('go') == 'disable') {
-		$enable = (getRequest('go') == 'activate');
+	elseif (getRequest('action') == 'hostgroup.massenable' || getRequest('action') == 'hostgroup.massdisable') {
+		$enable = (getRequest('action') == 'hostgroup.massenable');
 		$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
@@ -200,7 +205,7 @@ elseif (hasRequest('go')) {
 			DBstart();
 
 			$hosts = API::Host()->get(array(
-				'output' => array('hostid', 'status'),
+				'output' => array('hostid', 'status', 'host'),
 				'groupids' => $groupIds,
 				'editable' => true
 			));
@@ -224,6 +229,10 @@ elseif (hasRequest('go')) {
 
 			$result = DBend($result);
 
+			if ($result) {
+				uncheckTableRows();
+			}
+
 			$updated = count($hosts);
 
 			$messageSuccess = $enable
@@ -234,7 +243,6 @@ elseif (hasRequest('go')) {
 				: _n('Cannot disable host', 'Cannot disable hosts', $updated);
 
 			show_messages($result, $messageSuccess, $messageFailed);
-			clearCookies($result);
 		}
 	}
 }
@@ -330,18 +338,23 @@ if (hasRequest('form')) {
  * Display list
  */
 else {
-	$data = array(
-		'config' => $config
-	);
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	$sortfield = getPageSortField('name');
-	$sortorder =  getPageSortOrder();
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$data = array(
+		'config' => $config,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder
+	);
 
 	$groups = API::HostGroup()->get(array(
 		'output' => array('groupid'),
 		'editable' => true,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	));
 
@@ -367,7 +380,7 @@ else {
 		'selectDiscoveryRule' => array('itemid', 'name'),
 		'limitSelects' => $config['max_in_table'] + 1
 	));
-	order_result($data['groups'], $sortfield, $sortorder);
+	order_result($data['groups'], $sortField, $sortOrder);
 
 	// render view
 	$hostgroupView = new CView('configuration.hostgroups.list', $data);

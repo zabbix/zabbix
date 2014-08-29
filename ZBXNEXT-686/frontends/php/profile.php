@@ -42,16 +42,16 @@ $themes[] = THEME_DEFAULT;
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'),
+	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'),
 	'lang' =>				array(T_ZBX_STR, O_OPT, null, null, null),
-	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({save})'),
+	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
-	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, P_SYS, null, null, 'isset({save})'),
-	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
-	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})', _('Refresh (in seconds)')),
-	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({save})', _('Rows per page')),
+	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, null, IN('1'), null),
+	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({update})'),
+	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({update})', _('Refresh (in seconds)')),
+	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
 	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
@@ -60,20 +60,20 @@ $fields = array(
 	'disable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
 	'messages' =>			array(T_ZBX_STR, O_OPT, null, null, null),
 	// actions
-	'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'update'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS, null, null),
 	'del_user_media'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	// form
 	'form'=>				array(T_ZBX_STR, O_OPT, P_SYS, null, null),
-	'form_refresh'=>		array(T_ZBX_STR, O_OPT, null, null, null)
+	'form_refresh'=>		array(T_ZBX_INT, O_OPT, null, null, null)
 );
 check_fields($fields);
 
-$_REQUEST['autologin'] = get_request('autologin', 0);
+$_REQUEST['autologin'] = getRequest('autologin', 0);
 
 // secondary actions
 if (isset($_REQUEST['new_media'])) {
-	$_REQUEST['user_medias'] = get_request('user_medias', array());
+	$_REQUEST['user_medias'] = getRequest('user_medias', array());
 	array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 }
 elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['enable_media'])) {
@@ -87,7 +87,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (isset($_REQUEST['del_user_media'])) {
-	$user_medias_to_del = get_request('user_medias_to_del', array());
+	$user_medias_to_del = getRequest('user_medias_to_del', array());
 	foreach ($user_medias_to_del as $mediaid) {
 		if (isset($_REQUEST['user_medias'][$mediaid])) {
 			unset($_REQUEST['user_medias'][$mediaid]);
@@ -99,15 +99,15 @@ elseif (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 	redirect(CWebUser::$data['last_page']['url']);
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('update')) {
 	$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
 
 	if ($auth_type != ZBX_AUTH_INTERNAL) {
 		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 	}
 	else {
-		$_REQUEST['password1'] = get_request('password1', null);
-		$_REQUEST['password2'] = get_request('password2', null);
+		$_REQUEST['password1'] = getRequest('password1');
+		$_REQUEST['password2'] = getRequest('password2');
 	}
 
 	if ($_REQUEST['password1'] != $_REQUEST['password2']) {
@@ -123,21 +123,21 @@ elseif (isset($_REQUEST['save'])) {
 		$user = array();
 		$user['userid'] = CWebUser::$data['userid'];
 		$user['alias'] = CWebUser::$data['alias'];
-		$user['passwd'] = get_request('password1');
-		$user['url'] = get_request('url');
-		$user['autologin'] = get_request('autologin', 0);
+		$user['passwd'] = getRequest('password1');
+		$user['url'] = getRequest('url');
+		$user['autologin'] = getRequest('autologin', 0);
 		$user['autologout'] = hasRequest('autologout_visible') ? getRequest('autologout') : 0;
-		$user['theme'] = get_request('theme');
-		$user['refresh'] = get_request('refresh');
-		$user['rows_per_page'] = get_request('rows_per_page');
+		$user['theme'] = getRequest('theme');
+		$user['refresh'] = getRequest('refresh');
+		$user['rows_per_page'] = getRequest('rows_per_page');
 		$user['user_groups'] = null;
-		$user['user_medias'] = get_request('user_medias', array());
+		$user['user_medias'] = getRequest('user_medias', array());
 
 		if (hasRequest('lang')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		$messages = get_request('messages', array());
+		$messages = getRequest('messages', array());
 		if (!isset($messages['enabled'])) {
 			$messages['enabled'] = 0;
 		}
@@ -189,8 +189,8 @@ ob_end_flush();
  */
 $data = getUserFormData(CWebUser::$data['userid'], true);
 $data['userid'] = CWebUser::$data['userid'];
-$data['form'] = get_request('form');
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form'] = getRequest('form');
+$data['form_refresh'] = getRequest('form_refresh', 0);
 $data['autologout'] = getRequest('autologout');
 
 // render view

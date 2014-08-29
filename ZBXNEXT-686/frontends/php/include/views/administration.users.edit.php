@@ -33,9 +33,8 @@ else {
 // create form
 $userForm = new CForm();
 $userForm->setName('userForm');
-$userForm->addVar('config', get_request('config', 0));
+$userForm->addVar('config', getRequest('config', 0));
 $userForm->addVar('form', $this->data['form']);
-$userForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
 if (isset($_REQUEST['userid'])) {
 	$userForm->addVar('userid', $this->data['userid']);
@@ -50,7 +49,7 @@ if (!$data['is_profile']) {
 	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
 	$nameTextBox->attr('autofocus', 'autofocus');
 	$userFormList->addRow(_('Alias'), $nameTextBox);
-	$userFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
@@ -250,7 +249,7 @@ if ($this->data['is_profile']) {
 		SPACE,
 		$soundList,
 		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'formlist'),
-		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 	);
 
 	$triggersTable = new CTable('', 'invisible');
@@ -287,7 +286,7 @@ if ($this->data['is_profile']) {
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
-			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
+			new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'formlist')
 		));
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
@@ -379,28 +378,33 @@ if (isset($userMessagingFormList)) {
 $userForm->addItem($userTab);
 
 // append buttons to form
-if (empty($this->data['userid'])) {
-	$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
-}
-else {
+if (isset($this->data['userid'])) {
 	if ($this->data['is_profile']) {
-		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
+		$deleteButton = null;
 	}
 	else {
-		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid').url_param('config'));
-
+		$deleteButton = new CButtonDelete(
+			_('Delete selected user?'),
+			url_param('form').url_param('userid').url_param('config')
+		);
 		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
-
-		$userForm->addItem(makeFormFooter(
-			new CSubmit('save', _('Save')),
-			array(
-				$deleteButton,
-				new CButtonCancel(url_param('config'))
-			)
-		));
 	}
+
+	$userForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			$deleteButton,
+			new CButtonCancel(url_param('config'))
+		)
+	));
+}
+else {
+	$userForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('config'))
+	));
 }
 
 // append form to widget

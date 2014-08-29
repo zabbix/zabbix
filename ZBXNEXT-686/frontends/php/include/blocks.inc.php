@@ -121,7 +121,7 @@ function getFavouriteGraphs() {
 
 	if ($data['simpleGraphs']) {
 		foreach ($data['simpleGraphs'] as $item) {
-			$favourites->addItem(new CLink($item['label'], 'history.php?action=showgraph&itemid='.$item['id']), 'nowrap');
+			$favourites->addItem(new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id']), 'nowrap');
 		}
 	}
 
@@ -453,7 +453,7 @@ function make_system_status($filter) {
 		$table->addRow($groupRow);
 	}
 
-	$script = new CJSScript(get_js(
+	$script = new CJsScript(get_js(
 		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
@@ -472,6 +472,7 @@ function make_hoststat_summary($filter) {
 	// get host groups
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => 1,
 		'output' => array('groupid', 'name')
 	));
@@ -484,7 +485,7 @@ function make_hoststat_summary($filter) {
 	// get hosts
 	$hosts = API::Host()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
-		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid', 'name'),
@@ -497,7 +498,6 @@ function make_hoststat_summary($filter) {
 	$triggers = API::Trigger()->get(array(
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'expandData' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -788,7 +788,7 @@ function make_hoststat_summary($filter) {
 		$table->addRow($group_row);
 	}
 
-	$script = new CJSScript(get_js(
+	$script = new CJsScript(get_js(
 		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
@@ -846,11 +846,11 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$frontendSetup = new FrontendSetup();
+		$frontendSetup = new CFrontendSetup();
 		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
-			if ($req['result'] != FrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == FrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
+			if ($req['result'] != CFrontendSetup::CHECK_OK) {
+				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
 				$table->addRow(array(
 					new CSpan($req['name'], $class),
 					new CSpan($req['current'], $class),
@@ -860,7 +860,7 @@ function make_status_of_zbx() {
 		}
 	}
 
-	$script = new CJSScript(get_js(
+	$script = new CJsScript(get_js(
 		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
@@ -1117,7 +1117,7 @@ function make_latest_issues(array $filter = array()) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$script = new CJSScript(get_js(
+	$script = new CJsScript(get_js(
 		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
@@ -1218,7 +1218,7 @@ function make_webmon_overview($filter) {
 		}
 	}
 
-	$script = new CJSScript(get_js(
+	$script = new CJsScript(get_js(
 		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
@@ -1268,7 +1268,7 @@ function make_discovery_status() {
 		));
 	}
 
-	$script = new CJSScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
+	$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
 		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 

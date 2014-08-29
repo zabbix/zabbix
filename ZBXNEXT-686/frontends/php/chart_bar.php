@@ -51,7 +51,7 @@ $fields = array(
 check_fields($fields);
 
 // validate permissions
-$items = get_request('items', array());
+$items = getRequest('items', array());
 $itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
 $itemsCount = API::Item()->get(array(
 	'itemids' => $itemIds,
@@ -62,19 +62,19 @@ if (count($itemIds) != $itemsCount) {
 	access_deny();
 }
 
-$config = get_request('config', 1);
-$title = get_request('title', _('Report'));
-$xlabel = get_request('xlabel', 'X');
-$ylabel = get_request('ylabel', 'Y');
+$config = getRequest('config', 1);
+$title = getRequest('title', _('Report'));
+$xlabel = getRequest('xlabel', 'X');
+$ylabel = getRequest('ylabel', 'Y');
 
-$showlegend = get_request('showlegend', 0);
-$sorttype = get_request('sorttype', 0);
+$showlegend = getRequest('showlegend', 0);
+$sorttype = getRequest('sorttype', 0);
 
 if ($config == 1) {
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
-	$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
-	$timetill = get_request('report_timetill', time());
+	$timesince = getRequest('report_timesince', time() - SEC_PER_DAY);
+	$timetill = getRequest('report_timetill', time());
 
 	$str_since['hour'] = date('H', $timesince);
 	$str_since['day'] = date('d', $timesince);
@@ -171,9 +171,9 @@ if ($config == 1) {
 				' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 				' max(value_max) as max,max(clock) as clock'.
 			' FROM trends '.
-			' WHERE itemid='.$itemid.
-				' AND clock>='.$timesince.
-				' AND clock<='.$timetill.
+			' WHERE itemid='.zbx_dbstr($itemid).
+				' AND clock>='.zbx_dbstr($timesince).
+				' AND clock<='.zbx_dbstr($timetill).
 			' GROUP BY itemid,'.$calc_field.
 			' ORDER BY clock ASC'
 			,
@@ -182,9 +182,9 @@ if ($config == 1) {
 				' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 				' max(value_max) as max,max(clock) as clock'.
 			' FROM trends_uint '.
-			' WHERE itemid='.$itemid.
-				' AND clock>='.$timesince.
-				' AND clock<='.$timetill.
+			' WHERE itemid='.zbx_dbstr($itemid).
+				' AND clock>='.zbx_dbstr($timesince).
+				' AND clock<='.zbx_dbstr($timetill).
 			' GROUP BY itemid,'.$calc_field.
 			' ORDER BY clock ASC'
 			);
@@ -284,7 +284,7 @@ if ($config == 1) {
 	}
 }
 elseif ($config == 2) {
-	$periods = get_request('periods', array());
+	$periods = getRequest('periods', array());
 
 	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 1');
@@ -308,9 +308,9 @@ elseif ($config == 2) {
 			$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$period['report_timesince'].
-					' AND clock<='.$period['report_timetill'].
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($period['report_timesince']).
+					' AND clock<='.zbx_dbstr($period['report_timetill']).
 				' GROUP BY itemid';
 			$result = DBselect($sql);
 			if ($row = DBfetch($result)) {
@@ -324,9 +324,9 @@ elseif ($config == 2) {
 			$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends_uint '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$period['report_timesince'].
-					' AND clock<='.$period['report_timetill'].
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($period['report_timesince']).
+					' AND clock<='.zbx_dbstr($period['report_timetill']).
 				' GROUP BY itemid';
 			$result = DBselect($sql);
 			if ($row = DBfetch($result)) {
@@ -383,23 +383,23 @@ elseif ($config == 2) {
 	}
 }
 elseif ($config == 3) {
-	$hostids = get_request('hostids', array());
-	$groupids = get_request('groupids', array());
+	$hostids = getRequest('hostids', array());
+	$groupids = getRequest('groupids', array());
 
 	// validate permissions
 	if (!API::Host()->isReadable($hostids) || !API::HostGroup()->isReadable($groupids)) {
 		access_deny();
 	}
 
-	$title = get_request('title','Report 2');
-	$xlabel = get_request('xlabel','');
-	$ylabel = get_request('ylabel','');
+	$title = getRequest('title','Report 2');
+	$xlabel = getRequest('xlabel','');
+	$ylabel = getRequest('ylabel','');
 
-	$palette = get_request('palette',0);
-	$palettetype = get_request('palettetype',0);
+	$palette = getRequest('palette',0);
+	$palettetype = getRequest('palettetype',0);
 
-	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
-	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
+	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$avgperiod = getRequest('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 	if (!empty($groupids)) {
 		$sql = 'SELECT DISTINCT hg.hostid'.
@@ -432,8 +432,8 @@ elseif ($config == 3) {
 	$graph_data['legend'] = array();
 
 
-	$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
-	$timetill = get_request('report_timetill', time());
+	$timesince = getRequest('report_timesince', time() - SEC_PER_DAY);
+	$timetill = getRequest('report_timetill', time());
 
 	$str_since['hour'] = date('H', $timesince);
 	$str_since['day'] = date('d', $timesince);
@@ -576,17 +576,17 @@ elseif ($config == 3) {
 			array_push($sql_arr,
 				'SELECT itemid,'.$calc_field.' as i,sum(num) as count,avg(value_avg) as avg '.
 				' FROM trends '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$start.
-					' AND clock<='.$end.
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($start).
+					' AND clock<='.zbx_dbstr($end).
 				' GROUP BY itemid,'.$calc_field
 				,
 
 				'SELECT itemid,'.$calc_field.' as i,sum(num) as count,avg(value_avg) as avg '.
 				' FROM trends_uint '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$start.
-					' AND clock<='.$end.
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($start).
+					' AND clock<='.zbx_dbstr($end).
 				' GROUP BY itemid,'.$calc_field
 				);
 
@@ -651,8 +651,8 @@ $graph->setSeriesColor($graph_data['colors']);
 $graph->showLegend($showlegend);
 
 $graph->setWidth(1024);
-$graph->setHeight(400);
+$graph->setMinChartHeight(250);
 
-$graph->Draw();
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

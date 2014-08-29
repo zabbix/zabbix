@@ -106,9 +106,9 @@ class testFormMap extends CWebTest {
 			$this->zbxTestClick('gridautoalign');
 		}
 
-		// clicking "Save"
+		// clicking "Update"
 		$this->chooseOkOnNextConfirmation();
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->getConfirmation();
 
 		// checking if DB was updated as expected

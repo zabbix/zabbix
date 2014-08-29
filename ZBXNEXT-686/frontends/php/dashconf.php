@@ -44,7 +44,7 @@ $fields = array(
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,			null)
 );
 check_fields($fields);
@@ -52,7 +52,7 @@ check_fields($fields);
 /*
  * Actions
  */
-if (hasRequest('save')) {
+if (hasRequest('update')) {
 	// filter
 	$filterEnable = getRequest('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
@@ -114,18 +114,18 @@ $data = array(
 );
 
 if (isset($_REQUEST['form_refresh'])) {
-	$data['isFilterEnable'] = get_request('filterEnable', 0);
-	$data['maintenance'] = get_request('maintenance', 0);
-	$data['extAck'] = get_request('extAck', 0);
+	$data['isFilterEnable'] = getRequest('filterEnable', 0);
+	$data['maintenance'] = getRequest('maintenance', 0);
+	$data['extAck'] = getRequest('extAck', 0);
 
-	$data['severity'] = get_request('trgSeverity', array());
+	$data['severity'] = getRequest('trgSeverity', array());
 	$data['severity'] = array_keys($data['severity']);
 
 	// groups
-	$data['grpswitch'] = get_request('grpswitch', 0);
-	$data['groupIds'] = get_request('groupids', array());
+	$data['grpswitch'] = getRequest('grpswitch', 0);
+	$data['groupIds'] = getRequest('groupids', array());
 	$data['groupIds'] = zbx_toHash($data['groupIds']);
-	$data['hideGroupIds'] = get_request('hidegroupids', array());
+	$data['hideGroupIds'] = getRequest('hidegroupids', array());
 	$data['hideGroupIds'] = zbx_toHash($data['hideGroupIds']);
 }
 else {

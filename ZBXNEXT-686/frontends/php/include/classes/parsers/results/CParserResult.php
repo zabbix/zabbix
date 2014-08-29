@@ -47,7 +47,7 @@ class CParserResult {
 	/**
 	 * Length of the matched string in bytes.
 	 *
-	 * @var string
+	 * @var int
 	 */
 	public $length;
 }

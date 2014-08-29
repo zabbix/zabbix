@@ -29,19 +29,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'severity_name_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'save' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null),
+	'severity_name_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_name_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_name_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_name_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_name_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_name_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	'severity_color_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
+	// actions
+	'update' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null,	null,		null)
 );
 check_fields($fields);
@@ -49,20 +50,20 @@ check_fields($fields);
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('update')) {
 	$configs = array(
-		'severity_name_0' => get_request('severity_name_0', _('Not classified')),
-		'severity_color_0' => get_request('severity_color_0', ''),
-		'severity_name_1' => get_request('severity_name_1', _('Information')),
-		'severity_color_1' => get_request('severity_color_1', ''),
-		'severity_name_2' => get_request('severity_name_2', _('Warning')),
-		'severity_color_2' => get_request('severity_color_2', ''),
-		'severity_name_3' => get_request('severity_name_3', _('Average')),
-		'severity_color_3' => get_request('severity_color_3', ''),
-		'severity_name_4' => get_request('severity_name_4', _('High')),
-		'severity_color_4' => get_request('severity_color_4', ''),
-		'severity_name_5' => get_request('severity_name_5', _('Disaster')),
-		'severity_color_5' => get_request('severity_color_5', '')
+		'severity_name_0' => getRequest('severity_name_0', _('Not classified')),
+		'severity_color_0' => getRequest('severity_color_0', ''),
+		'severity_name_1' => getRequest('severity_name_1', _('Information')),
+		'severity_color_1' => getRequest('severity_color_1', ''),
+		'severity_name_2' => getRequest('severity_name_2', _('Warning')),
+		'severity_color_2' => getRequest('severity_color_2', ''),
+		'severity_name_3' => getRequest('severity_name_3', _('Average')),
+		'severity_color_3' => getRequest('severity_color_3', ''),
+		'severity_name_4' => getRequest('severity_name_4', _('High')),
+		'severity_color_4' => getRequest('severity_color_4', ''),
+		'severity_name_5' => getRequest('severity_name_5', _('Disaster')),
+		'severity_color_5' => getRequest('severity_color_5', '')
 	);
 
 	DBstart();
@@ -96,21 +97,21 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER SEVERITIES'), $form);
 
 $data = array();
-$data['form_refresh'] = get_request('form_refresh', 0);
+$data['form_refresh'] = getRequest('form_refresh', 0);
 
 if ($data['form_refresh']) {
-	$data['config']['severity_name_0'] = get_request('severity_name_0');
-	$data['config']['severity_color_0'] = get_request('severity_color_0', '');
-	$data['config']['severity_name_1'] = get_request('severity_name_1');
-	$data['config']['severity_color_1'] = get_request('severity_color_1', '');
-	$data['config']['severity_name_2'] = get_request('severity_name_2');
-	$data['config']['severity_color_2'] = get_request('severity_color_2', '');
-	$data['config']['severity_name_3'] = get_request('severity_name_3');
-	$data['config']['severity_color_3'] = get_request('severity_color_3', '');
-	$data['config']['severity_name_4'] = get_request('severity_name_4');
-	$data['config']['severity_color_4'] = get_request('severity_color_4', '');
-	$data['config']['severity_name_5'] = get_request('severity_name_5');
-	$data['config']['severity_color_5'] = get_request('severity_color_5', '');
+	$data['config']['severity_name_0'] = getRequest('severity_name_0');
+	$data['config']['severity_color_0'] = getRequest('severity_color_0', '');
+	$data['config']['severity_name_1'] = getRequest('severity_name_1');
+	$data['config']['severity_color_1'] = getRequest('severity_color_1', '');
+	$data['config']['severity_name_2'] = getRequest('severity_name_2');
+	$data['config']['severity_color_2'] = getRequest('severity_color_2', '');
+	$data['config']['severity_name_3'] = getRequest('severity_name_3');
+	$data['config']['severity_color_3'] = getRequest('severity_color_3', '');
+	$data['config']['severity_name_4'] = getRequest('severity_name_4');
+	$data['config']['severity_color_4'] = getRequest('severity_color_4', '');
+	$data['config']['severity_name_5'] = getRequest('severity_name_5');
+	$data['config']['severity_color_5'] = getRequest('severity_color_5', '');
 }
 else {
 	$data['config'] = select_config(false);

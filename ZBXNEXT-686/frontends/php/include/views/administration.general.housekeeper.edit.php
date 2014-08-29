@@ -165,8 +165,10 @@ $houseKeeperView->addTab('houseKeeper', _('Housekeeping'), $houseKeeperTab);
 
 $houseKeeperForm = new CForm();
 $houseKeeperForm->setName('houseKeeperForm');
-$houseKeeperForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $houseKeeperForm->addItem($houseKeeperView);
-$houseKeeperForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButton('resetDefaults', _('Reset defaults'))));
+$houseKeeperForm->addItem(makeFormFooter(
+	new CSubmit('update', _('Update')),
+	new CButton('resetDefaults', _('Reset defaults'))
+));
 
 return $houseKeeperForm;

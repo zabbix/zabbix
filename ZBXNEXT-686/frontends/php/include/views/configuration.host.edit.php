@@ -189,13 +189,11 @@ if ($isDiscovered) {
 	);
 }
 
-$hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered);
-$hostTB->setAttribute('maxlength', 64);
+$hostTB = new CTextBox('host', $host, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostTB->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
-$visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
@@ -647,6 +645,28 @@ if (getRequest('form') == 'full_clone') {
 		$listBox->addItems($prototypeList);
 		$hostList->addRow(_('Host prototypes'), $listBox);
 	}
+
+	// web scenarios
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('httptestid', 'name'),
+		'hostids' => $hostId,
+		'inherited' => false
+	));
+
+	if ($httpTests) {
+		$httpTestList = array();
+
+		foreach ($httpTests as $httpTest) {
+			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
+		}
+
+		order_result($httpTestList);
+
+		$listBox = new CListBox('httpTests', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($httpTestList);
+		$hostList->addRow(_('Web scenarios'), $listBox);
+	}
 }
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
@@ -686,16 +706,14 @@ if (!$isDiscovered) {
 			),
 			null, 'conditions_'.$template['templateid']
 		);
-
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 
 	// create new linked template table
 	$newTemplateTable = new CTable(null, 'formElementTable');
 	$newTemplateTable->attr('id', 'newTemplateTable');
-	$newTemplateTable->attr('style', 'min-width: 400px;');
 
 	$newTemplateTable->addRow(array(new CMultiSelect(array(
 		'name' => 'add_templates[]',
@@ -711,7 +729,7 @@ if (!$isDiscovered) {
 
 	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 }
 // templates for discovered hosts
 else {
@@ -723,7 +741,7 @@ else {
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -862,15 +880,24 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$others = array();
 // do not display the clone and delete buttons for clone forms and new host forms
 if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
-	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = new CSubmit('full_clone', _('Full clone'));
-	$others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			new CSubmit('full_clone', _('Full clone')),
+			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid')),
+			new CButtonCancel(url_param('groupid'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('groupid'));
+else {
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid'))
+	));
+}
 
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

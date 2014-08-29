@@ -36,8 +36,11 @@ $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));
 $discoveryTable->makeVerticalRotation();
 
+$discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $this->data['sort'], $this->data['sortorder']);
+$discoveredDeviceCol->addClass('left');
+
 $header = array(
-	make_sorting_header(_('Discovered device'), 'ip'),
+	$discoveredDeviceCol,
 	new CCol(_('Monitored host'), 'left'),
 	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 );

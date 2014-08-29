@@ -44,11 +44,11 @@ $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
 
 // active since
 if (isset($_REQUEST['active_since'])) {
-	$fromYear = get_request('active_since_year');
-	$fromMonth = get_request('active_since_month');
-	$fromDay = get_request('active_since_day');
-	$fromHours = get_request('active_since_hour');
-	$fromMinutes = get_request('active_since_minute');
+	$fromYear = getRequest('active_since_year');
+	$fromMonth = getRequest('active_since_month');
+	$fromDay = getRequest('active_since_day');
+	$fromHours = getRequest('active_since_hour');
+	$fromMinutes = getRequest('active_since_minute');
 	$fromDate = array(
 		'y' => $fromYear,
 		'm' => $fromMonth,
@@ -66,11 +66,11 @@ $maintenanceForm->addVar('active_since', $activeSince);
 
 // active till
 if (isset($_REQUEST['active_till'])) {
-	$toYear = get_request('active_till_year');
-	$toMonth = get_request('active_till_month');
-	$toDay = get_request('active_till_day');
-	$toHours = get_request('active_till_hour');
-	$toMinutes = get_request('active_till_minute');
+	$toYear = getRequest('active_till_year');
+	$toMonth = getRequest('active_till_month');
+	$toDay = getRequest('active_till_day');
+	$toHours = getRequest('active_till_hour');
+	$toMinutes = getRequest('active_till_minute');
 	$toDate = array(
 		'y' => $toYear,
 		'm' => $toMonth,
@@ -135,7 +135,7 @@ $maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
 
 if (isset($_REQUEST['new_timeperiod'])) {
 	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
-		$saveLabel = _('Save');
+		$saveLabel = _('Update');
 	}
 	else {
 		$saveLabel = _('Add');
@@ -188,20 +188,20 @@ $maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList)
 $maintenanceForm->addItem($maintenanceTab);
 
 // append buttons to form
-if (empty($this->data['maintenanceid'])) {
+if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel()
-	));
-}
-else {
-	$maintenanceForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
 			new CButtonCancel()
 		)
+	));
+}
+else {
+	$maintenanceForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
 	));
 }
 

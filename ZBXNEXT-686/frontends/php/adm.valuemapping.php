@@ -29,10 +29,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form})&&{form}=="update")||isset({delete})'),
-	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({save})'),
+	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'),
+	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'),
 	'mappings' =>		array(T_ZBX_STR, O_OPT,	null,			null,		null),
-	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	// actions
+	'add' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'update' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
@@ -43,7 +45,7 @@ check_fields($fields);
  * Permissions
  */
 if (isset($_REQUEST['valuemapid'])) {
-	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr(get_request('valuemapid'))));
+	$dbValueMap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr(getRequest('valuemapid'))));
 	if (empty($dbValueMap)) {
 		access_deny();
 	}
@@ -53,18 +55,18 @@ if (isset($_REQUEST['valuemapid'])) {
  * Actions
  */
 try {
-	if (isset($_REQUEST['save'])) {
+	if (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
-		$valueMap = array('name' => get_request('mapname'));
-		$mappings = get_request('mappings', array());
+		$valueMap = array('name' => getRequest('mapname'));
+		$mappings = getRequest('mappings', array());
 
-		if (isset($_REQUEST['valuemapid'])) {
+		if (hasRequest('update')) {
 			$messageSuccess = _('Value map updated');
 			$messageFailed = _('Cannot update value map');
 			$auditAction = AUDIT_ACTION_UPDATE;
 
-			$valueMap['valuemapid'] = get_request('valuemapid');
+			$valueMap['valuemapid'] = getRequest('valuemapid');
 			$result = updateValueMap($valueMap, $mappings);
 		}
 		else {
@@ -148,14 +150,14 @@ $valueMapWidget->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $valueMapFor
 
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0),
-		'valuemapid' => get_request('valuemapid'),
+		'form' => getRequest('form', 1),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'valuemapid' => getRequest('valuemapid'),
 		'mappings' => array(),
 		'mapname' => '',
 		'confirmMessage' => null,
-		'add_value' => get_request('add_value'),
-		'add_newvalue' => get_request('add_newvalue')
+		'add_value' => getRequest('add_value'),
+		'add_newvalue' => getRequest('add_newvalue')
 	);
 
 	if (isset($data['valuemapid'])) {
@@ -167,8 +169,8 @@ if (isset($_REQUEST['form'])) {
 			));
 		}
 		else {
-			$data['mapname'] = get_request('mapname', '');
-			$data['mappings'] = get_request('mappings', array());
+			$data['mapname'] = getRequest('mapname', '');
+			$data['mappings'] = getRequest('mappings', array());
 		}
 
 		$valueMapCount = DBfetch(DBselect(
@@ -182,8 +184,8 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
-		$data['mapname'] = get_request('mapname', '');
-		$data['mappings'] = get_request('mappings', array());
+		$data['mapname'] = getRequest('mapname', '');
+		$data['mappings'] = getRequest('mappings', array());
 	}
 
 	order_result($data['mappings'], 'value');

@@ -211,7 +211,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_set_defaults()
+static void	zbx_set_defaults(void)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -297,15 +297,27 @@ static void	zbx_set_defaults()
  ******************************************************************************/
 static void	zbx_validate_config(void)
 {
+	char	*ch_error;
+
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter '%s': %s", CONFIG_HOSTNAME,
+				ch_error);
+		zbx_free(ch_error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_IPMIPOLLER_FORKS +
+			CONFIG_JAVAPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
+				" if regular, IPMI or Java pollers are started");
 		exit(EXIT_FAILURE);
 	}
 
@@ -349,7 +361,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config()
+static void	zbx_load_config(void)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -521,7 +533,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
 }
@@ -599,7 +611,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, proxy_num = 0, proxy_count = 0;
+	int		i, proxy_num = 0, proxy_count = 0, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -674,6 +686,20 @@ int	MAIN_ZABBIX_ENTRY()
 		zbx_vmware_init();
 
 	DBinit();
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_PROXY != db_type)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
@@ -841,7 +867,7 @@ int	MAIN_ZABBIX_ENTRY()
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 

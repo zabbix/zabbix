@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 // create form
 $hostForm = new CForm();
 $hostForm->setName('hostForm');
-$hostForm->addVar('go', 'massupdate');
+$hostForm->addVar('action', 'host.massupdate');
 foreach ($this->data['hosts'] as $hostid) {
 	$hostForm->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -192,6 +192,9 @@ $templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
 $templatesTable->setAttribute('id', 'template_table');
 
+$clearDiv = new CDiv();
+$clearDiv->addStyle('clear: both;');
+
 $templatesDiv = new CDiv(
 	array(
 		new CMultiSelect(array(
@@ -205,6 +208,7 @@ $templatesDiv = new CDiv(
 				'height' => 450
 			)
 		)),
+		$clearDiv,
 		new CDiv(array(
 			new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
 			SPACE,

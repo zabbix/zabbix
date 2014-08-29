@@ -29,9 +29,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'iconmapid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'(isset({form})&&{form}=="update")||isset({delete})'),
-	'iconmap' =>		array(T_ZBX_STR, O_OPT, null,			null,	'isset({save})'),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'iconmapid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'(isset({form}) && {form} == "update") || isset({delete})'),
+	'iconmap' =>		array(T_ZBX_STR, O_OPT, null,			null,	'isset({add}) || isset({update})'),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, null,			null,	null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
@@ -42,9 +43,9 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (isset($_REQUEST['iconmapid'])) {
+if (hasRequest('iconmapid')) {
 	$iconMap = API::IconMap()->get(array(
-		'iconmapids' => get_request('iconmapid'),
+		'iconmapids' => getRequest('iconmapid'),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'preservekeys' => true,
@@ -58,7 +59,7 @@ if (isset($_REQUEST['iconmapid'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$_REQUEST['iconmap']['mappings'] = isset($_REQUEST['iconmap']['mappings'])
 		? $_REQUEST['iconmap']['mappings']
 		: array();
@@ -69,7 +70,7 @@ if (isset($_REQUEST['save'])) {
 	}
 	unset($mapping);
 
-	if (isset($_REQUEST['iconmapid'])) {
+	if (hasRequest('update')) {
 		$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
 		$result = API::IconMap()->update($_REQUEST['iconmap']);
 		$msgOk = _('Icon map updated');
@@ -87,7 +88,7 @@ if (isset($_REQUEST['save'])) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (isset($_REQUEST['delete'])) {
+elseif (hasRequest('delete')) {
 	$result = API::IconMap()->delete(array(getRequest('iconmapid')));
 
 	if ($result) {
@@ -130,8 +131,8 @@ $iconMapWidget = new CWidget();
 $iconMapWidget->addPageHeader(_('CONFIGURATION OF ICON MAPPING'), $iconMapForm);
 
 $data = array(
-	'form_refresh' => get_request('form_refresh', 0),
-	'iconmapid' => get_request('iconmapid'),
+	'form_refresh' => getRequest('form_refresh', 0),
+	'iconmapid' => getRequest('iconmapid'),
 	'iconList' => array(),
 	'inventoryList' => array()
 );
@@ -154,7 +155,7 @@ foreach ($inventoryFields as $field) {
 
 if (isset($_REQUEST['form'])) {
 	if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
-		$data['iconmap'] = get_request('iconmap');
+		$data['iconmap'] = getRequest('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {
 		$data['iconmap'] = reset($iconMap);

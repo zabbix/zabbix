@@ -42,13 +42,13 @@ if (isset($this->data['service'])) {
 
 // create form list
 $servicesFormList = new CFormList('servicesFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128);
+$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $servicesFormList->addRow(_('Name'), $nameTextBox);
 
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), array(
-	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes', 128),
+	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, true, 128),
 	new CButton('select_parent', _('Change'), "javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', 'ZBX_Services_List', 740, 420, 'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');", 'formlist')
 ));
 
@@ -59,7 +59,7 @@ $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox)
 
 // append SLA to form list
 $showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
-$goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, 'no', 8);
+$goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, false, 8);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
 }
@@ -67,7 +67,7 @@ $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), array($show
 
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), array(
-	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 	new CButton('btn1', _('Select'),
 		'return PopUp("popup.php?'.
 			'dstfrm='.$servicesForm->getName().
@@ -81,7 +81,7 @@ $servicesFormList->addRow(_('Trigger'), array(
 		'formlist'
 	)
 ));
-$servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, 'no', 3));
+$servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, false, 3));
 
 /*
  * Dependencies tab
@@ -175,11 +175,11 @@ $serviceTimeTable = new CTable(null, 'formElementTable');
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	// downtime since
 	if (isset($_REQUEST['new_service_time']['from'])) {
-		$fromYear = get_request('new_service_time_from_year');
-		$fromMonth = get_request('new_service_time_from_month');
-		$fromDay = get_request('new_service_time_from_day');
-		$fromHours = get_request('new_service_time_from_hour');
-		$fromMinutes = get_request('new_service_time_from_minute');
+		$fromYear = getRequest('new_service_time_from_year');
+		$fromMonth = getRequest('new_service_time_from_month');
+		$fromDay = getRequest('new_service_time_from_day');
+		$fromHours = getRequest('new_service_time_from_hour');
+		$fromMinutes = getRequest('new_service_time_from_minute');
 		$fromDate = array(
 			'y' => $fromYear,
 			'm' => $fromMonth,
@@ -198,11 +198,11 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 
 	// downtime till
 	if (isset($_REQUEST['new_service_time']['to'])) {
-		$toYear = get_request('new_service_time_to_year');
-		$toMonth = get_request('new_service_time_to_month');
-		$toDay = get_request('new_service_time_to_day');
-		$toHours = get_request('new_service_time_to_hour');
-		$toMinutes = get_request('new_service_time_to_minute');
+		$toYear = getRequest('new_service_time_to_year');
+		$toMonth = getRequest('new_service_time_to_month');
+		$toDay = getRequest('new_service_time_to_day');
+		$toHours = getRequest('new_service_time_to_hour');
+		$toMinutes = getRequest('new_service_time_to_minute');
 		$toDate = array(
 			'y' => $toYear,
 			'm' => $toMonth,
@@ -239,16 +239,16 @@ else {
 		$weekToComboBox->addItem($dow, getDayOfWeekCaption($dow));
 	}
 	$timeFromHourTextBox = new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
-			? $_REQUEST['new_service_time']['from_hour'] : '', 2, 'no', 2);
+			? $_REQUEST['new_service_time']['from_hour'] : '', 2, false, 2);
 	$timeFromHourTextBox->setAttribute('placeholder', _('hh'));
 	$timeFromMinuteTextBox = new CTextBox('new_service_time[from_minute]', isset($_REQUEST['new_service_time']['from_minute'])
-			? $_REQUEST['new_service_time']['from_minute'] : '', 2, 'no', 2);
+			? $_REQUEST['new_service_time']['from_minute'] : '', 2, false, 2);
 	$timeFromMinuteTextBox->setAttribute('placeholder', _('mm'));
 	$timeToHourTextBox = new CTextBox('new_service_time[to_hour]', isset($_REQUEST['new_service_time']['to_hour'])
-			? $_REQUEST['new_service_time']['to_hour'] : '', 2, 'no', 2);
+			? $_REQUEST['new_service_time']['to_hour'] : '', 2, false, 2);
 	$timeToHourTextBox->setAttribute('placeholder', _('hh'));
 	$timeToMinuteTextBox = new CTextBox('new_service_time[to_minute]', isset($_REQUEST['new_service_time']['to_minute'])
-			? $_REQUEST['new_service_time']['to_minute'] : '', 2, 'no', 2);
+			? $_REQUEST['new_service_time']['to_minute'] : '', 2, false, 2);
 	$timeToMinuteTextBox->setAttribute('placeholder', _('mm'));
 
 	$serviceTimeTable->addRow(array(_('From'), $weekFromComboBox, new CCol(array(_('Time'), SPACE, $timeFromHourTextBox, ' : ', $timeFromMinuteTextBox))));
@@ -283,16 +283,21 @@ $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 $servicesForm->addItem($servicesTab);
 
 // append buttons to form
-$buttons = array();
 if ($service['serviceid'] && !$service['dependencies']) {
-	$buttons[] = new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1');
+	$servicesForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		array (
+			new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1'),
+			new CButtonCancel()
+		)
+	));
 }
-$buttons[] = new CButtonCancel();
-
-$servicesForm->addItem(makeFormFooter(
-	new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'),
-	$buttons
-));
+else {
+	$servicesForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		new CButtonCancel()
+	));
+}
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);

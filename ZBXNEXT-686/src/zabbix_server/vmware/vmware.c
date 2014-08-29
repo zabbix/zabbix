@@ -118,8 +118,8 @@ zbx_perfcounter_mapping_t;
 			"<SOAP-ENV:Header/>"						\
 			"<ns1:Body>"
 
-#define ZBX_POST_VSPHERE_FOOTER								\
-			"</ns1:Body>"							\
+#define ZBX_POST_VSPHERE_FOOTER		\
+			"</ns1:Body>"	\
 		"</SOAP-ENV:Envelope>"
 
 typedef struct
@@ -207,6 +207,9 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 {
 	if (NULL != dev->instance)
 		__vm_mem_free_func(dev->instance);
+
+	if (NULL != dev->label)
+		__vm_mem_free_func(dev->label);
 
 	__vm_mem_free_func(dev);
 }
@@ -413,6 +416,7 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 	dev = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
 	dev->type = src->type;
 	dev->instance = vmware_shared_strdup(src->instance);
+	dev->label = vmware_shared_strdup(src->label);
 
 	return dev;
 }
@@ -545,6 +549,7 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 {
 	zbx_free(dev->instance);
+	zbx_free(dev->label);
 	zbx_free(dev);
 }
 
@@ -772,11 +777,11 @@ out:
 static	int	vmware_service_get_contents(zbx_vmware_service_t *service, CURL *easyhandle, char **contents,
 		char **error)
 {
-#	define ZBX_POST_VMWARE_CONTENTS 						\
-		ZBX_POST_VSPHERE_HEADER							\
-		"<ns0:RetrieveServiceContent>"						\
+#	define ZBX_POST_VMWARE_CONTENTS 							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveServiceContent>"							\
 			"<ns0:_this type=\"ServiceInstance\">ServiceInstance</ns0:_this>"	\
-		"</ns0:RetrieveServiceContent>"						\
+		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	int	err, opt, ret = FAIL;
@@ -856,7 +861,7 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:QueryPerfProviderSummary>"				\
 			"<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>"	\
-			"<ns0:entity type=\"%s\">%s</ns0:entity>"	\
+			"<ns0:entity type=\"%s\">%s</ns0:entity>"		\
 		"</ns0:QueryPerfProviderSummary>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
@@ -1212,12 +1217,11 @@ out:
 static int	vmware_service_vm_get_stats(const zbx_vmware_service_t *service, CURL *easyhandle, zbx_vmware_vm_t *vm,
 		char **error)
 {
-	const char		*__function_name = "vmware_service_get_vm_stats";
+	const char	*__function_name = "vmware_service_get_vm_stats";
 
-	int			i, err, o, ret = FAIL, refresh_rate;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
-	zbx_vmware_dev_t	*dev;
+	int		err, o, ret = FAIL, refresh_rate;
+	char		*tmp = NULL;
+	size_t		tmp_alloc = 0, tmp_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1236,25 +1240,11 @@ static int	vmware_service_vm_get_stats(const zbx_vmware_service_t *service, CURL
 			vm->id);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
 
-	/* first add networking devices which are already populated in device list */
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
-
-		switch (dev->type)
-		{
-			case ZBX_VMWARE_DEV_TYPE_NIC:
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_packets_rx);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_packets_tx);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_received);
-				vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, dev->instance,
-						service->counters.nic_transmitted);
-				break;
-		}
-	}
+	/* add network interface performance counters */
+	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.nic_packets_rx);
+	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.nic_packets_tx);
+	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.nic_received);
+	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.nic_transmitted);
 
 	/* then add all virtual disk devices */
 	vmware_add_perfcounter_metric(&tmp, &tmp_alloc, &tmp_offset, "*", service->counters.disk_read);
@@ -1346,6 +1336,8 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
 		dev->instance = zbx_strdup(NULL, key);
+		dev->label = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='deviceInfo']/*[local-name()='label']");
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -1360,42 +1352,41 @@ clean:
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, nics);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: wmware_vm_get_devices_by_counterid                               *
+ * Function: wmware_vm_get_disk_devices                                       *
  *                                                                            *
- * Purpose: gets devices from virtual machine stats filtered by the specified *
- *          performance counter id                                            *
+ * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
- * Parameters: vm        - [IN] the virtual machine                           *
- *             counterid - [IN] the performance counter id                    *
+ * Parameters: vm     - [IN] the virtual machine                              *
  *                                                                            *
  ******************************************************************************/
-static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t counterid)
+static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 {
-	const char	*__function_name = "wmware_vm_get_devices_by_counterid";
+	const char	*__function_name = "wmware_vm_get_disk_devices";
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
+	int		i, disks = 0;
 	char		*xpath = NULL;
-	int		i, nics = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->stats, strlen(vm->stats), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), "noname.xml", NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	xpath = zbx_dsprintf(xpath, "//*[local-name()='value']/*[local-name()='id']"
-			"[*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']", counterid);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+	/* select all hardware devices of VirtualDisk type */
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
+			"*[local-name()='device'][string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
+	{
 		goto clean;
+	}
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
@@ -1404,35 +1395,86 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char			*instance;
 		zbx_vmware_dev_t	*dev;
+		char			*unitNumber = NULL, *controllerKey = NULL, *busNumber = NULL,
+					*scsiCtlrUnitNumber = NULL;
+		xmlXPathObject		*xpathObjController = NULL;
 
-		if (NULL == (instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-				"*[local-name()='instance']")))
+		do
 		{
-			continue;
-		}
+			if (NULL == (unitNumber = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='unitNumber']")))
+			{
+				break;
+			}
 
-		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
-		dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
-		dev->instance = zbx_strdup(NULL, instance);
+			if (NULL == (controllerKey = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='controllerKey']")))
+			{
+				break;
+			}
 
-		zbx_vector_ptr_append(&vm->devs, dev);
-		nics++;
+			/* find the controller (parent) device */
+			xpath = zbx_dsprintf(xpath, "//*[local-name()='hardware']/*[local-name()='device']"
+					"[*[local-name()='key']/text()='%s']", controllerKey);
 
-		zbx_free(instance);
+			if (NULL == (xpathObjController = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+				break;
+
+			if (xmlXPathNodeSetIsEmpty(xpathObjController->nodesetval))
+				break;
+
+			if (NULL == (busNumber = zbx_xml_read_node_value(doc,
+					xpathObjController->nodesetval->nodeTab[0], "*[local-name()='busNumber']")))
+			{
+				break;
+			}
+
+			/* scsiCtlrUnitNumber property is simply used to determine controller type. */
+			/* For IDE controllers it is not set.                                       */
+			scsiCtlrUnitNumber = zbx_xml_read_node_value(doc, xpathObjController->nodesetval->nodeTab[0],
+				"*[local-name()='scsiCtlrUnitNumber']");
+
+			dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
+			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
+
+			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber> */
+			/* where controller type is either ide or scsi depending on the controller type   */
+			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", (NULL == scsiCtlrUnitNumber ? "ide" : "scsi"),
+					busNumber, unitNumber);
+
+			dev->label = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='deviceInfo']/*[local-name()='label']");
+
+			zbx_vector_ptr_append(&vm->devs, dev);
+
+			disks++;
+
+		} while (0);
+
+		if (NULL != xpathObjController)
+			xmlXPathFreeObject(xpathObjController);
+
+		zbx_free(scsiCtlrUnitNumber);
+		zbx_free(busNumber);
+		zbx_free(unitNumber);
+		zbx_free(controllerKey);
+
 	}
+
 clean:
+	zbx_free(xpath);
+
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
-
-	zbx_free(xpath);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
+
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
+
 }
 
 /******************************************************************************
@@ -1552,11 +1594,10 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(const zbx_vmware_service_t *ser
 	vm->id = zbx_strdup(NULL, id);
 
 	wmware_vm_get_nic_devices(vm);
+	wmware_vm_get_disk_devices(vm);
 
 	if (SUCCEED != vmware_service_vm_get_stats(service, easyhandle, vm, error))
 		goto out;
-
-	wmware_vm_get_devices_by_counterid(vm, service->counters.disk_read);
 
 	ret = SUCCEED;
 out:
@@ -1673,23 +1714,23 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		char **data, char **error)
 {
 #	define ZBX_POST_hv_DETAILS 							\
-		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrieveProperties>"							\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"	\
-			"<ns0:specSet>"								\
-				"<ns0:propSet>"							\
-					"<ns0:type>HostSystem</ns0:type>"			\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
-					"<ns0:pathSet>vm</ns0:pathSet>"				\
-					"<ns0:pathSet>summary</ns0:pathSet>"			\
-					"<ns0:pathSet>parent</ns0:pathSet>"			\
-					"<ns0:pathSet>datastore</ns0:pathSet>"			\
-				"</ns0:propSet>"						\
-				"<ns0:objectSet>"						\
-					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
-				"</ns0:objectSet>"						\
-			"</ns0:specSet>"							\
-		"</ns0:RetrieveProperties>"							\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrieveProperties>"						\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:specSet>"							\
+				"<ns0:propSet>"						\
+					"<ns0:type>HostSystem</ns0:type>"		\
+					"<ns0:pathSet>name</ns0:pathSet>"		\
+					"<ns0:pathSet>vm</ns0:pathSet>"			\
+					"<ns0:pathSet>summary</ns0:pathSet>"		\
+					"<ns0:pathSet>parent</ns0:pathSet>"		\
+					"<ns0:pathSet>datastore</ns0:pathSet>"		\
+				"</ns0:propSet>"					\
+				"<ns0:objectSet>"					\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"	\
+				"</ns0:objectSet>"					\
+			"</ns0:specSet>"						\
+		"</ns0:RetrieveProperties>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_hv_data";
@@ -1827,7 +1868,7 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             hosts        - [OUT] list of host ids                          *
+ *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -1956,34 +1997,79 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#	define ZBX_POST_VCENTER_HV_LIST_CONTINUE								\
+		ZBX_POST_VSPHERE_HEADER										\
+		"<ns0:ContinueRetrievePropertiesEx xsi:type=\"ns0:ContinueRetrievePropertiesExRequestType\">"	\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"			\
+			"<ns0:token>%s</ns0:token>"								\
+		"</ns0:ContinueRetrievePropertiesEx>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN			\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"	\
+		"/*[local-name()='RetrievePropertiesExResponse']"	\
+		"/*[local-name()='returnval']/*[local-name()='token']"
+
+#	define ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN			\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"		\
+		"/*[local-name()='ContinueRetrievePropertiesExResponse']"	\
+		"/*[local-name()='returnval']/*[local-name()='token']"
+
 	const char	*__function_name = "vmware_service_get_hv_list";
 
 	int		err, opt, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ZBX_VMWARE_SERVICE_VCENTER == service->type)
 	{
+		char	*token, *token_xpath = NULL;
+
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
 			goto out;
 		}
 
-		page.offset = 0;
-
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		while (1)
 		{
-			*error = zbx_strdup(*error, curl_easy_strerror(err));
-			goto out;
+			page.offset = 0;
+
+			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+			{
+				*error = zbx_strdup(*error, curl_easy_strerror(err));
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
+
+			if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+				goto out;
+
+			zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
+
+			if (NULL == token_xpath)
+				token_xpath = ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN;
+			else
+				token_xpath = ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN;
+
+			if (NULL == (token = zbx_xml_read_value(page.data, token_xpath)))
+				break;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'",
+					__function_name, token);
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_LIST_CONTINUE, token);
+			zbx_free(token);
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+			{
+				*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt,
+						curl_easy_strerror(err));
+				goto out;
+			}
 		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
-
-		if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-			goto out;
-
-		zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
 	}
 	else
 	{
@@ -1992,7 +2078,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret), hvs->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret), hvs->values_num);
 
 	return ret;
 }
@@ -2447,7 +2533,7 @@ out:
 	zbx_vector_str_clean(&ids);
 	zbx_vector_str_destroy(&ids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s [%d]", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
 			clusters->values_num);
 
 	return ret;

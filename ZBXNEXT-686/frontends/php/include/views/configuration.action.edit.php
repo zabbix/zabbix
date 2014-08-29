@@ -72,7 +72,7 @@ $conditionTable->attr('style', 'min-width: 350px;');
 $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
-foreach ($this->data['action']['conditions'] as $condition) {
+foreach ($this->data['action']['filter']['conditions'] as $condition) {
 	if (!isset($condition['conditiontype'])) {
 		$condition['conditiontype'] = 0;
 	}
@@ -86,7 +86,8 @@ foreach ($this->data['action']['conditions'] as $condition) {
 		continue;
 	}
 
-	$label = num2letter($i);
+	$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+
 	$labelSpan = new CSpan($label, 'label');
 	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
 	$labelSpan->setAttribute('data-formulaid', $label);
@@ -98,7 +99,8 @@ foreach ($this->data['action']['conditions'] as $condition) {
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
-			)
+			),
+			new CVar('conditions[' . $i . '][formulaid]', $label)
 		),
 		null, 'conditions_'.$i
 	);
@@ -106,11 +108,30 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$i++;
 }
 
-$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
+$formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
+$formula->attr('id', 'formula');
+$formula->attr('placeholder', 'A or (B and C) &hellip;');
+if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
+	$formula->addClass('hidden');
+}
+
+$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filter']['evaltype'], 'processTypeOfCalculation()');
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
-$conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression'));
+$calculationTypeComboBox->setAttribute('id', 'evaltype');
+
+$conditionFormList->addRow(
+	_('Type of calculation'),
+	array(
+		$calculationTypeComboBox,
+		new CSpan('', ($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'conditionLabel'),
+		$formula
+	),
+	false,
+	'conditionRow'
+);
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append new condition to form list
@@ -227,7 +248,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
@@ -240,7 +261,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
@@ -253,7 +274,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
-			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
+			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
@@ -337,7 +358,7 @@ $operationFormList = new CFormList('operationlist');
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationFormList->addRow(_('Default operation step duration'), array(
-		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
+		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6),
 		' ('._('minimum 60 seconds').')')
 	);
 }
@@ -435,6 +456,7 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
+	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[id]', $this->data['new_operation']['id']));
@@ -986,7 +1008,7 @@ if (!empty($this->data['new_operation'])) {
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 
-		$new_opcondition = get_request('new_opcondition', array());
+		$new_opcondition = getRequest('new_opcondition', array());
 		if (!is_array($new_opcondition)) {
 			$new_opcondition = array();
 		}
@@ -1052,12 +1074,25 @@ $actionForm->addItem($actionTabs);
 // append buttons to form
 $others = array();
 if (!empty($this->data['actionid'])) {
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete current action?'), url_param('form').url_param('eventsource').url_param('actionid'));
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(
+				_('Delete current action?'),
+				url_param('form').url_param('eventsource').url_param('actionid')
+			),
+			new CButtonCancel(url_param('actiontype'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('actiontype'));
+else {
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('actiontype'))
+	));
+}
 
-$actionForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 // append form to widget
 $actionWidget->addItem($actionForm);

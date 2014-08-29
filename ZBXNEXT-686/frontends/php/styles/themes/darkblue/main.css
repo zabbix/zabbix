@@ -469,14 +469,47 @@ input[type="submit"].input[disabled].formlist {
 }
 .input option { background: #2F6487; color: #FFFFFF; }
 .input:focus, .input:hover { border-color: #77B7DA; }
-.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover {
-/* NOTE: Ignored by IE */
-	border-color: #4E738C;
-	background: #2B495E;
+
+.input[readonly], .input[readonly]:hover {
+	border-color: #4e738c;
+	background: #2b495e;
+	color: #ffffff;
+}
+
+.input[disabled], .input[disabled]:hover,
+input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
+	border-color: #4e738c;
+	background: #2b495e;
+	/* ignored by IE for <select> */
+	color: #aca899;
+}
+
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
+	color: #aca899;
+}
+
+select[disabled] option { background: #2b495e; }
+
+/* disabled form buttons */
+.formtable .input.button[disabled]:hover {
+	background-color: #000e19;
+	border-color: #77b7da;
+	color: #77b7da;
+}
+
+/* disabled save button */
+.formtable .jqueryinput.input.button[disabled]:hover {
+	border-color: #77b7da;
+	color: #77b7da;
 }
 
 .shadow {}
 .shadow:hover{ -webkit-box-shadow: 0 0 6px #77B7DA; -moz-box-shadow: 0 0 6px #77B7DA; box-shadow: 0 0 6px #77B7DA; }
+
+.shadow[disabled]:hover {
+	-webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
+}
 
 .select { margin: 1px 4px 1px 1px; }
 .button{  border-color: #77B7DA; background: #022744; color: #77B7DA; }

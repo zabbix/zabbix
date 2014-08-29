@@ -52,8 +52,7 @@ $guiView->addTab('gui', _('GUI'), $guiTab);
 
 $guiForm = new CForm();
 $guiForm->setName('guiForm');
-$guiForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $guiForm->addItem($guiView);
-$guiForm->addItem(makeFormFooter(new CSubmit('save', _('Save'))));
+$guiForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $guiForm;

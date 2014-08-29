@@ -24,14 +24,13 @@ include('include/views/js/administration.general.valuemapping.edit.js.php');
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valueMappingForm');
 $valueMappingForm->addVar('form', $this->data['form']);
-$valueMappingForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
 
 // create form list
 $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // name
-$nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, null, 64);
+$nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, false, 64);
 $nameTextBox->attr('autofocus', 'autofocus');
 $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 
@@ -58,7 +57,7 @@ $valueMappingForm->addItem($valueMappingTab);
 // append buttons
 if (!empty($this->data['valuemapid'])) {
 	$valueMappingForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
@@ -66,7 +65,10 @@ if (!empty($this->data['valuemapid'])) {
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
+	$valueMappingForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel()
+	));
 }
 
 return $valueMappingForm;

@@ -103,18 +103,6 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
-// retrieve trigger's priority for services
-function get_service_status_of_trigger($triggerid) {
-	$sql = 'SELECT t.triggerid,t.priority'.
-			' FROM triggers t'.
-			' WHERE t.triggerid='.zbx_dbstr($triggerid).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.value='.TRIGGER_VALUE_TRUE;
-	$rows = DBfetch(DBselect($sql, 1));
-
-	return !empty($rows['priority']) ? $rows['priority'] : 0;
-}
-
 /**
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
@@ -869,7 +857,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 	$newFunctions = array();
 	$functions = array();
 	$items = array();
-	$triggerFunctionValidator = new CTriggerFunctionValidator();
+	$triggerFunctionValidator = new CFunctionValidator();
 
 	foreach ($expressionData->expressions as $exprPart) {
 		if (isset($newFunctions[$exprPart['expression']])) {
@@ -1213,7 +1201,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 				'name' => $dbItem['name_expanded'],
 				'params' => array(
 					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-						? 'showgraph' : 'showlatest',
+						? HISTORY_GRAPH : HISTORY_VALUES,
 					'itemid' => $dbItem['itemid'],
 					'period' => 3600
 				)
@@ -1236,7 +1224,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
+			$icon = new CImg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$icon->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$icon->setHint($dependencyTable, '', false);
 
@@ -1256,7 +1244,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+			$icon = new CImg('images/general/arrow_up2.png', 'DEP_UP');
 			$icon->setAttribute('style', 'vertical-align: middle; border: none;');
 			$icon->setHint($dependencyTable, '', false);
 
