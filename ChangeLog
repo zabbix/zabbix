@@ -1,6 +1,7 @@
 Changes for 2.3.4
 
 New features:
+...G...PS. [ZBXNEXT-101] added functionality for changing log level at runtime, added new trace log level for extended web and vmware monitoring (igors, wiper, asaveljevs)
 ..F....... [ZBXNEXT-1467] added clear separation between 'add' and 'update' operations in the front-end (Alexei, Sasha)
 ..F....... [ZBXNEXT-570] implemented the ability to quickly display items on a graph from the latest data page (Ivo, Pavels)
 .......PS. [ZBX-8367] added recalculating of unsupported items queue when changed "Refresh unsupported items" parameter (Juris, Sasha)

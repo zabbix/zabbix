@@ -52,7 +52,8 @@ zabbix_agentd_SOURCES = \
 	zbxconf.c zbxconf.h \
 	listener.c listener.h
 
-zabbix_agentd_LDADD = $(agents_ldadd)
+zabbix_agentd_LDADD = $(agents_ldadd) \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a
 
 zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
