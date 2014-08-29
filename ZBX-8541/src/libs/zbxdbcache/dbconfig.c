@@ -5513,7 +5513,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 
 			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
 			{
-				if (hostids[0] != dc_item->hostid)	/* hostids_num is 1 when entering maintenance */
+				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
 					continue;
 
 				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
