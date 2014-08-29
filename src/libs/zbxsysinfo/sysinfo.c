@@ -796,8 +796,9 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 		if (ITEM_VALUE_TYPE_UINT64 == value_type)
 			error = zbx_dsprintf(error,
-					"Received value [%s] is not suitable for value type [%s %s]",
-					c, zbx_item_value_type_string(value_type), zbx_item_data_type_string(data_type));
+					"Received value [%s] is not suitable for value type [%s] and data type [%s]",
+					c, zbx_item_value_type_string(value_type),
+					zbx_item_data_type_string(data_type));
 		else
 			error = zbx_dsprintf(error,
 					"Received value [%s] is not suitable for value type [%s]",
