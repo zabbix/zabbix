@@ -44,8 +44,8 @@ $commentTab->addTab('commentTab', _s('Description for "%s".', $this->data['trigg
 $commentForm->addItem($commentTab);
 
 // append buttons to form
-$saveButton = new CSubmit('save', _('Save'));
-$saveButton->setEnabled(!$this->data['isCommentExist']);
+$updateButton = new CSubmit('update', _('Update'));
+$updateButton->setEnabled(!$this->data['isCommentExist']);
 
 if ($this->data['isCommentExist']) {
 	$editButton = new CButton('edit', _('Edit'));
@@ -56,7 +56,7 @@ else {
 }
 
 $commentForm->addItem(makeFormFooter(
-	$saveButton,
+	$updateButton,
 	array($editButton, new CButtonCancel('&triggerid='.$this->data['triggerid']))
 ));
 

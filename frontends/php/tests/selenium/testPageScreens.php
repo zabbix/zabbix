@@ -86,7 +86,7 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextPresent('Columns');
 		$this->zbxTestTextPresent('Rows');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent('Screen updated');

@@ -121,7 +121,7 @@ function getFavouriteGraphs() {
 
 	if ($data['simpleGraphs']) {
 		foreach ($data['simpleGraphs'] as $item) {
-			$favourites->addItem(new CLink($item['label'], 'history.php?action=showgraph&itemid='.$item['id']), 'nowrap');
+			$favourites->addItem(new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id']), 'nowrap');
 		}
 	}
 
@@ -498,7 +498,6 @@ function make_hoststat_summary($filter) {
 	$triggers = API::Trigger()->get(array(
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'expandData' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE

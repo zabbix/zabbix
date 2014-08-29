@@ -34,15 +34,16 @@ $fields = array(
 	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// group
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Group name')),
+	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')),
 	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"hostgroup.massdelete","hostgroup.massdisable","hostgroup.massenable"'),
 							null
 						),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// other
@@ -61,7 +62,7 @@ if (hasRequest('form')) {
 	if (hasRequest('clone')) {
 		unset($_REQUEST['groupid']);
 	}
-	elseif (hasRequest('save')) {
+	elseif (hasRequest('add') || hasRequest('update')) {
 		$hostIds = getRequest('hosts', array());
 
 		DBstart();
@@ -159,8 +160,6 @@ if (hasRequest('form')) {
 			uncheckTableRows();
 		}
 		show_messages($result, $messageSuccess, $messageFailed);
-
-		unset($_REQUEST['save']);
 	}
 	elseif (hasRequest('delete') && hasRequest('groupid')) {
 		$result = API::HostGroup()->delete(array(getRequest('groupid')));
