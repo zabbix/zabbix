@@ -1972,17 +1972,22 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
 		{
+			/* get the end timestamp to which (including) the values should be cached */
+			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+
 			dropped_records = vch_item_drop_first_second(item);
 
 			if (0 != cached_records)
 				cached_records -= dropped_records;
 		}
-
-		/* get the end timestamp to which (including) the values should be cached */
-		if (NULL != item->head)
-			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
-			update_end = ZBX_VC_TIME();
+		{
+			/* get the end timestamp to which (including) the values should be cached */
+			if (NULL != item->head)
+				update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+			else
+				update_end = ZBX_VC_TIME();
+		}
 
 		zbx_vector_history_record_create(&records);
 
