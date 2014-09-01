@@ -1202,13 +1202,6 @@ clean:
 		return FAIL;
 	}
 
-	if (0 != access(directory, X_OK))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) to directory "
-				"\"%s\": %s", directory, zbx_strerror(errno));
-		return FAIL;
-	}
-
 	/* on UNIX file systems we always assume that inodes can be used to identify files */
 	*use_ino = 1;
 
@@ -1317,7 +1310,16 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if there are no matching log files or they are not */
 			/* accessible (can happen during a rotation), just log the problem. */
-			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
+			if (0 != access(directory, X_OK))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) "
+						"to directory \"%s\": %s", directory, zbx_strerror(errno));
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format,
+						directory);
+			}
 		}
 clean2:
 		regfree(&re);
