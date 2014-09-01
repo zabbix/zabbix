@@ -1,0 +1,8 @@
+app:
+  require: []
+  rows:
+    applications:
+      -
+        applicationid: 1000
+        hostid: 1000
+        name: App

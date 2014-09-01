@@ -1,0 +1,95 @@
+# https://support.zabbix.com/browse/ZBX-8603
+
+fixtures: [users, hostGroups, hosts, templates, templateApplications, templateHttpTests]
+
+steps:
+  step1:
+    request:
+      method: host.update
+      params:
+        hostid: 1
+        templates: { templateid: 1000 }
+
+    expect: result
+    response:
+      hostids: [1]
+
+  # make sure the HTTP test is inherited correctly
+  step2:
+    request:
+      method: httptest.get
+      params:
+        output: extend
+        selectSteps: extend
+        hostids: 1
+
+    expect: result
+    response:
+      -
+        httptestid: { _assert: string }
+        name: "Web scenario"
+        applicationid: { _assert: string }
+        nextcheck: 0
+        delay: 100
+        status: 0
+        variables: "var=value"
+        agent: "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
+        authentication: 1
+        http_user: "user"
+        http_password: "password"
+        hostid: @step1.request.params.hostid@
+        http_proxy: "root@proxy"
+        retries: 3
+        ssl_cert_file: "certificate"
+        ssl_key_file: "key"
+        ssl_key_password: "password"
+        verify_peer: 1
+        verify_host: 1
+        headers: "Accept: text/html"
+        templateid: 1000,
+        steps:
+          -
+            httpstepid: { _assert: string }
+            httptestid: { _assert: string }
+            name: "Step 1"
+            no: 1
+            url: "http://zabbix.com"
+            timeout: 30
+            posts: "post=1"
+            required: "required string"
+            status_codes: 200
+            variables: "stepVar=1"
+            follow_redirects: 1
+            retrieve_mode: 0
+            headers: "Accept: text/plain"
+          -
+            httpstepid: { _assert: string }
+            httptestid: { _assert: string }
+            name: "Step 2"
+            no: 2
+            url: "http://google.com"
+            timeout: 40
+            posts: ""
+            required: ""
+            status_codes: 302
+            variables: "stepVariable=2"
+            follow_redirects: 1
+            retrieve_mode: 1
+            headers: ""
+
+  # make sure the scenario has been linked to the correct application
+  step3:
+    request:
+      method: application.get
+      params:
+        output: [name, hostid]
+        applicationids: @step2.response[0].applicationid@
+
+    expect: result
+    response:
+      -
+        applicationid: @step2.response[0].applicationid@
+        name: App
+        hostid: @step1.request.params.hostid@
+
+  # TODO: check that web items have been created on the host

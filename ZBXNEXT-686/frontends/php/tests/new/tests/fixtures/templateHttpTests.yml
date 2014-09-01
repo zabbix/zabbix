@@ -1,0 +1,511 @@
+httpTest:
+  require: []
+  rows:
+    httptest:
+      -
+        httptestid: 1000
+        name: "Web scenario"
+        applicationid: 1000
+        nextcheck: 0
+        delay: 100
+        status: 0
+        variables: "var=value"
+        agent: "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
+        authentication: 1
+        http_user: "user"
+        http_password: "password"
+        hostid: 1000
+        http_proxy: "root@proxy"
+        retries: 3
+        ssl_cert_file: "certificate"
+        ssl_key_file: "key"
+        ssl_key_password: "password"
+        verify_peer: 1
+        verify_host: 1
+        headers: "Accept: text/html"
+
+    httpstep:
+      -
+        httpstepid: 1000
+        httptestid: 1000
+        name: "Step 1"
+        no: 1
+        url: "http://zabbix.com"
+        timeout: 30
+        posts: "post=1"
+        required: "required string"
+        status_codes: 200
+        variables: "stepVar=1"
+        follow_redirects: 1
+        retrieve_mode: 0
+        headers: "Accept: text/plain"
+      -
+        httpstepid: 1001
+        httptestid: 1000
+        name: "Step 2"
+        no: 2
+        url: "http://google.com"
+        timeout: 40
+        posts: ""
+        required: ""
+        status_codes: 302
+        variables: "stepVariable=2"
+        follow_redirects: 1
+        retrieve_mode: 1
+        headers: ""
+
+    items:
+      -
+        itemid: 1100
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Download speed for scenario \"$1\"."
+        key_: "web.test.in[Web scenario,,bps]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 0
+        trapper_hosts: ""
+        units: "Bps"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1101
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Failed step of scenario \"$1\"."
+        key_: "web.test.fail[Web scenario]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 3
+        trapper_hosts: ""
+        units: ""
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1102
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Last error message of scenario \"$1\"."
+        key_: "web.test.error[Web scenario]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 1
+        trapper_hosts: ""
+        units: ""
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1103
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Download speed for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.in[Web scenario,Step 1,bps]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 0
+        trapper_hosts: ""
+        units: "Bps"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1104
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Response time for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.time[Web scenario,Step 1,resp]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 0
+        trapper_hosts: ""
+        units: "s"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1105
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Response code for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.rspcode[Web scenario,Step 1]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 3
+        trapper_hosts: ""
+        units: ""
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1106
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Download speed for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.in[Web scenario,Step 2,bps]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 0
+        trapper_hosts: ""
+        units: "Bps"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1107
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Response time for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.time[Web scenario,Step 2,resp]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 0
+        trapper_hosts: ""
+        units: "s"
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+      -
+        itemid: 1108
+        type: 9
+        snmp_community: ""
+        snmp_oid: ""
+        hostid: 1000
+        name: "Response code for step \"$2\" of scenario \"$1\"."
+        key_: "web.test.rspcode[Web scenario,Step 2]"
+        delay: 100
+        history: 30
+        trends: 90
+        status: 0
+        value_type: 3
+        trapper_hosts: ""
+        units: ""
+        multiplier: 0
+        delta: 0
+        snmpv3_securityname: ""
+        snmpv3_securitylevel: 0
+        snmpv3_authpassphrase: ""
+        snmpv3_privpassphrase: ""
+        formula: ""
+        error: ""
+        lastlogsize: 0
+        logtimefmt: ""
+        delay_flex: ""
+        params: ""
+        ipmi_sensor: ""
+        data_type: 0
+        authtype: 0
+        username: ""
+        password: ""
+        publickey: ""
+        privatekey: ""
+        mtime: 0
+        flags: 0
+        port: ""
+        description: ""
+        inventory_link: 0
+        lifetime: 30
+        snmpv3_authprotocol: 0
+        snmpv3_privprotocol: 0
+        state: 0
+        snmpv3_contextname: ""
+        evaltype: 0
+
+  httptestitem:
+    -
+      httptestitemid: 1000
+      httptestid: 1000
+      itemid: 1100
+      type: 2
+    -
+      httptestitemid: 1001
+      httptestid: 1000
+      itemid: 1101
+      type: 3
+    -
+      httptestitemid: 1002
+      httptestid: 1000
+      itemid: 1102
+      type: 4
+
+  httpstepitem:
+    -
+      httpstepitemid: 1000
+      httpstepid: 1000
+      itemid: 1103
+      type: 2
+    -
+      httpstepitemid: 1001
+      httpstepid: 1000
+      itemid: 1104
+      type: 1
+    -
+      httpstepitemid: 1002
+      httpstepid: 1000
+      itemid: 1105
+      type: 0
+    -
+      httpstepitemid: 1003
+      httpstepid: 1001
+      itemid: 1106
+      type: 2
+    -
+      httpstepitemid: 1004
+      httpstepid: 1001
+      itemid: 1107
+      type: 1
+    -
+      httpstepitemid: 1005
+      httpstepid: 1001
+      itemid: 1108
+      type: 0
