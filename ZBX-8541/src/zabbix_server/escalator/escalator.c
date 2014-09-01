@@ -935,7 +935,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	/* schedule nextcheck for sleeping escalations */
 	if (ESCALATION_STATUS_SLEEP == escalation->status)
-		escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+		escalation->nextcheck = time(NULL) + SEC_PER_DAY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1496,7 +1496,7 @@ static int	process_escalations(int now, int *nextcheck)
 				}
 				else
 				{
-					escalation.nextcheck = time(NULL) + SEC_PER_MIN;
+					escalation.nextcheck = time(NULL) + SEC_PER_DAY;
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update escalations set nextcheck=%d"
 							" where escalationid=" ZBX_FS_UI64,

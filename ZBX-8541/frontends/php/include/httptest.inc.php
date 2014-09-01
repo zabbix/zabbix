@@ -193,3 +193,54 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
 
 	return $httpTests;
 }
+
+/**
+ * Copies web scenarios from given host ID to destination host.
+ *
+ * @param string $srcHostId		source host ID
+ * @param string $dstHostId		destination host ID
+ *
+ * @return bool
+ */
+function copyHttpTests($srcHostId, $dstHostId) {
+	$httpTests = API::HttpTest()->get(array(
+		'output' => array('name', 'applicationid', 'delay', 'status', 'variables', 'agent', 'authentication',
+			'http_user', 'http_password', 'http_proxy', 'retries'
+		),
+		'hostids' => $srcHostId,
+		'selectSteps' => array('name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes', 'variables'),
+		'inherited' => false
+	));
+
+	if (!$httpTests) {
+		return true;
+	}
+
+	// get destination application IDs
+	$srcApplicationIds = array();
+	foreach ($httpTests as $httpTest) {
+		if ($httpTest['applicationid'] != 0) {
+			$srcApplicationIds[] = $httpTest['applicationid'];
+		}
+	}
+
+	if ($srcApplicationIds) {
+		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
+	}
+
+	foreach ($httpTests as &$httpTest) {
+		$httpTest['hostid'] = $dstHostId;
+
+		if (isset($dstApplicationIds[$httpTest['applicationid']])) {
+			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
+		}
+		else {
+			unset($httpTest['applicationid']);
+		}
+
+		unset($httpTest['httptestid']);
+	}
+	unset($httpTest);
+
+	return (bool) API::HttpTest()->create($httpTests);
+}
