@@ -1317,7 +1317,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format,
+				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", format,
 						directory);
 			}
 		}
