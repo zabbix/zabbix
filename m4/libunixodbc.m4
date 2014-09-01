@@ -38,7 +38,7 @@ AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
   if test "x$want_unixodbc" != "xno"; then
 	AC_PATH_PROG([ODBC_CONFIG], [odbc_config], [])
 
-	found_unixodbc="yes"
+	unixodbc_error_msg=""
 
 	UNIXODBC_LIBS="-lodbc"
 
@@ -46,10 +46,10 @@ AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
 		UNIXODBC_CFLAGS="-I`$ODBC_CONFIG --include-prefix`"
 		UNIXODBC_LDFLAGS="-L`$ODBC_CONFIG --lib-prefix`"
 	elif test "x$specified_unixodbc" = "xyes"; then
-		found_unixodbc="file $ODBC_CONFIG not found or not executable"
+		unixodbc_error_msg="file $ODBC_CONFIG not found or not executable"
 	fi
 
-	if test "x$found_unixodbc" = "xyes"; then
+	if test "x$unixodbc_error_msg" = "x"; then
 		_save_unixodbc_cflags="${CFLAGS}"
 		_save_unixodbc_ldflags="${LDFLAGS}"
 		_save_unixodbc_libs="${LIBS}"
@@ -57,9 +57,9 @@ AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
 		LDFLAGS="${LDFLAGS} ${UNIXODBC_LDFLAGS}"
 		LIBS="${LIBS} ${UNIXODBC_LIBS}"
 
-		AC_CHECK_LIB(odbc, main, , [found_unixodbc="unixODBC library not found"])
+		AC_CHECK_LIB(odbc, main, , [unixodbc_error_msg="unixODBC library not found"])
 
-		if test "x$found_unixodbc" = "xyes"; then
+		if test "x$unixodbc_error_msg" = "x"; then
 			AC_CACHE_CHECK([whether unixodbc is usable],
 				[libunixodbc_cv_usable],
 				[AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -82,7 +82,7 @@ retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, (SQLHENV*)0);
 			unset _save_unixodbc_libs
 
 			if test "$libunixodbc_cv_usable" != "yes"; then
-				found_unixodbc="cannot use unixODBC library"
+				unixodbc_error_msg="cannot use unixODBC library"
 			else
 				AC_DEFINE(HAVE_UNIXODBC,1,[Define to 1 if unixUNIXODBC Driver Manager should be used.])
 			fi
