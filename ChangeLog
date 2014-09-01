@@ -1,6 +1,7 @@
 Changes for 2.2.7rc1
 
 Bug fixes:
+........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
 ..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
