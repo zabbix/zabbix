@@ -3,6 +3,7 @@ Changes for 2.3.5
 New features:
 
 Bug fixes:
+..F....... [ZBX-8683] fixed misplaced 'Add' button for IT Services having child services (Alexei)
 
 --------------------------------------------------------------------------------
 Changes for 2.3.4
