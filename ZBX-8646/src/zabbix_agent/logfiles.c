@@ -1310,6 +1310,10 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if there are no matching log files or they are not */
 			/* accessible (can happen during a rotation), just log the problem. */
+#ifdef _WINDOWS
+			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
+					"access rights", format, directory);
+#else
 			if (0 != access(directory, X_OK))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) "
@@ -1320,6 +1324,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", format,
 						directory);
 			}
+#endif
 		}
 clean2:
 		regfree(&re);
