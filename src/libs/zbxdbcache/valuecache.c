@@ -1975,7 +1975,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
 			update_end = ZBX_VC_TIME();
-		
+
 		if (ZBX_ITEM_STATUS_RELOAD_FIRST == item->status)
 		{
 			update_end++;
