@@ -30,7 +30,7 @@
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
  * This data can be accessed with zbx_vmware_get_service() function and is regularly
- * updated by VMware collector processess.
+ * updated by VMware collector processes.
  *
  * When a new service is requested by poller the zbx_vmware_get_service() function
  * creates a new service object, marks it as new, but still returns NULL object.
@@ -47,9 +47,12 @@
  * a service object. It is not locked for new data object creation during service update,
  * which is the most time consuming task.
  *
- * Independently VMware collector updates statistics (performance counter data) which is
- * stored directly in VMware service (outside data object). The statistics data contains
- * performance counters of all hypervisors/virtual machines discovered by VMware service.
+ * As the data retrieved by VMware collector can be quite big (for example 1 Hypervisor
+ * with 500 Virtual Machines will result in approximately 20 MB of data), VMware collector
+ * updates performance data (which is only 10% of the structure data) separately
+ * with CONFIG_VMWARE_PERF_FREQUENCY period. The performance data are stored directly
+ * in VMware service object entities vector - so the structure data is not affected by
+ * performance data updates.
  */
 
 /* external variables */
