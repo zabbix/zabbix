@@ -290,6 +290,14 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
+		var date = this.sdt.format('Y-m-d H:i').split(' '),
+			yearMonthDay = date[0].split('-'),
+			hoursMinutes = date[1].split(':'),
+			month = yearMonthDay[1],
+			day = yearMonthDay[2],
+			hours = hoursMinutes[0],
+			minutes = hoursMinutes[1];
+
 		switch (this.timeobjects.length) {
 			case 1:
 				var timestring = this.sdt.getDate() + '.' + (this.sdt.getMonth() + 1) + '.' + this.sdt.getFullYear() + ' ' + this.sdt.getHours() + ':' + this.sdt.getMinutes();
@@ -308,8 +316,6 @@ calendar.prototype = {
 			case 3:
 			case 5:
 				// day
-				var day = this.sdt.getDate();
-				day = day > 9 ? day : '0' + day;
 				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
 					this.timeobjects[0].value = day;
 				}
@@ -322,8 +328,6 @@ calendar.prototype = {
 					}
 				}
 				// month
-				var month = this.sdt.getMonth() + 1;
-				month = month > 9 ? month : '0' + month;
 				if (this.timeobjects[1].tagName.toLowerCase() == 'input') {
 					this.timeobjects[1].value = month;
 				}
@@ -350,8 +354,6 @@ calendar.prototype = {
 
 				if (this.timeobjects.length > 4) {
 					// hours
-					var hours = this.sdt.getHours();
-					hours = hours > 9 ? hours : '0' + hours;
 					if (this.timeobjects[3].tagName.toLowerCase() == 'input') {
 						this.timeobjects[3].value = hours;
 					}
@@ -364,8 +366,6 @@ calendar.prototype = {
 						}
 					}
 					// minutes
-					var minutes = this.sdt.getMinutes();
-					minutes = minutes > 9 ? minutes : '0' + minutes;
 					if (this.timeobjects[4].tagName.toLowerCase() == 'input') {
 						this.timeobjects[4].value = minutes;
 					}
@@ -521,7 +521,9 @@ calendar.prototype = {
 
 	setCDate: function() {
 		this.clndr_minute.value = this.minute;
+		this.clndr_minute.onchange();
 		this.clndr_hour.value = this.hour;
+		this.clndr_hour.onchange();
 		if (IE) {
 			this.clndr_month.innerHTML = this.monthname[this.month].toString();
 			this.clndr_year.innerHTML = this.year;
@@ -764,6 +766,7 @@ calendar.prototype = {
 		this.clndr_hour.setAttribute('name', 'hour');
 		this.clndr_hour.setAttribute('value', 'hh');
 		this.clndr_hour.setAttribute('maxlength', '2');
+		this.clndr_hour.onchange = function() { validateDatePartBox(this, 0, 23, 2); };
 		this.clndr_hour.className = 'calendar_textbox';
 
 		// minutes
@@ -772,6 +775,7 @@ calendar.prototype = {
 		this.clndr_minute.setAttribute('name', 'minute');
 		this.clndr_minute.setAttribute('value', 'mm');
 		this.clndr_minute.setAttribute('maxlength', '2');
+		this.clndr_minute.onchange = function() { validateDatePartBox(this, 0, 59, 2); };
 		this.clndr_minute.className = 'calendar_textbox';
 
 		// column 1
