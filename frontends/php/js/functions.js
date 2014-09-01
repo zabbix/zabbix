@@ -158,6 +158,37 @@ function validateNumericBox(obj, allowempty, allownegative) {
 	}
 }
 
+function validateDatePartBox(obj, min, max, paddingSize) {
+	if (obj != null) {
+		min = min ? min : 0;
+		max = max ? max : 99;
+		paddingSize = paddingSize ? paddingSize : Math.round(Math.log(max) / Math.LN10);
+
+		var paddingZeroes = [];
+		for (var i = 0; i != paddingSize; i++) {
+			paddingZeroes.push('0');
+		}
+		paddingZeroes = paddingZeroes.join('');
+
+		var currentValue = obj.value.toString();
+
+		if (/^[0-9]+$/.match(currentValue)) {
+			var intValue = parseInt(currentValue, 10);
+
+			if (intValue < min || intValue > max) {
+				obj.value = paddingZeroes;
+			}
+			else if (currentValue.length < paddingSize) {
+				var paddedValue = paddingZeroes + obj.value;
+				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
+			}
+		}
+		else {
+			obj.value = paddingZeroes;
+		}
+	}
+}
+
 /**
  * Translates the given string.
  *
