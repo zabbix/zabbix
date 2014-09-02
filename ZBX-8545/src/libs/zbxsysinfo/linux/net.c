@@ -40,7 +40,7 @@ net_stat_t;
 
 int	nlerr;
 
-static int	find_tcp_port_by_status_nl(unsigned short port, int state)
+static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 {
 	int				ret = -1, fd = -1;
 	int				family = -1, found = 0, done;
@@ -496,7 +496,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 #ifdef HAVE_INET_DIAG
-	n = find_tcp_port_by_status_nl(port, STATE_LISTEN);
+	n = find_tcp_port_by_state_nl(port, STATE_LISTEN);
 
 	if (n >= 0)
 	{
