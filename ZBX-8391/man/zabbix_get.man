@@ -15,7 +15,7 @@ zabbix_get \- Zabbix get utility
 .B zabbix_get \-V
 .SH DESCRIPTION
 .B zabbix_get
-is a command line utility for getting data from a remote Zabbix agent.
+is a command line utility for getting data from Zabbix agent.
 .SH OPTIONS
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\-name\-or\-IP\fR"
 Specify host name or IP address of a host.

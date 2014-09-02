@@ -13,7 +13,7 @@ zabbix_proxy \- Zabbix proxy daemon
 .B zabbix_proxy \-V
 .SH DESCRIPTION
 .B zabbix_proxy
-is a daemon used for remote data collection.
+is a daemon that collects monitoring data from devices and sends it to Zabbix server.
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
