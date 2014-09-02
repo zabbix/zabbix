@@ -21,6 +21,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8458] visual fixes in multiselect, actions, screens and maps (Oleg)
 ..F....... [ZBX-8682] added IT services sorting in dependencies tab (Oleg)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
