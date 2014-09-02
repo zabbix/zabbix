@@ -105,9 +105,15 @@ if (getRequest('triggerid')) {
 		access_deny();
 	}
 }
-if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
 	access_deny();
 }
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->get(array('groupids' => $groupId))) {
+	access_deny();
+}
+
 /*
  * Actions
  */

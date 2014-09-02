@@ -228,6 +228,16 @@ elseif (getRequest('hostid', 0) > 0) {
 	}
 }
 
+$filterHostId = getRequest('filter_hostid');
+if ($filterHostId && !API::Host()->get(array('hostids' => $filterHostId, 'output' => array('hostid')))) {
+	access_deny();
+}
+
+$filterGroupId = getRequest('filter_groupid');
+if ($filterGroupId && !API::HostGroup()->get(array('groupids' => $filterGroupId, 'output' => array('groupid')))) {
+	access_deny();
+}
+
 /*
  * Ajax
  */
