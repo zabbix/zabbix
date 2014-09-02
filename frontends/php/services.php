@@ -403,6 +403,8 @@ elseif (isset($_REQUEST['form'])) {
 					'soft' => $dependency['soft'],
 				);
 			}
+
+			CArrayHelper::sort($data['children'], array('name', 'serviceid'));
 		}
 	}
 	// populate the form from a submitted request
