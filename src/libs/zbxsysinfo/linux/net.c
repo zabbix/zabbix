@@ -36,7 +36,7 @@ typedef struct
 }
 net_stat_t;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
+#if HAVE_INET_DIAG
 
 int	nlerr;
 
@@ -45,20 +45,33 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 	int				ret = -1, fd = -1;
 	int				family = -1, found = 0, done;
 	int				status = -1, sequence = 0x5A4258;
-	struct timeval			timeout = { .tv_sec = 1, .tv_usec = 500 * 1000 };
+	struct timeval			timeout = { 1, 500 * 1000 };
 
-	struct msghdr			s_msg;
-	struct sockaddr_nl		s_sa;
-	struct iovec			s_io[1];
 	struct {
 		struct nlmsghdr		nlhdr;
 		struct inet_diag_req	r;
 	} request;
 
+	size_t				siz_request = sizeof(request), siz_sa_nl = sizeof(struct sockaddr_nl);
+
+	request.nlhdr.nlmsg_len		= siz_request;
+	request.nlhdr.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
+	request.nlhdr.nlmsg_pid		= 0;
+	request.nlhdr.nlmsg_seq		= sequence;
+	request.nlhdr.nlmsg_type	= TCPDIAG_GETSOCK;
+
+	request.r.idiag_states		= (1 << state);
+
+	struct sockaddr_nl		s_sa = { AF_NETLINK, 0, 0, 0 };
+	struct iovec			s_io[1] = { { &request, siz_request } };
+	struct msghdr			s_msg = { (void *)&s_sa, siz_sa_nl, s_io, 1 };
+
 	char				buffer[BUFSIZ] = { 0 };
-	struct msghdr			r_msg;
-	struct sockaddr_nl		r_sa;
-	struct iovec			r_io[1];
+
+	struct sockaddr_nl		r_sa = { AF_NETLINK, 0, 0, 0 };
+	struct iovec			r_io[1] = { { buffer, BUFSIZ } };
+	struct msghdr			r_msg = { (void *)&r_sa, siz_sa_nl, r_io, 1 };
+
 	struct nlmsghdr			*r_hdr = NULL;
 
 	do
@@ -87,30 +100,7 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 			else
 				break;
 
-			memset(&s_sa, 0, sizeof(struct sockaddr_nl));
-			s_sa.nl_family			= AF_NETLINK;
-
-			memset(&request, 0, sizeof(request));
-			request.nlhdr.nlmsg_len		= sizeof(request);
-			request.nlhdr.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
-			request.nlhdr.nlmsg_pid		= 0;
-			request.nlhdr.nlmsg_seq		= sequence;
-			request.nlhdr.nlmsg_type	= TCPDIAG_GETSOCK;
-
 			request.r.idiag_family		= family;
-			request.r.idiag_states		= (1 << state);
-
-			s_io[0] = (struct iovec) {
-				.iov_base		= &request,
-				.iov_len		= sizeof(request)
-			};
-
-			s_msg = (struct msghdr) {
-				.msg_name		= (void *)&s_sa,
-				.msg_namelen		= sizeof(struct sockaddr_nl),
-				.msg_iov		= s_io,
-				.msg_iovlen		= 1
-			};
 
 			if (-1 == sendmsg(fd, &s_msg, 0))
 			{
@@ -118,27 +108,10 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 				break;
 			}
 
-			memset(&r_sa, 0, sizeof(struct sockaddr_nl));
-			r_sa.nl_family			= AF_NETLINK;
-
-			r_io[0] = (struct iovec) {
-				.iov_base		= buffer,
-				.iov_len		= BUFSIZ
-			};
-
 			done = 0;
 
 			while (NLERR_OK == nlerr && 1 != done)
 			{
-				memset(&r_msg, 0, sizeof(struct msghdr));
-
-				r_msg = (struct msghdr) {
-					.msg_name	= (void *)&r_sa,
-					.msg_namelen	= sizeof(struct sockaddr_nl),
-					.msg_iov	= r_io,
-					.msg_iovlen	= 1
-				};
-
 				status = recvmsg(fd, &r_msg, 0);
 
 				if (0 > status)
@@ -167,35 +140,34 @@ static int	find_tcp_port_by_status_nl(unsigned short port, int state)
 					switch (r_hdr->nlmsg_type)
 					{
 						case NLMSG_DONE:
-								done = 1;
-								break;
+							done = 1;
+							break;
 						case NLMSG_ERROR:
-								{
-									struct nlmsgerr	*err = (struct nlmsgerr *)NLMSG_DATA(r_hdr);
+						{
+							struct nlmsgerr	*err = (struct nlmsgerr *)NLMSG_DATA(r_hdr);
 
-									if (NLMSG_LENGTH(sizeof(struct nlmsgerr)) > r_hdr->nlmsg_len)
-										nlerr = NLERR_RESPTRUNCAT;
-									else
-									{
-										errno = -err->error;
-										nlerr = (EOPNOTSUPP == errno) ?
-											NLERR_OPNOTSUPPORTED :
-											NLERR_UNKNOWN;
-									}
+							if (NLMSG_LENGTH(sizeof(struct nlmsgerr)) > r_hdr->nlmsg_len)
+								nlerr = NLERR_RESPTRUNCAT;
+							else
+							{
+								errno = -err->error;
+								nlerr = (EOPNOTSUPP == errno) ?
+									NLERR_OPNOTSUPPORTED :
+									NLERR_UNKNOWN;
+							}
 
-									done = 1;
+							done = 1;
 
-									break;
-								}
+							break;
+						}
 						case 0x12:
-								if (family == r->idiag_family &&
-									state == r->idiag_state &&
-									port == ntohs(r->id.idiag_sport))
-									(found = 1) && (done = 1);
+							if (state == r->idiag_state &&
+								port == ntohs(r->id.idiag_sport))
+								(found = 1) && (done = 1);
 
-								break;
+							break;
 						default:
-								nlerr = NLERR_UNKNOWNMSGTYPE;
+							nlerr = NLERR_UNKNOWNMSGTYPE;
 					}
 				}
 			}
@@ -520,77 +492,51 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,14)
+#ifdef HAVE_INET_DIAG
 	n = find_tcp_port_by_status_nl(port, STATE_LISTEN);
 
-	if (-1 == n)
-	{
-		switch(nlerr)
-		{
-			case NLERR_UNKNOWN:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unrecognized netlink error occurred."));
-				break;
-			case NLERR_SOCKCREAT:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot create netlink socket."));
-				break;
-			case NLERR_BADSEND:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot send netlink message to kernel."));
-				break;
-			case NLERR_BADRECV:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive netlink message from kernel."));
-				break;
-			case NLERR_RECVTIMEOUT:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Receiving netlink response timed out."));
-				break;
-			case NLERR_RESPTRUNCAT:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Received truncated netlink response from kernel."));
-				break;
-			case NLERR_OPNOTSUPPORTED:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Netlink operation not supported."));
-				break;
-			case NLERR_UNKNOWNMSGTYPE:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Received message of unrecognized type from kernel."));
-				break;
-		}
-	}
-	else
+	if (n >= 0)
 	{
 		ret = SYSINFO_RET_OK;
 		listen = n;
 	}
-#else
-	buffer = zbx_malloc(NULL, buffer_alloc);
-
-	if (0 < (n = proc_read_file("/proc/net/tcp", &buffer, &buffer_alloc)))
+	else
 	{
-		ret = SYSINFO_RET_OK;
+#endif
+		buffer = zbx_malloc(NULL, buffer_alloc);
 
-		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 0A", (unsigned int)port);
-
-		buffer[n] = '\0';
-
-		if (NULL != strstr(buffer, pattern))
+		if (0 < (n = proc_read_file("/proc/net/tcp", &buffer, &buffer_alloc)))
 		{
-			listen = 1;
-			goto out;
+			ret = SYSINFO_RET_OK;
+
+			zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 0A", (unsigned int)port);
+
+			buffer[n] = '\0';
+
+			if (NULL != strstr(buffer, pattern))
+			{
+				listen = 1;
+				goto out;
+			}
 		}
-	}
 
-	if (0 < (n = proc_read_file("/proc/net/tcp6", &buffer, &buffer_alloc)))
-	{
-		ret = SYSINFO_RET_OK;
+		if (0 < (n = proc_read_file("/proc/net/tcp6", &buffer, &buffer_alloc)))
+		{
+			ret = SYSINFO_RET_OK;
 
-		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 0A",
-				(unsigned int)port);
+			zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 0A",
+					(unsigned int)port);
 
-		buffer[n] = '\0';
+			buffer[n] = '\0';
 
-		if (NULL != strstr(buffer, pattern))
-			listen = 1;
-	}
+			if (NULL != strstr(buffer, pattern))
+				listen = 1;
+		}
 out:
-	zbx_free(buffer);
-#endif /* LINUX_VERSION_CODE conditional */
+		zbx_free(buffer);
+#ifdef HAVE_INET_DIAG
+	}
+#endif
 	SET_UI64_RESULT(result, listen);
 
 	return ret;

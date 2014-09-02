@@ -23,9 +23,7 @@
 #include "common.h"
 #include "module.h"
 
-#include <linux/version.h>
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
+#if HAVE_INET_DIAG
 #	include <sys/socket.h>
 #	include <linux/netlink.h>
 #	include <linux/inet_diag.h>
