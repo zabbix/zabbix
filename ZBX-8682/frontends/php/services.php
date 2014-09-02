@@ -404,10 +404,7 @@ elseif (isset($_REQUEST['form'])) {
 				);
 			}
 
-			CArrayHelper::sort($data['children'], array(
-				array('field' => 'name', 'order' => ZBX_SORT_UP),
-				array('field' => 'serviceid', 'order' => ZBX_SORT_UP)
-			));
+			CArrayHelper::sort($data['children'], array('name', 'serviceid'));
 		}
 	}
 	// populate the form from a submitted request
