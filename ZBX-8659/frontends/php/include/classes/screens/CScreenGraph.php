@@ -28,7 +28,7 @@ class CScreenGraph extends CScreenBase {
 	 */
 	public function get() {
 		$this->dataId = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
-		$resourceId = $this->screenitem['real_resourceid']
+		$resourceId = isset($this->screenitem['real_resourceid'])
 			? $this->screenitem['real_resourceid']
 			: $this->screenitem['resourceid'];
 		$containerId = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
@@ -131,7 +131,7 @@ class CScreenGraph extends CScreenBase {
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM ||!$this->screenitem['url']) {
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || !$this->screenitem['url']) {
 				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}
@@ -146,7 +146,7 @@ class CScreenGraph extends CScreenBase {
 				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 		else {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url']) {
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || !$this->screenitem['url']) {
 				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}
