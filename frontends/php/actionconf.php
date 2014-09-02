@@ -500,7 +500,8 @@ else {
 	$data = array(
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	$data['actions'] = API::Action()->get(array(
@@ -510,6 +511,7 @@ else {
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortField,
+		'preservekeys' => true,
 		'limit' => $config['search_limit'] + 1
 	));
 

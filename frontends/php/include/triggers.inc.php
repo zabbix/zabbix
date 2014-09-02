@@ -40,8 +40,10 @@ function getSeverityStyle($severity, $type = true) {
 	}
 }
 
-function getSeverityCaption($severity = null) {
-	$config = select_config();
+function getSeverityCaption($severity = null, array $config = null) {
+	if (!$config) {
+		$config = select_config();
+	}
 
 	$severities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
