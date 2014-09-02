@@ -69,7 +69,7 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
-	"A Zabbix daemon used for remote data collection:",
+	"A Zabbix daemon that collects monitoring data from devices and sends it to Zabbix server:",
 	"",
 	"Options:",
 	"  -c --config config-file       Absolute path to the configuration file",

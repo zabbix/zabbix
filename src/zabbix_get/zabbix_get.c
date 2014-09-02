@@ -36,7 +36,7 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
-	"Get data from a remote Zabbix agent.",
+	"Get data from Zabbix agent.",
 	"",
 	"Options:",
 	"  -s --host host-name-or-IP          Specify host name or IP address of a host",
@@ -171,7 +171,7 @@ int	main(int argc, char **argv)
 				opt_k++;
 
 				if (NULL == key)
-					key = strdup(zbx_optarg);
+					key = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'p':
 				opt_p++;
@@ -181,13 +181,13 @@ int	main(int argc, char **argv)
 				opt_s++;
 
 				if (NULL == host)
-					host = strdup(zbx_optarg);
+					host = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'I':
 				opt_i++;
 
 				if (NULL == source_ip)
-					source_ip = strdup(zbx_optarg);
+					source_ip = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'h':
 				help();

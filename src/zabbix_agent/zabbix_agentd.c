@@ -107,14 +107,16 @@ const char	*help_message[] = {
 	"",
 	"Functions:",
 	"",
-	"  -i --install          Install Zabbix agent as service",
-	"  -d --uninstall        Uninstall Zabbix agent from service",
+	"  -i --install             Install Zabbix agent as service",
+	"  -d --uninstall           Uninstall Zabbix agent from service",
 
-	"  -s --start            Start Zabbix agent service",
-	"  -x --stop             Stop Zabbix agent service",
+	"  -s --start               Start Zabbix agent service",
+	"  -x --stop                Stop Zabbix agent service",
 
-	"  -m --multiple-agents  Service name will include hostname",
+	"  -m --multiple-agents     Service name will include hostname",
 #endif
+	"",
+	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
 	NULL	/* end of text */
 };
 /* end of application HELP message */
