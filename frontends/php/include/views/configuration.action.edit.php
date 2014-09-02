@@ -349,7 +349,7 @@ $conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
-$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted ui-corner-all'));
 
 /*
  * Operation tab
@@ -926,7 +926,7 @@ if (!empty($this->data['new_operation'])) {
 				? _('Link with templates')
 				: _('Unlink from templates');
 
-			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup inlineblock border_dotted ui-corner-all')));
+			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup border_dotted ui-corner-all')));
 			break;
 	}
 
@@ -1058,7 +1058,7 @@ if (!empty($this->data['new_operation'])) {
 		SPACE.SPACE,
 		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 	);
-	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup floatleft border_dotted ui-corner-all'));
 }
 
 // append tabs to form
