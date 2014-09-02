@@ -56,7 +56,7 @@ zabbix_sender \- Zabbix sender utility
 .B zabbix_sender \-V
 .SH DESCRIPTION
 .B zabbix_sender
-is a command line utility for sending data to a remote Zabbix server.
+is a command line utility to send monitoring data to Zabbix server or proxy.
 On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key.
 Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
 .SH OPTIONS
