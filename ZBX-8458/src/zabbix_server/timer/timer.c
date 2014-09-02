@@ -35,8 +35,8 @@
 
 #define ZBX_TRIGGERS_MAX	1000
 
-extern unsigned char	process_type;
-extern int		process_num;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -799,18 +799,23 @@ static int	process_maintenance(void)
  * Comments: does update once per 30 seconds (hardcoded)                      *
  *                                                                            *
  ******************************************************************************/
-void	main_timer_loop(void)
+ZBX_THREAD_ENTRY(timer_thread, args)
 {
 	int	now, nextcheck, sleeptime = -1,
 		triggers_count = 0, events_count = 0, hm_count = 0,
 		old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
 		tr_count, ev_count;
-
 	double	sec = 0.0, sec_maint = 0.0,
 		total_sec = 0.0, total_sec_maint = 0.0,
 		old_total_sec = 0.0, old_total_sec_maint = 0.0;
-
 	time_t	last_stat_time;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

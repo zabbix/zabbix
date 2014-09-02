@@ -55,7 +55,9 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create table
-$itemTable = new CTableInfo(_('No items found.'));
+$itemTable = new CTableInfo(
+	($this->data['filterSet']) ? _('No items found.') : _('Specify some filter condition to see the items.')
+);
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	_('Wizard'),
@@ -268,7 +270,7 @@ $goOption = new CComboItem('item.massdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected items?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('item.massupdate', _('Mass update'));
+$goOption = new CComboItem('item.massupdateform', _('Mass update'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('item.masscopyto', _('Copy selected to ...'));

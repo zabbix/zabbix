@@ -32,30 +32,31 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'mediatypeids' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
-	'mediatypeid' =>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID, 'isset({form})&&{form}=="edit"'),
-	'type' =>			array(T_ZBX_INT, O_OPT,	null,	IN(implode(',', array_keys(media_type2str()))), 'isset({save})'),
-	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
+	'mediatypeid' =>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID, 'isset({form}) && {form} == "edit"'),
+	'type' =>			array(T_ZBX_INT, O_OPT,	null,	IN(implode(',', array_keys(media_type2str()))), 'isset({add}) || isset({update})'),
+	'description' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add}) || isset({update})'),
 	'smtp_server' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.MEDIA_TYPE_EMAIL),
 	'smtp_helo' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.MEDIA_TYPE_EMAIL),
 	'smtp_email' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.MEDIA_TYPE_EMAIL),
 	'exec_path' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_EXEC.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'(isset({add}) || isset({update})) && isset({type}) && ({type} == '.MEDIA_TYPE_EXEC.' || {type} == '.MEDIA_TYPE_EZ_TEXTING.')'),
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_SMS),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.MEDIA_TYPE_SMS),
 	'username' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'(isset({add}) || isset({update})) && isset({type}) && ({type} == '.MEDIA_TYPE_JABBER.' || {type} == '.MEDIA_TYPE_EZ_TEXTING.')'),
 	'password' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+		'(isset({add}) || isset({update})) && isset({type}) && ({type} == '.MEDIA_TYPE_JABBER.' || {type} == '.MEDIA_TYPE_EZ_TEXTING.')'),
 	'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,
 							IN('"mediatype.massdelete","mediatype.massdisable","mediatype.massenable"'),
 							null
 						),
-	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
+	'add' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
+	'update' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
@@ -71,7 +72,7 @@ $mediaTypeId = getRequest('mediatypeid');
 /*
  * Permissions
  */
-if (isset($_REQUEST['mediatypeid'])) {
+if (hasRequest('mediatypeid')) {
 	$mediaTypes = API::Mediatype()->get(array(
 		'mediatypeids' => $mediaTypeId,
 		'output' => API_OUTPUT_EXTEND
@@ -98,7 +99,7 @@ if (hasRequest('action')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$mediaType = array(
 		'type' => getRequest('type'),
 		'description' => getRequest('description'),

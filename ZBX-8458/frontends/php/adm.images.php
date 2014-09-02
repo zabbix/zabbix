@@ -30,10 +30,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'imageid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'isset({form})&&{form}=="update"'),
-	'name' =>		array(T_ZBX_STR, O_NO,	null,		NOT_EMPTY,	'isset({save})'),
-	'imagetype' =>	array(T_ZBX_INT, O_OPT, null,		IN('1,2'),	'isset({save})'),
-	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'imageid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'isset({form}) && {form} == "update"'),
+	'name' =>		array(T_ZBX_STR, O_NO,	null,		NOT_EMPTY,	'isset({add}) || isset({update})'),
+	'imagetype' =>	array(T_ZBX_INT, O_OPT, null,		IN('1,2'),	'isset({add}) || isset({update})'),
+	// actions
+	'add' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'update' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null)
 );
@@ -42,7 +44,7 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (isset($_REQUEST['imageid'])) {
+if (hasRequest('imageid')) {
 	$dbImage = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid='.zbx_dbstr(getRequest('imageid'))));
 	if (empty($dbImage)) {
 		access_deny();
@@ -52,8 +54,8 @@ if (isset($_REQUEST['imageid'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
-	if (isset($_REQUEST['imageid'])) {
+if (hasRequest('add') || hasRequest('update')) {
+	if (hasRequest('update')) {
 		$msgOk = _('Image updated');
 		$msgFail = _('Cannot update image');
 	}
@@ -75,7 +77,7 @@ if (isset($_REQUEST['save'])) {
 			}
 		}
 
-		if (hasRequest('imageid')) {
+		if (hasRequest('update')) {
 			$result = API::Image()->update(array(
 				'imageid' => getRequest('imageid'),
 				'name' => getRequest('name'),

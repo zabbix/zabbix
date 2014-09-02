@@ -21,6 +21,8 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxconf.h"
+#include "zbxself.h"
+
 #ifndef _WINDOWS
 #	include "diskdevices.h"
 #endif
@@ -36,6 +38,9 @@
 #endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
+
+extern unsigned char	process_type;
+extern int		server_num, process_num;
 
 #ifndef _WINDOWS
 static int		shm_id;
@@ -415,7 +420,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	assert(args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 
 	zbx_free(args);
 

@@ -83,7 +83,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent(array('Name', 'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Interface', 'Templates', 'Status', 'Availability'));
 
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Hosts');
 		$this->zbxTestTextPresent('Host updated');
 

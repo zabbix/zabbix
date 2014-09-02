@@ -67,7 +67,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 		$this->zbxTestClickWait('link='.$script['name']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script updated');
 		$this->zbxTestTextPresent($script['name']);

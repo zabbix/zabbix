@@ -27,7 +27,8 @@
 
 #include "housekeeper.h"
 
-extern unsigned char	process_type;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 #define HK_INITIAL_DELETE_QUEUE_SIZE	4096
 
@@ -777,10 +778,17 @@ static int	housekeeping_events(int now)
 	return deleted;
 }
 
-void	main_housekeeper_loop(void)
+ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
 	double	sec;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
 			HOUSEKEEPER_STARTUP_DELAY);

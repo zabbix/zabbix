@@ -84,7 +84,6 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret;
 	char	*command;
 
 	if (1 != request->nparam)
@@ -95,49 +94,33 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	command = get_rparam(request, 0);
 
-	ret = EXECUTE_STR(command, result);
-
-	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
-	{
-		/* only whitespace */
-
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-		ret = SYSINFO_RET_OK;
-	}
-
-	return ret;
+	return EXECUTE_STR(command, result);
 }
 
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-	char	*cmd_result = NULL, error[MAX_STRING_LEN];
+	const char	*__function_name = "EXECUTE_STR";
 
-	assert(result);
+	int		ret = SYSINFO_RET_FAIL;
+	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
 	init_result(result);
 
 	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		goto lbl_exit;
+		goto out;
 	}
 
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
-			command, strlen(cmd_result), cmd_result);
-
-	if ('\0' == *cmd_result)	/* we got whitespace only */
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Non-empty output is expected."));
-		goto lbl_exit;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() command:'%s' len:" ZBX_FS_SIZE_T " cmd_result:'%.20s'",
+			__function_name, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
 	ret = SYSINFO_RET_OK;
-lbl_exit:
+out:
 	zbx_free(cmd_result);
 
 	return ret;

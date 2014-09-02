@@ -41,6 +41,47 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
+const char	*zabbix_get_log_level_string(void)
+{
+	switch (log_level)
+	{
+		case LOG_LEVEL_EMPTY:
+			return "0 (none)";
+		case LOG_LEVEL_CRIT:
+			return "1 (critical)";
+		case LOG_LEVEL_ERR:
+			return "2 (error)";
+		case LOG_LEVEL_WARNING:
+			return "3 (warning)";
+		case LOG_LEVEL_DEBUG:
+			return "4 (debug)";
+		case LOG_LEVEL_TRACE:
+			return "5 (trace)";
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	zabbix_increase_log_level(void)
+{
+	if (LOG_LEVEL_TRACE == log_level)
+		return FAIL;
+
+	log_level = log_level + 1;
+
+	return SUCCEED;
+}
+
+int	zabbix_decrease_log_level(void)
+{
+	if (LOG_LEVEL_EMPTY == log_level)
+		return FAIL;
+
+	log_level = log_level - 1;
+
+	return SUCCEED;
+}
 
 #if !defined(_WINDOWS)
 void	redirect_std(const char *filename)
@@ -77,13 +118,12 @@ void	redirect_std(const char *filename)
 }
 #endif	/* not _WINDOWS */
 
-int zabbix_open_log(int type, int level, const char *filename)
+int	zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE	*log_file = NULL;
 #ifdef _WINDOWS
 	wchar_t	*wevent_source;
 #endif
-
 	log_level = level;
 
 	if (LOG_TYPE_FILE == type && NULL == filename)
@@ -92,7 +132,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 	if (LOG_TYPE_SYSLOG == type)
 	{
 		log_type = LOG_TYPE_SYSLOG;
-
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
@@ -129,7 +168,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	return SUCCEED;
 }
 
-void zabbix_close_log()
+void	zabbix_close_log(void)
 {
 	if (LOG_TYPE_SYSLOG == log_type)
 	{
@@ -146,12 +185,12 @@ void zabbix_close_log()
 	}
 }
 
-void zabbix_set_log_level(int level)
+void	zabbix_set_log_level(int level)
 {
 	log_level = level;
 }
 
-void zabbix_errlog(zbx_err_codes_t err, ...)
+void	zabbix_errlog(zbx_err_codes_t err, ...)
 {
 	const char	*msg;
 	char		*s = NULL;
@@ -203,12 +242,12 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int zabbix_check_log_level(int level)
+int	zabbix_check_log_level(int level)
 {
 	return ZBX_CHECK_LOG_LEVEL(level);
 }
 
-void __zbx_zabbix_log(int level, const char *fmt, ...)
+void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE			*log_file = NULL;
 	char			message[MAX_BUFFER_LEN], filename_old[MAX_STRING_LEN];
@@ -224,7 +263,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 #else
 	struct timeval		current_time;
 #endif
-
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
@@ -433,7 +471,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  ******************************************************************************/
 char	*zbx_strerror(int errnum)
 {
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
@@ -445,7 +484,8 @@ char	*strerror_from_system(unsigned long error)
 #ifdef _WINDOWS
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
@@ -473,9 +513,10 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! not thread-safe for Win32 */
 	char		*strings[2];
 	HMODULE		hmodule;
+	/* !!! Attention: static !!! not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	memset(strings, 0, sizeof(char *) * 2);
 	*utf8_string = '\0';

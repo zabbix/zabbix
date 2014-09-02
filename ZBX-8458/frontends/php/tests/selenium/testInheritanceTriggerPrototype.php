@@ -65,7 +65,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('trigger_prototypes.php?form=update&triggerid='.$data['triggerid'].'&parent_discoveryid='.$data['parent_itemid']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototype updated');
 
@@ -95,7 +95,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->input_type('description', $data['description']);
 		$this->input_type('expression', $data['expression']);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

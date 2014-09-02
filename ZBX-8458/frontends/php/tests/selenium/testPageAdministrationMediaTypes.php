@@ -73,7 +73,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->zbxTestClickWait('link='.$mediatype['description']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent('Media type updated');
 		$this->zbxTestTextPresent($mediatype['description']);
