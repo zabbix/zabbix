@@ -719,9 +719,8 @@ function __autoload($class_name){
 		while($session = DBfetch($db_sessions)){
 			if(($session['lastaccess']+ZBX_USER_ONLINE_TIME) >= time()) $status['users_online']++;
 		}
-
-// Comments: !!! Don't forget sync code with C !!!
-		$sql = 'SELECT sum(1.0/i.delay) as qps'.
+		// Comments: !!! Don't forget sync code with C !!!
+		$sql = 'SELECT SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) as qps'.
 				' FROM items i,hosts h'.
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
 					' AND i.hostid=h.hostid'.

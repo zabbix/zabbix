@@ -327,7 +327,7 @@
 
 // CALCULATE PERFORMANCE {{{
 		$proxyids = array_keys($proxies);
-		$sql = 'SELECT h.proxy_hostid, sum(1.0/i.delay) as qps '.
+		$sql = 'SELECT h.proxy_hostid, SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) as qps '.
 				' FROM items i,hosts h '.
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
 					' AND i.hostid=h.hostid '.

@@ -1,5 +1,6 @@
 Changes for 1.8.21rc1
 
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
