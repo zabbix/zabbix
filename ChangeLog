@@ -1,6 +1,7 @@
 Changes for 2.2.7rc1
 
 Bug fixes:
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
@@ -1084,6 +1085,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .....J.... [ZBX-6229] removed pretty formatting from Java gateway JSON responses (asaveljevs)
