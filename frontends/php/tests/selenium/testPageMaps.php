@@ -67,7 +67,7 @@ class testPageMaps extends CWebTest {
 
 //		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
 
-		$this->zbxTestClickWait('sysmap_save');
+		$this->zbxTestClickWait('sysmap_update');
 
 //		$this->waitForCondition("selenium.browserbot.getUserWindow().ZBX_SYSMAPS[0].map.saved == true", 3000);
 
@@ -105,7 +105,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->href_click("sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=");
 		$this->wait();
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent("Network map updated");
 		$this->zbxTestTextPresent("$name");

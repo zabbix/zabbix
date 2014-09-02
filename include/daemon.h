@@ -31,7 +31,7 @@ extern char	*CONFIG_PID_FILE;
 int	daemon_start(int allow_root, const char *user);
 void	daemon_stop();
 
-int	zbx_sigusr_send(zbx_task_t task);
+int	zbx_sigusr_send(int flags);
 
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()

@@ -32,6 +32,56 @@
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
 
+extern pid_t	*threads;
+extern int	threads_num;
+
+extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
+
+#ifdef HAVE_SIGQUEUE
+extern void	zbx_sigusr_handler(int flags);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: common_sigusr_handler                                            *
+ *                                                                            *
+ * Purpose: common SIGUSR1 handler for Zabbix processes                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	common_sigusr_handler(int flags)
+{
+	switch (ZBX_RTC_GET_MSG(flags))
+	{
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+			if (SUCCEED != zabbix_increase_log_level())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+						" maximum level has been already set");
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
+						zabbix_get_log_level_string());
+			}
+			break;
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			if (SUCCEED != zabbix_decrease_log_level())
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+						" minimum level has been already set");
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
+						zabbix_get_log_level_string());
+			}
+			break;
+		default:
+			zbx_sigusr_handler(flags);
+			break;
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: user1_signal_handler                                             *
@@ -41,21 +91,27 @@ static int	parent_pid = -1;
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+#ifdef HAVE_SIGQUEUE
+	int		flags, process_num, found = 0, i;
+	union sigval	s;
+	unsigned char	process_type;
+#endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
+	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d(0x%08x)].",
 			sig, get_signal_name(sig),
 			SIG_CHECKED_FIELD(siginfo, si_pid),
 			SIG_CHECKED_FIELD(siginfo, si_uid),
+			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT),
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
+	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
+
 	if (!SIG_PARENT_PROCESS)
 	{
-		extern void	zbx_sigusr_handler(zbx_task_t task);
-
-		zbx_sigusr_handler(SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
+		common_sigusr_handler(flags);
 	}
-	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT))
+	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
 		extern unsigned char	daemon_type;
 
@@ -63,30 +119,112 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
 					" cannot be performed for a passive proxy");
+			return;
+		}
+
+		for (i = 0; i < threads_num; i++)
+		{
+			if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+				continue;
+
+			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
+				break;
+		}
+
+		if (i != threads_num)
+		{
+			s.ZBX_SIVAL_INT = flags;
+
+			if (-1 != sigqueue(threads[i], SIGUSR1, s))
+				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to the configuration syncer");
+			else
+				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 		}
 		else
 		{
-			union sigval	s;
-			extern pid_t	*threads;
+			zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal to configuration syncer:"
+					" process not found");
+		}
+	}
+	else if (ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
+			ZBX_RTC_LOG_LEVEL_DECREASE == ZBX_RTC_GET_MSG(flags))
+	{
+		s.ZBX_SIVAL_INT = flags;
 
-			s.ZBX_SIVAL_INT = ZBX_TASK_CONFIG_CACHE_RELOAD;
-
-			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
-			if (NULL != threads && -1 != sigqueue(threads[0], SIGUSR1, s))
+		if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
+		{
+			for (i = 0; i < threads_num; i++)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
-						" the configuration syncer");
+				if (0 != ZBX_RTC_GET_DATA(flags) && threads[i] != ZBX_RTC_GET_DATA(flags))
+					continue;
+
+				found = 1;
+
+				if (-1 != sigqueue(threads[i], SIGUSR1, s))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
+							threads[i]);
+				}
+				else
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
 			}
-			else
+
+			if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-						zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
+						" child process", ZBX_RTC_GET_DATA(flags));
+			}
+		}
+		else
+		{
+			for (i = 0; i < threads_num; i++)
+			{
+				if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+					break;
+
+				if (ZBX_RTC_GET_SCOPE(flags) != process_type)
+				{
+					/* check if we have already checked processes of target type */
+					if (1 == found)
+						break;
+
+					continue;
+				}
+
+				if (0 != ZBX_RTC_GET_DATA(flags) && ZBX_RTC_GET_DATA(flags) != process_num)
+					continue;
+
+				found = 1;
+
+				if (-1 != sigqueue(threads[i], SIGUSR1, s))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
+							" pid:%d", get_process_type_string(process_type), threads[i]);
+				}
+				else
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
+			}
+
+			if (0 == found)
+			{
+				if (0 == ZBX_RTC_GET_DATA(flags))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+							" \"%s\" process does not exist",
+							get_process_type_string(ZBX_RTC_GET_SCOPE(flags)));
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+							" \"%s #%d\" process does not exist",
+							get_process_type_string(ZBX_RTC_GET_SCOPE(flags)),
+							ZBX_RTC_GET_DATA(flags));
+				}
 			}
 		}
 	}
 #endif
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -106,7 +244,7 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_daemon_signal_handlers                                   *
+ * Function: set_daemon_signal_handlers                                       *
  *                                                                            *
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
@@ -134,7 +272,8 @@ static void	set_daemon_signal_handlers()
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root - allow root permission for application             *
- *             user - user on the system to which to drop the privileges      *
+ *             user       - user on the system to which to drop the           *
+ *                          privileges                                        *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -242,7 +381,7 @@ void	daemon_stop()
 	drop_pid_file(CONFIG_PID_FILE);
 }
 
-int	zbx_sigusr_send(zbx_task_t task)
+int	zbx_sigusr_send(int flags)
 {
 	int	ret = FAIL;
 	char	error[256];
@@ -253,11 +392,11 @@ int	zbx_sigusr_send(zbx_task_t task)
 	{
 		union sigval	s;
 
-		s.ZBX_SIVAL_INT = task;
+		s.ZBX_SIVAL_INT = flags;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
 		{
-			printf("command sent successfully\n");
+			zbx_error("command sent successfully");
 			ret = SUCCEED;
 		}
 		else
@@ -269,9 +408,8 @@ int	zbx_sigusr_send(zbx_task_t task)
 #else
 	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
 #endif
-
 	if (SUCCEED != ret)
-		printf("%s\n", error);
+		zbx_error("%s", error);
 
 	return ret;
 }

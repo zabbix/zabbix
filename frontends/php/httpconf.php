@@ -38,31 +38,31 @@ $fields = array(
 	'group_httptestid'	=> array(T_ZBX_INT, O_OPT, null,	DB_ID,				null),
 	'showdisabled'		=> array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),			null),
 	// form
-	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form})||isset({save})'),
+	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'),
 	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
-	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
-	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
-	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
-	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({save})', _('Retries')),
+	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'),
+	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')),
+	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')),
+	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
-	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
-	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
-	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})', _('Steps')),
-	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({save})'),
-	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
-		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
-	'http_password'		=> array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
-		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
-	'http_proxy'		=> array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
+	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
+	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
+	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')),
+	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'),
+	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
+		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')),
+	'http_password'		=> array(T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
+		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')),
+	'http_proxy'		=> array(T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'),
 	'new_application'	=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'hostname'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'templated'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'verify_host'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'verify_peer'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'headers'			=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
-	'ssl_cert_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
-	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
-	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
+	'headers'			=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_cert_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'),
 	// actions
 	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -72,7 +72,8 @@ $fields = array(
 							),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'del_history'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
-	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'add'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'update'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
@@ -185,9 +186,9 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('add') || hasRequest('update')) {
 
-	if (hasRequest('httptestid')) {
+	if (hasRequest('update')) {
 		$action = AUDIT_ACTION_UPDATE;
 		$messageTrue = _('Scenario updated');
 		$messageFalse = _('Cannot update web scenario');
@@ -551,6 +552,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
+		'httpTestsLastData' => array(),
 		'paging' => null,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder

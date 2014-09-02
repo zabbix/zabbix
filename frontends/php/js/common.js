@@ -24,6 +24,12 @@ function isset(key, obj) {
 	return (is_null(key) || is_null(obj)) ? false : (typeof(obj[key]) != 'undefined');
 }
 
+/**
+ * @deprecated  use strict comparison instead
+ *
+ * @param obj
+ * @returns {*}
+ */
 function empty(obj) {
 	if (is_null(obj)) {
 		return true;
@@ -41,6 +47,12 @@ function empty(obj) {
 	return is_array(obj) && obj.length == 0;
 }
 
+/**
+ * @deprecated use === null instead
+ *
+ * @param obj
+ * @returns {boolean}
+ */
 function is_null(obj) {
 	return (obj == null);
 }
@@ -169,7 +181,9 @@ function checkAll(form_name, chkMain, shkName) {
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
 
-	chkbxRange.checkAll(shkName, value);
+	chkbxRange.checkObjectAll(shkName, value);
+	chkbxRange.update(shkName);
+	chkbxRange.saveCookies(shkName);
 
 	return true;
 }
@@ -284,18 +298,6 @@ function getDimensions(obj, trueSide) {
 	}
 
 	return dim;
-}
-
-function getParent(obj, name) {
-	if (obj.parentNode.nodeName.toLowerCase() == name.toLowerCase()) {
-		return obj.parentNode;
-	}
-	else if (obj.parentNode.nodeName.toLowerCase() == 'body') {
-		return null;
-	}
-	else {
-		return getParent(obj.parentNode, name);
-	}
 }
 
 function getPosition(obj) {

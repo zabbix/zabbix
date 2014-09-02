@@ -359,7 +359,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
 	int		err;
-	char		*auth = NULL;
+	char		*auth = NULL, errbuf[CURL_ERROR_SIZE];
 	size_t		auth_alloc = 0, auth_offset;
 	CURL            *easyhandle = NULL;
 #endif
@@ -392,13 +392,14 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
-					0 == httptest->httptest.verify_host ? 0L : 2L)))
+					0 == httptest->httptest.verify_host ? 0L : 2L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (NULL != CONFIG_SSL_CA_LOCATION)
+	if (0 != httptest->httptest.verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
 		{
@@ -434,9 +435,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
 		zbx_free(file_name);
 
-		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
-						httptest->httptest.ssl_key_password)))
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
+	if ('\0' != httptest->httptest.ssl_key_password)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
+				httptest->httptest.ssl_key_password)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto clean;
@@ -597,6 +606,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __function_name, httpstep.url, page.data);
+
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
@@ -605,7 +616,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			else if ('\0' != *httpstep.status_codes &&
 					FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 			{
-				err_str = zbx_strdup(err_str, "status code did not match");
+				err_str = zbx_dsprintf(err_str, "response code \"%ld\" did not match any of the"
+						" required status codes \"%s\"", stat.rspcode, httpstep.status_codes);
 			}
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)) &&
@@ -633,7 +645,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
 						httpstep.required, NULL))
 				{
-					err_str = zbx_strdup(err_str, "required pattern not found");
+					err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
+							httpstep.required, httpstep.url);
 				}
 
 				/* variables defined in scenario */
@@ -645,6 +658,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					variables = string_replace(httptest->httptest.variables, "\r\n", " ");
 					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
 							variables, var_err_str);
+
 					zbx_free(variables);
 				}
 
@@ -657,6 +671,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					variables = string_replace(httpstep.variables, "\r\n", " ");
 					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
 							variables, var_err_str);
+
 					zbx_free(variables);
 				}
 
@@ -664,7 +679,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 		}
 		else
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			err_str = zbx_dsprintf(err_str, "%s: %s", curl_easy_strerror(err), errbuf);
 
 		zbx_free(page.data);
 httpstep_error:
