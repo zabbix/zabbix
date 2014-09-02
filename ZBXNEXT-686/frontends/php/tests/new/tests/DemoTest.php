@@ -6,6 +6,7 @@ class HostCreateTest extends FileApiTestCase {
 
 	public function fileProvider() {
 		return array(
+			array('dev/syntax'),
 			array('dev/host.create'),
 			array('dev/host.create.invalid'),
 			array('dev/trigger.create'),

@@ -1,0 +1,77 @@
+# fixture files to load for this test case
+fixtures: [users, hostGroups]
+
+# an array of steps that will be executed one-by-one
+steps:
+  step1:
+    # the API request to perform
+    request:
+      method:  host.create
+      params:
+        host: "Linux server"
+        interfaces:
+          -
+            type: 1
+            main: 1
+            useip: 1
+            ip: "192.168.3.1"
+            dns: ""
+            port: "10050"
+        groups:
+          -
+            groupid: "1"
+
+    # what to expect: either "result" or "error"
+    expect: result
+
+    # validate the received response
+    # depending on the value of "expect", "response" will contain data either from "result" or "error"
+    response:
+      hostids:
+        # "_assert" makes sure that the value passes the given validator
+        - { _assert: string }
+
+  step2:
+    request:
+      method: host.get
+      params:
+        output: [host, host, status]
+        # macros can be used to reference values from the previous steps
+        hostids: ["@step1.response.hostids[0]@"]
+
+    expect: result
+
+    response:
+      -
+        # macros can be used in the response as well
+        # this will match the value of "hostid" to the ID returned by host.create in step1
+        hostid: @step1.response.hostids[0]@
+        host: @step1.request.params.host@
+        # a simple match
+        status: "0"
+
+  step3:
+    request:
+      method: host.create
+      params:
+        host: @step1.request.params.host@
+        interfaces:
+          -
+            type: 1
+            main: 1
+            useip: 1
+            ip: "192.168.3.1"
+            dns: ""
+            port: "10050"
+        groups:
+          -
+            groupid: "1"
+
+    # in this step we expect an error
+    expect: error
+
+    response:
+      message: "Invalid params."
+      # macros can also be used inside of strings
+      data: "Host with the same name \"@step1.request.params.host@\" already exists."
+      code: -32602

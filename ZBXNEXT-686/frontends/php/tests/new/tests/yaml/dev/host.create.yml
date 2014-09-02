@@ -24,10 +24,7 @@ steps:
 
     response:
       hostids:
-        _assert: arr|length(1)
-        _keys: sequence
-        _each:
-          _assert: string
+        - { _assert: string }
 
   step2:
     request:
