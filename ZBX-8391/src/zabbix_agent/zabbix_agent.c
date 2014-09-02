@@ -156,7 +156,7 @@ int	main(int argc, char **argv)
 			case 'c':
 				opt_c++;
 				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = strdup(zbx_optarg);
+					CONFIG_FILE = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -180,7 +180,7 @@ int	main(int argc, char **argv)
 				if (ZBX_TASK_START == task)
 				{
 					task = ZBX_TASK_TEST_METRIC;
-					TEST_METRIC = strdup(zbx_optarg);
+					TEST_METRIC = zbx_strdup(TEST_METRIC, zbx_optarg);
 				}
 				break;
 			default:
