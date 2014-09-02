@@ -364,51 +364,51 @@ static void    zbx_load_config(const char *config_file)
 		{NULL}
 	};
 
-	if (NULL != config_file)
+	if (NULL == config_file)
+		return;
+
+	/* do not complain about unknown parameters in agent configuration file */
+	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
+
+	if (NULL != cfg_source_ip)
 	{
-		/* do not complain about unknown parameters */
-		parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
-
-		if (NULL != cfg_source_ip)
+		if (NULL == CONFIG_SOURCE_IP)
 		{
-			if (NULL == CONFIG_SOURCE_IP)
-			{
-				CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, cfg_source_ip);
-			}
-			zbx_free(cfg_source_ip);
+			CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, cfg_source_ip);
 		}
+		zbx_free(cfg_source_ip);
+	}
 
-		if (NULL == ZABBIX_SERVER)
+	if (NULL == ZABBIX_SERVER)
+	{
+		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
 		{
-			if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
+			unsigned short	cfg_server_port = 0;
+
+			if (NULL != (r = strchr(cfg_active_hosts, ',')))
+				*r = '\0';
+
+			if (SUCCEED != parse_serveractive_element(cfg_active_hosts, &ZABBIX_SERVER,
+					&cfg_server_port, 0))
 			{
-				unsigned short	cfg_server_port = 0;
-
-				if (NULL != (r = strchr(cfg_active_hosts, ',')))
-					*r = '\0';
-
-				if (SUCCEED != parse_serveractive_element(cfg_active_hosts, &ZABBIX_SERVER,
-						&cfg_server_port, 0))
-				{
-					zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid",
-							cfg_active_hosts);
-					exit(EXIT_FAILURE);
-				}
-
-				if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
-					ZABBIX_SERVER_PORT = cfg_server_port;
+				zbx_error("error parsing \"ServerActive\" option: address \"%s\" is invalid",
+						cfg_active_hosts);
+				exit(EXIT_FAILURE);
 			}
-		}
-		zbx_free(cfg_active_hosts);
 
-		if (NULL != cfg_hostname)
+			if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
+				ZABBIX_SERVER_PORT = cfg_server_port;
+		}
+	}
+	zbx_free(cfg_active_hosts);
+
+	if (NULL != cfg_hostname)
+	{
+		if (NULL == ZABBIX_HOSTNAME)
 		{
-			if (NULL == ZABBIX_HOSTNAME)
-			{
-				ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, cfg_hostname);
-			}
-			zbx_free(cfg_hostname);
+			ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, cfg_hostname);
 		}
+		zbx_free(cfg_hostname);
 	}
 }
 
@@ -647,7 +647,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == ZABBIX_SERVER)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "'Server' parameter required");
+		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
 	if (0 == ZABBIX_SERVER_PORT)
