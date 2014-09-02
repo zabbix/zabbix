@@ -26,14 +26,13 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
-$page['hist_arg'] = array('hostid', 'parent_discoveryid');
+$page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
@@ -92,36 +91,36 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-if (getRequest('parent_discoveryid')) {
-	$discovery_rule = API::DiscoveryRule()->get(array(
-		'itemids' => $_REQUEST['parent_discoveryid'],
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true,
-		'preservekeys' => true
-	));
-	$discovery_rule = reset($discovery_rule);
-	if (!$discovery_rule) {
-		access_deny();
-	}
-
-	if (isset($_REQUEST['triggerid'])) {
-		$triggerPrototype = API::TriggerPrototype()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
-			'output' => array('triggerid'),
-			'editable' => true,
-			'preservekeys' => true
-		));
-		if (empty($triggerPrototype)) {
-			access_deny();
-		}
-	}
-}
-else {
+$discoveryRuleId = getRequest('parent_discoveryid');
+if (!$discoveryRuleId) {
 	access_deny();
 }
 
-$showdisabled = getRequest('showdisabled', 0);
-CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
+$discoveryRule = API::DiscoveryRule()->get(array(
+	'itemids' => $discoveryRuleId,
+	'output' => API_OUTPUT_EXTEND,
+	'editable' => true
+));
+$discoveryRule = reset($discoveryRule);
+
+if (!$discoveryRule) {
+	access_deny();
+}
+
+$triggerId = getRequest('triggerid');
+if ($triggerId) {
+	$triggerPrototype = API::TriggerPrototype()->get(array(
+		'triggerids' => $triggerId,
+		'output' => array('triggerid'),
+		'editable' => true
+	));
+	if (!$triggerPrototype) {
+		access_deny();
+	}
+}
+
+$showDisabled = getRequest('showdisabled', 0);
+CProfile::update('web.triggers.showdisabled', $showDisabled, PROFILE_TYPE_INT);
 
 /*
  * Actions
@@ -190,6 +189,7 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massup
 	$triggerIds = getRequest('g_triggerid');
 	$visible = getRequest('visible');
 
+	$result = false;
 	if (isset($visible['priority'])) {
 		$priority = getRequest('priority');
 
@@ -288,8 +288,8 @@ else {
 	$data = array(
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'showInfoColumn' => false,
-		'discovery_rule' => $discovery_rule,
-		'hostid' => getRequest('hostid'),
+		'discovery_rule' => $discoveryRule,
+		'hostid' => $discoveryRule['hostid'],
 		'showdisabled' => getRequest('showdisabled', 1),
 		'triggers' => array(),
 		'sort' => $sortField,
