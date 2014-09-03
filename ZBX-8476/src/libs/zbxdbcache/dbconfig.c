@@ -1136,7 +1136,6 @@ static void	DCsync_items(DB_RESULT result)
 	DB_ROW			row;
 
 	ZBX_DC_HOST		*host;
-	ZBX_DC_PROXY		*proxy;
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_NUMITEM		*numitem;
@@ -1157,8 +1156,7 @@ static void	DCsync_items(DB_RESULT result)
 
 	time_t			now;
 	unsigned char		old_poller_type, status, type;
-	int			old_nextcheck, delay, delay_flex_changed;
-	int			key_changed, found, update_index, proxy_timediff;
+	int			old_nextcheck, delay, delay_flex_changed, key_changed, found, update_index;
 	zbx_uint64_t		itemid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1188,14 +1186,6 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
-
-		if (0 == host->proxy_hostid ||
-				NULL == (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-		{
-			proxy_timediff = 0;
-		}
-		else
-			proxy_timediff = proxy->timediff;
 
 		/* array of selected items */
 		zbx_vector_uint64_append(&ids, itemid);
@@ -1343,7 +1333,14 @@ static void	DCsync_items(DB_RESULT result)
 					(ITEM_STATE_NORMAL == item->state &&
 					(item->delay != delay || 0 != delay_flex_changed))))
 			{
+				ZBX_DC_PROXY	*proxy = NULL;
 				zbx_uint64_t	seed;
+				int		proxy_timediff;
+
+				if (0 != host->proxy_hostid)
+					proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid);
+
+				proxy_timediff = (NULL == proxy ? 0 : proxy->timediff);
 
 				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, type, item->key);
 
