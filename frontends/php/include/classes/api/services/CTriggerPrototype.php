@@ -557,11 +557,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		// TODO: remove $noPermissionCheck hack
+		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
 			$dbTriggerPrototypes = $this->get(array(
 				'triggerids' => $triggerPrototypeIds,
-				'output' => array('triggerid', 'description', 'expression'),
+				'output' => array('triggerid', 'description', 'expression', 'templateid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
