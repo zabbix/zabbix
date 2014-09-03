@@ -72,7 +72,10 @@ $conditionTable->attr('style', 'min-width: 350px;');
 $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
-foreach ($this->data['action']['filter']['conditions'] as $condition) {
+
+$actionConditionStringValues = actionConditionValues2str(array($this->data['action']), $this->data['config']);
+
+foreach ($this->data['action']['filter']['conditions'] as $cIdx => $condition) {
 	if (!isset($condition['conditiontype'])) {
 		$condition['conditiontype'] = 0;
 	}
@@ -95,7 +98,9 @@ foreach ($this->data['action']['filter']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
+			getConditionDescription($condition['conditiontype'], $condition['operator'],
+				$actionConditionStringValues[0][$cIdx]
+			),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
@@ -948,7 +953,12 @@ if (!empty($this->data['new_operation'])) {
 		$operationConditionsTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 		$i = 0;
-		foreach ($this->data['new_operation']['opconditions'] as $opcondition) {
+
+		$conditionStringValues = actionOperationConditionValues2str(
+			$this->data['new_operation']['opconditions']
+		);
+
+		foreach ($this->data['new_operation']['opconditions'] as $cIdx => $opcondition) {
 			if (!isset($opcondition['conditiontype'])) {
 				$opcondition['conditiontype'] = 0;
 			}
@@ -969,7 +979,9 @@ if (!empty($this->data['new_operation'])) {
 			$operationConditionsTable->addRow(
 				array(
 					$labelCol,
-					get_condition_desc($opcondition['conditiontype'], $opcondition['operator'], $opcondition['value']),
+					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
+						$conditionStringValues[$cIdx]
+					),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),

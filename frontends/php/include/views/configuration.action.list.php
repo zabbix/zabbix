@@ -54,20 +54,16 @@ $actionTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
-$actionConditionValueStrings = actionConditionValues2str($this->data['actions'], $this->data['config']);
+$actionConditionStringValues = actionConditionValues2str($this->data['actions'], $this->data['config']);
 
-foreach ($this->data['actions'] as $action) {
+foreach ($this->data['actions'] as $aIdx => $action) {
 	$conditions = array();
 
 	order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
-	foreach ($action['filter']['conditions'] as $idx => $condition) {
-		$conditions[] = array(
-			condition_type2str($condition['conditiontype']),
-			SPACE,
-			condition_operator2str($condition['operator']),
-			SPACE,
-			italic(CHtml::encode($actionConditionValueStrings[$action['actionid']][$idx]))
+	foreach ($action['filter']['conditions'] as $cIdx => $condition) {
+		$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
+			$actionConditionStringValues[$aIdx][$cIdx]
 		);
 		$conditions[] = BR();
 	}
