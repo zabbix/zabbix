@@ -115,12 +115,20 @@ function discovery_object2str($object = null) {
 }
 
 /**
- * Get string values for action conditions for each specific condition type
+ * Converts numerical action condition values to their corresponding string values according to action condition type.
  *
- * @param array $actions
- * @param array $config
+ * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
+ * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
+ * For other action condition types values are returned as they are or converted using simple string convertion
+ * functions according to action condition type.
  *
- * @return array
+ * @param array $actions							array of actions
+ * @param array $action['filter']					array containing arrays of action conditions and other data
+ * @param array $action['filter']['conditions']		array of action conditions
+ * @param array $config								array containing configuration parameters for getting trigger
+ *													severity captions
+ *
+ * @return array									returns an array of actions condition string values
  */
 function actionConditionValues2str(array $actions, array $config = null) {
 	if (!$config) {
@@ -137,12 +145,12 @@ function actionConditionValues2str(array $actions, array $config = null) {
 	$dRulesToSelect = array();
 	$dChecksToSelect = array();
 
-	foreach ($actions as $actionId => $action) {
-		$result[$actionId] = array();
+	foreach ($actions as $aIdx => $action) {
+		$result[$aIdx] = array();
 
-		foreach ($action['filter']['conditions'] as $i => $condition) {
+		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
 			// unknown types and all of the default values for other types are 'Unknown'
-			$result[$actionId][$i] = _('Unknown');
+			$result[$aIdx][$cIdx] = _('Unknown');
 
 			switch ($condition['conditiontype']) {
 				// gather hostgroup IDs for later querying
@@ -180,23 +188,23 @@ function actionConditionValues2str(array $actions, array $config = null) {
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
-					$result[$actionId][$i] = $condition['value'];
+					$result[$aIdx][$cIdx] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-					$result[$actionId][$i] = $condition['value'] ? _('Ack') : _('Not Ack');
+					$result[$aIdx][$cIdx] = $condition['value'] ? _('Ack') : _('Not Ack');
 					break;
 
 				case CONDITION_TYPE_MAINTENANCE:
-					$result[$actionId][$i] = _('maintenance');
+					$result[$aIdx][$cIdx] = _('maintenance');
 					break;
 
 				case CONDITION_TYPE_TRIGGER_VALUE:
-					$result[$actionId][$i] = trigger_value2str($condition['value']);
+					$result[$aIdx][$cIdx] = trigger_value2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$actionId][$i] = getSeverityCaption($condition['value'], $config);
+					$result[$aIdx][$cIdx] = getSeverityCaption($condition['value'], $config);
 					break;
 
 				// gather dicovery rule IDs for later querying
@@ -210,22 +218,30 @@ function actionConditionValues2str(array $actions, array $config = null) {
 					break;
 
 				case CONDITION_TYPE_DOBJECT:
-					$result[$actionId][$i] = discovery_object2str($condition['value']);
+					$result[$aIdx][$cIdx] = discovery_object2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_DSERVICE_TYPE:
-					$result[$actionId][$i] = discovery_check_type2str($condition['value']);
+					$result[$aIdx][$cIdx] = discovery_check_type2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_DSTATUS:
-					$result[$actionId][$i] = discovery_object_status2str($condition['value']);
+					$result[$aIdx][$cIdx] = discovery_object_status2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_EVENT_TYPE:
-					$result[$actionId][$i] = eventType($condition['value']);
+					$result[$aIdx][$cIdx] = eventType($condition['value']);
 			}
 		}
 	}
+
+	$groups = null;
+	$triggers = null;
+	$hosts = null;
+	$templates = null;
+	$proxies = null;
+	$dRules = null;
+	$dChecks = null;
 
 	if ($hostGroupsToSelect) {
 		$groups = API::HostGroup()->get(array(
@@ -233,21 +249,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'groupids' => $hostGroupsToSelect,
 			'preservekeys' => true
 		));
-
-		if ($groups) {
-			foreach ($actions as $actionId => $action) {
-				// replace with real group name, if found
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
-						$groupId = $condition['value'];
-
-						if (isset($groups[$groupId])) {
-							$result[$actionId][$i] = $groups[$groupId]['name'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($triggersToSelect) {
@@ -258,21 +259,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'selectHosts' => array('name'),
 			'preservekeys' => true
 		));
-
-		if ($triggers) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER) {
-						$triggerId = $condition['value'];
-
-						if (isset($triggers[$triggerId])) {
-							$host = reset($triggers[$triggerId]['hosts']);
-							$result[$actionId][$i] = $host['name'].NAME_DELIMITER.$triggers[$triggerId]['description'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($hostsToSelect) {
@@ -281,20 +267,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'hostids' => $hostsToSelect,
 			'preservekeys' => true
 		));
-
-		if ($hosts) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
-						$hostId = $condition['value'];
-
-						if (isset($hosts[$hostId])) {
-							$result[$actionId][$i] = $hosts[$hostId]['name'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($templatesToSelect) {
@@ -303,20 +275,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'templateids' => $templatesToSelect,
 			'preservekeys' => true
 		));
-
-		if ($templates) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
-						$templateId = $condition['value'];
-
-						if (isset($templates[$templateId])) {
-							$result[$actionId][$i] = $templates[$templateId]['name'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($proxiesToSelect) {
@@ -325,20 +283,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'proxyids' => $proxiesToSelect,
 			'preservekeys' => true
 		));
-
-		if ($proxies) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_PROXY) {
-						$proxyId = $condition['value'];
-
-						if (isset($proxies[$proxyId])) {
-							$result[$actionId][$i] = $proxies[$proxyId]['host'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($dRulesToSelect) {
@@ -347,20 +291,6 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'druleids' => $dRulesToSelect,
 			'preservekeys' => true
 		));
-
-		if ($dRules) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_DRULE) {
-						$dRuleId = $condition['value'];
-
-						if (isset($dRules[$dRuleId])) {
-							$result[$actionId][$i] = $dRules[$dRuleId]['name'];
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if ($dChecksToSelect) {
@@ -370,24 +300,62 @@ function actionConditionValues2str(array $actions, array $config = null) {
 			'selectDRules' => array('name'),
 			'preservekeys' => true
 		));
+	}
 
-		if ($dChecks) {
-			foreach ($actions as $actionId => $action) {
-				foreach ($action['filter']['conditions'] as $i => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_DCHECK) {
-						$dCheckId = $condition['value'];
+	if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks) {
+		foreach ($actions as $aIdx => $action) {
+			foreach ($action['filter']['conditions'] as $cIdx => $condition) {
+				$id = $condition['value'];
 
-						if (isset($dChecks[$dCheckId])) {
-							$drule = reset($dChecks[$dCheckId]['drules']);
-							$type = $dChecks[$dCheckId]['type'];
-							$key = $dChecks[$dCheckId]['key_'];
-							$ports = $dChecks[$dCheckId]['ports'];
+				switch ($condition['conditiontype']) {
+					case CONDITION_TYPE_HOST_GROUP:
+						if (isset($groups[$id])) {
+							$result[$aIdx][$cIdx] = $groups[$id]['name'];
+						}
+						break;
+
+					case CONDITION_TYPE_TRIGGER:
+						if (isset($triggers[$id])) {
+							$host = reset($triggers[$id]['hosts']);
+							$result[$aIdx][$cIdx] = $host['name'].NAME_DELIMITER.$triggers[$id]['description'];
+						}
+						break;
+
+					case CONDITION_TYPE_HOST:
+						if (isset($hosts[$id])) {
+							$result[$aIdx][$cIdx] = $hosts[$id]['name'];
+						}
+						break;
+
+					case CONDITION_TYPE_TEMPLATE:
+						if (isset($templates[$id])) {
+							$result[$aIdx][$cIdx] = $templates[$id]['name'];
+						}
+						break;
+
+					case CONDITION_TYPE_PROXY:
+						if (isset($proxies[$id])) {
+							$result[$aIdx][$cIdx] = $proxies[$id]['host'];
+						}
+						break;
+
+					case CONDITION_TYPE_DRULE:
+						if (isset($dRules[$id])) {
+							$result[$aIdx][$cIdx] = $dRules[$id]['name'];
+						}
+						break;
+
+					case CONDITION_TYPE_DCHECK:
+						if (isset($dChecks[$id])) {
+							$drule = reset($dChecks[$id]['drules']);
+							$type = $dChecks[$id]['type'];
+							$key = $dChecks[$id]['key_'];
+							$ports = $dChecks[$id]['ports'];
 
 							$dCheck = discovery_check2str($type, $key, $ports);
 
-							$result[$actionId][$i] = $drule['name'].NAME_DELIMITER.$dCheck;
+							$result[$aIdx][$cIdx] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
-					}
 				}
 			}
 		}
@@ -396,152 +364,45 @@ function actionConditionValues2str(array $actions, array $config = null) {
 	return $result;
 }
 
-function condition_value2str($conditiontype, $value) {
-	switch ($conditiontype) {
-		case CONDITION_TYPE_HOST_GROUP:
-			$groups = API::HostGroup()->get(array(
-				'groupids' => $value,
-				'output' => array('name'),
-				'limit' => 1
-			));
+/**
+ * Converts numerical action operation condition values to their corresponding string values according to
+ * action operation condition type. Since action list does not display operation conditions,
+ * so there is only an array of operation conditions for single action which is displayed in operation details.
+ *
+ * @param array  $conditions					array of actions operation conditions
+ * @param string $condition['conditiontype']	operation condition type
+ * @param string $condition['value']			operation condition value
+ *
+ * @return array								returns an array of action operation condition string values
+ */
+function actionOperationConditionValues2str(array $conditions) {
+	$result = array();
 
-			if ($groups) {
-				$group = reset($groups);
-
-				$str_val = $group['name'];
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_TRIGGER:
-			$trigs = API::Trigger()->get(array(
-				'triggerids' => $value,
-				'expandDescription' => true,
-				'output' => array('description'),
-				'selectHosts' => array('name'),
-				'limit' => 1
-			));
-
-			if ($trigs) {
-				$trig = reset($trigs);
-				$host = reset($trig['hosts']);
-
-				$str_val = $host['name'].NAME_DELIMITER.$trig['description'];
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_HOST:
-		case CONDITION_TYPE_TEMPLATE:
-			if ($host = get_host_by_hostid($value)) {
-				$str_val = $host['name'];
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_TRIGGER_NAME:
-		case CONDITION_TYPE_HOST_METADATA:
-		case CONDITION_TYPE_HOST_NAME:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_TRIGGER_VALUE:
-			$str_val = trigger_value2str($value);
-			break;
-		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			$str_val = getSeverityCaption($value);
-			break;
-		case CONDITION_TYPE_TIME_PERIOD:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_MAINTENANCE:
-			$str_val = _('maintenance');
-			break;
-		case CONDITION_TYPE_DRULE:
-			if ($drule = get_discovery_rule_by_druleid($value)) {
-				$str_val = $drule['name'];
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_DCHECK:
-			$row = DBfetch(DBselect(
-					'SELECT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
-					' FROM drules dr,dchecks c'.
-					' WHERE dr.druleid=c.druleid'.
-						' AND c.dcheckid='.zbx_dbstr($value)
-			));
-			if ($row) {
-				$str_val = $row['name'].NAME_DELIMITER.discovery_check2str($row['type'], $row['key_'], $row['ports']);
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_DOBJECT:
-			$str_val = discovery_object2str($value);
-			break;
-		case CONDITION_TYPE_PROXY:
-			if ($host = get_host_by_hostid($value)) {
-				$str_val = $host['host'];
-			}
-			else {
-				return _('Unknown');
-			}
-			break;
-		case CONDITION_TYPE_DHOST_IP:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_DSERVICE_TYPE:
-			$str_val = discovery_check_type2str($value);
-			break;
-		case CONDITION_TYPE_DSERVICE_PORT:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_DSTATUS:
-			$str_val = discovery_object_status2str($value);
-			break;
-		case CONDITION_TYPE_DUPTIME:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_DVALUE:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-			$str_val = ($value) ? _('Ack') : _('Not Ack');
-			break;
-		case CONDITION_TYPE_APPLICATION:
-			$str_val = $value;
-			break;
-		case CONDITION_TYPE_EVENT_TYPE:
-			$str_val = eventType($value);
-			break;
-		default:
-			return _('Unknown');
+	foreach ($conditions as $condition) {
+		if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
+			$result[] = $condition['value'] ? _('Ack') : _('Not Ack');
+		}
 	}
 
-	return $str_val;
+	return $result;
 }
 
 /**
- * Returns the HTML representation of an action condition.
+ * Returns the HTML representation of an action condition and action operation condition.
  *
- * @param $conditiontype
- * @param $operator
- * @param $value
+ * @param string $conditionType
+ * @param string $operator
+ * @param string $value
  *
  * @return array
  */
-function get_condition_desc($conditiontype, $operator, $value) {
+function getConditionDescription($conditionType, $operator, $value) {
 	return array(
-		condition_type2str($conditiontype),
+		condition_type2str($conditionType),
 		SPACE,
 		condition_operator2str($operator),
 		SPACE,
-		italic(CHtml::encode(condition_value2str($conditiontype, $value)))
+		italic(CHtml::encode($value))
 	);
 }
 

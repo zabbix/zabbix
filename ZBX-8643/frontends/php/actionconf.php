@@ -367,7 +367,8 @@ if (hasRequest('form')) {
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid'),
 		'new_condition' => getRequest('new_condition', array()),
-		'new_operation' => getRequest('new_operation')
+		'new_operation' => getRequest('new_operation'),
+		'config' => $config
 	);
 
 	$action = null;
@@ -511,7 +512,6 @@ else {
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'preservekeys' => true,
 		'limit' => $config['search_limit'] + 1
 	));
 
