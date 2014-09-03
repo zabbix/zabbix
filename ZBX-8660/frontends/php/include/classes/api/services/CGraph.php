@@ -534,7 +534,8 @@ class CGraph extends CGraphGeneral {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('name'),
+			'filter' => array('flags' => $nopermissions ? null : ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
 		if (!$nopermissions) {
