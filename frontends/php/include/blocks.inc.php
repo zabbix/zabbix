@@ -1117,7 +1117,8 @@ function make_webmon_overview($filter) {
 		' FROM httptest ht,hosts_groups hg'.
 		' WHERE ht.hostid=hg.hostid'.
 			' AND '.dbConditionInt('hg.hostid', $availableHostIds).
-			' AND '.dbConditionInt('hg.groupid', $groupIds)
+			' AND '.dbConditionInt('hg.groupid', $groupIds).
+			' AND ht.status='.HTTPTEST_STATUS_ACTIVE
 	));
 
 	// fetch HTTP test execution data
