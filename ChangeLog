@@ -346,6 +346,8 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.7rc1
 
+New features:
+
 Bug fixes:
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
