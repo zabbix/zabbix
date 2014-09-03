@@ -3,6 +3,7 @@ Changes for 2.3.5
 New features:
 
 Bug fixes:
+..F....... [ZBX-8707] fixed not being able to add an action operation condition (Pavels)
 ..F....... [ZBX-8702] changed the default graph palette to generate the first line in green color and the second in red (Pavels)
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
