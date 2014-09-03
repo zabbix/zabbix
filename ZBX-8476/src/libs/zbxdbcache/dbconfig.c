@@ -5772,24 +5772,26 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 	LOCK_CACHE;
 
 	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)) &&
-			HOST_STATUS_PROXY_PASSIVE == dc_host->status &&
 			NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
 	{
-		if (0 != (0x01 & update_nextcheck))
-		{
-			dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
-		}
-		if (0 != (0x02 & update_nextcheck))
-		{
-			dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-		}
-
 		if (ZBX_LOC_POLLER == dc_proxy->location)
 			dc_proxy->location = ZBX_LOC_NOWHERE;
 
-		DCupdate_proxy_queue(dc_proxy);
+		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
+		{
+			if (0 != (0x01 & update_nextcheck))
+			{
+				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
+			}
+			if (0 != (0x02 & update_nextcheck))
+			{
+				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+			}
+
+			DCupdate_proxy_queue(dc_proxy);
+		}
 	}
 
 	UNLOCK_CACHE;
