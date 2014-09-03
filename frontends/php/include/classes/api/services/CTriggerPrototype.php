@@ -546,19 +546,19 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @see https://www.zabbix.com/documentation/2.4/manual/api/reference/triggerprototype/delete
 	 *
 	 * @param array $triggerPrototypeIds
-	 * @param bool  $noPermissionsCheck
+	 * @param bool  $nopermissions
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function delete(array $triggerPrototypeIds, $noPermissionsCheck = false) {
+	public function delete(array $triggerPrototypeIds, $nopermissions = false) {
 		if (!$triggerPrototypeIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		// TODO: remove $noPermissionCheck hack
-		if (!$noPermissionsCheck) {
+		if (!$nopermissions) {
 			$dbTriggerPrototypes = $this->get(array(
 				'triggerids' => $triggerPrototypeIds,
 				'output' => array('triggerid', 'description', 'expression'),
@@ -997,15 +997,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @return void
 	 */
 	protected function validateTriggerPrototypeExpression(array $triggerPrototype) {
-		$expression = new CTriggerExpression();
-		if (!$expression->parse($triggerPrototype['expression'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $expression->error);
+		$triggerExpression = new CTriggerExpression();
+		if (!$triggerExpression->parse($triggerPrototype['expression'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 		}
 
-		$expressionHostnames = $expression->getHosts();
+		$expressionHostnames = $triggerExpression->getHosts();
 		$this->checkTemplatesAndHostsTogether($expressionHostnames);
 
-		$triggerExpressionItems = getExpressionItems($expression);
+		$triggerExpressionItems = getExpressionItems($triggerExpression);
 		$this->checkDiscoveryRuleCount($triggerPrototype, $triggerExpressionItems);
 	}
 }
