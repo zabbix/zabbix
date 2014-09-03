@@ -625,7 +625,8 @@ class CItem extends CItemGeneral {
 			'selectHosts' => array('name'),
 			'itemids' => $itemIds,
 			'editable' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => $noPermissions ? null : ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
 		// TODO: remove $nopermissions hack
