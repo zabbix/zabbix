@@ -1849,12 +1849,20 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Checks if all of the given triggers are available for writing.
 	 *
-	 * @throws APIException     if a trigger is not writable or does not exist
+	 * @throws APIException     if a trigger is not writable or does not exist or is not normal
 	 *
 	 * @param array $triggerIds
 	 */
 	protected function checkPermissions(array $triggerIds) {
-		if (!$this->isWritable($triggerIds)) {
+		$triggerCount = $this->get(array(
+			'triggerids' => $triggerIds,
+			'output' => array('triggerid'),
+			'editable' => true,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'countOutput' => true
+		));
+
+		if ($triggerCount != count($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
