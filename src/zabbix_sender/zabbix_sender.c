@@ -44,7 +44,7 @@ const char	*help_message[] = {
 	"Utility to send monitoring data to Zabbix server or proxy.",
 	"",
 	"Options:",
-	"  -c --config config-file              Absolute path to Zabbix sender configuration file",
+	"  -c --config config-file              Absolute path to Zabbix agentd configuration file",
 	"",
 	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to",
 	"  -p --port port                       Specify port number of trapper process of Zabbix server or proxy.",
@@ -71,7 +71,7 @@ const char	*help_message[] = {
 	"  -h --help                            Display this help message",
 	"  -V --version                         Display version number",
 	"",
-	"Example: ./zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+	"Example: zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
 	NULL	/* end of text */
 };
 
