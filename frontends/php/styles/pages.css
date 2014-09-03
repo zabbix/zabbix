@@ -117,6 +117,7 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .filter tr td.inputcol { min-width: 277px; width: 35%; }
 .latest-mon .filter tr td.inputcol .checkbox { margin-top: 4px; }
 .latest-mon .filter tr td .text { width: 216px; }
+.latest-mon .filter .multiselect-wrapper { width: 269px; }
 .latest-mon .filter .multiselect { width: 217px; line-height: 12px; }
 
 /*history */
