@@ -561,7 +561,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!$nopermissions) {
 			$dbTriggerPrototypes = $this->get(array(
 				'triggerids' => $triggerPrototypeIds,
-				'output' => array('triggerid', 'description', 'expression', 'templateid'),
+				'output' => array('description', 'expression', 'templateid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
