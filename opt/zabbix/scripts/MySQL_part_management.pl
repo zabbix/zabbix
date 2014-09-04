@@ -89,7 +89,8 @@ $dbh->disconnect();
 
 sub check_have_partition {
     my $result = 0;
-    my $sth = $dbh->prepare(qq{SELECT variable_value FROM information_schema.global_variables WHERE variable_name = 'have_partitioning'});
+    #my $sth = $dbh->prepare(qq{SELECT variable_value FROM information_schema.global_variables WHERE variable_name = 'have_partitioning'});
+    my $sth = $dbh->prepare(qq{SELECT plugin_status FROM information_schema.plugins WHERE plugin_name = 'partition'});
 
     $sth->execute();
 
@@ -97,7 +98,8 @@ sub check_have_partition {
 
     $sth->finish();
 
-    return 1 if $row eq 'YES';
+    #return 1 if $row eq 'YES';
+    return 1 if $row eq 'ACTIVE';
 }
 
 sub create_next_partition {
