@@ -224,8 +224,7 @@ if ($type == SHOW_TRIGGERS) {
 		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
 		'maintenance' => !$filter['showMaintenance'] ? false : null,
 		'monitored' => true,
-		'skipDependent' => true,
-		'sortfield' => 'description'
+		'skipDependent' => true
 	);
 
 	// trigger status filter

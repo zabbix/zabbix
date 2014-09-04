@@ -46,7 +46,6 @@ class CScreenTriggersOverview extends CScreenBase {
 			'hostids' => $hostIds,
 			'monitored' => true,
 			'skipDependent' => true,
-			'sortfield' => 'description'
 		);
 
 		// application filter
