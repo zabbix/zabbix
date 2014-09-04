@@ -3,6 +3,11 @@ Changes for 2.3.5
 New features:
 
 Bug fixes:
+A......... [ZBX-8634] fixed trigger prototype validation to disallow items from both templates and hosts in same trigger prototype (Krists)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-8707] fixed not being able to add an action operation condition (Pavels)
+..F....... [ZBX-8702] changed the default graph palette to generate the first line in green color and the second in red (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ..F....... [ZBX-8683] fixed misplaced 'Add' button for IT Services having child services (Alexei)
@@ -345,7 +350,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.7rc1
 
+New features:
+
 Bug fixes:
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
@@ -1430,6 +1439,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
@@ -2999,6 +3009,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)

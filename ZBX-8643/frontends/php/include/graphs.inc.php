@@ -443,10 +443,10 @@ function get_next_color($palettetype = 0) {
 
 	switch ($prev_color['color']) {
 		case 0:
-			$r = $set_grad;
+			$g = $set_grad;
 			break;
 		case 1:
-			$g = $set_grad;
+			$r = $set_grad;
 			break;
 		case 2:
 			$b = $set_grad;
