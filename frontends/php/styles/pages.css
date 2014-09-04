@@ -147,7 +147,6 @@ table.tableinfo-overview-hint { width: 200px; }
 .item-list .filter .col1 span.text { padding: 0 4px; }
 .item-list .filter .multiselect-wrapper { width: 225px; }
 .item-list .menuPopup { width: 200px; }
-.item-list .filter .multiselect .selected ul { margin: 0;}
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -179,7 +178,6 @@ table.tableinfo-overview-hint { width: 200px; }
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
-#selementForm .multiselect .selected ul { margin: 0;}
 #map-window #application-select-row .link_menu { margin-left: 6px; }
 
 /* maintenance icon */
