@@ -29,57 +29,57 @@ class testClicks extends CWebTest {
 		return array(
 			// Configuration
 			array('hostgroups.php',
-				array('link=Discovered hosts','save'),
+				array('link=Discovered hosts','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=Zabbix servers','save'),
+				array('link=Zabbix servers','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=Hypervisors','save'),
+				array('link=Hypervisors','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=Linux servers','save'),
+				array('link=Linux servers','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=Virtual machines','save'),
+				array('link=Virtual machines','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=ZBX6648 All Triggers','save'),
+				array('link=ZBX6648 All Triggers','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=ZBX6648 Disabled Triggers','save'),
+				array('link=ZBX6648 Disabled Triggers','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=ZBX6648 Enabled Triggers','save'),
+				array('link=ZBX6648 Enabled Triggers','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
-				array('link=ZBX6648 Group No Hosts','save'),
+				array('link=ZBX6648 Group No Hosts','update'),
 				'Configuration of host groups',
 				'Group updated'
 			),
 			array('templates.php',
-				array('link=Template OS Linux','save'),
+				array('link=Template OS Linux','update'),
 				'Configuration of templates',
 				'Template updated'
 			),
 			array('templates.php',
-				array('link=ЗАББИКС Сервер','save'),
+				array('link=ЗАББИКС Сервер','update'),
 				'Configuration of hosts',
 				'Host updated'
 			),
@@ -89,43 +89,43 @@ class testClicks extends CWebTest {
 				'Grid'
 			),
 			array('discoveryconf.php',
-				array('link=Local network','save'),
+				array('link=Local network','update'),
 				'Configuration of discovery',
 				'Discovery rule updated'
 			),
 			// Administration
 			array('usergrps.php',
-				array('link=Guests', 'save'),
+				array('link=Guests', 'update'),
 				'Configuration of user groups',
 				'Group updated'
 			),
 			array('usergrps.php',
-				array('link=Zabbix administrators', 'save'),
+				array('link=Zabbix administrators', 'update'),
 				'Configuration of user groups',
 				'Group updated'
 			),
 			array('users.php',
-				array('link=Admin', 'save'),
+				array('link=Admin', 'update'),
 				'Configuration of users',
 				'User updated'
 			),
 			array('media_types.php',
-				array('link=Email', 'save'),
+				array('link=Email', 'update'),
 				'Configuration of media types',
 				'Media type updated'
 			),
 			array('media_types.php',
-				array('link=Jabber', 'save'),
+				array('link=Jabber', 'update'),
 				'Configuration of media types',
 				'Media type updated'
 			),
 			array('media_types.php',
-				array('link=SMS', 'save'),
+				array('link=SMS', 'update'),
 				'Configuration of media types',
 				'Media type updated'
 			),
 			array('scripts.php',
-				array('link=Ping', 'save'),
+				array('link=Ping', 'update'),
 				'Configuration of scripts',
 				'Script updated'
 			)

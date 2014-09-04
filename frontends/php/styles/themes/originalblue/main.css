@@ -38,17 +38,23 @@ div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
 
-.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
+.input[readonly], .input[readonly]:hover {
+	border-color: #d0d0d0;
+	background: #eeeeee;
+	color: #000000;
+}
+
+.input[disabled], .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #d0d0d0;
 	background: #eeeeee;
 	/* ignored by IE for <select> */
-	color: #505050;
+	color: #aca899;
 }
 
-/* disabled <select> font color for IE 9+ */
-select[disabled="disabled"]::-ms-value {
-	color: #505050;
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
+	color: #aca899;
 }
 
 .link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
@@ -57,14 +63,14 @@ select[disabled="disabled"]::-ms-value {
 }
 
 /* disabled form buttons */
-.input.button[disabled]:hover {
+.formtable .input.button[disabled]:hover {
 	background-color: #fafbfc;
 	border-color: #ced8e6;
 	color: #a8bfd4;
 }
 
 /* disabled save button */
-.jqueryinput.input.button[disabled]:hover {
+.formtable .jqueryinput.input.button[disabled]:hover {
 	border-color: #ffaa33;
 	color: #a8bfd4;
 }

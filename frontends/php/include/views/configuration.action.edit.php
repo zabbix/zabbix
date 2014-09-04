@@ -349,7 +349,7 @@ $conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
-$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted ui-corner-all'));
 
 /*
  * Operation tab
@@ -456,6 +456,7 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
+	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[id]', $this->data['new_operation']['id']));
@@ -925,7 +926,7 @@ if (!empty($this->data['new_operation'])) {
 				? _('Link with templates')
 				: _('Unlink from templates');
 
-			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup inlineblock border_dotted ui-corner-all')));
+			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup border_dotted ui-corner-all')));
 			break;
 	}
 
@@ -1057,7 +1058,7 @@ if (!empty($this->data['new_operation'])) {
 		SPACE.SPACE,
 		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 	);
-	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup floatleft border_dotted ui-corner-all'));
 }
 
 // append tabs to form
@@ -1073,12 +1074,25 @@ $actionForm->addItem($actionTabs);
 // append buttons to form
 $others = array();
 if (!empty($this->data['actionid'])) {
-	$others[] = new CButton('clone', _('Clone'));
-	$others[] = new CButtonDelete(_('Delete current action?'), url_param('form').url_param('eventsource').url_param('actionid'));
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CButton('clone', _('Clone')),
+			new CButtonDelete(
+				_('Delete current action?'),
+				url_param('form').url_param('eventsource').url_param('actionid')
+			),
+			new CButtonCancel(url_param('actiontype'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('actiontype'));
+else {
+	$actionForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('actiontype'))
+	));
+}
 
-$actionForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 // append form to widget
 $actionWidget->addItem($actionForm);

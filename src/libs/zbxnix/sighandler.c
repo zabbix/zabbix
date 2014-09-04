@@ -99,8 +99,6 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: child_signal_handler                                             *

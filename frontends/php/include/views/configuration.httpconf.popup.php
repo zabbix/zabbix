@@ -24,7 +24,7 @@ include('include/views/js/configuration.httpconf.popup.js.php');
 $httpPopupWidget = new CWidget(null, 'httptest-popup');
 
 $result = false;
-if (hasRequest('save')) {
+if (hasRequest('add') || hasRequest('update')) {
 	$result = true;
 	if ((!hasRequest('stepid') || (hasRequest('stepid') && getRequest('name') !== getRequest('old_name')))
 			&& hasRequest('steps_names')) {
@@ -46,7 +46,7 @@ else {
 	$retrieveMode = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 }
 
-if (hasRequest('save') && $result) {
+if ((hasRequest('add') || hasRequest('update')) && $result) {
 
 	$httpStepForJs = array(
 		'stepid' => getRequest('stepid'),
@@ -104,11 +104,18 @@ else {
 	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
-	$stepid = getRequest('stepid');
-	$httpPopupForm->addItem(makeFormFooter(
-		new CSubmit('save', isset($stepid) ? _('Update') : _('Add')),
-		new CButtonCancel(null, 'close_window();')
-	));
+	if (hasRequest('stepid')) {
+		$httpPopupForm->addItem(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			new CButtonCancel(null, 'close_window();')
+		));
+	}
+	else {
+		$httpPopupForm->addItem(makeFormFooter(
+			new CSubmit('add', _('Add')),
+			new CButtonCancel(null, 'close_window();')
+		));
+	}
 
 	$httpPopupWidget->addItem($httpPopupForm);
 }
