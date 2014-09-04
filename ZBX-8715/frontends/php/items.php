@@ -843,6 +843,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform') || hasRequest('massupdate')) && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
+		'action' => 'item.massupdateform',
 		'hostid' => getRequest('hostid'),
 		'itemids' => getRequest('group_itemid', array()),
 		'description' => getRequest('description', ''),
