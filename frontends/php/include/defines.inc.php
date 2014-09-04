@@ -942,10 +942,6 @@ define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
-// actions
-define('LONG_DESCRIPTION',	0);
-define('SHORT_DESCRIPTION',	1);
-
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);

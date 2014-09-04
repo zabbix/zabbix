@@ -54,10 +54,12 @@ $actionTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
-$actionConditionStringValues = actionConditionValues2str($this->data['actions'], $this->data['config']);
+$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
+$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions']);
 
 foreach ($this->data['actions'] as $aIdx => $action) {
 	$conditions = array();
+	$operations = array();
 
 	order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
@@ -69,9 +71,9 @@ foreach ($this->data['actions'] as $aIdx => $action) {
 	}
 
 	sortOperations($this->data['eventsource'], $action['operations']);
-	$operations = array();
-	foreach ($action['operations'] as $operation) {
-		$operations[] = get_operation_descr(SHORT_DESCRIPTION, $operation);
+
+	foreach ($action['operations'] as $oIdx => $operation) {
+		$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
 	}
 
 	if ($action['status'] == ACTION_STATUS_DISABLED) {

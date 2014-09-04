@@ -73,7 +73,7 @@ $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
 
-$actionConditionStringValues = actionConditionValues2str(array($this->data['action']), $this->data['config']);
+$actionConditionStringValues = actionConditionValueToString(array($this->data['action']), $this->data['config']);
 
 foreach ($this->data['action']['filter']['conditions'] as $cIdx => $condition) {
 	if (!isset($condition['conditiontype'])) {
@@ -379,6 +379,9 @@ else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
 }
 
+$actionOperationDescriptions = getActionOperationDescriptions(array($this->data['action']));
+$actionOperationHints = getActionOperationHints($this->data['action']['operations']);
+
 foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
 		continue;
@@ -390,8 +393,8 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 		$operation['mediatypeid'] = 0;
 	}
 
-	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
-	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
+	$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+	$details->setHint($actionOperationHints[$operationid]);
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$esc_steps_txt = null;
@@ -954,7 +957,7 @@ if (!empty($this->data['new_operation'])) {
 
 		$i = 0;
 
-		$conditionStringValues = actionOperationConditionValues2str(
+		$operationConditionStringValues = actionOperationConditionValueToString(
 			$this->data['new_operation']['opconditions']
 		);
 
@@ -980,7 +983,7 @@ if (!empty($this->data['new_operation'])) {
 				array(
 					$labelCol,
 					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-						$conditionStringValues[$cIdx]
+						$operationConditionStringValues[$cIdx]
 					),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
