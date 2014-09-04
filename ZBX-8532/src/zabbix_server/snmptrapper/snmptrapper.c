@@ -31,6 +31,9 @@ static int	trap_fd = -1;
 static int	trap_lastsize;
 static ino_t	trap_ino = 0;
 
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
+
 static void	DBget_lastsize()
 {
 	DB_RESULT	result;
@@ -463,10 +466,17 @@ static int	get_latest_data()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-void	main_snmptrapper_loop(void)
+ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 	double		sec;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
 
