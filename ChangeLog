@@ -1,6 +1,7 @@
 Changes for 2.3.6
 
 Bug fixes:
+..F....... [ZBX-8532] fixed frontend messaging sounds not playing on IE11 and playing in loop if set to play once on other browsers (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 2.3.5
