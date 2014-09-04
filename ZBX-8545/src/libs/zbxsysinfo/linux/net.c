@@ -82,11 +82,6 @@ int	nlerr;
 
 static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 {
-	int				ret = -1, fd = -1;
-	int				family = -1, found = 0, done;
-	int				status = -1, sequence = 0x5A4258;
-	struct timeval			timeout = { 1, 500 * 1000 };
-
 	struct
 	{
 		struct nlmsghdr		nlhdr;
@@ -94,27 +89,30 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 	}
 	request;
 
-	size_t				siz_request = sizeof(request), siz_sa_nl = sizeof(struct sockaddr_nl);
+	int			ret = -1, fd = -1, family = -1, found = 0, done, status = -1;
+	unsigned int		sequence = 0x5A4258;
+	struct timeval		timeout = { 1, 500 * 1000 };
 
-	request.nlhdr.nlmsg_len		= siz_request;
-	request.nlhdr.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
-	request.nlhdr.nlmsg_pid		= 0;
-	request.nlhdr.nlmsg_seq		= sequence;
-	request.nlhdr.nlmsg_type	= TCPDIAG_GETSOCK;
 
-	request.r.idiag_states		= (1 << state);
+	struct sockaddr_nl	s_sa = { AF_NETLINK, 0, 0, 0 };
+	struct iovec		s_io[1] = { { &request, sizeof(request) } };
+	struct msghdr		s_msg = { (void *)&s_sa, sizeof(struct sockaddr_nl), s_io, 1 };
 
-	struct sockaddr_nl		s_sa = { AF_NETLINK, 0, 0, 0 };
-	struct iovec			s_io[1] = { { &request, siz_request } };
-	struct msghdr			s_msg = { (void *)&s_sa, siz_sa_nl, s_io, 1 };
+	char			buffer[BUFSIZ] = { 0 };
 
-	char				buffer[BUFSIZ] = { 0 };
+	struct sockaddr_nl	r_sa = { AF_NETLINK, 0, 0, 0 };
+	struct iovec		r_io[1] = { { buffer, BUFSIZ } };
+	struct msghdr		r_msg = { (void *)&r_sa, sizeof(struct sockaddr_nl), r_io, 1 };
 
-	struct sockaddr_nl		r_sa = { AF_NETLINK, 0, 0, 0 };
-	struct iovec			r_io[1] = { { buffer, BUFSIZ } };
-	struct msghdr			r_msg = { (void *)&r_sa, siz_sa_nl, r_io, 1 };
+	struct nlmsghdr		*r_hdr = NULL;
 
-	struct nlmsghdr			*r_hdr = NULL;
+	request.nlhdr.nlmsg_len = sizeof(request);
+	request.nlhdr.nlmsg_flags = NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
+	request.nlhdr.nlmsg_pid = 0;
+	request.nlhdr.nlmsg_seq = sequence;
+	request.nlhdr.nlmsg_type = TCPDIAG_GETSOCK;
+
+	request.r.idiag_states = (1 << state);
 
 	do
 	{
@@ -170,7 +168,7 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 					break;
 
 				for (r_hdr = (struct nlmsghdr *)buffer;
-					NLMSG_OK(r_hdr, status) && 1 != found && 1 != done;
+					NLMSG_OK(r_hdr, (unsigned)status) && 1 != found && 1 != done;
 					r_hdr = NLMSG_NEXT(r_hdr, status))
 				{
 					struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
@@ -377,8 +375,7 @@ out:
  ******************************************************************************/
 static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc)
 {
-	int	n, fd, ret = -1;
-	size_t	offset = 0;
+	int	n, fd, ret = -1, offset = 0;
 
 	if (-1 == (fd = open(filename, O_RDONLY)))
 		return -1;
