@@ -3,6 +3,7 @@ Changes for 2.2.7rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
 ..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)

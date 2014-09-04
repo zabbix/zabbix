@@ -151,7 +151,7 @@ class CUser extends CZBXAPI {
 
 		// search
 		if (is_array($options['search'])) {
-			if ($options['search']['passwd']) {
+			if (isset($options['search']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password.'));
 			}
 
