@@ -290,13 +290,8 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		var date = this.sdt.format('Y-m-d H:i').split(' '),
-			yearMonthDay = date[0].split('-'),
-			hoursMinutes = date[1].split(':'),
-			month = yearMonthDay[1],
-			day = yearMonthDay[2],
-			hours = hoursMinutes[0],
-			minutes = hoursMinutes[1];
+		// get custom date format for input fields
+		var date = this.sdt.format('d m Y H i').split(' ');
 
 		switch (this.timeobjects.length) {
 			case 1:
@@ -315,66 +310,16 @@ calendar.prototype = {
 				break;
 			case 3:
 			case 5:
-				// day
-				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
-					this.timeobjects[0].value = day;
-				}
-				else {
-					if (IE) {
-						this.timeobjects[0].innerText = day;
-					}
-					else {
-						this.timeobjects[0].textContent = day;
-					}
-				}
-				// month
-				if (this.timeobjects[1].tagName.toLowerCase() == 'input') {
-					this.timeobjects[1].value = month;
-				}
-				else {
-					if(IE) {
-						this.timeobjects[1].innerText = month;
-					}
-					else {
-						this.timeobjects[1].textContent = month;
-					}
-				}
-				// year
-				if (this.timeobjects[2].tagName.toLowerCase() == 'input') {
-					this.timeobjects[2].value = this.sdt.getFullYear();
-				}
-				else {
-					if (IE) {
-						this.timeobjects[2].innerText = this.sdt.getFullYear();
-					}
-					else {
-						this.timeobjects[2].textContent = this.sdt.getFullYear();
-					}
-				}
-
-				if (this.timeobjects.length > 4) {
-					// hours
-					if (this.timeobjects[3].tagName.toLowerCase() == 'input') {
-						this.timeobjects[3].value = hours;
+				for (var i = 0; i < this.timeobjects.length; i++) {
+					if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
+						this.timeobjects[i].value = date[i];
 					}
 					else {
 						if (IE) {
-							this.timeobjects[3].innerText = hours;
+							this.timeobjects[i].innerText = date[i];
 						}
 						else {
-							this.timeobjects[3].textContent = hours;
-						}
-					}
-					// minutes
-					if (this.timeobjects[4].tagName.toLowerCase() == 'input') {
-						this.timeobjects[4].value = minutes;
-					}
-					else {
-						if (IE) {
-							this.timeobjects[4].innerText = minutes;
-						}
-						else {
-							this.timeobjects[4].textContent = minutes;
+							this.timeobjects[i].textContent = date[i];
 						}
 					}
 				}
