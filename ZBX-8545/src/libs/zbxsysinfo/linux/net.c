@@ -22,6 +22,46 @@
 #include "zbxjson.h"
 #include "log.h"
 
+#if HAVE_INET_DIAG
+#	include <sys/socket.h>
+#	include <linux/netlink.h>
+#	include <linux/inet_diag.h>
+
+enum
+{
+	STATE_UNKNOWN = 0,
+	STATE_ESTABLISHED,
+	STATE_SYN_SENT,
+	STATE_SYN_RECV,
+	STATE_FIN_WAIT1,
+	STATE_FIN_WAIT2,
+	STATE_TIME_WAIT,
+	STATE_CLOSE,
+	STATE_CLOSE_WAIT,
+	STATE_LAST_ACK,
+	STATE_LISTEN,
+	STATE_CLOSING,
+	STATE_MAXSTATES
+};
+
+#define	STATE_ALL ((1 << STATE_MAXSTATES) - 1)
+
+enum
+{
+	NLERR_OK = 0,
+	NLERR_UNKNOWN,
+	NLERR_SOCKCREAT,
+	NLERR_BADSEND,
+	NLERR_BADRECV,
+	NLERR_RECVTIMEOUT,
+	NLERR_RESPTRUNCAT,
+	NLERR_OPNOTSUPPORTED,
+	NLERR_UNKNOWNMSGTYPE
+};
+
+extern int	nlerr;
+#endif
+
 typedef struct
 {
 	zbx_uint64_t ibytes;
