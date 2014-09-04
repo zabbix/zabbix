@@ -173,7 +173,6 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 					NLMSG_OK(r_hdr, status) && 1 != found && 1 != done;
 					r_hdr = NLMSG_NEXT(r_hdr, status))
 				{
-					int			err;
 					struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
 
 					if (sequence != r_hdr->nlmsg_seq)
