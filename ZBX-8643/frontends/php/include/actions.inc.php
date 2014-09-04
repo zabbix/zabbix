@@ -130,7 +130,7 @@ function discovery_object2str($object = null) {
  *
  * @return array									returns an array of actions condition string values
  */
-function actionConditionValues2str(array $actions, array $config = null) {
+function actionConditionValueToString(array $actions, array $config = null) {
 	if (!$config) {
 		$config = select_config();
 	}
@@ -375,7 +375,7 @@ function actionConditionValues2str(array $actions, array $config = null) {
  *
  * @return array								returns an array of action operation condition string values
  */
-function actionOperationConditionValues2str(array $conditions) {
+function actionOperationConditionValueToString(array $conditions) {
 	$result = array();
 
 	foreach ($conditions as $condition) {
@@ -407,237 +407,409 @@ function getConditionDescription($conditionType, $operator, $value) {
 }
 
 /**
- * Generates array with HTML items representing operation with description
+ * Gathers media types, user groups, users, host groups, hosts and templates for actions and their operations, and
+ * returns the HTML representation of action operation values according to action operation type.
  *
- * @param int $type short or long description, use const. SHORT_DESCRIPTION and LONG_DESCRIPTION
- * @param array $data
- * @param int $data['operationtype'] type of operation: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, ...
- * @param int $data['opmessage']['mediatypeid'] type id of message media
- * @param bool $data['opmessage']['default_msg'] should default message be used
- * @param bool $data['opmessage']['operationid'] if true $data['operationid'] will be used to retrieve default messages from DB
- * @param string $data['opmessage']['subject'] subject of message
- * @param string $data['opmessage']['message'] message it self
- * @param array $data['opmessage_usr'] list of user ids if OPERATION_TYPE_MESSAGE
- * @param array $data['opmessage_grp'] list of group ids if OPERATION_TYPE_MESSAGE
- * @param array $data['opcommand_grp'] list of group ids if OPERATION_TYPE_COMMAND
- * @param array $data['opcommand_hst'] list of host ids if OPERATION_TYPE_COMMAND
- * @param array $data['opgroup'] list of group ids if OPERATION_TYPE_GROUP_ADD or OPERATION_TYPE_GROUP_REMOVE
- * @param array $data['optemplate'] list of template ids if OPERATION_TYPE_TEMPLATE_ADD or OPERATION_TYPE_TEMPLATE_REMOVE
- * @param int $data['operationid'] id of operation
- * @param int $data['opcommand']['type'] type of command: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ...
- * @param string $data['opcommand']['command'] actual command
- * @param int $data['opcommand']['scriptid'] script id used if $data['opcommand']['type'] is ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ * @param array $actions				array of actions
+ * @param array $action['operations']	array of action operations
  *
- * @return array
+ * @return array						returns an array of actions operation descriptions
  */
-function get_operation_descr($type, $data) {
+function getActionOperationDescriptions(array $actions) {
 	$result = array();
 
-	if ($type == SHORT_DESCRIPTION) {
-		switch ($data['operationtype']) {
-			case OPERATION_TYPE_MESSAGE:
-				$mediaTypes = API::Mediatype()->get(array(
-					'mediatypeids' => $data['opmessage']['mediatypeid'],
-					'output' => array('description')
-				));
-				if (empty($mediaTypes)) {
-					$mediatype = _('all media');
-				}
-				else {
-					$mediatype = reset($mediaTypes);
-					$mediatype = $mediatype['description'];
-				}
+	$mediaTypesToSelect = array();
+	$usersToSelect = array();
+	$userGroupsToSelect = array();
+	$hostsToSelect = array();
+	$hostGroupsToSelect = array();
+	$templatesToSelect = array();
 
+	foreach ($actions as $aIdx => $action) {
+		$result[$aIdx] = array();
 
-				if (!empty($data['opmessage_usr'])) {
-					$users = API::User()->get(array(
-						'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
-						'output' => array('userid', 'alias', 'name', 'surname')
-					));
-					order_result($users, 'alias');
+		foreach ($action['operations'] as $oIdx => $operation) {
+			$result[$aIdx][$oIdx] = array();
 
-					foreach ($users as $user) {
-						$fullnames[] = getUserFullname($user);
+			switch ($operation['operationtype']) {
+				// gather media type IDs, user IDs and user group IDs for later querying
+				case OPERATION_TYPE_MESSAGE:
+					$mediaTypeId = $operation['opmessage']['mediatypeid'];
+
+					if ($mediaTypeId != 0) {
+						$mediaTypesToSelect[$mediaTypeId] = $mediaTypeId;
 					}
 
-					$result[] = bold(_('Send message to users').NAME_DELIMITER);
-					$result[] = array(implode(', ', $fullnames), SPACE, _('via'), SPACE, $mediatype);
-					$result[] = BR();
-				}
-
-				if (!empty($data['opmessage_grp'])) {
-					$usrgrps = API::UserGroup()->get(array(
-						'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
-						'output' => API_OUTPUT_EXTEND
-					));
-					order_result($usrgrps, 'name');
-
-					$result[] = bold(_('Send message to user groups').NAME_DELIMITER);
-					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), SPACE, _('via'), SPACE, $mediatype);
-					$result[] = BR();
-				}
-				break;
-			case OPERATION_TYPE_COMMAND:
-				if (!isset($data['opcommand_grp'])) {
-					$data['opcommand_grp'] = array();
-				}
-				if (!isset($data['opcommand_hst'])) {
-					$data['opcommand_hst'] = array();
-				}
-
-				$hosts = API::Host()->get(array(
-					'hostids' => zbx_objectValues($data['opcommand_hst'], 'hostid'),
-					'output' => array('hostid', 'name')
-				));
-
-				foreach ($data['opcommand_hst'] as $cmd) {
-					if ($cmd['hostid'] != 0) {
-						continue;
+					if (isset($operation['opmessage_usr']) && $operation['opmessage_usr']) {
+						foreach ($operation['opmessage_usr'] as $users) {
+							$usersToSelect[$users['userid']] = $users['userid'];
+						}
 					}
 
-					$result[] = array(bold(_('Run remote commands on current host')), BR());
+					if (isset($operation['opmessage_grp']) && $operation['opmessage_grp']) {
+						foreach ($operation['opmessage_grp'] as $userGroups) {
+							$userGroupsToSelect[$userGroups['usrgrpid']] = $userGroups['usrgrpid'];
+						}
+					}
 					break;
-				}
 
-				if (!empty($hosts)) {
-					order_result($hosts, 'name');
-
-					$result[] = bold(_('Run remote commands on hosts').NAME_DELIMITER);
-					$result[] = array(implode(', ', zbx_objectValues($hosts, 'name')), BR());
-				}
-
-				$groups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($data['opcommand_grp'], 'groupid'),
-					'output' => array('groupid', 'name')
-				));
-
-				if (!empty($groups)) {
-					order_result($groups, 'name');
-
-					$result[] = bold(_('Run remote commands on host groups').NAME_DELIMITER);
-					$result[] = array(implode(', ', zbx_objectValues($groups, 'name')), BR());
-				}
-				break;
-			case OPERATION_TYPE_HOST_ADD:
-				$result[] = array(bold(_('Add host')), BR());
-				break;
-			case OPERATION_TYPE_HOST_REMOVE:
-				$result[] = array(bold(_('Remove host')), BR());
-				break;
-			case OPERATION_TYPE_HOST_ENABLE:
-				$result[] = array(bold(_('Enable host')), BR());
-				break;
-			case OPERATION_TYPE_HOST_DISABLE:
-				$result[] = array(bold(_('Disable host')), BR());
-				break;
-			case OPERATION_TYPE_GROUP_ADD:
-			case OPERATION_TYPE_GROUP_REMOVE:
-				if (!isset($data['opgroup'])) {
-					$data['opgroup'] = array();
-				}
-
-				$groups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($data['opgroup'], 'groupid'),
-					'output' => array('groupid', 'name')
-				));
-
-				if (!empty($groups)) {
-					order_result($groups, 'name');
-
-					if (OPERATION_TYPE_GROUP_ADD == $data['operationtype']) {
-						$result[] = bold(_('Add to host groups').NAME_DELIMITER);
-					}
-					else {
-						$result[] = bold(_('Remove from host groups').NAME_DELIMITER);
+				// gather host IDs and host group IDs for later querying
+				case OPERATION_TYPE_COMMAND:
+					if (isset($operation['opcommand_hst']) && $operation['opcommand_hst']) {
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] != 0) {
+								$hostsToSelect[$host['hostid']] = $host['hostid'];
+							}
+						}
 					}
 
-					$result[] = array(implode(', ', zbx_objectValues($groups, 'name')), BR());
-				}
-				break;
-			case OPERATION_TYPE_TEMPLATE_ADD:
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				if (!isset($data['optemplate'])) {
-					$data['optemplate'] = array();
-				}
-
-				$templates = API::Template()->get(array(
-					'templateids' => zbx_objectValues($data['optemplate'], 'templateid'),
-					'output' => array('hostid', 'name')
-				));
-
-				if (!empty($templates)) {
-					order_result($templates, 'name');
-
-					if (OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype']) {
-						$result[] = bold(_('Link to templates').NAME_DELIMITER);
+					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
+						foreach ($operation['opcommand_grp'] as $hostGroup) {
+							$hostGroupsToSelect[$hostGroup['groupid']] = $hostGroup['groupid'];
+						}
 					}
-					else {
-						$result[] = bold(_('Unlink from templates').NAME_DELIMITER);
-					}
+					break;
 
-					$result[] = array(implode(', ', zbx_objectValues($templates, 'name')), BR());
-				}
-				break;
-			default:
+				// gather host group IDs for later querying
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					foreach ($operation['opgroup'] as $hostGroup) {
+						$hostGroupsToSelect[$hostGroup['groupid']] = $hostGroup['groupid'];
+					}
+					break;
+
+				// gather template IDs for later querying
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					foreach ($operation['optemplate'] as $template) {
+						$templatesToSelect[$template['templateid']] = $template['templateid'];
+					}
+					break;
+
+				default:
+			}
 		}
 	}
-	else {
-		switch ($data['operationtype']) {
-			case OPERATION_TYPE_MESSAGE:
-				if (isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])) {
-					if (isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])) {
-						$result[] = array(bold(_('Subject').NAME_DELIMITER), BR(), zbx_nl2br($_REQUEST['def_shortdata']));
-						$result[] = array(bold(_('Message').NAME_DELIMITER), BR(), zbx_nl2br($_REQUEST['def_longdata']));
+
+	$mediaTypes = null;
+	$users = null;
+	$userGroups = null;
+	$hosts = null;
+	$hostGroups = null;
+	$templates = null;
+
+	if ($mediaTypesToSelect) {
+		$mediaTypes = API::Mediatype()->get(array(
+			'output' => array('description'),
+			'mediatypeids' => $mediaTypesToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	if ($usersToSelect) {
+		$fullnames = array();
+
+		$users = API::User()->get(array(
+			'output' => array('userid', 'alias', 'name', 'surname'),
+			'userids' => $usersToSelect
+		));
+
+		foreach ($users as $user) {
+			$fullnames[$user['userid']] = getUserFullname($user);
+		}
+	}
+
+	if ($userGroupsToSelect) {
+		$userGroups = API::UserGroup()->get(array(
+			'output' => array('name'),
+			'usrgrpids' => $userGroupsToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	if ($hostsToSelect) {
+		$hosts = API::Host()->get(array(
+			'output' => array('name'),
+			'hostids' => $hostsToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	if ($hostGroupsToSelect) {
+		$hostGroups = API::HostGroup()->get(array(
+			'output' => array('name'),
+			'groupids' => $hostGroupsToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	if ($templatesToSelect) {
+		$templates = API::Template()->get(array(
+			'output' => array('name'),
+			'templateids' => $templatesToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	// format the HTML ouput
+	foreach ($actions as $aIdx => $action) {
+		foreach ($action['operations'] as $oIdx => $operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_MESSAGE:
+					$mediaType = _('all media');
+
+					$mediaTypeId = $operation['opmessage']['mediatypeid'];
+
+					if ($mediaTypeId != 0 && isset($mediaTypes[$mediaTypeId])) {
+						$mediaType = $mediaTypes[$mediaTypeId]['description'];
 					}
-					elseif (isset($data['opmessage']['operationid'])) {
-						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
-								' FROM actions a,operations o '.
-								' WHERE a.actionid=o.actionid '.
-									' AND o.operationid='.zbx_dbstr($data['operationid']);
-						if ($rows = DBfetch(DBselect($sql, 1))) {
-							$result[] = array(bold(_('Subject').NAME_DELIMITER), BR(), zbx_nl2br($rows['def_shortdata']));
-							$result[] = array(bold(_('Message').NAME_DELIMITER), BR(), zbx_nl2br($rows['def_longdata']));
+
+					if (isset($operation['opmessage_usr']) && $operation['opmessage_usr']) {
+						$userNamesList = array();
+
+						foreach ($operation['opmessage_usr'] as $user) {
+							if (isset($fullnames[$user['userid']])) {
+								$userNamesList[] = $fullnames[$user['userid']];
+							}
+						}
+
+						order_result($userNamesList);
+
+						$result[$aIdx][$oIdx][] = bold(_('Send message to users').': ');
+						$result[$aIdx][$oIdx][] = array(implode(', ', $userNamesList), SPACE, _('via'), SPACE,
+							$mediaType
+						);
+						$result[$aIdx][$oIdx][] = BR();
+					}
+
+					if (isset($operation['opmessage_grp']) && $operation['opmessage_grp']) {
+						$userGroupsList = array();
+
+						foreach ($operation['opmessage_grp'] as $userGroup) {
+							if (isset($userGroups[$userGroup['usrgrpid']])) {
+								$userGroupsList[] = $userGroups[$userGroup['usrgrpid']]['name'];
+							}
+						}
+
+						order_result($userGroupsList);
+
+						$result[$aIdx][$oIdx][] = bold(_('Send message to user groups').': ');
+						$result[$aIdx][$oIdx][] = array(implode(', ', $userGroupsList), SPACE, _('via'), SPACE,
+							$mediaType
+						);
+						$result[$aIdx][$oIdx][] = BR();
+					}
+					break;
+
+				case OPERATION_TYPE_COMMAND:
+					if (isset($operation['opcommand_hst']) && $operation['opcommand_hst']) {
+						$hostList = array();
+
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] == 0) {
+								$result[$aIdx][$oIdx][] = array(
+									bold(_('Run remote commands on current host')),
+									BR()
+								);
+							}
+							elseif (isset($hosts[$host['hostid']])) {
+								$hostList[] = $hosts[$host['hostid']]['name'];
+							}
+						}
+
+						if ($hostList) {
+							order_result($hostList);
+
+							$result[$aIdx][$oIdx][] = bold(_('Run remote commands on hosts').': ');
+							$result[$aIdx][$oIdx][] = array(implode(', ', $hostList), BR());
 						}
 					}
+
+					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
+						$hostGroupList = array();
+
+						foreach ($operation['opcommand_grp'] as $hostGroup) {
+							if (isset($hostGroups[$hostGroup['groupid']])) {
+								$hostGroupList[] = $hostGroups[$hostGroup['groupid']]['name'];
+							}
+						}
+
+						order_result($hostGroupList);
+
+						$result[$aIdx][$oIdx][] = bold(_('Run remote commands on host groups').': ');
+						$result[$aIdx][$oIdx][] = array(implode(', ', $hostGroupList), BR());
+					}
+					break;
+
+				case OPERATION_TYPE_HOST_ADD:
+					$result[$aIdx][$oIdx][] = array(bold(_('Add host')), BR());
+					break;
+
+				case OPERATION_TYPE_HOST_REMOVE:
+					$result[$aIdx][$oIdx][] = array(bold(_('Remove host')), BR());
+					break;
+
+				case OPERATION_TYPE_HOST_ENABLE:
+					$result[$aIdx][$oIdx][] = array(bold(_('Enable host')), BR());
+					break;
+
+				case OPERATION_TYPE_HOST_DISABLE:
+					$result[$aIdx][$oIdx][] = array(bold(_('Disable host')), BR());
+					break;
+
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$hostGroupList = array();
+
+					foreach ($operation['opgroup'] as $hostGroup) {
+						if (isset($hostGroups[$hostGroup['groupid']])) {
+							$hostGroupList[] = $hostGroups[$hostGroup['groupid']]['name'];
+						}
+					}
+
+					order_result($hostGroupList);
+
+					if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
+						$result[$aIdx][$oIdx][] = bold(_('Add to host groups').': ');
+					}
+					else {
+						$result[$aIdx][$oIdx][] = bold(_('Remove from host groups').': ');
+					}
+
+					$result[$aIdx][$oIdx][] = array(implode(', ', $hostGroupList), BR());
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$templateList = array();
+
+					foreach ($operation['optemplate'] as $template) {
+						if (isset($templates[$template['templateid']])) {
+							$templateList[] = $templates[$template['templateid']]['name'];
+						}
+					}
+
+					order_result($templateList);
+
+					if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
+						$result[$aIdx][$oIdx][] = bold(_('Link to templates').': ');
+					}
+					else {
+						$result[$aIdx][$oIdx][] = bold(_('Unlink from templates').': ');
+					}
+
+					$result[$aIdx][$oIdx][] = array(implode(', ', $templateList), BR());
+			}
+		}
+	}
+
+	return $result;
+}
+
+/**
+ * Gathers action operation script details and returns the HTML items representing action operation with hint.
+ *
+ * @param array  $operations						array of action operations
+ * @param string $operation['operationtype']		action operation type.
+ *													Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
+ * @param string $operation['opcommand']['type']	action operation command type.
+ *													Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+ *													ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+ *													and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ *
+ * @return array									returns an array of action operation hints
+ */
+function getActionOperationHints(array $operations) {
+	$result = array();
+
+	$scriptsToSelect = array();
+
+	foreach ($operations as $oIdx => $operation) {
+		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+			$scriptId = $operation['opcommand']['scriptid'];
+			$scriptsToSelect[$scriptId] = $scriptId;
+		}
+	}
+
+	$scripts = null;
+	if ($scriptsToSelect) {
+		$scripts = API::Script()->get(array(
+			'output' => array('name'),
+			'scriptids' => $scriptsToSelect,
+			'preservekeys' => true
+		));
+	}
+
+	foreach ($operations as $oIdx => $operation) {
+		$result[$oIdx] = array();
+
+		switch ($operation['operationtype']) {
+			case OPERATION_TYPE_MESSAGE:
+				if (hasRequest('def_shortdata') && hasRequest('def_longdata')) {
+					$result[$oIdx][] = array(bold(_('Subject').': '), BR(), zbx_nl2br(getRequest('def_shortdata')));
+					$result[$oIdx][] = array(bold(_('Message').': '), BR(), zbx_nl2br(getRequest('def_longdata')));
 				}
 				else {
-					$result[] = array(bold(_('Subject').NAME_DELIMITER), BR(), zbx_nl2br($data['opmessage']['subject']));
-					$result[] = array(bold(_('Message').NAME_DELIMITER), BR(), zbx_nl2br($data['opmessage']['message']));
+					$result[$oIdx][] = array(bold(_('Subject').': '), BR(),
+						zbx_nl2br($operation['opmessage']['subject'])
+					);
+					$result[$oIdx][] = array(bold(_('Message').': '), BR(),
+						zbx_nl2br($operation['opmessage']['message'])
+					);
 				}
-
 				break;
+
 			case OPERATION_TYPE_COMMAND:
-				switch ($data['opcommand']['type']) {
+				switch ($operation['opcommand']['type']) {
 					case ZBX_SCRIPT_TYPE_IPMI:
-						$result[] = array(bold(_('Run IPMI command').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[$oIdx][] = array(bold(_('Run IPMI command').': '), BR(),
+							italic(zbx_nl2br($operation['opcommand']['command']))
+						);
 						break;
+
 					case ZBX_SCRIPT_TYPE_SSH:
-						$result[] = array(bold(_('Run SSH commands').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[$oIdx][] = array(bold(_('Run SSH commands').': '), BR(),
+							italic(zbx_nl2br($operation['opcommand']['command']))
+						);
 						break;
+
 					case ZBX_SCRIPT_TYPE_TELNET:
-						$result[] = array(bold(_('Run TELNET commands').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[$oIdx][] = array(bold(_('Run TELNET commands').': '), BR(),
+							italic(zbx_nl2br($operation['opcommand']['command']))
+						);
 						break;
+
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-						if ($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-							$result[] = array(bold(_('Run custom commands on Zabbix agent').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
+							$result[$oIdx][] = array(bold(_('Run custom commands on Zabbix agent').': '), BR(),
+								italic(zbx_nl2br($operation['opcommand']['command']))
+							);
 						}
 						else {
-							$result[] = array(bold(_('Run custom commands on Zabbix server').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+							$result[$oIdx][] = array(bold(_('Run custom commands on Zabbix server').': '), BR(),
+								italic(zbx_nl2br($operation['opcommand']['command']))
+							);
 						}
 						break;
-					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-						$userScripts = API::Script()->get(array(
-							'scriptids' => $data['opcommand']['scriptid'],
-							'output' => API_OUTPUT_EXTEND
-						));
-						$userScript = reset($userScripts);
 
-						$result[] = array(bold(_('Run global script').NAME_DELIMITER), italic($userScript['name']));
+					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+						$scriptId = $operation['opcommand']['scriptid'];
+
+						if (isset($scripts[$scriptId])) {
+							$result[$oIdx][] = array(bold(_('Run global script').': '),
+								italic($scripts[$scriptId]['name'])
+							);
+						}
 						break;
+
 					default:
-						$result[] = array(bold(_('Run commands').NAME_DELIMITER), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[$oIdx][] = array(bold(_('Run commands').': '), BR(),
+							italic(zbx_nl2br($operation['opcommand']['command']))
+						);
 				}
 				break;
+
 			default:
 		}
 	}
