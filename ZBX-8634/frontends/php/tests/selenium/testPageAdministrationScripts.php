@@ -55,7 +55,7 @@ class testPageAdministrationScripts extends CWebTest {
 			$this->zbxTestTextPresent(array($dbRow['name'], $dbRow['command']));
 		}
 
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
@@ -67,7 +67,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 		$this->zbxTestClickWait('link='.$script['name']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script updated');
 		$this->zbxTestTextPresent($script['name']);
@@ -82,7 +82,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 		$this->zbxTestCheckboxSelect('all_scripts');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of scripts');
@@ -105,7 +105,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 		$this->zbxTestCheckboxSelect('scripts['.$script['scriptid'].']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of scripts');

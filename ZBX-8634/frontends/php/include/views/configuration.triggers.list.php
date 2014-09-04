@@ -226,7 +226,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$status = new CLink(
 			triggerIndicator($trigger['status']),
 			'trigger_prototypes.php?'.
-				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+					? 'triggerprototype.massenable'
+					: 'triggerprototype.massdisable'
+				).
 				'&hostid='.$this->data['hostid'].
 				'&g_triggerid='.$triggerid.
 				'&parent_discoveryid='.$this->data['parent_discoveryid'],
@@ -237,7 +240,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$status = new CLink(
 			triggerIndicator($trigger['status'], $trigger['state']),
 			'triggers.php?'.
-				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+					? 'trigger.massenable'
+					: 'trigger.massdisable'
+				).
 				'&hostid='.$this->data['hostid'].
 				'&g_triggerid='.$triggerid,
 			triggerIndicatorStyle($trigger['status'], $trigger['state'])
@@ -271,29 +277,34 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Enable selected'));
+
+$actionObject = $this->data['parent_discoveryid'] ? 'triggerprototype' : 'trigger';
+
+$goComboBox = new CComboBox('action');
+
+$goOption = new CComboItem($actionObject.'.massenable', _('Enable selected'));
 $goOption->setAttribute(
 	'confirm',
 	$this->data['parent_discoveryid'] ? _('Enable selected trigger prototypes?') : _('Enable selected triggers?')
 );
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption = new CComboItem($actionObject.'.massdisable', _('Disable selected'));
 $goOption->setAttribute(
 	'confirm',
 	$this->data['parent_discoveryid'] ? _('Disable selected trigger prototypes?') : _('Disable selected triggers?')
 );
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('massupdate', _('Mass update'));
+$goOption = new CComboItem($actionObject.'.massupdateform', _('Mass update'));
 $goComboBox->addItem($goOption);
+
 if (empty($this->data['parent_discoveryid'])) {
-	$goOption = new CComboItem('copy_to', _('Copy selected to ...'));
+	$goOption = new CComboItem($actionObject.'.masscopyto', _('Copy selected to ...'));
 	$goComboBox->addItem($goOption);
 }
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem($actionObject.'.massdelete', _('Delete selected'));
 $goOption->setAttribute(
 	'confirm',
 	$this->data['parent_discoveryid'] ? _('Delete selected trigger prototypes?') : _('Delete selected triggers?')

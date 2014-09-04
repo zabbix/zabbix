@@ -38,8 +38,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'name' => 							array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
-	'algorithm' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
+	'name' => 							array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
+	'algorithm' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'),
 	'showsla' =>						array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'goodsla' => 						array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
 	'sortorder' => 						array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
@@ -61,7 +61,8 @@ $fields = array(
 	'parentid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'parentname' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'save_service' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add' =>							array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>							array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_service_time' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>							array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	// others
@@ -122,7 +123,7 @@ if (isset($_REQUEST['form'])) {
 	$result = false;
 
 	// save
-	if (isset($_REQUEST['save_service'])) {
+	if (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$children = getRequest('children', array());
@@ -271,7 +272,7 @@ if (isset($_REQUEST['pservices'])) {
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
-		'sortfield' => array('sortorder', 'name')
+		'sortfield' => array('name')
 	));
 
 	if (isset($service)) {
@@ -312,7 +313,7 @@ elseif (isset($_REQUEST['cservices'])) {
 		'output' => array('serviceid', 'name', 'algorithm'),
 		'selectTrigger' => array('triggerid', 'description', 'expression'),
 		'preservekeys' => true,
-		'sortfield' => array('sortorder', 'name')
+		'sortfield' => array('name')
 	));
 
 	if (isset($service)) {
@@ -402,6 +403,8 @@ elseif (isset($_REQUEST['form'])) {
 					'soft' => $dependency['soft'],
 				);
 			}
+
+			CArrayHelper::sort($data['children'], array('name', 'serviceid'));
 		}
 	}
 	// populate the form from a submitted request

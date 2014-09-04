@@ -1627,8 +1627,8 @@ class testFormAction extends CWebTest {
 			$this->assertElementNotPresent('cancel_new_operation');
 		}
 
-		$this->assertVisible('save');
-		$this->assertAttribute('//input[@id=\'save\']/@value', 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute('//input[@id=\'update\']/@value', 'Update');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute('//input[@id=\'cancel\']/@value', 'Cancel');
@@ -1666,7 +1666,7 @@ class testFormAction extends CWebTest {
 		}
 
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent(array(
 				'Action updated',
@@ -1929,7 +1929,7 @@ class testFormAction extends CWebTest {
 						break;
 					case 'Remote command':
 						$this->zbxTestClick('add');
-						$this->zbxTestClick("//input[@name='save']");
+						$this->zbxTestClick("//input[@name='add']");
 						$this->type('new_operation_opcommand_command', $operation['command']);
 						break;
 					case 'Remote command':
@@ -1949,7 +1949,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('search');
 		sleep(1);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case ACTION_GOOD:
@@ -2015,7 +2015,7 @@ class testFormAction extends CWebTest {
 		$this->wait();
 // add target current host
 		$this->zbxTestClick('add');
-		$this->zbxTestClick("//input[@name='save']");
+		$this->zbxTestClick("//input[@name='add']");
 
 // add target host Zabbix server
 		$this->zbxTestClick('add');
@@ -2027,7 +2027,7 @@ class testFormAction extends CWebTest {
 		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClick("//input[@name='save']");
+		$this->zbxTestClick("//input[@name='add']");
 
 		sleep(1);
 // add target group Zabbix servers
@@ -2040,7 +2040,7 @@ class testFormAction extends CWebTest {
 		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClick("//input[@name='save']");
+		$this->zbxTestClick("//input[@name='add']");
 
 		sleep(1);
 
@@ -2057,7 +2057,7 @@ class testFormAction extends CWebTest {
 		$this->select("new_operation_operationtype", "label=Remote command");
 		$this->wait();
 		$this->zbxTestClick('add');
-		$this->zbxTestClick("//input[@name='save']");
+		$this->zbxTestClick("//input[@name='add']");
 		$this->select("new_operation_opcommand_type", "label=SSH");
 		$this->type("new_operation_opcommand_username", "user");
 		$this->type("new_operation_opcommand_password", "pass");
@@ -2076,7 +2076,7 @@ class testFormAction extends CWebTest {
 		$this->type('new_condition_value', '');
 		sleep(1);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Action added');
 	}
 

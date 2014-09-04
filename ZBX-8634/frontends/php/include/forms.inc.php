@@ -1314,7 +1314,6 @@ function getTriggerMassupdateFormData() {
 		'dependencies' => getRequest('dependencies', array()),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'go' => getRequest('go', 'massupdate'),
 		'g_triggerid' => getRequest('g_triggerid', array()),
 		'priority' => getRequest('priority', 0),
 		'config' => select_config(),

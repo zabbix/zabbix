@@ -98,6 +98,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'expandData');
+
 		// editable + permission check
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;

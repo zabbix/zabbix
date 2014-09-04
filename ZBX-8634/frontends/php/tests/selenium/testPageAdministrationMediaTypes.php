@@ -61,7 +61,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->zbxTestTextPresent(array($dbRow['description'], $this->mediatypes[$dbRow['type']]));
 		}
 
-		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
@@ -73,7 +73,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->zbxTestClickWait('link='.$mediatype['description']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestTextPresent('Media type updated');
 		$this->zbxTestTextPresent($mediatype['description']);
@@ -95,7 +95,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestDropdownSelect('action', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of media types');
@@ -123,7 +123,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestDropdownSelect('action', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of media types');
@@ -156,7 +156,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of media types');

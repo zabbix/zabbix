@@ -30,23 +30,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'proxyid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Proxy name')),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
-	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
+	'proxyid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
+	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Proxy name')),
+	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({add}) || isset({update})'),
+	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && {status} == '.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+							IN('"proxy.massenable","proxy.massdisable","proxy.massdelete"'),
+							null
+						),
+	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN("'host'"),								null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN("'".ZBX_SORT_DOWN."','".ZBX_SORT_UP."'"),	null)
+	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"host"'),								null),
+	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 check_fields($fields);
 
@@ -65,7 +69,7 @@ if (isset($_REQUEST['proxyid'])) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['go'])) {
+if (isset($_REQUEST['action'])) {
 	if (!isset($_REQUEST['hosts']) || !is_array($_REQUEST['hosts'])) {
 		access_deny();
 	}
@@ -81,12 +85,11 @@ if (isset($_REQUEST['go'])) {
 		}
 	}
 }
-$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('add') || hasRequest('update')) {
 	$proxy = array(
 		'host' => getRequest('host'),
 		'status' => getRequest('status'),
@@ -103,8 +106,8 @@ if (isset($_REQUEST['save'])) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
-	if (isset($_REQUEST['proxyid'])) {
-		$proxy['proxyid'] = $_REQUEST['proxyid'];
+	if (hasRequest('update')) {
+		$proxy['proxyid'] = getRequest('proxyid');
 		$result = API::Proxy()->update($proxy);
 
 		$messageSuccess = _('Proxy updated');
@@ -123,7 +126,6 @@ if (isset($_REQUEST['save'])) {
 		add_audit($auditAction, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($result['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
-	unset($_REQUEST['save']);
 
 	$result = DBend($result);
 
@@ -147,11 +149,11 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['proxyid'])) {
 	unset($_REQUEST['proxyid'], $_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('hosts')) {
+elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.massdisable')) && hasRequest('hosts')) {
 	$result = true;
-	$enable =(getRequest('go') == 'activate');
+	$enable =(getRequest('action') == 'proxy.massenable');
 	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = getRequest('hosts', array());
+	$hosts = getRequest('hosts');
 
 	DBstart();
 
@@ -191,7 +193,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
+elseif (hasRequest('action') && getRequest('action') == 'proxy.massdelete' && hasRequest('hosts')) {
 	DBstart();
 
 	$result = API::Proxy()->delete(getRequest('hosts'));
@@ -286,7 +288,7 @@ else {
 
 	// calculate performance
 	$dbPerformance = DBselect(
-		'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
+		'SELECT h.proxy_hostid,SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) AS qps'.
 		' FROM items i,hosts h'.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.hostid=h.hostid'.

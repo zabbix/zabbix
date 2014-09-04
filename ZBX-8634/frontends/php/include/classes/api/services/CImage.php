@@ -161,16 +161,20 @@ class CImage extends CApiService {
 	/**
 	 * Get images.
 	 *
-	 * @param array $image
-	 * @param array $image['name']
-	 * @param array $image['hostid']
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return array|boolean
+	 * @param array  $image
+	 * @param string $image['name']
+	 * @param string $image['hostid']
+	 *
+	 * @return array
 	 */
-	public function getObjects($imageData) {
+	public function getObjects(array $imageData) {
+		$this->deprecated('image.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $imageData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $imageData
 		));
 	}
 
@@ -183,16 +187,16 @@ class CImage extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('image.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
+		$image = $this->get(array(
 			'output' => array('imageid'),
+			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $image;
 	}
 
 	/**

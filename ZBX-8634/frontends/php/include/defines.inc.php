@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.3.4');
-define('ZABBIX_API_VERSION',	'2.3.4');
+define('ZABBIX_VERSION',		'2.3.5');
+define('ZABBIX_API_VERSION',	'2.3.5');
 define('ZABBIX_DB_VERSION',		2030118);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
@@ -770,7 +770,13 @@ define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
  */
 define('SPACE',	'&nbsp;');
 
+/**
+ * Symbol used to separate name pairs such as "host: item" or "proxy: host".
+ *
+ * Should not be used as just a colon.
+ */
 define('NAME_DELIMITER', ': ');
+
 define('UNKNOWN_VALUE', '-');
 
 // suffixes
@@ -956,6 +962,11 @@ define('QUEUE_DETAIL_ITEM_COUNT', 500);
 define('COPY_TYPE_TO_HOST', 0);
 define('COPY_TYPE_TO_TEMPLATE', 2);
 define('COPY_TYPE_TO_HOST_GROUP', 1);
+
+define('HISTORY_GRAPH', 'showgraph');
+define('HISTORY_BATCH_GRAPH', 'batchgraph');
+define('HISTORY_VALUES', 'showvalues');
+define('HISTORY_LATEST', 'showlatest');
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');

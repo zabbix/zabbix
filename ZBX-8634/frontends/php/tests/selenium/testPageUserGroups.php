@@ -38,7 +38,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestTextPresent(array('Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode'));
 		// Data
 		$this->zbxTestTextPresent(array($group['name']));
-		$this->zbxTestDropdownHasOptions('go',
+		$this->zbxTestDropdownHasOptions('action',
 				array('Enable selected', 'Disable selected', 'Enable DEBUG', 'Disable DEBUG', 'Delete selected'));
 	}
 
@@ -57,7 +57,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Group updated');
 		$this->zbxTestTextPresent("$name");
@@ -81,7 +81,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestDropdownSelect('action', 'Enable selected');
 		$this->zbxTestClick('goButton');
 
 		$this->getConfirmation();
@@ -111,7 +111,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestDropdownSelect('action', 'Disable selected');
 		$this->zbxTestClick('goButton');
 
 		$this->getConfirmation();
@@ -149,7 +149,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('go', 'Enable DEBUG');
+		$this->zbxTestDropdownSelect('action', 'Enable DEBUG');
 		$this->zbxTestClick('goButton');
 
 		$this->getConfirmation();
@@ -177,7 +177,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('go', 'Disable DEBUG');
+		$this->zbxTestDropdownSelect('action', 'Disable DEBUG');
 		$this->zbxTestClick('goButton');
 
 		$this->getConfirmation();

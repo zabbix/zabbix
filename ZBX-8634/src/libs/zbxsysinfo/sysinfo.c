@@ -385,24 +385,24 @@ void	test_parameter(const char *key)
 
 	if (SUCCEED == process(key, 0, &result))
 	{
-		if (ISSET_UI64(&result))
+		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
-		if (ISSET_DBL(&result))
+		if (0 != ISSET_DBL(&result))
 			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 
-		if (ISSET_STR(&result))
+		if (0 != ISSET_STR(&result))
 			printf(" [s|%s]", result.str);
 
-		if (ISSET_TEXT(&result))
+		if (0 != ISSET_TEXT(&result))
 			printf(" [t|%s]", result.text);
 
-		if (ISSET_MSG(&result))
+		if (0 != ISSET_MSG(&result))
 			printf(" [m|%s]", result.msg);
 	}
 	else
 	{
-		if (ISSET_MSG(&result))
+		if (0 != ISSET_MSG(&result))
 			printf(" [m|" ZBX_NOTSUPPORTED "] [%s]", result.msg);
 		else
 			printf(" [m|" ZBX_NOTSUPPORTED "]");
@@ -691,7 +691,7 @@ zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)
 {
 	size_t	i;
 
-	if (!ISSET_LOG(result) || NULL == result->logs[0])
+	if (0 == ISSET_LOG(result) || NULL == result->logs[0])
 		return 0;
 
 	for (i = 1; NULL != result->logs[i]; i++)
@@ -797,7 +797,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 		if (ITEM_VALUE_TYPE_UINT64 == value_type)
 			error = zbx_dsprintf(error,
 					"Received value [%s] is not suitable for value type [%s] and data type [%s]",
-					c, zbx_item_value_type_string(value_type), zbx_item_data_type_string(data_type));
+					c, zbx_item_value_type_string(value_type),
+					zbx_item_data_type_string(data_type));
 		else
 			error = zbx_dsprintf(error,
 					"Received value [%s] is not suitable for value type [%s]",
@@ -815,15 +816,15 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (ISSET_UI64(result))
+	if (0 != ISSET_UI64(result))
 	{
 		/* nothing to do */
 	}
-	else if (ISSET_DBL(result))
+	else if (0 != ISSET_DBL(result))
 	{
 		SET_UI64_RESULT(result, result->dbl);
 	}
-	else if (ISSET_STR(result))
+	else if (0 != ISSET_STR(result))
 	{
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"+");
@@ -834,7 +835,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, value);
 	}
-	else if (ISSET_TEXT(result))
+	else if (0 != ISSET_TEXT(result))
 	{
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"+");
@@ -847,7 +848,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (ISSET_UI64(result))
+	if (0 != ISSET_UI64(result))
 		return &result->ui64;
 
 	return NULL;
@@ -859,15 +860,15 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (ISSET_DBL(result))
+	if (0 != ISSET_DBL(result))
 	{
 		/* nothing to do */
 	}
-	else if (ISSET_UI64(result))
+	else if (0 != ISSET_UI64(result))
 	{
 		SET_DBL_RESULT(result, result->ui64);
 	}
-	else if (ISSET_STR(result))
+	else if (0 != ISSET_STR(result))
 	{
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"+");
@@ -878,7 +879,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 
 		SET_DBL_RESULT(result, value);
 	}
-	else if (ISSET_TEXT(result))
+	else if (0 != ISSET_TEXT(result))
 	{
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"+");
@@ -891,7 +892,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (ISSET_DBL(result))
+	if (0 != ISSET_DBL(result))
 		return &result->dbl;
 
 	return NULL;
@@ -903,11 +904,11 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (ISSET_STR(result))
+	if (0 != ISSET_STR(result))
 	{
 		/* nothing to do */
 	}
-	else if (ISSET_TEXT(result))
+	else if (0 != ISSET_TEXT(result))
 	{
 		/* NOTE: copy only line */
 		for (p = result->text; '\0' != *p && '\r' != *p && '\n' != *p; p++);
@@ -916,17 +917,17 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 		SET_STR_RESULT(result, zbx_strdup(NULL, result->text)); /* copy line */
 		*p = tmp; /* restore result->text character */
 	}
-	else if (ISSET_UI64(result))
+	else if (0 != ISSET_UI64(result))
 	{
 		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
-	else if (ISSET_DBL(result))
+	else if (0 != ISSET_DBL(result))
 	{
 		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (ISSET_STR(result))
+	if (0 != ISSET_STR(result))
 		return &result->str;
 
 	return NULL;
@@ -936,25 +937,25 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 {
 	assert(result);
 
-	if (ISSET_TEXT(result))
+	if (0 != ISSET_TEXT(result))
 	{
 		/* nothing to do */
 	}
-	else if (ISSET_STR(result))
+	else if (0 != ISSET_STR(result))
 	{
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, result->str));
 	}
-	else if (ISSET_UI64(result))
+	else if (0 != ISSET_UI64(result))
 	{
 		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
-	else if (ISSET_DBL(result))
+	else if (0 != ISSET_DBL(result))
 	{
 		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (ISSET_TEXT(result))
+	if (0 != ISSET_TEXT(result))
 		return &result->text;
 
 	return NULL;
@@ -962,10 +963,10 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 
 static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
 {
-	if (ISSET_LOG(result))
+	if (0 != ISSET_LOG(result))
 		return result->logs;
 
-	if (ISSET_STR(result) || ISSET_TEXT(result) || ISSET_UI64(result) || ISSET_DBL(result))
+	if (0 != ISSET_STR(result) || 0 != ISSET_TEXT(result) || 0 != ISSET_UI64(result) || 0 != ISSET_DBL(result))
 	{
 		zbx_log_t	*log;
 		size_t		i;
@@ -973,13 +974,13 @@ static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
 		log = zbx_malloc(NULL, sizeof(zbx_log_t));
 
 		zbx_log_init(log);
-		if (ISSET_STR(result))
+		if (0 != ISSET_STR(result))
 			log->value = zbx_strdup(log->value, result->str);
-		else if (ISSET_TEXT(result))
+		else if (0 != ISSET_TEXT(result))
 			log->value = zbx_strdup(log->value, result->text);
-		else if (ISSET_UI64(result))
+		else if (0 != ISSET_UI64(result))
 			log->value = zbx_dsprintf(log->value, ZBX_FS_UI64, result->ui64);
-		else if (ISSET_DBL(result))
+		else if (0 != ISSET_DBL(result))
 			log->value = zbx_dsprintf(log->value, ZBX_FS_DBL, result->dbl);
 
 		for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
@@ -1037,7 +1038,7 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 		case AR_LOG:
 			return (void *)get_result_log_value(result);
 		case AR_MESSAGE:
-			if (ISSET_MSG(result))
+			if (0 != ISSET_MSG(result))
 				return (void *)(&result->msg);
 			break;
 		default:

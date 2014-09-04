@@ -1,5 +1,6 @@
 <script type="text/javascript">
 	jQuery(function($) {
+		chkbxRange.pageGoName = "itemids";
 
 		/**
 		 * Make so that all visible table rows would alternate colors
@@ -116,6 +117,10 @@
 				toggle_ids: appId,
 				toggle_open_state: openState
 			});
+		});
+
+		$('#filter_set, #filter_rst').click(function() {
+			chkbxRange.clearSelectedOnFilterChange();
 		});
 	});
 </script>
