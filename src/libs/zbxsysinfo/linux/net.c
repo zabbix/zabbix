@@ -546,9 +546,6 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
-#ifdef HAVE_INET_DIAG
-	int		prev_nlerr = NLERR_OK;
-#endif
 
 	if (1 < request->nparam)
 	{
@@ -574,40 +571,35 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		if (prev_nlerr != nlerr)
+		switch(nlerr)
 		{
-			switch(nlerr)
-			{
-				case NLERR_UNKNOWN:
-					zabbix_log(LOG_LEVEL_DEBUG, "Unrecognized netlink error occurred.");
-					break;
-				case NLERR_SOCKCREAT:
-					zabbix_log(LOG_LEVEL_DEBUG, "Cannot create netlink socket.");
-					break;
-				case NLERR_BADSEND:
-					zabbix_log(LOG_LEVEL_DEBUG, "Cannot send netlink message to kernel.");
-					break;
-				case NLERR_BADRECV:
-					zabbix_log(LOG_LEVEL_DEBUG, "Cannot receive netlink message from kernel.");
-					break;
-				case NLERR_RECVTIMEOUT:
-					zabbix_log(LOG_LEVEL_DEBUG, "Receiving netlink response timed out.");
-					break;
-				case NLERR_RESPTRUNCAT:
-					zabbix_log(LOG_LEVEL_DEBUG, "Received truncated netlink response from kernel.");
-					break;
-				case NLERR_OPNOTSUPPORTED:
-					zabbix_log(LOG_LEVEL_DEBUG, "Netlink operation not supported.");
-					break;
-				case NLERR_UNKNOWNMSGTYPE:
-					zabbix_log(LOG_LEVEL_DEBUG, "Received message of unrecognized type from kernel.");
-					break;
-			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Falling back on reading /proc/net/tcp...");
-
-			prev_nlerr = nlerr;
+			case NLERR_UNKNOWN:
+				zabbix_log(LOG_LEVEL_DEBUG, "Unrecognized netlink error occurred.");
+				break;
+			case NLERR_SOCKCREAT:
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot create netlink socket.");
+				break;
+			case NLERR_BADSEND:
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot send netlink message to kernel.");
+				break;
+			case NLERR_BADRECV:
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot receive netlink message from kernel.");
+				break;
+			case NLERR_RECVTIMEOUT:
+				zabbix_log(LOG_LEVEL_DEBUG, "Receiving netlink response timed out.");
+				break;
+			case NLERR_RESPTRUNCAT:
+				zabbix_log(LOG_LEVEL_DEBUG, "Received truncated netlink response from kernel.");
+				break;
+			case NLERR_OPNOTSUPPORTED:
+				zabbix_log(LOG_LEVEL_DEBUG, "Netlink operation not supported.");
+				break;
+			case NLERR_UNKNOWNMSGTYPE:
+				zabbix_log(LOG_LEVEL_DEBUG, "Received message of unrecognized type from kernel.");
+				break;
 		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Falling back on reading /proc/net/tcp...");
 #endif
 		buffer = zbx_malloc(NULL, buffer_alloc);
 
