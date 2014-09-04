@@ -245,6 +245,75 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 	return SYSINFO_RET_OK;
 }
 
+static int    proc_read_tcp_listen(const char *filename, char **buffer, int *buffer_alloc)
+{
+	int     n, fd, ret = -1, offset = 0;
+	char    *start, *end;
+
+	if (-1 == (fd = open(filename, O_RDONLY)))
+		return -1;
+
+	while (0 != (n = read(fd, *buffer + offset, *buffer_alloc - offset)))
+	{
+		int    count = 0;
+
+		if (-1 == n)
+			goto out;
+
+		offset += n;
+
+		if (offset == *buffer_alloc)
+		{
+			*buffer_alloc *= 2;
+			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+		}
+
+		(*buffer)[offset] = '\0';
+
+		/* find the last full line */
+		for (start = *buffer + offset - 1; start > *buffer; start--)
+		{
+			if ('\n' == *start)
+			{
+				if (++count == 2)
+					break;
+
+				end = start;
+			}
+		}
+
+		/* check if the socket is in listening state */
+		if (2 == count)
+		{
+			start++;
+			count = 0;
+
+			while (' ' == *start++)
+				;
+
+			while (count < 3 && start < end)
+			{
+				while (' ' != *start)
+					start++;
+
+				while (' ' == *start)
+					start++;
+
+				count++;
+			}
+
+			if (3 == count && 0 != strncmp(start, "0A", 2))
+				break;
+		}
+	}
+
+	ret = offset;
+out:
+	close(fd);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: proc_read_file                                                   *
@@ -542,7 +611,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 		buffer = zbx_malloc(NULL, buffer_alloc);
 
-		if (0 < (n = proc_read_file("/proc/net/tcp", &buffer, &buffer_alloc)))
+		if (0 < (n = proc_read_tcp_listen("/proc/net/tcp", &buffer, &buffer_alloc)))
 		{
 			ret = SYSINFO_RET_OK;
 
@@ -557,7 +626,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 
-		if (0 < (n = proc_read_file("/proc/net/tcp6", &buffer, &buffer_alloc)))
+		if (0 < (n = proc_read_tcp_listen("/proc/net/tcp6", &buffer, &buffer_alloc)))
 		{
 			ret = SYSINFO_RET_OK;
 
