@@ -87,10 +87,12 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 	int				status = -1, sequence = 0x5A4258;
 	struct timeval			timeout = { 1, 500 * 1000 };
 
-	struct {
+	struct
+	{
 		struct nlmsghdr		nlhdr;
 		struct inet_diag_req	r;
-	} request;
+	}
+	request;
 
 	size_t				siz_request = sizeof(request), siz_sa_nl = sizeof(struct sockaddr_nl);
 
@@ -211,9 +213,10 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 					}
 				}
 			}
-
-		} while(NLERR_OK == nlerr && 1 != found);
-	} while(0);
+		}
+		while(NLERR_OK == nlerr && 1 != found);
+	}
+	while(0);
 
 	if (NLERR_SOCKCREAT != nlerr)
 		close(fd);
