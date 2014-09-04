@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DISCOVERER_H
 #define ZABBIX_DISCOVERER_H
 
-void	main_discoverer_loop(void);
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(discoverer_thread, args);
 
 #endif

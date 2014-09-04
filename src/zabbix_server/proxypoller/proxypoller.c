@@ -30,8 +30,8 @@
 #include "log.h"
 #include "proxy.h"
 
-extern unsigned char	process_type;
-extern int		process_num;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 {
@@ -337,11 +337,18 @@ exit:
 	return num;
 }
 
-void	main_proxypoller_loop(void)
+ZBX_THREAD_ENTRY(proxypoller_thread, args)
 {
 	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HTTPPOLLER_H
 #define ZABBIX_HTTPPOLLER_H
 
-void	main_httppoller_loop(void);
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(httppoller_thread, args);
 
 #endif

@@ -36,8 +36,8 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-extern unsigned char	process_type;
-extern int		process_num;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -538,13 +538,19 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_pinger_loop(void)
+ZBX_THREAD_ENTRY(pinger_thread, args)
 {
-	int			nextcheck, sleeptime;
+	int			nextcheck, sleeptime, items_count = 0, itc;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
-	int			items_count = 0, itc;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
