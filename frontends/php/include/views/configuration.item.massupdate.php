@@ -32,7 +32,7 @@ $itemForm = new CForm();
 $itemForm->setName('itemForm');
 $itemForm->addVar('group_itemid', $this->data['itemids']);
 $itemForm->addVar('hostid', $this->data['hostid']);
-$itemForm->addVar('action', 'item.massupdateform');
+$itemForm->addVar('action', $this->data['action']);
 
 // create form list
 $itemFormList = new CFormList('itemFormList');
