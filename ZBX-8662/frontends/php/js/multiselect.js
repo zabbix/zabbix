@@ -834,7 +834,7 @@ jQuery(function($) {
 		// settings
 		var settingTopPaddingsEmpty = IE8 ? 1 : 0,
 			settingTopPaddingsExist = IE8 ? 1 : 2,
-			settingTopPaddingsInit = 3,
+			settingTopPaddingsInit = 2,
 			settingRightPaddings = 4,
 			settingMinimumWidth = 50,
 			settingMinimumHeight = 12,
