@@ -290,28 +290,29 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		// get custom date format for input fields
-		var date = this.sdt.format('d m Y H i').split(' ');
-
 		switch (this.timeobjects.length) {
 			case 1:
 				// uses default format
-				var timestring = this.sdt.format();
-				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
-					this.timeobjects[0].value = timestring;
+				var date = this.sdt.format();
+
+				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
+					this.timeobjects[0].value = date;
 				}
 				else {
 					if (IE) {
-						this.timeobjects[0].innerText =  timestring;
+						this.timeobjects[0].innerText =  date;
 					}
 					else {
-						this.timeobjects[0].textContent = timestring;
+						this.timeobjects[0].textContent = date;
 					}
 				}
 				break;
 
 			case 3:
 			case 5:
+				// custom date format for input fields
+				var date = this.sdt.format('d m Y H i').split(' ');
+
 				for (var i = 0; i < this.timeobjects.length; i++) {
 					if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
 						this.timeobjects[i].value = date[i];

@@ -161,10 +161,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 /**
  * Validates and formats input element containing a part of date.
  *
- * @param obj input element value of which is being validated
- * @param min minimal allowed value (inclusive)
- * @param max maximum allowed value (inclusive)
- * @param paddingSize number of zeroes used for padding
+ * @param object {obj}			input element value of which is being validated
+ * @param int {min}				minimal allowed value (inclusive)
+ * @param int {max}				maximum allowed value (inclusive)
+ * @param int {paddingSize}		number of zeroes used for padding
  */
 function validateDatePartBox(obj, min, max, paddingSize) {
 	if (obj != null) {
