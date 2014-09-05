@@ -295,7 +295,8 @@ calendar.prototype = {
 
 		switch (this.timeobjects.length) {
 			case 1:
-				var timestring = this.sdt.getDate() + '.' + (this.sdt.getMonth() + 1) + '.' + this.sdt.getFullYear() + ' ' + this.sdt.getHours() + ':' + this.sdt.getMinutes();
+				// uses default format
+				var timestring = this.sdt.format();
 				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
 					this.timeobjects[0].value = timestring;
 				}
@@ -308,6 +309,7 @@ calendar.prototype = {
 					}
 				}
 				break;
+
 			case 3:
 			case 5:
 				for (var i = 0; i < this.timeobjects.length; i++) {
