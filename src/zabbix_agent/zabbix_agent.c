@@ -41,6 +41,10 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
+unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+int process_num;
+int server_num			= 0;
+
 const char	*help_message[] = {
 	"A Zabbix executable for monitoring of various server parameters, to be started upon request by inetd.",
 	"",
