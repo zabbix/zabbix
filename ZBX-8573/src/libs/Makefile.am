@@ -49,6 +49,11 @@ PROXY_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxself
+else
+if AGENT
+AGENT_SUBDIRS = \
+	zbxself
+endif
 endif
 endif
 
@@ -67,6 +72,7 @@ SUBDIRS = \
 	zbxmodules \
 	zbxregexp \
 	$(PROXY_SUBDIRS) \
-	$(SERVER_SUBDIRS)
+	$(SERVER_SUBDIRS) \
+	$(AGENT_SUBDIRS)
 
 EXTRA_DIST = zbxwin32

@@ -34,12 +34,16 @@ const char	title_message[] = "Zabbix agent";
 const char	syslog_app_name[] = "zabbix_agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
+unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+int process_num;
+int server_num			= 0;
+
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>  Absolute path to the configuration file",
 	"  -p --print          Print known items and exit",
 	"  -t --test <item>    Test specified item and exit",
-	"  -h --help           Give this help",
+	"  -h --help           Display help information",
 	"  -V --version        Display version number",
 	NULL	/* end of text */
 };

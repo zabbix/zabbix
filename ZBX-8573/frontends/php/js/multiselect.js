@@ -502,7 +502,7 @@ jQuery(function($) {
 					});
 				}
 
-				obj.parent().append(popupButton);
+				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
 			}
 
 			// IE browsers use default width

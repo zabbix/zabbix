@@ -459,7 +459,7 @@ table.filter tr td.label { border-right: 0 !important; text-align: right; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
-table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; margin-left: 3px; }
+table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; margin-left: 2px; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -521,7 +521,10 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
+.multiselect-wrapper { position: relative; width: 369px; }
 .multiselect { margin: 0 2px 0 0; width: 317px; position: relative; float: left; }
+.multiselect-button { width: 50px; height: 20px; position: absolute; right: 0; top: 0; z-index: 50; }
+.multiselect-button .select-popup { margin-left: 8px; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
@@ -533,8 +536,9 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 }
 
 .multiselect .selected ul {
-	padding: 0 0 0 1px; margin: 0; min-height: 18px;
+	padding: 0; margin: 0; min-height: 18px;
 	background: #ffffff; border: 1px solid #AAAAAA;
+	white-space: normal;
 }
 .multiselect .selected ul.active {
 	-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
@@ -550,9 +554,10 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	background-image: linear-gradient(#F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
 	border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
 }
+.multiselect .selected ul li:first-child { margin-left: 1px; }
 .multiselect .selected ul li { position: relative; }
 .multiselect .selected ul li.pressed { background: #D4D4D4; }
-.multiselect .selected ul li span.text { padding: 0 4px; text-align: justify; white-space: nowrap; }
+.multiselect .selected ul li span.text { text-align: justify; white-space: nowrap; }
 .multiselect .selected ul li span.arrow {
 	padding: 0 -12px 0 12px; cursor: pointer; position: absolute; z-index: 11; width: 12px; height: 12px; right: 0px;
 	background: url("../images/general/multiselect.png") no-repeat -12px 1px;
@@ -573,9 +578,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; display: list-item; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
-
-.multiselect-wrapper { white-space: normal; text-align: left; }
-.multiselect-wrapper .select-popup { margin-left: 10px; }
 
 /* menu popup */
 .menuPopup {

@@ -17,21 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
+#ifndef ZABBIX_CONTROL_H
+#define ZABBIX_CONTROL_H
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+#include "common.h"
+#include "zbxself.h"
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"4 September 2014"
-#define ZABBIX_VERSION_MAJOR	2
-#define ZABBIX_VERSION_MINOR	3
-#define ZABBIX_VERSION_PATCH	6
-#define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#define ZABBIX_VERSION_RC	""
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+int	get_log_level_message(const char *opt, int command, int *message);
 
 #endif
