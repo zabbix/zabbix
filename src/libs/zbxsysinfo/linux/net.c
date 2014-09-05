@@ -22,6 +22,20 @@
 #include "zbxjson.h"
 #include "log.h"
 
+typedef struct
+{
+	zbx_uint64_t ibytes;
+	zbx_uint64_t ipackets;
+	zbx_uint64_t ierr;
+	zbx_uint64_t idrop;
+	zbx_uint64_t obytes;
+	zbx_uint64_t opackets;
+	zbx_uint64_t oerr;
+	zbx_uint64_t odrop;
+	zbx_uint64_t colls;
+}
+net_stat_t;
+
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
 #	include <linux/netlink.h>
@@ -44,7 +58,7 @@ enum
 	STATE_MAXSTATES
 };
 
-#define	STATE_ALL ((1 << STATE_MAXSTATES) - 1)
+#	define	STATE_ALL ((1 << STATE_MAXSTATES) - 1)
 
 enum
 {
@@ -59,28 +73,9 @@ enum
 	NLERR_UNKNOWNMSGTYPE
 };
 
-extern int	nlerr;
-#endif
-
-typedef struct
-{
-	zbx_uint64_t ibytes;
-	zbx_uint64_t ipackets;
-	zbx_uint64_t ierr;
-	zbx_uint64_t idrop;
-	zbx_uint64_t obytes;
-	zbx_uint64_t opackets;
-	zbx_uint64_t oerr;
-	zbx_uint64_t odrop;
-	zbx_uint64_t colls;
-}
-net_stat_t;
-
-#if HAVE_INET_DIAG
-
 int	nlerr;
 
-static int	find_tcp_port_by_state_nl(unsigned short port, int state)
+static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 {
 	struct
 	{
@@ -89,8 +84,9 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 	}
 	request;
 
-	int			ret = -1, fd = -1, family = -1, found = 0, done, status = -1;
-	unsigned int		sequence = 0x5A4258;
+	int			ret = FAIL, fd = -1, status = -1, i;
+	int			families[] = {AF_INET, AF_INET6, AF_UNSPEC};
+	unsigned int		sequence = 0x58425A;
 	struct timeval		timeout = { 1, 500 * 1000 };
 
 
@@ -114,112 +110,90 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state)
 
 	request.r.idiag_states = (1 << state);
 
-	do
+	if (-1 == (fd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)) ||
+			0 != setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)))
 	{
-		if (-1 == (fd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)))
-		{
-			nlerr = NLERR_SOCKCREAT;
-			break;
-		}
-
-		if (0 != setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)))
-		{
-			nlerr = NLERR_SOCKCREAT;
-			close(fd);
-			break;
-		}
-
-		nlerr = NLERR_OK;
-
-		do
-		{
-			if (-1 == family)
-				family = AF_INET;
-			else if (AF_INET == family)
-				family = AF_INET6;
-			else
-				break;
-
-			request.r.idiag_family		= family;
-
-			if (-1 == sendmsg(fd, &s_msg, 0))
-			{
-				nlerr = NLERR_BADSEND;
-				break;
-			}
-
-			done = 0;
-
-			while (NLERR_OK == nlerr && 1 != done)
-			{
-				status = recvmsg(fd, &r_msg, 0);
-
-				if (0 > status)
-				{
-					if (EAGAIN == errno || EWOULDBLOCK == errno)
-						nlerr = NLERR_RECVTIMEOUT;
-					else if (EINTR != errno)
-						nlerr = NLERR_BADRECV;
-
-					continue;
-				}
-
-				if (0 == status)
-					break;
-
-				for (r_hdr = (struct nlmsghdr *)buffer;
-					NLMSG_OK(r_hdr, (unsigned)status) && 1 != found && 1 != done;
-					r_hdr = NLMSG_NEXT(r_hdr, status))
-				{
-					struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
-
-					if (sequence != r_hdr->nlmsg_seq)
-						continue;
-
-					switch (r_hdr->nlmsg_type)
-					{
-						case NLMSG_DONE:
-							done = 1;
-							break;
-						case NLMSG_ERROR:
-						{
-							struct nlmsgerr	*err = (struct nlmsgerr *)NLMSG_DATA(r_hdr);
-
-							if (NLMSG_LENGTH(sizeof(struct nlmsgerr)) > r_hdr->nlmsg_len)
-								nlerr = NLERR_RESPTRUNCAT;
-							else
-							{
-								errno = -err->error;
-								nlerr = (EOPNOTSUPP == errno) ?
-									NLERR_OPNOTSUPPORTED :
-									NLERR_UNKNOWN;
-							}
-
-							done = 1;
-
-							break;
-						}
-						case 0x12:
-							if (state == r->idiag_state &&
-								port == ntohs(r->id.idiag_sport))
-								(found = 1) && (done = 1);
-
-							break;
-						default:
-							nlerr = NLERR_UNKNOWNMSGTYPE;
-					}
-				}
-			}
-		}
-		while(NLERR_OK == nlerr && 1 != found);
+		nlerr = NLERR_SOCKCREAT;
+		goto out;
 	}
-	while(0);
 
-	if (NLERR_SOCKCREAT != nlerr)
+	nlerr = NLERR_OK;
+
+	for (i = 0; AF_UNSPEC != families[i]; i++)
+	{
+		request.r.idiag_family = families[i];
+
+		if (-1 == sendmsg(fd, &s_msg, 0))
+		{
+			nlerr = NLERR_BADSEND;
+			goto out;
+		}
+
+		while (NLERR_OK == nlerr)
+		{
+			status = recvmsg(fd, &r_msg, 0);
+
+			if (0 > status)
+			{
+				if (EAGAIN == errno || EWOULDBLOCK == errno)
+					nlerr = NLERR_RECVTIMEOUT;
+				else if (EINTR != errno)
+					nlerr = NLERR_BADRECV;
+
+				continue;
+			}
+
+			if (0 == status)
+				break;
+
+			for (r_hdr = (struct nlmsghdr *)buffer; NLMSG_OK(r_hdr, (unsigned)status);
+					r_hdr = NLMSG_NEXT(r_hdr, status))
+			{
+				struct inet_diag_msg	*r = NLMSG_DATA(r_hdr);
+
+				if (sequence != r_hdr->nlmsg_seq)
+					continue;
+
+				switch (r_hdr->nlmsg_type)
+				{
+					case NLMSG_DONE:
+						goto out;
+					case NLMSG_ERROR:
+					{
+						struct nlmsgerr	*err = (struct nlmsgerr *)NLMSG_DATA(r_hdr);
+
+						if (NLMSG_LENGTH(sizeof(struct nlmsgerr)) > r_hdr->nlmsg_len)
+						{
+							nlerr = NLERR_RESPTRUNCAT;
+						}
+						else
+						{
+							nlerr = (EOPNOTSUPP == -err->error) ? NLERR_OPNOTSUPPORTED :
+								NLERR_UNKNOWN;
+						}
+
+						goto out;
+					}
+					case 0x12:
+						if (state == r->idiag_state && port == ntohs(r->id.idiag_sport))
+						{
+							*found = 1;
+							goto out;
+						}
+						break;
+					default:
+						nlerr = NLERR_UNKNOWNMSGTYPE;
+						break;
+				}
+			}
+		}
+	}
+out:
+	if (-1 != fd)
 		close(fd);
 
 	if (NLERR_OK == nlerr)
-		ret = found;
+		ret = SUCCEED;
 
 	return ret;
 }
@@ -285,6 +259,22 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 	return SYSINFO_RET_OK;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: proc_read_tcp_listen                                             *
+ *                                                                            *
+ * Purpose: reads /proc/net/tcp(6) file by chunks until the last line in      *
+ *          in buffer has non-listening socket state                          *
+ *                                                                            *
+ * Parameters: filename     - [IN] the file to read                           *
+ *             buffer       - [IN/OUT] the output buffer                      *
+ *             buffer_alloc - [IN/OUT] the output buffer size                 *
+ *                                                                            *
+ * Return value: -1 error occurred during reading                             *
+ *                0 empty file (shouldn't happen)                             *
+ *               >0 the number of bytes read                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int    proc_read_tcp_listen(const char *filename, char **buffer, int *buffer_alloc)
 {
 	int     n, fd, ret = -1, offset = 0;
@@ -367,10 +357,6 @@ out:
  * Return value: -1 error occurred during reading                             *
  *                0 empty file (shouldn't happen)                             *
  *               >0 the number of bytes read                                  *
- *                                                                            *
- * Comments: When reading line by line the file might be changed between      *
- *           reads resulting in a possible information loss. To avoid it      *
- *           try reading/expanding the buffer until it fits the whole file.   *
  *                                                                            *
  ******************************************************************************/
 static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc)
@@ -584,7 +570,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
+	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE, found = 0;
 
 	if (1 < request->nparam)
 	{
@@ -601,44 +587,49 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 #ifdef HAVE_INET_DIAG
-	n = find_tcp_port_by_state_nl(port, STATE_LISTEN);
-
-	if (n >= 0)
+	if (SUCCEED == find_tcp_port_by_state_nl(port, STATE_LISTEN, &found))
 	{
 		ret = SYSINFO_RET_OK;
-		listen = n;
+		listen = found;
 	}
 	else
 	{
+		char	*error = NULL;
+
 		switch(nlerr)
 		{
 			case NLERR_UNKNOWN:
-				zabbix_log(LOG_LEVEL_DEBUG, "Unrecognized netlink error occurred.");
+				error = zbx_strdup(error, "unrecognized netlink error occurred");
 				break;
 			case NLERR_SOCKCREAT:
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot create netlink socket.");
+				error = zbx_strdup(error, "cannot create netlink socket");
 				break;
 			case NLERR_BADSEND:
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot send netlink message to kernel.");
+				error = zbx_strdup(error, "cannot send netlink message to kernel");
 				break;
 			case NLERR_BADRECV:
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot receive netlink message from kernel.");
+				error = zbx_strdup(error, "cannot receive netlink message from kernel");
 				break;
 			case NLERR_RECVTIMEOUT:
-				zabbix_log(LOG_LEVEL_DEBUG, "Receiving netlink response timed out.");
+				error = zbx_strdup(error, "receiving netlink response timed out");
 				break;
 			case NLERR_RESPTRUNCAT:
-				zabbix_log(LOG_LEVEL_DEBUG, "Received truncated netlink response from kernel.");
+				error = zbx_strdup(error, "received truncated netlink response from kernel");
 				break;
 			case NLERR_OPNOTSUPPORTED:
-				zabbix_log(LOG_LEVEL_DEBUG, "Netlink operation not supported.");
+				error = zbx_strdup(error, "netlink operation not supported");
 				break;
 			case NLERR_UNKNOWNMSGTYPE:
-				zabbix_log(LOG_LEVEL_DEBUG, "Received message of unrecognized type from kernel.");
+				error = zbx_strdup(error, "received message of unrecognized type from kernel");
 				break;
+			default:
+				error = zbx_strdup(error, "unknown error");
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Falling back on reading /proc/net/tcp...");
+		zabbix_log(LOG_LEVEL_DEBUG, "netlink interface error: %s", error);
+		zbx_free(error);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "falling back on reading /proc/net/tcp...");
 #endif
 		buffer = zbx_malloc(NULL, buffer_alloc);
 
@@ -647,8 +638,6 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 			ret = SYSINFO_RET_OK;
 
 			zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 0A", (unsigned int)port);
-
-			buffer[n] = '\0';
 
 			if (NULL != strstr(buffer, pattern))
 			{
@@ -663,8 +652,6 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 0A",
 					(unsigned int)port);
-
-			buffer[n] = '\0';
 
 			if (NULL != strstr(buffer, pattern))
 				listen = 1;
