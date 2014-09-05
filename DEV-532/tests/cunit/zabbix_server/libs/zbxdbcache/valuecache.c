@@ -592,6 +592,63 @@ static int	cuvc_clean_str_lowmem()
 	return cuvc_clean_str();
 }
 
+static void	cuvc_print_record(zbx_vc_item_t *item, zbx_history_record_t *record)
+{
+	char	value[4096], *pvalue = value;
+
+	switch (item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_snprintf(value, sizeof(value), "%f", record->value.dbl);
+			break;
+
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, record->value.ui64);
+			break;
+
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			pvalue = record->value.str;
+			break;
+
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_snprintf(value, sizeof(value), "%d %d %d [%s] %s",
+					record->value.log->timestamp, record->value.log->logeventid,
+					record->value.log->severity, record->value.log->source,
+					record->value.log->value);
+
+	}
+	printf("\t\t\t%d.%d %s\n", record->timestamp.sec, record->timestamp.ns, pvalue);
+}
+
+static void	cuvc_dump_cache(zbx_vc_item_t *item)
+{
+	zbx_vc_chunk_t	*chunk = item->tail;
+
+	printf("ITEM DUMP: " ZBX_FS_UI64 " (type=%d, records=%d, recount=%d, hits=" ZBX_FS_UI64,
+			item->itemid, item->value_type, item->values_total, item->refcount, item->hits);
+
+	printf(", status=%d, range=%d)\n", item->status, item->range);
+
+	while (NULL != chunk)
+	{
+		int i;
+
+		printf("\tchunk: %d-%d\n", chunk->slots[chunk->first_value].timestamp.sec,
+				chunk->slots[chunk->last_value].timestamp.sec);
+		printf("\t\trecords: %d-%d\n", chunk->first_value, chunk->last_value);
+
+		for (i = chunk->first_value; i <= chunk->last_value; i++)
+		{
+			cuvc_print_record(item, &chunk->slots[i]);
+		}
+
+		chunk = chunk->next;
+	}
+	printf("========\n");
+}
+
+
 /*
  * include test suites grouped by functionality
  */
@@ -769,21 +826,6 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "get value with 1002.600 timestamp", cuvc_suite_get10_test9);
 	ZBX_CU_ADD_TEST(suite, "get value with 1001.000 timestamp", cuvc_suite_get10_test10);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get10_cleanup);
-
-	/* test suite: get11                                                                         */
-	/*    check if the 'reload first' flag is handled correctly - no data are missing and no     */
-	/*    unnecessary database requests are made.                                                */
-	if (NULL == (suite = CU_add_suite("valuecache reload first flag tests",
-			cuvc_init_str, cuvc_clean_str)))
-	{
-		return CU_get_error();
-	}
-
-	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp", cuvc_suite_get11_test1);
-	ZBX_CU_ADD_TEST(suite, "get 1s interval of string values from 1005 timestamp", cuvc_suite_get11_test2);
-	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp (2)", cuvc_suite_get11_test3);
-	ZBX_CU_ADD_TEST(suite, "get 1 string value from 1006 timestamp (3)", cuvc_suite_get11_test4);
-	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_get11_cleanup);
 
 	/* test suite: add1                                                                          */
 	/*   check if all item value types are correctly added to cache                              */
