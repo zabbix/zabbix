@@ -135,7 +135,7 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect .selected ul.active { border: 1px solid #6681B2; }
+.multiselect.active { border: 1px solid #6681B2; }
 .multiselect .available ul li.hover { background: #4F70A8; }
 
 /* suggest */
