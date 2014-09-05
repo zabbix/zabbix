@@ -78,3 +78,32 @@ steps:
       # macros can also be used inside of strings
       data: "Host with the same name \"@step1.request.params.host@\" already exists."
       code: -32602
+
+  # Step 4, try to create a host the same way as in step 1, but use different validators to check the result
+  step4:
+    request:
+      method:  host.create
+      params:
+        host: "Linux server 2"
+        interfaces:
+          -
+            type: 1
+            main: 1
+            useip: 1
+            ip: "192.168.3.1"
+            dns: ""
+            port: "10050"
+        groups:
+          -
+            groupid: "1"
+
+    expect: result
+
+    response:
+      hostids:
+        # check that "hostis" is an array containing one element
+        _assert: arr|length(1)
+        # check that the keys are sequential, i.e., 0, 1, 2 etc
+        _keys: sequence
+        # check that each element is a string
+        _each: string
