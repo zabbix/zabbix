@@ -221,10 +221,10 @@ function getNextColor(paletteType) {
 
 	switch (prevColor['color']) {
 		case 0:
-			r = gradient;
+			g = gradient;
 			break;
 		case 1:
-			g = gradient;
+			r = gradient;
 			break;
 		case 2:
 			b = gradient;
