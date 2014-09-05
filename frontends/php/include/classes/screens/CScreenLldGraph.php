@@ -60,6 +60,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 					'output' => array('graphid', 'name'),
 					'hostids' => array($graphPrototype['discoveryRule']['hostid']),
 					'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
+					'expandName' => true,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
 				));
 
