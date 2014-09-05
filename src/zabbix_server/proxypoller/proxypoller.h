@@ -20,10 +20,12 @@
 #ifndef ZABBIX_PROXYPOLLER_H
 #define ZABBIX_PROXYPOLLER_H
 
+#include "threads.h"
+
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	main_proxypoller_loop(void);
+ZBX_THREAD_ENTRY(proxypoller_thread, args);
 
 #endif
 

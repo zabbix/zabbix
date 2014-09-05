@@ -24,9 +24,13 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
+#include "zbxself.h"
+
 #ifndef _WINDOWS
+#	include "../libs/zbxnix/control.h"
 #	include "zbxmodules.h"
 #endif
+
 #include "comms.h"
 #include "alias.h"
 
@@ -77,9 +81,10 @@ const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
 const char	usage_message[] =
-	"[-Vhp]"
-#ifdef _WINDOWS
-	" [-idsx] [-m]"
+#ifndef _WINDOWS
+	"[-Vhp] [-R <runtime option>]"
+#else
+	"[-Vhp] [-idsx] [-m]"
 #endif
 	" [-c <config-file>] [-t <item key>]";
 /* end of application USAGE message */
@@ -87,13 +92,23 @@ const char	usage_message[] =
 /* application HELP message */
 const char	*help_message[] = {
 	"Options:",
+	"  -c --config <config-file>       Absolute path to the configuration file",
+	"  -p --print                      Print known items and exit",
+	"  -t --test <item key>            Test specified item and exit",
+	"  -h --help                       Display help information",
+	"  -V --version                    Display version number",
+#ifndef _WINDOWS
+	"  -R --runtime-control <option>   Perform administrative functions",
 	"",
-	"  -c --config <config-file>  Absolute path to the configuration file",
-	"  -p --print                 Print known items and exit",
-	"  -t --test <item key>       Test specified item and exit",
-	"  -h --help                  Give this help",
-	"  -V --version               Display version number",
-#ifdef _WINDOWS
+	"Runtime control options:",
+	"  " ZBX_LOG_LEVEL_INCREASE "=<target>     Increase log level, affect all processes if target is not specified",
+	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
+	"",
+	"Log level control targets:",
+	"  <pid>                           Process identifier",
+	"  <process type>                  All processes of specified type (e.g., listener)",
+	"  <process type,N>                Process type and number (e.g., listener,3)",
+#else
 	"",
 	"Functions:",
 	"",
@@ -117,7 +132,9 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
 	{"test",		1,	NULL,	't'},
-#ifdef _WINDOWS
+#ifndef _WINDOWS
+	{"runtime-control",	1,	NULL,	'R'},
+#else
 	{"install",		0,	NULL,	'i'},
 	{"uninstall",		0,	NULL,	'd'},
 
@@ -131,31 +148,91 @@ static struct zbx_option	longopts[] =
 
 static char	shortopts[] =
 	"c:hVpt:"
-#ifdef _WINDOWS
+#ifndef _WINDOWS
+	"R:"
+#else
 	"idsxm"
 #endif
 	;
-/* end of COMMAND LINE OPTIONS */
 
+/* end of COMMAND LINE OPTIONS */
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
 unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
-unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL int process_num;
+ZBX_THREAD_LOCAL int server_num			= 0;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
-int				CONFIG_ACTIVE_FORKS = 0;
-int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
+
+int	CONFIG_ALERTER_FORKS		= 0;
+int	CONFIG_DISCOVERER_FORKS		= 0;
+int	CONFIG_HOUSEKEEPER_FORKS	= 0;
+int	CONFIG_PINGER_FORKS		= 0;
+int	CONFIG_POLLER_FORKS		= 0;
+int	CONFIG_UNREACHABLE_POLLER_FORKS	= 0;
+int	CONFIG_HTTPPOLLER_FORKS		= 0;
+int	CONFIG_IPMIPOLLER_FORKS		= 0;
+int	CONFIG_TIMER_FORKS		= 0;
+int	CONFIG_TRAPPER_FORKS		= 0;
+int	CONFIG_SNMPTRAPPER_FORKS	= 0;
+int	CONFIG_JAVAPOLLER_FORKS		= 0;
+int	CONFIG_ESCALATOR_FORKS		= 0;
+int	CONFIG_SELFMON_FORKS		= 0;
+int	CONFIG_WATCHDOG_FORKS		= 0;
+int	CONFIG_DATASENDER_FORKS		= 0;
+int	CONFIG_HEARTBEAT_FORKS		= 0;
+int	CONFIG_PROXYPOLLER_FORKS	= 0;
+int	CONFIG_HISTSYNCER_FORKS		= 0;
+int	CONFIG_CONFSYNCER_FORKS		= 0;
+int	CONFIG_VMWARE_FORKS		= 0;
+int	CONFIG_COLLECTOR_FORKS		= 1;
+int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
+int	CONFIG_ACTIVE_FORKS		= 0;
+
+char	*opt = NULL;
 
 #ifdef _WINDOWS
-void zbx_co_uninitialize();
+void	zbx_co_uninitialize();
 #endif
+
+int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+{
+	int	server_count = 0;
+
+	if (0 == server_num)
+	{
+		/* fail if the main process is queried */
+		return FAIL;
+	}
+	else if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
+		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+	}
+	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_LISTENER;
+		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+
+	}
+	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	{
+		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
+		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+	}
+	else
+		return FAIL;
+
+	return SUCCEED;
+}
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char	ch = '\0';
+	char	ch;
 
 	t->task = ZBX_TASK_START;
 
@@ -167,6 +244,37 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
+#ifndef _WINDOWS
+			case 'R':
+				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
+				{
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
+							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
+					{
+						exit(EXIT_FAILURE);
+					}
+
+				}
+				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
+						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
+				{
+					if (SUCCEED != get_log_level_message(
+							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
+							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
+					{
+						exit(EXIT_FAILURE);
+					}
+				}
+				else
+				{
+					zbx_error("invalid runtime control option: %s", zbx_optarg);
+					exit(EXIT_FAILURE);
+				}
+				t->task = ZBX_TASK_RUNTIME_CONTROL;
+				break;
+#endif
 			case 'h':
 				help();
 				exit(EXIT_SUCCESS);
@@ -554,13 +662,11 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_thread_args_t	*thread_args;
-	zbx_sock_t		listen_sock;
-	int			i, thread_num = 0;
+	zbx_sock_t	listen_sock;
+	int		i, j = 0;
 #ifdef _WINDOWS
-	DWORD			res;
+	DWORD		res;
 #endif
-
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
@@ -597,8 +703,8 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* --- START THREADS ---*/
 
-	/* allocate memory for a collector, all listeners and an active check */
-	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
+	/* allocate memory for a collector, all listeners and active checks */
+	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
 #ifdef _WINDOWS
 	if (MAXIMUM_WAIT_OBJECTS < threads_num)
@@ -608,34 +714,39 @@ int	MAIN_ZABBIX_ENTRY()
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
-	/* start the collector thread */
-	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-	thread_args->thread_num = thread_num;
-	thread_args->thread_num2 = 1;
-	thread_args->args = NULL;
-	threads[thread_num++] = zbx_thread_start(collector_thread, thread_args);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 
-	/* start listeners */
-	for (i = 0; i < CONFIG_PASSIVE_FORKS; i++)
+	for (i = 0; i < threads_num; i++)
 	{
-		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->thread_num = thread_num;
-		thread_args->thread_num2 = i + 1;
-		thread_args->args = &listen_sock;
-		threads[thread_num++] = zbx_thread_start(listener_thread, thread_args);
-	}
+		zbx_thread_args_t	*thread_args;
 
-	/* start active check */
-	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
-	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
-		thread_args->thread_num = thread_num;
-		thread_args->thread_num2 = i + 1;
-		thread_args->args = &CONFIG_ACTIVE_ARGS[i];
-		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
+
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		thread_args->server_num = i + 1;
+		thread_args->args = NULL;
+
+		switch (thread_args->process_type)
+		{
+			case ZBX_PROCESS_TYPE_COLLECTOR:
+				threads[i] = zbx_thread_start(collector_thread, thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_LISTENER:
+				thread_args->args = &listen_sock;
+				threads[i] = zbx_thread_start(listener_thread, thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+				thread_args->args = &CONFIG_ACTIVE_ARGS[j++];
+				threads[i] = zbx_thread_start(active_checks_thread, thread_args);
+				break;
+		}
 	}
 
 #ifdef _WINDOWS
@@ -751,16 +862,15 @@ void	zbx_on_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
-#if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
-void	zbx_sigusr_handler(zbx_task_t task)
+#if defined(HAVE_SIGQUEUE)
+void	zbx_sigusr_handler(int flags)
 {
-	/* nothing to do */
 }
 #endif
 
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t;
+	ZBX_TASK_EX	t = {ZBX_TASK_START};
 #ifdef _WINDOWS
 	int		ret;
 
@@ -773,9 +883,6 @@ int	main(int argc, char **argv)
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
-	memset(&t, 0, sizeof(t));
-	t.task = ZBX_TASK_START;
-
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv, &t);
@@ -791,7 +898,12 @@ int	main(int argc, char **argv)
 			usage();
 			exit(EXIT_FAILURE);
 			break;
-#ifdef _WINDOWS
+#ifndef _WINDOWS
+		case ZBX_TASK_RUNTIME_CONTROL:
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+			break;
+#else
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "listener.h"
+#include "zbxself.h"
 
 #include "comms.h"
 #include "cfg.h"
@@ -26,6 +27,9 @@
 #include "stats.h"
 #include "sysinfo.h"
 #include "log.h"
+
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -69,7 +73,7 @@ static void	process_listener(zbx_sock_t *s)
 					buffer = zbx_malloc(buffer, buffer_alloc);
 
 				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-						ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED) - 1);
+						ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED));
 				buffer_offset++;
 				zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
 
@@ -88,16 +92,18 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
-	int		ret, local_request_failed = 0, thread_num, thread_num2;
+	int		ret, local_request_failed = 0;
 	zbx_sock_t	s;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	thread_num = ((zbx_thread_args_t *)args)->thread_num;
-	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener #%d]", thread_num, thread_num2);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
@@ -105,13 +111,13 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_setproctitle("listener #%d [waiting for connection]", thread_num2);
+		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
 			local_request_failed = 0;     /* reset consecutive errors counter */
 
-			zbx_setproctitle("listener #%d [processing request]", thread_num2);
+			zbx_setproctitle("listener #%d [processing request]", process_num);
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))
 				process_listener(&s);
@@ -119,14 +125,14 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			zbx_tcp_unaccept(&s);
 		}
 
-		if (SUCCEED == ret)
+		if (SUCCEED == ret || EINTR == zbx_sock_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_tcp_strerror());
 
 		if (local_request_failed++ > 1000)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Too many consecutive errors on accept() call.");
+			zabbix_log(LOG_LEVEL_WARNING, "too many failures to accept an incoming connection");
 			local_request_failed = 0;
 		}
 
