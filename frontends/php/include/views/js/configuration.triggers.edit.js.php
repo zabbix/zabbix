@@ -19,6 +19,9 @@
 				create_var('triggersForm', 'new_dependency[' + i + ']', list.values[i].triggerid, false);
 			}
 
+			// return to the same form after it has been submitted
+			jQuery('#action').val(<?php echo CJs::encodeJson(getRequest('action')) ?>);
+
 			create_var('triggersForm', 'add_dependency', 1, true);
 		}
 	}

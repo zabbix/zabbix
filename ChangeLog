@@ -1,6 +1,7 @@
 Changes for 2.3.6
 
 Bug fixes:
+..F....... [ZBX-8716] fixed not being able to add trigger dependencies in the trigger mass update form (Pavels)
 ..F....... [ZBX-8573] fixed date part form inputs (month, day, hour, minute) to be consistent and have leading zero when needed (Krists)
 ..F....... [ZBX-8717] fixed error in the action operation configuration form when switching operation types (Krists)
 ..F....... [ZBX-8685] fixed ordering of graphs in simple graph prototype and graph prototype screen elements (Krists)
