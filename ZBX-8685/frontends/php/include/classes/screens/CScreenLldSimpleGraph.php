@@ -57,8 +57,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 			if ($itemPrototype) {
 				// get all created (discovered) items for current host
 				$allCreatedItems = API::Item()->get(array(
-					'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid',
-						'status', 'error', 'trends', 'history', 'delay', 'key_', 'flags'),
+					'output' => array('itemid', 'name', 'key_', 'hostid'),
 					'hostids' => array($itemPrototype['discoveryRule']['hostid']),
 					'selectItemDiscovery' => array('itemid', 'parent_itemid'),
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
