@@ -1221,7 +1221,7 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 	}
 	zbx_mib_norm_t;
 
-#define LEN_STR(x)	sizeof(x) - 1, x
+#define LEN_STR(x)	ZBX_CONST_STRLEN(x), x
 	static zbx_mib_norm_t mibs[] =
 	{
 		/* the most popular items first */

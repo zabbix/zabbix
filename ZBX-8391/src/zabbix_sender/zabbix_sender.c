@@ -41,7 +41,7 @@ const char	*usage_message[] = {
 };
 
 const char	*help_message[] = {
-	"Utility to send monitoring data to Zabbix server or proxy.",
+	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
 	"Options:",
 	"  -c --config config-file              Absolute path to Zabbix agentd configuration file",
@@ -660,7 +660,7 @@ int	main(int argc, char **argv)
 		goto exit;
 	}
 
-	thread_args.thread_num = 0;
+	thread_args.server_num = 0;
 	thread_args.args = &sentdval_args;
 
 	sentdval_args.server = ZABBIX_SERVER;

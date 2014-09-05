@@ -83,7 +83,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
 	{
 		*dev_path = '\0';
-		if (0 != strncmp(devname, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
+		if (0 != strncmp(devname, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
 			strscpy(dev_path, ZBX_DEV_PFX);
 		strscat(dev_path, devname);
 
@@ -146,7 +146,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 		return ret;
 
 	*dev_path = '\0';
-	if (0 != strncmp(devname, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
+	if (0 != strncmp(devname, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
 		strscpy(dev_path, ZBX_DEV_PFX);
 	strscat(dev_path, devname);
 

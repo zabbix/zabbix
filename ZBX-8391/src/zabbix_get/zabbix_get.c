@@ -43,7 +43,7 @@ const char	*help_message[] = {
 	"  -p --port port-number              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
 	"  -I --source-address IP-address     Specify source IP address",
 	"",
-	"  -k --key item-key                  Specify key of item to retrieve value for",
+	"  -k --key item-key                  Specify key of the item to retrieve value for",
 	"",
 	"  -h --help                          Display this help message",
 	"  -V --version                       Display version number",

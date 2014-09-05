@@ -55,6 +55,7 @@ OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
+	..\..\..\src\libs\zbxself\selfmon.o \
 	..\..\..\src\zabbix_agent\active.o \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
@@ -230,6 +231,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\libs\zbxwin32\service.o: ..\..\..\src\libs\zbxwin32\service.c
 	$(CC) ..\..\..\src\libs\zbxwin32\service.c /Fo"..\..\..\src\libs\zbxwin32\service.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxself\selfmon.o: ..\..\..\src\libs\zbxself\selfmon.c
+	$(CC) ..\..\..\src\libs\zbxself\selfmon.c /Fo"..\..\..\src\libs\zbxself\selfmon.o" $(CFLAGS)
 
 ..\..\..\src\zabbix_agent\active.o: ..\..\..\src\zabbix_agent\active.c
 	$(CC) ..\..\..\src\zabbix_agent\active.c /Fo"..\..\..\src\zabbix_agent\active.o" $(CFLAGS)

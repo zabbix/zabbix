@@ -17,6 +17,12 @@ zabbix_agentd \- Zabbix agent daemon
 .B \-t
 .I item\-key
 .br
+.B zabbix_agentd
+.RB [ \-c
+.IR config\-file ]
+.B \-R
+.I runtime-option
+.br
 .B zabbix_agentd \-h
 .br
 .B zabbix_agentd \-V
@@ -27,7 +33,41 @@ is a daemon for monitoring of various server parameters.
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
-.
+.IP "\fB\-R\fR, \fB\-\-runtime-control\fR \fIruntime-option\fR"
+Perform administrative functions according to \fIruntime-option\fR.
+.SS
+.RS 4
+Runtime control options
+.RS 4
+.TP 4
+\fBlog_level_increase\fR[=\fItarget\fR]
+Increase log level, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+\fBlog_level_decrease\fR[=\fItarget\fR]
+Decrease log level, affects all processes if target is not specified
+.RE
+.RE
+.SS
+.RS 4
+Log level control targets
+.RS 4
+.TP 4
+.I pid
+Process identifier
+.RE
+.RS 4
+.TP 4
+.I process-type
+All processes of specified type (e.g., listener)
+.RE
+.RS 4
+.TP 4
+.I process-type,N
+Process type and number (e.g., listener,3)
+.RE
+.RE
 .IP "\fB\-p\fR, \fB\-\-print\fR"
 Print known items and exit.
 For each item either generic defaults are used, or specific defaults for testing are supplied.

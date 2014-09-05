@@ -449,6 +449,9 @@
 					height: 450
 				}
 			});
+			if (IE8) {
+				jQuery('.formElementTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			}
 		}
 	}
 

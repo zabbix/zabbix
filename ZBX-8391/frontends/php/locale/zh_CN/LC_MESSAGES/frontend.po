@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-27 17:23+0300\n"
+"POT-Creation-Date: 2014-08-30 23:10+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -96,7 +96,7 @@ msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] ""
 
-#: include/views/monitoring.discovery.php:130
+#: include/views/monitoring.discovery.php:133
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
@@ -253,7 +253,7 @@ msgstr "访问被拒绝."
 msgid "Account is blocked for %s seconds"
 msgstr "帐号被封锁%s秒"
 
-#: events.php:477 include/actions.inc.php:232 include/blocks.inc.php:1004
+#: events.php:476 include/actions.inc.php:232 include/blocks.inc.php:1004
 #: include/blocks.inc.php:1298 include/events.inc.php:197
 #: include/events.inc.php:272 include/views/configuration.action.edit.php:1042
 msgid "Ack"
@@ -381,7 +381,7 @@ msgstr "动作操作"
 msgid "Action updated"
 msgstr "动作已更新"
 
-#: events.php:478 include/blocks.inc.php:1005 include/blocks.inc.php:1299
+#: events.php:477 include/blocks.inc.php:1005 include/blocks.inc.php:1299
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -461,8 +461,8 @@ msgstr "作用中直到"
 #: include/views/configuration.host.prototype.edit.php:195
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
-#: include/views/configuration.httpconf.edit.php:269
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:278
+#: include/views/configuration.httpconf.edit.php:322
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
@@ -852,8 +852,7 @@ msgstr "八月"
 msgid "August"
 msgstr "八月"
 
-#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:156
-#: include/views/configuration.httpconf.edit.php:281
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:290
 #: include/views/configuration.httpconf.list.php:68
 msgid "Authentication"
 msgstr "认证"
@@ -2777,7 +2776,7 @@ msgstr "典型的"
 msgid "Clear"
 msgstr "清除"
 
-#: include/views/configuration.httpconf.edit.php:303
+#: include/views/configuration.httpconf.edit.php:312
 #: include/views/configuration.item.edit.php:447
 msgid "Clear history and trends"
 msgstr "清除历史和趋势"
@@ -2807,7 +2806,7 @@ msgstr "时钟"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:300
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -3532,7 +3531,7 @@ msgstr "禁用"
 msgid "DISCOVERED"
 msgstr "被发现"
 
-#: events.php:457 hosts.php:829 include/views/administration.proxy.edit.php:60
+#: events.php:456 hosts.php:829 include/views/administration.proxy.edit.php:60
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3914,7 +3913,7 @@ msgstr "删除代理?"
 msgid "Delete regular expression?"
 msgstr "删除正规表示式?"
 
-#: include/views/configuration.httpconf.edit.php:289
+#: include/views/configuration.httpconf.edit.php:298
 msgid "Delete scenario?"
 msgstr "删除场景?"
 
@@ -4222,7 +4221,7 @@ msgstr "依赖于"
 msgid "Deployment status"
 msgstr "部署状态"
 
-#: events.php:458 events.php:473 include/classes/screens/CScreenEvents.php:41
+#: events.php:457 events.php:472 include/classes/screens/CScreenEvents.php:41
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
@@ -4471,11 +4470,11 @@ msgstr "已探索到的"
 msgid "Discovered by"
 msgstr ""
 
-#: include/views/monitoring.discovery.php:40
+#: include/views/monitoring.discovery.php:39
 msgid "Discovered device"
 msgstr "已探索到的装置"
 
-#: events.php:334 hosts.php:864 hosts.php:957 include/html.inc.php:351
+#: events.php:333 hosts.php:864 hosts.php:957 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:234
@@ -4639,8 +4638,8 @@ msgstr "下"
 
 #: include/views/configuration.services.edit.php:142
 #: include/views/configuration.services.edit.php:261
-#: include/views/monitoring.discovery.php:42
-#: include/views/monitoring.discovery.php:164 report3.php:83
+#: include/views/monitoring.discovery.php:45
+#: include/views/monitoring.discovery.php:167 report3.php:83
 msgid "Downtime"
 msgstr "断线时间"
 
@@ -4724,7 +4723,7 @@ msgstr "重複的严重性名称\"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "重複的用户别名\"%s\"."
 
-#: events.php:476 include/events.inc.php:195 include/events.inc.php:272
+#: events.php:475 include/events.inc.php:195 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:294
 msgid "Duration"
 msgstr "持续时间"
@@ -5174,7 +5173,7 @@ msgstr "事件来源细节"
 msgid "Event type"
 msgstr "只有超级管理员能创建群组"
 
-#: events.php:338 include/menu.inc.php:56
+#: events.php:337 include/menu.inc.php:56
 #: include/views/common.filter.trigger.php:63
 #: include/views/inventory.host.view.php:216 jsLoader.php:191 search.php:136
 #: search.php:222 search.php:276 search.php:329
@@ -5264,7 +5263,7 @@ msgstr "爆发的"
 msgid "Export selected"
 msgstr "汇出所选的"
 
-#: events.php:299
+#: events.php:298
 msgid "Export to CSV"
 msgstr "汇出到CSV"
 
@@ -5466,7 +5465,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "填满的区域"
 
-#: events.php:396 hosts.php:834 include/forms.inc.php:616
+#: events.php:395 hosts.php:834 include/forms.inc.php:616
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/common.filter.trigger.php:147
@@ -5947,7 +5946,7 @@ msgstr "希腊(el_GR)"
 msgid "Grid"
 msgstr "网格"
 
-#: events.php:322 hostinventoriesoverview.php:90 hosts.php:819 httpmon.php:77
+#: events.php:321 hostinventoriesoverview.php:90 hosts.php:819 httpmon.php:77
 #: include/classes/html/CHostsInfo.php:105
 #: include/classes/html/CTriggersInfo.php:111
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -6062,7 +6061,7 @@ msgstr "H:i"
 msgid "H:i:s"
 msgstr "H:i:s"
 
-#: events.php:302
+#: events.php:301
 msgid "HISTORY OF EVENTS"
 msgstr "事件的历史"
 
@@ -6089,7 +6088,7 @@ msgstr ""
 msgid "HTTP"
 msgstr "HTTP"
 
-#: include/perm.inc.php:50
+#: include/perm.inc.php:50 include/views/configuration.httpconf.edit.php:156
 msgid "HTTP authentication"
 msgstr "HTTP认证"
 
@@ -6194,7 +6193,7 @@ msgstr "历史记录"
 msgid "History cleared"
 msgstr "历史已清除"
 
-#: include/views/configuration.httpconf.edit.php:304
+#: include/views/configuration.httpconf.edit.php:313
 #: include/views/configuration.item.edit.php:448
 msgid "History clearing can take a long time. Continue?"
 msgstr "历史清除可能会很久?继续吗?"
@@ -6229,7 +6228,7 @@ msgstr "横向"
 msgid "Horizontal align"
 msgstr "横向对齐"
 
-#: events.php:326 events.php:472 events.php:572 httpmon.php:78 httpmon.php:91
+#: events.php:325 events.php:471 events.php:571 httpmon.php:78 httpmon.php:91
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:671 include/blocks.inc.php:720
 #: include/blocks.inc.php:989 include/blocks.inc.php:999
@@ -6645,7 +6644,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:456 hosts.php:830
+#: events.php:455 hosts.php:830
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
@@ -9448,7 +9447,7 @@ msgstr "週一"
 msgid "Monitored by proxy"
 msgstr "由系统代理程式监测"
 
-#: include/views/monitoring.discovery.php:41
+#: include/views/monitoring.discovery.php:44
 msgid "Monitored host"
 msgstr "已监测的主机"
 
@@ -9565,7 +9564,7 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.host.prototype.list.php:48
 #: include/views/configuration.httpconf.edit.php:59
-#: include/views/configuration.httpconf.edit.php:198
+#: include/views/configuration.httpconf.edit.php:207
 #: include/views/configuration.httpconf.list.php:64
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:52
@@ -9721,7 +9720,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "次"
 
-#: events.php:813 include/events.inc.php:355 include/events.inc.php:373
+#: events.php:811 include/events.inc.php:355 include/events.inc.php:373
 #: include/func.inc.php:2022 include/triggers.inc.php:1487
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
@@ -9951,7 +9950,7 @@ msgstr "没有找到错误."
 msgid "No events"
 msgstr "没有事件"
 
-#: events.php:406 include/blocks.inc.php:997
+#: events.php:405 include/blocks.inc.php:997
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr ""
@@ -11351,7 +11350,7 @@ msgstr "被动式"
 #: include/views/configuration.host.discovery.edit.php:176
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.prototype.edit.php:277
-#: include/views/configuration.httpconf.edit.php:159
+#: include/views/configuration.httpconf.edit.php:169
 #: include/views/configuration.item.edit.php:170
 #: include/views/configuration.item.edit.php:182
 #: include/views/configuration.item.massupdate.php:245
@@ -11889,7 +11888,7 @@ msgstr "远端命令"
 #: include/views/configuration.action.edit.php:974
 #: include/views/configuration.host.discovery.edit.php:211
 #: include/views/configuration.host.discovery.edit.php:320
-#: include/views/configuration.httpconf.edit.php:249
+#: include/views/configuration.httpconf.edit.php:258
 #: include/views/configuration.item.edit.php:278
 #: include/views/configuration.item.massupdate.php:333
 #: include/views/configuration.maintenance.edit.php:114
@@ -12000,7 +11999,7 @@ msgid "Reports"
 msgstr "报表"
 
 #: include/classes/setup/CSetupWizard.php:187
-#: include/views/configuration.httpconf.edit.php:201
+#: include/views/configuration.httpconf.edit.php:210
 msgid "Required"
 msgstr "要求的"
 
@@ -12040,7 +12039,7 @@ msgstr "要求的状态码"
 msgid "Required string"
 msgstr "要求的字串"
 
-#: events.php:397 hosts.php:837 include/forms.inc.php:619
+#: events.php:396 hosts.php:837 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
@@ -12405,23 +12404,23 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSH 端点代理程式"
 
-#: include/views/configuration.httpconf.edit.php:170
+#: include/views/configuration.httpconf.edit.php:179
 msgid "SSL certificate file"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:176
+#: include/views/configuration.httpconf.edit.php:185
 msgid "SSL key file"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:182
+#: include/views/configuration.httpconf.edit.php:191
 msgid "SSL key password"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:166
+#: include/views/configuration.httpconf.edit.php:175
 msgid "SSL verify host"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:163
+#: include/views/configuration.httpconf.edit.php:172
 msgid "SSL verify peer"
 msgstr ""
 
@@ -12458,7 +12457,7 @@ msgstr "週六"
 msgid "Scale"
 msgstr "Scale"
 
-#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:279
+#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:288
 msgid "Scenario"
 msgstr "方桉"
 
@@ -12698,7 +12697,7 @@ msgstr "安全级别"
 msgid "Security name"
 msgstr "安全名称"
 
-#: events.php:378 include/classes/html/CButtonPopup.php:52
+#: events.php:377 include/classes/html/CButtonPopup.php:52
 #: include/classes/html/CMultiSelect.php:54 include/forms.inc.php:569
 #: include/reports.inc.php:414
 #: include/views/administration.auditacts.list.php:44
@@ -12840,7 +12839,7 @@ msgstr "伺服器资讯"
 msgid "Server time"
 msgstr "伺服器时间"
 
-#: events.php:586 include/actions.inc.php:103
+#: events.php:585 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:280
 #: include/views/configuration.services.parent.list.php:36 services.php:468
@@ -12917,7 +12916,7 @@ msgstr "服务形成了一个循环式迴圈."
 msgid "Session terminated, re-login, please."
 msgstr "连线期已中断, 请重连."
 
-#: events.php:475 include/classes/screens/CScreenEvents.php:43
+#: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
 #: include/triggers.inc.php:1479 include/views/configuration.item.list.php:148
 #: include/views/configuration.triggers.edit.php:253
@@ -13231,7 +13230,7 @@ msgstr "依此排序触发器:"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "依栏位\"%1$s\"排序是不允许的."
 
-#: events.php:335 include/classes/screens/CScreenHistory.php:148
+#: events.php:334 include/classes/screens/CScreenHistory.php:148
 msgid "Source"
 msgstr "来源 "
 
@@ -13282,7 +13281,7 @@ msgstr "州"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:459 events.php:474 hosts.php:868 httpdetails.php:134
+#: events.php:458 events.php:473 hosts.php:868 httpdetails.php:134
 #: httpmon.php:95 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13325,7 +13324,7 @@ msgstr "状态统计"
 msgid "Status calculation algorithm"
 msgstr "状态计算演算法"
 
-#: include/views/configuration.httpconf.edit.php:202
+#: include/views/configuration.httpconf.edit.php:211
 msgid "Status codes"
 msgstr "状态码"
 
@@ -13374,8 +13373,8 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "名字为\"%1$s\"的步骤已经存在."
 
 #: httpconf.php:50 include/views/configuration.action.edit.php:370
-#: include/views/configuration.httpconf.edit.php:272
-#: include/views/configuration.httpconf.edit.php:280
+#: include/views/configuration.httpconf.edit.php:281
+#: include/views/configuration.httpconf.edit.php:289
 msgid "Steps"
 msgstr "步骤"
 
@@ -13852,7 +13851,7 @@ msgstr "週四"
 msgid "Till"
 msgstr "直到"
 
-#: events.php:455 events.php:471 include/acknow.inc.php:49
+#: events.php:454 events.php:470 include/acknow.inc.php:49
 #: include/actions.inc.php:819 include/actions.inc.php:842
 #: include/actions.inc.php:915 include/actions.inc.php:933
 #: include/blocks.inc.php:993 include/classes/screens/CScreenActions.php:32
@@ -13905,7 +13904,7 @@ msgstr "时间类型"
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:199
+#: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.popup.php:97 popup_httpstep.php:43
 msgid "Timeout"
 msgstr "逾时"
@@ -14007,7 +14006,7 @@ msgstr ""
 msgid "Trends"
 msgstr "趋势"
 
-#: events.php:333 events.php:375 include/actions.inc.php:56
+#: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
 #: include/maps.inc.php:26 include/triggers.inc.php:1476
 #: include/views/configuration.services.child.list.php:40
@@ -14385,7 +14384,7 @@ msgid "UP"
 msgstr "上线"
 
 #: include/screens.inc.php:44
-#: include/views/configuration.httpconf.edit.php:200
+#: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.httpconf.popup.php:87
 #: include/views/configuration.screen.constructor.edit.php:661
 #: include/views/configuration.sysmap.edit.php:137
@@ -14489,8 +14488,8 @@ msgstr "解除封锁所选的用户?"
 msgid "Units"
 msgstr "单位"
 
-#: events.php:569 events.php:570 events.php:580 events.php:581 events.php:582
-#: events.php:583 httpdetails.php:165 httpmon.php:174
+#: events.php:568 events.php:569 events.php:579 events.php:580 events.php:581
+#: events.php:582 httpdetails.php:165 httpmon.php:174
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14712,7 +14711,7 @@ msgstr "上"
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:298
+#: include/views/configuration.httpconf.edit.php:307
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
 #: include/views/configuration.item.massupdate.php:570
@@ -14822,8 +14821,8 @@ msgstr "上层拓墣图"
 
 #: include/views/configuration.services.edit.php:137
 #: include/views/configuration.services.edit.php:260
-#: include/views/monitoring.discovery.php:42
-#: include/views/monitoring.discovery.php:161
+#: include/views/monitoring.discovery.php:45
+#: include/views/monitoring.discovery.php:164
 msgid "Uptime"
 msgstr "在线时间"
 
@@ -14858,7 +14857,7 @@ msgstr "用于动作中"
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:343
 #: include/views/configuration.action.edit.php:562
-#: include/views/configuration.httpconf.edit.php:158
+#: include/views/configuration.httpconf.edit.php:168
 msgid "User"
 msgstr "用户"
 
@@ -15753,7 +15752,7 @@ msgstr "年"
 msgid "Yearly"
 msgstr "每年"
 
-#: events.php:813 include/blocks.inc.php:813
+#: events.php:811 include/blocks.inc.php:813
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2022
 #: include/triggers.inc.php:1487
@@ -16379,7 +16378,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/views/configuration.httpconf.edit.php:258
+#: include/views/configuration.httpconf.edit.php:267
 msgid "sec"
 msgstr "秒"
 
