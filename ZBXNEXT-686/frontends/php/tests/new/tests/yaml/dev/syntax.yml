@@ -3,6 +3,7 @@ fixtures: [users, hostGroups]
 
 # an array of steps that will be executed one-by-one
 steps:
+  # Step 1, try to create a host and make sure a single ID is returned
   step1:
     # the API request to perform
     request:
@@ -31,6 +32,7 @@ steps:
         # "_assert" makes sure that the value passes the given validator
         - { _assert: string }
 
+  # Step 2, retrieve the newly created host and check that it has a correct host name and status
   step2:
     request:
       method: host.get
@@ -50,6 +52,7 @@ steps:
         # a simple match
         status: "0"
 
+  # Step 3, try to create a host with the same name and make sure an error is triggered.
   step3:
     request:
       method: host.create
