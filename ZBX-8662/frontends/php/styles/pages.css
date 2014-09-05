@@ -178,7 +178,7 @@ table.tableinfo-overview-hint { width: 200px; }
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
-#map-window #application-select-row .link_menu { margin-left: 6px; }
+#map-window .link_menu { margin-left: 6px; }
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {
