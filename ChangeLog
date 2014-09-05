@@ -1,8 +1,22 @@
-Changes for 2.3.5
-
-New features:
+Changes for 2.3.6
 
 Bug fixes:
+..F....... [ZBX-8662] fixed multiselect and text input alignment (Pavels)
+..F....... [ZBX-8715] fixed item flex interval updating in item massupdate (Krists)
+..F....... [ZBX-8710] fixed LLD graph prototype screen items to be displayed correctly when containing item has colspan/rowspan set (Krists)
+..F....... [ZBX-8532] fixed frontend messaging sounds not playing on IE11 and playing in loop if set to play once on other browsers (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.3.5
+
+Bug fixes:
+..F....... [ZBX-8714] fixed confirmation dialogs when performing a mass action (Pavels)
+A......... [ZBX-8634] fixed trigger prototype validation to disallow items from both templates and hosts in same trigger prototype (Krists)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-8707] fixed not being able to add an action operation condition (Pavels)
+..F....... [ZBX-8702] changed the default graph palette to generate the first line in green color and the second in red (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ..F....... [ZBX-8683] fixed misplaced 'Add' button for IT Services having child services (Alexei)
 
@@ -21,6 +35,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8458] visual fixes in multiselect, actions, screens and maps (Oleg)
+..F....... [ZBX-8682] added IT services sorting in dependencies tab (Oleg)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
 ..F....... [ZBX-8675] removed sortorder sorting from IT services popup window (Oleg)
@@ -342,7 +358,13 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.7rc1
 
+New features:
+
 Bug fixes:
+A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
@@ -1426,6 +1448,8 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .....J.... [ZBX-6229] removed pretty formatting from Java gateway JSON responses (asaveljevs)
@@ -2994,6 +3018,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
