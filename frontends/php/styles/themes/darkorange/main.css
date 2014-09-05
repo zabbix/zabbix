@@ -518,8 +518,8 @@ div.preloader {
 /* multiselect */
 .multiselect input[type="text"] { color: #F50; }
 .multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
-.multiselect .selected ul { border: 1px solid #DFDFDF; background: #313131; }
-.multiselect .selected ul.active { border: 1px solid #BE4F00; }
+.multiselect { border: 1px solid #DFDFDF; background: #313131; }
+.multiselect.active { border: 1px solid #BE4F00; }
 .multiselect .selected ul li {
 	border: 1px solid #DFDFDF; background: #908E8E; color: #FFFFFF;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #4E4D4E), color-stop(15%, #908E8E));
