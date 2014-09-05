@@ -598,18 +598,30 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		$i = date('i', $date);
 	}
 
-	$day = new CNumericBox($name.'_day', $d, 2);
+	$day = new CTextBox($name.'_day', $d, 2, false, 2);
+	$day->attr('style', 'text-align: right;');
 	$day->attr('placeholder', _('dd'));
-	$month = new CNumericBox($name.'_month', $m, 2);
+	$day->addAction('onchange', 'validateDatePartBox(this, 1, 31, 2);');
+
+	$month = new CTextBox($name.'_month', $m, 2, false, 2);
+	$month->attr('style', 'text-align: right;');
 	$month->attr('placeholder', _('mm'));
+	$month->addAction('onchange', 'validateDatePartBox(this, 1, 12, 2);');
+
 	$year = new CNumericBox($name.'_year', $y, 4);
 	$year->attr('placeholder', _('yyyy'));
-	$hour = new CNumericBox($name.'_hour', $h, 2);
-	$hour->attr('placeholder', _('hh'));
-	$minute = new CNumericBox($name.'_minute', $i, 2);
-	$minute->attr('placeholder', _('mm'));
 
-	$fields = array($year, '-', $month, '-', $day, SPACE, $hour, ':', $minute, $calendarIcon);
+	$hour = new CTextBox($name.'_hour', $h, 2, false, 2);
+	$hour->attr('style', 'text-align: right;');
+	$hour->attr('placeholder', _('hh'));
+	$hour->addAction('onchange', 'validateDatePartBox(this, 0, 23, 2);');
+
+	$minute = new CTextBox($name.'_minute', $i, 2, false, 2);
+	$minute->attr('style', 'text-align: right;');
+	$minute->attr('placeholder', _('mm'));
+	$minute->addAction('onchange', 'validateDatePartBox(this, 0, 59, 2);');
+
+	$fields = array($year, '-', $month, '-', $day, ' ', $hour, ':', $minute, $calendarIcon);
 
 	zbx_add_post_js('create_calendar(null,'.
 		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
