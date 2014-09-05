@@ -26,7 +26,7 @@ steps:
     expect: result
 
     # validate the received response
-    # depending on the value of "expect", "response" will contain data either from "result" or "error"
+    # depending on the value of "expect", the rules will be matched against the data contained in "result" or "error"
     response:
       hostids:
         # "_assert" makes sure that the value passes the given validator
