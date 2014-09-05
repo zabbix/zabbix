@@ -466,6 +466,13 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		step++;
 	}
 
+	/* check if there was data to read */
+	if (0 == values->values_num || end_timestamp < values->values[values->values_num - 1].timestamp.sec)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	/* drop the last second values and read them from database */
 	end_timestamp = values->values[values->values_num - 1].timestamp.sec;
 
@@ -2034,8 +2041,7 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records, update_seconds,
 				update_end, &queries);
 
-		zbx_vector_history_record_sort(&records,
-				(zbx_compare_func_t)vc_history_record_compare_asc_func);
+		zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
 	}
 
 	/* the target second does not contain the required value, read first value before it */
