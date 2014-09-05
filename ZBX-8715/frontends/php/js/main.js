@@ -215,7 +215,7 @@ var AudioControl = {
 			clearTimeout(AudioControl.timeoutHandler);
 
 			if (IE) {
-				obj.setAttribute('loop', 0);
+				obj.setAttribute('loop', false);
 				obj.setAttribute('playcount', 0);
 
 				try {
@@ -252,9 +252,7 @@ var AudioControl = {
 				autostart: true,
 				loop: true,
 				playcount: loop ? 9999999 : 1,
-				css: {
-					display: 'none'
-				}
+				height: 0
 			}));
 		}
 		else {
@@ -263,14 +261,19 @@ var AudioControl = {
 			if (obj.length == 0 || obj.data('name') !== name) {
 				obj.remove();
 
-				jQuery('body').append(jQuery('<audio>', {
+				var audioOptions = {
 					id: 'audio',
 					'data-name': name,
 					src: 'audio/' + name,
 					preload: 'auto',
-					autoplay: true,
-					loop: loop ? 9999999 : 1
-				}));
+					autoplay: true
+				};
+
+				if (loop) {
+					audioOptions.loop = true;
+				}
+
+				jQuery('body').append(jQuery('<audio>', audioOptions));
 			}
 		}
 	}
