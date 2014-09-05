@@ -1,8 +1,13 @@
-Changes for 2.3.5
-
-New features:
+Changes for 2.3.6
 
 Bug fixes:
+..F....... [ZBX-8532] fixed frontend messaging sounds not playing on IE11 and playing in loop if set to play once on other browsers (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.3.5
+
+Bug fixes:
+..F....... [ZBX-8714] fixed confirmation dialogs when performing a mass action (Pavels)
 A......... [ZBX-8634] fixed trigger prototype validation to disallow items from both templates and hosts in same trigger prototype (Krists)
 ..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
 ..F....... [ZBX-8707] fixed not being able to add an action operation condition (Pavels)
@@ -353,6 +358,7 @@ Changes for 2.2.7rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
 ..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
