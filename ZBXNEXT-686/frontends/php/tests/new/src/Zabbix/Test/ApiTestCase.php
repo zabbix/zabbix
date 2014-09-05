@@ -19,7 +19,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @var \PDO
 	 */
-	private static $pdo;
+	private $pdo;
 
 	/**
 	 * @var TestDatabase
@@ -43,13 +43,13 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	public function __construct($name = null, array $data = array(), $dataName = '') {
 		parent::__construct($name, $data, $dataName);
 
-		$configFileName = __DIR__.'/../../../config/'.$this->config.'.ini';
+		$configFile = new \CConfigFile(__DIR__.'/../../../../../conf/zabbix.conf.php');
+		$config = $configFile->load();
 
-		if (!is_readable($configFileName)) {
-			throw new \Exception(sprintf('Can not find config file "%s" for config "%s"', $configFileName, $this->config));
-		}
-
-		$this->parsedConfig = parse_ini_file($configFileName);
+		$this->pdo = new \PDO('mysql:host='.$config['DB']['SERVER'].';dbname='.$config['DB']['DATABASE'], $config['DB']['USER'],
+			$config['DB']['PASSWORD']
+		);
+		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
 		$this->database = new TestDatabase($this->getPdo());
 	}
@@ -59,7 +59,11 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function getGateway() {
 		$gateway = new FileAPIGateway();
-		$gateway->configure($this->gatewayConfiguration, $this->parsedConfig);
+		// TODO: make the user name and password configurable
+		$gateway->configure($this->gatewayConfiguration, array(
+			'username' => 'Admin',
+			'password' => 'zabbix'
+		));
 
 		return $gateway;
 	}
@@ -71,17 +75,8 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @return \PDO
 	 */
-	protected function getPdo()
-	{
-		if (!self::$pdo) {
-			self::$pdo = new \PDO($this->parsedConfig['database_dsn'], $this->parsedConfig['database_user'],
-				$this->parsedConfig['database_password']
-			);
-
-			self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-		}
-
-		return self::$pdo;
+	protected function getPdo() {
+		return $this->pdo;
 	}
 
 }
