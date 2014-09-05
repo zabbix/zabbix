@@ -63,6 +63,10 @@ $fields = array(
 								IN('"action.massdelete","action.massdisable","action.massenable"'),
 								null
 							),
+	'operation_action' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+								IN('"create","update"'),
+								null
+							),
 	'add_condition' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_condition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'add_operation' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -322,7 +326,7 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	if (isset($_REQUEST['operations'][$edit_operationid])) {
 		$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 		$_REQUEST['new_operation']['id'] = $edit_operationid;
-		$_REQUEST['new_operation']['action'] = 'update';
+		$_REQUEST['new_operation']['operation_action'] = 'update';
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), array('action.massenable', 'action.massdisable')) && hasRequest('g_actionid')) {
@@ -497,7 +501,7 @@ if (hasRequest('form')) {
 	if (!empty($data['new_operation'])) {
 		if (!is_array($data['new_operation'])) {
 			$data['new_operation'] = array(
-				'action' => 'create',
+				'operation_action' => 'create',
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
