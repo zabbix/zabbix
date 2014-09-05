@@ -1,6 +1,14 @@
-Changes for 2.3.5
+Changes for 2.3.6
 
-New features:
+Bug fixes:
+..F....... [ZBX-8685] fixed ordering of graphs in simple graph prototype and graph prototype screen elements (Krists)
+..F....... [ZBX-8662] fixed multiselect and text input alignment (Pavels)
+..F....... [ZBX-8715] fixed item flex interval updating in item massupdate (Krists)
+..F....... [ZBX-8710] fixed LLD graph prototype screen items to be displayed correctly when containing item has colspan/rowspan set (Krists)
+..F....... [ZBX-8532] fixed frontend messaging sounds not playing on IE11 and playing in loop if set to play once on other browsers (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.3.5
 
 Bug fixes:
 ..F....... [ZBX-8714] fixed confirmation dialogs when performing a mass action (Pavels)
