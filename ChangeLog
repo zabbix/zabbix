@@ -1,6 +1,7 @@
 Changes for 2.2.7rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)

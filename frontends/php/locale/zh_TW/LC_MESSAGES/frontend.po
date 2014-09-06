@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-06 09:39+0300\n"
-"PO-Revision-Date: 2014-08-22 14:18+0300\n"
+"POT-Creation-Date: 2014-09-06 09:40+0300\n"
+"PO-Revision-Date: 2014-09-02 10:34+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
@@ -16,18 +16,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408709928.0\n"
+"X-POOTLE-MTIME: 1409646850.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr "\"%s\"必須介於1970/01/01和2038/01/18之間。"
+msgstr "\"%s\" 必須介於1970.01.01和2038.01.18之間。"
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"顯示「正常」的觸發器\" 必須為 \"0\" 或正整數。"
+msgstr "\"顯示「正常/OK」的觸發器\" 必須為 \"0\" 或正整數。"
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
@@ -48,7 +48,7 @@ msgstr[0] "在%2$d天裡，事件出現了%1$d天"
 #: chart4.php:89 chart5.php:83
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr "%1$s( %2$s年)"
+msgstr "%1$s ( %2$s年)"
 
 #: latest.php:559 latest.php:726
 #, c-format
@@ -69,7 +69,7 @@ msgstr[0] "%1$s天"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "有連續%4$s次登入失敗。最後一次登入失敗發生在 %2$s %3$s，從 %1$s 而來。"
+msgstr[0] "%4$s次登入失敗。最後一次登入失敗發生在 %2$s %3$s，從 %1$s 而來。"
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -81,7 +81,7 @@ msgstr[0] "%d個裝置"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr "（%1$s %2$s）"
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:474
 msgid "(0 - infinitely)"
@@ -110,7 +110,7 @@ msgstr "(最少 60 秒，0 表示採用預設值)"
 #: include/views/configuration.host.massupdate.php:152
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
-msgstr "沒有 proxy"
+msgstr "(沒有 proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
@@ -118,11 +118,11 @@ msgstr "(含有警告)"
 
 #: include/blocks.inc.php:1539
 msgid "-"
-msgstr "－"
+msgstr "-"
 
 #: acknow.php:135
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "－－[整批知悉]－－"
+msgstr "----[BULK ACKNOWLEDGE 整批知悉]----"
 
 #: include/triggers.inc.php:2250 include/triggers.inc.php:2251
 #: include/triggers.inc.php:2252 include/triggers.inc.php:2254
@@ -183,12 +183,12 @@ msgstr "警報知悉"
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
 msgid "AND"
-msgstr "且"
+msgstr "且（AND）"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:996
 msgid "AND / OR"
-msgstr "且／或"
+msgstr "且（AND）/ 或（OR）"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
@@ -842,16 +842,16 @@ msgstr "自動退出(90秒)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "自動註冊資料保存期限(天)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "自動註冊主機之事件及警報保存期限"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "自動註冊主機之事件及警報保存期限(天)：\"%1$s\""
 
 #: include/views/configuration.host.edit.php:805
 #: include/views/configuration.host.massupdate.php:263
@@ -948,7 +948,7 @@ msgstr "Bind密碼"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "最新(近)數據 T 之 位元運算 AND 及遮罩為 N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
@@ -9508,7 +9508,7 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr ""
+msgstr "沒有發現稽核記錄"
 
 #: api/classes/CAction.php:1354
 #, c-format
