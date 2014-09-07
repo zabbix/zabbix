@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-07 08:32+0300\n"
-"PO-Revision-Date: 2014-08-25 09:26+0300\n"
+"POT-Creation-Date: 2014-09-07 08:36+0300\n"
+"PO-Revision-Date: 2014-09-06 15:43+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408951568.0\n"
+"X-POOTLE-MTIME: 1410011039.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -57,9 +57,9 @@ msgstr "%1$s (rok %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s POZYCJA"
+msgstr[1] "%1$s POZYCJE"
+msgstr[2] "%1$s POZYCJI"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -164,7 +164,7 @@ msgstr "-"
 
 #: acknow.php:134
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "----[POTWIERDZENIE ZBIORCZE]----"
+msgstr "----[POTWIERDZENIE ZBIOROWE]----"
 
 #: include/triggers.inc.php:2089 include/triggers.inc.php:2090
 #: include/triggers.inc.php:2091 include/triggers.inc.php:2093
@@ -294,7 +294,7 @@ msgstr "Potwierdź i wróć"
 
 #: include/views/common.filter.trigger.php:45
 msgid "Acknowledge status"
-msgstr "Status potwierdzenia"
+msgstr "Stan potwierdzenia"
 
 #: include/events.inc.php:182 tr_status.php:295 tr_status.php:688
 msgid "Acknowledged"
@@ -416,7 +416,7 @@ msgstr "Aktywne"
 #: include/views/configuration.maintenance.list.php:63
 msgctxt "maintenance status"
 msgid "Active"
-msgstr "Aktywny"
+msgstr "Aktywne"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:513
@@ -838,12 +838,12 @@ msgstr "O (godzina:minuta)"
 #: include/classes/api/services/CMaintenance.php:302
 #: include/classes/api/services/CMaintenance.php:537
 msgid "At least one host or group should be selected."
-msgstr "Co najmniej jeden host lub grupa musi być zaznaczona."
+msgstr "Przynajmniej jeden host lub grupa musi być zaznaczona."
 
 #: include/classes/api/services/CMaintenance.php:391
 #: include/classes/api/services/CMaintenance.php:528
 msgid "At least one maintenance period must be created."
-msgstr "Co najmniej jeden okres konserwacji musi być utworzony."
+msgstr "Przynajmniej jeden okres utrzymania musi być utworzony."
 
 #: include/classes/setup/CFrontendSetup.php:228
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1255,7 +1255,7 @@ msgstr "KONFIGURACJA MAPOWAŃ WARTOŚCI"
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:39
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "KONFIGURACJA MONITORINGU WWW"
+msgstr "KONFIGURACJA MONITOROWANIA WWW"
 
 #: adm.workingtime.php:78
 msgid "CONFIGURATION OF WORKING TIME"
@@ -1435,7 +1435,7 @@ msgstr "Nie można dodać makra."
 
 #: maintenance.php:132
 msgid "Cannot add maintenance"
-msgstr "Nie można dodać okresu utrzymania"
+msgstr "Nie można dodać utrzymania"
 
 #: media_types.php:135
 msgid "Cannot add media type"
@@ -1538,19 +1538,19 @@ msgstr "Nie można wyczyścić historii"
 
 #: include/classes/api/services/CDiscoveryRule.php:1196
 msgid "Cannot clone graph prototypes."
-msgstr "Nie można sklonować prototypu wykresów."
+msgstr "Nie można powielić prototypu wykresów."
 
 #: include/classes/api/services/CDiscoveryRule.php:1244
 msgid "Cannot clone host prototypes."
-msgstr "Nie można sklonować prototypu hosta."
+msgstr "Nie można powielić prototypu hosta."
 
 #: include/classes/api/services/CDiscoveryRule.php:1080
 msgid "Cannot clone item prototypes."
-msgstr "Nie można sklonować prototypów pozycji."
+msgstr "Nie można powielić prototypów pozycji."
 
 #: include/classes/api/services/CDiscoveryRule.php:623
 msgid "Cannot clone trigger prototypes."
-msgstr "Nie można sklonować prototypów wyzwalaczy."
+msgstr "Nie można powielić prototypów wyzwalaczy."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1723,7 +1723,7 @@ msgstr "Nie można usunąć pozycji"
 
 #: maintenance.php:252
 msgid "Cannot delete maintenance"
-msgstr "Nie można usunąć okresu utrzymania"
+msgstr "Nie można usunąć utrzymania"
 
 #: media_types.php:158 media_types.php:195
 msgid "Cannot delete media type"
@@ -1754,7 +1754,7 @@ msgstr "Nie można usunąć skryptu"
 
 #: include/classes/api/services/CScript.php:491
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "Nie można usunąć skryptów. Wyczyść parametr wejściowy \"scriptids\"."
+msgstr "Nie można usunąć skryptów. Pusty parametr wejściowy \"scriptids\"."
 
 #: include/classes/api/services/CScript.php:523
 #, c-format
@@ -1784,39 +1784,39 @@ msgstr "Nie można usunąć szablonu"
 
 #: include/classes/api/services/CApplication.php:423
 msgid "Cannot delete templated application."
-msgstr "Nie można usunąć aplikacji użytych jako szablony."
+msgstr "Nie można usunąć aplikacji pochodzących z szablonu."
 
 #: include/classes/api/services/CGraph.php:547
 #: include/classes/api/services/CGraphPrototype.php:561
 msgid "Cannot delete templated graphs."
-msgstr "Nie można usunąć wykresów użytych jako szablon."
+msgstr "Nie można usunąć wykresów pochodzących z szablonu."
 
 #: include/classes/api/services/CHostPrototype.php:1075
 msgid "Cannot delete templated host prototype."
-msgstr "Nie można usunąć prototypów hosta użytych jako szablony."
+msgstr "Nie można usunąć prototypów hosta pochodzących z szablonu."
 
 #: include/classes/api/services/CItem.php:638
 msgid "Cannot delete templated item."
-msgstr "Nie można usunąć pozycji użytej jako szablon."
+msgstr "Nie można usunąć pozycji pochodzącej z szablonu."
 
 #: include/classes/api/services/CItemPrototype.php:477
 msgid "Cannot delete templated items"
-msgstr "Nie można usunąć pozycji użytych jako szablon"
+msgstr "Nie można usunąć pozycji pochodzących z szablonu"
 
 #: include/classes/api/services/CDiscoveryRule.php:391
 msgid "Cannot delete templated items."
-msgstr "Nie można usunąć pozycji użytych jako szablon."
+msgstr "Nie można usunąć pozycji pochodzących z szablonu."
 
 #: include/classes/api/services/CTrigger.php:1879
 #: include/classes/api/services/CTriggerPrototype.php:581
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "Nie można usunąć wyzwalacza użytego jako szablon \"%1$s:%2$s\"."
+msgstr "Nie można usunąć wyzwalacza pochodzącego z szablonu \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:366
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr "Nie można usunąć scenariusza sieci www \"%1$s\" użytego jako szablon."
+msgstr "Nie można usunąć scenariusza sieci www \"%1$s\" pochodzącego z szablonu."
 
 #: triggers.php:208
 msgid "Cannot delete trigger"
@@ -2575,7 +2575,7 @@ msgstr "Nie można zaktualizować makr"
 
 #: maintenance.php:127
 msgid "Cannot update maintenance"
-msgstr "Nie można zaktualizować okresu utrzymania"
+msgstr "Nie można zaktualizować utrzymania"
 
 #: include/classes/import/CXmlImport18.php:844
 #, c-format
@@ -2625,7 +2625,7 @@ msgstr "Nie można zaktualizować szablonu"
 
 #: include/classes/api/services/CApplication.php:332
 msgid "Cannot update templated applications."
-msgstr "Nie można zaktualizować aplikacji użytych jako szablony."
+msgstr "Nie można zaktualizować aplikacji pochodzących z szablonu."
 
 #: include/classes/api/services/CTemplate.php:750
 #: include/classes/api/services/CTemplate.php:1084
@@ -2950,7 +2950,7 @@ msgstr "Polecenie"
 
 #: tr_events.php:128
 msgid "Command actions"
-msgstr "Akcje polecenia"
+msgstr "Wykonane polecenia"
 
 #: scripts.php:93
 msgid "Command cannot be empty."
@@ -3162,7 +3162,7 @@ msgstr "Konfiguracja mapowań wartości"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr "Konfiguracja monitoringu www"
+msgstr "Konfiguracja monitorowania www"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
@@ -4295,7 +4295,7 @@ msgstr "Zależy od"
 
 #: include/hosts.inc.php:270
 msgid "Deployment status"
-msgstr "Status instalacji"
+msgstr "Stan instalacji"
 
 #: events.php:457 events.php:472 include/classes/screens/CScreenEvents.php:41
 #: include/views/administration.auditlogs.list.php:91
@@ -4658,7 +4658,7 @@ msgstr "Usunięto reguły wykrywania"
 
 #: dashboard.php:492 include/actions.inc.php:80
 msgid "Discovery status"
-msgstr "Status wykrycia"
+msgstr "Stan wykrywania"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
@@ -4666,11 +4666,11 @@ msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
 #: latest.php:892
 msgid "Display graph"
-msgstr ""
+msgstr "Wyświetl wykres"
 
 #: latest.php:891
 msgid "Display stacked graph"
-msgstr ""
+msgstr "Wyświetl wykres skumulowany"
 
 #: include/func.inc.php:1568
 msgid "Displaying"
@@ -4721,7 +4721,7 @@ msgstr "Nie działa"
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:167 report3.php:83
 msgid "Downtime"
-msgstr "Czas przerw w pracy"
+msgstr "Czas przerwy w pracy"
 
 #: include/views/configuration.host.edit.php:306
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
@@ -5250,11 +5250,11 @@ msgstr "Zdarzenia i alarmy"
 
 #: include/forms.inc.php:1645
 msgid "Every day(s)"
-msgstr "Codziennie"
+msgstr "Co ile dni"
 
 #: include/forms.inc.php:1652
 msgid "Every week(s)"
-msgstr "Każdego tygodnia"
+msgstr "Co ile tygodni"
 
 #: include/func.inc.php:669
 msgid "Exa"
@@ -6113,7 +6113,7 @@ msgstr "Grupy"
 
 #: include/views/configuration.maintenance.edit.php:178
 msgid "Groups in maintenance"
-msgstr "Grupy w okresie utrzymania"
+msgstr "Grupy w utrzymaniu"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1440
@@ -6667,7 +6667,7 @@ msgstr "Hosty w"
 
 #: include/views/configuration.maintenance.edit.php:169
 msgid "Hosts in maintenance"
-msgstr "Hosty w okresie utrzymania"
+msgstr "Hosty w utrzymaniu"
 
 #: include/classes/html/CHostsInfo.php:101 include/screens.inc.php:33
 msgid "Hosts info"
@@ -6854,7 +6854,7 @@ msgstr "Ikona (wyłączone)"
 
 #: include/views/js/configuration.sysmaps.js.php:284
 msgid "Icon (maintenance)"
-msgstr "Ikona (w okresie utrzymania)"
+msgstr "Ikona (utrzymanie)"
 
 #: include/views/js/configuration.sysmaps.js.php:275
 msgid "Icon (problem)"
@@ -7077,7 +7077,7 @@ msgstr "W grupach"
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
-msgstr "W okresie utrzymania"
+msgstr "W utrzymaniu"
 
 #: include/actions.inc.php:853 include/actions.inc.php:945
 #: include/actions.inc.php:991 include/actions.inc.php:1073
@@ -7537,23 +7537,23 @@ msgstr "Błędna lista pozycji."
 
 #: maintenance.php:330
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Błędny okres utrzymania - data musi być z przedziału od 1970-01-01 do 2038-01-18"
+msgstr "Błędne utrzymanie - data musi być z przedziału od 1970-01-01 do 2038-01-18"
 
 #: maintenance.php:358
 msgid "Incorrect maintenance date"
-msgstr "Błędna data okresu utrzymania"
+msgstr "Błędna data utrzymania"
 
 #: maintenance.php:337
 msgid "Incorrect maintenance day period"
-msgstr "Błędny przedział dnia okresu utrzymania"
+msgstr "Błędny przedział dnia utrzymania"
 
 #: maintenance.php:344 maintenance.php:355
 msgid "Incorrect maintenance days of week"
-msgstr "Błędne dni tygodnia okresu utrzymania"
+msgstr "Błędne dni tygodnia utrzymania"
 
 #: maintenance.php:352
 msgid "Incorrect maintenance month period"
-msgstr "Błędny miesiąc dla okresu utrzymania"
+msgstr "Błędny miesiąc dla utrzymania"
 
 #: maintenance.php:317
 msgid "Incorrect maintenance period"
@@ -7561,11 +7561,11 @@ msgstr "Błędny okres utrzymania"
 
 #: maintenance.php:314
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr "Błędny okres utrzymania (minimalnie 5 sekund)"
+msgstr "Błędny okres utrzymania (minimalnie 5 minut)"
 
 #: maintenance.php:341
 msgid "Incorrect maintenance week period"
-msgstr "Błędny tydzień dla okresu utrzymania"
+msgstr "Błędny tydzień dla utrzymania"
 
 #: include/classes/api/services/CScreenItem.php:716
 #, c-format
@@ -7632,7 +7632,7 @@ msgstr "Błędne parametry dla metody aktualizacji mapy ikon \"%s\"."
 #: include/classes/api/services/CMaintenance.php:350
 #: include/classes/api/services/CMaintenance.php:577
 msgid "Incorrect parameters for maintenance."
-msgstr "Błędne parametry dla okresu utrzymania."
+msgstr "Błędne parametry dla utrzymania."
 
 #: include/classes/api/services/CUserGroup.php:245
 #: include/classes/api/services/CUserGroup.php:299
@@ -8323,7 +8323,7 @@ msgstr "Pozycja wykorzystuje niepoprawny typ interfejsu."
 
 #: chart.php:89
 msgid "Item values"
-msgstr ""
+msgstr "Wartości pozycji"
 
 #: include/classes/api/services/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -8930,7 +8930,7 @@ msgstr "MAC adres B"
 
 #: include/maps.inc.php:536
 msgid "MAINTENANCE"
-msgstr "OKRES UTRZYMANIA"
+msgstr "UTRZYMANIE"
 
 #: include/hosts.inc.php:39
 msgid "MD2"
@@ -9008,7 +9008,7 @@ msgstr "Zaktualizowano makra"
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:150
 msgid "Maintenance"
-msgstr "Okres utrzymania"
+msgstr "Utrzymanie"
 
 #: include/classes/api/services/CMaintenance.php:356
 #: include/classes/api/services/CMaintenance.php:370
@@ -9016,12 +9016,12 @@ msgstr "Okres utrzymania"
 #: include/classes/api/services/CMaintenance.php:501
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
-msgstr "Okres utrzymania \"%1$s\" już istnieje."
+msgstr "Utrzymanie \"%1$s\" już istnieje."
 
 #: include/classes/api/services/CMaintenance.php:386
 #: include/classes/api/services/CMaintenance.php:523
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr "Wartość okresu utrzymania \"Aktywne od\" nie może być większa od \"Aktywne do\"."
+msgstr "Wartość utrzymania \"Aktywne od\" nie może być większa od \"Aktywne do\"."
 
 #: include/classes/validators/CActionCondValidator.php:158
 msgid "Maintenance action condition value must be empty."
@@ -9029,11 +9029,11 @@ msgstr "Wartość warunku akcji utrzymania powinna być pusta."
 
 #: maintenance.php:131
 msgid "Maintenance added"
-msgstr "Dodano okres utrzymania"
+msgstr "Dodano utrzymanie"
 
 #: maintenance.php:252
 msgid "Maintenance deleted"
-msgstr "Usunięto okres utrzymania"
+msgstr "Usunięto utrzymanie"
 
 #: include/views/configuration.maintenance.edit.php:150
 msgid "Maintenance period"
@@ -9049,23 +9049,23 @@ msgstr "Okresy utrzymania"
 
 #: include/actions.inc.php:50
 msgid "Maintenance status"
-msgstr "Stan okresu utrzymania"
+msgstr "Stan utrzymania"
 
 #: include/views/configuration.maintenance.edit.php:43
 msgid "Maintenance type"
-msgstr "Typ okresu utrzymania"
+msgstr "Typ utrzymania"
 
 #: maintenance.php:126
 msgid "Maintenance updated"
-msgstr "Zaktualizowano okres utrzymania"
+msgstr "Zaktualizowano utrzymanie"
 
 #: include/blocks.inc.php:1032 tr_status.php:626
 msgid "Maintenance with data collection"
-msgstr "Okres utrzymania ze zbieraniem danych"
+msgstr "Utrzymanie ze zbieraniem danych"
 
 #: include/blocks.inc.php:1031 tr_status.php:625
 msgid "Maintenance without data collection"
-msgstr "Okres utrzymania bez zbierania danych"
+msgstr "Utrzymanie bez zbierania danych"
 
 #: include/classes/validators/CFunctionValidator.php:276
 msgid "Mandatory parameter is missing."
@@ -9111,7 +9111,7 @@ msgstr "Zaktualizowano mapę \"%s\"."
 
 #: sysmap.php:85
 msgid "Map is updated! Return?"
-msgstr ""
+msgstr "Zaktualizowano mapę! Wrócić?"
 
 #: include/views/configuration.sysmap.edit.php:99
 msgid "Map label type"
@@ -9119,7 +9119,7 @@ msgstr "Typ etykiety mapy"
 
 #: sysmap.php:88
 msgid "Map update failed."
-msgstr ""
+msgstr "Aktualizacja mapy nieudana."
 
 #: include/classes/api/services/CMap.php:513
 #, c-format
@@ -9346,7 +9346,7 @@ msgstr "Wiadomość"
 
 #: tr_events.php:123
 msgid "Message actions"
-msgstr "Działania komunikatu"
+msgstr "Wysłane powiadomienia"
 
 #: include/views/administration.mediatypes.edit.php:91
 msgid "Message text limit"
@@ -10224,11 +10224,11 @@ msgstr "Nie znaleziono makr."
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr "Nie zdefiniowano okresów konserwacji."
+msgstr "Nie zdefiniowano okresów utrzymania."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr "Nie znaleziono okresów konserwacji."
+msgstr "Nie znaleziono okresów utrzymania."
 
 #: include/classes/api/services/CScreenItem.php:539
 msgid "No map ID provided for screen element."
@@ -10472,7 +10472,7 @@ msgstr "Nie znaleziono slajdów."
 
 #: include/classes/api/services/CProxy.php:216
 msgid "No status for proxy."
-msgstr "Brak statusu dla proxy."
+msgstr "Brak stanu dla proxy."
 
 #: triggers.php:323
 msgid "No target selected"
@@ -10908,7 +10908,7 @@ msgstr "Jeden z obiektów nadal nie ma grupy hostów."
 
 #: include/forms.inc.php:1632 include/maintenances.inc.php:31
 msgid "One time only"
-msgstr "Tylko jeden raz"
+msgstr "Jednorazowo"
 
 #: include/views/configuration.services.edit.php:147
 #: include/views/configuration.services.edit.php:262
@@ -11537,7 +11537,7 @@ msgstr "Odtwórz dźwięk"
 
 #: include/classes/setup/CSetupWizard.php:231
 msgid "Please correct all issues and press \"Retry\" button"
-msgstr "Nalezy poprawić wszystkie błędy, a następnie nacisnąć przycisk \"Ponów\""
+msgstr "Należy poprawić wszystkie błędy, a następnie nacisnąć przycisk \"Ponów\""
 
 #: scripts.php:89
 msgid "Please enter confirmation text."
@@ -12225,7 +12225,7 @@ msgstr "Zwraca dostępność określonych typów kontroli na hoście. Wartość 
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
-msgstr "Zwraca bieżący stan obsługi dla hosta."
+msgstr "Zwraca bieżący stan utrzymania dla hosta."
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
@@ -12513,7 +12513,7 @@ msgstr "STAN WYZWALACZY"
 
 #: httpmon.php:82
 msgid "STATUS OF WEB MONITORING"
-msgstr "STAN MONITORINGU WWW"
+msgstr "STAN MONITOROWANIA WWW"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
@@ -13067,7 +13067,7 @@ msgstr "Pokaż filtr"
 #: include/views/common.filter.trigger.php:137
 #: include/views/monitoring.dashconf.php:87
 msgid "Show hosts in maintenance"
-msgstr "Wyświetl hosty w okresie utrzymania"
+msgstr "Wyświetl hosty w utrzymaniu"
 
 #: latest.php:398
 msgid "Show items without data"
@@ -13327,11 +13327,11 @@ msgstr "Podany skrypt nie istnieje lub brak uprawnień dla polecenia operacji ak
 
 #: include/views/configuration.item.list.php:59
 msgid "Specify some filter condition to see the items."
-msgstr ""
+msgstr "Określ jakieś warunki filtra, żeby zobaczyć pozycje."
 
 #: latest.php:442
 msgid "Specify some filter condition to see the values."
-msgstr ""
+msgstr "Określ jakieś warunki filtra, żeby zobaczyć wartości."
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -13413,7 +13413,7 @@ msgstr "Kody stanów"
 
 #: httpmon.php:24
 msgid "Status of Web monitoring"
-msgstr "Stan monitoringu WWW"
+msgstr "Stan monitorowania WWW"
 
 #: dashboard.php:369 include/classes/screens/CScreenSystemStatus.php:46
 #: include/menu.inc.php:120 report1.php:25
@@ -13794,7 +13794,7 @@ msgstr "Dane testowe"
 
 #: include/views/administration.general.regularexpressions.edit.php:69
 msgid "Test expressions"
-msgstr "Wyrażenia testowe"
+msgstr "Testowanie wyrażeń"
 
 #: adm.regexps.php:38
 #: include/views/administration.general.regularexpressions.edit.php:66
@@ -14834,7 +14834,7 @@ msgstr "Zaktualizuj"
 
 #: acknow.php:229
 msgid "Update and return"
-msgstr ""
+msgstr "Aktualizuj i powróć."
 
 #: include/views/conf.import.php:24
 msgid "Update existing"
@@ -14935,7 +14935,7 @@ msgstr "Czas dostępności/niedostępności"
 #: include/views/js/configuration.host.edit.js.php:12
 #: include/views/js/configuration.host.edit.js.php:365
 msgid "Use bulk requests"
-msgstr "Użyj żądań zbiorczych"
+msgstr "Użyj żądań zbiorowych"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
@@ -14982,11 +14982,11 @@ msgstr "Użytkownik nie może zmienić sposobu dostępu do interfejsu użytkowni
 
 #: include/classes/api/services/CUserGroup.php:331
 msgid "User cannot change status of himself"
-msgstr "Użytkownik nie może zmienić swojego własnego statusu"
+msgstr "Użytkownik nie może zmienić swojego własnego stanu"
 
 #: include/users.inc.php:187
 msgid "User cannot change status of himself."
-msgstr "Użytkownik nie może zmienić swojego własnego statusu."
+msgstr "Użytkownik nie może zmienić swojego własnego stanu."
 
 #: users.php:299 users.php:359
 msgid "User deleted"
@@ -15067,7 +15067,7 @@ msgstr "Użytkownik nie może modyfikować dostępu GUI dla siebie samego, poprz
 #: include/classes/api/services/CUser.php:305
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "Użytkownik nie może modyfikować statusu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
+msgstr "Użytkownik nie może modyfikować stanu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
 #: include/views/configuration.action.edit.php:763
@@ -15530,7 +15530,7 @@ msgstr "WWW"
 
 #: dashboard.php:462 include/items.inc.php:98
 msgid "Web monitoring"
-msgstr "Monitoring WWW"
+msgstr "Monitorowanie WWW"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -16318,7 +16318,7 @@ msgstr "makro(a)"
 
 #: include/actions.inc.php:178 include/views/configuration.action.edit.php:245
 msgid "maintenance"
-msgstr "okres utrzymania"
+msgstr "utrzymanie"
 
 #: include/classes/api/services/CMap.php:404
 msgid "map"
