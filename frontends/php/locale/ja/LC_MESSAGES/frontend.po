@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-07 08:32+0300\n"
-"PO-Revision-Date: 2014-08-26 05:02+0300\n"
+"POT-Creation-Date: 2014-09-07 08:36+0300\n"
+"PO-Revision-Date: 2014-09-03 02:07+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1409022150.0\n"
+"X-POOTLE-MTIME: 1409702828.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -53,7 +53,7 @@ msgstr "%1$s (%2$s年)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
+msgstr[0] "%1$sアイテム"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -4569,11 +4569,11 @@ msgstr "復旧トリガーの表示期間"
 
 #: latest.php:892
 msgid "Display graph"
-msgstr ""
+msgstr "グラフ表示"
 
 #: latest.php:891
 msgid "Display stacked graph"
-msgstr ""
+msgstr "積算グラフ表示"
 
 #: include/func.inc.php:1568
 msgid "Displaying"
@@ -8206,7 +8206,7 @@ msgstr "アイテムに正しくないインターフェースタイプが設定
 
 #: chart.php:89
 msgid "Item values"
-msgstr ""
+msgstr "アイテムの値"
 
 #: include/classes/api/services/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -8992,7 +8992,7 @@ msgstr "マップ\"%s\"を更新しました。"
 
 #: sysmap.php:85
 msgid "Map is updated! Return?"
-msgstr ""
+msgstr "マップが更新されています！ 戻りますか？"
 
 #: include/views/configuration.sysmap.edit.php:99
 msgid "Map label type"
@@ -9000,7 +9000,7 @@ msgstr "マップラベルのタイプ"
 
 #: sysmap.php:88
 msgid "Map update failed."
-msgstr ""
+msgstr "マップの更新に失敗しました。"
 
 #: include/classes/api/services/CMap.php:513
 #, c-format
@@ -13194,11 +13194,11 @@ msgstr "実行するアクションのコマンドで指定されたスクリプ
 
 #: include/views/configuration.item.list.php:59
 msgid "Specify some filter condition to see the items."
-msgstr ""
+msgstr "アイテムを表示するにはいくつかのフィルター条件を指定してください。"
 
 #: latest.php:442
 msgid "Specify some filter condition to see the values."
-msgstr ""
+msgstr "値を表示するにはいくつかのフィルター条件を指定してください。"
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -14686,7 +14686,7 @@ msgstr "更新"
 
 #: acknow.php:229
 msgid "Update and return"
-msgstr ""
+msgstr "更新して戻る"
 
 #: include/views/conf.import.php:24
 msgid "Update existing"
