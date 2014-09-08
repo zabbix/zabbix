@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:36+0300\n"
-"PO-Revision-Date: 2014-09-03 02:07+0300\n"
+"PO-Revision-Date: 2014-09-08 05:48+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1409702828.0\n"
+"X-POOTLE-MTIME: 1410148137.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -7692,11 +7692,11 @@ msgstr "条件式のトリガー関数\"%1$s\"が正しくありません。"
 #: include/classes/api/services/CTriggerPrototype.php:976
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "トリガーのプロトタイプの条件式が正しくありません。ホスト\"%1$s\"が存在しないかアクセス権限がありません。"
 
 #: include/classes/api/services/CTriggerPrototype.php:987
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "トリガーのプロトタイプの条件式が正しくありません。トリガーのプロトタイプの条件式はテンプレートと同時にホストに属していなければなりません。"
 
 #: include/func.inc.php:1004
 msgid "Incorrect type of asort_by_key."
@@ -12931,7 +12931,7 @@ msgstr "イベントの表示期間(日) \"%1$s\""
 
 #: include/classes/html/widget/CWidget.php:129
 msgid "Show filter"
-msgstr "フィルターの表示"
+msgstr "フィルターを表示"
 
 #: include/views/common.filter.trigger.php:137
 #: include/views/monitoring.dashconf.php:87
@@ -16171,7 +16171,7 @@ msgstr "マップ"
 #: include/views/configuration.host.discovery.edit.php:322
 #: include/views/js/configuration.host.discovery.edit.js.php:23
 msgid "matches"
-msgstr ""
+msgstr "一致する"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1839
 #: include/classes/graphdraw/CLineGraphDraw.php:1853
@@ -16216,7 +16216,7 @@ msgstr "新規"
 #: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "新規"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1931
 #: include/classes/graphdraw/CPieGraphDraw.php:347
