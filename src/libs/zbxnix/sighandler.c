@@ -160,7 +160,6 @@ void	zbx_set_common_signal_handlers()
  * Purpose: set the handlers for child process signals                        *
  *                                                                            *
  ******************************************************************************/
-
 void 	zbx_set_child_signal_handler()
 {
 	struct sigaction	phan;
