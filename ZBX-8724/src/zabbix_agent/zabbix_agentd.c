@@ -807,11 +807,9 @@ void	zbx_free_service_resources(void)
 #if !defined(_WINDOWS)
 		sigset_t	set;
 
-		sigemptyset(&set);
 		/* ignore SIGCHLD signals in order for zbx_sleep() to work */
+		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
-		/* ignore SIGUSR1 signals, because there will be no children for runtime control */
-		sigaddset(&set, SIGUSR1);
 		sigprocmask(SIG_BLOCK, &set, NULL);
 #else
 		/* wait for threads to finish first. although listener threads will never end */
