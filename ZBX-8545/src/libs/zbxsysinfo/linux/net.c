@@ -58,8 +58,6 @@ enum
 	STATE_MAXSTATES
 };
 
-#	define	STATE_ALL ((1 << STATE_MAXSTATES) - 1)
-
 enum
 {
 	NLERR_OK = 0,
@@ -197,7 +195,6 @@ out:
 
 	return ret;
 }
-
 #endif
 
 static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
