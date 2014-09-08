@@ -19,11 +19,13 @@
 
 #include "zbxself.h"
 #include "common.h"
-#include "mutexs.h"
-#include "ipc.h"
-#include "log.h"
 
-#define MAX_HISTORY	60
+#ifndef _WINDOWS
+#	include "mutexs.h"
+#	include "ipc.h"
+#	include "log.h"
+
+#	define MAX_HISTORY	60
 
 typedef struct
 {
@@ -45,10 +47,11 @@ zbx_selfmon_collector_t;
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
-#define	LOCK_SM		zbx_mutex_lock(&sm_lock)
-#define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
+#	define	LOCK_SM		zbx_mutex_lock(&sm_lock)
+#	define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
 static ZBX_MUTEX	sm_lock;
+#endif
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;
@@ -72,8 +75,12 @@ extern int	CONFIG_CONFSYNCER_FORKS;
 extern int	CONFIG_HEARTBEAT_FORKS;
 extern int	CONFIG_SELFMON_FORKS;
 extern int	CONFIG_VMWARE_FORKS;
+extern int	CONFIG_COLLECTOR_FORKS;
+extern int	CONFIG_PASSIVE_FORKS;
+extern int	CONFIG_ACTIVE_FORKS;
+
 extern unsigned char	process_type;
-extern int	process_num;
+extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -134,9 +141,16 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_SELFMON_FORKS;
 		case ZBX_PROCESS_TYPE_VMWARE:
 			return CONFIG_VMWARE_FORKS;
+		case ZBX_PROCESS_TYPE_COLLECTOR:
+			return CONFIG_COLLECTOR_FORKS;
+		case ZBX_PROCESS_TYPE_LISTENER:
+			return CONFIG_PASSIVE_FORKS;
+		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+			return CONFIG_ACTIVE_FORKS;
 	}
 
-	assert(0);
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -199,11 +213,48 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "self-monitoring";
 		case ZBX_PROCESS_TYPE_VMWARE:
 			return "vmware collector";
+		case ZBX_PROCESS_TYPE_COLLECTOR:
+			return "collector";
+		case ZBX_PROCESS_TYPE_LISTENER:
+			return "listener";
+		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+			return "active checks";
 	}
 
-	assert(0);
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
 }
 
+int	get_process_type_by_name(const char *proc_type_str)
+{
+	int	i;
+
+	for (i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
+			return i;
+	}
+
+	return ZBX_PROCESS_TYPE_UNKNOWN;
+}
+
+const char	*get_daemon_type_string(unsigned char daemon_type)
+{
+	switch (daemon_type)
+	{
+		case ZBX_DAEMON_TYPE_SERVER:
+			return "server";
+		case ZBX_DAEMON_TYPE_PROXY_ACTIVE:
+		case ZBX_DAEMON_TYPE_PROXY_PASSIVE:
+			return "proxy";
+		case ZBX_DAEMON_TYPE_AGENT:
+			return "agent";
+		default:
+			return "unknown";
+	}
+}
+
+#ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *
  * Function: init_selfmon_collector                                           *
@@ -531,3 +582,4 @@ void	zbx_wakeup(void)
 {
 	sleep_remains = 0;
 }
+#endif

@@ -44,8 +44,9 @@ ZBX_RECIPIENT;
 static zbx_vector_ptr_t	recipients;
 static int		lastsent = 0;
 
-extern unsigned char	process_type;
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -200,12 +201,17 @@ exit:
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-void	main_watchdog_loop(void)
+ZBX_THREAD_ENTRY(watchdog_thread, args)
 {
 	int	now, nextsync = 0, action;
 	double	sec;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_vector_ptr_create(&recipients);
 

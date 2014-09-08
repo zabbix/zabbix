@@ -606,6 +606,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __function_name, httpstep.url, page.data);
+
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
@@ -614,7 +616,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			else if ('\0' != *httpstep.status_codes &&
 					FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 			{
-				err_str = zbx_strdup(err_str, "status code did not match");
+				err_str = zbx_dsprintf(err_str, "response code \"%ld\" did not match any of the"
+						" required status codes \"%s\"", stat.rspcode, httpstep.status_codes);
 			}
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)) &&
@@ -642,7 +645,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
 						httpstep.required, NULL))
 				{
-					err_str = zbx_strdup(err_str, "required pattern not found");
+					err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
+							httpstep.required, httpstep.url);
 				}
 
 				/* variables defined in scenario */
@@ -654,6 +658,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					variables = string_replace(httptest->httptest.variables, "\r\n", " ");
 					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
 							variables, var_err_str);
+
 					zbx_free(variables);
 				}
 
@@ -666,6 +671,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					variables = string_replace(httpstep.variables, "\r\n", " ");
 					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
 							variables, var_err_str);
+
 					zbx_free(variables);
 				}
 

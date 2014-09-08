@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
@@ -18,22 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+#ifndef ZABBIX_CONTROL_H
+#define ZABBIX_CONTROL_H
 
-class API_JSON_APIInfo extends CZabbixTest {
+#include "common.h"
+#include "zbxself.h"
 
-	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', array(), $debug);
+int	get_log_level_message(const char *opt, int command, int *message);
 
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.4.0');
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', array(), $debug);
-
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.4.0');
-	}
-
-}
+#endif

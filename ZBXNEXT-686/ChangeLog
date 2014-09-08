@@ -1,7 +1,43 @@
+Changes for 2.4.0rc2
+
+New features:
+A.F....... [ZBX-1357] updated Japanese, Polish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.4.0rc1
+
+Bug fixes:
+..F....... [ZBX-8716] fixed not being able to add trigger dependencies in the trigger mass update form (Pavels)
+..F....... [ZBX-8573] fixed date part form inputs (month, day, hour, minute) to be consistent and have leading zero when needed (Krists)
+..F....... [ZBX-8717] fixed error in the action operation configuration form when switching operation types (Krists)
+..F....... [ZBX-8685] fixed ordering of graphs in simple graph prototype and graph prototype screen elements (Krists)
+..F....... [ZBX-8662] fixed multiselect and text input alignment (Pavels)
+..F....... [ZBX-8715] fixed item flex interval updating in item massupdate (Krists)
+..F....... [ZBX-8710] fixed LLD graph prototype screen items to be displayed correctly when containing item has colspan/rowspan set (Krists)
+..F....... [ZBX-8532] fixed frontend messaging sounds not playing on IE11 and playing in loop if set to play once on other browsers (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.3.5
+
+Bug fixes:
+..F....... [ZBX-8714] fixed confirmation dialogs when performing a mass action (Pavels)
+A......... [ZBX-8634] fixed trigger prototype validation to disallow items from both templates and hosts in same trigger prototype (Krists)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-8707] fixed not being able to add an action operation condition (Pavels)
+..F....... [ZBX-8702] changed the default graph palette to generate the first line in green color and the second in red (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
+........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
+..F....... [ZBX-8683] fixed misplaced 'Add' button for IT Services having child services (Alexei)
+
+--------------------------------------------------------------------------------
 Changes for 2.3.4
 
 New features:
-..F....... [ZBXNEXT-1467] added clear separation between 'add' and 'update' operations in the front-end (Alexei, Sasha)
+...G...PS. [ZBXNEXT-101] added functionality for changing log level at runtime, added new trace log level for extended web and vmware monitoring (asaveljevs, igors, wiper)
+..F....... [ZBXNEXT-1467] added clear separation between 'add' and 'update' operations in the frontend (Alexei, Sasha)
 ..F....... [ZBXNEXT-570] implemented the ability to quickly display items on a graph from the latest data page (Ivo, Pavels)
 .......PS. [ZBX-8367] added recalculating of unsupported items queue when changed "Refresh unsupported items" parameter (Juris, Sasha)
 A.F....... [ZBXNEXT-1583] implemented new screen element types - "Graph prototype" and "Simple graph prototype" (Krists)
@@ -11,6 +47,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Italian, Polish an
 A.F.I..PS. [ZBX-7720] increased size of "Host name", "Visible host name" and "Proxy name" fields to 128 characters (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8458] visual fixes in multiselect, actions, screens and maps (Oleg)
+..F....... [ZBX-8682] added IT services sorting in dependencies tab (Oleg)
+........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
+........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
+..F....... [ZBX-8675] removed sortorder sorting from IT services popup window (Oleg)
 ...G...... [ZBX-8664] changed agent to allow empty return values from user parameters and remote commands (dimir)
 ..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
 ..F....... [ZBX-8624] fixed inconsistent header layout in Monitoring->Discovery page (Krists)
@@ -329,7 +370,16 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 --------------------------------------------------------------------------------
 Changes for 2.2.7rc1
 
+New features:
+
 Bug fixes:
+A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
+........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
+........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
+........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
 ..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
 
 --------------------------------------------------------------------------------
@@ -342,7 +392,7 @@ A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks t
 Changes for 2.2.6rc1
 
 New features:
-..F....... [ZBX-8275] added a feature to automatically clone web scenarios when cloning a host or template (Ivo)
+..F....... [ZBX-8275] implemented web scenario cloning (Ivo)
 A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 
@@ -1410,6 +1460,8 @@ New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .....J.... [ZBX-6229] removed pretty formatting from Java gateway JSON responses (asaveljevs)
@@ -2978,6 +3030,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)

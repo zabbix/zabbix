@@ -25,7 +25,7 @@
 #include "httpmacro.h"
 
 #define REGEXP_PREFIX		"regex:"
-#define REGEXP_PREFIX_SIZE	(sizeof(REGEXP_PREFIX) - 1)
+#define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)
 
 /******************************************************************************
  *                                                                            *

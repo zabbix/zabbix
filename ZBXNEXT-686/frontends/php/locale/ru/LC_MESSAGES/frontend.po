@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-27 17:23+0300\n"
+"POT-Creation-Date: 2014-09-07 08:32+0300\n"
 "PO-Revision-Date: 2014-06-05 14:47+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -111,7 +111,7 @@ msgstr[0] "Зафиксирована %4$s неуспешная попытка �
 msgstr[1] "Зафиксировано %4$s неуспешные попытки входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
 msgstr[2] "Зафиксировано %4$s неуспешных попыток входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
 
-#: include/views/monitoring.discovery.php:130
+#: include/views/monitoring.discovery.php:133
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
@@ -125,7 +125,7 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
 
-#: include/views/configuration.action.edit.php:484
+#: include/views/configuration.action.edit.php:483
 msgid "(0 - infinitely)"
 msgstr "(0 - бесконечно)"
 
@@ -143,7 +143,7 @@ msgstr "(в днях)"
 msgid "(in sec)"
 msgstr "(в сек)"
 
-#: include/views/configuration.action.edit.php:495
+#: include/views/configuration.action.edit.php:494
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(минимум 60 секунд, 0 - использовать из настроек действия)"
 
@@ -158,7 +158,7 @@ msgstr "(без прокси)"
 msgid "(with warnings)"
 msgstr "(с предупреждениями)"
 
-#: include/blocks.inc.php:1325
+#: include/blocks.inc.php:1326
 msgid "-"
 msgstr "-"
 
@@ -216,7 +216,7 @@ msgstr "ЖУРНАЛ ДЕЙСТВИЙ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
-#: include/views/configuration.item.massupdate.php:171
+#: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
 msgstr "AES"
@@ -270,9 +270,9 @@ msgstr "Доступ запрещен."
 msgid "Account is blocked for %s seconds"
 msgstr "Аккаунт заблокирован на %s секунд"
 
-#: events.php:477 include/actions.inc.php:232 include/blocks.inc.php:1004
-#: include/blocks.inc.php:1298 include/events.inc.php:197
-#: include/events.inc.php:272 include/views/configuration.action.edit.php:1042
+#: events.php:476 include/actions.inc.php:232 include/blocks.inc.php:1004
+#: include/blocks.inc.php:1299 include/events.inc.php:197
+#: include/events.inc.php:272 include/views/configuration.action.edit.php:1041
 msgid "Ack"
 msgstr "Подтверждено"
 
@@ -323,17 +323,17 @@ msgstr "Подтверждение отключено"
 #: include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
-#: include/views/configuration.action.edit.php:553
-#: include/views/configuration.action.edit.php:562
-#: include/views/configuration.action.edit.php:678
-#: include/views/configuration.action.edit.php:948
-#: include/views/configuration.action.edit.php:1069
+#: include/views/configuration.action.edit.php:552
+#: include/views/configuration.action.edit.php:561
+#: include/views/configuration.action.edit.php:677
+#: include/views/configuration.action.edit.php:947
+#: include/views/configuration.action.edit.php:1068
 #: include/views/configuration.graph.edit.php:239
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.edit.php:688
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.item.edit.php:265
-#: include/views/configuration.item.massupdate.php:320
+#: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:131
@@ -346,21 +346,21 @@ msgstr "Подтверждение отключено"
 msgid "Action"
 msgstr "Действие"
 
-#: include/classes/api/services/CAction.php:2148
-#: include/classes/api/services/CAction.php:2163
-#: include/classes/api/services/CAction.php:2259
-#: include/classes/api/services/CAction.php:2295
+#: include/classes/api/services/CAction.php:1910
+#: include/classes/api/services/CAction.php:1925
+#: include/classes/api/services/CAction.php:2021
+#: include/classes/api/services/CAction.php:2057
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Действие \"%1$s\" уже существует."
 
-#: include/classes/api/services/CAction.php:2143
-#: include/classes/api/services/CAction.php:2242
+#: include/classes/api/services/CAction.php:1905
+#: include/classes/api/services/CAction.php:2004
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "В действии \"%1$s\" задано некорректное значение для \"esc_period\" (минимально %2$s секунд)."
 
-#: include/classes/api/services/CAction.php:2317
+#: include/classes/api/services/CAction.php:2079
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr "В действии \"%1$s\" нет заданных операций."
@@ -373,14 +373,14 @@ msgstr "Действие добавлено"
 msgid "Action deleted"
 msgstr "Действие удалено"
 
-#: actionconf.php:339
+#: actionconf.php:360
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Действие деактивировано"
 msgstr[1] "Действий деактивировано"
 msgstr[2] "Действия деактивированы"
 
-#: actionconf.php:338
+#: actionconf.php:359
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Действие активировано"
@@ -402,7 +402,7 @@ msgstr "Операции действия"
 msgid "Action updated"
 msgstr "Действие обновлено"
 
-#: events.php:478 include/blocks.inc.php:1005 include/blocks.inc.php:1299
+#: events.php:477 include/blocks.inc.php:1005 include/blocks.inc.php:1300
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -458,13 +458,13 @@ msgstr "Активно до"
 #: include/views/common.filter.trigger.php:132
 #: include/views/common.macros.php:69
 #: include/views/configuration.action.edit.php:350
-#: include/views/configuration.action.edit.php:557
-#: include/views/configuration.action.edit.php:566
-#: include/views/configuration.action.edit.php:851
-#: include/views/configuration.action.edit.php:905
-#: include/views/configuration.action.edit.php:1048
-#: include/views/configuration.action.edit.php:1057
-#: include/views/configuration.action.edit.php:1091
+#: include/views/configuration.action.edit.php:556
+#: include/views/configuration.action.edit.php:565
+#: include/views/configuration.action.edit.php:850
+#: include/views/configuration.action.edit.php:904
+#: include/views/configuration.action.edit.php:1047
+#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:1090
 #: include/views/configuration.application.edit.php:61
 #: include/views/configuration.discovery.edit.php:97
 #: include/views/configuration.graph.edit.php:242
@@ -482,19 +482,19 @@ msgstr "Активно до"
 #: include/views/configuration.host.prototype.edit.php:195
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
-#: include/views/configuration.httpconf.edit.php:269
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:278
+#: include/views/configuration.httpconf.edit.php:322
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
-#: include/views/configuration.item.massupdate.php:365
+#: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
 #: include/views/configuration.maintenance.edit.php:203
-#: include/views/configuration.screen.constructor.edit.php:751
+#: include/views/configuration.screen.constructor.edit.php:753
 #: include/views/configuration.screen.edit.php:64
 #: include/views/configuration.services.edit.php:120
 #: include/views/configuration.services.edit.php:268
-#: include/views/configuration.services.edit.php:297
+#: include/views/configuration.services.edit.php:307
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.slideconf.edit.php:118
 #: include/views/configuration.sysmap.edit.php:173
@@ -509,13 +509,13 @@ msgstr "Активно до"
 #: include/views/js/administration.script.edit.js.php:43
 #: include/views/js/adm.regexprs.edit.js.php:249
 #: include/views/js/adm.regexprs.edit.js.php:447
-#: include/views/js/configuration.action.edit.js.php:313
-#: include/views/js/configuration.action.edit.js.php:632
+#: include/views/js/configuration.action.edit.js.php:311
+#: include/views/js/configuration.action.edit.js.php:630
 #: include/views/js/configuration.discovery.edit.js.php:110
 #: include/views/js/configuration.discovery.edit.js.php:662
 #: include/views/js/configuration.sysmap.edit.js.php:32
-#: include/views/js/configuration.sysmaps.js.php:192
-#: include/views/js/configuration.sysmaps.js.php:405
+#: include/views/js/configuration.sysmaps.js.php:191
+#: include/views/js/configuration.sysmaps.js.php:404
 #: include/views/monitoring.history.php:115 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
@@ -542,7 +542,7 @@ msgstr "Добавить узел сети"
 msgid "Add link"
 msgstr "Добавить соединитель"
 
-#: include/views/configuration.item.massupdate.php:545
+#: include/views/configuration.item.massupdate.php:546
 msgid "Add new or existing applications"
 msgstr "Добавить новые или существующие группы элементов данных"
 
@@ -567,7 +567,7 @@ msgstr "Добавить в избранное"
 msgid "Add to host group"
 msgstr "Добавить в группу узлов сети"
 
-#: include/actions.inc.php:405 include/views/configuration.action.edit.php:872
+#: include/actions.inc.php:405 include/views/configuration.action.edit.php:871
 msgid "Add to host groups"
 msgstr "Добавить в группы узлов сети"
 
@@ -587,7 +587,7 @@ msgstr "Администрирование"
 msgid "Advanced labels"
 msgstr "Расширенные подписи"
 
-#: include/blocks.inc.php:1002 include/blocks.inc.php:1296
+#: include/blocks.inc.php:1002 include/blocks.inc.php:1297
 #: include/events.inc.php:196 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:293
 msgid "Age"
@@ -646,7 +646,7 @@ msgstr "Привязать иконки"
 #: include/views/administration.script.list.php:81
 #: include/views/administration.usergroups.edit.php:44
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:604
+#: include/views/configuration.action.edit.php:603
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
@@ -665,7 +665,7 @@ msgstr "У всех ссылок должны быть указаны \"Имя\"
 
 #: include/views/configuration.host.discovery.edit.php:249
 #: include/views/configuration.item.edit.php:387
-#: include/views/configuration.item.massupdate.php:456
+#: include/views/configuration.item.massupdate.php:457
 msgid "Allowed hosts"
 msgstr "Разрешенные узлы сети"
 
@@ -676,14 +676,14 @@ msgstr "Объем памяти в байтах. Если режим не ука
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:120
-#: include/views/configuration.action.edit.php:989
+#: include/views/configuration.action.edit.php:988
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
 msgstr "И"
 
 #: include/views/configuration.action.edit.php:119
-#: include/views/configuration.action.edit.php:988
+#: include/views/configuration.action.edit.php:987
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
 msgstr "И/Или"
@@ -753,9 +753,9 @@ msgstr "Группа элементов данных с ID \"%1$s\" недост
 msgid "Applications"
 msgstr "Группы элементов данных"
 
-#: include/views/js/configuration.sysmaps.js.php:201
-#: include/views/js/configuration.sysmaps.js.php:302
-#: include/views/js/configuration.sysmaps.js.php:415
+#: include/views/js/configuration.sysmaps.js.php:200
+#: include/views/js/configuration.sysmaps.js.php:301
+#: include/views/js/configuration.sysmaps.js.php:414
 msgid "Apply"
 msgstr "Применить"
 
@@ -792,8 +792,8 @@ msgstr "Тип области"
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.edit.php:379
-#: include/views/configuration.item.massupdate.php:423
-#: include/views/configuration.item.massupdate.php:437
+#: include/views/configuration.item.massupdate.php:424
+#: include/views/configuration.item.massupdate.php:438
 msgid "As is"
 msgstr "Как есть"
 
@@ -878,8 +878,7 @@ msgstr "Авг"
 msgid "August"
 msgstr "Август"
 
-#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:156
-#: include/views/configuration.httpconf.edit.php:281
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:290
 #: include/views/configuration.httpconf.list.php:68
 msgid "Authentication"
 msgstr "Аутентификация"
@@ -890,10 +889,10 @@ msgstr "Аутентификация"
 msgid "Authentication algorithm"
 msgstr "Алгоритм аутентификации"
 
-#: include/views/configuration.action.edit.php:757
+#: include/views/configuration.action.edit.php:756
 #: include/views/configuration.host.discovery.edit.php:166
 #: include/views/configuration.item.edit.php:172
-#: include/views/configuration.item.massupdate.php:249
+#: include/views/configuration.item.massupdate.php:250
 msgid "Authentication method"
 msgstr "Метод аутентификации"
 
@@ -911,14 +910,14 @@ msgstr "Метод аутентификации изменен на Zabbix вн�
 
 #: include/views/configuration.host.discovery.edit.php:136
 #: include/views/configuration.item.edit.php:142
-#: include/views/configuration.item.massupdate.php:158
+#: include/views/configuration.item.massupdate.php:159
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Authentication passphrase"
 msgstr "Пароль аутентификации"
 
 #: include/views/configuration.host.discovery.edit.php:132
 #: include/views/configuration.item.edit.php:138
-#: include/views/configuration.item.massupdate.php:148
+#: include/views/configuration.item.massupdate.php:149
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
@@ -959,8 +958,8 @@ msgstr "Автоматически"
 msgid "Automatic icon mapping"
 msgstr "Автоматическое соответствие иконок"
 
-#: include/views/js/configuration.sysmaps.js.php:133
-#: include/views/js/configuration.sysmaps.js.php:258
+#: include/views/js/configuration.sysmaps.js.php:132
+#: include/views/js/configuration.sysmaps.js.php:257
 msgid "Automatic icon selection"
 msgstr "Автоматический выбор иконки"
 
@@ -1062,8 +1061,8 @@ msgstr "Мигание"
 msgid "Blocked"
 msgstr "Заблокирован"
 
-#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:373
-#: include/views/js/configuration.sysmaps.js.php:451
+#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:372
+#: include/views/js/configuration.sysmaps.js.php:450
 msgid "Bold line"
 msgstr "Жирная линия"
 
@@ -1074,7 +1073,7 @@ msgstr "Логический"
 #: include/views/configuration.screen.constructor.edit.php:714
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:83
-#: include/views/js/configuration.sysmaps.js.php:248
+#: include/views/js/configuration.sysmaps.js.php:247
 msgid "Bottom"
 msgstr "По нижнему краю"
 
@@ -1170,7 +1169,7 @@ msgstr "НАСТРОЙКА ПРОТОТИПОВ ЭЛЕМЕНТОВ ДАННЫХ"
 
 #: include/views/configuration.item.list.php:39
 #: include/views/configuration.item.massupdate.php:28 items.php:831
-#: items.php:966
+#: items.php:967
 msgid "CONFIGURATION OF ITEMS"
 msgstr "НАСТРОЙКА ЭЛЕМЕНТОВ ДАННЫХ"
 
@@ -1320,14 +1319,14 @@ msgstr "Канада (136 символов)"
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:215
 #: include/views/administration.general.regularexpressions.edit.php:58
-#: include/views/configuration.action.edit.php:1050
-#: include/views/configuration.action.edit.php:1059
+#: include/views/configuration.action.edit.php:1049
+#: include/views/configuration.action.edit.php:1058
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.housekeeper.edit.js.php:127
 #: include/views/js/administration.general.triggerDisplayOptions.js.php:55
 #: include/views/js/administration.general.triggerSeverity.js.php:38
-#: include/views/js/configuration.action.edit.js.php:102
+#: include/views/js/configuration.action.edit.js.php:101
 #: include/views/js/configuration.discovery.edit.js.php:114 jsLoader.php:105
 #: tr_logform.php:353
 msgid "Cancel"
@@ -1769,7 +1768,7 @@ msgstr "Не удалось удалить скрипты. Скрипт \"%1$s\"
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Не удалось удалить скрипты. Скрипт с scriptid \"%1$s\" не существует."
 
-#: actionconf.php:357
+#: actionconf.php:378
 msgid "Cannot delete selected actions"
 msgstr "Не удалось удалить выбранные действия"
 
@@ -1811,7 +1810,7 @@ msgid "Cannot delete templated items."
 msgstr "Не удалось удалить шаблонные элементы данных."
 
 #: include/classes/api/services/CTrigger.php:1879
-#: include/classes/api/services/CTriggerPrototype.php:599
+#: include/classes/api/services/CTriggerPrototype.php:581
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не удалось удалить шаблонный триггер \"%1$s:%2$s\"."
@@ -1837,10 +1836,6 @@ msgstr ""
 msgid "Cannot delete triggers"
 msgstr "Не удалось удалить триггеры"
 
-#: include/classes/api/services/CTriggerPrototype.php:637
-msgid "Cannot delete triggers created by low level discovery."
-msgstr "Невозможно удалить триггеры созданные низкоуровневым обнаружением."
-
 #: users.php:299 users.php:359
 msgid "Cannot delete user"
 msgstr "Не удалось удалить пользователя"
@@ -1857,7 +1852,7 @@ msgstr "Не удалось удалить преобразование знач
 msgid "Cannot delete web scenario"
 msgstr "Не удалось удалить веб-сценарий"
 
-#: actionconf.php:342
+#: actionconf.php:363
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1951,7 +1946,7 @@ msgstr "Не удалось отобразить очередь элементо
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Не удалось отобразить более одного элемента данных с типом \"Суммарный график\""
 
-#: actionconf.php:341
+#: actionconf.php:362
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2195,7 +2190,7 @@ msgstr ""
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Не удалось построить дерево. Проверьте логическую структуру в соединениях между услугами."
 
-#: services.php:473
+#: services.php:475
 msgid "Cannot format tree."
 msgstr "Не удалось построить дерево."
 
@@ -2205,8 +2200,8 @@ msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1068
 #: include/classes/api/services/CTrigger.php:1203
-#: include/classes/api/services/CTriggerPrototype.php:680
-#: include/classes/api/services/CTriggerPrototype.php:738
+#: include/classes/api/services/CTriggerPrototype.php:678
+#: include/classes/api/services/CTriggerPrototype.php:743
 #, c-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Не удалось раскрыть выражение \"%s\"."
@@ -2347,7 +2342,8 @@ msgstr "Не удалось установить \"templateid\" для груп�
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для комплексного экрана \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:460
+#: include/classes/api/services/CTriggerPrototype.php:463
+#: include/classes/api/services/CTriggerPrototype.php:942
 #, c-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для прототипа триггера \"%1$s\"."
@@ -2427,7 +2423,7 @@ msgstr "Не удалось обновить \"%1$s\" для обнаружен�
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr "Не удалось обновить \"%1$s\" для обнаруженного триггера."
 
-#: include/classes/api/services/CAction.php:2250
+#: include/classes/api/services/CAction.php:2012
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
@@ -2471,11 +2467,6 @@ msgstr "Не удалось обновить \"templateid\" для компле�
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr ""
-
-#: include/classes/api/services/CTriggerPrototype.php:516
-#, c-format
-msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Не удалось обновить \"templateid\" для прототипа триггера \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
@@ -2724,7 +2715,7 @@ msgstr "Изменить пароль"
 
 #: include/forms.inc.php:403 include/items.inc.php:125
 #: include/triggers.inc.php:2066 include/views/configuration.item.edit.php:213
-#: include/views/configuration.item.massupdate.php:209
+#: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Символ"
 
@@ -2861,7 +2852,7 @@ msgstr "Классическая"
 msgid "Clear"
 msgstr "Очистить"
 
-#: include/views/configuration.httpconf.edit.php:303
+#: include/views/configuration.httpconf.edit.php:312
 #: include/views/configuration.item.edit.php:447
 msgid "Clear history and trends"
 msgstr "Очистить историю и динамику изменений"
@@ -2883,7 +2874,7 @@ msgstr "Часы"
 #: include/views/administration.general.regularexpressions.edit.php:89
 #: include/views/administration.proxy.edit.php:99
 #: include/views/administration.script.edit.php:120
-#: include/views/configuration.action.edit.php:1080
+#: include/views/configuration.action.edit.php:1079
 #: include/views/configuration.application.edit.php:53
 #: include/views/configuration.discovery.edit.php:89
 #: include/views/configuration.graph.edit.php:323
@@ -2891,7 +2882,7 @@ msgstr "Часы"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:300
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -2905,9 +2896,9 @@ msgstr "Клонировать"
 #: include/views/js/configuration.discovery.edit.js.php:548
 #: include/views/js/configuration.discovery.edit.js.php:612
 #: include/views/js/configuration.discovery.edit.js.php:629
-#: include/views/js/configuration.sysmaps.js.php:203
-#: include/views/js/configuration.sysmaps.js.php:304
-#: include/views/js/configuration.sysmaps.js.php:417 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:202
+#: include/views/js/configuration.sysmaps.js.php:303
+#: include/views/js/configuration.sysmaps.js.php:416 jsLoader.php:147
 #: jsLoader.php:171 tr_testexpr.php:192
 msgid "Close"
 msgstr "Закрыть"
@@ -2919,7 +2910,7 @@ msgstr "Закрыть конструктор выражения"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
 #: include/views/configuration.graph.edit.php:238
-#: include/views/js/configuration.sysmaps.js.php:397 popup_bitem.php:43
+#: include/views/js/configuration.sysmaps.js.php:396 popup_bitem.php:43
 #: popup_bitem.php:170 popup_period.php:139
 msgid "Colour"
 msgstr "Цвет"
@@ -2930,7 +2921,7 @@ msgstr "Цвет"
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
-#: include/views/js/configuration.sysmaps.js.php:381
+#: include/views/js/configuration.sysmaps.js.php:380
 msgid "Colour (OK)"
 msgstr "Цвет (ОК)"
 
@@ -2942,7 +2933,7 @@ msgstr ""
 msgid "Column deleted"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:717
+#: include/views/configuration.screen.constructor.edit.php:719
 #: screenedit.php:73
 msgid "Column span"
 msgstr "Объединение столбцов"
@@ -2972,8 +2963,8 @@ msgstr "Команда не может быть пустой."
 
 #: include/views/administration.script.edit.php:60
 #: include/views/administration.script.list.php:41
-#: include/views/configuration.action.edit.php:807
-#: include/views/configuration.action.edit.php:811 popup.php:1695
+#: include/views/configuration.action.edit.php:806
+#: include/views/configuration.action.edit.php:810 popup.php:1695
 #: popup.php:1702
 msgid "Commands"
 msgstr "Команды"
@@ -2998,7 +2989,7 @@ msgstr "Компоновка прав доступа"
 msgid "Condition"
 msgstr "Условие"
 
-#: include/classes/api/services/CAction.php:2020
+#: include/classes/api/services/CAction.php:1782
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
 msgstr ""
@@ -3008,7 +2999,7 @@ msgstr ""
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2019
+#: include/classes/api/services/CAction.php:1781
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
 msgstr ""
@@ -3019,8 +3010,8 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr ""
 
 #: include/views/configuration.action.edit.php:135
-#: include/views/configuration.action.edit.php:1002
-#: include/views/configuration.action.edit.php:1070
+#: include/views/configuration.action.edit.php:1001
+#: include/views/configuration.action.edit.php:1069
 #: include/views/configuration.action.list.php:52
 msgid "Conditions"
 msgstr "Условия"
@@ -3205,7 +3196,7 @@ msgstr "Текст подтверждения"
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
 #: include/views/inventory.host.view.php:154
-#: include/views/js/configuration.sysmaps.js.php:360
+#: include/views/js/configuration.sysmaps.js.php:359
 msgid "Connect to"
 msgstr "Подключаться через"
 
@@ -3262,7 +3253,7 @@ msgstr "Контактная информация"
 
 #: include/views/configuration.host.discovery.edit.php:107
 #: include/views/configuration.item.edit.php:113
-#: include/views/configuration.item.massupdate.php:104
+#: include/views/configuration.item.massupdate.php:105
 #: include/views/js/configuration.discovery.edit.js.php:50
 msgid "Context name"
 msgstr "Имя контекста"
@@ -3276,7 +3267,7 @@ msgstr ""
 msgid "Contract number"
 msgstr "Номер контракта"
 
-#: include/views/js/configuration.sysmaps.js.php:168
+#: include/views/js/configuration.sysmaps.js.php:167
 msgid "Coordinates"
 msgstr "Координаты"
 
@@ -3479,7 +3470,7 @@ msgstr "Создано: Прототип элемента данных \"%1$s\" 
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Триггер \"%1$s\" в \"%2$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:688
+#: include/classes/api/services/CTriggerPrototype.php:674
 #, c-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
@@ -3515,7 +3506,7 @@ msgid "Current date is NOT N"
 msgstr "Текущая дата NOT N"
 
 #: include/views/js/configuration.action.edit.js.php:87
-#: include/views/js/configuration.action.edit.js.php:215
+#: include/views/js/configuration.action.edit.js.php:214
 msgid "Current host"
 msgstr "Текущий узел сети"
 
@@ -3557,7 +3548,7 @@ msgstr "Пользовательская подпись"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Пользовательская подпись для карты сети \"%2$s\" у элементов с типом \"%1$s\" не может быть пустой."
 
-#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:299
+#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
 #: items.php:115
 msgid "Custom multiplier"
 msgstr "Пользовательский множитель"
@@ -3566,7 +3557,7 @@ msgstr "Пользовательский множитель"
 msgid "Custom screens"
 msgstr "Пользовательские комплексные экраны"
 
-#: include/views/configuration.action.edit.php:730
+#: include/views/configuration.action.edit.php:729
 msgid "Custom script"
 msgstr "Пользовательский скрипт"
 
@@ -3600,7 +3591,7 @@ msgstr "НАСТРОЙКА ПАНЕЛИ"
 
 #: include/views/configuration.host.discovery.edit.php:142
 #: include/views/configuration.item.edit.php:148
-#: include/views/configuration.item.massupdate.php:169
+#: include/views/configuration.item.massupdate.php:170
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "DES"
 msgstr "DES"
@@ -3618,7 +3609,7 @@ msgstr "ОТКЛЮЧЕНО"
 msgid "DISCOVERED"
 msgstr "ОБНАРУЖЕНО"
 
-#: events.php:457 hosts.php:829 include/views/administration.proxy.edit.php:60
+#: events.php:456 hosts.php:829 include/views/administration.proxy.edit.php:60
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3668,8 +3659,8 @@ msgstr "Настройка ПАНЕЛИ"
 msgid "Dashboard filter"
 msgstr "Фильтр ПАНЕЛИ"
 
-#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:375
-#: include/views/js/configuration.sysmaps.js.php:453
+#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:374
+#: include/views/js/configuration.sysmaps.js.php:452
 msgid "Dashed line"
 msgstr "Пунктирная линия"
 
@@ -3701,7 +3692,7 @@ msgid "Data storage period (in days)"
 msgstr ""
 
 #: include/forms.inc.php:435 include/views/configuration.item.edit.php:228
-#: include/views/configuration.item.massupdate.php:226
+#: include/views/configuration.item.massupdate.php:227
 msgid "Data type"
 msgstr "Тип данных"
 
@@ -3853,8 +3844,8 @@ msgstr "Десятичный"
 #: include/views/configuration.host.edit.php:341
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
-#: include/views/js/configuration.sysmaps.js.php:139
-#: include/views/js/configuration.sysmaps.js.php:247 jsLoader.php:146
+#: include/views/js/configuration.sysmaps.js.php:138
+#: include/views/js/configuration.sysmaps.js.php:246 jsLoader.php:146
 #: popup_bitem.php:123 popup_period.php:119
 msgid "Default"
 msgstr "По умолчанию"
@@ -3868,7 +3859,7 @@ msgid "Default delay (in seconds)"
 msgstr "Задержка по умолчанию (в сек)"
 
 #: include/views/configuration.action.edit.php:48
-#: include/views/configuration.action.edit.php:617
+#: include/views/configuration.action.edit.php:616
 msgid "Default message"
 msgstr "Сообщение по умолчанию"
 
@@ -3930,7 +3921,7 @@ msgstr "Удалить и очистить шаблон? (Внимание: вс
 msgid "Delete application?"
 msgstr "Удалить группу элементов данных?"
 
-#: include/views/configuration.action.edit.php:1082
+#: include/views/configuration.action.edit.php:1081
 msgid "Delete current action?"
 msgstr "Удалить текущее действие?"
 
@@ -4000,7 +3991,7 @@ msgstr "Удалить прокси?"
 msgid "Delete regular expression?"
 msgstr "Удалить регулярное выражение?"
 
-#: include/views/configuration.httpconf.edit.php:289
+#: include/views/configuration.httpconf.edit.php:298
 msgid "Delete scenario?"
 msgstr "Удалить сценарий?"
 
@@ -4260,7 +4251,7 @@ msgstr "Удалено: Шаблон \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Триггер \"%1$s\" из \"%2$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:643
+#: include/classes/api/services/CTriggerPrototype.php:625
 #, c-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип триггера \"%1$s\" из \"%2$s\"."
@@ -4275,12 +4266,12 @@ msgid "Delimiter"
 msgstr "Разделитель"
 
 #: include/views/configuration.item.edit.php:356
-#: include/views/configuration.item.massupdate.php:425
+#: include/views/configuration.item.massupdate.php:426
 msgid "Delta (simple change)"
 msgstr "Дельта (простое изменение)"
 
 #: include/views/configuration.item.edit.php:355
-#: include/views/configuration.item.massupdate.php:424
+#: include/views/configuration.item.massupdate.php:425
 msgid "Delta (speed per second)"
 msgstr "Дельта (скорость в секунду)"
 
@@ -4310,7 +4301,7 @@ msgstr "Зависит от"
 msgid "Deployment status"
 msgstr "Состояние развертывания"
 
-#: events.php:458 events.php:473 include/classes/screens/CScreenEvents.php:41
+#: events.php:457 events.php:472 include/classes/screens/CScreenEvents.php:41
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
@@ -4318,7 +4309,7 @@ msgstr "Состояние развертывания"
 #: include/views/configuration.host.edit.php:394
 #: include/views/configuration.host.massupdate.php:153
 #: include/views/configuration.item.edit.php:431
-#: include/views/configuration.item.massupdate.php:557
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
 #: include/views/configuration.template.edit.php:175
@@ -4539,8 +4530,8 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:178
 #: include/views/configuration.host.massupdate.php:282
 #: include/views/configuration.host.prototype.edit.php:309
-#: include/views/configuration.item.massupdate.php:299
-#: include/views/js/configuration.sysmaps.js.php:156
+#: include/views/configuration.item.massupdate.php:300
+#: include/views/js/configuration.sysmaps.js.php:155
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
 #: tr_logform.php:343
 msgid "Disabled"
@@ -4559,11 +4550,11 @@ msgstr "Обнаружен"
 msgid "Discovered by"
 msgstr "Обнаружено"
 
-#: include/views/monitoring.discovery.php:40
+#: include/views/monitoring.discovery.php:39
 msgid "Discovered device"
 msgstr "Обнаруженное устройство"
 
-#: events.php:334 hosts.php:864 hosts.php:957 include/html.inc.php:351
+#: events.php:333 hosts.php:864 hosts.php:957 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:234
@@ -4600,7 +4591,7 @@ msgid "Discovery object"
 msgstr "Объект обнаружения"
 
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/blocks.inc.php:1255 include/forms.inc.php:1090
+#: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4714,12 +4705,12 @@ msgstr "Вы хотите заменить условие выражения?"
 msgid "Done"
 msgstr "Готово"
 
-#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:374
-#: include/views/js/configuration.sysmaps.js.php:452 jsLoader.php:149
+#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:373
+#: include/views/js/configuration.sysmaps.js.php:451 jsLoader.php:149
 msgid "Dot"
 msgstr "Точечная линия"
 
-#: include/blocks.inc.php:1257
+#: include/blocks.inc.php:1258
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Недоступно"
@@ -4731,8 +4722,8 @@ msgstr "Недоступен"
 
 #: include/views/configuration.services.edit.php:142
 #: include/views/configuration.services.edit.php:261
-#: include/views/monitoring.discovery.php:42
-#: include/views/monitoring.discovery.php:164 report3.php:83
+#: include/views/monitoring.discovery.php:45
+#: include/views/monitoring.discovery.php:167 report3.php:83
 msgid "Downtime"
 msgstr "Недоступен"
 
@@ -4816,7 +4807,7 @@ msgstr "Дублированное имя важности \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дубликат псевдонима пользователя \"%s\"."
 
-#: events.php:476 include/events.inc.php:195 include/events.inc.php:272
+#: events.php:475 include/events.inc.php:195 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:294
 msgid "Duration"
 msgstr "Длительность"
@@ -4829,7 +4820,7 @@ msgstr "Длительность (сек)"
 msgid "Dutch (nl_NL)"
 msgstr "Dutch (nl_NL)"
 
-#: include/views/configuration.screen.constructor.edit.php:730
+#: include/views/configuration.screen.constructor.edit.php:732
 msgid "Dynamic item"
 msgstr "Динамический элемент"
 
@@ -4860,8 +4851,8 @@ msgstr "У каждого URL должно быть уникальное имя.
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/js/adm.regexprs.edit.js.php:7
 #: include/views/js/configuration.discovery.edit.js.php:7
-#: include/views/js/configuration.sysmaps.js.php:427
-#: include/views/js/configuration.sysmaps.js.php:435
+#: include/views/js/configuration.sysmaps.js.php:426
+#: include/views/js/configuration.sysmaps.js.php:434
 #: include/views/monitoring.triggerComment.php:51 jsLoader.php:189
 msgid "Edit"
 msgstr "Изменить"
@@ -4878,7 +4869,7 @@ msgstr "Изменить триггер"
 msgid "Element"
 msgstr "Элемент"
 
-#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:326
+#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:325
 msgid "Element name"
 msgstr "Название элемента"
 
@@ -4901,22 +4892,6 @@ msgstr ""
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1513
-#: include/classes/api/services/CAction.php:1520
-#: include/classes/api/services/CAction.php:1527
-#: include/classes/api/services/CAction.php:1534
-#: include/classes/api/services/CAction.php:1541
-#: include/classes/api/services/CAction.php:1548
-#: include/classes/api/services/CAction.php:1555
-#: include/classes/api/services/CAction.php:1562
-#: include/classes/api/services/CAction.php:1578
-#: include/classes/api/services/CAction.php:1588
-#: include/classes/api/services/CAction.php:1597
-#: include/classes/api/services/CAction.php:1607
-#: include/classes/api/services/CAction.php:1623
-#: include/classes/api/services/CAction.php:1633
-#: include/classes/api/services/CAction.php:1642
-#: include/classes/api/services/CAction.php:1656
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:77
@@ -4940,7 +4915,7 @@ msgstr "Условие действия пустое."
 msgid "Empty color."
 msgstr "Пустой цвет."
 
-#: include/classes/api/services/CAction.php:2062
+#: include/classes/api/services/CAction.php:1824
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -4986,7 +4961,7 @@ msgstr "Пустое имя узла сети."
 #: include/classes/api/services/CTrigger.php:837
 #: include/classes/api/services/CTrigger.php:910
 #: include/classes/api/services/CTrigger.php:1000
-#: include/classes/api/services/CTriggerPrototype.php:580
+#: include/classes/api/services/CTriggerPrototype.php:559
 #: include/classes/api/services/CUserGroup.php:637
 #: include/classes/api/services/CUserMacro.php:347
 #: include/classes/api/services/CUserMacro.php:499
@@ -5266,7 +5241,7 @@ msgstr "Детали источника события"
 msgid "Event type"
 msgstr "Тип события"
 
-#: events.php:338 include/menu.inc.php:56
+#: events.php:337 include/menu.inc.php:56
 #: include/views/common.filter.trigger.php:63
 #: include/views/inventory.host.view.php:216 jsLoader.php:191 search.php:136
 #: search.php:222 search.php:276 search.php:329
@@ -5309,8 +5284,8 @@ msgstr ""
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:748
-#: include/views/js/configuration.action.edit.js.php:113 popup.php:1694
+#: include/views/configuration.action.edit.php:747
+#: include/views/js/configuration.action.edit.js.php:112 popup.php:1694
 #: popup.php:1701
 msgid "Execute on"
 msgstr "Выполнять на"
@@ -5356,7 +5331,7 @@ msgstr "Расширенный круговой"
 msgid "Export selected"
 msgstr "Экспортировать выбранное"
 
-#: events.php:299
+#: events.php:298
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
@@ -5558,7 +5533,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "Заполнение"
 
-#: events.php:396 hosts.php:834 include/forms.inc.php:616
+#: events.php:395 hosts.php:834 include/forms.inc.php:616
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/common.filter.trigger.php:147
@@ -5638,7 +5613,7 @@ msgstr "Фиксированное"
 
 #: include/views/configuration.host.discovery.edit.php:223
 #: include/views/configuration.item.edit.php:290
-#: include/views/configuration.item.massupdate.php:347
+#: include/views/configuration.item.massupdate.php:348
 msgid "Flexible intervals"
 msgstr "Переменные интервалы"
 
@@ -5672,10 +5647,10 @@ msgid "Friday"
 msgstr "Пятница"
 
 #: include/reports.inc.php:71 include/reports.inc.php:375
-#: include/views/configuration.action.edit.php:480
+#: include/views/configuration.action.edit.php:479
 #: include/views/configuration.services.edit.php:228
 #: include/views/configuration.services.edit.php:254
-#: include/views/js/configuration.sysmaps.js.php:337 popup_period.php:129
+#: include/views/js/configuration.sysmaps.js.php:336 popup_period.php:129
 #: report2.php:372 report3.php:143 report4.php:175 services.php:188
 #: services.php:194
 msgid "From"
@@ -5792,7 +5767,7 @@ msgstr "Заданное выражение не является макросо
 msgid "Global expression does not exist."
 msgstr "Глобальное выражение не существует."
 
-#: include/views/configuration.action.edit.php:733
+#: include/views/configuration.action.edit.php:732
 msgid "Global script"
 msgstr "Глобальный скрипт"
 
@@ -5958,7 +5933,7 @@ msgstr ""
 msgid "Graph prototype deleted"
 msgstr ""
 
-#: include/classes/screens/CScreenLldGraph.php:175
+#: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
 msgstr ""
 
@@ -6039,7 +6014,7 @@ msgstr "Greek (el_GR)"
 msgid "Grid"
 msgstr "Сетка"
 
-#: events.php:322 hostinventoriesoverview.php:90 hosts.php:819 httpmon.php:77
+#: events.php:321 hostinventoriesoverview.php:90 hosts.php:819 httpmon.php:77
 #: include/classes/html/CHostsInfo.php:105
 #: include/classes/html/CTriggersInfo.php:111
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -6155,7 +6130,7 @@ msgstr "H:i"
 msgid "H:i:s"
 msgstr "H:i:s"
 
-#: events.php:302
+#: events.php:301
 msgid "HISTORY OF EVENTS"
 msgstr "ИСТОРИЯ СОБЫТИЙ"
 
@@ -6182,7 +6157,7 @@ msgstr "СОБЫТИЯ У УЗЛА СЕТИ"
 msgid "HTTP"
 msgstr "HTTP"
 
-#: include/perm.inc.php:50
+#: include/perm.inc.php:50 include/views/configuration.httpconf.edit.php:156
 msgid "HTTP authentication"
 msgstr "HTTP аутентификация"
 
@@ -6287,7 +6262,7 @@ msgstr "История"
 msgid "History cleared"
 msgstr "История очищена"
 
-#: include/views/configuration.httpconf.edit.php:304
+#: include/views/configuration.httpconf.edit.php:313
 #: include/views/configuration.item.edit.php:448
 msgid "History clearing can take a long time. Continue?"
 msgstr "Очистка истории может занять продолжительное время. Продолжить?"
@@ -6310,7 +6285,7 @@ msgid "History storage period"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.massupdate.php:380
+#: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
 msgstr ""
 
@@ -6322,11 +6297,11 @@ msgstr "Горизонтальный"
 msgid "Horizontal align"
 msgstr "Выравнивание по горизонтали"
 
-#: events.php:326 events.php:472 events.php:572 httpmon.php:78 httpmon.php:91
+#: events.php:325 events.php:471 events.php:571 httpmon.php:78 httpmon.php:91
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:671 include/blocks.inc.php:720
 #: include/blocks.inc.php:989 include/blocks.inc.php:999
-#: include/blocks.inc.php:1294 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1295 include/classes/screens/CScreenEvents.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6350,7 +6325,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/inventory.host.view.php:227
 #: include/views/inventory.host.view.php:239
 #: include/views/js/configuration.action.edit.js.php:88
-#: include/views/js/configuration.action.edit.js.php:212
+#: include/views/js/configuration.action.edit.js.php:211
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
@@ -6431,7 +6406,7 @@ msgstr[2] ""
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
-#: include/views/js/configuration.action.edit.js.php:200
+#: include/views/js/configuration.action.edit.js.php:199
 #: include/views/js/configuration.sysmaps.js.php:20
 #: include/views/js/configuration.sysmaps.js.php:30
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:144
@@ -6488,7 +6463,7 @@ msgstr "Группы узлов сети"
 
 #: include/views/configuration.host.discovery.edit.php:100
 #: include/views/configuration.item.edit.php:106
-#: include/views/configuration.item.massupdate.php:83
+#: include/views/configuration.item.massupdate.php:84
 msgid "Host interface"
 msgstr "Интерфейс узла сети"
 
@@ -6748,7 +6723,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:456 hosts.php:830
+#: events.php:455 hosts.php:830
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
@@ -6787,7 +6762,7 @@ msgstr "Диапазон IP адресов не может быть пустым
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:45
 #: include/views/administration.script.list.php:53
-#: include/views/configuration.action.edit.php:729
+#: include/views/configuration.action.edit.php:728
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:337
 #: include/views/configuration.host.prototype.edit.php:278
@@ -6874,19 +6849,19 @@ msgstr "Отчет доступности IT услуг"
 msgid "Icon"
 msgstr "Иконка"
 
-#: include/views/js/configuration.sysmaps.js.php:267
+#: include/views/js/configuration.sysmaps.js.php:266
 msgid "Icon (default)"
 msgstr "Иконка (по умолчанию)"
 
-#: include/views/js/configuration.sysmaps.js.php:294
+#: include/views/js/configuration.sysmaps.js.php:293
 msgid "Icon (disabled)"
 msgstr "Иконка (отключен)"
 
-#: include/views/js/configuration.sysmaps.js.php:285
+#: include/views/js/configuration.sysmaps.js.php:284
 msgid "Icon (maintenance)"
 msgstr "Иконка (обслуживание)"
 
-#: include/views/js/configuration.sysmaps.js.php:276
+#: include/views/js/configuration.sysmaps.js.php:275
 msgid "Icon (problem)"
 msgstr "Иконка (проблема)"
 
@@ -6988,7 +6963,7 @@ msgstr "В соответствии иконок запись \"%1$s\" для \"
 msgid "Iconmap is not enabled"
 msgstr "Соответствие иконок не активировано"
 
-#: include/views/js/configuration.sysmaps.js.php:128
+#: include/views/js/configuration.sysmaps.js.php:127
 msgid "Icons"
 msgstr "Иконки"
 
@@ -7168,88 +7143,68 @@ msgstr ""
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Некорректное допустимое SLA для услуги \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:1591
 #: include/classes/validators/CActionCondValidator.php:134
 msgid "Incorrect action condition discovery check."
 msgstr "Некорректная проверка обнаружения в условии действия."
 
-#: include/classes/api/services/CAction.php:1683
-#: include/classes/api/services/CAction.php:2425
+#: include/classes/api/services/CAction.php:2187
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Некорректная проверка обнаружения в условии действия. Проверка обнаружения не существует или у вас нет прав доступа к ней."
 
-#: include/classes/api/services/CAction.php:1566
 #: include/classes/validators/CActionCondValidator.php:110
 msgid "Incorrect action condition discovery object."
 msgstr "Некорректный объект обнаружения в условии действия"
 
-#: include/classes/api/services/CAction.php:1680
-#: include/classes/api/services/CAction.php:2419
+#: include/classes/api/services/CAction.php:2181
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Некорректное правило обнаружения в условии действия. Правило обнаружения не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:1611
 #: include/classes/validators/CActionCondValidator.php:152
 msgid "Incorrect action condition discovery status."
 msgstr "Некорректное состояние обнаружения в условии действия."
 
-#: include/classes/api/services/CAction.php:1645
 #: include/classes/validators/CActionCondValidator.php:185
 msgid "Incorrect action condition event type."
 msgstr "Некорректный тип события в условии действия."
 
-#: include/classes/api/services/CAction.php:1668
-#: include/classes/api/services/CAction.php:2395
+#: include/classes/api/services/CAction.php:2157
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Некорректная группа узлов сети в условии действия. Группа узлов сети не существует или у вас нет прав доступа к ней."
 
-#: include/classes/api/services/CAction.php:1671
-#: include/classes/api/services/CAction.php:2401
+#: include/classes/api/services/CAction.php:2163
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Некорректный узел сети в условии действия. Узел сети не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:1582
 #: include/classes/validators/CActionCondValidator.php:125
 #, c-format
 msgid "Incorrect action condition ip \"%1$s\"."
 msgstr "Некорректный ip \"%1$s\" в условии действия."
 
-#: include/classes/api/services/CAction.php:1504
-msgid "Incorrect action condition operator."
-msgstr "Некорректный оператор в условии действия."
-
-#: include/classes/api/services/CAction.php:1601
 #: include/classes/validators/CActionCondValidator.php:143
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Некорректный порт \"%1$s\" в условии действия."
 
-#: include/classes/api/services/CAction.php:1686
-#: include/classes/api/services/CAction.php:2431
+#: include/classes/api/services/CAction.php:2193
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Некорректный прокси в условии действия. Прокси не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:1674
-#: include/classes/api/services/CAction.php:2407
+#: include/classes/api/services/CAction.php:2169
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Некорректный шаблон в условии действия. Шаблон не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:1627
 #: include/classes/validators/CActionCondValidator.php:167
 msgid "Incorrect action condition trigger severity."
 msgstr "Некорректная важность триггера в условии действия."
 
-#: include/classes/api/services/CAction.php:1636
 #: include/classes/validators/CActionCondValidator.php:176
 msgid "Incorrect action condition trigger value."
 msgstr "Некорректное значение триггера в условии действия."
 
-#: include/classes/api/services/CAction.php:1677
-#: include/classes/api/services/CAction.php:2413
+#: include/classes/api/services/CAction.php:2175
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Некорректный триггер в условии действия. Триггер не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:1661
 #: include/classes/validators/CActionCondValidator.php:201
 msgid "Incorrect action condition type."
 msgstr "Некорректный тип условия действия."
@@ -7258,11 +7213,11 @@ msgstr "Некорректный тип условия действия."
 msgid "Incorrect action operation command type."
 msgstr "Некорректный тип команды в операции действия."
 
-#: include/classes/api/services/CAction.php:1710
+#: include/classes/api/services/CAction.php:1472
 msgid "Incorrect action operation condition acknowledge type."
 msgstr "Некорректный тип подтверждения для условия в операции действия."
 
-#: include/classes/api/services/CAction.php:1715
+#: include/classes/api/services/CAction.php:1477
 msgid "Incorrect action operation condition type."
 msgstr "Некорректный тип условия в операции действия."
 
@@ -7301,7 +7256,7 @@ msgstr "Некорректная группа пользователей для 
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "Некорректный пользователь для операции действия. Пользователь не существует или у вас нет к нему доступа."
 
-#: include/classes/api/services/CAction.php:2330
+#: include/classes/api/services/CAction.php:2092
 msgid "Incorrect action operationid."
 msgstr "Некорректный operationid действия."
 
@@ -7367,7 +7322,7 @@ msgstr "Использованы некорректные символы в им
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2013
+#: include/classes/api/services/CAction.php:1775
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr ""
@@ -7377,7 +7332,7 @@ msgstr ""
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2018
+#: include/classes/api/services/CAction.php:1780
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
 msgstr ""
@@ -7426,7 +7381,7 @@ msgstr "Некорректные поля для триггера."
 msgid "Incorrect file upload."
 msgstr "Некорректный загружаемый файл."
 
-#: include/classes/api/services/CAction.php:2063
+#: include/classes/api/services/CAction.php:1825
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -7441,7 +7396,7 @@ msgstr ""
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2067
+#: include/classes/api/services/CAction.php:1829
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr ""
@@ -7451,7 +7406,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2055
+#: include/classes/api/services/CAction.php:1817
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
@@ -7650,8 +7605,8 @@ msgstr ""
 msgid "Incorrect object value."
 msgstr "Некорректное значение объекта."
 
-#: include/classes/api/services/CAction.php:2136
-#: include/classes/api/services/CAction.php:2189
+#: include/classes/api/services/CAction.php:1898
+#: include/classes/api/services/CAction.php:1951
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr "Некорректный параметр для действия \"%1$s\"."
@@ -7665,7 +7620,7 @@ msgstr "Некорректный параметр для операций."
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Использован некорректный параметр для соответствия иконок \"%s\"."
 
-#: include/classes/api/services/CAction.php:2232
+#: include/classes/api/services/CAction.php:1994
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
 msgstr ""
@@ -7848,11 +7803,20 @@ msgstr "Некорректное выражение у триггера. Эле�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "В выражении указана некорректная функция триггера \"%1$s\"."
 
+#: include/classes/api/services/CTriggerPrototype.php:976
+#, c-format
+msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
+msgstr ""
+
+#: include/classes/api/services/CTriggerPrototype.php:987
+msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
+msgstr ""
+
 #: include/func.inc.php:1004
 msgid "Incorrect type of asort_by_key."
 msgstr "Некорректный тип asort_by_key."
 
-#: include/classes/api/services/CAction.php:2006
+#: include/classes/api/services/CAction.php:1768
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
 msgstr ""
@@ -7936,7 +7900,7 @@ msgid "Indonesian (id_ID)"
 msgstr "Индонезийский (id_ID)"
 
 #: include/actions.inc.php:825 include/blocks.inc.php:1003
-#: include/blocks.inc.php:1297 include/classes/html/CFormList.php:72
+#: include/blocks.inc.php:1298 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
 #: include/views/administration.auditacts.list.php:75
 #: include/views/configuration.host.discovery.list.php:55
@@ -8044,7 +8008,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.list.php:68
-#: include/views/configuration.item.massupdate.php:320
+#: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.prototype.list.php:49
 #: include/views/configuration.services.edit.php:131 latest.php:474
 #: latest.php:475
@@ -8053,7 +8017,7 @@ msgstr "Интервал"
 
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:296
-#: include/views/configuration.item.massupdate.php:357
+#: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
 msgstr "Интервал (в сек)"
 
@@ -8182,7 +8146,7 @@ msgid "Is online?"
 msgstr "В системе?"
 
 #: include/blocks.inc.php:991 include/blocks.inc.php:1000
-#: include/blocks.inc.php:1295
+#: include/blocks.inc.php:1296
 msgid "Issue"
 msgstr "Проблема"
 
@@ -8194,7 +8158,6 @@ msgstr "Невозможно отфильтровать по паролям по
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "Невозможно выполнить выход с HTTP аутентификацией."
 
-#: include/classes/api/services/CUserMedia.php:154
 #: include/classes/api/services/CUser.php:150
 msgid "It is not possible to search by user password."
 msgstr "Невозможно выполнить поиск по паролям пользователей."
@@ -8542,7 +8505,7 @@ msgstr "Ключ"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpavg>[\"Группы узлов сети\", \"Ключ элемента данных\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
 
-#: include/views/configuration.action.edit.php:794
+#: include/views/configuration.action.edit.php:793
 #: include/views/js/common.item.edit.js.php:179
 msgid "Key passphrase"
 msgstr "Фраза-пароль ключа"
@@ -8600,16 +8563,16 @@ msgid "LOST"
 msgstr "ПОТЕРЯН"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:948
+#: include/views/configuration.action.edit.php:947
 #: include/views/configuration.host.discovery.edit.php:291
 #: include/views/js/configuration.sysmaps.js.php:70
-#: include/views/js/configuration.sysmaps.js.php:234
-#: include/views/js/configuration.sysmaps.js.php:352
+#: include/views/js/configuration.sysmaps.js.php:233
+#: include/views/js/configuration.sysmaps.js.php:351
 msgid "Label"
 msgstr "Подпись"
 
 #: include/views/js/configuration.sysmaps.js.php:78
-#: include/views/js/configuration.sysmaps.js.php:243
+#: include/views/js/configuration.sysmaps.js.php:242
 msgid "Label location"
 msgstr "Расположение подписи"
 
@@ -8727,7 +8690,7 @@ msgstr "Latvian (lv_LV)"
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
-#: include/views/js/configuration.sysmaps.js.php:249
+#: include/views/js/configuration.sysmaps.js.php:248
 #: include/views/monitoring.overview.items.php:54
 #: include/views/monitoring.overview.triggers.php:76 popup_bitem.php:163
 msgid "Left"
@@ -8754,8 +8717,8 @@ msgstr "Длина в символах последнего (самого нов
 msgid "Length of last (most recent) T value in characters is NOT N"
 msgstr "Длина в символах последнего (самого нового) T значения NOT N"
 
-#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:372
-#: include/views/js/configuration.sysmaps.js.php:450
+#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:371
+#: include/views/js/configuration.sysmaps.js.php:449
 msgid "Line"
 msgstr "Линия"
 
@@ -8763,9 +8726,9 @@ msgstr "Линия"
 msgid "Link"
 msgstr "Связь"
 
-#: include/views/js/configuration.sysmaps.js.php:327
-#: include/views/js/configuration.sysmaps.js.php:339
-#: include/views/js/configuration.sysmaps.js.php:391
+#: include/views/js/configuration.sysmaps.js.php:326
+#: include/views/js/configuration.sysmaps.js.php:338
+#: include/views/js/configuration.sysmaps.js.php:390
 msgid "Link indicators"
 msgstr "Индикаторы связи"
 
@@ -8797,7 +8760,7 @@ msgstr "Присоединить к шаблону"
 msgid "Link to templates"
 msgstr "Присоединить к шаблонам"
 
-#: include/views/configuration.action.edit.php:926
+#: include/views/configuration.action.edit.php:925
 msgid "Link with templates"
 msgstr "Соединения с шаблонами"
 
@@ -8813,11 +8776,11 @@ msgstr "Присоединенные шаблоны"
 msgid "Linked to"
 msgstr "Присоединен к"
 
-#: include/views/js/configuration.sysmaps.js.php:333
+#: include/views/js/configuration.sysmaps.js.php:332
 msgid "Links between the selected elements"
 msgstr "Индикаторы связей между выбранными элементами"
 
-#: include/views/js/configuration.sysmaps.js.php:322
+#: include/views/js/configuration.sysmaps.js.php:321
 msgid "Links for the selected element"
 msgstr "Индикаторы связей для выбранного элемента"
 
@@ -8858,7 +8821,7 @@ msgstr "Размещение (долгота)"
 
 #: include/forms.inc.php:404 include/items.inc.php:127
 #: include/triggers.inc.php:2067 include/views/configuration.item.edit.php:214
-#: include/views/configuration.item.massupdate.php:210
+#: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Журнал (лог)"
 
@@ -8887,7 +8850,7 @@ msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - 
 msgstr "Источник события последней записи в журнале соответствует параметру T, тогда N NOT 1, 0 - в противном случае"
 
 #: include/views/configuration.item.edit.php:347
-#: include/views/configuration.item.massupdate.php:414
+#: include/views/configuration.item.massupdate.php:415
 msgid "Log time format"
 msgstr "Формат времени в журнале (логе)"
 
@@ -8982,7 +8945,7 @@ msgstr "MD2"
 #: include/hosts.inc.php:40
 #: include/views/configuration.host.discovery.edit.php:128
 #: include/views/configuration.item.edit.php:134
-#: include/views/configuration.item.massupdate.php:139
+#: include/views/configuration.item.massupdate.php:140
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "MD5"
 msgstr "MD5"
@@ -9049,7 +9012,7 @@ msgstr "Макросы обновлены"
 #: include/audit.inc.php:47 include/maps.inc.php:621 include/maps.inc.php:711
 #: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
-#: include/views/js/configuration.sysmaps.js.php:151
+#: include/views/js/configuration.sysmaps.js.php:150
 msgid "Maintenance"
 msgstr "Обслуживание"
 
@@ -9066,7 +9029,6 @@ msgstr ""
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Значение обслуживания \"Активно с\" не может быть больше чем \"Активно до\"."
 
-#: include/classes/api/services/CAction.php:1617
 #: include/classes/validators/CActionCondValidator.php:158
 msgid "Maintenance action condition value must be empty."
 msgstr "Значение обслуживания в условии действия должно быть пустым."
@@ -9217,12 +9179,12 @@ msgid "Mask"
 msgstr "Маска"
 
 #: hosts.php:1066 include/views/configuration.item.list.php:273
-#: include/views/configuration.item.massupdate.php:565
+#: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
 msgid "Mass update"
 msgstr "Массовое обновление"
 
-#: include/views/js/configuration.sysmaps.js.php:217
+#: include/views/js/configuration.sysmaps.js.php:216
 msgid "Mass update elements"
 msgstr "Массовое обновление элементов"
 
@@ -9252,7 +9214,7 @@ msgstr "Развернуть"
 
 #: include/views/configuration.host.discovery.edit.php:241
 #: include/views/configuration.item.edit.php:308
-#: include/views/configuration.item.massupdate.php:371
+#: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr "Добавлено максимальное количество переменных интервалов"
 
@@ -9386,7 +9348,7 @@ msgstr "Меню"
 #: include/classes/screens/CScreenActions.php:168
 #: include/views/administration.auditacts.list.php:73
 #: include/views/administration.auditacts.list.php:104
-#: include/views/configuration.action.edit.php:629
+#: include/views/configuration.action.edit.php:628
 msgid "Message"
 msgstr "Сообщение"
 
@@ -9570,7 +9532,7 @@ msgstr "Понедельник"
 msgid "Monitored by proxy"
 msgstr "Наблюдение через прокси"
 
-#: include/views/monitoring.discovery.php:41
+#: include/views/monitoring.discovery.php:44
 msgid "Monitored host"
 msgstr "Наблюдаемый узел сети"
 
@@ -9671,7 +9633,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:45
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:948
+#: include/views/configuration.action.edit.php:947
 #: include/views/configuration.action.list.php:51
 #: include/views/configuration.application.edit.php:41
 #: include/views/configuration.discovery.edit.php:39
@@ -9687,7 +9649,7 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.host.prototype.list.php:48
 #: include/views/configuration.httpconf.edit.php:59
-#: include/views/configuration.httpconf.edit.php:198
+#: include/views/configuration.httpconf.edit.php:207
 #: include/views/configuration.httpconf.list.php:64
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:52
@@ -9710,7 +9672,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:102
 #: include/views/configuration.triggers.massupdate.php:87
 #: include/views/inventory.host.list.php:76
-#: include/views/js/configuration.sysmaps.js.php:184 items.php:44
+#: include/views/js/configuration.sysmaps.js.php:183 items.php:44
 #: latest.php:375 latest.php:456 latest.php:457 maintenance.php:44
 #: maintenance.php:210 maintenance.php:241 popup_httpstep.php:36 popup.php:537
 #: popup.php:660 popup.php:734 popup.php:808 popup.php:883 popup.php:948
@@ -9782,8 +9744,8 @@ msgid "Never executed"
 msgstr "Никогда не выполнялось"
 
 #: include/views/configuration.action.edit.php:450
-#: include/views/configuration.action.edit.php:680
-#: include/views/configuration.action.edit.php:1000
+#: include/views/configuration.action.edit.php:679
+#: include/views/configuration.action.edit.php:999
 #: include/views/configuration.discovery.edit.php:55
 #: include/views/configuration.maintenance.edit.php:132
 msgid "New"
@@ -9805,7 +9767,7 @@ msgstr "Новый элемент"
 #: disc_prototypes.php:49 host_discovery.php:58
 #: include/views/configuration.host.discovery.edit.php:245
 #: include/views/configuration.item.edit.php:312
-#: include/views/configuration.item.massupdate.php:375 items.php:51
+#: include/views/configuration.item.massupdate.php:376 items.php:51
 msgid "New flexible interval"
 msgstr "Новый переменный интервал"
 
@@ -9843,7 +9805,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Следующая"
 
-#: events.php:813 include/events.inc.php:355 include/events.inc.php:373
+#: events.php:811 include/events.inc.php:355 include/events.inc.php:373
 #: include/func.inc.php:2022 include/triggers.inc.php:1487
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
@@ -9882,7 +9844,7 @@ msgstr ""
 msgid "No \"%1$s\" given for web scenario."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2074
+#: include/classes/api/services/CAction.php:1836
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -9897,7 +9859,7 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "Не задано \"%2$s\" для прототипа узла сети \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:2024
+#: include/classes/api/services/CAction.php:1786
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr ""
@@ -10013,7 +9975,7 @@ msgid "No command type specified for action operation."
 msgstr "Для операции действия не указан тип команды."
 
 #: include/views/configuration.action.edit.php:69
-#: include/views/configuration.action.edit.php:945
+#: include/views/configuration.action.edit.php:944
 msgid "No conditions defined."
 msgstr "Условия не заданы."
 
@@ -10069,11 +10031,11 @@ msgstr "Правила обнаружения не найдены."
 msgid "No errors found."
 msgstr "Ошибки не найдены."
 
-#: include/blocks.inc.php:1077 include/blocks.inc.php:1316 tr_status.php:698
+#: include/blocks.inc.php:1077 include/blocks.inc.php:1317 tr_status.php:698
 msgid "No events"
 msgstr "Нет событий"
 
-#: events.php:406 include/blocks.inc.php:997
+#: events.php:405 include/blocks.inc.php:997
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr "События не найдены."
@@ -10093,7 +10055,7 @@ msgstr "Файл не был загружен."
 
 #: include/views/configuration.host.discovery.edit.php:195
 #: include/views/configuration.item.edit.php:262
-#: include/views/configuration.item.massupdate.php:317
+#: include/views/configuration.item.massupdate.php:318
 msgid "No flexible intervals defined."
 msgstr "Переменные интервалы не заданы."
 
@@ -10208,7 +10170,7 @@ msgstr "Изображения не найдены."
 
 #: include/views/configuration.host.discovery.edit.php:96
 #: include/views/configuration.item.edit.php:102
-#: include/views/configuration.item.massupdate.php:76 jsLoader.php:232
+#: include/views/configuration.item.massupdate.php:77 jsLoader.php:232
 msgid "No interface found"
 msgstr "Интерфейс не найден"
 
@@ -10359,7 +10321,7 @@ msgid "No permissions for system access."
 msgstr "Нет прав доступа в систему."
 
 #: include/classes/api/services/CAction.php:1259
-#: include/classes/api/services/CAction.php:2219
+#: include/classes/api/services/CAction.php:1981
 #: include/classes/api/services/CApplication.php:307
 #: include/classes/api/services/CApplication.php:314
 #: include/classes/api/services/CApplication.php:420
@@ -10438,8 +10400,8 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CTrigger.php:929
 #: include/classes/api/services/CTrigger.php:950
 #: include/classes/api/services/CTrigger.php:1858
-#: include/classes/api/services/CTriggerPrototype.php:506
-#: include/classes/api/services/CTriggerPrototype.php:594
+#: include/classes/api/services/CTriggerPrototype.php:574
+#: include/classes/api/services/CTriggerPrototype.php:937
 #: include/classes/api/services/CUserMacro.php:540
 #: include/classes/api/services/CUserMacro.php:649
 #: include/classes/api/services/CUser.php:619
@@ -10608,7 +10570,7 @@ msgid "Normal view"
 msgstr "Нормальный вид"
 
 #: include/actions.inc.php:232
-#: include/views/configuration.action.edit.php:1041
+#: include/views/configuration.action.edit.php:1040
 msgid "Not Ack"
 msgstr "Не подтверждено"
 
@@ -10836,7 +10798,7 @@ msgstr ""
 
 #: include/forms.inc.php:402 include/items.inc.php:123
 #: include/triggers.inc.php:2065 include/views/configuration.item.edit.php:212
-#: include/views/configuration.item.massupdate.php:208
+#: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Числовой (с плавающей точкой)"
 
@@ -10848,7 +10810,7 @@ msgstr "Числовой (целое 64бит)"
 
 #: include/forms.inc.php:401 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:211
-#: include/views/configuration.item.massupdate.php:207
+#: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
 msgstr "Числовой (целое положительное)"
 
@@ -11050,7 +11012,7 @@ msgstr "Подсчитываются только триггеры у узлов
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:274
+#: actionconf.php:296
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" уже существует."
@@ -11059,11 +11021,11 @@ msgstr "Операция \"%s\" уже существует."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операция не может быть выполнена из-за несанкционированного запроса."
 
-#: include/views/configuration.action.edit.php:1053
+#: include/views/configuration.action.edit.php:1052
 msgid "Operation condition"
 msgstr "Условие операции"
 
-#: include/views/configuration.action.edit.php:1061
+#: include/views/configuration.action.edit.php:1060
 msgid "Operation details"
 msgstr "Детали операции"
 
@@ -11075,12 +11037,12 @@ msgstr "Операция не имеет группу для функциони�
 msgid "Operation has no template to operate."
 msgstr "Операция не имеет шаблон для функционирования."
 
-#: include/views/configuration.action.edit.php:513
-#: include/views/configuration.action.edit.php:519
+#: include/views/configuration.action.edit.php:512
+#: include/views/configuration.action.edit.php:518
 msgid "Operation type"
 msgstr "Тип операции"
 
-#: include/views/configuration.action.edit.php:1071
+#: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.list.php:53
 msgid "Operations"
 msgstr "Операции"
@@ -11091,7 +11053,7 @@ msgstr "Оператор"
 
 #: include/triggers.inc.php:1542
 #: include/views/configuration.action.edit.php:121
-#: include/views/configuration.action.edit.php:990
+#: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.triggers.edit.php:119
 msgid "Or"
@@ -11110,38 +11072,38 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:273
 #: include/views/configuration.host.massupdate.php:289
 #: include/views/configuration.host.massupdate.php:320
-#: include/views/configuration.item.massupdate.php:46
-#: include/views/configuration.item.massupdate.php:80
-#: include/views/configuration.item.massupdate.php:96
-#: include/views/configuration.item.massupdate.php:106
-#: include/views/configuration.item.massupdate.php:116
-#: include/views/configuration.item.massupdate.php:130
-#: include/views/configuration.item.massupdate.php:150
-#: include/views/configuration.item.massupdate.php:160
-#: include/views/configuration.item.massupdate.php:180
-#: include/views/configuration.item.massupdate.php:190
-#: include/views/configuration.item.massupdate.php:200
-#: include/views/configuration.item.massupdate.php:216
-#: include/views/configuration.item.massupdate.php:228
-#: include/views/configuration.item.massupdate.php:238
-#: include/views/configuration.item.massupdate.php:251
-#: include/views/configuration.item.massupdate.php:261
-#: include/views/configuration.item.massupdate.php:271
-#: include/views/configuration.item.massupdate.php:281
-#: include/views/configuration.item.massupdate.php:291
-#: include/views/configuration.item.massupdate.php:301
-#: include/views/configuration.item.massupdate.php:311
-#: include/views/configuration.item.massupdate.php:349
-#: include/views/configuration.item.massupdate.php:382
-#: include/views/configuration.item.massupdate.php:392
-#: include/views/configuration.item.massupdate.php:406
-#: include/views/configuration.item.massupdate.php:416
-#: include/views/configuration.item.massupdate.php:430
-#: include/views/configuration.item.massupdate.php:448
-#: include/views/configuration.item.massupdate.php:458
-#: include/views/configuration.item.massupdate.php:495
-#: include/views/configuration.item.massupdate.php:546
-#: include/views/configuration.item.massupdate.php:559
+#: include/views/configuration.item.massupdate.php:47
+#: include/views/configuration.item.massupdate.php:81
+#: include/views/configuration.item.massupdate.php:97
+#: include/views/configuration.item.massupdate.php:107
+#: include/views/configuration.item.massupdate.php:117
+#: include/views/configuration.item.massupdate.php:131
+#: include/views/configuration.item.massupdate.php:151
+#: include/views/configuration.item.massupdate.php:161
+#: include/views/configuration.item.massupdate.php:181
+#: include/views/configuration.item.massupdate.php:191
+#: include/views/configuration.item.massupdate.php:201
+#: include/views/configuration.item.massupdate.php:217
+#: include/views/configuration.item.massupdate.php:229
+#: include/views/configuration.item.massupdate.php:239
+#: include/views/configuration.item.massupdate.php:252
+#: include/views/configuration.item.massupdate.php:262
+#: include/views/configuration.item.massupdate.php:272
+#: include/views/configuration.item.massupdate.php:282
+#: include/views/configuration.item.massupdate.php:292
+#: include/views/configuration.item.massupdate.php:302
+#: include/views/configuration.item.massupdate.php:312
+#: include/views/configuration.item.massupdate.php:350
+#: include/views/configuration.item.massupdate.php:383
+#: include/views/configuration.item.massupdate.php:393
+#: include/views/configuration.item.massupdate.php:407
+#: include/views/configuration.item.massupdate.php:417
+#: include/views/configuration.item.massupdate.php:431
+#: include/views/configuration.item.massupdate.php:449
+#: include/views/configuration.item.massupdate.php:459
+#: include/views/configuration.item.massupdate.php:496
+#: include/views/configuration.item.massupdate.php:547
+#: include/views/configuration.item.massupdate.php:560
 #: include/views/configuration.triggers.massupdate.php:75
 #: include/views/configuration.triggers.massupdate.php:150
 msgid "Original"
@@ -11467,17 +11429,17 @@ msgstr "Пассивный"
 #: include/views/administration.users.edit.php:83
 #: include/views/administration.users.edit.php:101
 #: include/views/administration.users.edit.php:105
-#: include/views/configuration.action.edit.php:752
-#: include/views/configuration.action.edit.php:785
+#: include/views/configuration.action.edit.php:751
+#: include/views/configuration.action.edit.php:784
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.prototype.edit.php:277
-#: include/views/configuration.httpconf.edit.php:159
+#: include/views/configuration.httpconf.edit.php:169
 #: include/views/configuration.item.edit.php:170
 #: include/views/configuration.item.edit.php:182
-#: include/views/configuration.item.massupdate.php:245
-#: include/views/configuration.item.massupdate.php:289
+#: include/views/configuration.item.massupdate.php:246
+#: include/views/configuration.item.massupdate.php:290
 #: include/views/general.login.php:69
 #: include/views/js/common.item.edit.js.php:182
 msgid "Password"
@@ -11525,8 +11487,8 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:233
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.edit.php:300
-#: include/views/configuration.item.massupdate.php:320
-#: include/views/configuration.item.massupdate.php:361
+#: include/views/configuration.item.massupdate.php:321
+#: include/views/configuration.item.massupdate.php:362
 #: include/views/configuration.maintenance.edit.php:102 popup_period.php:25
 #: popup_period.php:96 popup_period.php:136 report2.php:380 report3.php:62
 #: report4.php:102 report6.php:56 srv_status.php:159
@@ -11606,13 +11568,13 @@ msgstr "Заполнение поля инвентаря узла сети"
 #: include/forms.inc.php:470
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:55
-#: include/views/configuration.action.edit.php:799
+#: include/views/configuration.action.edit.php:798
 #: include/views/configuration.host.discovery.edit.php:154
 #: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:95
 #: include/views/configuration.item.edit.php:160
-#: include/views/configuration.item.massupdate.php:198
+#: include/views/configuration.item.massupdate.php:199
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
@@ -11711,21 +11673,21 @@ msgstr "Печать"
 
 #: include/views/configuration.host.discovery.edit.php:150
 #: include/views/configuration.item.edit.php:156
-#: include/views/configuration.item.massupdate.php:188
+#: include/views/configuration.item.massupdate.php:189
 #: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Privacy passphrase"
 msgstr "Пароль безопасности"
 
 #: include/views/configuration.host.discovery.edit.php:146
 #: include/views/configuration.item.edit.php:152
-#: include/views/configuration.item.massupdate.php:178
+#: include/views/configuration.item.massupdate.php:179
 msgid "Privacy protocol"
 msgstr "Протокол безопасности"
 
-#: include/views/configuration.action.edit.php:778
+#: include/views/configuration.action.edit.php:777
 #: include/views/configuration.host.discovery.edit.php:173
 #: include/views/configuration.item.edit.php:179
-#: include/views/configuration.item.massupdate.php:279
+#: include/views/configuration.item.massupdate.php:280
 msgid "Private key file"
 msgstr "Файл приватного ключа"
 
@@ -11741,7 +11703,7 @@ msgstr "Возможно отсутствует модуль php-ldap."
 
 #: include/maps.inc.php:508 include/maps.inc.php:591 include/maps.inc.php:682
 #: include/views/common.filter.trigger.php:40
-#: include/views/js/configuration.sysmaps.js.php:144
+#: include/views/js/configuration.sysmaps.js.php:143
 msgid "Problem"
 msgstr "Проблема"
 
@@ -11832,17 +11794,17 @@ msgstr "Имя прокси"
 msgid "Proxy updated"
 msgstr "Прокси обновлен"
 
-#: include/views/configuration.action.edit.php:753
+#: include/views/configuration.action.edit.php:752
 #: include/views/configuration.host.discovery.edit.php:165
 #: include/views/configuration.item.edit.php:171
-#: include/views/configuration.item.massupdate.php:246
+#: include/views/configuration.item.massupdate.php:247
 msgid "Public key"
 msgstr "Публичный ключ"
 
-#: include/views/configuration.action.edit.php:771
+#: include/views/configuration.action.edit.php:770
 #: include/views/configuration.host.discovery.edit.php:170
 #: include/views/configuration.item.edit.php:176
-#: include/views/configuration.item.massupdate.php:269
+#: include/views/configuration.item.massupdate.php:270
 msgid "Public key file"
 msgstr "Файл публичного ключа"
 
@@ -12011,12 +11973,12 @@ msgstr "Удаленная команда"
 #: include/views/configuration.action.edit.php:100
 #: include/views/configuration.action.edit.php:421
 #: include/views/configuration.action.edit.php:434
-#: include/views/configuration.action.edit.php:974
+#: include/views/configuration.action.edit.php:973
 #: include/views/configuration.host.discovery.edit.php:211
 #: include/views/configuration.host.discovery.edit.php:320
-#: include/views/configuration.httpconf.edit.php:249
+#: include/views/configuration.httpconf.edit.php:258
 #: include/views/configuration.item.edit.php:278
-#: include/views/configuration.item.massupdate.php:333
+#: include/views/configuration.item.massupdate.php:334
 #: include/views/configuration.maintenance.edit.php:114
 #: include/views/configuration.services.edit.php:110
 #: include/views/configuration.services.edit.php:162
@@ -12042,11 +12004,11 @@ msgstr "Удаленная команда"
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:202
-#: include/views/js/configuration.sysmaps.js.php:303
-#: include/views/js/configuration.sysmaps.js.php:416
-#: include/views/js/configuration.sysmaps.js.php:461
-#: include/views/js/configuration.sysmaps.js.php:470 jsLoader.php:214
+#: include/views/js/configuration.sysmaps.js.php:201
+#: include/views/js/configuration.sysmaps.js.php:302
+#: include/views/js/configuration.sysmaps.js.php:415
+#: include/views/js/configuration.sysmaps.js.php:460
+#: include/views/js/configuration.sysmaps.js.php:469 jsLoader.php:214
 msgid "Remove"
 msgstr "Удалить"
 
@@ -12071,7 +12033,7 @@ msgstr "Удалить из избранного"
 msgid "Remove from host group"
 msgstr "Удалить из группы узлов сети"
 
-#: include/actions.inc.php:408 include/views/configuration.action.edit.php:873
+#: include/actions.inc.php:408 include/views/configuration.action.edit.php:872
 msgid "Remove from host groups"
 msgstr "Удалить из групп узлов сети"
 
@@ -12092,7 +12054,7 @@ msgstr "Удалить выбранное"
 msgid "Replace"
 msgstr "Заменить"
 
-#: include/views/configuration.item.massupdate.php:494
+#: include/views/configuration.item.massupdate.php:495
 msgid "Replace applications"
 msgstr "Заменить группы элементов данных"
 
@@ -12125,7 +12087,7 @@ msgid "Reports"
 msgstr "Отчеты"
 
 #: include/classes/setup/CSetupWizard.php:187
-#: include/views/configuration.httpconf.edit.php:201
+#: include/views/configuration.httpconf.edit.php:210
 msgid "Required"
 msgstr "Требуется"
 
@@ -12165,7 +12127,7 @@ msgstr "Требуемые коды состояния"
 msgid "Required string"
 msgstr "Требуемая строка"
 
-#: events.php:397 hosts.php:837 include/forms.inc.php:619
+#: events.php:396 hosts.php:837 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
@@ -12297,7 +12259,7 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:85
-#: include/views/js/configuration.sysmaps.js.php:250 popup_bitem.php:164
+#: include/views/js/configuration.sysmaps.js.php:249 popup_bitem.php:164
 msgid "Right"
 msgstr "По правой стороне"
 
@@ -12313,7 +12275,7 @@ msgstr ""
 msgid "Row deleted"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:718
+#: include/views/configuration.screen.constructor.edit.php:720
 #: screenedit.php:74
 msgid "Row span"
 msgstr "Объединение строк"
@@ -12406,7 +12368,7 @@ msgstr "СЕРВЕР"
 
 #: include/views/configuration.host.discovery.edit.php:130
 #: include/views/configuration.item.edit.php:136
-#: include/views/configuration.item.massupdate.php:141
+#: include/views/configuration.item.massupdate.php:142
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "SHA"
 msgstr "SHA"
@@ -12463,7 +12425,7 @@ msgstr "SNMP OID"
 #: disc_prototypes.php:76 host_discovery.php:79 include/forms.inc.php:449
 #: include/views/configuration.host.discovery.edit.php:111
 #: include/views/configuration.item.edit.php:117
-#: include/views/configuration.item.massupdate.php:94
+#: include/views/configuration.item.massupdate.php:95
 #: include/views/js/configuration.discovery.edit.js.php:39 items.php:85
 msgid "SNMP community"
 msgstr "SNMP community"
@@ -12521,7 +12483,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
 
 #: include/discovery.inc.php:56
-#: include/views/configuration.action.edit.php:731
+#: include/views/configuration.action.edit.php:730
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
 msgstr "SSH"
@@ -12530,23 +12492,23 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSH агент"
 
-#: include/views/configuration.httpconf.edit.php:170
+#: include/views/configuration.httpconf.edit.php:179
 msgid "SSL certificate file"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:176
+#: include/views/configuration.httpconf.edit.php:185
 msgid "SSL key file"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:182
+#: include/views/configuration.httpconf.edit.php:191
 msgid "SSL key password"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:166
+#: include/views/configuration.httpconf.edit.php:175
 msgid "SSL verify host"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:163
+#: include/views/configuration.httpconf.edit.php:172
 msgid "SSL verify peer"
 msgstr ""
 
@@ -12583,7 +12545,7 @@ msgstr "Суббота"
 msgid "Scale"
 msgstr "Период"
 
-#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:279
+#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:288
 msgid "Scenario"
 msgstr "Сценарий"
 
@@ -12669,7 +12631,7 @@ msgstr "Комплексный экран \"%1$s\" обновлен."
 msgid "Screen added"
 msgstr "Комплексный экран добавлен"
 
-#: include/views/configuration.screen.constructor.edit.php:736
+#: include/views/configuration.screen.constructor.edit.php:738
 msgid "Screen cell configuration"
 msgstr "Настройка элемента комплексного экрана"
 
@@ -12810,7 +12772,7 @@ msgstr "Секунд"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.item.edit.php:131
-#: include/views/configuration.item.massupdate.php:128
+#: include/views/configuration.item.massupdate.php:129
 #: include/views/js/configuration.discovery.edit.js.php:61
 msgid "Security level"
 msgstr "Уровень безопасности"
@@ -12818,12 +12780,12 @@ msgstr "Уровень безопасности"
 #: include/forms.inc.php:456
 #: include/views/configuration.host.discovery.edit.php:115
 #: include/views/configuration.item.edit.php:121
-#: include/views/configuration.item.massupdate.php:114
+#: include/views/configuration.item.massupdate.php:115
 #: include/views/js/configuration.discovery.edit.js.php:56
 msgid "Security name"
 msgstr "Имя безопасности"
 
-#: events.php:378 include/classes/html/CButtonPopup.php:52
+#: events.php:377 include/classes/html/CButtonPopup.php:52
 #: include/classes/html/CMultiSelect.php:54 include/forms.inc.php:569
 #: include/reports.inc.php:414
 #: include/views/administration.auditacts.list.php:44
@@ -12832,7 +12794,7 @@ msgstr "Имя безопасности"
 #: include/views/configuration.action.edit.php:253
 #: include/views/configuration.action.edit.php:266
 #: include/views/configuration.action.edit.php:279
-#: include/views/configuration.action.edit.php:737
+#: include/views/configuration.action.edit.php:736
 #: include/views/configuration.graph.edit.php:129
 #: include/views/configuration.graph.edit.php:187
 #: include/views/configuration.item.edit.php:71
@@ -12855,7 +12817,7 @@ msgstr "Имя безопасности"
 #: include/views/configuration.triggers.expression.php:43
 #: include/views/js/configuration.sysmaps.js.php:107
 #: include/views/js/configuration.sysmaps.js.php:114
-#: include/views/js/configuration.sysmaps.js.php:121
+#: include/views/js/configuration.sysmaps.js.php:120
 #: include/views/monitoring.overview.items.php:74 jsLoader.php:178
 #: latest.php:408 popup_bitem.php:138 popup.php:573 popup.php:640
 #: popup.php:712 popup.php:786 popup.php:861 popup.php:931 popup.php:1065
@@ -12881,11 +12843,11 @@ msgstr "Выбрать строки, содержащие в описании"
 msgid "Selected"
 msgstr "Выбранные"
 
-#: actionconf.php:357
+#: actionconf.php:378
 msgid "Selected actions deleted"
 msgstr "Выбранные действия удалены"
 
-#: include/views/js/configuration.sysmaps.js.php:223
+#: include/views/js/configuration.sysmaps.js.php:222
 msgid "Selected elements"
 msgstr "Выбранные элементы"
 
@@ -12909,7 +12871,7 @@ msgstr "Отправлять сообщение группам пользова�
 msgid "Send message to users"
 msgstr "Отправлять сообщение пользователям"
 
-#: include/views/configuration.action.edit.php:614
+#: include/views/configuration.action.edit.php:613
 msgid "Send only to"
 msgstr "Отправлять только"
 
@@ -12917,11 +12879,11 @@ msgstr "Отправлять только"
 msgid "Send to"
 msgstr "Отправлять на"
 
-#: include/views/configuration.action.edit.php:600
+#: include/views/configuration.action.edit.php:599
 msgid "Send to User groups"
 msgstr "Отправлять группам пользователей"
 
-#: include/views/configuration.action.edit.php:601
+#: include/views/configuration.action.edit.php:600
 msgid "Send to Users"
 msgstr "Отправлять пользователям"
 
@@ -12965,10 +12927,10 @@ msgstr "Информация о сервере"
 msgid "Server time"
 msgstr "Время на сервере"
 
-#: events.php:586 include/actions.inc.php:103
+#: events.php:585 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:280
-#: include/views/configuration.services.parent.list.php:36 services.php:468
+#: include/views/configuration.services.parent.list.php:36 services.php:470
 #: srv_status.php:139
 msgid "Service"
 msgstr "Услуга"
@@ -13042,7 +13004,7 @@ msgstr "Услуги образуют круговую зависимость."
 msgid "Session terminated, re-login, please."
 msgstr "Сессия завершена, пожалуйста, зайдите повторно в систему."
 
-#: events.php:475 include/classes/screens/CScreenEvents.php:43
+#: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
 #: include/triggers.inc.php:1479 include/views/configuration.item.list.php:148
 #: include/views/configuration.triggers.edit.php:253
@@ -13157,7 +13119,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: include/views/configuration.item.edit.php:386
-#: include/views/configuration.item.massupdate.php:446
+#: include/views/configuration.item.massupdate.php:447
 msgid "Show value"
 msgstr "Отображение значения"
 
@@ -13360,7 +13322,7 @@ msgstr "Сортировать триггеры по"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Сортировка по полю \"%1$s\" не разрешена."
 
-#: events.php:335 include/classes/screens/CScreenHistory.php:148
+#: events.php:334 include/classes/screens/CScreenHistory.php:148
 msgid "Source"
 msgstr "Источник"
 
@@ -13411,7 +13373,7 @@ msgstr "Состояние"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:459 events.php:474 hosts.php:868 httpdetails.php:134
+#: events.php:458 events.php:473 hosts.php:868 httpdetails.php:134
 #: httpmon.php:95 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13430,7 +13392,7 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.item.list.php:73
 #: include/views/configuration.item.list.php:151
-#: include/views/configuration.item.massupdate.php:404
+#: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:104 popup_media.php:134
 #: popup.php:973 popup.php:1095 srv_status.php:140 tr_status.php:290
@@ -13446,7 +13408,7 @@ msgid "Status (descending)"
 msgstr "Состояние (в порядке убывания)"
 
 #: include/views/configuration.services.child.list.php:39
-#: include/views/configuration.services.parent.list.php:36 services.php:469
+#: include/views/configuration.services.parent.list.php:36 services.php:471
 msgid "Status calculation"
 msgstr "Вычисление состояния"
 
@@ -13454,7 +13416,7 @@ msgstr "Вычисление состояния"
 msgid "Status calculation algorithm"
 msgstr "Алгоритм вычисления состояния"
 
-#: include/views/configuration.httpconf.edit.php:202
+#: include/views/configuration.httpconf.edit.php:211
 msgid "Status codes"
 msgstr "Коды состояний"
 
@@ -13480,7 +13442,7 @@ msgid "Status only"
 msgstr "Только состояние"
 
 #: httpdetails.php:130 include/actions.inc.php:839 include/actions.inc.php:930
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:500
 msgid "Step"
 msgstr "Шаг"
 
@@ -13489,7 +13451,7 @@ msgstr "Шаг"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Шаг \"%1$s\" [%2$s из %3$s] ошибочный: %4$s"
 
-#: include/views/configuration.action.edit.php:491
+#: include/views/configuration.action.edit.php:490
 msgid "Step duration"
 msgstr "Длительность шага"
 
@@ -13503,8 +13465,8 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "Шаг с именем \"%1$s\" уже существует."
 
 #: httpconf.php:50 include/views/configuration.action.edit.php:370
-#: include/views/configuration.httpconf.edit.php:272
-#: include/views/configuration.httpconf.edit.php:280
+#: include/views/configuration.httpconf.edit.php:281
+#: include/views/configuration.httpconf.edit.php:289
 msgid "Steps"
 msgstr "Шаги"
 
@@ -13514,7 +13476,7 @@ msgid "Stop"
 msgstr "Остановить"
 
 #: include/views/configuration.item.edit.php:366
-#: include/views/configuration.item.massupdate.php:428
+#: include/views/configuration.item.massupdate.php:429
 msgid "Store value"
 msgstr "Хранение значения"
 
@@ -13534,7 +13496,7 @@ msgstr "Подфильтр [влияет только на отфильтров�
 #: include/actions.inc.php:461 include/actions.inc.php:866
 #: include/classes/screens/CScreenActions.php:163
 #: include/views/administration.auditacts.list.php:99
-#: include/views/configuration.action.edit.php:625
+#: include/views/configuration.action.edit.php:624
 msgid "Subject"
 msgstr "Тема"
 
@@ -13681,14 +13643,14 @@ msgstr "У таблицы \"%1$s\" нет поля с именем \"%2$s\"."
 msgid "Tag"
 msgstr "Этикетка"
 
-#: include/views/configuration.action.edit.php:678
+#: include/views/configuration.action.edit.php:677
 #: include/views/configuration.copy.elements.php:105
 #: include/views/configuration.triggers.edit.php:152
 #: include/views/js/configuration.action.edit.js.php:84
 msgid "Target"
 msgstr "Цель"
 
-#: include/views/configuration.action.edit.php:725
+#: include/views/configuration.action.edit.php:724
 msgid "Target list"
 msgstr "Список целей"
 
@@ -13697,7 +13659,7 @@ msgid "Target type"
 msgstr "Тип цели"
 
 #: include/discovery.inc.php:70
-#: include/views/configuration.action.edit.php:732
+#: include/views/configuration.action.edit.php:731
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
 msgstr "Telnet"
@@ -13850,7 +13812,7 @@ msgstr "Тестовая строка"
 
 #: include/forms.inc.php:405 include/items.inc.php:129
 #: include/triggers.inc.php:2068 include/views/configuration.item.edit.php:215
-#: include/views/configuration.item.massupdate.php:211
+#: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Текст"
 
@@ -13987,7 +13949,7 @@ msgstr "Четверг"
 msgid "Till"
 msgstr "До"
 
-#: events.php:455 events.php:471 include/acknow.inc.php:49
+#: events.php:454 events.php:470 include/acknow.inc.php:49
 #: include/actions.inc.php:819 include/actions.inc.php:842
 #: include/actions.inc.php:915 include/actions.inc.php:933
 #: include/blocks.inc.php:993 include/classes/screens/CScreenActions.php:32
@@ -14040,7 +14002,7 @@ msgstr "Тип времени"
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:199
+#: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.popup.php:97 popup_httpstep.php:43
 msgid "Timeout"
 msgstr "Время ожидания"
@@ -14070,8 +14032,8 @@ msgstr ""
 msgid "Title"
 msgstr "Заголовок"
 
-#: include/views/configuration.action.edit.php:483
-#: include/views/js/configuration.sysmaps.js.php:338
+#: include/views/configuration.action.edit.php:482
+#: include/views/js/configuration.sysmaps.js.php:337
 msgid "To"
 msgstr "К"
 
@@ -14087,7 +14049,7 @@ msgstr "Сегодня"
 #: include/views/configuration.screen.constructor.edit.php:710
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
-#: include/views/js/configuration.sysmaps.js.php:251
+#: include/views/js/configuration.sysmaps.js.php:250
 #: include/views/monitoring.overview.items.php:53
 #: include/views/monitoring.overview.triggers.php:75
 msgid "Top"
@@ -14130,7 +14092,7 @@ msgid "Trend storage period"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:346
-#: include/views/configuration.item.massupdate.php:390
+#: include/views/configuration.item.massupdate.php:391
 msgid "Trend storage period (in days)"
 msgstr ""
 
@@ -14142,7 +14104,7 @@ msgstr ""
 msgid "Trends"
 msgstr "Динамика изменений"
 
-#: events.php:333 events.php:375 include/actions.inc.php:56
+#: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
 #: include/maps.inc.php:26 include/triggers.inc.php:1476
 #: include/views/configuration.services.child.list.php:40
@@ -14152,7 +14114,7 @@ msgstr "Динамика изменений"
 #: include/views/configuration.triggers.edit.php:271
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:103 jsLoader.php:143
-#: jsLoader.php:219 report5.php:59 services.php:470 tr_comments.php:77
+#: jsLoader.php:219 report5.php:59 services.php:472 tr_comments.php:77
 #: tr_logform.php:156 tr_logform.php:172
 msgid "Trigger"
 msgstr "Триггер"
@@ -14235,7 +14197,7 @@ msgid "Trigger expression condition"
 msgstr "Условие выражения триггера"
 
 #: include/classes/api/services/CTrigger.php:649
-#: include/classes/api/services/CTriggerPrototype.php:726
+#: include/classes/api/services/CTriggerPrototype.php:730
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Выражение триггера должно содержать по крайней мере одну ссылку узел_сети:ключ."
 
@@ -14261,7 +14223,7 @@ msgstr "Триггер в \"неизвестном\" состоянии"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "У триггера из шаблона \"%1$s\" есть зависимость от триггера из шаблона \"%2$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:451
+#: include/classes/api/services/CTriggerPrototype.php:454
 msgid "Trigger just added. No status update so far."
 msgstr "Триггер только добавлен. До сих пор нет обновления состояния."
 
@@ -14277,12 +14239,12 @@ msgstr "Имя триггера"
 msgid "Trigger prototype"
 msgstr "Прототип триггера"
 
-#: include/classes/api/services/CTriggerPrototype.php:874
+#: include/classes/api/services/CTriggerPrototype.php:905
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr ""
 
-#: include/classes/api/services/CTriggerPrototype.php:880
+#: include/classes/api/services/CTriggerPrototype.php:911
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
@@ -14373,7 +14335,7 @@ msgstr "Значение триггера"
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:232
 #: include/views/inventory.host.view.php:242
-#: include/views/js/configuration.sysmaps.js.php:395
+#: include/views/js/configuration.sysmaps.js.php:394
 #: include/views/monitoring.overview.items.php:25
 #: include/views/monitoring.overview.triggers.php:27 jsLoader.php:220
 #: popup.php:59 search.php:135 search.php:142 search.php:177 search.php:199
@@ -14455,7 +14417,7 @@ msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не мог�
 #: include/views/administration.mediatypes.list.php:40
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.list.php:39
-#: include/views/configuration.action.edit.php:741
+#: include/views/configuration.action.edit.php:740
 #: include/views/configuration.graph.edit.php:233
 #: include/views/configuration.host.discovery.edit.php:57
 #: include/views/configuration.host.discovery.edit.php:64
@@ -14463,13 +14425,13 @@ msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не мог�
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.edit.php:64
 #: include/views/configuration.item.list.php:71
-#: include/views/configuration.item.massupdate.php:44
+#: include/views/configuration.item.massupdate.php:45
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/configuration.maintenance.list.php:45
 #: include/views/configuration.services.edit.php:131
 #: include/views/inventory.host.list.php:77
 #: include/views/js/configuration.sysmaps.js.php:13
-#: include/views/js/configuration.sysmaps.js.php:396
+#: include/views/js/configuration.sysmaps.js.php:395
 #: include/views/monitoring.overview.items.php:30
 #: include/views/monitoring.overview.triggers.php:32 latest.php:483
 #: latest.php:484 popup_media.php:117 popup.php:495 popup.php:1093
@@ -14481,7 +14443,7 @@ msgstr "Тип"
 msgid "Type (Full details)"
 msgstr "Тип (полная детализация)"
 
-#: include/views/js/configuration.sysmaps.js.php:368
+#: include/views/js/configuration.sysmaps.js.php:367
 msgid "Type (OK)"
 msgstr "Тип (ОК)"
 
@@ -14494,7 +14456,7 @@ msgid "Type (descending)"
 msgstr "Тип (в порядке убывания)"
 
 #: include/views/configuration.action.edit.php:126
-#: include/views/configuration.action.edit.php:993
+#: include/views/configuration.action.edit.php:992
 #: include/views/configuration.host.discovery.edit.php:274
 msgid "Type of calculation"
 msgstr "Тип вычисления"
@@ -14502,7 +14464,7 @@ msgstr "Тип вычисления"
 #: include/forms.inc.php:514 include/forms.inc.php:899
 #: include/views/configuration.item.edit.php:205
 #: include/views/configuration.item.edit.php:216
-#: include/views/configuration.item.massupdate.php:214 popup.php:1094
+#: include/views/configuration.item.massupdate.php:215 popup.php:1094
 msgid "Type of information"
 msgstr "Тип информации"
 
@@ -14528,12 +14490,12 @@ msgid "UP"
 msgstr "ДОСТУПЕН"
 
 #: include/screens.inc.php:44
-#: include/views/configuration.httpconf.edit.php:200
+#: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.httpconf.popup.php:87
 #: include/views/configuration.screen.constructor.edit.php:661
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:185 jsLoader.php:221
+#: include/views/js/configuration.sysmaps.js.php:184 jsLoader.php:221
 #: popup_httpstep.php:37 tr_logform.php:342
 msgid "URL"
 msgstr "URL"
@@ -14573,7 +14535,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:180
-#: include/views/js/configuration.sysmaps.js.php:180 jsLoader.php:222
+#: include/views/js/configuration.sysmaps.js.php:179 jsLoader.php:222
 msgid "URLs"
 msgstr "URLы"
 
@@ -14628,12 +14590,12 @@ msgid "Unblock selected users?"
 msgstr "Разблокировать выбранных пользователей?"
 
 #: include/views/configuration.item.edit.php:229
-#: include/views/configuration.item.massupdate.php:236
+#: include/views/configuration.item.massupdate.php:237
 msgid "Units"
 msgstr "Единица измерения"
 
-#: events.php:569 events.php:570 events.php:580 events.php:581 events.php:582
-#: events.php:583 httpdetails.php:165 httpmon.php:174
+#: events.php:568 events.php:569 events.php:579 events.php:580 events.php:581
+#: events.php:582 httpdetails.php:165 httpmon.php:174
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14713,7 +14675,7 @@ msgstr "Отсоединить и очистить"
 msgid "Unlink from template"
 msgstr "Отсоединить от шаблона"
 
-#: include/actions.inc.php:432 include/views/configuration.action.edit.php:927
+#: include/actions.inc.php:432 include/views/configuration.action.edit.php:926
 msgid "Unlink from templates"
 msgstr "Отсоединить от шаблонов"
 
@@ -14787,7 +14749,7 @@ msgstr "Неподдерживаемый формат импорта \"%1$s\"."
 msgid "Unsupported parameter \"%1$s\" for group prototype."
 msgstr "Неподдерживаемый параметр \"%1$s\" для прототипа группы."
 
-#: include/classes/api/services/CAction.php:2075
+#: include/classes/api/services/CAction.php:1837
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -14807,7 +14769,7 @@ msgstr "Неподдерживаемый параметр \"%2$s\" для про
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Неподдерживаемый параметр \"%2$s\" для прототипа узла сети %1$s инвентарных данных."
 
-#: include/classes/api/services/CAction.php:2025
+#: include/classes/api/services/CAction.php:1787
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr ""
@@ -14817,7 +14779,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1256
+#: include/blocks.inc.php:1257
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Доступно"
@@ -14845,8 +14807,8 @@ msgstr "Доступен"
 #: include/views/administration.script.edit.php:118
 #: include/views/administration.usergroups.edit.php:136
 #: include/views/administration.users.edit.php:396
-#: include/views/configuration.action.edit.php:1057
-#: include/views/configuration.action.edit.php:1078
+#: include/views/configuration.action.edit.php:1056
+#: include/views/configuration.action.edit.php:1077
 #: include/views/configuration.application.edit.php:51
 #: include/views/configuration.discovery.edit.php:87
 #: include/views/configuration.graph.edit.php:309
@@ -14855,15 +14817,15 @@ msgstr "Доступен"
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:298
+#: include/views/configuration.httpconf.edit.php:307
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
-#: include/views/configuration.item.massupdate.php:570
+#: include/views/configuration.item.massupdate.php:571
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
-#: include/views/configuration.screen.constructor.edit.php:742
+#: include/views/configuration.screen.constructor.edit.php:744
 #: include/views/configuration.screen.edit.php:54
-#: include/views/configuration.services.edit.php:288
+#: include/views/configuration.services.edit.php:298
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:190
@@ -14895,7 +14857,7 @@ msgstr "Интервал обновления"
 #: include/views/configuration.host.discovery.edit.php:192
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.item.edit.php:259
-#: include/views/configuration.item.massupdate.php:309 items.php:49
+#: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
 msgstr "Интервал обновления (в сек)"
 
@@ -14909,7 +14871,7 @@ msgstr "Состояние узла сети обновлено"
 
 #: include/blocks.inc.php:457 include/blocks.inc.php:792
 #: include/blocks.inc.php:864 include/blocks.inc.php:1121
-#: include/blocks.inc.php:1222 include/blocks.inc.php:1272
+#: include/blocks.inc.php:1223 include/blocks.inc.php:1273
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14945,7 +14907,7 @@ msgstr "Обновлено: Прототип элемента данных \"%1$
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Триггер \"%1$s\" в \"%2$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:765
+#: include/classes/api/services/CTriggerPrototype.php:770
 #, c-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип триггера \"%1$s\" в \"%2$s\"."
@@ -14965,8 +14927,8 @@ msgstr "Карты верхнего уровня"
 
 #: include/views/configuration.services.edit.php:137
 #: include/views/configuration.services.edit.php:260
-#: include/views/monitoring.discovery.php:42
-#: include/views/monitoring.discovery.php:161
+#: include/views/monitoring.discovery.php:45
+#: include/views/monitoring.discovery.php:164
 msgid "Uptime"
 msgstr "Доступен"
 
@@ -15000,8 +14962,8 @@ msgstr "Используется в действиях"
 #: include/hosts.inc.php:67 include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:343
-#: include/views/configuration.action.edit.php:562
-#: include/views/configuration.httpconf.edit.php:158
+#: include/views/configuration.action.edit.php:561
+#: include/views/configuration.httpconf.edit.php:168
 msgid "User"
 msgstr "Пользователь"
 
@@ -15042,7 +15004,7 @@ msgstr "Пользователь удален"
 #: include/views/administration.script.list.php:42
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:553
+#: include/views/configuration.action.edit.php:552
 msgid "User group"
 msgstr "Группа пользователей"
 
@@ -15116,10 +15078,10 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "Пользователь не может изменять системный статус для самого себя путем введения в группу пользователей \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
-#: include/views/configuration.action.edit.php:764
+#: include/views/configuration.action.edit.php:763
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.item.edit.php:173
-#: include/views/configuration.item.massupdate.php:259 items.php:73
+#: include/views/configuration.item.massupdate.php:260 items.php:73
 msgid "User name"
 msgstr "Имя пользователя"
 
@@ -15516,7 +15478,7 @@ msgstr ""
 msgid "Vertical"
 msgstr "Вертикальный"
 
-#: include/views/configuration.screen.constructor.edit.php:716
+#: include/views/configuration.screen.constructor.edit.php:717
 msgid "Vertical align"
 msgstr "Выравнивание по вертикали"
 
@@ -15806,8 +15768,8 @@ msgstr "Ошибочные поля для услуги \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Ошибочные поля для времени услуги \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:454
-#: include/classes/api/services/CTriggerPrototype.php:510
+#: include/classes/api/services/CTriggerPrototype.php:458
+#: include/classes/api/services/CTriggerPrototype.php:933
 msgid "Wrong fields for trigger."
 msgstr "Ошибочные поля для триггера."
 
@@ -15821,7 +15783,7 @@ msgstr "Ошибочные поля для пользователя \"%s\"."
 msgid "Wrong macro \"%1$s\"."
 msgstr "Ошибочный макрос \"%1$s\"."
 
-#: include/views/js/configuration.sysmaps.js.php:170
+#: include/views/js/configuration.sysmaps.js.php:169
 msgid "X"
 msgstr "X"
 
@@ -15851,7 +15813,7 @@ msgstr "XML файл содержит фатальную ошибку %1$s:"
 msgid "XML file contains warning %1$s:"
 msgstr "XML файл содержит предупреждение %1$s:"
 
-#: include/views/js/configuration.sysmaps.js.php:172
+#: include/views/js/configuration.sysmaps.js.php:171
 msgid "Y"
 msgstr "Y"
 
@@ -15904,7 +15866,7 @@ msgstr "Год"
 msgid "Yearly"
 msgstr "Ежегодно"
 
-#: events.php:813 include/blocks.inc.php:813
+#: events.php:811 include/blocks.inc.php:813
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2022
 #: include/triggers.inc.php:1487
@@ -15935,11 +15897,11 @@ msgstr "Вы не вошли в систему."
 msgid "You can not switch hosts for current selection."
 msgstr "Вы не можете переключить узлы сети для текущего выбора."
 
-#: include/views/js/configuration.action.edit.js.php:375
+#: include/views/js/configuration.action.edit.js.php:371
 msgid "You did not specify host for operation."
 msgstr "Вы не указали узел сети для операции."
 
-#: include/views/js/configuration.action.edit.js.php:341
+#: include/views/js/configuration.action.edit.js.php:338
 msgid "You did not specify host group for operation."
 msgstr "Вы не указали группу узлов сети для операции."
 
@@ -16030,8 +15992,8 @@ msgstr "Zabbix Пользователь"
 
 #: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:52
-#: include/views/configuration.action.edit.php:746
-#: include/views/js/configuration.action.edit.js.php:118
+#: include/views/configuration.action.edit.php:745
+#: include/views/js/configuration.action.edit.js.php:117
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
 msgstr "Zabbix агент"
@@ -16060,8 +16022,8 @@ msgstr "Внутренняя аутентификация Zabbix"
 #: include/classes/html/CServerInfo.php:37
 #: include/classes/setup/CSetupWizard.php:432
 #: include/views/administration.script.edit.php:53
-#: include/views/configuration.action.edit.php:747
-#: include/views/js/configuration.action.edit.js.php:122
+#: include/views/configuration.action.edit.php:746
+#: include/views/js/configuration.action.edit.js.php:121
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
@@ -16212,7 +16174,7 @@ msgstr "d.m H:i"
 msgid "days"
 msgstr "дней"
 
-#: include/html.inc.php:602
+#: include/html.inc.php:603
 msgid "dd"
 msgstr "дд"
 
@@ -16243,7 +16205,7 @@ msgstr "обнаружение"
 msgid "dynamic"
 msgstr "динам"
 
-#: include/views/js/configuration.sysmaps.js.php:218
+#: include/views/js/configuration.sysmaps.js.php:217
 msgid "elements"
 msgstr "элементы"
 
@@ -16284,7 +16246,7 @@ msgctxt "hour short"
 msgid "h"
 msgstr "ч"
 
-#: include/html.inc.php:608 include/views/configuration.services.edit.php:243
+#: include/html.inc.php:616 include/views/configuration.services.edit.php:243
 #: include/views/configuration.services.edit.php:249
 msgid "hh"
 msgstr "чч"
@@ -16396,7 +16358,7 @@ msgstr "мин"
 msgid "minimum 60 seconds"
 msgstr "минимум 60 секунд"
 
-#: include/html.inc.php:604 include/html.inc.php:610
+#: include/html.inc.php:608 include/html.inc.php:621
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:252
 msgid "mm"
@@ -16416,7 +16378,7 @@ msgid "new"
 msgstr "новый"
 
 #: include/views/configuration.host.massupdate.php:80
-#: include/views/configuration.item.massupdate.php:507
+#: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
@@ -16530,7 +16492,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "с"
 
-#: include/views/configuration.httpconf.edit.php:258
+#: include/views/configuration.httpconf.edit.php:267
 msgid "sec"
 msgstr "сек"
 
@@ -16552,7 +16514,7 @@ msgid "show icon mappings"
 msgstr "показать соответствия иконок"
 
 #: include/views/configuration.item.edit.php:384
-#: include/views/configuration.item.massupdate.php:441
+#: include/views/configuration.item.massupdate.php:442
 msgid "show value mappings"
 msgstr "преобразования значений"
 
@@ -16597,6 +16559,6 @@ msgctxt "year short"
 msgid "y"
 msgstr "Г"
 
-#: include/html.inc.php:606
+#: include/html.inc.php:612
 msgid "yyyy"
 msgstr "гггг"

@@ -10,7 +10,41 @@ is a daemon for monitoring of various server parameters.
 .IP "-c, --config \fI<config-file>\fR"
 Use the alternate \fIconfig-file\fR instead of the default one.
 Absolute path should be specified.
-.
+.IP "-R, --runtime-control \fI<option>\fR"
+Perform administrative functions according to \fIoption\fR.
+.SS
+.RS 4
+Runtime control options
+.RS 4
+.TP 4
+log_level_increase[=<target>]
+Increase log level, affect all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+log_level_increase[=<target>]
+Decrease log level, affect all processes if target is not specified
+.RE
+.RE
+.SS
+.RS 4
+Log level control targets
+.RS 4
+.TP 4
+<pid>
+Process identifier
+.RE
+.RS 4
+.TP 4
+<process type>
+All processes of specified type (e.g., listener)
+.RE
+.RS 4
+.TP 4
+<process type>,N
+Process type and number (e.g., listener,3)
+.RE
+.RE
 .IP "-p, --print"
 Print known items and exit. For each item either generic defaults are used, or specific defaults for testing are supplied. These defaults are listed in square brackets as item key parameters.
 Returned values are enclosed in square brackets and prefixed with the type of the returned value, separated by a pipe character.
