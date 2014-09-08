@@ -466,14 +466,16 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		step++;
 	}
 
-	/* check if there was data to read */
-	if (0 == values->values_num || end_timestamp < values->values[values->values_num - 1].timestamp.sec)
+
+	if (0 < count)
 	{
+		/* no more data in database, return success */
 		ret = SUCCEED;
 		goto out;
 	}
 
-	/* drop the last second values and read them from database */
+	/* drop data from the last second and read the whole second again  */
+	/* to ensure that data is cached by seconds                        */
 	end_timestamp = values->values[values->values_num - 1].timestamp.sec;
 
 	while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == end_timestamp)
