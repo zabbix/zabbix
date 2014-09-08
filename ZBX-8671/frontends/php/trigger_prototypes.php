@@ -91,14 +91,9 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-$discoveryRuleId = getRequest('parent_discoveryid');
-if (!$discoveryRuleId) {
-	access_deny();
-}
-
 $discoveryRule = API::DiscoveryRule()->get(array(
-	'itemids' => $discoveryRuleId,
-	'output' => API_OUTPUT_EXTEND,
+	'output' => array('name', 'itemid', 'hostid'),
+	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ));
 $discoveryRule = reset($discoveryRule);
@@ -110,8 +105,8 @@ if (!$discoveryRule) {
 $triggerId = getRequest('triggerid');
 if ($triggerId) {
 	$triggerPrototype = API::TriggerPrototype()->get(array(
-		'triggerids' => $triggerId,
 		'output' => array('triggerid'),
+		'triggerids' => $triggerId,
 		'editable' => true
 	));
 	if (!$triggerPrototype) {
