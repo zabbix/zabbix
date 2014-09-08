@@ -41,6 +41,42 @@
  *
  */
 
+/*
+ * The database contents, request and expected value cache state is described
+ * in following format:
+ *
+ * database:
+ *   [<itemid>] {<timestamp1>, <timestamp2>, <timestamp3>....}
+ *
+ * <request>
+ * ....
+ * <request>
+ *
+ *   returned:
+ *     {<timestampN>, ... ,<timestamp2>, <timestamp1>}
+ *   cached:
+ *     [<itemid>] {<timestamp1>, <timestamp2>, <timestamp3>....}
+ *
+ *  <request> can be one of following:
+ *    get_by_time(<itemid>, <type>, <seconds>, <end timestamp>)
+ *    get_by_count(<itemid>, <type>, <count>, <end timestamp>)
+ *    get_value(<itemid>, <type>, <timestamp>)
+ *    add_value(<itemid>, <type>, <timestamp>)
+ *    remove(<itemid>)
+ *    set_low_memory(<on|off>)
+ *    set_time(<seconds>)
+ *    addref(<itemid>)
+ *    release(<itemid>)
+ *
+ *  <itemid> - the item id
+ *  <timestampN> - item value with the specified timestamp
+ *  <type> - item type (FLOAT, STR, LOG, UINT64 or TEXT)
+ *  <seconds> - the requested data period in seconds
+ *  <count> - the number of requested values
+ *  <timestamp> - the value timestamp <seconds>.<nanoseconds>
+ *  <end timestamp> - the end timestamp of requested values
+ *
+ */
 
 /*
  * value cache test suite: get1
@@ -81,31 +117,182 @@ static void	cuvc_suite_get1_test_type(int value_type)
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100000, FLOAT, now, now)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2, 1004.7, 1004.5, 1004.2, 1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2,
+ *        1001.7, 1001.5, 1001.2}
+ *
+ *    cached:
+ *       [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get1_test1()
 {
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_FLOAT);
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, now, now)
+ *    returned:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *    cached:
+ *       [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get1_test2()
 {
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100002, LOG, now, now)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2, 1004.7, 1004.5, 1004.2, 1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2,
+ *        1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get1_test3()
 {
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_LOG);
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100003, UINT64, now, now)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2, 1004.7, 1004.5, 1004.2, 1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2,
+ *        1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get1_test4()
 {
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_UINT64);
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100004, TEXT, now, now)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2, 1004.7, 1004.5, 1004.2, 1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2,
+ *        1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *       [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get1_test5()
 {
 	cuvc_suite_get1_test_type(ITEM_VALUE_TYPE_TEXT);
 }
 
+/*
+ * database:
+ *   [100000] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100002] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100003] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *   [100004] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * remove(100000)
+ * remove(100001)
+ * remove(100002)
+ * remove(100003)
+ * remove(100004)
+ *    cached:
+ */
 static void	cuvc_suite_get1_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -137,6 +324,18 @@ static void	cuvc_suite_get1_cleanup()
  *
  */
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1004)
+ *    returned:
+ *       {1004.7, 1004.5, 1004.2}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get2_test1()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -173,6 +372,18 @@ static void	cuvc_suite_get2_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1002)
+ *    returned:
+ *       {1002.7, 1002.5, 1002.2}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get2_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -206,6 +417,18 @@ static void	cuvc_suite_get2_test2()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get2_test3()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -239,6 +462,18 @@ static void	cuvc_suite_get2_test3()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 2, 1003)
+ *    returned:
+ *       {1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get2_test4()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -272,6 +507,18 @@ static void	cuvc_suite_get2_test4()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 10, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ */
 static void	cuvc_suite_get2_test5()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -306,6 +553,18 @@ static void	cuvc_suite_get2_test5()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 10, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ */
 static void	cuvc_suite_get2_test6()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -340,6 +599,14 @@ static void	cuvc_suite_get2_test6()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *    cached:
+ */
 static void	cuvc_suite_get2_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -361,6 +628,19 @@ static void	cuvc_suite_get2_cleanup()
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by count based requests.
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 1, 1004)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
  */
 static void	cuvc_suite_get3_test1()
@@ -398,6 +678,18 @@ static void	cuvc_suite_get3_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 1, 1004)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get3_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -433,6 +725,18 @@ static void	cuvc_suite_get3_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 2, 1004)
+ *    returned:
+ *       {1004.7, 1004.5}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get3_test3()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -468,6 +772,19 @@ static void	cuvc_suite_get3_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 4, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get3_test4()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -487,7 +804,7 @@ static void	cuvc_suite_get3_test4()
 
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 3);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
-	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 3);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
@@ -506,6 +823,19 @@ static void	cuvc_suite_get3_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 4, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get3_test5()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -544,6 +874,15 @@ static void	cuvc_suite_get3_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get3_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -565,6 +904,19 @@ static void	cuvc_suite_get3_cleanup()
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by timestamp based requests.
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.9)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
  */
 static void	cuvc_suite_get4_test1()
@@ -606,6 +958,18 @@ static void	cuvc_suite_get4_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.9)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test2()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -645,6 +1009,18 @@ static void	cuvc_suite_get4_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.6)
+ *    returned:
+ *       {1004.5}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test3()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -684,6 +1060,18 @@ static void	cuvc_suite_get4_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.5)
+ *    returned:
+ *       {1004.5}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test4()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -723,6 +1111,18 @@ static void	cuvc_suite_get4_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.3)
+ *    returned:
+ *       {1004.2}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test5()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -762,7 +1162,18 @@ static void	cuvc_suite_get4_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.2)
+ *    returned:
+ *       {1004.2}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test6()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -802,6 +1213,18 @@ static void	cuvc_suite_get4_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1003.0)
+ *    returned:
+ *       {1002.7}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test7()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -841,6 +1264,18 @@ static void	cuvc_suite_get4_test7()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1002.7)
+ *    returned:
+ *       {1002.7}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test8()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -880,6 +1315,18 @@ static void	cuvc_suite_get4_test8()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1002.6)
+ *    returned:
+ *       {1002.5}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test9()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -920,6 +1367,19 @@ static void	cuvc_suite_get4_test9()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1001.0)
+ *    returned:
+ *       {}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get4_test10()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -954,6 +1414,15 @@ static void	cuvc_suite_get4_test10()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get4_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -976,6 +1445,19 @@ static void	cuvc_suite_get4_cleanup()
  *
  * This test suite checks if the data is being correctly cached and retrieved
  * by mixed request types.
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1005.6)
+ *    returned:
+ *       {1005.5}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
  *
  */
 static void	cuvc_suite_get5_test1()
@@ -1017,6 +1499,18 @@ static void	cuvc_suite_get5_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1005.1)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test2()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1055,6 +1549,18 @@ static void	cuvc_suite_get5_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1003)
+ *    returned:
+ *       {1003.7, 1003.5, 1003.2}
+ *    cached:
+ *       [100001] {1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test3()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1092,6 +1598,18 @@ static void	cuvc_suite_get5_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1003.0)
+ *    returned:
+ *       {1002.7}
+ *    cached:
+ *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test4()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1131,6 +1649,19 @@ static void	cuvc_suite_get5_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 1, 1001)
+ *    returned:
+ *       {1001.7}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test5()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1168,6 +1699,19 @@ static void	cuvc_suite_get5_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 4, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test6()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1206,6 +1750,19 @@ static void	cuvc_suite_get5_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 10, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ */
 static void	cuvc_suite_get5_test7()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1244,6 +1801,15 @@ static void	cuvc_suite_get5_test7()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get5_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -1266,6 +1832,17 @@ static void	cuvc_suite_get5_cleanup()
  *
  * This test suite checks if the data is being correctly retrieved
  * by all request types on empty history tables.
+ *
+ */
+
+/*
+ * database:
+ *
+ * get_by_time(100001, STR, 1, 10000000)
+ *    returned:
+ *       {}
+ *    cached:
+ *       [100001] {}
  *
  */
 static void	cuvc_suite_get6_test1()
@@ -1305,6 +1882,16 @@ static void	cuvc_suite_get6_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *
+ * get_by_count(100000, FLOAT, 1, 10000000)
+ *    returned:
+ *       {}
+ *    cached:
+ *       [100000] {}
+ *
+ */
 static void	cuvc_suite_get6_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1342,6 +1929,16 @@ static void	cuvc_suite_get6_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *
+ * get_value(100003, UINT64, 10000000.1)
+ *    returned:
+ *       {}
+ *    cached:
+ *       [100003] {}
+ *
+ */
 static void	cuvc_suite_get6_test3()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1375,6 +1972,15 @@ static void	cuvc_suite_get6_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *
+ * remove(100000)
+ * remove(100001)
+ * remove(100003)
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get6_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -1407,6 +2013,19 @@ static void	cuvc_suite_get6_cleanup()
  * This test suite checks if the data is being correctly retrieved
  * by all request types when the requested value type differs from
  * the cached value type (item value type has been changed).
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 3, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
  *
  */
 static void	cuvc_suite_get7_test1()
@@ -1444,6 +2063,17 @@ static void	cuvc_suite_get7_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, TEXT, 1, 1005)
+ *    returned:
+ *       {}
+ *
+ *    cached:
+ */
 static void	cuvc_suite_get7_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1475,6 +2105,32 @@ static void	cuvc_suite_get7_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 3, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ *  The cuvc_suite_get7_test1() test case is called again
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, TEXT, 1005.5)
+ *    returned:
+ *       {}
+ *
+ *    cached:
+ */
 static void	cuvc_suite_get7_test3()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1505,6 +2161,32 @@ static void	cuvc_suite_get7_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 3, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ *  The cuvc_suite_get7_test1() test case is called again
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, TEXT, 1, 1005)
+ *    returned:
+ *       {}
+ *
+ *    cached:
+ */
 static void	cuvc_suite_get7_test4()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1536,6 +2218,32 @@ static void	cuvc_suite_get7_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 3, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ *  The cuvc_suite_get7_test1() test case is called again
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7} (STR)
+ *   [100001] {1004.5} (TEXT)
+ *
+ * get_by_time(100001, TEXT, 1, 1004)
+ *    returned:
+ *       {1004.5}
+ *    cached:
+ */
 static void	cuvc_suite_get7_test5()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1572,6 +2280,18 @@ static void	cuvc_suite_get7_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7} (STR)
+ *   [100001] {1004.5} (TEXT)
+ *
+ * get_by_time(100001, TEXT, 1, 1004)
+ *   returned:
+ *     {1004.5}
+ *   cached:
+ *     [100001] {1004.5}
+ */
 static void	cuvc_suite_get7_test6()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1608,6 +2328,15 @@ static void	cuvc_suite_get7_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7} (STR)
+ *   [100001] {1004.5} (TEXT)
+ *
+ * remove(100001)
+ *   cached:
+ */
 static void	cuvc_suite_get7_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -1637,6 +2366,17 @@ static void	cuvc_suite_get7_cleanup()
  *
  */
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1004)
+ *    returned:
+ *       {1004.7, 1004.5, 1004.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get8_test1()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1668,6 +2408,17 @@ static void	cuvc_suite_get8_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1002)
+ *    returned:
+ *       {1002.7, 1002.5, 1002.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get8_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1695,6 +2446,17 @@ static void	cuvc_suite_get8_test2()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 1, 1005)
+ *    returned:
+ *       {1005.7, 1005.5, 1005.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get8_test3()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1722,6 +2484,17 @@ static void	cuvc_suite_get8_test3()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 2, 1003)
+ *    returned:
+ *       {1003.7, 1003.5, 1003.2, 1002.7, 1002.5, 1002.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get8_test4()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1749,6 +2522,17 @@ static void	cuvc_suite_get8_test4()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 10, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get8_test5()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1776,6 +2560,7 @@ static void	cuvc_suite_get8_test5()
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
 
+
 static void	cuvc_suite_get8_cleanup()
 {
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
@@ -1786,6 +2571,18 @@ static void	cuvc_suite_get8_cleanup()
  *
  * This test suite checks if the data is being correctly retrieved
  * (and not cached) by count based requests in low memory mode.
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 1, 1004)
+ *    returned:
+ *       {1004.7}
+ *    cached:
  *
  */
 static void	cuvc_suite_get9_test1()
@@ -1819,6 +2616,17 @@ static void	cuvc_suite_get9_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 2, 1004)
+ *    returned:
+ *       {1004.7, 1004.5}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get9_test2()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1850,6 +2658,17 @@ static void	cuvc_suite_get9_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_count(100001, STR, 4, 1001)
+ *    returned:
+ *       {1001.7, 1001.5, 1001.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get9_test3()
 {
 	cuvc_snapshot_t			s1, s2;
@@ -1869,7 +2688,7 @@ static void	cuvc_suite_get9_test3()
 
 	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 3);
 	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
-	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 2);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NULL_FATAL(item);
@@ -1891,6 +2710,18 @@ static void	cuvc_suite_get9_cleanup()
  *
  * This test suite checks if the data is being correctly retrieved
  * (and not cached) by timestamp based requests in low memory mode.
+ *
+ */
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.9)
+ *    returned:
+ *       {1004.7}
+ *    cached:
  *
  */
 static void	cuvc_suite_get10_test1()
@@ -1927,6 +2758,17 @@ static void	cuvc_suite_get10_test1()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.7)
+ *    returned:
+ *       {1004.7}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test2()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1961,6 +2803,17 @@ static void	cuvc_suite_get10_test2()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.6)
+ *    returned:
+ *       {1004.5}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test3()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -1995,6 +2848,17 @@ static void	cuvc_suite_get10_test3()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.5)
+ *    returned:
+ *       {1004.5}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test4()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2029,6 +2893,17 @@ static void	cuvc_suite_get10_test4()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.3)
+ *    returned:
+ *       {1004.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test5()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2063,7 +2938,17 @@ static void	cuvc_suite_get10_test5()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.2)
+ *    returned:
+ *       {1004.2}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test6()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2098,7 +2983,17 @@ static void	cuvc_suite_get10_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
-
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1003.0)
+ *    returned:
+ *       {1002.7}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test7()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2133,6 +3028,17 @@ static void	cuvc_suite_get10_test7()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1002.7)
+ *    returned:
+ *       {1002.7}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test8()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2167,6 +3073,17 @@ static void	cuvc_suite_get10_test8()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1002.6)
+ *    returned:
+ *       {1002.5}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test9()
 {
 	cuvc_snapshot_t		s1, s2;
@@ -2201,6 +3118,17 @@ static void	cuvc_suite_get10_test9()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1001.0)
+ *    returned:
+ *      {}
+ *    cached:
+ *
+ */
 static void	cuvc_suite_get10_test10()
 {
 	cuvc_snapshot_t		s1, s2;
