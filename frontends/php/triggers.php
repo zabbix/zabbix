@@ -93,10 +93,11 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-if (getRequest('triggerid')) {
+$triggerId = getRequest('triggerid');
+if ($triggerId) {
 	$triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['triggerid'],
-		'output' => array('triggerid'),
+		'output' => array(),
+		'triggerids' => $triggerId,
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
@@ -105,12 +106,14 @@ if (getRequest('triggerid')) {
 		access_deny();
 	}
 }
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable(array($hostId))) {
+
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
-$groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->get(array('groupids' => $groupId))) {
+
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
 	access_deny();
 }
 

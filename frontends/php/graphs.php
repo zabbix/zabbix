@@ -95,12 +95,13 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 /*
  * Permissions
  */
+$hostId = getRequest('hostid');
 if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (hasRequest('parent_discoveryid')) {
 		// check whether discovery rule is editable by user
 		$discoveryRule = API::DiscoveryRule()->get(array(
+			'output' => array('hostid', 'name'),
 			'itemids' => getRequest('parent_discoveryid'),
-			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$discoveryRule = reset($discoveryRule);
@@ -108,14 +109,13 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 			access_deny();
 		}
 
-		// sets corresponding hostid for later usage
-		$_REQUEST['hostid'] = $discoveryRule['hostid'];
+		$hostId = $discoveryRule['hostid'];
 
 		// check whether graph prototype is editable by user
 		if (hasRequest('graphid')) {
 			$graphPrototype = API::GraphPrototype()->get(array(
+				'output' => array(),
 				'graphids' => getRequest('graphid'),
-				'output' => array('graphid'),
 				'editable' => true
 			));
 			if (!$graphPrototype) {
@@ -126,7 +126,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	elseif (hasRequest('graphid')) {
 		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
-			'output' => array('graphid'),
+			'output' => array(),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => getRequest('graphid'),
 			'editable' => true
@@ -135,11 +135,11 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 			access_deny();
 		}
 	}
-	elseif (hasRequest('hostid')) {
+	elseif ($hostId) {
 		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid'),
-			'hostids' => getRequest('hostid'),
+			'hostids' => $hostId,
 			'templated_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
@@ -151,7 +151,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 }
 
 $groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->get(array('groupids' => $groupId, 'output' => array('groupid')))) {
+if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
 
@@ -255,7 +255,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$messageFailed = _('Cannot add graph');
 		}
 
-		$cookieId = getRequest('hostid');
+		$cookieId = $hostId;
 	}
 
 	if ($result) {
@@ -293,7 +293,7 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		$result = API::Graph()->delete(array($graphId));
 
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			uncheckTableRows($hostId);
 		}
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 	}
@@ -317,7 +317,7 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 		$result = API::Graph()->delete($graphIds);
 
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			uncheckTableRows($hostId);
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
@@ -367,7 +367,7 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 
 		if ($result) {
 			uncheckTableRows(
-				getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
+				getRequest('parent_discoveryid') == 0 ? $hostId : getRequest('parent_discoveryid')
 			);
 			unset($_REQUEST['group_graphid']);
 		}
@@ -391,16 +391,16 @@ $pageFilter = new CPageFilter(array(
 		'editable' => true,
 		'templated_hosts' => true
 	),
-	'groupid' => getRequest('groupid'),
-	'hostid' => getRequest('hostid')
+	'groupid' => $groupId,
+	'hostid' => $hostId
 ));
 
 if (empty($_REQUEST['parent_discoveryid'])) {
 	if ($pageFilter->groupid > 0) {
-		$_REQUEST['groupid'] = $pageFilter->groupid;
+		$groupId = $pageFilter->groupid;
 	}
 	if ($pageFilter->hostid > 0) {
-		$_REQUEST['hostid'] = $pageFilter->hostid;
+		$hostId = $pageFilter->hostid;
 	}
 }
 

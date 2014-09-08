@@ -147,13 +147,9 @@ $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 // permissions
-$discoveryRuleId = getRequest('parent_discoveryid', false);
-if (!$discoveryRuleId) {
-	access_deny();
-}
 $discoveryRule = API::DiscoveryRule()->get(array(
-	'itemids' => $_REQUEST['parent_discoveryid'],
-	'output' => API_OUTPUT_EXTEND,
+	'output' => array('hostid', 'name'),
+	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ));
 $discoveryRule = reset($discoveryRule);
@@ -164,8 +160,8 @@ if (!$discoveryRule) {
 $itemPrototypeId = getRequest('itemid');
 if ($itemPrototypeId) {
 	$itemPrototype = API::ItemPrototype()->get(array(
+		'output' => array(),
 		'itemids' => $itemPrototypeId,
-		'output' => array('itemid'),
 		'editable' => true,
 	));
 	if (!$itemPrototype) {
