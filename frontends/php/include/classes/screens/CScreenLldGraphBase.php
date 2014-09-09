@@ -137,8 +137,8 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	protected function getScreenItemTemplate($resourceType) {
 		return array(
 			'resourcetype' => $resourceType,
-			'rowspan' => $this->screenitem['rowspan'],
-			'colspan' => $this->screenitem['colspan'],
+			'rowspan' => 1,
+			'colspan' => 1,
 			'height' => $this->screenitem['height'],
 			'width' => $this->screenitem['width'],
 			'dynamic' => $this->screenitem['dynamic'],
