@@ -53,7 +53,10 @@
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
 
+/* Redefine the time function so unit tests can simulate time changes. */
+/* It should not be changed during normal processing.                  */
 static time_t (*vc_time)(time_t *) = time;
+#define ZBX_VC_TIME()	vc_time(NULL)
 
 static zbx_mem_info_t	*vc_mem = NULL;
 
@@ -162,8 +165,6 @@ typedef struct
 }
 zbx_vc_item_t;
 
-#define ZBX_VC_TIME()	vc_time(NULL)
-
 /* the value cache data  */
 typedef struct
 {
@@ -173,7 +174,7 @@ typedef struct
 	/* the number of cache misses, used for statistics */
 	zbx_uint64_t	misses;
 
-	/* the number of database queries performed */
+	/* the number of database queries performed, used only for unit tests */
 	zbx_uint64_t	db_queries;
 
 	/* the low memory mode flag */
