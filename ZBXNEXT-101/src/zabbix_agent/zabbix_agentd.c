@@ -199,30 +199,32 @@ char	*opt = NULL;
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
 	int	server_count = 0;
 
-	if (0 == server_num)
+	if (0 == local_server_num)
 	{
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_COLLECTOR;
+		*local_process_num = local_server_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_LISTENER;
+		*local_process_num = local_server_num - server_count + CONFIG_PASSIVE_FORKS;
 
 	}
-	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
+		*local_process_num = local_server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
 		return FAIL;
