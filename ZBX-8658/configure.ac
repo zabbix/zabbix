@@ -1100,7 +1100,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	dnl Checking for Oracle support
 	AX_LIB_ORACLE_OCI([10.0])
-	if test "x$WANT_ORACLE_OCI" = "xyes"; then
+	if test "x$want_oracle_oci" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
@@ -1147,7 +1147,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	dnl Checking for SQLite3 support
 	AX_LIB_SQLITE3()
-	if test "x$WANT_SQLITE3" = "xyes"; then
+	if test "x$want_sqlite3" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
