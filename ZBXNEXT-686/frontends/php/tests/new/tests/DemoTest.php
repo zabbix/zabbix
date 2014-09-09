@@ -2,17 +2,24 @@
 
 use Zabbix\Test\FileApiTestCase;
 
-class HostCreateTest extends FileApiTestCase {
+class DemoTest extends FileApiTestCase {
 
 	public function fileProvider() {
-		return array(
-			array('dev/syntax'),
-			array('dev/host.create'),
-			array('dev/host.create.invalid'),
-			array('dev/trigger.create'),
-			array('dev/hostUnlinkTemplateAndRemoveInterface'),
-			array('dev/templateLinkHttpTest')
+		$files = array(
+			'dev/syntax',
+			'dev/host.create',
+			'dev/host.create.invalid',
+			'dev/trigger.create',
+			'dev/hostUnlinkTemplateAndRemoveInterface',
+			'dev/templateLinkHttpTest'
 		);
+
+		$data = array();
+		foreach ($files as $file) {
+			$data[$file] = array($file);
+		}
+
+		return $data;
 	}
 
 	/**
