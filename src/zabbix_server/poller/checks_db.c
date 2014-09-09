@@ -120,6 +120,8 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 								column_names[i]);
 
 							zbx_json_addstring(&json, colname, row[i], ZBX_JSON_TYPE_STRING);
+
+							zbx_free(column_names[i]);
 						}
 
 						zbx_json_close(&json);
