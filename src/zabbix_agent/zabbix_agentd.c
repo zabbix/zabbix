@@ -246,7 +246,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char		ch = '\0';
-	int		opt_c = 0, opt_p = 0, opt_t = 0, ret = SUCCEED;
+	int		opt_c = 0, opt_p = 0, opt_t = 0, opt_r = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
 	unsigned int	opt_mask = 0;
@@ -266,6 +266,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
+				opt_r++;
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 				{
@@ -343,7 +344,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_p || 1 < opt_t)
+	if (1 < opt_c || 1 < opt_p || 1 < opt_t || 1 < opt_r)
 	{
 		if (1 < opt_c)
 			zbx_error("option \"-c\" or \"--config\" specified multiple times");
@@ -351,6 +352,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			zbx_error("option \"-p\" or \"--print\" specified multiple times");
 		if (1 < opt_t)
 			zbx_error("option \"-t\" or \"--test\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
 		ret = FAIL;
 		goto out;
@@ -429,9 +432,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 #else
 	/* check for mutually exclusive options */
-	if (1 < opt_p + opt_t)
+	if (1 < opt_p + opt_t + opt_r)
 	{
-		zbx_error("only one of options \"-p\", \"--print\", \"-t\" or \"--test\" can be used");
+		zbx_error("only one of options \"-p\", \"--print\", \"-t\", \"--test\", \"-R\" or \"--runtime-control\""
+				" can be used");
 		ret = FAIL;
 		goto out;
 	}
