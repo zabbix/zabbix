@@ -53,7 +53,8 @@ CDate.prototype = {
 	/**
 	* Formats date according given format. Uses server timezone.
 	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d', 'H:i:s', 'H:i',
-	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
+	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
+	*						Format 'd m Y H i' is also accepted but used internally for date input fields.
 	*
 	* @param format PHP style date format limited to supported formats
 	*
@@ -121,6 +122,9 @@ CDate.prototype = {
 				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'd. m. Y H:i':
 				return appZr(dt) + '. ' + appZr(mnth + 1) + '. ' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			// date format used for date input fields
+			case 'd m Y H i':
+				return appZr(dt) + ' ' + appZr(mnth + 1) + ' ' + yr + ' ' + appZr(hrs) + ' ' + appZr(mnts);
 			default:
 				// defaults to Y-m-d H:i:s
 				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
