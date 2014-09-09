@@ -1156,7 +1156,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_db="SQLite v3.x"
 
 			saved_CPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			saved_LDFLAGS="$LDFLAGS"
+
+			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_TRY_LINK([#include <sqlite3.h>],
@@ -1168,6 +1171,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 				AC_MSG_RESULT(no))
 
 			CPPFLAGS="$saved_CPPFLAGS"
+			LDFLAGS="$saved_LDFLAGS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1236,8 +1240,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
-		if test "x$unixodbc_error_msg" != "x"; then
-			AC_MSG_ERROR($unixodbc_error_msg)
+		if test "x$unixodbc_error" != "x"; then
+			AC_MSG_ERROR($unixodbc_error)
 		fi
 		have_unixodbc="yes"
 	fi
