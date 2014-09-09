@@ -56,7 +56,7 @@ static int	get_result_table_col_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t c
 	return ret;
 }
 
-static int db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*__function_name = "db_odbc_discovery";
 	int		ret = NOTSUPPORTED, failure = 0, i, j;
@@ -151,7 +151,7 @@ static int db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 	return ret;
 }
 
-static int db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*__function_name = "db_odbc_select";
 	int		ret = NOTSUPPORTED;
@@ -163,7 +163,7 @@ static int db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 	if (2 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		return ret;
+		goto out;
 	}
 
 	if (SUCCEED == odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
@@ -198,7 +198,7 @@ static int db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 	}
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -232,18 +232,17 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	init_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED == parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
-		return ret;
+		if (0 == strcmp(request.key, "db.odbc.select"))
+			ret = db_odbc_select(item, &request, result);
+		else if (0 == strcmp(request.key, "db.odbc.discovery"))
+			ret = db_odbc_discovery(item, &request, result);
+		else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 	}
-
-	if (0 == strcmp(request.key, "db.odbc.select"))
-		ret = db_odbc_select(item, &request, result);
-	else if (0 == strcmp(request.key, "db.odbc.discovery"))
-		ret = db_odbc_discovery(item, &request, result);
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
 
 	free_request(&request);
 
