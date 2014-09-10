@@ -286,7 +286,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 	}
 	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
+		*process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
 		*process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
 	}
 	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
