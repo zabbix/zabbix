@@ -248,30 +248,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
 				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
-							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-
-				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
-							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					zbx_error("invalid runtime control option: %s", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
