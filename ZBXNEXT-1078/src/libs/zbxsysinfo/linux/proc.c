@@ -206,8 +206,11 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	value = 0;
 	int		do_task, proccount = 0;
 	double		memsize = 0;
+	char		*memtype = NULL;
+	const char	*memtype_search;
+	size_t		memtype_search_len;
 
-	if (4 < request->nparam)
+	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -252,6 +255,40 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
+	memtype = get_rparam(request, 4);
+
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "VmSize"))
+		memtype_search = "VmSize:\t";
+	else if (0 == strcmp(memtype, "VmPeak"))
+		memtype_search = "VmPeak:\t";
+	else if (0 == strcmp(memtype, "VmLck"))
+		memtype_search = "VmLck:\t";
+	else if (0 == strcmp(memtype, "VmPin"))
+		memtype_search = "VmPin:\t";
+	else if (0 == strcmp(memtype, "VmHWM"))
+		memtype_search = "VmHWM:\t";
+	else if (0 == strcmp(memtype, "VmRSS"))
+		memtype_search = "VmRSS:\t";
+	else if (0 == strcmp(memtype, "VmData"))
+		memtype_search = "VmData:\t";
+	else if (0 == strcmp(memtype, "VmStk"))
+		memtype_search = "VmStk:\t";
+	else if (0 == strcmp(memtype, "VmExe"))
+		memtype_search = "VmExe:\t";
+	else if (0 == strcmp(memtype, "VmLib"))
+		memtype_search = "VmLib:\t";
+	else if (0 == strcmp(memtype, "VmPTE"))
+		memtype_search = "VmPTE:\t";
+	else if (0 == strcmp(memtype, "VmSwap"))
+		memtype_search = "VmSwap:\t";
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	memtype_search_len = strlen(memtype_search);
+
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
@@ -289,10 +326,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (NULL != fgets(tmp, sizeof(tmp), f_stat))
 		{
-			if (0 != strncmp(tmp, "VmSize:\t", 8))
+			if (0 != strncmp(tmp, memtype_search, memtype_search_len))
 				continue;
 
-			p = tmp + 8;
+			p = tmp + memtype_search_len;
 
 			if (NULL == (p1 = strrchr(p, ' ')))
 				continue;
