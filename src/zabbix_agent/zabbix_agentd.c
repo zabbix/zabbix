@@ -106,8 +106,6 @@ const char	*help_message[] = {
 	"  -c --config config-file               Absolute path to the configuration file",
 	"  -p --print                            Print known items and exit",
 	"  -t --test item-key                    Test specified item and exit",
-	"  -h --help                             Display this help message",
-	"  -V --version                          Display version number",
 #ifdef _WINDOWS
 	"",
 	"Functions:",
@@ -131,6 +129,9 @@ const char	*help_message[] = {
 	"        process-type                    All processes of specified type (e.g., listener)",
 	"        process-type,N                  Process type and number (e.g., listener,3)",
 #endif
+	"",
+	"  -h --help                             Display this help message",
+	"  -V --version                          Display version number",
 	"",
 	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
 	NULL	/* end of text */
