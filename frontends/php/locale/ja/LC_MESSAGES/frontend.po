@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:36+0300\n"
-"PO-Revision-Date: 2014-09-08 05:48+0300\n"
+"PO-Revision-Date: 2014-09-10 02:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410148137.0\n"
+"X-POOTLE-MTIME: 1410309239.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -8799,7 +8799,7 @@ msgstr "M"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:455
 msgid "MAC address - lists all MAC addresses with interface names by default"
-msgstr "MACアドレスのリスト - デフォルトではインターフェイス名を持つすべてのMACアドレスのリスト"
+msgstr "MACアドレスのリスト - デフォルトではインターフェース名を持つすべてのMACアドレスのリスト"
 
 #: include/hosts.inc.php:160 include/views/inventory.host.list.php:81
 msgid "MAC address A"
@@ -9769,7 +9769,7 @@ msgstr "SNMPコミュニティ名が設定されていません。"
 #: include/views/configuration.host.edit.php:362
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
-msgstr "SNMPイターフェースが設定されていません。"
+msgstr "SNMPインターフェースが設定されていません。"
 
 #: include/classes/api/services/CScreenItem.php:557
 msgid "No URL provided for screen element."
