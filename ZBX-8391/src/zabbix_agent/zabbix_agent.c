@@ -52,6 +52,7 @@ const char	*help_message[] = {
 	"  -c --config config-file  Absolute path to the configuration file",
 	"  -p --print               Print known items and exit",
 	"  -t --test item-key       Test specified item and exit",
+	"",
 	"  -h --help                Display this help message",
 	"  -V --version             Display version number",
 	NULL	/* end of text */
