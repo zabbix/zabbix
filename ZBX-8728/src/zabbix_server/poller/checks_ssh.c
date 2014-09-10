@@ -339,7 +339,7 @@ close:
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
-	int		ret;
+	int		ret = NOTSUPPORTED;
 	const char	*port, *encoding, *dns;
 
 	init_request(&request);
@@ -347,19 +347,19 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
 	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
 	if (4 < get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
 	if (NULL != (dns = get_rparam(&request, 1)) && '\0' != *dns)
@@ -373,7 +373,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 		if (FAIL == is_ushort(port, &item->interface.port))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			return NOTSUPPORTED;
+			goto out;
 		}
 	}
 	else
@@ -384,7 +384,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
 
 	free_request(&request);
-
+out:
 	return ret;
 }
 
