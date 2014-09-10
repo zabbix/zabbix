@@ -1,3 +1,7 @@
+Changes for 1.8.21
+
+1.8.21rc1 was released as 1.8.21 without any changes
+
 Changes for 1.8.21rc1
 
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
