@@ -363,4 +363,7 @@ class FileApiTestCase extends ApiTestCase {
 		}
 	}
 
+	protected function loadFixtures(array $fixtures) {
+		$this->getFixtureLoader()->load($fixtures);
+	}
 }

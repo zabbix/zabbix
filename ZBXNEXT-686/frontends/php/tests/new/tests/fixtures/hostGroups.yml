@@ -1,5 +1,8 @@
-hostgroups:
-  require: []
-  rows:
-    groups:
-      - { groupid: 1, name: "Zabbix servers" }
+fixtures:
+  hostgroup:
+    type: api
+    params:
+      method: hostgroup.create
+      params:
+        groupid: 1
+        name: "Zabbix servers"

@@ -1,50 +1,52 @@
-base_host_items:
-  require: []
-  rows:
-    items:
-      -
-        itemid: 1
-        type: 0
-        snmp_community: ""
-        snmp_oid: ""
-        hostid: 1`
-        name: "Available memory"
-        key_: "vm.memory.size[available]"
-        delay: 60
-        history: 7
-        trends: 365
-        status: 0
-        value_type: 3
-        trapper_hosts: ""
-        units: "B"
-        multiplier: 0
-        delta: 0
-        snmpv3_securityname: ""
-        snmpv3_securitylevel: 0
-        snmpv3_authpassphrase: ""
-        snmpv3_privpassphrase: ""
-        formula: 1
-        error: ""
-        lastlogsize: 0
-        logtimefmt: ""
-        delay_flex: ""
-        params: ""
-        ipmi_sensor: ""
-        data_type: 0
-        authtype: 0
-        username: ""
-        password: ""
-        publickey: ""
-        privatekey: ""
-        mtime: 0
-        flags: 0
-        interfaceid: 1
-        port: ""
-        description: "Available memory is defined as free+cached+buffers memory."
-        inventory_link: 0
-        lifetime: 30
-        snmpv3_authprotocol: 0
-        snmpv3_privprotocol: 0
-        state: 0
-        snmpv3_contextname: ""
-        evaltype: 0
+fixtures:
+  item:
+    type: data
+    params:
+      table: items
+      values:
+        -
+          itemid: 1
+          type: 0
+          snmp_community: ""
+          snmp_oid: ""
+          hostid: 1
+          name: "Available memory"
+          key_: "vm.memory.size[available]"
+          delay: 60
+          history: 7
+          trends: 365
+          status: 0
+          value_type: 3
+          trapper_hosts: ""
+          units: "B"
+          multiplier: 0
+          delta: 0
+          snmpv3_securityname: ""
+          snmpv3_securitylevel: 0
+          snmpv3_authpassphrase: ""
+          snmpv3_privpassphrase: ""
+          formula: 1
+          error: ""
+          lastlogsize: 0
+          logtimefmt: ""
+          delay_flex: ""
+          params: ""
+          ipmi_sensor: ""
+          data_type: 0
+          authtype: 0
+          username: ""
+          password: ""
+          publickey: ""
+          privatekey: ""
+          mtime: 0
+          flags: 0
+          interfaceid: 1
+          port: ""
+          description: "Available memory is defined as free+cached+buffers memory."
+          inventory_link: 0
+          lifetime: 30
+          snmpv3_authprotocol: 0
+          snmpv3_privprotocol: 0
+          state: 0
+          snmpv3_contextname: ""
+          evaltype: 0

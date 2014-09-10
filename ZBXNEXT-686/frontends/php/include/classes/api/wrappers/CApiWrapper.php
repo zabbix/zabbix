@@ -25,13 +25,6 @@
 class CApiWrapper {
 
 	/**
-	 * Currently used API.
-	 *
-	 * @var string
-	 */
-	public $api;
-
-	/**
 	 * Authentication token.
 	 *
 	 * @var string
@@ -71,38 +64,31 @@ class CApiWrapper {
 	}
 
 	/**
-	 * A magic method for calling the public methods of the API client.
-	 *
-	 * @param string 	$method		API method name
-	 * @param array 	$params		API method parameters
-	 *
-	 * @return CApiClientResponse
-	 */
-	public function __call($method, array $params) {
-		return $this->callMethod($method, reset($params));
-	}
-
-	/**
 	 * Pre-process and call the client method.
 	 *
+	 * @param string    $api        API name
 	 * @param string 	$method		API method name
 	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callMethod($method, array $params) {
-		return $this->callClientMethod($method, $params);
+	public function callMethod($api, $method, array $params) {
+		$auth = ($this->requiresAuthentication($api, $method)) ? $this->auth : null;
+
+		return $this->client->callMethod($api, $method, $params, $auth);
 	}
 
 	/**
-	 * Call the client method and return the result.
+	 * Returns true if calling the given method requires an authentication token.
 	 *
-	 * @param string 	$method		API method name
-	 * @param array 	$params		API method parameters
+	 * @param $api
+	 * @param $method
 	 *
-	 * @return CApiClientResponse
+	 * @return bool
 	 */
-	protected function callClientMethod($method, array $params) {
-		return $this->client->callMethod($this->api, $method, $params, $this->auth);
+	protected function requiresAuthentication($api, $method) {
+		return !(($api === 'user' && $method === 'login')
+			|| ($api === 'user' && $method === 'checkAuthentication')
+			|| ($api === 'apiinfo' && $method === 'version'));
 	}
 }

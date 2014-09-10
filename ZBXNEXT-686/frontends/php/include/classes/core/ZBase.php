@@ -25,6 +25,7 @@ class ZBase {
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
 	const EXEC_MODE_API = 'api';
+	const EXEC_MODE_COMMAND = 'command';
 
 	/**
 	 * An instance of the current Z object.
@@ -126,11 +127,10 @@ class ZBase {
 	public function run($mode = self::EXEC_MODE_DEFAULT) {
 		$this->init();
 
-		$this->setMaintenanceMode();
-		$this->setErrorHandler();
-
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+				$this->setMaintenanceMode();
+				$this->setErrorHandler();
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->authenticateUser();
@@ -138,12 +138,16 @@ class ZBase {
 				break;
 
 			case self::EXEC_MODE_API:
+				$this->setMaintenanceMode();
+				$this->setErrorHandler();
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->initLocales();
 				break;
 
 			case self::EXEC_MODE_SETUP:
+				$this->setMaintenanceMode();
+				$this->setErrorHandler();
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
@@ -153,6 +157,11 @@ class ZBase {
 					DBclose();
 				}
 				catch (ConfigFileException $e) {}
+				break;
+
+			case self::EXEC_MODE_COMMAND:
+				$this->loadConfigFile();
+				$this->initDB();
 				break;
 		}
 	}
@@ -384,7 +393,7 @@ class ZBase {
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionId;
+		API::getWrapper()->setAuth($sessionId);
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();

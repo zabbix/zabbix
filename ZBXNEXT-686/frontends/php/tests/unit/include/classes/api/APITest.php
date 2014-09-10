@@ -46,10 +46,10 @@ class CAPITest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetGetApiWrapper() {
 		$client = new CLocalApiClient();
-		API::setWrapper(new CApiWrapper($client));
+		API::setWrapper(new CFrontendApiWrapper($client));
 
 		$item = API::getApi('item');
-		$this->assertEquals(get_class($item), 'CApiWrapper');
+		$this->assertEquals(get_class($item), 'CFrontendApiWrapper');
 		$this->assertEquals($item->api, 'item');
 	}
 }

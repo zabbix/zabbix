@@ -1,8 +1,10 @@
-app:
-  require: []
-  rows:
-    applications:
-      -
-        applicationid: 1000
-        hostid: 1000
-        name: App
+fixtures:
+  application:
+    type: data
+    params:
+      table: applications
+      values:
+        -
+          applicationid: 1000
+          hostid: 1000
+          name: App

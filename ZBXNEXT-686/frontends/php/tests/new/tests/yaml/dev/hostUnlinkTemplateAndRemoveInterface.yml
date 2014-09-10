@@ -1,6 +1,30 @@
 # https://support.zabbix.com/browse/ZBX-8530
 
-fixtures: [users, hostGroups, hosts, hostItems, templates]
+fixtures:
+  users:
+    type: include
+    params:
+      file: users
+
+  hostGroups:
+    type: include
+    params:
+      file: hostGroups
+
+  hosts:
+    type: include
+    params:
+      file: hosts
+
+  hostItems:
+    type: include
+    params:
+      file: hostItems
+
+  templates:
+    type: include
+    params:
+      file: templates
 
 steps:
   # link the template to the host

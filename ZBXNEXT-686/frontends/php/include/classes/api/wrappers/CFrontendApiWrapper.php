@@ -25,6 +25,13 @@
 class CFrontendApiWrapper extends CApiWrapper {
 
 	/**
+	 * Currently used API.
+	 *
+	 * @var string
+	 */
+	public $api;
+
+	/**
 	 * Whether to enable debug mode.
 	 *
 	 * @var bool
@@ -48,19 +55,32 @@ class CFrontendApiWrapper extends CApiWrapper {
 	}
 
 	/**
+	 * A magic method for calling the public methods of the API client.
+	 *
+	 * @param string 	$method		API method name
+	 * @param array 	$params		API method parameters
+	 *
+	 * @return CApiClientResponse
+	 */
+	public function __call($method, array $params) {
+		return $this->callMethod($this->api, $method, reset($params));
+	}
+
+	/**
 	 * Call the API method with profiling.
 	 *
 	 * If the API call has been unsuccessful - return only the result value.
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
 	 *
+	 * @param string    $api
 	 * @param string 	$method
 	 * @param array 	$params
 	 *
 	 * @return mixed
 	 */
-	protected function callMethod($method, array $params) {
+	public function callMethod($api, $method, array $params) {
 		API::setWrapper();
-		$response = parent::callMethod($method, $params);
+		$response = parent::callMethod($api, $method, $params);
 		API::setWrapper($this);
 
 		// call profiling
@@ -81,28 +101,5 @@ class CFrontendApiWrapper extends CApiWrapper {
 
 			return false;
 		}
-	}
-
-	/**
-	 * Call the client method. Pass the "auth" parameter only to the methods that require it.
-	 */
-	protected function callClientMethod($method, array $params) {
-		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
-
-		return $this->client->callMethod($this->api, $method, $params, $auth);
-	}
-
-	/**
-	 * Returns true if calling the given method requires an authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
-		return !(($api === 'user' && $method === 'login')
-			|| ($api === 'user' && $method === 'checkAuthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
 	}
 }

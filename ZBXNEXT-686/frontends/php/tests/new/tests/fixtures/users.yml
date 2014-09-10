@@ -1,10 +1,23 @@
-base_groups:
-    require: []
-    rows:
-        usrgrp:
-            admins: { usrgrpid: 1, name: 'Zabbix administrators', gui_access: 0, users_status: 0, debug_mode: 0 }
-base_users:
-    require: []
-    rows:
-        users:
-            admin: { userid: 1, alias: Admin, passwd: 5fce1b3e34b520afeffb37ce08c7cd66, type: 3 }
+fixtures:
+  group:
+    type: data
+    params:
+      table: usrgrp
+      values:
+        -
+          usrgrpid: 1
+          name: 'Zabbix administrators'
+          gui_access: 0
+          users_status: 0
+          debug_mode: 0
+
+  users:
+    type: data
+    params:
+      table: users
+      values:
+        -
+          userid: 1
+          alias: Admin
+          passwd: 5fce1b3e34b520afeffb37ce08c7cd66
+          type: 3

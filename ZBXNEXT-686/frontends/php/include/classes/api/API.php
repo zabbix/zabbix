@@ -24,7 +24,7 @@ class API {
 	/**
 	 * API wrapper that all of the calls will go through.
 	 *
-	 * @var CApiWrapper
+	 * @var CFrontendApiWrapper
 	 */
 	private static $wrapper;
 
@@ -38,9 +38,9 @@ class API {
 	/**
 	 * Sets the API wrapper.
 	 *
-	 * @param CApiWrapper $wrapper
+	 * @param CFrontendApiWrapper $wrapper
 	 */
-	public static function setWrapper(CApiWrapper $wrapper = null) {
+	public static function setWrapper(CFrontendApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
 	}
 
@@ -56,7 +56,7 @@ class API {
 	/**
 	 * Returns the API wrapper.
 	 *
-	 * @return CApiWrapper
+	 * @return CFrontendApiWrapper
 	 */
 	public static function getWrapper() {
 		return self::$wrapper;

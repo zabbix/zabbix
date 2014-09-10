@@ -27,7 +27,7 @@ class DemoTest extends FileApiTestCase {
 	 */
 	public function testFile($file) {
 		$test = $this->parseTestFile($file);
-		$this->database->loadFixtures($test['fixtures']);
+		$this->loadFixtures($test['fixtures']);
 		$this->runSteps($test['steps']);
 	}
 

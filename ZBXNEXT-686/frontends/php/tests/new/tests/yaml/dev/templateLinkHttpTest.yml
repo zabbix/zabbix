@@ -1,6 +1,35 @@
 # https://support.zabbix.com/browse/ZBX-8603
 
-fixtures: [users, hostGroups, hosts, templates, templateApplications, templateHttpTests]
+fixtures:
+  users:
+    type: include
+    params:
+      file: users
+
+  hostGroups:
+    type: include
+    params:
+      file: hostGroups
+
+  hosts:
+    type: include
+    params:
+      file: hosts
+
+  templates:
+    type: include
+    params:
+      file: templates
+
+  templateApplications:
+    type: include
+    params:
+      file: templateApplications
+
+  templateHttpTests:
+    type: include
+    params:
+      file: templateHttpTests
 
 steps:
   step1:

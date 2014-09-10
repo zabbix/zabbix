@@ -1,5 +1,15 @@
 # fixture files to load for this test case
-fixtures: [users, hostGroups]
+
+fixtures:
+  users:
+    type: include
+    params:
+      file: users
+
+  hostGroups:
+    type: include
+    params:
+      file: hostGroups
 
 # an array of steps that will be executed one-by-one
 steps:

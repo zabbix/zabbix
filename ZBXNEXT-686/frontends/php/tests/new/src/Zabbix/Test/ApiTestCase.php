@@ -4,6 +4,8 @@ namespace Zabbix\Test;
 
 use Zabbix\Test\APIGateway\APIGatewayInterface;
 use Zabbix\Test\APIGateway\FileAPIGateway;
+use Zabbix\Test\Fixtures\FixtureFactory;
+use Zabbix\Test\Fixtures\FixtureLoader;
 
 class ApiTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -27,6 +29,16 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	protected $database;
 
 	/**
+	 * @var APIGateway\FileAPIGateway
+	 */
+	private $gateway;
+
+	/**
+	 * @var FixtureLoader
+	 */
+	private $fixtureLoader;
+
+	/**
 	 * Current settings file name
 	 *
 	 * @var string
@@ -43,29 +55,31 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	public function __construct($name = null, array $data = array(), $dataName = '') {
 		parent::__construct($name, $data, $dataName);
 
-		$configFile = new \CConfigFile(__DIR__.'/../../../../../conf/zabbix.conf.php');
-		$config = $configFile->load();
+		// TODO: move all of this to setUpBeforeClass()
 
-		$this->pdo = new \PDO('mysql:host='.$config['DB']['SERVER'].';dbname='.$config['DB']['DATABASE'], $config['DB']['USER'],
-			$config['DB']['PASSWORD']
+		$this->database = new TestDatabase();
+
+		// TODO: use an API client instead of the gateway
+		$this->gateway = new FileAPIGateway();
+		// TODO: make the user name and password configurable
+		$this->gateway->configure($this->gatewayConfiguration, array(
+			'username' => 'Admin',
+			'password' => 'zabbix'
+		));
+
+		$client = new \CLocalApiClient();
+		$client->setServiceFactory(new \CApiServiceFactory());
+
+		$this->fixtureLoader = new FixtureLoader(
+			new FixtureFactory(new \CApiWrapper($client))
 		);
-		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-		$this->database = new TestDatabase($this->getPdo());
 	}
 
 	/**
 	 * @return APIGatewayInterface
 	 */
 	protected function getGateway() {
-		$gateway = new FileAPIGateway();
-		// TODO: make the user name and password configurable
-		$gateway->configure($this->gatewayConfiguration, array(
-			'username' => 'Admin',
-			'password' => 'zabbix'
-		));
-
-		return $gateway;
+		return $this->gateway;
 	}
 
 	protected function tearDown() {
@@ -77,6 +91,13 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function getPdo() {
 		return $this->pdo;
+	}
+
+	/**
+	 * @return FixtureLoader
+	 */
+	protected function getFixtureLoader() {
+		return $this->fixtureLoader;
 	}
 
 }

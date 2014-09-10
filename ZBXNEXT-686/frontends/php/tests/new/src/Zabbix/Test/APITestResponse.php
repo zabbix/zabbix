@@ -23,8 +23,12 @@ class APITestResponse {
 	protected $id;
 
 	public function __construct(array $contents) {
-		$this->result = $contents['result'];
-		$this->error = $contents['error'];
+		if (isset($contents['result'])) {
+			$this->result = $contents['result'];
+		}
+		if (isset($contents['error'])) {
+			$this->error = $contents['error'];
+		}
 		$this->id = $contents['id'];
 	}
 

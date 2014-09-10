@@ -64,7 +64,7 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 			);
 		}
 
-		$this->authKey = $result->getResult()['result'];
+		$this->authKey = $result->getResult();
 
 		return $this->authKey;
 	}
@@ -92,6 +92,10 @@ abstract class BaseAPIGateway implements APIGatewayInterface {
 	public function getPassword()
 	{
 		return $this->password;
+	}
+
+	public function getAuthKey() {
+		return $this->authKey;
 	}
 
 

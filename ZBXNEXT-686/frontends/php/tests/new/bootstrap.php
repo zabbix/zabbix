@@ -4,14 +4,15 @@
 define('ZABBIX_NEW_TEST_DIR', __DIR__);
 require __DIR__.'/vendor/autoload.php';
 
-require_once __DIR__.'/../../include/defines.inc.php';
-require_once __DIR__.'/../../include/func.inc.php';
-
 // register autoloader
-require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
+require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
 
-$autoloader = new CAutoloader(array(
-	__DIR__.'/../../include/classes/core',
-	__DIR__.'/../../include/classes/db',
-));
-$autoloader->register();
+// mock some of the environment variables to avoid undefined index errors
+// TODO: get rid of these mocks
+$_SERVER['REMOTE_ADDR'] = '';
+$_SERVER['SERVER_SOFTWARE'] = '';
+
+// start a whole zabbix instance so whe can run test with API fixtures
+// TODO: check if there's a better way to do that
+Z::getInstance()->run(ZBase::EXEC_MODE_COMMAND);
+

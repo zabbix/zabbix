@@ -2,29 +2,21 @@
 
 namespace Zabbix\Test;
 
-use Symfony\Component\Yaml\Yaml;
-
 class TestDatabase {
-
-	protected $pdo;
-
-	public function __construct(\PDO $pdo) {
-		$this->pdo = $pdo;
-	}
 
 	public function clear() {
 		try {
-			$this->pdo->beginTransaction();
+			DBstart();
 
 			// TODO: clear the database in the correct order
 			foreach ($this->getTablesToClear() as $tableName) {
-				$this->pdo->query('DELETE FROM '.$tableName);
+				DBexecute('DELETE FROM '.$tableName);
 			}
 
-			$this->pdo->commit();
+			DBend();
 		}
 		catch (\Exception $e) {
-			$this->pdo->rollBack();
+			DBend(false);
 
 			throw $e;
 		}
@@ -46,74 +38,6 @@ class TestDatabase {
 		array_unshift($tables, 'httptest');
 
 		return $tables;
-	}
-
-	public function loadFixtures(array $files, $loaded = array()) {
-		try {
-			$this->pdo->beginTransaction();
-
-			foreach ($files as $file) {
-				$this->loadFixture($file);
-			}
-
-			$this->pdo->commit();
-		}
-		catch (\Exception $e) {
-			$this->pdo->rollBack();
-
-			throw $e;
-		}
-	}
-
-	protected function loadFixture($file, array $loaded = array()) {
-		if (in_array($file, $loaded)) {
-			return;
-		}
-
-		$path = __DIR__ . '/../../../tests/fixtures/'.$file.'.yml';
-
-		if (!is_readable($path)) {
-			throw new \Exception(sprintf('Can not find fixture file "%s" (expected location "%s")', $file, $path));
-		}
-
-		$fixtures = Yaml::parse(file_get_contents($path));
-
-		// todo: validate here
-
-		foreach ($fixtures as $set => $data) {
-			foreach ($data['require'] as $fixture) {
-				$this->loadFixture($fixture, $loaded);
-			}
-
-			foreach ($data['rows'] as $table => $rows) {
-				foreach ($rows as $i => $fields) {
-					try {
-						$this->insertFixture($table, $fields);
-					}
-					catch (\Exception $e) {
-						throw new \Exception(sprintf(
-							'Cannot load fixture "%1$s" set "%2$s" table "%3$s" row "%4$s": ""%5$s""',
-							$file, $set, $table, $i, $e->getMessage()
-						));
-					}
-				}
-			}
-
-			$loaded[] = $file;
-		}
-	}
-
-	protected function insertFixture($table, $fields) {
-		$query = 'INSERT INTO '.$table.' (';
-		$query .= implode(', ', array_keys($fields));
-		$query .= ') VALUES (';
-		$query .= implode(', ', array_map(function ($value) {
-			return ':'.$value;
-		}, array_keys($fields)));
-		$query .= ')';
-
-		$query = $this->pdo->prepare($query);
-		$query->execute($fields);
 	}
 
 }

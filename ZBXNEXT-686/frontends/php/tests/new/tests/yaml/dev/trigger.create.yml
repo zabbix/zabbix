@@ -1,5 +1,23 @@
+fixtures:
+  users:
+    type: include
+    params:
+      file: users
 
-fixtures: [users, hostGroups, hosts, hostItems]
+  hostGroups:
+    type: include
+    params:
+      file: hostGroups
+
+  hosts:
+    type: include
+    params:
+      file: hosts
+
+  hostItems:
+    type: include
+    params:
+      file: hostItems
 
 steps:
 
