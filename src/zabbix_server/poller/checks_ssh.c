@@ -23,6 +23,7 @@
 
 #include "comms.h"
 #include "log.h"
+#include "module.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 
@@ -264,8 +265,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			if (0 < (rc = libssh2_channel_read(channel, buf, sizeof(buf))))
 			{
 				sz = (size_t)rc;
-				if (sz > MAX_BUFFER_LEN - (bytecount + 1))
-					sz = MAX_BUFFER_LEN - (bytecount + 1);
+				if (sz > (size_t)(MAX_BUFFER_LEN - (bytecount + 1)))
+					sz =  (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
 				if (0 == sz)
 					continue;
 
@@ -337,43 +338,38 @@ close:
 
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
-	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], dns[INTERFACE_DNS_LEN_MAX],
-		port[8], encoding[32];
+	AGENT_REQUEST	request;
+	int		ret;
+	const char	*port, *encoding, *dns;
 
-	if (ZBX_COMMAND_ERROR == parse_command(item->key, cmd, sizeof(cmd), params, sizeof(params)))
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		return NOTSUPPORTED;
 	}
 
-	if (0 != strcmp(SSH_RUN_KEY, cmd))
+
+	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		return NOTSUPPORTED;
 	}
 
-	if (4 < num_param(params))
+	if (4 < get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 2, dns, sizeof(dns)))
-		*dns = '\0';
-
-	if ('\0' != *dns)
+	if (NULL != (dns = get_rparam(&request, 1)) && '\0' != *dns)
 	{
 		strscpy(item->interface.dns_orig, dns);
 		item->interface.addr = item->interface.dns_orig;
 	}
 
-	if (0 != get_param(params, 3, port, sizeof(port)))
-		*port = '\0';
-
-	if (0 != get_param(params, 4, encoding, sizeof(encoding)))
-		*encoding = '\0';
-
-	if ('\0' != *port)
+	if (NULL != (port = get_rparam(&request, 2)) && '\0' != *port)
 	{
 		if (FAIL == is_ushort(port, &item->interface.port))
 		{
@@ -384,7 +380,13 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	else
 		item->interface.port = ZBX_DEFAULT_SSH_PORT;
 
-	return ssh_run(item, result, encoding);
+	encoding = get_rparam(&request, 3);
+
+	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
+
+	free_request(&request);
+
+	return ret;
 }
 
 #endif	/* HAVE_SSH2 */
