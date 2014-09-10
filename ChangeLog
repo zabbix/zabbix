@@ -1,5 +1,8 @@
 Changes for 2.4.0rc3
 
+New features:
+A.F....... [ZBX-1357] updated Polish and Russian translations; thanks to Zabbix translators (Richlv)
+
 Bug fixes:
 ........S. [ZBX-8734] fixed IPMI pollers not starting properly on the server (asaveljevs)
 
