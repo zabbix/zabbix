@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:32+0300\n"
-"PO-Revision-Date: 2014-06-05 14:47+0300\n"
+"PO-Revision-Date: 2014-09-09 14:59+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401972461.0\n"
+"X-POOTLE-MTIME: 1410267589.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -57,9 +57,9 @@ msgstr "%1$s (год %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s ЭЛЕМЕНТ ДАННЫХ"
+msgstr[1] "%1$s ЭЛЕМЕНТА ДАННЫХ"
+msgstr[2] "%1$s ЭЛЕМЕНТОВ ДАННЫХ"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -847,7 +847,7 @@ msgstr "Должен быть создан по крайней мере один
 
 #: include/classes/setup/CFrontendSetup.php:228
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "Должная поддерживаться по крайней мере одна из MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2."
 
 #: include/menu.inc.php:255
 #: include/views/administration.general.housekeeper.edit.php:100
@@ -856,18 +856,18 @@ msgstr "Аудит"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Период хранения данных аудита"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Период хранения данных аудита (в днях) \"%1$s\"."
 
 #: auditlogs.php:27 include/views/administration.auditacts.list.php:28
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Audit log"
-msgstr ""
+msgstr "Журнал аудита"
 
 #: include/func.inc.php:244
 msgid "Aug"
@@ -937,16 +937,16 @@ msgstr "Авто-выход (мин 90 секунд)"
 
 #: include/views/administration.general.housekeeper.edit.php:57
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Период хранения данных авторегистрации (в днях)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "Период хранения данных о событиях и оповещениях о авторегистрациях"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Период хранения данных о событиях и оповещениях о авторегистрациях (в днях) \"%1$s\"."
 
 #: include/views/configuration.host.edit.php:820
 #: include/views/configuration.host.massupdate.php:284
@@ -1029,7 +1029,7 @@ msgstr "База для поиска (BaseDN)"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Простая"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
@@ -1147,7 +1147,7 @@ msgstr "НАСТРОЙКА УЗЛОВ СЕТИ"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "НАСТРОЙКА ОЧИСТКИ ИСТОРИИ"
 
 #: adm.iconmapping.php:131
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1385,7 +1385,7 @@ msgstr "Не удалось добавить график"
 
 #: graphs.php:237
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Не удалось добавить прототип графика"
 
 #: hostgroups.php:121 usergrps.php:196
 msgid "Cannot add group"
@@ -1394,7 +1394,7 @@ msgstr "Не удалось добавить группу"
 #: include/classes/api/services/CTemplate.php:379
 #: include/classes/api/services/CTemplate.php:830
 msgid "Cannot add group."
-msgstr ""
+msgstr "Не удалось добавить группу."
 
 #: hosts.php:394
 msgid "Cannot add host"
@@ -1423,7 +1423,7 @@ msgstr "Не удалось добавить элемент данных \"%1$s\
 
 #: disc_prototypes.php:302
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Не удалось добавить прототип элементов данных"
 
 #: include/classes/api/services/CApplication.php:580
 msgid "Cannot add items."
@@ -1494,7 +1494,7 @@ msgstr "Не удалось добавить триггер"
 
 #: trigger_prototypes.php:172
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Не удалось добавить прототипа триггеров"
 
 #: users.php:249
 msgid "Cannot add user"
@@ -1518,7 +1518,7 @@ msgstr "Не удалось добавить веб-сценарий"
 
 #: authentication.php:136
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Не удалось изменить аутентификацию"
 
 #: authentication.php:183
 msgid "Cannot change authentication method to HTTP"
@@ -1619,7 +1619,7 @@ msgstr "Не удалось создать новый элемент"
 
 #: include/classes/api/services/CTemplate.php:393
 msgid "Cannot create template."
-msgstr ""
+msgstr "Не удалось создать шаблон."
 
 #: include/classes/api/services/CUser.php:1317
 #, c-format
@@ -1631,12 +1631,11 @@ msgid "Cannot delete action"
 msgstr "Не удалось удалить действие"
 
 #: applications.php:168 applications.php:209
-#, fuzzy
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
-msgstr[0] "Невозможно удалить группу элементов данных"
-msgstr[1] "Невозможно удалить группу элементов данных"
-msgstr[2] "Невозможно удалить группу элементов данных"
+msgstr[0] "Не удалось удалить группу элементов данных"
+msgstr[1] "Не удалось удалить группу элементов данных"
+msgstr[2] "Не удалось удалить группу элементов данных"
 
 #: include/classes/api/services/CTrigger.php:1035
 msgid "Cannot delete dependency"
@@ -1661,7 +1660,7 @@ msgstr "Не удалось удалить прототип графика"
 
 #: graphs.php:314
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "Не удалось удалить прототипы графиков"
 
 #: graphs.php:322
 msgid "Cannot delete graphs"
@@ -1672,12 +1671,11 @@ msgid "Cannot delete graphs created by low level discovery."
 msgstr "Невозможно удалить графики созданные низкоуровневым обнаружением."
 
 #: hostgroups.php:171 hostgroups.php:193 usergrps.php:229 usergrps.php:260
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Не удалось удалить группу"
-msgstr[1] "Не удалось удалить группу"
-msgstr[2] "Не удалось удалить группу"
+msgstr[1] "Не удалось удалить группы"
+msgstr[2] "Не удалось удалить группы"
 
 #: hosts.php:632 hosts.php:645
 msgid "Cannot delete host"
@@ -1713,11 +1711,11 @@ msgstr "Не удалось удалить элемент данных"
 
 #: disc_prototypes.php:203
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "Не удалось удалить прототип элементов данных"
 
 #: disc_prototypes.php:343
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "Не удалось удалить прототипы элементов данных"
 
 #: items.php:806
 msgid "Cannot delete items"
@@ -1830,7 +1828,7 @@ msgstr "Не удалось удалить прототип триггера"
 
 #: trigger_prototypes.php:263
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "Не удалось удалить прототипы триггеров"
 
 #: triggers.php:332
 msgid "Cannot delete triggers"
@@ -1855,88 +1853,86 @@ msgstr "Не удалось удалить веб-сценарий"
 #: actionconf.php:363
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать действие"
+msgstr[1] "Не удалось деактивировать действия"
+msgstr[2] "Не удалось деактивировать действия"
 
 #: discoveryconf.php:206
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать правило обнаружения"
+msgstr[1] "Не удалось деактивировать правила обнаружения"
+msgstr[2] "Не удалось деактивировать правила обнаружения"
 
 #: host_discovery.php:323
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать правила обнаружения"
+msgstr[1] "Не удалось деактивировать правила обнаружения"
+msgstr[2] "Не удалось деактивировать правила обнаружения"
 
 #: hostgroups.php:243 hosts.php:676 proxies.php:192
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать узел сети"
+msgstr[1] "Не удалось деактивировать узлы сети"
+msgstr[2] "Не удалось деактивировать узлы сети"
 
 #: host_prototypes.php:243
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать прототип узлов сети"
+msgstr[1] "Не удалось деактивировать прототипы узлов сети"
+msgstr[2] "Не удалось деактивировать прототипы узлов сети"
 
 #: applications.php:249 items.php:714
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать элемент данных"
+msgstr[1] "Не удалось деактивировать элементы данных"
+msgstr[2] "Не удалось деактивировать элементы данных"
 
 #: disc_prototypes.php:327
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать прототип элементов данных"
+msgstr[1] "Не удалось деактивировать прототипы элементов данных"
+msgstr[2] "Не удалось деактивировать прототипы элементов данных"
 
 #: media_types.php:185
-#, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] "Не удалось отключить способ оповещения"
-msgstr[1] "Не удалось отключить способ оповещения"
-msgstr[2] "Не удалось отключить способ оповещения"
+msgstr[0] "Не удалось деактивировать способ оповещения"
+msgstr[1] "Не удалось деактивировать способы оповещения"
+msgstr[2] "Не удалось деактивировать способы оповещения"
 
 #: triggers.php:281
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать триггер"
+msgstr[1] "Не удалось деактивировать триггеры"
+msgstr[2] "Не удалось деактивировать триггеры"
 
 #: trigger_prototypes.php:253
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать прототип триггеров"
+msgstr[1] "Не удалось деактивировать прототипы триггеров"
+msgstr[2] "Не удалось деактивировать прототипы триггеров"
 
 #: usergrps.php:370
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать группу пользователей"
+msgstr[1] "Не удалось деактивировать группы пользователей"
+msgstr[2] "Не удалось деактивировать группы пользователей"
 
 #: httpconf.php:369
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
-msgstr[0] "Не удалось отключить веб-сценарий"
-msgstr[1] "Не удалось отключить веб-сценарий"
-msgstr[2] "Не удалось отключить веб-сценарий"
+msgstr[0] "Не удалось деактивировать веб-сценарий"
+msgstr[1] "Не удалось деактивировать веб-сценарии"
+msgstr[2] "Не удалось деактивировать веб-сценарии"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -1949,87 +1945,86 @@ msgstr "Не удалось отобразить более одного эле�
 #: actionconf.php:362
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать действие"
+msgstr[1] "Не удалось активировать действия"
+msgstr[2] "Не удалось активировать действия"
 
 #: discoveryconf.php:205
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать правило обнаружения"
+msgstr[1] "Не удалось активировать правила обнаружения"
+msgstr[2] "Не удалось активировать правила обнаружения"
 
 #: host_discovery.php:322
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать правила обнаружения"
+msgstr[1] "Не удалось активировать правила обнаружения"
+msgstr[2] "Не удалось активировать правила обнаружения"
 
 #: hostgroups.php:242 hosts.php:675 proxies.php:191
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать узел сети"
+msgstr[1] "Не удалось активировать узлы сети"
+msgstr[2] "Не удалось активировать узлы сети"
 
 #: host_prototypes.php:242
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать прототип узлов сети"
+msgstr[1] "Не удалось активировать прототипы узлов сети"
+msgstr[2] "Не удалось активировать прототипы узлов сети"
 
 #: applications.php:248 items.php:713
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать элемент данных"
+msgstr[1] "Не удалось активировать элементы данных"
+msgstr[2] "Не удалось активировать элементы данных"
 
 #: disc_prototypes.php:326
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать прототип элементов данных"
+msgstr[1] "Не удалось активировать прототипы элементов данных"
+msgstr[2] "Не удалось активировать прототипы элементов данных"
 
 #: media_types.php:184
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
-msgstr[0] "Не удалось включить способ оповещения"
-msgstr[1] "Не удалось включить способ оповещения"
-msgstr[2] "Не удалось включить способ оповещения"
+msgstr[0] "Не удалось активировать способ оповещения"
+msgstr[1] "Не удалось активировать способы оповещения"
+msgstr[2] "Не удалось активировать способы оповещения"
 
 #: triggers.php:280
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать триггер"
+msgstr[1] "Не удалось активировать триггеры"
+msgstr[2] "Не удалось активировать триггеры"
 
 #: trigger_prototypes.php:252
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать прототип триггеров"
+msgstr[1] "Не удалось активировать прототипы триггеров"
+msgstr[2] "Не удалось активировать прототипы триггеров"
 
 #: usergrps.php:369
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать группу пользователей"
+msgstr[1] "Не удалось активировать группы пользователей"
+msgstr[2] "Не удалось активировать группы пользователей"
 
 #: httpconf.php:368
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать веб-сценарий"
+msgstr[1] "Не удалось активировать веб-сценарии"
+msgstr[2] "Не удалось активировать веб-сценарии"
 
 #: include/classes/import/CXmlImport18.php:701
 #: include/classes/import/importers/CMapImporter.php:188
@@ -2124,12 +2119,12 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в триггере \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в прототипе триггеров \"%3$s\" в правиле обнаружения \"%4$s\" на \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -2166,7 +2161,7 @@ msgstr "Не удалось найти комплексный экран \"%1$s\
 #: include/classes/import/CConfigurationImport.php:900
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Не удалось найти шаблон \"%1$s\" для прототипа узлов сети \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
 
 #: include/classes/import/CXmlImport18.php:780
 #: include/classes/import/CXmlImport18.php:825
@@ -2179,12 +2174,12 @@ msgstr "Не удалось найти триггер \"%1$s\" использу�
 #: include/classes/import/CConfigurationImport.php:686
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти преобразование значений \"%1$s\", используемое для элемента данных \"%2$s\" на \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:844
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Не удалось найти преобразование значений \"%1$s\", используемое для прототипа элементов данных \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
 
 #: srv_status.php:169
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -2196,7 +2191,7 @@ msgstr "Не удалось построить дерево."
 
 #: include/classes/api/services/CTemplate.php:795
 msgid "Cannot have empty visible template name."
-msgstr ""
+msgstr "Видимое имя шаблона не может быть пустым."
 
 #: include/classes/api/services/CTrigger.php:1068
 #: include/classes/api/services/CTrigger.php:1203
@@ -2229,7 +2224,7 @@ msgstr "Не удалось подключить \"view file\" \"%s\"."
 
 #: popup_trexpr.php:774
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Не удалось вставить выражение триггера"
 
 #: include/classes/api/services/CUser.php:677
 msgid "Cannot insert user media."
@@ -2242,11 +2237,11 @@ msgstr "Не удалось присоединить шаблон"
 #: include/classes/api/services/CTemplate.php:917
 #: include/classes/api/services/CTemplate.php:932
 msgid "Cannot link template."
-msgstr ""
+msgstr "Не удалось присоединить шаблон."
 
 #: include/classes/api/services/CUser.php:1029
 msgid "Cannot login."
-msgstr ""
+msgstr "Не удалось войти в систему."
 
 #: include/classes/api/services/CUser.php:954
 msgid "Cannot logout."
@@ -2401,7 +2396,7 @@ msgstr "Не удалось отсоединить шаблон"
 #: include/classes/api/services/CTemplate.php:879
 #: include/classes/api/services/CTemplate.php:902
 msgid "Cannot unlink template."
-msgstr ""
+msgstr "Не удалось отсоединить шаблон."
 
 #: include/classes/api/services/CHostGeneral.php:234
 #, c-format
@@ -2426,7 +2421,7 @@ msgstr "Не удалось обновить \"%1$s\" для обнаружен�
 #: include/classes/api/services/CAction.php:2012
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для действия \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
@@ -2441,7 +2436,7 @@ msgstr "Не удалось обновить \"%1$s\" для триггера \"
 #: include/classes/api/services/CImage.php:557
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"imagetype\" для изображения \"%1$s\"."
 
 #: include/classes/api/services/CApplication.php:321
 #, c-format
@@ -2466,7 +2461,7 @@ msgstr "Не удалось обновить \"templateid\" для компле�
 #: include/classes/api/services/CTemplateScreen.php:630
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"templateid\" для шаблонного комплексного экрана \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
@@ -2496,7 +2491,7 @@ msgstr "Не удалось обновить режим отладки"
 
 #: tr_comments.php:83
 msgid "Cannot update description"
-msgstr ""
+msgstr "Не удалось обновить описание"
 
 #: discoveryconf.php:148 host_discovery.php:292
 msgid "Cannot update discovery rule"
@@ -2512,7 +2507,7 @@ msgstr "Не удалось обновить график"
 
 #: graphs.php:231
 msgid "Cannot update graph prototype"
-msgstr ""
+msgstr "Не удалось обновить прототип графиков"
 
 #: hostgroups.php:72 usergrps.php:189
 msgid "Cannot update group"
@@ -2564,7 +2559,7 @@ msgstr "Не удалось обновить элемент данных"
 
 #: disc_prototypes.php:298
 msgid "Cannot update item prototype"
-msgstr ""
+msgstr "Не удалось обновить прототип элементов данных"
 
 #: items.php:693
 msgid "Cannot update items"
@@ -2644,11 +2639,11 @@ msgstr "Не удалось обновить триггер"
 
 #: trigger_prototypes.php:167
 msgid "Cannot update trigger prototype"
-msgstr ""
+msgstr "Не удалось обновить прототип триггеров"
 
 #: trigger_prototypes.php:214
 msgid "Cannot update trigger prototypes"
-msgstr ""
+msgstr "Не удалось обновить прототипы триггеров"
 
 #: profile.php:180 users.php:242
 msgid "Cannot update user"
@@ -2927,11 +2922,11 @@ msgstr "Цвет (ОК)"
 
 #: screenedit.php:287
 msgid "Column added"
-msgstr ""
+msgstr "Колонка добавлена"
 
 #: screenedit.php:362
 msgid "Column deleted"
-msgstr ""
+msgstr "Колонка удалена"
 
 #: include/views/configuration.screen.constructor.edit.php:719
 #: screenedit.php:73
@@ -2992,22 +2987,22 @@ msgstr "Условие"
 #: include/classes/api/services/CAction.php:1782
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" для действия \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:860
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" для правила обнаружения \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1781
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для действия \"%1$s\" не определено."
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr ""
+msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для правила обнаружения \"%1$s\" не определено."
 
 #: include/views/configuration.action.edit.php:135
 #: include/views/configuration.action.edit.php:1001
@@ -3079,7 +3074,7 @@ msgstr "Настройка узлов сети"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
-msgstr ""
+msgstr "Настройка очистки истории"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -3261,7 +3256,7 @@ msgstr "Имя контекста"
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:431
 msgid "Context switches."
-msgstr ""
+msgstr "Переключения контекста."
 
 #: include/hosts.inc.php:260
 msgid "Contract number"
@@ -3279,9 +3274,9 @@ msgstr "Копировать"
 #, c-format
 msgid "Copy %1$s element to..."
 msgid_plural "Copy %1$s elements to..."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Копировать %1$s элемент в..."
+msgstr[1] "Копировать %1$s элементы в..."
+msgstr[2] "Копировать %1$s элементов в..."
 
 #: include/views/configuration.graph.list.php:156
 #: include/views/configuration.item.list.php:276
@@ -3320,7 +3315,7 @@ msgstr "Создать группу элементов данных (выбер�
 
 #: adm.images.php:153
 msgid "Create background"
-msgstr ""
+msgstr "Создать фон"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:28
@@ -3533,7 +3528,7 @@ msgstr "Текущее значение"
 #: include/views/configuration.action.edit.php:122
 #: include/views/configuration.host.discovery.edit.php:280
 msgid "Custom expression"
-msgstr ""
+msgstr "Пользовательское выражение"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -3689,7 +3684,7 @@ msgstr "Обзор данных"
 #: include/views/administration.general.housekeeper.edit.php:136
 #: include/views/administration.general.housekeeper.edit.php:157
 msgid "Data storage period (in days)"
-msgstr ""
+msgstr "Период хранения данных (в днях)"
 
 #: include/forms.inc.php:435 include/views/configuration.item.edit.php:228
 #: include/views/configuration.item.massupdate.php:227
@@ -3903,7 +3898,7 @@ msgstr "Удалить"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Удалить все элементы, которых нет в XML файле?"
 
 #: include/views/configuration.template.edit.php:486
 msgid "Delete and clear"
@@ -3937,7 +3932,7 @@ msgstr "Удалить выражение?"
 
 #: include/views/configuration.graph.edit.php:311
 msgid "Delete graph prototype?"
-msgstr ""
+msgstr "Удалить прототип графиков?"
 
 #: include/views/configuration.graph.edit.php:311
 msgid "Delete graph?"
@@ -3949,7 +3944,7 @@ msgstr "Удалить историю выбранных элементов да
 
 #: include/views/configuration.httpconf.list.php:150
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "Очистить историю выбранных веб-сценариев?"
 
 #: include/views/administration.general.iconmap.edit.php:147
 msgid "Delete icon map?"
@@ -3957,7 +3952,7 @@ msgstr "Удалить соответствие иконок?"
 
 #: include/views/configuration.item.edit.php:457
 msgid "Delete item prototype?"
-msgstr ""
+msgstr "Удалить прототип элементов данных?"
 
 #: include/views/configuration.item.edit.php:457
 msgid "Delete item?"
@@ -3977,7 +3972,7 @@ msgstr "Удалить период обслуживания?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "Удалить пропущенное"
 
 #: include/views/configuration.sysmap.edit.php:193
 msgid "Delete network map?"
@@ -4053,7 +4048,7 @@ msgstr "Удалить выбранные элементы?"
 
 #: include/views/configuration.graph.list.php:162
 msgid "Delete selected graph prototypes?"
-msgstr ""
+msgstr "Удалить выбранные прототипы графиков?"
 
 #: include/views/configuration.graph.list.php:162
 msgid "Delete selected graphs?"
@@ -4094,7 +4089,7 @@ msgstr "Удалить выбранное изображение?"
 
 #: include/views/configuration.item.prototype.list.php:121
 msgid "Delete selected item prototypes?"
-msgstr ""
+msgstr "Удалить выбранные прототипы элементов данных?"
 
 #: include/views/configuration.item.list.php:284
 msgid "Delete selected items?"
@@ -4142,7 +4137,7 @@ msgstr "Удалить выбранные шаблоны?"
 
 #: include/views/configuration.triggers.list.php:310
 msgid "Delete selected trigger prototypes?"
-msgstr ""
+msgstr "Удалить выбранные прототипы триггеров?"
 
 #: include/views/configuration.triggers.list.php:310
 msgid "Delete selected triggers?"
@@ -4170,7 +4165,7 @@ msgstr[2] "Удалить выбранное преобразование зна
 
 #: include/views/configuration.httpconf.list.php:154
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "Удалить выбранные веб-сценарии?"
 
 #: templates.php:673
 msgid "Delete selected with linked elements"
@@ -4179,7 +4174,7 @@ msgstr "Удалить выбранное с присоединенными эл
 #: jsLoader.php:187
 #, c-format
 msgid "Delete service \"%1$s\"?"
-msgstr ""
+msgstr "Удалить услугу \"%1$s\"?"
 
 #: include/views/configuration.slideconf.edit.php:111
 msgid "Delete slide show?"
@@ -4191,7 +4186,7 @@ msgstr "Удалить шаблон?"
 
 #: include/views/configuration.triggers.edit.php:340
 msgid "Delete trigger prototype?"
-msgstr ""
+msgstr "Удалить прототип триггеров?"
 
 #: include/views/configuration.triggers.edit.php:340
 msgid "Delete trigger?"
@@ -4323,11 +4318,11 @@ msgstr "Описание"
 #: include/views/monitoring.triggerComment.php:43
 #, c-format
 msgid "Description for \"%s\"."
-msgstr ""
+msgstr "Описание для \"%s\"."
 
 #: tr_comments.php:83
 msgid "Description updated"
-msgstr ""
+msgstr "Описание обновлено"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
 #: include/func.inc.php:1790
@@ -4350,7 +4345,7 @@ msgstr "Устройство"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:419
 msgid "Device interrupts."
-msgstr ""
+msgstr "Прерывания устройства."
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:451
@@ -4360,7 +4355,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:507
 msgid "Device read statistics."
-msgstr ""
+msgstr "Статистика чтения с устройств."
 
 #: discoveryconf.php:41 include/views/configuration.discovery.edit.php:68
 msgid "Device uniqueness criteria"
@@ -4369,7 +4364,7 @@ msgstr "Критерий уникальности устройства"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:511
 msgid "Device write statistics."
-msgstr ""
+msgstr "Статистика записи на устройства."
 
 #: popup_trexpr.php:165
 msgid "Difference between MAX and MIN value of a period T is < N"
@@ -4414,7 +4409,7 @@ msgstr "Разница между последним и предыдущим з�
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:407
 msgid "Different information about specific process(es)"
-msgstr ""
+msgstr "Различная информация о специфичных процессах"
 
 #: include/views/configuration.screen.list.php:52
 msgid "Dimension (cols x rows)"
@@ -4426,7 +4421,7 @@ msgstr "Отключить"
 
 #: include/views/administration.usergroups.list.php:144
 msgid "Disable debug mode"
-msgstr ""
+msgstr "Деактивировать режим отладки"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Disable debug mode in selected groups?"
@@ -4491,7 +4486,7 @@ msgstr "Деактивировать выбранные узлы сети?"
 
 #: include/views/configuration.item.prototype.list.php:117
 msgid "Disable selected item prototypes?"
-msgstr ""
+msgstr "Деактивировать выбранные прототипы элементов данных?"
 
 #: include/views/configuration.item.list.php:270
 msgid "Disable selected items?"
@@ -4503,7 +4498,7 @@ msgstr "Деактивировать выбранные способы опов�
 
 #: include/views/configuration.triggers.list.php:295
 msgid "Disable selected trigger prototypes?"
-msgstr ""
+msgstr "Деактивировать выбранные прототипы триггеров?"
 
 #: include/views/configuration.triggers.list.php:295
 msgid "Disable selected triggers?"
@@ -4511,7 +4506,7 @@ msgstr "Деактивировать выбранные триггеры?"
 
 #: include/views/configuration.httpconf.list.php:146
 msgid "Disable selected web scenarios?"
-msgstr ""
+msgstr "Деактивировать выбранные веб-сценарии?"
 
 #: auditlogs.php:142 dashboard.php:295 hosts.php:993
 #: include/discovery.inc.php:121 include/html.inc.php:336
@@ -4606,7 +4601,7 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 #: include/classes/api/services/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\"."
 
 #: include/classes/api/services/CDRule.php:417
 #: include/classes/api/services/CDRule.php:430
@@ -4670,11 +4665,11 @@ msgstr "Отображать триггеры ОК в течении"
 
 #: latest.php:892
 msgid "Display graph"
-msgstr ""
+msgstr "Показать график"
 
 #: latest.php:891
 msgid "Display stacked graph"
-msgstr ""
+msgstr "Показать стэкируемый график"
 
 #: include/func.inc.php:1568
 msgid "Displaying"
@@ -4885,12 +4880,12 @@ msgstr "Пусто"
 #: include/classes/api/services/CHttpTest.php:909
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Пустой файл SSL сертификата для веб-сценария \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:902
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Пустой файл SSL ключа для веб-сценария \"%1$s\"."
 
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
@@ -4918,21 +4913,21 @@ msgstr "Пустой цвет."
 #: include/classes/api/services/CAction.php:1824
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Пустой ID формулы условия фильтра для действия \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:887
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Пустой ID формулы условия фильтра для правила обнаружения \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:879
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Пустой макрос условия фильтра для правила обнаружения \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
-msgstr "Пустой ID узла сети у прототипа узла сети."
+msgstr "Пустой макрос фильтра условия для правила обнаружения \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:173
 msgid "Empty host."
@@ -5017,11 +5012,11 @@ msgstr "Получен пустой ответ от Zabbix сервера \"%1$s
 
 #: include/classes/api/services/CScreen.php:471
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "Пустой screen ID для комплексного экрана"
 
 #: include/classes/api/services/CTemplateScreen.php:597
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "Пустой screen ID для шаблонного комплексного экрана."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5029,7 +5024,7 @@ msgstr "Пустой период времени."
 
 #: include/classes/api/services/CHttpTest.php:310
 msgid "Empty web scenario ID."
-msgstr ""
+msgstr "Пустой ID веб-сценария."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -5435,11 +5430,11 @@ msgstr "Избранные комплексные экраны"
 
 #: jsLoader.php:195
 msgid "Favourite simple graphs"
-msgstr ""
+msgstr "Избранные простые графики"
 
 #: jsLoader.php:196
 msgid "Favourite slide shows"
-msgstr ""
+msgstr "Избранные слайд-шоу"
 
 #: include/views/monitoring.slides.php:40 slides.php:152 slides.php:159
 msgid "Favourites"
@@ -5504,7 +5499,7 @@ msgstr "Поле \"druleid\" является обязательным."
 
 #: include/classes/api/services/CTemplate.php:443
 msgid "Field \"host\" is mandatory."
-msgstr ""
+msgstr "Поле \"host\" является обязательным."
 
 #: include/classes/api/services/CDRule.php:354
 msgid "Field \"name\" is required."
@@ -5548,7 +5543,7 @@ msgstr "Фильтр"
 #: include/views/common.filter.trigger.php:98
 #: include/views/monitoring.overview.items.php:72
 msgid "Filter by application"
-msgstr ""
+msgstr "Фильтр по группе элементов данных"
 
 #: report2.php:322
 msgid "Filter by host group"
@@ -5556,7 +5551,7 @@ msgstr "Фильтр по группе узлов сети"
 
 #: include/views/common.filter.trigger.php:134
 msgid "Filter by host inventory"
-msgstr ""
+msgstr "Фильтр по инвентарным данным"
 
 #: include/views/common.filter.trigger.php:95
 msgid "Filter by name"
@@ -5565,7 +5560,7 @@ msgstr "Фильтр по имени"
 #: include/views/configuration.host.discovery.edit.php:336
 #: include/views/configuration.host.discovery.edit.php:345
 msgid "Filters"
-msgstr ""
+msgstr "Фильтры"
 
 #: popup_trexpr.php:305
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
@@ -5578,12 +5573,12 @@ msgstr "Искать строку V в последнем (самом новом
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:535
 msgid "Find string in a file. 0 - expression not found, 1 - found"
-msgstr ""
+msgstr "Поиск строки в файле. 0 - выражение не найдено, 1 - найдено"
 
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:531
 msgid "Find string in a file. Matched string"
-msgstr ""
+msgstr "Поиск строки в файле. Совпадение строки"
 
 #: include/classes/setup/CSetupWizard.php:121
 msgid "Finish"
@@ -5927,19 +5922,19 @@ msgstr "Прототип графика \"%s\" удален."
 
 #: graphs.php:236
 msgid "Graph prototype added"
-msgstr ""
+msgstr "Прототип графиков добавлен"
 
 #: graphs.php:290
 msgid "Graph prototype deleted"
-msgstr ""
+msgstr "Прототип графиков удален"
 
 #: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "Прототип графиков не найден."
 
 #: graphs.php:230
 msgid "Graph prototype updated"
-msgstr ""
+msgstr "Прототип графиков обновлен"
 
 #: include/html.inc.php:424 include/html.inc.php:428
 #: include/views/configuration.host.discovery.list.php:125
@@ -5950,7 +5945,7 @@ msgstr "Прототипы графиков"
 
 #: graphs.php:314
 msgid "Graph prototypes deleted"
-msgstr ""
+msgstr "Прототипы графиков удалены"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
@@ -6061,12 +6056,11 @@ msgid "Group added"
 msgstr "Группа добавлена"
 
 #: hostgroups.php:171 hostgroups.php:192 usergrps.php:229 usergrps.php:260
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Группа удалена"
-msgstr[1] "Группа удалена"
-msgstr[2] "Группа удалена"
+msgstr[1] "Группы удалены"
+msgstr[2] "Группы удалены"
 
 #: include/views/administration.general.other.edit.php:36
 msgid "Group for discovered hosts"
@@ -6186,7 +6180,7 @@ msgstr "Аппаратные средства (полная детализаци
 #: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.httpconf.popup.php:91
 msgid "Headers"
-msgstr ""
+msgstr "Заголовки"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:56
 #: include/views/configuration.graph.list.php:79
@@ -6224,7 +6218,7 @@ msgstr "Скрывать деактивированные сценарии"
 
 #: include/views/configuration.triggers.list.php:63
 msgid "Hide disabled trigger prototypes"
-msgstr ""
+msgstr "Скрывать деактивированные прототипы триггеров"
 
 #: include/views/configuration.triggers.list.php:81
 msgid "Hide disabled triggers"
@@ -6232,7 +6226,7 @@ msgstr "Скрывать деактивированные триггеры"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
-msgstr ""
+msgstr "Скрыть фильтр"
 
 #: include/views/monitoring.history.php:130
 msgid "Hide selected"
@@ -6619,7 +6613,7 @@ msgstr "Узел сети обновлен"
 #: include/classes/api/services/CTemplate.php:1047
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же именем \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHost.php:678
 #, c-format
@@ -6630,7 +6624,7 @@ msgstr "Узел сети с таким же именем \"%s\" уже суще
 #: include/classes/api/services/CTemplate.php:1012
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHost.php:684
 #, c-format
@@ -6703,7 +6697,7 @@ msgstr "Часы"
 #: adm.valuemapping.php:129 adm.workingtime.php:64
 #: include/views/administration.general.housekeeper.edit.php:164
 msgid "Housekeeping"
-msgstr ""
+msgstr "Очистка истории"
 
 #: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
@@ -6816,12 +6810,12 @@ msgstr "Услуга IT"
 
 #: adm.housekeeper.php:47
 msgid "IT service data storage period"
-msgstr ""
+msgstr "Период хранения данных IT услуг"
 
 #: adm.housekeeper.php:109
 #, c-format
 msgid "IT service data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Период хранения данных IT услуг (в днях) \"%1$s\"."
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
@@ -7111,7 +7105,7 @@ msgstr "Некорректное значение %1$s типа подписи �
 #: include/classes/api/clients/CLocalApiClient.php:61
 #, c-format
 msgid "Incorrect API \"%1$s\"."
-msgstr ""
+msgstr "Некорректный API \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:217
 #, c-format
