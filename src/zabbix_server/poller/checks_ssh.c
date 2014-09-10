@@ -266,7 +266,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			{
 				sz = (size_t)rc;
 				if (sz > (size_t)(MAX_BUFFER_LEN - (bytecount + 1)))
-					sz =  (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
+					sz = (size_t)(MAX_BUFFER_LEN - (bytecount + 1));
 				if (0 == sz)
 					continue;
 
@@ -349,7 +349,6 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		return NOTSUPPORTED;
 	}
-
 
 	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
 	{
