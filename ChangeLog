@@ -1,6 +1,7 @@
 Changes for 2.4.0rc3
 
 Bug fixes:
+........S. [ZBX-8734] fixed IPMI pollers not starting properly on the server (asaveljevs)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.0rc2
