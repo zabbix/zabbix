@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:36+0300\n"
-"PO-Revision-Date: 2014-09-09 10:46+0300\n"
+"PO-Revision-Date: 2014-09-10 17:16+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410252409.0\n"
+"X-POOTLE-MTIME: 1410362185.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -838,7 +838,7 @@ msgstr "O (godzina:minuta)"
 #: include/classes/api/services/CMaintenance.php:302
 #: include/classes/api/services/CMaintenance.php:537
 msgid "At least one host or group should be selected."
-msgstr "Przynajmniej jeden host lub grupa musi być zaznaczona."
+msgstr "Musi być wybrany przynajmniej jeden host lub grupa."
 
 #: include/classes/api/services/CMaintenance.php:391
 #: include/classes/api/services/CMaintenance.php:528
@@ -1095,7 +1095,7 @@ msgstr "Wg hosta"
 
 #: report2.php:188
 msgid "By trigger template"
-msgstr "Wg wzorca wyzwalacza"
+msgstr "Wg szablonu wyzwalacza"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
@@ -3907,7 +3907,7 @@ msgstr "Usuń i wyczyść"
 
 #: templates.php:674
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Usunąć i wyczyścić zaznaczone szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
+msgstr "Usunąć i wyczyścić wybrane szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
 
 #: include/views/configuration.template.edit.php:487
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
@@ -3965,7 +3965,7 @@ msgstr "Usunąć słowo kluczowe?"
 
 #: jsLoader.php:155
 msgid "Delete links between selected elements?"
-msgstr "Usunąć powiązania między zaznaczonymi elementami?"
+msgstr "Usunąć powiązania między wybranymi elementami?"
 
 #: include/views/configuration.maintenance.edit.php:196
 msgid "Delete maintenance period?"
@@ -4426,7 +4426,7 @@ msgstr "Wyłącz tryb debugowania"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Disable debug mode in selected groups?"
-msgstr "Wyłączyć tryb debugowania dla zaznaczonych grup?"
+msgstr "Wyłączyć tryb debugowania dla wybranych grup?"
 
 #: include/actions.inc.php:388 include/actions.inc.php:611
 msgid "Disable host"
@@ -5325,7 +5325,7 @@ msgstr "Rozwinięty"
 #: hosts.php:1064 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:62 templates.php:667
 msgid "Export selected"
-msgstr "Eksportuj zaznaczone"
+msgstr "Eksportuj wybrane"
 
 #: events.php:298
 msgid "Export to CSV"
@@ -12038,7 +12038,7 @@ msgstr "Usuń powiązanie"
 
 #: include/views/monitoring.history.php:120
 msgid "Remove selected"
-msgstr "Usuń zaznaczone"
+msgstr "Usuń wybrane"
 
 #: include/views/configuration.host.massupdate.php:215
 #: include/views/configuration.triggers.edit.php:126
@@ -14575,11 +14575,11 @@ msgstr "Niedostępne dla użytkowników z %1$s."
 
 #: include/views/administration.users.list.php:151
 msgid "Unblock selected"
-msgstr "Odblokuj zaznaczone"
+msgstr "Odblokuj wybrane"
 
 #: include/views/administration.users.list.php:152
 msgid "Unblock selected users?"
-msgstr "Odblokować zaznaczonych użytkowników?"
+msgstr "Odblokować wybranych użytkowników?"
 
 #: include/views/configuration.item.edit.php:229
 #: include/views/configuration.item.massupdate.php:237
@@ -16464,7 +16464,7 @@ msgstr "wyrażenie regularne"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "pamiętaj zaznaczone"
+msgstr "pamiętaj wybrane"
 
 #: include/services.inc.php:69 include/services.inc.php:70
 #: include/services.inc.php:157
