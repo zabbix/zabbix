@@ -259,28 +259,28 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "VmSize"))
 		memtype_search = "VmSize:\t";
+	else if (0 == strcmp(memtype, "VmRSS"))
+		memtype_search = "VmRSS:\t";
 	else if (0 == strcmp(memtype, "VmPeak"))
 		memtype_search = "VmPeak:\t";
+	else if (0 == strcmp(memtype, "VmSwap"))
+		memtype_search = "VmSwap:\t";
+	else if (0 == strcmp(memtype, "VmLib"))
+		memtype_search = "VmLib:\t";
 	else if (0 == strcmp(memtype, "VmLck"))
 		memtype_search = "VmLck:\t";
 	else if (0 == strcmp(memtype, "VmPin"))
 		memtype_search = "VmPin:\t";
 	else if (0 == strcmp(memtype, "VmHWM"))
 		memtype_search = "VmHWM:\t";
-	else if (0 == strcmp(memtype, "VmRSS"))
-		memtype_search = "VmRSS:\t";
 	else if (0 == strcmp(memtype, "VmData"))
 		memtype_search = "VmData:\t";
 	else if (0 == strcmp(memtype, "VmStk"))
 		memtype_search = "VmStk:\t";
 	else if (0 == strcmp(memtype, "VmExe"))
 		memtype_search = "VmExe:\t";
-	else if (0 == strcmp(memtype, "VmLib"))
-		memtype_search = "VmLib:\t";
 	else if (0 == strcmp(memtype, "VmPTE"))
 		memtype_search = "VmPTE:\t";
-	else if (0 == strcmp(memtype, "VmSwap"))
-		memtype_search = "VmSwap:\t";
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
