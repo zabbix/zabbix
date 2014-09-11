@@ -43,7 +43,7 @@ else {
 	$originalTemplates = array();
 }
 
-$cloningDiscoveredHost = (in_array(getRequest('form'), array('clone', 'full_clone'))
+$cloningDiscoveredHost = (in_array($this->data['form'], array('clone', 'full_clone'))
 	&& (getRequest('form_refresh') == 1) && ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 );
 
@@ -151,8 +151,8 @@ natcasesort($templateIds);
 // whether this is a discovered host
 $isDiscovered = (
 	getRequest('hostid')
-	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-	&& in_array(getRequest('form'), array('update'))
+	&& ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+	&& ($this->data['form'] == 'update')
 );
 
 $divTabs = new CTabView();
@@ -162,14 +162,14 @@ if (!hasRequest('form_refresh')) {
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
-$frmHost->addVar('form', getRequest('form', 1));
+$frmHost->addVar('form', $this->data['form']);
 
 $frmHost->addVar('clear_templates', $clearTemplates);
 
 $hostList = new CFormList('hostlist');
 
 $hostId = getRequest('hostid', 0);
-if ($hostId > 0 && getRequest('form') != 'clone') {
+if ($hostId > 0 && $this->data['form'] != 'clone') {
 	$frmHost->addVar('hostid', $hostId);
 }
 
@@ -424,7 +424,7 @@ $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
 $hostList->addRow(_('Enabled'), new CCheckBox('status', ($status == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED));
 
-if (getRequest('form') == 'full_clone') {
+if ($this->data['form'] == 'full_clone') {
 	// host applications
 	$hostApps = API::Application()->get(array(
 		'hostids' => $hostId,
@@ -699,7 +699,7 @@ if (!$isDiscovered) {
 					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
 					SPACE,
 					SPACE,
-					isset($originalTemplates[$template['templateid']])
+					isset($originalTemplates[$template['templateid']]) && ($this->data['form'] != 'full_clone')
 						? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
 						: SPACE
 				)
@@ -881,7 +881,7 @@ $frmHost->addItem($divTabs);
  * footer
  */
 // do not display the clone and delete buttons for clone forms and new host forms
-if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
+if (getRequest('hostid') && !in_array($this->data['form'], array('clone', 'full_clone'))) {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
