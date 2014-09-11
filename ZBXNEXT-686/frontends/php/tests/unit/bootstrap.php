@@ -30,7 +30,7 @@ require_once __DIR__.'/../../include/actions.inc.php';
 require_once __DIR__.'/../../include/validate.inc.php';
 require_once __DIR__.'/../../include/services.inc.php';
 
-require __DIR__.'/../new/vendor/autoload.php';
+require __DIR__.'/../api/vendor/autoload.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
@@ -55,6 +55,7 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/services',
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
+	__DIR__.'/../../tests/api/include/validators',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',

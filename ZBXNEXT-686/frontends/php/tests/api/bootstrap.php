@@ -16,3 +16,9 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 // TODO: check if there's a better way to do that
 Z::getInstance()->run(ZBase::EXEC_MODE_COMMAND);
 
+// register the paths for additional test-specific classes
+// TODO: merge them with the common include paths
+$autoloader = new CAutoloader(array(
+	__DIR__.'/include/validators',
+));
+$autoloader->register();
