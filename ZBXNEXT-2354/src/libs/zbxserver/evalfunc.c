@@ -160,7 +160,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	const char		*__function_name = "evaluate_LOGEVENTID";
 
 	char			*arg1 = NULL;
-	int			found, ret = FAIL;
+	int			ret = FAIL;
 	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 	zbx_timespec_t		ts = {now, 999999999};
@@ -181,7 +181,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	if ('@' == *arg1)
 		DCget_expressions_by_name(&regexps, arg1 + 1);
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 	{
 		char	logeventid[16];
 
@@ -225,7 +225,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	const char		*__function_name = "evaluate_LOGSOURCE";
 
 	char			*arg1 = NULL;
-	int			found, ret = FAIL;
+	int			ret = FAIL;
 	zbx_history_record_t	vc_value;
 	zbx_timespec_t		ts = {now, 999999999};
 
@@ -240,7 +240,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 	{
 		if (0 == strcmp(NULL == vc_value.value.log->source ? "" : vc_value.value.log->source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -278,7 +278,7 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function
 {
 	const char		*__function_name = "evaluate_LOGSEVERITY";
 
-	int			found, ret = FAIL;
+	int			ret = FAIL;
 	zbx_history_record_t	vc_value;
 	zbx_timespec_t		ts = {now, 999999999};
 
@@ -287,7 +287,7 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 	{
 		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", vc_value.value.log->severity);
 		zbx_history_record_clear(&vc_value, item->value_type);
@@ -1563,7 +1563,7 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, 
 {
 	const char		*__function_name = "evaluate_FUZZYTIME";
 
-	int			arg1, flag, found, ret = FAIL;
+	int			arg1, flag, ret = FAIL;
 	zbx_history_record_t	vc_value;
 	zbx_uint64_t		fuzlow, fuzhig;
 	zbx_timespec_t		ts = {now, 999999999};
@@ -1582,7 +1582,7 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, 
 	if (ZBX_FLAG_SEC != flag || now <= arg1)
 		goto out;
 
-	if (SUCCEED != zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) || 1 != found)
+	if (SUCCEED != zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 		goto out;
 
 	fuzlow = (int)(now - arg1);

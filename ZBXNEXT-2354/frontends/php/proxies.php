@@ -278,7 +278,7 @@ else {
 
 	// calculate performance
 	$dbPerformance = DBselect(
-		'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
+		'SELECT h.proxy_hostid,SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) AS qps'.
 		' FROM items i,hosts h'.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.hostid=h.hostid'.
