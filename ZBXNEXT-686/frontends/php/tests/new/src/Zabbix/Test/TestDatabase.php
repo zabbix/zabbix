@@ -5,21 +5,21 @@ namespace Zabbix\Test;
 class TestDatabase {
 
 	public function clear() {
-		try {
-			DBstart();
+		DBstart();
 
-			// TODO: clear the database in the correct order
-			foreach ($this->getTablesToClear() as $tableName) {
-				DBexecute('DELETE FROM '.$tableName);
+		// TODO: clear the database in the correct order
+		foreach ($this->getTablesToClear() as $tableName) {
+			$rs = DBexecute('DELETE FROM '.$tableName);
+			if (!$rs) {
+				DBend(false);
+
+				global $ZBX_MESSAGES;
+				$lastMessage = array_pop($ZBX_MESSAGES);
+				throw new \Exception($lastMessage['message']);
 			}
-
-			DBend();
 		}
-		catch (\Exception $e) {
-			DBend(false);
 
-			throw $e;
-		}
+		DBend();
 	}
 
 	protected function getTablesToClear() {

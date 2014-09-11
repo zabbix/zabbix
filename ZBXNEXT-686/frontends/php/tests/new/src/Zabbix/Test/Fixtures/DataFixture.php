@@ -17,7 +17,9 @@ class DataFixture extends Fixture {
 		catch (\Exception $e) {
 			DBend(false);
 
-			throw $e;
+			global $ZBX_MESSAGES;
+			$lastMessage = array_pop($ZBX_MESSAGES);
+			throw new \Exception($lastMessage['message']);
 		}
 	}
 
