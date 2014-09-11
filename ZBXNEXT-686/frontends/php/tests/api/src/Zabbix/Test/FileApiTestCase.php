@@ -19,11 +19,24 @@ class FileApiTestCase extends ApiTestCase {
 	protected $stepData;
 
 	/**
+	 * @var \CArrayMacroResolver
+	 */
+	protected $macroResolver;
+
+	/**
 	 * Stack of requests / responses
+	 *
+	 * TODO: remove it and replace with a local variable
 	 *
 	 * @var array
 	 */
 	protected $stepStack;
+
+	public function __construct($name = null, array $data = array(), $dataName = '') {
+		parent::__construct($name, $data, $dataName);
+
+		$this->macroResolver = new \CArrayMacroResolver();
+	}
 
 	protected function parseTestFile($name) {
 		$path = ZABBIX_NEW_TEST_DIR . '/tests/yaml/'.$name.'.yml';
@@ -72,11 +85,11 @@ class FileApiTestCase extends ApiTestCase {
 
 			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
 
-			$this->stepStack[$stepName]['request'] = $apiRequest;
+			$this->stepStack[$stepName]['request'] = $request;
 
 			$apiResponse = $gateway->execute($apiRequest);
 
-			$this->stepStack[$stepName]['response'] = $apiResponse;
+			$this->stepStack[$stepName]['response'] = $apiResponse->getResult();
 
 			// now we verify that the response is what we expected
 			if (!isset($definition['expect']) || !in_array($definition['expect'], array('result', 'error'))) {
@@ -218,135 +231,8 @@ class FileApiTestCase extends ApiTestCase {
 	 * @param array $data
 	 * @return array
 	 */
-	protected function expandStepVariables($data) {
-		array_walk_recursive($data, function (&$value, $index) {
-			if (!is_string($value)) {
-				return;
-			}
-
-			// TODO: this should be refactored to single regular expression like (@((([a-z0-9]+)[.[\]]*)+)@)
-			// extract variables
-			preg_match_all("/@(?:[a-z0-9[\\].]+)@/i", $value, $matches);
-
-			if (count($matches) == 1 && count($matches[0]) > 0) {
-				foreach ($matches[0] as $expression) {
-					$keys = preg_split('/(\[|]\.|\.|\])/', trim($expression, '@'), -1, PREG_SPLIT_NO_EMPTY);
-
-					if (count($keys) > 0) {
-						try {
-							$newValue = $this->resolveStepVariable($keys);
-						} catch (\Exception $e) {
-							throw new \Exception(
-								sprintf('Parsing of expression "%s" failed with message "%s"',
-									$expression,
-									$e->getMessage()
-								)
-							);
-						}
-
-						$value = str_replace($expression, $newValue, $value);
-					}
-					else {
-						throw new \Exception(sprintf('Problem parsing expression "%s"', $expression));
-					}
-				}
-			}
-		});
-
-		return $data;
-	}
-
-	/**
-	 * Resolves actual value from array of keys like ['step1', 'response', 'hosts', 0, 'id']
-	 * @todo: this should be cached
-	 *
-	 * @param array $keys
-	 * @throws \Exception
-	 * @return mixed
-	 */
-	protected function resolveStepVariable(array $keys) {
-		// first key should be valid step name
-		$stepName = array_shift($keys);
-
-		if (!isset($this->stepStack[$stepName])) {
-			throw new \Exception(sprintf('No data for step "%s"', $stepName));
-		}
-
-		// second key is request/response; exceptions are not supported (since back-referencing exception message is
-		// a bit senseless
-		$type = array_shift($keys);
-
-		if (!in_array($type, array('request', 'response'))) {
-			throw new \Exception(sprintf('Second part of the expressions should be "request" or "response", "%s" given', $type));
-		}
-
-
-		if ($type == 'request') {
-			// third key is method or params
-			$subtype = array_shift($keys);
-
-			$allow = array('method', 'params');
-
-			if (!in_array($subtype, $allow)) {
-				throw new \Exception(
-					sprintf('Third part of request expression must be one of "%s", "%s" given',
-						implode(', ', $allow),
-						$subtype
-					)
-				);
-			}
-
-			if (!isset($this->stepStack[$stepName]['request'])) {
-				throw new \Exception(sprintf('No request has been logged yet for step "%s"', $stepName));
-			}
-
-			/* @var $request APITestRequest */
-			$request = $this->stepStack[$stepName]['request'];
-
-			if ($subtype == 'method') {
-				return $request->getMethod();
-			}
-
-			return $this->drillIn($request->getParams(), $keys);
-		}
-
-		if ($type == 'response') {
-			if (!isset($this->stepStack[$stepName]['response'])) {
-				throw new \Exception(sprintf('No response has been logged yet for step "%s"', $stepName));
-			}
-
-			/* @var $response \Zabbix\Test\APITestResponse */
-			$response = $this->stepStack[$stepName]['response'];
-
-			return $this->drillIn($response->getResponseData(), $keys);
-		}
-	}
-
-	/**
-	 * Drill in function - returns item from array $data defined by $keys.
-	 *
-	 * @param $data
-	 * @param $keys
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	protected function drillIn($data, $keys) {
-		foreach ($keys as $key) {
-			if (!is_array($data)) {
-				throw new \Exception(sprintf(
-					'Data nto an array for key "%s", have we gone too deep?', $key
-				));
-			}
-			elseif(!isset($data[$key])) {
-				throw new \Exception(sprintf(
-					'No key "%s" for data with keys "%s", have we gone too deep?', $key, implode(', ', array_keys($data))
-				));
-			}
-
-			$data = $data[$key];
-		}
-
-		return $data;
+	protected function expandStepVariables(array $data) {
+		return $this->macroResolver->resolve($data, $this->stepStack);
 	}
 
 	/**

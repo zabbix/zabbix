@@ -20,5 +20,6 @@ Z::getInstance()->run(ZBase::EXEC_MODE_COMMAND);
 // TODO: merge them with the common include paths
 $autoloader = new CAutoloader(array(
 	__DIR__.'/include/validators',
+	__DIR__.'/include/macros',
 ));
 $autoloader->register();
