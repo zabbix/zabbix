@@ -78,13 +78,14 @@ static void	DBupdate_lastsize()
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
 	DC_ITEM			*items = NULL;
-	char			cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN],
-				error[ITEM_ERROR_LEN_MAX];
+	const char		*regex;
+	char			error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
+	AGENT_REQUEST		request;
 	zbx_vector_ptr_t	regexps;
 
 	zbx_vector_ptr_create(&regexps);
@@ -117,29 +118,33 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 		}
 
-		if (ZBX_COMMAND_ERROR == parse_command(items[i].key, cmd, sizeof(cmd), params, sizeof(params)))
-			continue;
+		init_request(&request);
 
-		if (0 != strcmp(cmd, "snmptrap"))
-			continue;
+		if (SUCCEED != parse_item_key(items[i].key, &request))
+			goto next;
 
-		if (1 < num_param(params))
-			continue;
+		if (0 != strcmp(get_rkey(&request), "snmptrap"))
+			goto next;
 
-		if (0 != get_param(params, 1, regex, sizeof(regex)))
-			continue;
+		if (1 < get_rparams_num(&request))
+			goto next;
+
+		if (NULL == (regex = get_rparam(&request, 0)))
+			goto next;
 
 		if ('@' == *regex)
 			DCget_expressions_by_name(&regexps, regex + 1);
 
 		if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
-			continue;
+			goto next;
 
 		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
 			errcodes[i] = SUCCEED;
 		else
 			errcodes[i] = NOTSUPPORTED;
 		ret = SUCCEED;
+next:
+		free_request(&request);
 	}
 
 	if (FAIL == ret && -1 != fb)
