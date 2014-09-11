@@ -194,6 +194,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
 
+#define ZBX_VM_RUNTIME(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='runtime']/*[local-name()='" property "']"
+
 #define ZBX_VM_CONFIG(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"

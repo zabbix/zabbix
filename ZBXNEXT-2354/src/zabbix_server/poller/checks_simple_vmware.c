@@ -2028,7 +2028,7 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("powerState"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_RUNTIME("powerState"), result);
 
 	if (SYSINFO_RET_OK == ret)
 		ret = vmware_set_powerstate_result(result);
