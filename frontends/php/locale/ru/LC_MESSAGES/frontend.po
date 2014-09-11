@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:32+0300\n"
-"PO-Revision-Date: 2014-09-10 14:34+0300\n"
+"PO-Revision-Date: 2014-09-11 07:10+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410352450.0\n"
+"X-POOTLE-MTIME: 1410412233.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -816,20 +816,20 @@ msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "В %1$s:%2$s на %3$s день каждый %4$s"
 
 #: include/maintenances.inc.php:76
-#, fuzzy, c-format
+#, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "В %1$s:%2$s каждый %3$s каждую неделю"
-msgstr[1] "В %1$s:%2$s каждый %3$s каждые %4$s недели"
-msgstr[2] "В %1$s:%2$s каждый %3$s каждые %4$s недель"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:56
-#, fuzzy, c-format
+#, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] "В %1$s:%2$s каждый день"
-msgstr[1] "В %1$s:%2$s каждые %3$s дня"
-msgstr[2] "В %1$s:%2$s каждые %3$s дней"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/forms.inc.php:1765
 msgid "At (hour:minute)"
@@ -7287,7 +7287,7 @@ msgstr "Некорректный протокол аутентификации �
 
 #: include/classes/api/services/CHostInterface.php:658
 msgid "Incorrect bulk value for interface."
-msgstr ""
+msgstr "Некорректное значение массового опроса для интерфейса."
 
 #: include/classes/api/services/CService.php:941
 #, c-format
@@ -9385,12 +9385,12 @@ msgstr "Свернуть"
 #: include/classes/setup/CFrontendSetup.php:120
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "Минимально требуемый лимит памяти в PHP - %s (опция конфигурации \"memory_limit\")."
 
 #: include/classes/setup/CFrontendSetup.php:154
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "Минимально требуемый размер загружаемого файла в PHP - %s (опция конфигурации \"upload_max_filesize\")."
 
 #: include/classes/setup/CFrontendSetup.php:102
 #, c-format
@@ -9400,17 +9400,17 @@ msgstr "Минимально требуемая версия PHP - %s."
 #: include/classes/setup/CFrontendSetup.php:171
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "Минимально требуемый лимит выполнения PHP скриптов - %s (опция конфигурации \"max_execution_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:188
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "Минимально требуемый лимит времени разбора входящих данных для PHP скриптов - %s (опция конфигурации \"max_input_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:137
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "Минимально требуемый размер PHP post - %s (опция конфигурации \"post_max_size\")."
 
 #: include/views/monitoring.maps.php:40
 msgid "Minimum severity"
@@ -9534,7 +9534,7 @@ msgstr "Мониторинг"
 
 #: include/classes/items/CHelpItems.php:327
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
-msgstr ""
+msgstr "Мониторинг журнала событий Windows. pattern, severity, eventid - регулярные выражения"
 
 #: include/classes/items/CHelpItems.php:343
 msgid "Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression"
@@ -9694,12 +9694,12 @@ msgstr "Период хранения данных сетевого обнару
 
 #: adm.housekeeper.php:40
 msgid "Network discovery event and alert data storage period"
-msgstr ""
+msgstr "Период хранения данных о событиях сетевого обнаружения и оповещениях"
 
 #: adm.housekeeper.php:107
 #, c-format
 msgid "Network discovery event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Период хранения данных о событиях сетевого обнаружения и оповещениях (в днях) \"%1$s\"."
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:359
