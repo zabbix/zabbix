@@ -382,9 +382,9 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	encoding = get_rparam(&request, 3);
 
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
-
-	free_request(&request);
 out:
+	free_request(&request);
+
 	return ret;
 }
 
