@@ -393,7 +393,7 @@ class ZBase {
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->setAuth($sessionId);
+		API::getWrapper()->auth = $sessionId;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();

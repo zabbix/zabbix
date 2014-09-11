@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/include/func.inc.php';
+require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 sendHeader('Access-Control-Allow-Origin: *');
 sendHeader('Access-Control-Allow-Headers: Content-Type');
@@ -27,9 +29,6 @@ sendHeader('Access-Control-Max-Age: 1000');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 	return;
 }
-
-require_once dirname(__FILE__).'/include/func.inc.php';
-require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 $allowed_content = array(
 	'application/json-rpc' => 'json-rpc',
