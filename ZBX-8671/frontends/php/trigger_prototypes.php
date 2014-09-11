@@ -104,8 +104,8 @@ if (!$discoveryRule) {
 
 $triggerId = getRequest('triggerid');
 if ($triggerId) {
-	$triggerPrototype = API::TriggerPrototype()->get(array(
-		'output' => array('triggerid'),
+	$triggerPrototype = (bool) API::TriggerPrototype()->get(array(
+		'output' => array(),
 		'triggerids' => $triggerId,
 		'editable' => true
 	));
@@ -282,7 +282,6 @@ else {
 
 	$data = array(
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'showInfoColumn' => false,
 		'discovery_rule' => $discoveryRule,
 		'hostid' => $discoveryRule['hostid'],
 		'showdisabled' => getRequest('showdisabled', 1),
@@ -321,7 +320,7 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// render view
-	$triggersView = new CView('configuration.triggers.list', $data);
+	$triggersView = new CView('configuration.trigger.prototype.list', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
