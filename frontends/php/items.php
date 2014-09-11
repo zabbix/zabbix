@@ -217,9 +217,9 @@ if ($itemId) {
 	$item = reset($item);
 	$hosts = $item['hosts'];
 }
-else{
-	$hostId = getRequest('hostid', 0);
-	if ($hostId !== 0) {
+else {
+	$hostId = getRequest('hostid');
+	if ($hostId) {
 		$hosts = API::Host()->get(array(
 			'output' => array('status'),
 			'hostids' => $hostId,
@@ -241,7 +241,6 @@ $filterHostId = getRequest('filter_hostid');
 if ($filterHostId && !API::Host()->isWritable(array($filterHostId))) {
 	access_deny();
 }
-
 
 /*
  * Ajax

@@ -95,14 +95,13 @@ $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIG
 // validate permissions
 $triggerId = getRequest('triggerid');
 if ($triggerId) {
-	$triggers = API::Trigger()->get(array(
+	$trigger = (bool) API::Trigger()->get(array(
 		'output' => array(),
 		'triggerids' => $triggerId,
-		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (!$triggers) {
+	if (!$trigger) {
 		access_deny();
 	}
 }
@@ -470,11 +469,11 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
-	// determine, show or not column of errors
+	// do not show 'Info' column, if it is a template
 	if ($data['hostid'] > 0) {
 		$data['showInfoColumn'] = (bool) API::Host()->get(array(
-			'hostids' => $data['hostid'],
-			'output' => array('status')
+			'output' => array(),
+			'hostids' => $data['hostid']
 		));
 	}
 	else {

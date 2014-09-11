@@ -95,12 +95,17 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 /*
  * Permissions
  */
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
+	access_deny();
+}
+
 $hostId = getRequest('hostid');
 if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (hasRequest('parent_discoveryid')) {
 		// check whether discovery rule is editable by user
 		$discoveryRule = API::DiscoveryRule()->get(array(
-			'output' => array('hostid', 'name'),
+			'output' => array('name', 'itemid', 'hostid'),
 			'itemids' => getRequest('parent_discoveryid'),
 			'editable' => true
 		));
@@ -113,7 +118,7 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 
 		// check whether graph prototype is editable by user
 		if (hasRequest('graphid')) {
-			$graphPrototype = API::GraphPrototype()->get(array(
+			$graphPrototype = (bool) API::GraphPrototype()->get(array(
 				'output' => array(),
 				'graphids' => getRequest('graphid'),
 				'editable' => true
@@ -125,34 +130,28 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	}
 	elseif (hasRequest('graphid')) {
 		// check whether graph is normal and editable by user
-		$graphs = API::Graph()->get(array(
+		$graph = (bool) API::Graph()->get(array(
 			'output' => array(),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => getRequest('graphid'),
 			'editable' => true
 		));
-		if (!$graphs) {
+		if (!$graph) {
 			access_deny();
 		}
 	}
 	elseif ($hostId) {
 		// check whether host is editable by user
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid'),
+		$host = (bool) API::Host()->get(array(
+			'output' => array(),
 			'hostids' => $hostId,
 			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
+			'editable' => true
 		));
-		if (!$hosts) {
+		if (!$host) {
 			access_deny();
 		}
 	}
-}
-
-$groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
-	access_deny();
 }
 
 /*
@@ -367,7 +366,7 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 
 		if ($result) {
 			uncheckTableRows(
-				getRequest('parent_discoveryid') == 0 ? $hostId : getRequest('parent_discoveryid')
+				(getRequest('parent_discoveryid') == 0) ? $hostId : getRequest('parent_discoveryid')
 			);
 			unset($_REQUEST['group_graphid']);
 		}
