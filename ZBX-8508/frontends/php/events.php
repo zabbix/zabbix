@@ -382,31 +382,46 @@ $scroll_div->setAttribute('id', 'scrollbar_cntr');
 $events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
 // }}} FILTER
 
-
 $table = new CTableInfo(_('No events defined.'));
 
-// CHECK IF EVENTS EXISTS {{{
-$options = array(
-	'output' => API_OUTPUT_EXTEND,
-	'sortfield' => 'eventid',
-	'sortorder' => ZBX_SORT_UP,
-	'nopermissions' => 1,
-	'limit' => 1
-);
+// get all available triggers
+$availableTriggers = array();
+if ($source != EVENT_SOURCE_DISCOVERY) {
+	$availableTriggers = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'nodeids' => get_current_nodeid(),
+		'triggerids' => (get_request('triggerid', 0) != 0) ? get_request('triggerid') : null,
+		'hostids' => ($pageFilter->hostid != 0) ? $pageFilter->hostid : null,
+		'groupids' => ($pageFilter->groupid != 0) ? $pageFilter->groupid : null,
+		'monitored' => true,
+		'preservekeys' => true
+	));
+}
+
+if ($source == EVENT_SOURCE_DISCOVERY || $availableTriggers) {
+	$options = array(
+		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => 'eventid',
+		'sortorder' => ZBX_SORT_UP,
+		'nopermissions' => 1,
+		'limit' => 1
+	);
+}
 
 if ($source == EVENT_SOURCE_DISCOVERY) {
 	$options['source'] = EVENT_SOURCE_DISCOVERY;
 }
-else {
-	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
-		$options['triggerids'] = $_REQUEST['triggerid'];
-	}
+elseif ($availableTriggers) {
+	$options['triggerids'] = array_keys($availableTriggers);
 	$options['object'] = EVENT_OBJECT_TRIGGER;
 	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
 	$options['nodeids'] = get_current_nodeid();
 }
 
-$firstEvent = API::Event()->get($options);
+$firstEvent = array();
+if ($source == EVENT_SOURCE_DISCOVERY || $availableTriggers) {
+	$firstEvent = API::Event()->get($options);
+}
 // }}} CHECK IF EVENTS EXISTS
 
 $_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
@@ -599,25 +614,10 @@ else {
 				$options['filter']['value_changed'] = null;
 			}
 
-			// trigger options
-			$trigOpt = array(
-				'nodeids' => get_current_nodeid(),
-				'output' => API_OUTPUT_SHORTEN
-			);
-
-			if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
-				$trigOpt['triggerids'] = $_REQUEST['triggerid'];
-			}
-			else if ($pageFilter->hostid > 0) {
-				$trigOpt['hostids'] = $pageFilter->hostid;
-			}
-			else if ($pageFilter->groupid > 0) {
-				$trigOpt['groupids'] = $pageFilter->groupid;
-			}
-
-			$trigOpt['monitored'] = true;
-
-			$triggers = API::Trigger()->get($trigOpt);
+			$triggers = API::Trigger()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'triggerids' => array_keys($availableTriggers),
+			));
 			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
 			// query event with short data
