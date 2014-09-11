@@ -3131,8 +3131,8 @@ out:
 
 	zbx_vmware_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed " ZBX_FS_SIZE_T " bytes of data", __function_name,
-			page.offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): processed " ZBX_FS_SIZE_T " bytes of data", __function_name,
+			(zbx_fs_size_t)page.offset);
 }
 
 /*
