@@ -463,7 +463,6 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 // create new operation table
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
-	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
 	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
@@ -1069,7 +1068,7 @@ if (!empty($this->data['new_operation'])) {
 	}
 
 	$footer = array(
-		new CSubmit('add_operation', ($this->data['new_operation']['action'] == 'update') ? _('Update') : _('Add'), null, 'link_menu'),
+		new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add'), null, 'link_menu'),
 		SPACE.SPACE,
 		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 	);
