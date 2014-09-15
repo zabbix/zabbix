@@ -143,6 +143,7 @@ $totalTime = array(
 	'units' => null
 );
 
+$itemIds = array();
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
@@ -168,7 +169,6 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		}
 	}
 
-	$itemIds = array();
 	foreach ($httpStepItemsByType as &$httpStepItem) {
 		// calculate the total time it took to execute the scenario
 		// skip steps that come after a failed step
