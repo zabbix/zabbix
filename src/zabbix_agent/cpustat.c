@@ -350,11 +350,13 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		memset(counter, 0, sizeof(counter));
 
 		sscanf(line, "%*s " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64
-				" " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64,
+				" " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64
+				" " ZBX_FS_UI64 " " ZBX_FS_UI64,
 				&counter[ZBX_CPU_STATE_USER], &counter[ZBX_CPU_STATE_NICE],
 				&counter[ZBX_CPU_STATE_SYSTEM], &counter[ZBX_CPU_STATE_IDLE],
 				&counter[ZBX_CPU_STATE_IOWAIT], &counter[ZBX_CPU_STATE_INTERRUPT],
-				&counter[ZBX_CPU_STATE_SOFTIRQ], &counter[ZBX_CPU_STATE_STEAL]);
+				&counter[ZBX_CPU_STATE_SOFTIRQ], &counter[ZBX_CPU_STATE_STEAL],
+				&counter[ZBX_CPU_STATE_GCPU], &counter[ZBX_CPU_STATE_GNICE]);
 
 		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 		cpu_status[cpu_num] = SYSINFO_RET_OK;
