@@ -3,6 +3,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 
 --------------------------------------------------------------------------------
@@ -396,6 +397,7 @@ Changes for 2.2.7rc1
 New features:
 
 Bug fixes:
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
 ..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
