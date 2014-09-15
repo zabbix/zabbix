@@ -130,12 +130,12 @@ function discovery_object2str($object = null) {
  *
  * @return array									returns an array of actions condition string values
  */
-function actionConditionValueToString(array $actions, array $config = null) {
-	if (!$config) {
-		$config = select_config();
-	}
-
+function actionConditionValueToString(array $actions, array $config) {
 	$result = array();
+
+	if (!$actions) {
+		return $result;
+	}
 
 	$hostGroupsToSelect = array();
 	$triggersToSelect = array();
