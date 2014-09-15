@@ -123,6 +123,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 	zbx_free(trigger_prototype->comments);
 	zbx_free(trigger_prototype->expression);
 	zbx_free(trigger_prototype->description);
+	zbx_free(trigger_prototype);
 }
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
