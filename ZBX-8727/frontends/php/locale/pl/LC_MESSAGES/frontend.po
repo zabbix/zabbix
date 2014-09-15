@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-07 08:36+0300\n"
-"PO-Revision-Date: 2014-09-06 15:43+0300\n"
+"PO-Revision-Date: 2014-09-10 17:16+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410011039.0\n"
+"X-POOTLE-MTIME: 1410362185.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -838,7 +838,7 @@ msgstr "O (godzina:minuta)"
 #: include/classes/api/services/CMaintenance.php:302
 #: include/classes/api/services/CMaintenance.php:537
 msgid "At least one host or group should be selected."
-msgstr "Przynajmniej jeden host lub grupa musi być zaznaczona."
+msgstr "Musi być wybrany przynajmniej jeden host lub grupa."
 
 #: include/classes/api/services/CMaintenance.php:391
 #: include/classes/api/services/CMaintenance.php:528
@@ -1020,7 +1020,7 @@ msgstr "Obraz tła"
 
 #: include/menu.inc.php:133 report6.php:25 report6.php:242
 msgid "Bar reports"
-msgstr "Raport belkowy"
+msgstr "Raporty słupkowe"
 
 #: authentication.php:43
 #: include/views/administration.authentication.edit.php:75
@@ -1095,7 +1095,7 @@ msgstr "Wg hosta"
 
 #: report2.php:188
 msgid "By trigger template"
-msgstr "Wg wzorca wyzwalacza"
+msgstr "Wg szablonu wyzwalacza"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
@@ -1341,18 +1341,18 @@ msgstr "Nie można potwierdzić zdarzenia"
 #: include/classes/api/services/CGraph.php:745
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\" do wykresu \"%2$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\" do wykresu \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:693
 #: include/classes/api/services/CGraphPrototype.php:757
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\" do prototypu wykresu \"%2$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\" do prototypu wykresu \"%2$s\"."
 
 #: include/reports.inc.php:492
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\"."
 
 #: actionconf.php:164
 msgid "Cannot add action"
@@ -1562,7 +1562,7 @@ msgstr "Nie można skopiować wykresów"
 
 #: items.php:749
 msgid "Cannot copy items"
-msgstr "Nie można skopiować elementów"
+msgstr "Nie można skopiować pozycji"
 
 #: include/triggers.inc.php:400
 #, c-format
@@ -2931,7 +2931,7 @@ msgstr "usunięto kolumnę"
 #: include/views/configuration.screen.constructor.edit.php:719
 #: screenedit.php:73
 msgid "Column span"
-msgstr "Rozpiętość kolumn"
+msgstr "Rozpiętość kolumny"
 
 #: include/views/configuration.screen.edit.php:42 screenconf.php:51
 msgid "Columns"
@@ -3907,7 +3907,7 @@ msgstr "Usuń i wyczyść"
 
 #: templates.php:674
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Usunąć i wyczyścić zaznaczone szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
+msgstr "Usunąć i wyczyścić wybrane szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
 
 #: include/views/configuration.template.edit.php:487
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
@@ -3965,7 +3965,7 @@ msgstr "Usunąć słowo kluczowe?"
 
 #: jsLoader.php:155
 msgid "Delete links between selected elements?"
-msgstr "Usunąć powiązania między zaznaczonymi elementami?"
+msgstr "Usunąć powiązania między wybranymi elementami?"
 
 #: include/views/configuration.maintenance.edit.php:196
 msgid "Delete maintenance period?"
@@ -4426,7 +4426,7 @@ msgstr "Wyłącz tryb debugowania"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Disable debug mode in selected groups?"
-msgstr "Wyłączyć tryb debugowania dla zaznaczonych grup?"
+msgstr "Wyłączyć tryb debugowania dla wybranych grup?"
 
 #: include/actions.inc.php:388 include/actions.inc.php:611
 msgid "Disable host"
@@ -5325,7 +5325,7 @@ msgstr "Rozwinięty"
 #: hosts.php:1064 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:62 templates.php:667
 msgid "Export selected"
-msgstr "Eksportuj zaznaczone"
+msgstr "Eksportuj wybrane"
 
 #: events.php:298
 msgid "Export to CSV"
@@ -5352,7 +5352,7 @@ msgstr "Błąd składni w wyrażeniu."
 
 #: tr_testexpr.php:50
 msgid "Expression Variable Elements"
-msgstr "Wyrażenie elementów zmiennych"
+msgstr "Elementy zmiennej wyrażenia"
 
 #: include/classes/triggers/CTextTriggerConstructor.php:63
 #: include/views/js/adm.regexprs.edit.js.php:215
@@ -6686,7 +6686,7 @@ msgstr "Zaktualizowano hosty"
 #: include/reports.inc.php:61 include/reports.inc.php:385
 #: include/reports.inc.php:393
 msgid "Hourly"
-msgstr "Godzinny"
+msgstr "Godzinowo"
 
 #: include/forms.inc.php:1780
 msgid "Hours"
@@ -7801,11 +7801,11 @@ msgstr "Błędna funkcja wyzwalacza \"%1$s\" udostępniona w wyrażeniu."
 #: include/classes/api/services/CTriggerPrototype.php:976
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "Błędne wyrażenie prototypu wyzwalacza. Host \"%1$s\" nie istnieje lub nie masz dostępu do tego hosta."
 
 #: include/classes/api/services/CTriggerPrototype.php:987
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "Błędne wyrażenie prototypu wyzwalacza. Elementy wyrażenia prototypu wyzwalacza nie powinny jednocześnie należeć do szablonu i hosta."
 
 #: include/func.inc.php:1004
 msgid "Incorrect type of asort_by_key."
@@ -9180,7 +9180,7 @@ msgstr "Aktualizacja masowa"
 
 #: include/views/js/configuration.sysmaps.js.php:216
 msgid "Mass update elements"
-msgstr "Masowo aktualizuj pozycje"
+msgstr "Masowo aktualizuj elementy"
 
 #: include/views/configuration.screen.constructor.edit.php:190
 #: include/views/configuration.screen.constructor.edit.php:287
@@ -9190,12 +9190,12 @@ msgstr "Ilość maksymalna kolumn"
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Maksymalna liczba pozycji do wyświetlenia w komórce tabeli"
+msgstr "Maksymalna liczba elementów do wyświetlenia w komórce tabeli"
 
 #: adm.gui.php:79
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Maksymalna liczba pozycji do wyświetlenia w komórce tabeli \"%1$s\"."
+msgstr "Maksymalna liczba elementów do wyświetlenia w komórce tabeli \"%1$s\"."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
@@ -9754,7 +9754,7 @@ msgstr "Nowy warunek"
 
 #: jsLoader.php:152
 msgid "New element"
-msgstr "Nowa pozycja"
+msgstr "Nowy element"
 
 #: disc_prototypes.php:49 host_discovery.php:58
 #: include/views/configuration.host.discovery.edit.php:245
@@ -10276,7 +10276,7 @@ msgstr "Brak uprawnień dla hosta \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1841
 #, c-format
 msgid "No permission for item \"%1$s\"."
-msgstr "Brak uprawnień dla elementu \"%1$s\"."
+msgstr "Brak uprawnień dla pozycji \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1500
 #, c-format
@@ -11537,7 +11537,7 @@ msgstr "Odtwórz dźwięk"
 
 #: include/classes/setup/CSetupWizard.php:231
 msgid "Please correct all issues and press \"Retry\" button"
-msgstr "Należy poprawić wszystkie błędy, a następnie nacisnąć przycisk \"Ponów\""
+msgstr "Proszę poprawić wszystkie błędy i nacisnąć przycisk \"Ponów\""
 
 #: scripts.php:89
 msgid "Please enter confirmation text."
@@ -12038,7 +12038,7 @@ msgstr "Usuń powiązanie"
 
 #: include/views/monitoring.history.php:120
 msgid "Remove selected"
-msgstr "Usuń zaznaczone"
+msgstr "Usuń wybrane"
 
 #: include/views/configuration.host.massupdate.php:215
 #: include/views/configuration.triggers.edit.php:126
@@ -12269,7 +12269,7 @@ msgstr "Usunięto wiersz"
 #: include/views/configuration.screen.constructor.edit.php:720
 #: screenedit.php:74
 msgid "Row span"
-msgstr "Rozpiętość wierszy"
+msgstr "Rozpiętość wiersza"
 
 #: include/views/configuration.screen.edit.php:43 screenconf.php:52
 msgid "Rows"
@@ -12591,22 +12591,22 @@ msgstr "Komórka X - %2$s Y - %3$s ekranu \"%1$s\" jest już zajęta."
 #: include/classes/api/services/CScreenItem.php:793
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Span kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwy."
+msgstr "Rozpiętość kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwa."
 
 #: include/classes/api/services/CScreenItem.php:842
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
-msgstr "Span kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duży."
+msgstr "Rozpiętość kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duża."
 
 #: include/classes/api/services/CScreenItem.php:779
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Span wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwy."
+msgstr "Rozpiętość wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwa."
 
 #: include/classes/api/services/CScreenItem.php:829
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
-msgstr "Span wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duży."
+msgstr "Rozpiętość wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duża."
 
 #: include/classes/import/CXmlImport18.php:449
 #, c-format
@@ -14575,11 +14575,11 @@ msgstr "Niedostępne dla użytkowników z %1$s."
 
 #: include/views/administration.users.list.php:151
 msgid "Unblock selected"
-msgstr "Odblokuj zaznaczone"
+msgstr "Odblokuj wybrane"
 
 #: include/views/administration.users.list.php:152
 msgid "Unblock selected users?"
-msgstr "Odblokować zaznaczonych użytkowników?"
+msgstr "Odblokować wybranych użytkowników?"
 
 #: include/views/configuration.item.edit.php:229
 #: include/views/configuration.item.massupdate.php:237
@@ -15516,7 +15516,7 @@ msgstr "Ostrzeżenie"
 
 #: jsLoader.php:168
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
-msgstr "Przepraszamy, maksymalna możliwa liczba elementów to zapamiętania została osiągnięta."
+msgstr "Przepraszamy, maksymalna możliwa liczba elementów do zapamiętania została osiągnięta."
 
 #: hosts.php:865 hosts.php:959 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:208
@@ -15698,7 +15698,7 @@ msgstr "Błędne pola dla zależności dla serwisu \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:55
 msgid "Wrong fields for element."
-msgstr "Błędne pola dla pozycji."
+msgstr "Błędne pola dla elementu."
 
 #: include/classes/api/services/CHost.php:560
 #, c-format
@@ -16464,7 +16464,7 @@ msgstr "wyrażenie regularne"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "pamiętaj zaznaczone"
+msgstr "pamiętaj wybrane"
 
 #: include/services.inc.php:69 include/services.inc.php:70
 #: include/services.inc.php:157
