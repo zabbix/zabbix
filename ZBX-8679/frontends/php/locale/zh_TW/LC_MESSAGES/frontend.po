@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-25 14:49+0300\n"
-"PO-Revision-Date: 2014-08-22 14:18+0300\n"
+"POT-Creation-Date: 2014-09-06 09:40+0300\n"
+"PO-Revision-Date: 2014-09-02 10:34+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
@@ -16,18 +16,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408709928.0\n"
+"X-POOTLE-MTIME: 1409646850.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
 #: maintenance.php:141 maintenance.php:153 services.php:184 services.php:198
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr "\"%s\"必須介於1970/01/01和2038/01/18之間。"
+msgstr "\"%s\" 必須介於1970.01.01和2038.01.18之間。"
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"顯示「正常」的觸發器\" 必須為 \"0\" 或正整數。"
+msgstr "\"顯示「正常/OK」的觸發器\" 必須為 \"0\" 或正整數。"
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
@@ -48,7 +48,7 @@ msgstr[0] "在%2$d天裡，事件出現了%1$d天"
 #: chart4.php:89 chart5.php:83
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr "%1$s( %2$s年)"
+msgstr "%1$s ( %2$s年)"
 
 #: latest.php:559 latest.php:726
 #, c-format
@@ -69,7 +69,7 @@ msgstr[0] "%1$s天"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "有連續%4$s次登入失敗。最後一次登入失敗發生在 %2$s %3$s，從 %1$s 而來。"
+msgstr[0] "%4$s次登入失敗。最後一次登入失敗發生在 %2$s %3$s，從 %1$s 而來。"
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -81,7 +81,7 @@ msgstr[0] "%d個裝置"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr "（%1$s %2$s）"
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:474
 msgid "(0 - infinitely)"
@@ -110,19 +110,19 @@ msgstr "(最少 60 秒，0 表示採用預設值)"
 #: include/views/configuration.host.massupdate.php:152
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
-msgstr "沒有 proxy"
+msgstr "(沒有 proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
 msgstr "(含有警告)"
 
-#: include/blocks.inc.php:1538
+#: include/blocks.inc.php:1539
 msgid "-"
-msgstr "－"
+msgstr "-"
 
 #: acknow.php:135
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "－－[整批知悉]－－"
+msgstr "----[BULK ACKNOWLEDGE 整批知悉]----"
 
 #: include/triggers.inc.php:2250 include/triggers.inc.php:2251
 #: include/triggers.inc.php:2252 include/triggers.inc.php:2254
@@ -183,12 +183,12 @@ msgstr "警報知悉"
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
 msgid "AND"
-msgstr "且"
+msgstr "且（AND）"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:996
 msgid "AND / OR"
-msgstr "且／或"
+msgstr "且（AND）/ 或（OR）"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
@@ -236,7 +236,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
 
 #: events.php:590 events.php:603 include/actions.inc.php:256
-#: include/blocks.inc.php:936 include/blocks.inc.php:1511
+#: include/blocks.inc.php:936 include/blocks.inc.php:1512
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
@@ -352,7 +352,7 @@ msgid "Action updated"
 msgstr "已更新 回應動作"
 
 #: events.php:591 events.php:604 include/blocks.inc.php:937
-#: include/blocks.inc.php:1512 include/events.inc.php:205
+#: include/blocks.inc.php:1513 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -382,9 +382,9 @@ msgstr "啟用自"
 msgid "Active till"
 msgstr "啟用至"
 
-#: include/blocks.inc.php:1232 include/blocks.inc.php:1238
-#: include/blocks.inc.php:1356 include/blocks.inc.php:1401
-#: include/blocks.inc.php:1407 include/reports.inc.php:122
+#: include/blocks.inc.php:1233 include/blocks.inc.php:1239
+#: include/blocks.inc.php:1357 include/blocks.inc.php:1402
+#: include/blocks.inc.php:1408 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -506,7 +506,7 @@ msgstr "管理"
 msgid "Advanced labels"
 msgstr "進階標示"
 
-#: include/blocks.inc.php:934 include/blocks.inc.php:1509
+#: include/blocks.inc.php:934 include/blocks.inc.php:1510
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -555,9 +555,9 @@ msgstr "別名"
 msgid "Align icons"
 msgstr "對齊圖示"
 
-#: include/blocks.inc.php:1334 include/blocks.inc.php:1343
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1473
-#: include/blocks.inc.php:1482 include/nodes.inc.php:174
+#: include/blocks.inc.php:1335 include/blocks.inc.php:1344
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1474
+#: include/blocks.inc.php:1483 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -842,16 +842,16 @@ msgstr "自動退出(90秒)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "自動註冊資料保存期限(天)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "自動註冊主機之事件及警報保存期限"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "自動註冊主機之事件及警報保存期限(天)：\"%1$s\""
 
 #: include/views/configuration.host.edit.php:805
 #: include/views/configuration.host.massupdate.php:263
@@ -948,7 +948,7 @@ msgstr "Bind密碼"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "最新(近)數據 T 之 位元運算 AND 及遮罩為 N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
@@ -4405,7 +4405,7 @@ msgid "Discovery object"
 msgstr "探索物件"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1203 include/forms.inc.php:1150
+#: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4509,7 +4509,7 @@ msgstr "完成"
 msgid "Dot"
 msgstr "點"
 
-#: include/blocks.inc.php:1205
+#: include/blocks.inc.php:1206
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "下"
@@ -5161,15 +5161,15 @@ msgstr "更新範本失敗"
 msgid "Failure Audit"
 msgstr "稽核失敗"
 
-#: dashboard.php:311 include/blocks.inc.php:1225
+#: dashboard.php:311 include/blocks.inc.php:1226
 msgid "Favourite graphs"
 msgstr "常用的圖形"
 
-#: dashboard.php:339 include/blocks.inc.php:1354
+#: dashboard.php:339 include/blocks.inc.php:1355
 msgid "Favourite maps"
 msgstr "常用的拓墣圖"
 
-#: dashboard.php:325 include/blocks.inc.php:1399
+#: dashboard.php:325 include/blocks.inc.php:1400
 msgid "Favourite screens"
 msgstr "常用的監看螢幕"
 
@@ -5530,7 +5530,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "漸層線"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1232
+#: include/audit.inc.php:29 include/blocks.inc.php:1233
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:283
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:448 latest.php:621
@@ -5681,7 +5681,7 @@ msgstr "名為\"%1$s\"的圖形已經存在於圖形或圖形原型中."
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同類型的圖形已存在."
 
-#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1334
+#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1335
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5825,7 +5825,7 @@ msgstr "H:i"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -6000,7 +6000,7 @@ msgstr "橫向對齊"
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:615 include/blocks.inc.php:662
 #: include/blocks.inc.php:920 include/blocks.inc.php:931
-#: include/blocks.inc.php:1507 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1508 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -7476,7 +7476,7 @@ msgstr "圖形\"%1$s\"的不正確y min項目."
 msgid "Indonesian (id_ID)"
 msgstr "印尼語 (id_ID)"
 
-#: include/blocks.inc.php:935 include/blocks.inc.php:1510
+#: include/blocks.inc.php:935 include/blocks.inc.php:1511
 #: include/classes/class.cformlist.php:72 latest.php:365 latest.php:366
 #: tr_status.php:371
 msgid "Info"
@@ -7706,7 +7706,7 @@ msgid "Is online?"
 msgstr "是否在線?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
-#: include/blocks.inc.php:1508
+#: include/blocks.inc.php:1509
 msgid "Issue"
 msgstr "議題"
 
@@ -7718,7 +7718,7 @@ msgstr "不能以用戶密碼來過濾."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "不可能於HTTP認證中登出."
 
-#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
+#: api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
@@ -8641,7 +8641,7 @@ msgstr "手動的"
 msgid "Manual Logout"
 msgstr "手動登出"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1356
+#: include/audit.inc.php:40 include/blocks.inc.php:1357
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8701,7 +8701,7 @@ msgstr "對應值\"%1$s\"並非唯一."
 msgid "Mappings"
 msgstr "對應"
 
-#: dashboard.php:340 include/blocks.inc.php:1389 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1390 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:96
@@ -9508,7 +9508,7 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr ""
+msgstr "沒有發現稽核記錄"
 
 #: api/classes/CAction.php:1354
 #, c-format
@@ -9593,7 +9593,7 @@ msgstr "沒有選取組件!"
 msgid "No errors found."
 msgstr "沒有找到錯誤."
 
-#: include/blocks.inc.php:1009 include/blocks.inc.php:1529 tr_status.php:734
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1530 tr_status.php:734
 msgid "No events"
 msgstr "沒有事件"
 
@@ -10069,7 +10069,7 @@ msgstr ""
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
-#: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1203 include/classes/screens/CScreenEvents.php:40
 #: include/page_header.php:324 include/triggers.inc.php:1625
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -11513,10 +11513,10 @@ msgstr "記住我三十日"
 msgid "Remote command"
 msgstr "遠端命令"
 
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1334
-#: include/blocks.inc.php:1343 include/blocks.inc.php:1361
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1412
-#: include/blocks.inc.php:1473 include/blocks.inc.php:1482
+#: include/blocks.inc.php:1246 include/blocks.inc.php:1335
+#: include/blocks.inc.php:1344 include/blocks.inc.php:1362
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1413
+#: include/blocks.inc.php:1474 include/blocks.inc.php:1483
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -12136,7 +12136,7 @@ msgstr "排程"
 msgid "Scheduled check"
 msgstr "排程的檢查"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1401
+#: include/audit.inc.php:41 include/blocks.inc.php:1402
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12216,7 +12216,7 @@ msgstr "監看螢幕應包含至少一個行和列."
 msgid "Screen updated"
 msgstr "監看螢幕已更新"
 
-#: dashboard.php:326 include/blocks.inc.php:1473 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1474 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:371
@@ -12696,11 +12696,11 @@ msgstr "簡單"
 msgid "Simple check"
 msgstr "簡單檢查"
 
-#: include/blocks.inc.php:1238 include/screens.inc.php:38
+#: include/blocks.inc.php:1239 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "簡單圖形"
 
-#: include/blocks.inc.php:1343 jsLoader.php:114
+#: include/blocks.inc.php:1344 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "簡單圖形"
 
@@ -12759,7 +12759,7 @@ msgstr "略過複製圖片\"%1$s\"到主機\"%2$s\"."
 msgid "Slide"
 msgstr "簡報片"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1407
+#: include/audit.inc.php:45 include/blocks.inc.php:1408
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "簡報片展示"
@@ -12796,7 +12796,7 @@ msgstr "簡報片展示已更新"
 msgid "Slide shows"
 msgstr "簡報片展示"
 
-#: include/blocks.inc.php:1482
+#: include/blocks.inc.php:1483
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "簡報片"
@@ -14269,7 +14269,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/blocks.inc.php:1204
+#: include/blocks.inc.php:1205
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "上"
@@ -14316,7 +14316,7 @@ msgstr "主機的已更新狀態"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"

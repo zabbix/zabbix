@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 11:45+0300\n"
+"POT-Creation-Date: 2014-09-06 09:39+0300\n"
 "PO-Revision-Date: 2013-12-17 21:07+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -118,7 +118,7 @@ msgstr "(no proxy)"
 msgid "(with warnings)"
 msgstr "(with warnings)"
 
-#: include/blocks.inc.php:1538
+#: include/blocks.inc.php:1539
 msgid "-"
 msgstr "-"
 
@@ -238,7 +238,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "Account is blocked for %s seconds"
 
 #: events.php:590 events.php:603 include/actions.inc.php:256
-#: include/blocks.inc.php:936 include/blocks.inc.php:1511
+#: include/blocks.inc.php:936 include/blocks.inc.php:1512
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
@@ -356,7 +356,7 @@ msgid "Action updated"
 msgstr "Action updated"
 
 #: events.php:591 events.php:604 include/blocks.inc.php:937
-#: include/blocks.inc.php:1512 include/events.inc.php:205
+#: include/blocks.inc.php:1513 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -386,9 +386,9 @@ msgstr "Active since"
 msgid "Active till"
 msgstr "Active until"
 
-#: include/blocks.inc.php:1232 include/blocks.inc.php:1238
-#: include/blocks.inc.php:1356 include/blocks.inc.php:1401
-#: include/blocks.inc.php:1407 include/reports.inc.php:122
+#: include/blocks.inc.php:1233 include/blocks.inc.php:1239
+#: include/blocks.inc.php:1357 include/blocks.inc.php:1402
+#: include/blocks.inc.php:1408 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -510,7 +510,7 @@ msgstr "Administration"
 msgid "Advanced labels"
 msgstr "Advanced labels"
 
-#: include/blocks.inc.php:934 include/blocks.inc.php:1509
+#: include/blocks.inc.php:934 include/blocks.inc.php:1510
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -559,9 +559,9 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Align icons"
 
-#: include/blocks.inc.php:1334 include/blocks.inc.php:1343
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1473
-#: include/blocks.inc.php:1482 include/nodes.inc.php:174
+#: include/blocks.inc.php:1335 include/blocks.inc.php:1344
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1474
+#: include/blocks.inc.php:1483 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -4437,7 +4437,7 @@ msgid "Discovery object"
 msgstr "Discovery object"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1203 include/forms.inc.php:1150
+#: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4543,7 +4543,7 @@ msgstr "Done"
 msgid "Dot"
 msgstr "Dot"
 
-#: include/blocks.inc.php:1205
+#: include/blocks.inc.php:1206
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Down"
@@ -5195,15 +5195,15 @@ msgstr "Failed to update template"
 msgid "Failure Audit"
 msgstr "Failure Audit"
 
-#: dashboard.php:311 include/blocks.inc.php:1225
+#: dashboard.php:311 include/blocks.inc.php:1226
 msgid "Favourite graphs"
 msgstr "Favorite graphs"
 
-#: dashboard.php:339 include/blocks.inc.php:1354
+#: dashboard.php:339 include/blocks.inc.php:1355
 msgid "Favourite maps"
 msgstr "Favorite maps"
 
-#: dashboard.php:325 include/blocks.inc.php:1399
+#: dashboard.php:325 include/blocks.inc.php:1400
 msgid "Favourite screens"
 msgstr "Favorite screens"
 
@@ -5564,7 +5564,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Gradient line"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1232
+#: include/audit.inc.php:29 include/blocks.inc.php:1233
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:283
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:448 latest.php:621
@@ -5715,7 +5715,7 @@ msgstr "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgid "Graph with same name but other type exist."
 msgstr "Graph with same name but other type exist."
 
-#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1334
+#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1335
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5859,7 +5859,7 @@ msgstr "h:i A"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -6034,7 +6034,7 @@ msgstr "Horizontal align"
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:615 include/blocks.inc.php:662
 #: include/blocks.inc.php:920 include/blocks.inc.php:931
-#: include/blocks.inc.php:1507 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1508 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -7514,7 +7514,7 @@ msgstr "Incorrect y min item for graph \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indonesian (id_ID)"
 
-#: include/blocks.inc.php:935 include/blocks.inc.php:1510
+#: include/blocks.inc.php:935 include/blocks.inc.php:1511
 #: include/classes/class.cformlist.php:72 latest.php:365 latest.php:366
 #: tr_status.php:371
 msgid "Info"
@@ -7744,7 +7744,7 @@ msgid "Is online?"
 msgstr "Is online?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
-#: include/blocks.inc.php:1508
+#: include/blocks.inc.php:1509
 msgid "Issue"
 msgstr "Issue"
 
@@ -7756,7 +7756,7 @@ msgstr "It is not possible to filter by user password."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "It is not possible to logout from HTTP authentication."
 
-#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
+#: api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "It is not possible to search by user password."
 
@@ -8684,7 +8684,7 @@ msgstr "Manual"
 msgid "Manual Logout"
 msgstr "Manual Logout"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1356
+#: include/audit.inc.php:40 include/blocks.inc.php:1357
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8744,7 +8744,7 @@ msgstr "Mapping value \"%1$s\" is not unique."
 msgid "Mappings"
 msgstr "Mappings"
 
-#: dashboard.php:340 include/blocks.inc.php:1389 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1390 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:96
@@ -9642,7 +9642,7 @@ msgstr "No elements selected!"
 msgid "No errors found."
 msgstr "No errors found."
 
-#: include/blocks.inc.php:1009 include/blocks.inc.php:1529 tr_status.php:734
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1530 tr_status.php:734
 msgid "No events"
 msgstr "No events"
 
@@ -10118,7 +10118,7 @@ msgstr "No web scenarios found."
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
-#: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1203 include/classes/screens/CScreenEvents.php:40
 #: include/page_header.php:324 include/triggers.inc.php:1625
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -11563,10 +11563,10 @@ msgstr "Remember me for 30 days"
 msgid "Remote command"
 msgstr "Remote command"
 
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1334
-#: include/blocks.inc.php:1343 include/blocks.inc.php:1361
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1412
-#: include/blocks.inc.php:1473 include/blocks.inc.php:1482
+#: include/blocks.inc.php:1246 include/blocks.inc.php:1335
+#: include/blocks.inc.php:1344 include/blocks.inc.php:1362
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1413
+#: include/blocks.inc.php:1474 include/blocks.inc.php:1483
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -12186,7 +12186,7 @@ msgstr "Schedule"
 msgid "Scheduled check"
 msgstr "Scheduled check"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1401
+#: include/audit.inc.php:41 include/blocks.inc.php:1402
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12266,7 +12266,7 @@ msgstr "Screen should contain at least one row and column."
 msgid "Screen updated"
 msgstr "Screen updated"
 
-#: dashboard.php:326 include/blocks.inc.php:1473 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1474 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:371
@@ -12746,11 +12746,11 @@ msgstr "Simple"
 msgid "Simple check"
 msgstr "Simple check"
 
-#: include/blocks.inc.php:1238 include/screens.inc.php:38
+#: include/blocks.inc.php:1239 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Simple graph"
 
-#: include/blocks.inc.php:1343 jsLoader.php:114
+#: include/blocks.inc.php:1344 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Simple graphs"
 
@@ -12809,7 +12809,7 @@ msgstr "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgid "Slide"
 msgstr "Slide"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1407
+#: include/audit.inc.php:45 include/blocks.inc.php:1408
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Slide show"
@@ -12846,7 +12846,7 @@ msgstr "Slide show updated"
 msgid "Slide shows"
 msgstr "Slide shows"
 
-#: include/blocks.inc.php:1482
+#: include/blocks.inc.php:1483
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Slides"
@@ -14326,7 +14326,7 @@ msgstr "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 
-#: include/blocks.inc.php:1204
+#: include/blocks.inc.php:1205
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Up"
@@ -14373,7 +14373,7 @@ msgstr "Updated status of host"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
