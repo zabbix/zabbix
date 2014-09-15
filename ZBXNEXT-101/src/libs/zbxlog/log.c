@@ -262,12 +262,23 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	wchar_t			thread_id[20], *strings[2];
 #else
 	struct timeval		current_time;
+	sigset_t		mask, orig_mask;
 #endif
+
+#ifndef _WINDOWS
+	sigemptyset (&mask);
+	sigaddset (&mask, SIGUSR1);
+#endif
+
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (LOG_TYPE_FILE == log_type)
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zbx_error("could not set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
@@ -369,6 +380,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		zbx_mutex_unlock(&log_file_access);
 
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zbx_error("could not restore sigprocmask");
+#endif
 		return;
 	}
 
