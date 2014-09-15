@@ -316,7 +316,7 @@ var chkbxRange = {
 	submitGo: function(e) {
 		e = e || window.event;
 
-		var goSelect = $('go');
+		var goSelect = $('action');
 		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
 
 		if (!is_null(confirmText) && !confirm(confirmText)) {

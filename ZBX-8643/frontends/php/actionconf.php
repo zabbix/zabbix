@@ -322,7 +322,6 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	if (isset($_REQUEST['operations'][$edit_operationid])) {
 		$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 		$_REQUEST['new_operation']['id'] = $edit_operationid;
-		$_REQUEST['new_operation']['action'] = 'update';
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), array('action.massenable', 'action.massdisable')) && hasRequest('g_actionid')) {
@@ -498,7 +497,6 @@ if (hasRequest('form')) {
 	if (!empty($data['new_operation'])) {
 		if (!is_array($data['new_operation'])) {
 			$data['new_operation'] = array(
-				'action' => 'create',
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,
