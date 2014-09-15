@@ -813,7 +813,6 @@ int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 void	remove_param(char *param, int num);
-const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -942,11 +941,12 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
-int	ip_in_list(char *list, char *ip);
+int	ip_in_list(char *list, const char *ip);
 
-int	expand_ipv6(const char *ip, char *str, size_t str_len);
+int	ip4_str2dig(const char *ip, unsigned int *ip_dig);
+int	ip6_str2dig(const char *ip, unsigned short *groups);
 #ifdef HAVE_IPV6
-char	*collapse_ipv6(char *str, size_t str_len);
+void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len);
 #endif
 
 /* time related functions */
