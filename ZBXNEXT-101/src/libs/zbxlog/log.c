@@ -455,6 +455,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_SYSLOG */
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
+			zbx_error("could not set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		switch (level)
@@ -477,6 +481,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		}
 
 		zbx_mutex_unlock(&log_file_access);
+#ifndef _WINDOWS
+		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
+			zbx_error("could not restore sigprocmask");
+#endif
 	}
 }
 
