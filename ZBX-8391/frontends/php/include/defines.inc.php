@@ -19,9 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.4.0rc3');
-define('ZABBIX_API_VERSION',	'2.4.0');
-define('ZABBIX_DB_VERSION',		2030118);
+define('ZABBIX_VERSION',		'2.5.0');
+define('ZABBIX_API_VERSION',	'2.5.0');
+define('ZABBIX_DB_VERSION',		2040000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2014');

@@ -1,4 +1,30 @@
+Changes for 2.5.0
+
+New features:
+...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
+
+Bug fixes:
+...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
+....I..... [ZBX-8658] made various changes to odbc related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.0
+
+2.4.0rc3 was released as 2.4.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.0rc3
+
+New features:
+A.F....... [ZBX-1357] updated Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-8734] fixed IPMI pollers not starting properly on the server (asaveljevs)
@@ -380,6 +406,7 @@ Changes for 2.2.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
 ..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
 ..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
@@ -1466,6 +1493,7 @@ Changes for 2.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.13
