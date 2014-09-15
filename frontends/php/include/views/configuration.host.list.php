@@ -19,7 +19,7 @@ $config = $this->data['config'];
 $frmForm = new CForm();
 $frmForm->cleanItems();
 $frmForm->addItem(new CDiv(array(
-		new CSubmit('form', _('Create host')),
+		new CSubmit('start_add', _('Create host')),
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 	)));
 $frmForm->addItem(new CVar('groupid', getRequest('groupid'), 'filter_groupid_id'));
@@ -106,7 +106,7 @@ foreach ($hosts as $host) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+	$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?start_update=1&hostid='.$host['hostid'].url_param('groupid'));
 
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
