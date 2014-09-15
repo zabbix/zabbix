@@ -142,6 +142,7 @@ $totalTime = array(
 	'units' => null
 );
 
+$itemIds = array();
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$status['msg'] = _('OK');
 	$status['style'] = 'enabled';
@@ -162,7 +163,6 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		}
 	}
 
-	$itemIds = array();
 	$db_items = DBselect(
 		'SELECT i.lastvalue,i.lastclock,i.value_type,i.valuemapid,i.units,i.itemid,hi.type AS httpitem_type'.
 			' FROM items i,httpstepitem hi'.

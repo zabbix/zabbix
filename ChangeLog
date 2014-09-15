@@ -3,6 +3,7 @@ Changes for 2.0.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.13
