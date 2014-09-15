@@ -1,35 +1,49 @@
-.TH ZABBIX_PROXY 8 "10 November 2011"
+.TH ZABBIX_PROXY 8 "2014\-07\-10" Zabbix
 .SH NAME
-zabbix_proxy \- Zabbix proxy daemon.
+zabbix_proxy \- Zabbix proxy daemon
 .SH SYNOPSIS
-.B zabbix_proxy [-hV] [-c \fI<config-file>\fB] [-R \fI<option>\fB]
+.B zabbix_proxy
+.RB [ \-c
+.IR config\-file ]
+.br
+.B zabbix_proxy
+.RB [ \-c
+.IR config\-file ]
+.B \-R
+.I runtime-option
+.br
+.B zabbix_proxy \-h
+.br
+.B zabbix_proxy \-V
 .SH DESCRIPTION
 .B zabbix_proxy
-is a daemon used for remote data collection.
-.SS Options
-.IP "-c, --config \fI<config-file>\fR"
-Use the alternate \fIconfig-file\fR instead of the default one.
+is a daemon that collects monitoring data from devices and sends it to Zabbix server.
+.SH OPTIONS
+.IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
+Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
-.IP "-R, --runtime-control \fI<option>\fR"
-Perform administrative functions according to \fIoption\fR.
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime-option\fR"
+Perform administrative functions according to \fIruntime-option\fR.
 .SS
 .RS 4
 Runtime control options
 .RS 4
 .TP 4
-config_cache_reload
-Reload configuration cache. Ignored if cache is being currently loaded. Active Zabbix proxy will connect to the Zabbix server and request configuration data.
-Default configuration file (unless \fB-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
+.B config_cache_reload
+Reload configuration cache.
+Ignored if cache is being currently loaded.
+Active Zabbix proxy will connect to the Zabbix server and request configuration data.
+Default configuration file (unless \fB\-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
 .RE
 .RS 4
 .TP 4
-log_level_increase[=<target>]
-Increase log level, affect all processes if target is not specified
+\fBlog_level_increase\fR[=\fItarget\fR]
+Increase log level, affects all processes if target is not specified
 .RE
 .RS 4
 .TP 4
-log_level_increase[=<target>]
-Decrease log level, affect all processes if target is not specified
+\fBlog_level_decrease\fR[=\fItarget\fR]
+Decrease log level, affects all processes if target is not specified
 .RE
 .RE
 .SS
@@ -37,23 +51,23 @@ Decrease log level, affect all processes if target is not specified
 Log level control targets
 .RS 4
 .TP 4
-<pid>
+.I pid
 Process identifier
 .RE
 .RS 4
 .TP 4
-<process type>
+.I process-type
 All processes of specified type (e.g., poller)
 .RE
 .RS 4
 .TP 4
-<process type>,N
+.I process-type,N
 Process type and number (e.g., poller,3)
 .RE
 .RE
-.IP "-h, --help"
+.IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
-.IP "-V, --version"
+.IP "\fB\-V\fR, \fB\-\-version\fR"
 Output version information and exit.
 .SH FILES
 .TP
