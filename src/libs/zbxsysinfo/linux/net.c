@@ -71,7 +71,7 @@ enum
 	NLERR_UNKNOWNMSGTYPE
 };
 
-int	nlerr;
+static int	nlerr;
 
 static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 {
@@ -567,7 +567,10 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE, found = 0;
+	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
+#ifdef HAVE_INET_DIAG
+	int		found = 0;
+#endif
 
 	if (1 < request->nparam)
 	{
@@ -593,7 +596,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		char	*error = NULL;
 
-		switch(nlerr)
+		switch (nlerr)
 		{
 			case NLERR_UNKNOWN:
 				error = zbx_strdup(error, "unrecognized netlink error occurred");
