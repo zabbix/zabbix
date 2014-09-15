@@ -418,6 +418,10 @@ function getConditionDescription($conditionType, $operator, $value) {
 function getActionOperationDescriptions(array $actions) {
 	$result = array();
 
+	if (!$actions) {
+		return $result;
+	}
+
 	$mediaTypesToSelect = array();
 	$usersToSelect = array();
 	$userGroupsToSelect = array();
