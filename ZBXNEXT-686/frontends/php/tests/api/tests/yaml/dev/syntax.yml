@@ -30,7 +30,8 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "1"
+            # macros can be used to reference values returned by fixtures
+            groupid: @fixtures.hostGroups.result.groupid@
 
     # what to expect: either "result" or "error"
     expect: result
@@ -49,7 +50,7 @@ steps:
       params:
         output: [host, host, status]
         # macros can be used to reference values from the previous steps
-        hostids: ["@step1.response.hostids[0]@"]
+        hostids: ["@steps.step1.response.hostids[0]@"]
 
     expect: result
 
@@ -57,8 +58,8 @@ steps:
       -
         # macros can be used in the response as well
         # this will match the value of "hostid" to the ID returned by host.create in step1
-        hostid: @step1.response.hostids[0]@
-        host: @step1.request.params.host@
+        hostid: @steps.step1.response.hostids[0]@
+        host: @steps.step1.request.params.host@
         # a simple match
         status: "0"
 
@@ -67,7 +68,7 @@ steps:
     request:
       method: host.create
       params:
-        host: @step1.request.params.host@
+        host: @steps.step1.request.params.host@
         interfaces:
           -
             type: 1
@@ -78,7 +79,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "1"
+            groupid: @fixtures.hostGroups.result.groupid@
 
     # in this step we expect an error
     expect: error
@@ -86,7 +87,7 @@ steps:
     response:
       message: "Invalid params."
       # macros can also be used inside of strings
-      data: "Host with the same name \"@step1.request.params.host@\" already exists."
+      data: "Host with the same name \"@steps.step1.request.params.host@\" already exists."
       code: -32602
 
   # Step 4, try to create a host the same way as in step 1, but use different validators to check the result
@@ -105,7 +106,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "1"
+            groupid: @fixtures.hostGroups.result.groupid@
 
     expect: result
 

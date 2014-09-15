@@ -10,7 +10,7 @@ class DataFixture extends Fixture {
 			DBstart();
 
 			// TODO: enable ID generation
-			\DB::insert($params['table'], $params['values'], false);
+			$ids = \DB::insert($params['table'], $params['values']);
 
 			DBend();
 		}
@@ -21,6 +21,8 @@ class DataFixture extends Fixture {
 			$lastMessage = array_pop($ZBX_MESSAGES);
 			throw new \Exception($lastMessage['message']);
 		}
+
+		return $ids;
 	}
 
 }

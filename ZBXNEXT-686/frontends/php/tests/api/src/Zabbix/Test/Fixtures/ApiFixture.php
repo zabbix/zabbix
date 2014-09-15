@@ -36,10 +36,7 @@ class ApiFixture extends Fixture {
 			throw new \Exception($rs->errorMessage);
 		}
 
-		$data = $rs->data;
-		$ids = reset($data);
-
-		return $ids;
+		return $rs->data;
 	}
 
 }

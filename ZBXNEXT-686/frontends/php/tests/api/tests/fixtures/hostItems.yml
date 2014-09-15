@@ -1,3 +1,6 @@
+params:
+  hostid: ~
+
 fixtures:
   item:
     type: data
@@ -5,7 +8,6 @@ fixtures:
       table: items
       values:
         -
-          itemid: 1
           type: 0
           snmp_community: ""
           snmp_oid: ""

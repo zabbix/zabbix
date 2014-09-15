@@ -71,7 +71,8 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		$client->setServiceFactory(new \CApiServiceFactory());
 
 		$this->fixtureLoader = new FixtureLoader(
-			new FixtureFactory(new \CApiWrapper($client))
+			new FixtureFactory(new \CApiWrapper($client)),
+			new \CArrayMacroResolver()
 		);
 	}
 

@@ -29,7 +29,11 @@ class IncludeFixture extends Fixture {
 
 		$fixtureFile = Yaml::parse(file_get_contents($path));
 
-		$this->fixtureLoader->load($fixtureFile['fixtures'], $params['params']);
+		$fixtures = $this->fixtureLoader->load($fixtureFile['fixtures'], $params['params']);
+
+		$return = (isset($fixtureFile['return'])) ? $fixtureFile['return'] : array();
+
+		return $this->fixtureLoader->resolveMacros($return, $fixtures, $params);
 	}
 
 }

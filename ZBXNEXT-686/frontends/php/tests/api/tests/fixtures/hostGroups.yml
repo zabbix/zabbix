@@ -1,8 +1,10 @@
+return:
+  groupid: @fixtures.hostgroup.result.groupids[0]@
+
 fixtures:
   hostgroup:
     type: api
     params:
       method: hostgroup.create
       params:
-        groupid: 1
         name: "Zabbix servers"

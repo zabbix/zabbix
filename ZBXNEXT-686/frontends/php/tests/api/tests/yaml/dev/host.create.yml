@@ -27,7 +27,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "1"
+            groupid: @fixtures.hostGroups.result.groupid@
 
     expect: result
 
@@ -39,7 +39,7 @@ steps:
     request:
       method: host.get
       params:
-        hostids: ["@step1.response.hostids[0]@"]
+        hostids: ["@steps.step1.response.hostids[0]@"]
         selectGroups: [groupid]
         selectInterfaces: [ip]
         selectParentTemplate: [templateid]
@@ -48,9 +48,9 @@ steps:
 
     response:
       -
-        hostid: @step1.response.hostids[0]@
-        host: @step1.request.params.host@
-        name: @step1.request.params.host@
+        hostid: @steps.step1.response.hostids[0]@
+        host: @steps.step1.request.params.host@
+        name: @steps.step1.request.params.host@
         proxy_hostid: "0"
         status: "0"
         disable_until: "0"
@@ -83,7 +83,7 @@ steps:
         description: ""
         groups:
           -
-            groupid: @step1.request.params.groups[0].groupid@
+            groupid: @steps.step1.request.params.groups[0].groupid@
         interfaces:
           -
-            ip: @step1.request.params.interfaces[0].ip@
+            ip: @steps.step1.request.params.interfaces[0].ip@

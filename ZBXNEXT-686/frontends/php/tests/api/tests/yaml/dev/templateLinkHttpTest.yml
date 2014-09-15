@@ -15,21 +15,30 @@ fixtures:
     type: include
     params:
       file: hosts
+      params:
+        groupid: @fixtures.hostGroups.result.groupid@
 
   templates:
     type: include
     params:
       file: templates
+      params:
+        groupid: @fixtures.hostGroups.result.groupid@
 
   templateApplications:
     type: include
     params:
       file: templateApplications
+      params:
+        hostid: @fixtures.templates.result.templateid@
 
   templateHttpTests:
     type: include
     params:
       file: templateHttpTests
+      params:
+        hostid: @fixtures.templates.result.templateid@
+        applicationid: @fixtures.templateApplications.result.applicationid@
 
 steps:
   step1:
@@ -37,7 +46,7 @@ steps:
       method: host.update
       params:
         hostid: 1
-        templates: { templateid: 1000 }
+        templates: { templateid: @fixtures.templates.result.templateid@ }
 
     expect: result
     response:
@@ -66,7 +75,7 @@ steps:
         authentication: 1
         http_user: "user"
         http_password: "password"
-        hostid: @step1.request.params.hostid@
+        hostid: @steps.step1.request.params.hostid@
         http_proxy: "root@proxy"
         retries: 3
         ssl_cert_file: "certificate"
@@ -75,7 +84,7 @@ steps:
         verify_peer: 1
         verify_host: 1
         headers: "Accept: text/html"
-        templateid: 1000,
+        templateid: @fixtures.templateHttpTests.result.httptestid@
         steps:
           -
             httpstepid: { _assert: string }
@@ -112,13 +121,13 @@ steps:
       method: application.get
       params:
         output: [name, hostid]
-        applicationids: @step2.response[0].applicationid@
+        applicationids: @steps.step2.response[0].applicationid@
 
     expect: result
     response:
       -
-        applicationid: @step2.response[0].applicationid@
+        applicationid: @steps.step2.response[0].applicationid@
         name: App
-        hostid: @step1.request.params.hostid@
+        hostid: @steps.step1.request.params.hostid@
 
   # TODO: check that web items have been created on the host

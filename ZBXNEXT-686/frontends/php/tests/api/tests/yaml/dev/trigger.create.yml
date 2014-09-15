@@ -13,11 +13,15 @@ fixtures:
     type: include
     params:
       file: hosts
+      params:
+        groupid: @fixtures.hostGroups.result.groupid@
 
   hostItems:
     type: include
     params:
       file: hostItems
+      params:
+        hostid: @fixtures.hosts.result.hostid@
 
 steps:
 
@@ -40,17 +44,17 @@ steps:
       params:
         selectFunctions: extend
         selectHosts: [host]
-        triggerids: @step1.response.triggerids[0]@
+        triggerids: @steps.step1.response.triggerids[0]@
 
     expect: result
     response:
       -
-        triggerid: @step1.response.triggerids[0]@
+        triggerid: @steps.step1.response.triggerids[0]@
 
         # since we don't know the ID of the function, validate the expression using a regex
         expression: { _assert: "regex(\"^{[0-9]+}<1024$\")" }
 
-        description: @step1.request.params.description@
+        description: @steps.step1.request.params.description@
         url: ""
         status: 0
         value: 0
@@ -68,7 +72,7 @@ steps:
             functionid: { _assert: string }
             itemid: { _assert: string }
 
-            triggerid: @step1.response.triggerids[0]@
+            triggerid: @steps.step1.response.triggerids[0]@
             function: "last"
             parameter: ""
 
@@ -90,6 +94,6 @@ steps:
     expect: result
     response:
       -
-        triggerid: @step1.response.triggerids[0]@
-        expression: @step1.request.params.expression@
+        triggerid: @steps.step1.response.triggerids[0]@
+        expression: @steps.step1.request.params.expression@
         description: "Low memory on Zabbix server"

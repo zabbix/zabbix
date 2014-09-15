@@ -1,3 +1,9 @@
+params:
+  groupid: ~
+
+return:
+  templateid: @fixtures.template.result[0]@
+
 fixtures:
   template:
     type: data
@@ -5,7 +11,6 @@ fixtures:
       table: hosts
       values:
         -
-          hostid: 1000
           host: "Template"
           name: "Template"
           description: ""
@@ -17,9 +22,8 @@ fixtures:
       table: hosts_groups
       values:
         -
-          hostgroupid: 1000
-          hostid: 1000
-          groupid: 1
+          hostid: @fixtures.template.result[0]@
+          groupid: @params.groupid@
 
   items:
     type: data
@@ -27,11 +31,10 @@ fixtures:
       table: items
       values:
         -
-          itemid: 1001
           type: 0
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @fixtures.template.result[0]@
           name: "Available memory"
           key_: "vm.memory.size[available]"
           delay: 60

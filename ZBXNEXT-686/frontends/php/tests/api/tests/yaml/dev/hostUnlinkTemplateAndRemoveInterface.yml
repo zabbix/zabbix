@@ -15,16 +15,22 @@ fixtures:
     type: include
     params:
       file: hosts
+      params:
+        groupid: @fixtures.hostGroups.result.groupid@
 
   hostItems:
     type: include
     params:
       file: hostItems
+      params:
+        groupid: @fixtures.hosts.result.hostid@
 
   templates:
     type: include
     params:
       file: templates
+      params:
+        groupid: @fixtures.hostGroups.result.groupid@
 
 steps:
   # link the template to the host
@@ -34,7 +40,7 @@ steps:
       params:
         # using host and template IDs here
         hostid: 1
-        templates: { templateid: 1000 }
+        templates: { templateid: @fixtures.templates.result.templateid@ }
         interfaces:
           -
             interfaceid: 1
@@ -84,8 +90,8 @@ steps:
     request:
       method: host.update
       params:
-        hostid: @step1.request.params.hostid@
-        templates_clear: [{ templateid: @step1.request.params.templates.templateid@] }]
+        hostid: @steps.step1.request.params.hostid@
+        templates_clear: [{ templateid: @steps.step1.request.params.templates.templateid@] }]
         interfaces:
           -
             interfaceid: 2
@@ -100,7 +106,7 @@ steps:
 
     expect: result
     response:
-      hostids: [@step1.request.params.hostid@]
+      hostids: [@steps.step1.request.params.hostid@]
 
   # make sure step2 has been executed correctly
   step3:

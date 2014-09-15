@@ -1,3 +1,10 @@
+params:
+  hostid: ~
+  applicationid: ~
+
+return:
+  httptestid: @fixtures.scenario.result[0]@
+
 fixtures:
   scenario:
     type: data
@@ -5,9 +12,8 @@ fixtures:
       table: httptest
       values:
         -
-          httptestid: 1000
           name: "Web scenario"
-          applicationid: 1000
+          applicationid: @params.applicationid@
           nextcheck: 0
           delay: 100
           status: 0
@@ -16,7 +22,7 @@ fixtures:
           authentication: 1
           http_user: "user"
           http_password: "password"
-          hostid: 1000
+          hostid: @params.hostid@
           http_proxy: "root@proxy"
           retries: 3
           ssl_cert_file: "certificate"
@@ -32,8 +38,7 @@ fixtures:
       table: httpstep
       values:
         -
-          httpstepid: 1000
-          httptestid: 1000
+          httptestid: @fixtures.scenario.result[0]@
           name: "Step 1"
           no: 1
           url: "http://zabbix.com"
@@ -46,8 +51,7 @@ fixtures:
           retrieve_mode: 0
           headers: "Accept: text/plain"
         -
-          httpstepid: 1001
-          httptestid: 1000
+          httptestid: @fixtures.scenario.result[0]@
           name: "Step 2"
           no: 2
           url: "http://google.com"
@@ -66,11 +70,10 @@ fixtures:
       table: items
       values:
         -
-          itemid: 1100
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Download speed for scenario \"$1\"."
           key_: "web.test.in[Web scenario,,bps]"
           delay: 100
@@ -111,11 +114,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1101
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Failed step of scenario \"$1\"."
           key_: "web.test.fail[Web scenario]"
           delay: 100
@@ -156,11 +158,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1102
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Last error message of scenario \"$1\"."
           key_: "web.test.error[Web scenario]"
           delay: 100
@@ -201,11 +202,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1103
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Download speed for step \"$2\" of scenario \"$1\"."
           key_: "web.test.in[Web scenario,Step 1,bps]"
           delay: 100
@@ -246,11 +246,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1104
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Response time for step \"$2\" of scenario \"$1\"."
           key_: "web.test.time[Web scenario,Step 1,resp]"
           delay: 100
@@ -291,11 +290,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1105
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Response code for step \"$2\" of scenario \"$1\"."
           key_: "web.test.rspcode[Web scenario,Step 1]"
           delay: 100
@@ -336,11 +334,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1106
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Download speed for step \"$2\" of scenario \"$1\"."
           key_: "web.test.in[Web scenario,Step 2,bps]"
           delay: 100
@@ -381,11 +378,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1107
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Response time for step \"$2\" of scenario \"$1\"."
           key_: "web.test.time[Web scenario,Step 2,resp]"
           delay: 100
@@ -426,11 +422,10 @@ fixtures:
           snmpv3_contextname: ""
           evaltype: 0
         -
-          itemid: 1108
           type: 9
           snmp_community: ""
           snmp_oid: ""
-          hostid: 1000
+          hostid: @params.hostid@
           name: "Response code for step \"$2\" of scenario \"$1\"."
           key_: "web.test.rspcode[Web scenario,Step 2]"
           delay: 100
@@ -477,19 +472,16 @@ fixtures:
       table: httptestitem
       values:
         -
-          httptestitemid: 1000
-          httptestid: 1000
-          itemid: 1100
+          httptestid: @fixtures.scenario.result[0]@
+          itemid: @fixtures.items.result[0]@
           type: 2
         -
-          httptestitemid: 1001
-          httptestid: 1000
-          itemid: 1101
+          httptestid: @fixtures.scenario.result[0]@
+          itemid: @fixtures.items.result[1]@
           type: 3
         -
-          httptestitemid: 1002
-          httptestid: 1000
-          itemid: 1102
+          httptestid: @fixtures.scenario.result[0]@
+          itemid: @fixtures.items.result[2]@
           type: 4
 
   httpstepitem:
@@ -498,32 +490,26 @@ fixtures:
       table: httpstepitem
       values:
         -
-          httpstepitemid: 1000
-          httpstepid: 1000
-          itemid: 1103
+          httpstepid: @fixtures.steps.result[0]@
+          itemid: @fixtures.items.result[3]@
           type: 2
         -
-          httpstepitemid: 1001
-          httpstepid: 1000
-          itemid: 1104
+          httpstepid: @fixtures.steps.result[0]@
+          itemid: @fixtures.items.result[4]@
           type: 1
         -
-          httpstepitemid: 1002
-          httpstepid: 1000
-          itemid: 1105
+          httpstepid: @fixtures.steps.result[0]@
+          itemid: @fixtures.items.result[5]@
           type: 0
         -
-          httpstepitemid: 1003
-          httpstepid: 1001
-          itemid: 1106
+          httpstepid: @fixtures.steps.result[1]@
+          itemid: @fixtures.items.result[6]@
           type: 2
         -
-          httpstepitemid: 1004
-          httpstepid: 1001
-          itemid: 1107
+          httpstepid: @fixtures.steps.result[1]@
+          itemid: @fixtures.items.result[7]@
           type: 1
         -
-          httpstepitemid: 1005
-          httpstepid: 1001
-          itemid: 1108
+          httpstepid: @fixtures.steps.result[1]@
+          itemid: @fixtures.items.result[8]@
           type: 0

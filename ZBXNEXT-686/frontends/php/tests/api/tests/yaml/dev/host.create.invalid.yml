@@ -26,7 +26,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: "1"
+            groupid: @fixtures.hostGroups.result.groupid@
 
     expect: error
 

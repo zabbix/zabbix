@@ -1,3 +1,9 @@
+params:
+  hostid: ~
+
+return:
+  applicationid: @fixtures.application.result[0]@
+
 fixtures:
   application:
     type: data
@@ -5,6 +11,5 @@ fixtures:
       table: applications
       values:
         -
-          applicationid: 1000
-          hostid: 1000
+          hostid: @params.hostid@
           name: App

@@ -48,24 +48,33 @@ class FileApiTestCase extends ApiTestCase {
 		return Yaml::parse(file_get_contents($path));
 	}
 
+	protected function runTestFile($file) {
+		$test = $this->parseTestFile($file);
+		$fixtures = $this->loadFixtures($test['fixtures']);
+
+		$this->runSteps($test['steps'], $fixtures);
+	}
+
 	/**
 	 * Executes test by file-based scenarios.
 	 *
 	 * @param array $steps
+	 * @param array $fixtures
 	 *
 	 * @throws \Exception
 	 */
-	protected function runSteps(array $steps) {
+	protected function runSteps(array $steps, array $fixtures) {
 		$gateway = $this->getGateway();
 
-		foreach ($steps as $stepName => $definition) {
-			$this->stepStack[$stepName] = array();
-
+		foreach ($steps as $stepName => &$definition) {
 			if (!isset($definition['request'])) {
 				throw new \Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
 			}
 
+			$definition['request']['params'] = $this->resolveStepMacros($definition['request']['params'], $steps, $fixtures);
+
 			$request = $definition['request'];
+			$expectedResponse = $definition['response'];
 
 			if (!isset($request['method']) || !is_string($request['method']) ||
 				!isset($request['params']) || !is_array($request['params'])
@@ -81,15 +90,11 @@ class FileApiTestCase extends ApiTestCase {
 				), $request
 			);
 
-			$request['params'] = $this->expandStepVariables($request['params']);
-
 			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
-
-			$this->stepStack[$stepName]['request'] = $request;
 
 			$apiResponse = $gateway->execute($apiRequest);
 
-			$this->stepStack[$stepName]['response'] = $apiResponse->getResult();
+			$steps[$stepName]['response'] = $apiResponse->getResult();
 
 			// now we verify that the response is what we expected
 			if (!isset($definition['expect']) || !in_array($definition['expect'], array('result', 'error'))) {
@@ -110,12 +115,9 @@ class FileApiTestCase extends ApiTestCase {
 			}
 
 			if ($expectation == 'result' || $expectation == 'error') {
-				$responseExpectation = $definition['response'];
-				$responseExpectation = $this->expandStepVariables($responseExpectation);
+				$expectedResponse = $this->resolveStepMacros($expectedResponse, $steps, $fixtures);
 
-				reset($responseExpectation);
-
-				$this->validate($responseExpectation, $apiResponse->getResponseData());
+				$this->validate($expectedResponse, $apiResponse->getResponseData());
 			}
 			else {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
@@ -126,6 +128,7 @@ class FileApiTestCase extends ApiTestCase {
 			// each step is one assertion
 			$this->addToAssertionCount(1);
 		}
+		unset($definition);
 	}
 
 	protected function processSqlAssertions($definition, $stepName) {
@@ -161,7 +164,7 @@ class FileApiTestCase extends ApiTestCase {
 					$this->addToAssertionCount(1);
 				}
 				elseif (isset($assertion['rowResult'])) {
-					$expectation = $this->expandStepVariables($assertion['rowResult']);
+					$expectation = $this->resolveStepMacros($assertion['rowResult']);
 
 					$realResult = array();
 
@@ -229,10 +232,16 @@ class FileApiTestCase extends ApiTestCase {
 	 * Expands step variables like "@step1.data"
 	 *
 	 * @param array $data
+	 * @param array $steps
+	 * @param array $fixtures
+	 *
 	 * @return array
 	 */
-	protected function expandStepVariables(array $data) {
-		return $this->macroResolver->resolve($data, $this->stepStack);
+	protected function resolveStepMacros(array $data, array $steps, array $fixtures) {
+		return $this->macroResolver->resolve($data, array(
+			'steps' => $steps,
+			'fixtures' => $fixtures
+		));
 	}
 
 	/**
@@ -250,6 +259,6 @@ class FileApiTestCase extends ApiTestCase {
 	}
 
 	protected function loadFixtures(array $fixtures) {
-		$this->getFixtureLoader()->load($fixtures);
+		return $this->getFixtureLoader()->load($fixtures);
 	}
 }

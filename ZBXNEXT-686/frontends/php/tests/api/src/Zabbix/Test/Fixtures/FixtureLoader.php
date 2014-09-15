@@ -14,7 +14,14 @@ class FixtureLoader {
 	 */
 	protected $fixtureFactory;
 
-	public function __construct(FixtureFactory $fixtureFactory) {
+	/**
+	 * @var \CArrayMacroResolver
+	 */
+	protected $macroResolver;
+
+	public function __construct(FixtureFactory $fixtureFactory, \CArrayMacroResolver $macroResolver) {
+		$this->macroResolver = $macroResolver;
+
 		$fixtureFactory->setFixtureLoader($this);
 
 		$this->fixtureFactory = $fixtureFactory;
@@ -29,18 +36,32 @@ class FixtureLoader {
 				throw $this->getException($name, '"params" parameter missing');
 			}
 
+			$fixtureConf['params'] = $this->resolveMacros($fixtureConf['params'], $fixtures, $params);
+
 			try {
 				$fixture = $this->fixtureFactory->getFixture($fixtureConf['type']);
-				$fixture->load($fixtureConf['params']);
+				$result = $fixture->load($fixtureConf['params']);
+
+				$fixtures[$name]['result'] = $result;
 			}
 			catch (\Exception $e) {
 				throw $this->getException($name, $e->getMessage());
 			}
 		}
+
+		return $fixtures;
 	}
 
 	protected function getException($fixtureName, $message) {
 		return new \Exception(sprintf('Error loading fixture "%1$s": %2$s', $fixtureName, $message));
 	}
+
+	public function resolveMacros(array $array, array $fixtures, array $params) {
+		return $this->macroResolver->resolve($array, array(
+			'params' => $params,
+			'fixtures' => $fixtures
+		));
+	}
+
 
 }
