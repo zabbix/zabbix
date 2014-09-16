@@ -159,6 +159,45 @@ function validateNumericBox(obj, allowempty, allownegative) {
 }
 
 /**
+ * Validates and formats input element containing a part of date.
+ *
+ * @param object {obj}			input element value of which is being validated
+ * @param int {min}				minimal allowed value (inclusive)
+ * @param int {max}				maximum allowed value (inclusive)
+ * @param int {paddingSize}		number of zeroes used for padding
+ */
+function validateDatePartBox(obj, min, max, paddingSize) {
+	if (obj != null) {
+		min = min ? min : 0;
+		max = max ? max : 59;
+		paddingSize = paddingSize ? paddingSize : 2;
+
+		var paddingZeroes = [];
+		for (var i = 0; i != paddingSize; i++) {
+			paddingZeroes.push('0');
+		}
+		paddingZeroes = paddingZeroes.join('');
+
+		var currentValue = obj.value.toString();
+
+		if (/^[0-9]+$/.match(currentValue)) {
+			var intValue = parseInt(currentValue, 10);
+
+			if (intValue < min || intValue > max) {
+				obj.value = paddingZeroes;
+			}
+			else if (currentValue.length < paddingSize) {
+				var paddedValue = paddingZeroes + obj.value;
+				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
+			}
+		}
+		else {
+			obj.value = paddingZeroes;
+		}
+	}
+}
+
+/**
  * Translates the given string.
  *
  * @param {String} str
@@ -221,10 +260,10 @@ function getNextColor(paletteType) {
 
 	switch (prevColor['color']) {
 		case 0:
-			r = gradient;
+			g = gradient;
 			break;
 		case 1:
-			g = gradient;
+			r = gradient;
 			break;
 		case 2:
 			b = gradient;
