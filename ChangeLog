@@ -1095,6 +1095,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 
 --------------------------------------------------------------------------------
