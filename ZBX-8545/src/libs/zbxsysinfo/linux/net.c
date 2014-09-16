@@ -186,6 +186,8 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 			}
 		}
 	}
+
+	*found = 0;
 out:
 	if (-1 != fd)
 		close(fd);
@@ -569,7 +571,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	listen = 0;
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
 #ifdef HAVE_INET_DIAG
-	int		found = 0;
+	int		found;
 #endif
 
 	if (1 < request->nparam)
