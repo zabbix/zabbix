@@ -39,6 +39,7 @@ $filterForm->setAttribute('id', 'zbx_filter');
 $filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(array(
 	bold(_('Recipient')),
+	':',
 	SPACE,
 	new CTextBox('alias', $this->data['alias'], 20),
 	new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
