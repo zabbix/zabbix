@@ -5,7 +5,6 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-8570] fixed colons in frontend filters (Oleg)
-........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .D........ [ZBX-5166] minor man pages corrections ('-' escaped as '\-') (Andris)
 ...G...PS. [ZBX-8391] stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
