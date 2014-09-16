@@ -5567,11 +5567,32 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 		if (dc_host->maintenance_status != maintenance_status)
 			dc_host->maintenance_from = maintenance_from;
 
-		/* store time at which no-data maintenance ended for the host (either */
-		/* because no-data maintenance ended or because maintenance type was */
-		/* changed to normal), this is needed for nodata() trigger function */
 		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
+		{
+			/* Store time at which no-data maintenance ended for the host (either */
+			/* because no-data maintenance ended or because maintenance type was */
+			/* changed to normal), this is needed for nodata() trigger function. */
+			/* Also, recalculate "nextcheck" time for items for which we usually */
+			/* update it upon receiving a value (i.e., items without a poller). */
+
+			ZBX_DC_ITEM		*dc_item;
+			zbx_hashset_iter_t	iter;
+
 			dc_host->data_expected_from = now;
+
+			zbx_hashset_iter_reset(&config->items, &iter);
+
+			while (NULL != (dc_item = zbx_hashset_iter_next(&iter)))
+			{
+				if (SUCCEED != uint64_array_exists(hostids, hostids_num, dc_item->hostid))
+					continue;
+
+				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
+					continue;
+
+				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
+			}
+		}
 
 		dc_host->maintenance_status = maintenance_status;
 		dc_host->maintenance_type = maintenance_type;

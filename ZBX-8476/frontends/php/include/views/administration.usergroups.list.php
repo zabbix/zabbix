@@ -123,7 +123,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
 		$this->data['displayNodes'] ? $usrgrp['nodename'] : null,
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
-		array(new CLink(_('Users'), 'users.php?&filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
+		array(new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
 		new CCol($users, 'wraptext'),
 		$usersStatus,
 		$guiAccess,

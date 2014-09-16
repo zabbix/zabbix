@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 11:45+0300\n"
-"PO-Revision-Date: 2014-08-25 09:21+0300\n"
+"POT-Creation-Date: 2014-09-06 09:40+0300\n"
+"PO-Revision-Date: 2014-09-09 10:46+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408951266.0\n"
+"X-POOTLE-MTIME: 1410252368.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -24,7 +24,7 @@ msgstr "\"%s\" musi zawierać się w przedziale pomiędzy 1970-01-01 a 2038-01-1
 
 #: include/profiles.inc.php:320
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "Pole \"Wyświetlanie wyzwalaczy w stanie OK” musi być wartością \"0\" lub dodatnią liczbą całkowitą."
+msgstr "Pole \"Wyświetlanie wyzwalaczy w stanie OK przez” musi być wartością \"0\" lub dodatnią liczbą całkowitą."
 
 #: include/profiles.inc.php:325
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
@@ -94,7 +94,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:474
 msgid "(0 - infinitely)"
-msgstr "(0 - nieskończoność)"
+msgstr "(0 - nieskończenie)"
 
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.hostgroups.list.php:31
@@ -125,13 +125,13 @@ msgstr "(brak proxy)"
 msgid "(with warnings)"
 msgstr "(z ostrzeżeniami)"
 
-#: include/blocks.inc.php:1538
+#: include/blocks.inc.php:1539
 msgid "-"
 msgstr "-"
 
 #: acknow.php:135
 msgid "----[BULK ACKNOWLEDGE]----"
-msgstr "----[POTWIERDZENIE ZBIORCZE]----"
+msgstr "----[POTWIERDZENIE ZBIOROWE]----"
 
 #: include/triggers.inc.php:2250 include/triggers.inc.php:2251
 #: include/triggers.inc.php:2252 include/triggers.inc.php:2254
@@ -245,7 +245,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "Konto zostało zablokowane na %s sekund"
 
 #: events.php:590 events.php:603 include/actions.inc.php:256
-#: include/blocks.inc.php:936 include/blocks.inc.php:1511
+#: include/blocks.inc.php:936 include/blocks.inc.php:1512
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
@@ -269,7 +269,7 @@ msgstr "Potwierdź i wróć"
 
 #: tr_status.php:290
 msgid "Acknowledge status"
-msgstr "Status potwierdzenia"
+msgstr "Stan potwierdzenia"
 
 #: include/events.inc.php:189 tr_status.php:375 tr_status.php:724
 msgid "Acknowledged"
@@ -365,7 +365,7 @@ msgid "Action updated"
 msgstr "Zaktualizowano akcję"
 
 #: events.php:591 events.php:604 include/blocks.inc.php:937
-#: include/blocks.inc.php:1512 include/events.inc.php:205
+#: include/blocks.inc.php:1513 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -381,7 +381,7 @@ msgstr "Aktywne"
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
 msgid "Active"
-msgstr "Aktywny"
+msgstr "Aktywne"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:500
 #: include/views/configuration.maintenance.edit.php:89 maintenance.php:135
@@ -395,9 +395,9 @@ msgstr "Aktywne od"
 msgid "Active till"
 msgstr "Aktywne do"
 
-#: include/blocks.inc.php:1232 include/blocks.inc.php:1238
-#: include/blocks.inc.php:1356 include/blocks.inc.php:1401
-#: include/blocks.inc.php:1407 include/reports.inc.php:122
+#: include/blocks.inc.php:1233 include/blocks.inc.php:1239
+#: include/blocks.inc.php:1357 include/blocks.inc.php:1402
+#: include/blocks.inc.php:1408 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -519,7 +519,7 @@ msgstr "Administracja"
 msgid "Advanced labels"
 msgstr "Zaawansowane etykiety"
 
-#: include/blocks.inc.php:934 include/blocks.inc.php:1509
+#: include/blocks.inc.php:934 include/blocks.inc.php:1510
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -568,9 +568,9 @@ msgstr "Alias (Login)"
 msgid "Align icons"
 msgstr "Wyrównaj ikony"
 
-#: include/blocks.inc.php:1334 include/blocks.inc.php:1343
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1473
-#: include/blocks.inc.php:1482 include/nodes.inc.php:174
+#: include/blocks.inc.php:1335 include/blocks.inc.php:1344
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1474
+#: include/blocks.inc.php:1483 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -753,9 +753,9 @@ msgstr[2] "O %1$s:%2$s w każdy(ą) %3$s co %4$s tygodni"
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] "O %1$s:%2$s każdego"
-msgstr[1] "O %1$s:%2$s każdego %3$s dnia tygodnia"
-msgstr[2] "O%1$s:%2$s każdego %3$s dnia tygodnia"
+msgstr[0] "O %1$s:%2$s każdego dnia"
+msgstr[1] "O %1$s:%2$s każdego %3$s dnia"
+msgstr[2] "O %1$s:%2$s każdego %3$s dnia"
 
 #: include/forms.inc.php:1793
 msgid "At (hour:minute)"
@@ -763,11 +763,11 @@ msgstr "O (godzina:minuta)"
 
 #: api/classes/CMaintenance.php:332 api/classes/CMaintenance.php:524
 msgid "At least one host or group should be selected."
-msgstr "Co najmniej jeden host lub grupa musi być zaznaczona."
+msgstr "Przynajmniej jeden host lub grupa musi być zaznaczona."
 
 #: api/classes/CMaintenance.php:402 api/classes/CMaintenance.php:515
 msgid "At least one maintenance period must be created."
-msgstr "Co najmniej jeden okres konserwacji musi być utworzony."
+msgstr "Przynajmniej jeden okres utrzymania musi być utworzony."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -942,7 +942,7 @@ msgstr "Obraz tła"
 
 #: include/menu.inc.php:137 report6.php:25 report6.php:209
 msgid "Bar reports"
-msgstr "Raport belkowy"
+msgstr "Raporty słupkowe"
 
 #: authentication.php:42
 #: include/views/administration.authentication.edit.php:75
@@ -1182,7 +1182,7 @@ msgstr "KONFIGURACJA MAPOWAŃ WARTOŚCI"
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:39
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "KONFIGURACJA MONITORINGU WWW"
+msgstr "KONFIGURACJA MONITOROWANIA WWW"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
@@ -1283,17 +1283,17 @@ msgstr "Nie można potwierdzić zdarzenia"
 #: api/classes/CGraph.php:761
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\" do wykresu \"%2$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\" do wykresu \"%2$s\"."
 
 #: api/classes/CGraphPrototype.php:707 api/classes/CGraphPrototype.php:769
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\" do prototypu wykresu \"%2$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\" do prototypu wykresu \"%2$s\"."
 
 #: include/reports.inc.php:512
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr "Nie można dodać nienumerycznego elementu \"%1$s\"."
+msgstr "Nie można dodać nienumerycznej pozycji \"%1$s\"."
 
 #: actionconf.php:158
 msgid "Cannot add action"
@@ -1371,7 +1371,7 @@ msgstr "Nie można dodać makra."
 
 #: maintenance.php:125
 msgid "Cannot add maintenance"
-msgstr "Nie można dodać okresu utrzymania"
+msgstr "Nie można dodać utrzymania"
 
 #: media_types.php:127
 msgid "Cannot add media type"
@@ -1478,19 +1478,19 @@ msgstr "Nie można wyczyścić historii"
 
 #: api/classes/CDiscoveryRule.php:953
 msgid "Cannot clone graph prototypes."
-msgstr "Nie można sklonować prototypu wykresów."
+msgstr "Nie można powielić prototypu wykresów."
 
 #: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
-msgstr "Nie można sklonować prototypu hosta."
+msgstr "Nie można powielić prototypu hosta."
 
 #: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
-msgstr "Nie można sklonować prototypów pozycji."
+msgstr "Nie można powielić prototypów pozycji."
 
 #: api/classes/CDiscoveryRule.php:594
 msgid "Cannot clone trigger prototypes."
-msgstr "Nie można sklonować prototypów wyzwalaczy."
+msgstr "Nie można powielić prototypów wyzwalaczy."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1502,7 +1502,7 @@ msgstr "Nie można skopiować wykresów"
 
 #: items.php:714
 msgid "Cannot copy items"
-msgstr "Nie można skopiować elementów"
+msgstr "Nie można skopiować pozycji"
 
 #: include/triggers.inc.php:400
 #, c-format
@@ -1664,7 +1664,7 @@ msgstr "Nie można usunąć pozycji utworzonych przez niskopoziomowe wykrywanie.
 
 #: maintenance.php:232
 msgid "Cannot delete maintenance"
-msgstr "Nie można usunąć okresu utrzymania"
+msgstr "Nie można usunąć utrzymania"
 
 #: media_types.php:143 media_types.php:174
 msgid "Cannot delete media type"
@@ -1699,7 +1699,7 @@ msgstr "Nie można usunąć skryptu"
 
 #: api/classes/CScript.php:504
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "Nie można usunąć skryptów. Wyczyść parametr wejściowy \"scriptids\"."
+msgstr "Nie można usunąć skryptów. Pusty parametr wejściowy \"scriptids\"."
 
 #: api/classes/CScript.php:536
 #, c-format
@@ -1729,37 +1729,37 @@ msgstr "Nie można usunąć szablonu"
 
 #: api/classes/CApplication.php:444
 msgid "Cannot delete templated application."
-msgstr "Nie można usunąć aplikacji użytych jako szablony."
+msgstr "Nie można usunąć aplikacji pochodzących z szablonu."
 
 #: api/classes/CGraph.php:561 api/classes/CGraphPrototype.php:577
 msgid "Cannot delete templated graphs."
-msgstr "Nie można usunąć wykresów użytych jako szablon."
+msgstr "Nie można usunąć wykresów pochodzących z szablonu."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr "Nie można usunąć prototypów hosta użytych jako szablony."
+msgstr "Nie można usunąć prototypów hosta pochodzących z szablonu."
 
 #: api/classes/CItem.php:693
 msgid "Cannot delete templated item."
-msgstr "Nie można usunąć pozycji użytej jako szablon."
+msgstr "Nie można usunąć pozycji pochodzącej z szablonu."
 
 #: api/classes/CItemPrototype.php:512
 msgid "Cannot delete templated items"
-msgstr "Nie można usunąć pozycji użytych jako szablon"
+msgstr "Nie można usunąć pozycji pochodzących z szablonu"
 
 #: api/classes/CDiscoveryRule.php:361
 msgid "Cannot delete templated items."
-msgstr "Nie można usunąć pozycji użytych jako szablon."
+msgstr "Nie można usunąć pozycji pochodzących z szablonu."
 
 #: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:649
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "Nie można usunąć wyzwalacza użytego jako szablon \"%1$s:%2$s\"."
+msgstr "Nie można usunąć wyzwalacza pochodzącego z szablonu \"%1$s:%2$s\"."
 
 #: api/classes/CHttpTest.php:392
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr "Nie można usunąć scenariusza sieci www \"%1$s\" użytego jako szablon."
+msgstr "Nie można usunąć scenariusza sieci www \"%1$s\" pochodzącego z szablonu."
 
 #: triggers.php:197
 msgid "Cannot delete trigger"
@@ -2493,7 +2493,7 @@ msgstr "Nie można zaktualizować makr"
 
 #: maintenance.php:121
 msgid "Cannot update maintenance"
-msgstr "Nie można zaktualizować okresu utrzymania"
+msgstr "Nie można zaktualizować utrzymania"
 
 #: include/classes/import/CXmlImport18.php:807
 #, c-format
@@ -2551,7 +2551,7 @@ msgstr "Nie można zaktualizować szablonu"
 
 #: api/classes/CApplication.php:353
 msgid "Cannot update templated applications."
-msgstr "Nie można zaktualizować aplikacji użytych jako szablony."
+msgstr "Nie można zaktualizować aplikacji pochodzących z szablonu."
 
 #: api/classes/CTemplate.php:797 api/classes/CTemplate.php:1082
 #, c-format
@@ -2849,7 +2849,7 @@ msgstr "Kolor (OK)"
 #: include/views/configuration.screen.constructor.edit.php:633
 #: screenedit.php:46
 msgid "Column span"
-msgstr "Rozpiętość kolumn"
+msgstr "Rozpiętość kolumny"
 
 #: include/views/configuration.screen.edit.php:42 screenconf.php:51
 msgid "Columns"
@@ -2868,7 +2868,7 @@ msgstr "Polecenie"
 
 #: tr_events.php:132
 msgid "Command actions"
-msgstr "Akcje polecenia"
+msgstr "Wykonane polecenia"
 
 #: scripts.php:99
 msgid "Command cannot be empty."
@@ -3074,7 +3074,7 @@ msgstr "Konfiguracja mapowań wartości"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr "Konfiguracja monitoringu www"
+msgstr "Konfiguracja monitorowania www"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
@@ -4202,7 +4202,7 @@ msgstr "Zależy od"
 
 #: include/hosts.inc.php:270
 msgid "Deployment status"
-msgstr "Status instalacji"
+msgstr "Stan instalacji"
 
 #: events.php:510 events.php:519 events.php:586 events.php:599
 #: include/classes/screens/CScreenEvents.php:42
@@ -4477,7 +4477,7 @@ msgid "Discovery object"
 msgstr "Obiekt wykrywania"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1203 include/forms.inc.php:1150
+#: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4545,7 +4545,7 @@ msgstr "Usunięto reguły wykrywania"
 
 #: dashboard.php:434 include/actions.inc.php:82
 msgid "Discovery status"
-msgstr "Status wykrycia"
+msgstr "Stan wykrywania"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
@@ -4585,7 +4585,7 @@ msgstr "Zrobione"
 msgid "Dot"
 msgstr "Kropka"
 
-#: include/blocks.inc.php:1205
+#: include/blocks.inc.php:1206
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Nie działa"
@@ -4600,7 +4600,7 @@ msgstr "Nie działa"
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:166 report3.php:83
 msgid "Downtime"
-msgstr "Czas przerw w pracy"
+msgstr "Czas przerwy w pracy"
 
 #: include/views/configuration.host.edit.php:291
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
@@ -5078,11 +5078,11 @@ msgstr "Zdarzenia i alarmy"
 
 #: include/forms.inc.php:1673
 msgid "Every day(s)"
-msgstr "Codziennie"
+msgstr "Co ile dni"
 
 #: include/forms.inc.php:1680
 msgid "Every week(s)"
-msgstr "Każdego tygodnia"
+msgstr "Co ile tygodni"
 
 #: include/func.inc.php:681
 msgid "Exa"
@@ -5174,7 +5174,7 @@ msgstr "Błąd składni w wyrażeniu."
 
 #: tr_testexpr.php:50
 msgid "Expression Variable Elements"
-msgstr "Wyrażenie elementów zmiennych"
+msgstr "Elementy zmiennej wyrażenia"
 
 #: include/triggers.inc.php:569 include/views/js/adm.regexprs.edit.js.php:215
 msgid "Expression cannot be empty"
@@ -5237,15 +5237,15 @@ msgstr "Aktualizacja szablonu się nie powiodła"
 msgid "Failure Audit"
 msgstr "Audyt niepowodzeń"
 
-#: dashboard.php:311 include/blocks.inc.php:1225
+#: dashboard.php:311 include/blocks.inc.php:1226
 msgid "Favourite graphs"
 msgstr "Ulubione wykresy"
 
-#: dashboard.php:339 include/blocks.inc.php:1354
+#: dashboard.php:339 include/blocks.inc.php:1355
 msgid "Favourite maps"
 msgstr "Ulubione mapy"
 
-#: dashboard.php:325 include/blocks.inc.php:1399
+#: dashboard.php:325 include/blocks.inc.php:1400
 msgid "Favourite screens"
 msgstr "Ulubione ekrany"
 
@@ -5606,7 +5606,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Linia gradientu"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1232
+#: include/audit.inc.php:29 include/blocks.inc.php:1233
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:283
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:448 latest.php:621
@@ -5757,7 +5757,7 @@ msgstr "Istnieje już wykres lub prototyp wykresu o nazwie \"%1$s\"."
 msgid "Graph with same name but other type exist."
 msgstr "Innego typu wykres o takiej samej nazwie już istnieje."
 
-#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1334
+#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1335
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5887,7 +5887,7 @@ msgstr "Grupy"
 
 #: include/views/configuration.maintenance.edit.php:178
 msgid "Groups in maintenance"
-msgstr "Grupy w okresie utrzymania"
+msgstr "Grupy w utrzymaniu"
 
 #: include/translateDefines.inc.php:50
 msgid "H.i"
@@ -5901,7 +5901,7 @@ msgstr "H:i"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -6076,7 +6076,7 @@ msgstr "Ułożenie poziome"
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:615 include/blocks.inc.php:662
 #: include/blocks.inc.php:920 include/blocks.inc.php:931
-#: include/blocks.inc.php:1507 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1508 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6444,7 +6444,7 @@ msgstr "Hosty w"
 
 #: include/views/configuration.maintenance.edit.php:169
 msgid "Hosts in maintenance"
-msgstr "Hosty w okresie utrzymania"
+msgstr "Hosty w utrzymaniu"
 
 #: include/classes/class.chostsinfo.php:104 include/screens.inc.php:33
 msgid "Hosts info"
@@ -6462,7 +6462,7 @@ msgstr "Zaktualizowano hosty"
 #: include/reports.inc.php:60 include/reports.inc.php:402
 #: include/reports.inc.php:410
 msgid "Hourly"
-msgstr "Godzinny"
+msgstr "Godzinowo"
 
 #: include/forms.inc.php:1808
 msgid "Hours"
@@ -6618,7 +6618,7 @@ msgstr "Raport dostępności usług IT"
 
 #: include/views/monitoring.history.php:26
 msgid "ITEMS"
-msgstr "ELEMENTY"
+msgstr "POZYCJE"
 
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.image.edit.php:28
@@ -6637,7 +6637,7 @@ msgstr "Ikona (wyłączone)"
 
 #: include/views/js/configuration.sysmaps.js.php:278
 msgid "Icon (maintenance)"
-msgstr "Ikona (w okresie utrzymania)"
+msgstr "Ikona (utrzymanie)"
 
 #: include/views/js/configuration.sysmaps.js.php:269
 msgid "Icon (problem)"
@@ -6854,7 +6854,7 @@ msgstr "W grupach"
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
-msgstr "W okresie utrzymania"
+msgstr "W utrzymaniu"
 
 #: include/actions.inc.php:862 include/actions.inc.php:936
 #: include/actions.inc.php:987 include/actions.inc.php:1069
@@ -7242,23 +7242,23 @@ msgstr "Błędna lista pozycji."
 
 #: maintenance.php:311
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Błędny okres utrzymania - data musi być z przedziału od 1970-01-01 do 2038-01-18"
+msgstr "Błędne utrzymanie - data musi być z przedziału od 1970-01-01 do 2038-01-18"
 
 #: maintenance.php:339
 msgid "Incorrect maintenance date"
-msgstr "Błędna data okresu utrzymania"
+msgstr "Błędna data utrzymania"
 
 #: maintenance.php:318
 msgid "Incorrect maintenance day period"
-msgstr "Błędny przedział dnia okresu utrzymania"
+msgstr "Błędny przedział dnia utrzymania"
 
 #: maintenance.php:325 maintenance.php:336
 msgid "Incorrect maintenance days of week"
-msgstr "Błędne dni tygodnia okresu utrzymania"
+msgstr "Błędne dni tygodnia utrzymania"
 
 #: maintenance.php:333
 msgid "Incorrect maintenance month period"
-msgstr "Błędny miesiąc dla okresu utrzymania"
+msgstr "Błędny miesiąc dla utrzymania"
 
 #: maintenance.php:298
 msgid "Incorrect maintenance period"
@@ -7266,11 +7266,11 @@ msgstr "Błędny okres utrzymania"
 
 #: maintenance.php:295
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr "Błędny okres utrzymania (minimalnie 5 sekund)"
+msgstr "Błędny okres utrzymania (minimalnie 5 minut)"
 
 #: maintenance.php:322
 msgid "Incorrect maintenance week period"
-msgstr "Błędny tydzień dla okresu utrzymania"
+msgstr "Błędny tydzień dla utrzymania"
 
 #: api/classes/CScreenItem.php:646
 #, c-format
@@ -7330,7 +7330,7 @@ msgstr "Błędne parametry dla metody aktualizacji mapy ikon \"%s\"."
 
 #: api/classes/CMaintenance.php:377 api/classes/CMaintenance.php:564
 msgid "Incorrect parameters for maintenance."
-msgstr "Błędne parametry dla okresu utrzymania."
+msgstr "Błędne parametry dla utrzymania."
 
 #: api/classes/CUserGroup.php:248 api/classes/CUserGroup.php:297
 msgid "Incorrect parameters for user group."
@@ -7560,7 +7560,7 @@ msgstr "Błędna pozycja minimalna y dla wykresu \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indonezyjski (id_ID)"
 
-#: include/blocks.inc.php:935 include/blocks.inc.php:1510
+#: include/blocks.inc.php:935 include/blocks.inc.php:1511
 #: include/classes/class.cformlist.php:72 latest.php:365 latest.php:366
 #: tr_status.php:371
 msgid "Info"
@@ -7790,7 +7790,7 @@ msgid "Is online?"
 msgstr "Czy jest włączony?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
-#: include/blocks.inc.php:1508
+#: include/blocks.inc.php:1509
 msgid "Issue"
 msgstr "Problem"
 
@@ -7802,7 +7802,7 @@ msgstr "Nie można filtrować według hasła użytkownika."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "Nie można się wylogować z autoryzacji HTTP."
 
-#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
+#: api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "Nie można wyszukiwać według hasła użytkownika."
 
@@ -8590,7 +8590,7 @@ msgstr "MAC adres B"
 
 #: include/maps.inc.php:760
 msgid "MAINTENANCE"
-msgstr "OKRES UTRZYMANIA"
+msgstr "UTRZYMANIE"
 
 #: include/hosts.inc.php:39
 msgid "MD2"
@@ -8666,16 +8666,16 @@ msgstr "Zaktualizowano makra"
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
 msgid "Maintenance"
-msgstr "Okres utrzymania"
+msgstr "Utrzymanie"
 
 #: api/classes/CMaintenance.php:382 api/classes/CMaintenance.php:494
 #, c-format
 msgid "Maintenance \"%s\" already exists."
-msgstr "Okres utrzymania \"%s\" już istnieje."
+msgstr "Utrzymanie \"%s\" już istnieje."
 
 #: api/classes/CMaintenance.php:397 api/classes/CMaintenance.php:510
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr "Wartość okresu utrzymania \"Aktywne od\" nie może być większa od \"Aktywne do\"."
+msgstr "Wartość utrzymania \"Aktywne od\" nie może być większa od \"Aktywne do\"."
 
 #: api/classes/CAction.php:1638
 msgid "Maintenance action condition value must be empty."
@@ -8683,11 +8683,11 @@ msgstr "Wartość warunku akcji utrzymania powinna być pusta."
 
 #: maintenance.php:124
 msgid "Maintenance added"
-msgstr "Dodano okres utrzymania"
+msgstr "Dodano utrzymanie"
 
 #: maintenance.php:232
 msgid "Maintenance deleted"
-msgstr "Usunięto okres utrzymania"
+msgstr "Usunięto utrzymanie"
 
 #: include/views/configuration.maintenance.edit.php:150
 msgid "Maintenance period"
@@ -8703,23 +8703,23 @@ msgstr "Okresy utrzymania"
 
 #: include/actions.inc.php:50
 msgid "Maintenance status"
-msgstr "Stan okresu utrzymania"
+msgstr "Stan utrzymania"
 
 #: include/views/configuration.maintenance.edit.php:43
 msgid "Maintenance type"
-msgstr "Typ okresu utrzymania"
+msgstr "Typ utrzymania"
 
 #: maintenance.php:120
 msgid "Maintenance updated"
-msgstr "Zaktualizowano okres utrzymania"
+msgstr "Zaktualizowano utrzymanie"
 
 #: include/blocks.inc.php:964 tr_status.php:662
 msgid "Maintenance with data collection"
-msgstr "Okres utrzymania ze zbieraniem danych"
+msgstr "Utrzymanie ze zbieraniem danych"
 
 #: include/blocks.inc.php:963 tr_status.php:661
 msgid "Maintenance without data collection"
-msgstr "Okres utrzymania bez zbierania danych"
+msgstr "Utrzymanie bez zbierania danych"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:276
 msgid "Mandatory parameter is missing."
@@ -8735,7 +8735,7 @@ msgstr "Ręcznie"
 msgid "Manual Logout"
 msgstr "Ręczne Wylogowanie"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1356
+#: include/audit.inc.php:40 include/blocks.inc.php:1357
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8795,7 +8795,7 @@ msgstr "Wartość mapowania \"%1$s\" nie jest unikalna."
 msgid "Mappings"
 msgstr "Mapowania"
 
-#: dashboard.php:340 include/blocks.inc.php:1389 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1390 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:96
@@ -8835,7 +8835,7 @@ msgstr "Aktualizacja masowa"
 
 #: include/views/js/configuration.sysmaps.js.php:210
 msgid "Mass update elements"
-msgstr "Masowo aktualizuj pozycje"
+msgstr "Masowo aktualizuj elementy"
 
 #: include/nodes.inc.php:303
 msgid "Master"
@@ -8855,12 +8855,12 @@ msgstr "Węzeł główny już istnieje. "
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Maksymalna liczba pozycji do wyświetlenia w komórce tabeli"
+msgstr "Maksymalna liczba elementów do wyświetlenia w komórce tabeli"
 
 #: adm.gui.php:79
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Maksymalna liczba pozycji do wyświetlenia w komórce tabeli \"%1$s\"."
+msgstr "Maksymalna liczba elementów do wyświetlenia w komórce tabeli \"%1$s\"."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
@@ -9039,7 +9039,7 @@ msgstr "Wiadomość"
 
 #: tr_events.php:127
 msgid "Message actions"
-msgstr "Działania komunikatu"
+msgstr "Wysłane powiadomienia"
 
 #: include/views/administration.mediatypes.edit.php:92
 msgid "Message text limit"
@@ -9459,7 +9459,7 @@ msgstr "Nowy warunek"
 
 #: jsLoader.php:157
 msgid "New element"
-msgstr "Nowa pozycja"
+msgstr "Nowy element"
 
 #: disc_prototypes.php:49 host_discovery.php:52
 #: include/views/configuration.item.edit.php:323
@@ -9695,13 +9695,13 @@ msgstr "nie znaleziono reguł wykrywania."
 
 #: jsLoader.php:178
 msgid "No elements selected!"
-msgstr "Nie zaznaczono pozycji!"
+msgstr "Nie zaznaczono elementów!"
 
 #: include/views/configuration.triggers.edit.php:172
 msgid "No errors found."
 msgstr "Nie znaleziono błędów."
 
-#: include/blocks.inc.php:1009 include/blocks.inc.php:1529 tr_status.php:734
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1530 tr_status.php:734
 msgid "No events"
 msgstr "Brak zdarzeń"
 
@@ -9889,11 +9889,11 @@ msgstr "Nie znaleziono makr."
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr "Nie zdefiniowano okresów konserwacji."
+msgstr "Nie zdefiniowano okresów utrzymania."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr "Nie znaleziono okresów konserwacji."
+msgstr "Nie znaleziono okresów utrzymania."
 
 #: api/classes/CScreenItem.php:509
 msgid "No map ID provided for screen element."
@@ -9943,7 +9943,7 @@ msgstr "Brak uprawnień dla hosta \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1512
 #, c-format
 msgid "No permission for item \"%1$s\"."
-msgstr "Brak uprawnień dla elementu \"%1$s\"."
+msgstr "Brak uprawnień dla pozycji \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1143
 #, c-format
@@ -10100,7 +10100,7 @@ msgstr "Nie znaleziono slajdów."
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
-msgstr "Brak statusu dla proxy."
+msgstr "Brak stanu dla proxy."
 
 #: triggers.php:312
 msgid "No target selected"
@@ -10177,7 +10177,7 @@ msgstr "Nie znaleziono scenariuszy sieci www."
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
-#: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1203 include/classes/screens/CScreenEvents.php:40
 #: include/page_header.php:324 include/triggers.inc.php:1625
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -10353,7 +10353,7 @@ msgstr "Liczba węzłów inode dla wolumenu. Jeżeli mode jest puste zostanie u�
 
 #: include/blocks.inc.php:762
 msgid "Number of items (monitored/disabled/not supported)"
-msgstr "Liczba elementów (monitorowanych/wyłączonych/niewspieranych)"
+msgstr "Liczba pozycji (monitorowanych/wyłączonych/niewspieranych)"
 
 #: include/classes/items/CHelpItems.php:835
 msgid "Number of items in Zabbix database."
@@ -10600,7 +10600,7 @@ msgstr "Jeden z obiektów nadal nie ma grupy hostów."
 
 #: include/forms.inc.php:1660 include/maintenances.inc.php:34
 msgid "One time only"
-msgstr "Tylko jeden raz"
+msgstr "Jednorazowo"
 
 #: include/views/configuration.services.edit.php:144
 #: include/views/configuration.services.edit.php:259
@@ -11209,7 +11209,7 @@ msgstr "Proszę pamiętać, że baza danych nadal przechowuje dane związane z u
 
 #: include/setup.inc.php:231
 msgid "Please correct all issues and press \"Retry\" button"
-msgstr "Nalezy poprawić wszystkie błędy, a następnie nacisnąć przycisk \"Ponów\""
+msgstr "Proszę poprawić wszystkie błędy i nacisnąć przycisk \"Ponów\""
 
 #: scripts.php:95
 msgid "Please enter confirmation text."
@@ -11623,10 +11623,10 @@ msgstr "Pamiętaj mnie przez 30 dni"
 msgid "Remote command"
 msgstr "Zdalne polecenie"
 
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1334
-#: include/blocks.inc.php:1343 include/blocks.inc.php:1361
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1412
-#: include/blocks.inc.php:1473 include/blocks.inc.php:1482
+#: include/blocks.inc.php:1246 include/blocks.inc.php:1335
+#: include/blocks.inc.php:1344 include/blocks.inc.php:1362
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1413
+#: include/blocks.inc.php:1474 include/blocks.inc.php:1483
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -11920,7 +11920,7 @@ msgstr "Rumuński (ro_RO)"
 #: include/views/configuration.screen.constructor.edit.php:634
 #: screenedit.php:47
 msgid "Row span"
-msgstr "Rozpiętość wierszy"
+msgstr "Rozpiętość wiersza"
 
 #: include/views/configuration.screen.edit.php:43 screenconf.php:52
 msgid "Rows"
@@ -12139,7 +12139,7 @@ msgstr "STAN WYZWALACZY"
 
 #: httpmon.php:77
 msgid "STATUS OF WEB MONITORING"
-msgstr "STAN MONITORINGU WWW"
+msgstr "STAN MONITOROWANIA WWW"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
@@ -12246,7 +12246,7 @@ msgstr "Harmonogram"
 msgid "Scheduled check"
 msgstr "Zaplanowane sprawdzenia"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1401
+#: include/audit.inc.php:41 include/blocks.inc.php:1402
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12276,22 +12276,22 @@ msgstr "Komórka X - %2$s Y - %3$s ekranu \"%1$s\" jest już zajęta."
 #: api/classes/CScreenItem.php:724
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Span kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwy."
+msgstr "Rozpiętość kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwa."
 
 #: api/classes/CScreenItem.php:773
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
-msgstr "Span kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duży."
+msgstr "Rozpiętość kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duża."
 
 #: api/classes/CScreenItem.php:710
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Span wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwy."
+msgstr "Rozpiętość wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest niewłaściwa."
 
 #: api/classes/CScreenItem.php:760
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
-msgstr "Span wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duży."
+msgstr "Rozpiętość wiersza w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest zbyt duża."
 
 #: include/classes/import/CXmlImport18.php:461
 #: include/classes/import/CXmlImport18.php:1639
@@ -12326,7 +12326,7 @@ msgstr "Ekran powinien zawierać przynajmniej jeden wiersz i kolumnę."
 msgid "Screen updated"
 msgstr "Zaktualizowano ekran"
 
-#: dashboard.php:326 include/blocks.inc.php:1473 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1474 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:371
@@ -12734,7 +12734,7 @@ msgstr "Wyświetl zdarzenia nie starcze niż (w dniach) \"%1$s\"."
 
 #: include/views/monitoring.dashconf.php:87 tr_status.php:326
 msgid "Show hosts in maintenance"
-msgstr "Wyświetl hosty w okresie utrzymania"
+msgstr "Wyświetl hosty w utrzymaniu"
 
 #: latest.php:305
 msgid "Show items with name like"
@@ -12806,11 +12806,11 @@ msgstr "Prosty"
 msgid "Simple check"
 msgstr "Proste sprawdzenie"
 
-#: include/blocks.inc.php:1238 include/screens.inc.php:38
+#: include/blocks.inc.php:1239 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Prosty wykres"
 
-#: include/blocks.inc.php:1343 jsLoader.php:114
+#: include/blocks.inc.php:1344 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Proste wykresy"
 
@@ -12869,7 +12869,7 @@ msgstr "Pominięto kopiowanie wykresu \"%1$s\" na hosta \"%2$s\"."
 msgid "Slide"
 msgstr "Slajd"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1407
+#: include/audit.inc.php:45 include/blocks.inc.php:1408
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Pokaz slajdów"
@@ -12906,7 +12906,7 @@ msgstr "Zaktualizowano pokaz slajdów"
 msgid "Slide shows"
 msgstr "Pokazy slajdów"
 
-#: include/blocks.inc.php:1482
+#: include/blocks.inc.php:1483
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Slajdy"
@@ -13075,7 +13075,7 @@ msgstr "Kody stanów"
 
 #: httpmon.php:24
 msgid "Status of Web monitoring"
-msgstr "Stan monitoringu WWW"
+msgstr "Stan monitorowania WWW"
 
 #: dashboard.php:354 include/classes/screens/CScreenSystemStatus.php:46
 #: include/menu.inc.php:124 report1.php:25
@@ -13458,7 +13458,7 @@ msgstr "Dane testowe"
 
 #: include/views/administration.general.regularexpressions.edit.php:69
 msgid "Test expressions"
-msgstr "Wyrażenia testowe"
+msgstr "Testowanie wyrażeń"
 
 #: adm.regexps.php:38
 #: include/views/administration.general.regularexpressions.edit.php:66
@@ -14394,7 +14394,7 @@ msgstr "Niewspierany parametr \"%2$s\" dla prototypu hosta \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Niewspierany parametr \"%2$s\" dla prototypu hosta %1$s w inwentarzu hosta."
 
-#: include/blocks.inc.php:1204
+#: include/blocks.inc.php:1205
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Działa"
@@ -14441,7 +14441,7 @@ msgstr "Zaktualizowano stan hosta"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14560,12 +14560,12 @@ msgstr "Użytkownik nie może zmienić sposobu dostępu do interfejsu użytkowni
 
 #: api/classes/CUserGroup.php:329
 msgid "User cannot change status of himself"
-msgstr "Użytkownik nie może zmienić swojego własnego statusu"
+msgstr "Użytkownik nie może zmienić swojego własnego stanu"
 
 #: include/users.inc.php:149 include/users.inc.php:168
 #: include/users.inc.php:230
 msgid "User cannot change status of himself."
-msgstr "Użytkownik nie może zmienić swojego własnego statusu."
+msgstr "Użytkownik nie może zmienić swojego własnego stanu."
 
 #: users.php:277 users.php:386
 msgid "User deleted"
@@ -14642,7 +14642,7 @@ msgstr "Użytkownik nie może modyfikować dostępu GUI dla siebie samego, poprz
 #: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "Użytkownik nie może modyfikować statusu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
+msgstr "Użytkownik nie może modyfikować stanu systemu dla siebie samego, poprzez stanie się członkiem grupy \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:61
 #: include/views/configuration.action.edit.php:757
@@ -15091,7 +15091,7 @@ msgstr "Ostrzeżenie"
 
 #: jsLoader.php:174
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
-msgstr "Przepraszamy, maksymalna możliwa liczba elementów to zapamiętania została osiągnięta."
+msgstr "Przepraszamy, maksymalna możliwa liczba elementów do zapamiętania została osiągnięta."
 
 #: hosts.php:818 hosts.php:913 include/menu.inc.php:42
 #: include/views/inventory.host.view.php:206
@@ -15105,7 +15105,7 @@ msgstr "WWW"
 
 #: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
-msgstr "Monitoring WWW"
+msgstr "Monitorowanie WWW"
 
 #: api/classes/managers/CHttpTestManager.php:383
 #: api/classes/managers/CHttpTestManager.php:391
@@ -15265,7 +15265,7 @@ msgstr "Błędne pola dla zależności dla serwisu \"%1$s\"."
 
 #: api/classes/CMapElement.php:55
 msgid "Wrong fields for element."
-msgstr "Błędne pola dla pozycji."
+msgstr "Błędne pola dla elementu."
 
 #: api/classes/CHost.php:665
 #, c-format
@@ -15526,7 +15526,7 @@ msgstr "Jesteś zalogowany jako"
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
-msgstr "Twoja konfiguracja nie jest ustawiona dla monitorowania zdalnego."
+msgstr "Twoja konfiguracja nie jest ustawiona do monitorowania zdalnego."
 
 #: include/func.inc.php:682
 msgctxt "Zetta short"
@@ -15824,7 +15824,7 @@ msgstr "elementy"
 #: include/views/configuration.copy.elements.php:97
 #: include/views/configuration.item.copy.php:78
 msgid "elements copy to ..."
-msgstr "skopiuj elementy do …"
+msgstr "skopiuj elementy do ..."
 
 #: api/classes/CAction.php:1302
 msgid "esc_step_from and esc_step_to must be set together."
@@ -15939,7 +15939,7 @@ msgstr "makro(a)"
 
 #: include/actions.inc.php:194 include/views/configuration.action.edit.php:224
 msgid "maintenance"
-msgstr "okres utrzymania"
+msgstr "utrzymanie"
 
 #: api/classes/CMap.php:422
 msgid "map"
