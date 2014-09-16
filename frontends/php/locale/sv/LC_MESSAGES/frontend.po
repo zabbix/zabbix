@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-30 02:40+0300\n"
+"POT-Creation-Date: 2014-09-16 13:50+0300\n"
 "PO-Revision-Date: 2013-01-27 08:54+0200\n"
 "Last-Translator: Niklas <niklas@gyori.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -4231,7 +4231,7 @@ msgstr ""
 msgid "Error in search request for table \"%1$s\"."
 msgstr ""
 
-#: httpdetails.php:155 httpdetails.php:209
+#: httpdetails.php:156 httpdetails.php:209
 #, php-format
 msgid "Error: %1$s"
 msgstr ""
@@ -7935,7 +7935,7 @@ msgstr "Nätverkskartor"
 msgid "Never"
 msgstr ""
 
-#: httpdetails.php:150 httpdetails.php:205
+#: httpdetails.php:151 httpdetails.php:205
 msgid "Never executed"
 msgstr ""
 
@@ -8811,7 +8811,7 @@ msgstr "Numerisk (heltal 64-bit)"
 msgid "OEM"
 msgstr ""
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:146 httpdetails.php:213
+#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -12270,7 +12270,7 @@ msgid "Units"
 msgstr "Enheter"
 
 #: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
-#: events.php:518 events.php:519 hosts.php:807 httpdetails.php:159
+#: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
 #: include/actions.inc.php:153 include/actions.inc.php:166
