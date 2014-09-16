@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
-"PO-Revision-Date: 2014-09-09 10:46+0300\n"
+"POT-Creation-Date: 2014-09-16 15:14+0300\n"
+"PO-Revision-Date: 2014-09-15 12:32+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410252368.0\n"
+"X-POOTLE-MTIME: 1410777131.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -763,7 +763,7 @@ msgstr "O (godzina:minuta)"
 
 #: api/classes/CMaintenance.php:332 api/classes/CMaintenance.php:524
 msgid "At least one host or group should be selected."
-msgstr "Przynajmniej jeden host lub grupa musi być zaznaczona."
+msgstr "Musi być wybrany przynajmniej jeden host lub grupa."
 
 #: api/classes/CMaintenance.php:402 api/classes/CMaintenance.php:515
 msgid "At least one maintenance period must be created."
@@ -1017,7 +1017,7 @@ msgstr "Wg hosta"
 
 #: report2.php:178
 msgid "By trigger template"
-msgstr "Wg wzorca wyzwalacza"
+msgstr "Wg szablonu wyzwalacza"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
@@ -3811,7 +3811,7 @@ msgstr "Usuń i wyczyść"
 
 #: templates.php:655
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Usunąć i wyczyścić zaznaczone szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
+msgstr "Usunąć i wyczyścić wybrane szablony? (Uwaga: wszystkie połączone hosty zostaną wyczyszczone!)"
 
 #: include/views/configuration.template.edit.php:480
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
@@ -3869,7 +3869,7 @@ msgstr "Usunąć słowo kluczowe?"
 
 #: jsLoader.php:160
 msgid "Delete links between selected elements?"
-msgstr "Usunąć powiązania między zaznaczonymi elementami?"
+msgstr "Usunąć powiązania między wybranymi elementami?"
 
 #: include/views/configuration.maintenance.edit.php:202
 msgid "Delete maintenance period?"
@@ -4306,7 +4306,7 @@ msgstr "Różne informacje o określonym procesie (określonych procesach)"
 
 #: include/views/configuration.screen.list.php:53
 msgid "Dimension (cols x rows)"
-msgstr "Wymiary (kol. x rzędy)"
+msgstr "Wymiary (kolumny x wiersze)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
@@ -4318,7 +4318,7 @@ msgstr "Wyłącz tryb debugowania"
 
 #: include/views/administration.usergroups.list.php:150
 msgid "Disable debug mode in selected groups?"
-msgstr "Wyłączyć tryb debugowania dla zaznaczonych grup?"
+msgstr "Wyłączyć tryb debugowania dla wybranych grup?"
 
 #: include/actions.inc.php:412 include/actions.inc.php:640
 msgid "Disable host"
@@ -4470,7 +4470,7 @@ msgstr "Testy wykrywania"
 
 #: include/html.inc.php:389
 msgid "Discovery list"
-msgstr "Lista wykrytych"
+msgstr "Lista reguł wykrywania"
 
 #: include/actions.inc.php:74
 msgid "Discovery object"
@@ -5147,7 +5147,7 @@ msgstr "Rozwinięty"
 #: hosts.php:1015 include/views/configuration.screen.list.php:70
 #: include/views/configuration.sysmap.list.php:63 templates.php:650
 msgid "Export selected"
-msgstr "Eksportuj zaznaczone"
+msgstr "Eksportuj wybrane"
 
 #: events.php:266
 msgid "Export to CSV"
@@ -9695,7 +9695,7 @@ msgstr "nie znaleziono reguł wykrywania."
 
 #: jsLoader.php:178
 msgid "No elements selected!"
-msgstr "Nie zaznaczono elementów!"
+msgstr "Nie wybrano elementów!"
 
 #: include/views/configuration.triggers.edit.php:172
 msgid "No errors found."
@@ -11699,7 +11699,7 @@ msgstr "Usuń powiązanie"
 
 #: include/views/monitoring.history.php:105
 msgid "Remove selected"
-msgstr "Usuń zaznaczone"
+msgstr "Usuń wybrane"
 
 #: include/views/configuration.host.massupdate.php:196
 #: include/views/configuration.triggers.edit.php:120
@@ -12588,7 +12588,7 @@ msgstr "Numer seryjny B"
 #: include/views/administration.script.list.php:67 popup.php:1888
 #: queue.php:146
 msgid "Server"
-msgstr "Usługa"
+msgstr "Serwer"
 
 #: include/screens.inc.php:37
 msgid "Server info"
@@ -14219,11 +14219,11 @@ msgstr "Niedostępne dla użytkowników z %1$s."
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
-msgstr "Odblokuj zaznaczone"
+msgstr "Odblokuj wybrane"
 
 #: include/views/administration.users.list.php:136
 msgid "Unblock selected users?"
-msgstr "Odblokować zaznaczonych użytkowników?"
+msgstr "Odblokować wybranych użytkowników?"
 
 #: include/views/configuration.item.edit.php:240
 #: include/views/configuration.item.massupdate.php:237
@@ -16080,7 +16080,7 @@ msgstr "odświeżanie co %1$s sek."
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "pamiętaj zaznaczone"
+msgstr "pamiętaj wybrane"
 
 #: include/services.inc.php:70 include/services.inc.php:73
 #: include/services.inc.php:166
