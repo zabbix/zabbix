@@ -266,8 +266,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 #endif
 
 #ifndef _WINDOWS
-	sigemptyset (&mask);
-	sigaddset (&mask, SIGUSR1);
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
 #endif
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
@@ -276,8 +276,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	if (LOG_TYPE_FILE == log_type)
 	{
 #ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zbx_error("could not set sigprocmask to block the user signal");
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
 #endif
 		zbx_mutex_lock(&log_file_access);
 
@@ -381,8 +381,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		zbx_mutex_unlock(&log_file_access);
 
 #ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zbx_error("could not restore sigprocmask");
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
 #endif
 		return;
 	}
@@ -456,8 +456,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
 #ifndef _WINDOWS
-		if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0)
-			zbx_error("could not set sigprocmask to block the user signal");
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
 #endif
 		zbx_mutex_lock(&log_file_access);
 
@@ -482,8 +482,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		zbx_mutex_unlock(&log_file_access);
 #ifndef _WINDOWS
-		if (sigprocmask(SIG_SETMASK, &orig_mask, NULL) < 0)
-			zbx_error("could not restore sigprocmask");
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
 #endif
 	}
 }
