@@ -190,7 +190,7 @@ foreach ($this->data['items'] as $item) {
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow(array(
-			getSeverityCell($trigger['priority']),
+			getSeverityCell($trigger['priority'], null, false, $this->data['config']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
 			new CSpan(

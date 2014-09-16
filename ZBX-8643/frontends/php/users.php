@@ -368,7 +368,7 @@ CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROF
 if (!empty($_REQUEST['form'])) {
 	$userId = getRequest('userid');
 
-	$data = getUserFormData($userId);
+	$data = getUserFormData($userId, false, $config);
 
 	$data['userid'] = $userId;
 	$data['form'] = getRequest('form');

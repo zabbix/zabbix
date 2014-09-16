@@ -50,7 +50,13 @@ class CTriggersInfo extends CTable {
 	public function bodyToString() {
 		$this->cleanItems();
 
-		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
+		$config = select_config();
+
+		// array of triggers (not classified, information, warning, average, high, disaster) in problem state
+		$triggersProblemState = array();
+
+		// number of triggers in OK state
+		$triggersOkState = 0;
 
 		$options = array(
 			'monitored' => true,
@@ -76,30 +82,15 @@ class CTriggersInfo extends CTable {
 		while ($row = DBfetch($db_priority)) {
 			switch ($row['value']) {
 				case TRIGGER_VALUE_TRUE:
-					switch ($row['priority']) {
-						case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-							$uncl += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_INFORMATION:
-							$info += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_WARNING:
-							$warn += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_AVERAGE:
-							$avg += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_HIGH:
-							$high += $row['cnt'];
-							break;
-						case TRIGGER_SEVERITY_DISASTER:
-							$dis += $row['cnt'];
-							break;
+					if (!isset($triggersProblemState[$row['priority']])) {
+						$triggersProblemState[$row['priority']] = 0;
 					}
+
+					$triggersProblemState[$row['priority']] += $row['cnt'];
 					break;
+
 				case TRIGGER_VALUE_FALSE:
-					$ok += $row['cnt'];
-					break;
+					$triggersOkState += $row['cnt'];
 			}
 		}
 
@@ -121,25 +112,25 @@ class CTriggersInfo extends CTable {
 			$this->addRow($header);
 		}
 
-		$trok = getSeverityCell(null, $ok.SPACE._('Ok'), true);
-		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$uncl);
-		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
-		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
-		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$avg);
-		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
-		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
+		$severityCells = array(getSeverityCell(null, $triggersOkState.SPACE._('Ok'), true, $config));
+
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severityCount = isset($triggersProblemState[$severity]) ? $triggersProblemState[$severity] : 0;
+
+			$severityCells[] = getSeverityCell($severity,
+				$severityCount.SPACE.getSeverityName($severity, $config),
+				!$severityCount,
+				$config
+			);
+		}
 
 		if (STYLE_HORIZONTAL == $this->style) {
-			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
+			$this->addRow($severityCells);
 		}
 		else {
-			$this->addRow($trok);
-			$this->addRow($uncl);
-			$this->addRow($info);
-			$this->addRow($warn);
-			$this->addRow($avg);
-			$this->addRow($high);
-			$this->addRow($dis);
+			foreach ($severityCells as $severityCell) {
+				$this->addRow($severityCell);
+			}
 		}
 
 		return parent::bodyToString();

@@ -984,7 +984,8 @@ else {
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	// items

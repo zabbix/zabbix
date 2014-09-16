@@ -64,16 +64,13 @@ if (!$overview) {
 }
 
 // min severity
+$severityNames = array();
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$severityNames[] = getSeverityName($severity, $config);
+}
 $filterForm->addRow(_('Minimum trigger severity'),
-	new CComboBox('show_severity', $filter['showSeverity'], null, array(
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-		TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-		TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
-	)
-));
+	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
+);
 
 // age less than
 $statusChangeDays = new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false);

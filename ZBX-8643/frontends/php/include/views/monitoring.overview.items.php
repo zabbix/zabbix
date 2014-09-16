@@ -33,8 +33,8 @@ $overviewWidget->addHeader(_('Overview'), $headerForm);
 
 // hint table
 $hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
-for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$hintTable->addRow(array(getSeverityCell($severity, null, false, $this->data['config']), _('PROBLEM')));
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 

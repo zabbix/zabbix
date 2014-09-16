@@ -715,7 +715,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	// severity
-	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value']);
+	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value'], $config);
 	if ($showEventColumn) {
 		$severityColumn->setColSpan(2);
 	}

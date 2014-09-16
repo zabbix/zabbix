@@ -126,7 +126,7 @@ function discovery_object2str($object = null) {
  * @param array $action['filter']					array containing arrays of action conditions and other data
  * @param array $action['filter']['conditions']		array of action conditions
  * @param array $config								array containing configuration parameters for getting trigger
- *													severity captions
+ *													severity names
  *
  * @return array									returns an array of actions condition string values
  */
@@ -204,7 +204,7 @@ function actionConditionValueToString(array $actions, array $config) {
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$aIdx][$cIdx] = getSeverityCaption($condition['value'], $config);
+					$result[$aIdx][$cIdx] = getSeverityName($condition['value'], $config);
 					break;
 
 				// gather dicovery rule IDs for later querying

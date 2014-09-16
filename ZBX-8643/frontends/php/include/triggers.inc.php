@@ -40,11 +40,15 @@ function getSeverityStyle($severity, $type = true) {
 	}
 }
 
-function getSeverityCaption($severity = null, array $config = null) {
-	if (!$config) {
-		$config = select_config();
-	}
-
+/**
+ *	Get trigger severity name by given state and configuration.
+ *
+ * @param int	 $severity		trigger severity
+ * @param array  $config		array containing configuration parameters containing severity names
+ *
+ * @return string
+ */
+function getSeverityName($severity, array $config) {
 	$severities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
 		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
@@ -54,10 +58,7 @@ function getSeverityCaption($severity = null, array $config = null) {
 		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5'])
 	);
 
-	if (is_null($severity)) {
-		return $severities;
-	}
-	elseif (isset($severities[$severity])) {
+	if (isset($severities[$severity])) {
 		return $severities[$severity];
 	}
 	else {
@@ -97,12 +98,22 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 	return $color;
 }
 
-function getSeverityCell($severity, $text = null, $force_normal = false) {
+/**
+ * Returns HTML representation of trigger severity cell containing severity name and color.
+ *
+ * @param int	 $severity			trigger severity
+ * @param string $text				trigger severity name
+ * @param bool	 $forceNormal		true to return 'normal' class, false to return corresponding severity class
+ * @param array  $config			array of configuration parameters to get trigger severity name
+ *
+ * @return CCol
+ */
+function getSeverityCell($severity, $text = null, $forceNormal = false, array $config) {
 	if ($text === null) {
-		$text = CHtml::encode(getSeverityCaption($severity));
+		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
 
-	return new CCol($text, getSeverityStyle($severity, !$force_normal));
+	return new CCol($text, getSeverityStyle($severity, !$forceNormal));
 }
 
 /**
@@ -1446,6 +1457,8 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 function make_trigger_details($trigger) {
 	$hostNames = array();
 
+	$config = select_config();
+
 	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get(array(
@@ -1478,7 +1491,7 @@ function make_trigger_details($trigger) {
 		new CCol(_('Trigger')),
 		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
 	));
-	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
+	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], null, false, $config)));
 	$table->addRow(array(
 		new CCol(_('Expression')),
 		new CCol(explode_exp($trigger['expression'], true, true), 'trigger-expression')
