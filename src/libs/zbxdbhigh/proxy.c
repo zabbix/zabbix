@@ -2347,6 +2347,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
+			if (FAIL == is_uint_n_range(tmp, tmp_alloc, NULL, 0, 0x0LL, 0x7FFFFFFFLL))
+				break;
+
 			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
