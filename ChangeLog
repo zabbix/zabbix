@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .D........ [ZBX-5166] minor man pages corrections ('-' escaped as '\-') (Andris)
 ...G...PS. [ZBX-8391] stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
@@ -16,6 +17,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
@@ -411,6 +413,7 @@ Changes for 2.2.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
