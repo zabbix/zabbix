@@ -58,28 +58,35 @@
 #include "setproctitle.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix server";
+const char	title_message[] = "zabbix_server";
 const char	syslog_app_name[] = "zabbix_server";
-const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -R runtime-option",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
+	"The core daemon of Zabbix software.",
+	"",
 	"Options:",
-	"  -c --config <file>              Absolute path to the configuration file",
-	"  -R --runtime-control <option>   Perform administrative functions",
+	"  -c --config config-file               Absolute path to the configuration file",
+	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
-	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
-	"  " ZBX_LOG_LEVEL_INCREASE "=<target>     Increase log level, affect all processes if target is not specified",
-	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
+	"    Runtime control options:",
+	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
-	"Log level control targets:",
-	"  <pid>                           Process identifier",
-	"  <process type>                  All processes of specified type (e.g., poller)",
-	"  <process type,N>                Process type and number (e.g., poller,3)",
+	"      Log level control targets:",
+	"        pid                             Process identifier",
+	"        process-type                    All processes of specified type (e.g., poller)",
+	"        process-type,N                  Process type and number (e.g., poller,3)",
 	"",
-	"Other options:",
-	"  -h --help                       Display help information",
-	"  -V --version                    Display version number",
+	"  -h --help                             Display this help message",
+	"  -V --version                          Display version number",
 	NULL	/* end of text */
 };
 
@@ -279,7 +286,7 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 	}
 	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
+		*process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
 		*process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
 	}
 	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
@@ -614,6 +621,7 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch = '\0';
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -626,9 +634,12 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'R':
+				opt_r++;
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
 					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
@@ -673,6 +684,29 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 		}
+	}
+
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_r)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_FILE)

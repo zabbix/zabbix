@@ -528,7 +528,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 // mass update
 elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$visible = getRequest('visible', array());
-	if (isset($visible['delay_flex_visible'])) {
+	if (isset($visible['delay_flex'])) {
 		$delay_flex = getRequest('delay_flex');
 		if (!is_null($delay_flex)) {
 			$db_delay_flex = '';
@@ -843,6 +843,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform') || hasRequest('massupdate')) && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
+		'action' => 'item.massupdateform',
 		'hostid' => getRequest('hostid'),
 		'itemids' => getRequest('group_itemid', array()),
 		'description' => getRequest('description', ''),

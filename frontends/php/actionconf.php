@@ -250,6 +250,28 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 	}
 }
+elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
+	$new_opcondition = $_REQUEST['new_opcondition'];
+
+	try {
+		CAction::validateOperationConditions($new_opcondition);
+		$new_operation = getRequest('new_operation', array());
+
+		if (!isset($new_operation['opconditions'])) {
+			$new_operation['opconditions'] = array();
+		}
+		if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
+			array_push($new_operation['opconditions'], $new_opcondition);
+		}
+
+		$_REQUEST['new_operation'] = $new_operation;
+
+		unset($_REQUEST['new_opcondition']);
+	}
+	catch (APIException $e) {
+		error($e->getMessage());
+	}
+}
 elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
 	$new_operation = $_REQUEST['new_operation'];
 	$result = true;
@@ -300,7 +322,6 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	if (isset($_REQUEST['operations'][$edit_operationid])) {
 		$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 		$_REQUEST['new_operation']['id'] = $edit_operationid;
-		$_REQUEST['new_operation']['action'] = 'update';
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), array('action.massenable', 'action.massdisable')) && hasRequest('g_actionid')) {
@@ -475,7 +496,6 @@ if (hasRequest('form')) {
 	if (!empty($data['new_operation'])) {
 		if (!is_array($data['new_operation'])) {
 			$data['new_operation'] = array(
-				'action' => 'create',
 				'operationtype' => 0,
 				'esc_period' => 0,
 				'esc_step_from' => 1,

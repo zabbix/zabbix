@@ -60,19 +60,19 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
         ),
         [
         if test "$withval" = "no"; then
-            WANT_ORACLE_OCI="no"
+            want_oracle_oci="no"
         elif test "$withval" = "yes"; then
-            WANT_ORACLE_OCI="yes"
+            want_oracle_oci="yes"
             oracle_home_dir="$ORACLE_HOME"
         elif test -d "$withval"; then
-            WANT_ORACLE_OCI="yes"
+            want_oracle_oci="yes"
             oracle_home_dir="$withval"
         else
-            WANT_ORACLE_OCI="yes"
+            want_oracle_oci="yes"
             oracle_home_dir=""
         fi
         ],
-        [WANT_ORACLE_OCI="no"]
+        [want_oracle_oci="no"]
     )
 
     AC_ARG_WITH([oracle-include],
@@ -81,7 +81,7 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
         ),
         [
         if test "$withval" != "no"; then
-            WANT_ORACLE_OCI="yes"
+            want_oracle_oci="yes"
             oracle_home_include_dir="$withval"
         fi
         ],
@@ -93,7 +93,7 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
         ),
         [
         if test "$withval" != "no"; then
-            WANT_ORACLE_OCI="yes"
+            want_oracle_oci="yes"
             oracle_home_lib_dir="$withval"
         fi
         ],
