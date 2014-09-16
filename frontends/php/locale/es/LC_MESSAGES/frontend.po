@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 13:50+0300\n"
-"PO-Revision-Date: 2013-11-08 11:48+0300\n"
-"Last-Translator: David.perez <david.perez@securitasdirect.es>\n"
+"POT-Creation-Date: 2014-09-16 13:52+0300\n"
+"PO-Revision-Date: 2014-09-13 22:34+0300\n"
+"Last-Translator: lucho <luislopez72@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383904081.0\n"
+"X-POOTLE-MTIME: 1410640450.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1251,8 +1251,9 @@ msgid "Cannot add value map"
 msgstr "No es posible añadir la asignación"
 
 #: authentication.php:148
+#, fuzzy
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "No se pudo cambiar la autenticación"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1705,8 +1706,9 @@ msgid "Cannot link template"
 msgstr "No se puede linkar plantilla"
 
 #: api/classes/CUser.php:985
+#, fuzzy
 msgid "Cannot login."
-msgstr ""
+msgstr "No se pudo iniciar sesión"
 
 #: api/classes/CUser.php:910
 msgid "Cannot logout."
@@ -4832,14 +4834,14 @@ msgid "Graph name"
 msgstr "Nombre del gráfico"
 
 #: api/classes/CGraphPrototype.php:881
-#, php-format
+#, fuzzy, php-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "El prototipo de la gráfica \"%1$s\" contiene elementos de multiples reglas de descubrimiento"
 
 #: api/classes/CGraphPrototype.php:887
-#, php-format
+#, fuzzy, php-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "El prototipo de la gráfica \"%1$s\" debe tener al menos un elemento."
 
 #: api/classes/CGraphPrototype.php:34
 #, php-format
@@ -6026,9 +6028,9 @@ msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Intervalo flexible \"%1$s\" incorrecto."
 
 #: api/classes/CItemGeneral.php:748
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr ""
+msgstr "Intervalo flexible incorrecto en el elemento \"%1$s\". El intervalo flexible debe ser una cadena (string)."
 
 #: include/triggers.inc.php:625 include/triggers.inc.php:1779
 #: tr_testexpr.php:37
@@ -6041,9 +6043,9 @@ msgid "Incorrect graph ID \"%s\" provided for screen element."
 msgstr "El gráfico  ID \"%s\" proporcionado para el elemento de pantalla es incorrecto."
 
 #: api/classes/CScreenItem.php:502
-#, php-format
+#, fuzzy, php-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "El host ID \"%s\" proporcionado es incorrecto para el elemento de pantalla."
 
 #: api/classes/CScreenItem.php:488
 #, php-format
@@ -6084,8 +6086,9 @@ msgid "Incorrect item ID \"%s\" provided for screen element."
 msgstr "ID del elemento \"%s\" definido es incorrecto para el elemento de pantalla"
 
 #: api/classes/CGraphGeneral.php:401
+#, fuzzy
 msgid "Incorrect item for axis value."
-msgstr ""
+msgstr "Elemento incorrecto para el valor del eje."
 
 #: api/classes/CTrigger.php:1119 include/triggers.inc.php:957
 #, php-format
