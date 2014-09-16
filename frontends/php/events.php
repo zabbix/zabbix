@@ -806,7 +806,7 @@ else {
 						(getRequest('hostid', 0) == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
-						getSeverityCaption($trigger['priority']),
+						getSeverityName($trigger['priority'], $config),
 						$event['duration'],
 						$config['event_ack_enable'] ? ($event['acknowledges'] ? _('Yes') : _('No')) : null,
 						strip_tags((string) $action)
@@ -847,7 +847,7 @@ else {
 						$hostName,
 						$triggerDescription,
 						$statusSpan,
-						getSeverityCell($trigger['priority'], null, !$event['value']),
+						getSeverityCell($trigger['priority'], null, !$event['value'], $config),
 						$event['duration'],
 						$config['event_ack_enable'] ? $ack : null,
 						$action

@@ -266,21 +266,27 @@ function getFavouriteScreens() {
 }
 
 function make_system_status($filter) {
+	$config = select_config();
+
 	$ackParams = array();
 	if (!empty($filter['screenid'])) {
 		$ackParams['screenid'] = $filter['screenid'];
 	}
 
 	$table = new CTableInfo(_('No host groups found.'));
-	$table->setHeader(array(
-		_('Host group'),
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH])) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING])) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
-		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
-	));
+
+	// set trigger severities as table header starting from highest severity
+	$header = array();
+
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
+			? getSeverityName($severity, $config)
+			: null;
+	}
+	krsort($header);
+	array_unshift($header, _('Host group'));
+
+	$table->setHeader($header);
 
 	// get host groups
 	$groups = API::HostGroup()->get(array(
@@ -398,8 +404,6 @@ function make_system_status($filter) {
 	}
 	unset($triggers);
 
-	$config = select_config();
-
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
@@ -428,11 +432,11 @@ function make_system_status($filter) {
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$groupRow->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
+					$groupRow->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum, $config));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$groupRow->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
+					$groupRow->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum, $config));
 					break;
 
 				case EXTACK_OPTION_BOTH:
@@ -445,8 +449,10 @@ function make_system_status($filter) {
 						$unackTriggersNum = null;
 					}
 
-					$groupRow->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum), !$allTriggersNum));
-					break;
+					$groupRow->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum),
+						!$allTriggersNum,
+						$config
+					));
 			}
 		}
 
@@ -461,6 +467,8 @@ function make_system_status($filter) {
 }
 
 function make_hoststat_summary($filter) {
+	$config = select_config();
+
 	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
 		_('Host group'),
@@ -588,13 +596,14 @@ function make_hoststat_summary($filter) {
 				$problematic_host_list[$host['hostid']] = array();
 				$problematic_host_list[$host['hostid']]['host'] = $host['name'];
 				$problematic_host_list[$host['hostid']]['hostid'] = $host['hostid'];
+
 				$problematic_host_list[$host['hostid']]['severities'] = array();
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
-				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+
+				for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+					$problematic_host_list[$host['hostid']]['severities'][$severity] = 0;
+				}
+
+				krsort($problematic_host_list[$host['hostid']]['severities']);
 			}
 			$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
 
@@ -667,15 +676,21 @@ function make_hoststat_summary($filter) {
 			if ($hosts_data[$group['groupid']]['lastUnack']) {
 				$table_inf = new CTableInfo();
 				$table_inf->setAttribute('style', 'width: 400px;');
-				$table_inf->setHeader(array(
-					_('Host'),
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
-					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
-				));
+
+				// set trigger severities as table header starting from highest severity
+				$header = array();
+
+				for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+					$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
+						? getSeverityName($severity, $config)
+						: null;
+				}
+
+				krsort($header);
+				array_unshift($header, _('Host'));
+
+				$table_inf->setHeader($header);
+
 				$popup_rows = 0;
 
 				foreach ($group['hosts'] as $host) {
@@ -716,15 +731,21 @@ function make_hoststat_summary($filter) {
 		if ($hosts_data[$group['groupid']]['problematic']) {
 			$table_inf = new CTableInfo();
 			$table_inf->setAttribute('style', 'width: 400px;');
-			$table_inf->setHeader(array(
-				_('Host'),
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
-				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
-			));
+
+			// set trigger severities as table header starting from highest severity
+			$header = array();
+
+			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+				$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
+					? getSeverityName($severity, $config)
+					: null;
+			}
+
+			krsort($header);
+			array_unshift($header, _('Host'));
+
+			$table_inf->setHeader($header);
+
 			$popup_rows = 0;
 
 			foreach ($group['hosts'] as $host) {
@@ -1327,7 +1348,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $trigger['description']),
+			getSeverityCell($trigger['priority'], $trigger['description'], false, $config),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,

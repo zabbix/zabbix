@@ -243,7 +243,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
 		$condition = new CComboBox('new_condition[value]');
-		$condition->addItems(getSeverityCaption());
+		$severityNames = array();
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severityNames[] = getSeverityName($severity, $this->data['config']);
+		}
+		$condition->addItems($severityNames);
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:

@@ -196,11 +196,13 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 						'&severity='.$media['severity'].
 						'&active='.$media['active'];
 
-		foreach (getSeverityCaption() as $key => $caption) {
-			$mediaActive = ($media['severity'] & (1 << $key));
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severityName = getSeverityName($severity, $this->data['config']);
 
-			$mediaSeverity[$key] = new CSpan(mb_substr($caption, 0, 1), $mediaActive ? 'enabled' : null);
-			$mediaSeverity[$key]->setHint($caption.($mediaActive ? ' (on)' : ' (off)'));
+			$mediaActive = ($media['severity'] & (1 << $severity));
+
+			$mediaSeverity[$severity] = new CSpan(mb_substr($severityName, 0, 1), $mediaActive ? 'enabled' : null);
+			$mediaSeverity[$severity]->setHint($severityName.($mediaActive ? ' ('._('on').')' : ' ('._('off').')'));
 		}
 
 		$mediaTableInfo->addRow(array(
@@ -282,7 +284,7 @@ if ($this->data['is_profile']) {
 
 		$triggersTable->addRow(array(
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
-			getSeverityCaption($severity),
+			getSeverityName($severity, $this->data['config']),
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
