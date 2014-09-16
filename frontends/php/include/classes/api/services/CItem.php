@@ -457,26 +457,10 @@ class CItem extends CItemGeneral {
 	 * @throws APIException if validation fails
 	 *
 	 * @param array $items
-	 * @param array $dbItems
 	 *
 	 * @return void
 	 */
-	protected function validateUpdate(array $items, array $dbItems) {
-		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-			'allowed' => array('itemid', 'status'),
-			'messageAllowedField' => _('Cannot update "%1$s" for a discovered item.')
-		));
-
-		foreach ($items as $item) {
-			// check permissions
-			if (!isset($dbItems[$item['itemid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			// discovered fields, except status, cannot be updated
-			$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItems[$item['itemid']]);
-		}
-
+	protected function validateUpdate(array $items) {
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);
 	}
@@ -542,8 +526,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -594,8 +578,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -616,13 +600,13 @@ class CItem extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$dbItems = $this->get(array(
-			'itemids' => zbx_objectValues($items, 'itemid'),
 			'output' => array('itemid', 'flags'),
+			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
 
-		$this->validateUpdate($items, $dbItems);
+		$this->validateUpdate($items);
 
 		foreach ($items as &$item) {
 			$item['flags'] = $dbItems[$item['itemid']]['flags'];
@@ -779,10 +763,10 @@ class CItem extends CItemGeneral {
 		}
 
 		$items = $this->get(array(
+			'output' => $selectFields,
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => array('applicationid'),
-			'output' => $selectFields,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 

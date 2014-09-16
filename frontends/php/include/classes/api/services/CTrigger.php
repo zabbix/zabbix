@@ -548,8 +548,8 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$triggers = $this->get(array(
+			'output' => API_OUTPUT_EXTEND,
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
-			'output' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($triggers as $trigger) {
@@ -577,8 +577,8 @@ class CTrigger extends CTriggerGeneral {
 			$triggerDbFields = array('triggerid' => null);
 
 			$dbTriggers = $this->get(array(
-				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_EXTEND,
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
@@ -652,13 +652,9 @@ class CTrigger extends CTriggerGeneral {
 				$expressionHosts = $expressionData->getHosts();
 
 				$hosts = API::Host()->get(array(
+					'output' => array('hostid', 'host', 'status'),
 					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
-					'output' => array(
-						'hostid',
-						'host',
-						'status'
-					),
 					'templated_hosts' => true,
 					'preservekeys' => true
 				));
@@ -801,8 +797,8 @@ class CTrigger extends CTriggerGeneral {
 
 		// select all triggers which are deleted (including children)
 		$delTriggers = $this->get(array(
-			'triggerids' => $triggerIds,
 			'output' => array('triggerid', 'description', 'expression'),
+			'triggerids' => $triggerIds,
 			'nopermissions' => true,
 			'selectHosts' => array('name')
 		));
@@ -1115,8 +1111,8 @@ class CTrigger extends CTriggerGeneral {
 		$triggerIds = zbx_objectValues($triggers, 'triggerid');
 
 		$dbTriggers = $this->get(array(
-			'triggerids' => $triggerIds,
 			'output' => API_OUTPUT_EXTEND,
+			'triggerids' => $triggerIds,
 			'selectHosts' => array('name'),
 			'selectDependencies' => array('triggerid'),
 			'preservekeys' => true,
@@ -1263,11 +1259,11 @@ class CTrigger extends CTriggerGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$triggers = $this->get(array(
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
 			'output' => array(
 				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			)
+			),
+			'hostids' => $data['templateids'],
+			'preservekeys' => true
 		));
 
 		foreach ($triggers as $trigger) {
@@ -1295,19 +1291,19 @@ class CTrigger extends CTriggerGeneral {
 		$hostIds = zbx_toArray($data['hostids']);
 
 		$parentTriggers = $this->get(array(
+			'output' => array('triggerid'),
 			'hostids' => $templateIds,
 			'preservekeys' => true,
-			'output' => array('triggerid'),
 			'selectDependencies' => array('triggerid')
 		));
 
 		if ($parentTriggers) {
 			$childTriggers = $this->get(array(
+				'output' => array('triggerid', 'templateid'),
 				'hostids' => ($hostIds) ? $hostIds : null,
 				'filter' => array('templateid' => array_keys($parentTriggers)),
 				'nopermissions' => true,
 				'preservekeys' => true,
-				'output' => array('triggerid', 'templateid'),
 				'selectHosts' => array('hostid')
 			));
 
@@ -1364,8 +1360,8 @@ class CTrigger extends CTriggerGeneral {
 			// forbid dependencies from hosts to templates
 			if (!$triggerTemplates) {
 				$triggerDependencyTemplates = API::Template()->get(array(
-					'triggerids' => $trigger['dependencies'],
 					'output' => array('templateid'),
+					'triggerids' => $trigger['dependencies'],
 					'nopermissions' => true,
 					'limit' => 1
 				));
@@ -1412,8 +1408,8 @@ class CTrigger extends CTriggerGeneral {
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
-				'triggerids' => $trigger['dependencies'],
 				'output' => array('templateid'),
+				'triggerids' => $trigger['dependencies'],
 				'nopermissions' => true,
 			));
 			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
@@ -1855,8 +1851,8 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	protected function checkPermissions(array $triggerIds) {
 		$triggerCount = $this->get(array(
-			'triggerids' => $triggerIds,
 			'output' => array('triggerid'),
+			'triggerids' => $triggerIds,
 			'editable' => true,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'countOutput' => true
