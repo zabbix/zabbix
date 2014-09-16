@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 16:05+0300\n"
-"PO-Revision-Date: 2014-09-11 07:10+0300\n"
+"POT-Creation-Date: 2014-09-16 16:06+0300\n"
+"PO-Revision-Date: 2014-09-11 08:16+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410412233.0\n"
+"X-POOTLE-MTIME: 1410416219.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -686,7 +686,7 @@ msgstr "И"
 #: include/views/configuration.action.edit.php:987
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr "И/Или"
+msgstr "И/ИЛИ"
 
 #: include/views/common.filter.trigger.php:38
 #: include/views/common.filter.trigger.php:46
@@ -1278,7 +1278,7 @@ msgstr "Загрузка ЦПУ. Загрузка процессора. ЦПУ �
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Утилизация ЦПУ. Загрузка процессора в процентах. ЦПУ, тип и режим опциональны. Если цпу не указан, используются все. Если тип не указан, используется - user. Если режим не указан, используется avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -10090,7 +10090,7 @@ msgstr "Нет групп для узлов сети."
 #: include/classes/api/services/CTemplate.php:411
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr ""
+msgstr "Нет групп для шаблона \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:980
 msgid "No groups for template."
@@ -10193,7 +10193,7 @@ msgstr "Ключи элементов данных не найдены."
 
 #: include/classes/api/services/CScreenItem.php:511
 msgid "No item prototype ID provided for screen element."
-msgstr ""
+msgstr "ID прототипа элементов данных не указан для элемента комплексного экрана."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:1085
 msgid "No item prototypes found."
@@ -11194,7 +11194,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/setup/CFrontendSetup.php:290
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
-msgstr ""
+msgstr "Расширение PHP bcmath отсутствует (параметр конфигурации PHP --enable-bcmath)."
 
 #: include/classes/setup/CFrontendSetup.php:521
 msgid "PHP ctype"
@@ -11202,7 +11202,7 @@ msgstr "PHP ctype"
 
 #: include/classes/setup/CFrontendSetup.php:525
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
-msgstr ""
+msgstr "Расширение PHP ctype отсутствует (параметр конфигурации PHP --enable-ctype)."
 
 #: include/classes/setup/CFrontendSetup.php:224
 msgid "PHP databases support"
@@ -11218,11 +11218,11 @@ msgstr "Поддержка PHP gd FreeType"
 
 #: include/classes/setup/CFrontendSetup.php:441
 msgid "PHP gd FreeType support missing."
-msgstr ""
+msgstr "Поддержка PHP gd FreeType отсутствует."
 
 #: include/classes/setup/CFrontendSetup.php:418
 msgid "PHP gd JPEG image support missing."
-msgstr ""
+msgstr "Поддержка PHP gd JPEG изображений отсутствует."
 
 #: include/classes/setup/CFrontendSetup.php:414
 msgid "PHP gd JPEG support"
@@ -11230,7 +11230,7 @@ msgstr "Поддержка PHP gd JPEG"
 
 #: include/classes/setup/CFrontendSetup.php:393
 msgid "PHP gd PNG image support missing."
-msgstr ""
+msgstr "Поддержка PHP gd PNG изображений отсутствует."
 
 #: include/classes/setup/CFrontendSetup.php:389
 msgid "PHP gd PNG support"
@@ -11238,7 +11238,7 @@ msgstr "Поддержка PHP gd PNG"
 
 #: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
-msgstr ""
+msgstr "Отсутствует расширение PHP gd (параметр конфигурации PHP --with-gd)."
 
 #: include/classes/setup/CFrontendSetup.php:572
 msgid "PHP gettext"
@@ -11246,7 +11246,7 @@ msgstr "PHP gettext"
 
 #: include/classes/setup/CFrontendSetup.php:576
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
-msgstr ""
+msgstr "Отсутствует расширение PHP gettext (параметр конфигурации PHP --with-gettext). Переводы недоступны."
 
 #: include/classes/setup/CFrontendSetup.php:460
 msgid "PHP libxml"
@@ -11266,7 +11266,7 @@ msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:324
 msgid "PHP mbstring.func_overload"
-msgstr ""
+msgstr "PHP mbstring.func_overload"
 
 #: include/classes/setup/CFrontendSetup.php:167
 msgid "PHP option max_execution_time"
@@ -11298,7 +11298,7 @@ msgstr "PHP session auto start"
 
 #: include/classes/setup/CFrontendSetup.php:559
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
-msgstr ""
+msgstr "Автоматический старт сессий в PHP должен быть отключен (PHP директива \"session.auto_start\")."
 
 #: include/classes/setup/CFrontendSetup.php:542
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
@@ -12097,7 +12097,7 @@ msgstr "В соответствии иконок пропущено требуе
 
 #: include/views/administration.script.edit.php:100
 msgid "Required host permissions"
-msgstr "Требуемые права доступа к узлу сети"
+msgstr "Требуемые права доступа к узлам сети"
 
 #: include/views/administration.proxy.list.php:45
 msgid "Required performance (vps)"
@@ -12498,11 +12498,11 @@ msgstr "Пароль SSL ключа"
 
 #: include/views/configuration.httpconf.edit.php:175
 msgid "SSL verify host"
-msgstr ""
+msgstr "Проверка SSL хоста"
 
 #: include/views/configuration.httpconf.edit.php:172
 msgid "SSL verify peer"
-msgstr ""
+msgstr "Проверка SSL узла"
 
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
