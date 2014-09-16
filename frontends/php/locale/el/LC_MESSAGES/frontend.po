@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-06 09:39+0300\n"
+"POT-Creation-Date: 2014-09-16 14:46+0300\n"
 "PO-Revision-Date: 2014-01-20 10:54+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -4971,7 +4971,7 @@ msgstr "Σφάλμα"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Σφάλμα αιτήματος αναζήτησης πίνακα \"%1$s\"."
 
-#: httpdetails.php:163 httpdetails.php:236
+#: httpdetails.php:164 httpdetails.php:236
 #, c-format
 msgid "Error: %1$s"
 msgstr "Σφάλμα: %1$s"
@@ -9385,7 +9385,7 @@ msgstr "Χάρτες δικτύου"
 msgid "Never"
 msgstr "Ποτέ"
 
-#: httpdetails.php:156 httpdetails.php:230
+#: httpdetails.php:157 httpdetails.php:230
 msgid "Never executed"
 msgstr "Ουδέποτε εκτελέσιμο"
 
@@ -10452,7 +10452,7 @@ msgstr "Αριθμητικό (απρόσημο)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
+#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
 #: include/maps.inc.php:956 include/setup.inc.php:198
@@ -14172,7 +14172,7 @@ msgid "Units"
 msgstr "Μονάδες"
 
 #: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:956 httpdetails.php:167 httpmon.php:170
+#: events.php:545 hosts.php:956 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14204,7 +14204,7 @@ msgstr "Άγνωστο"
 msgid "Unknown action"
 msgstr "Άγνωστη ενέργεια"
 
-#: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
+#: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
 msgstr ""
 
