@@ -269,10 +269,63 @@ out:
  *             str    - [IN] the string to append                             *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, char *str)
+static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str)
 {
 	if (FAIL == zbx_vector_str_search(vector, str, ZBX_DEFAULT_STR_COMPARE_FUNC))
 		zbx_vector_str_append(vector, zbx_strdup(NULL, str));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_itemkey_extract_global_regexps                               *
+ *                                                                            *
+ * Purpose: extract global regular expression names from item key             *
+ *                                                                            *
+ * Parameters: key    - [IN] the item key to parse                            *
+ *             vector - [OUT] the extracted regular expression names          *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t *regexps)
+{
+#define ZBX_KEY_LOG		1
+#define ZBX_KEY_EVENTLOG	2
+
+	AGENT_REQUEST	request;
+	int		item_key;
+	const char	*param;
+
+	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6))
+		item_key = ZBX_KEY_LOG;
+	else if (0 == strncmp(key, "eventlog[", 9))
+		item_key = ZBX_KEY_EVENTLOG;
+	else
+		return;
+
+	init_request(&request);
+
+	if(SUCCEED == parse_item_key(key, &request))
+		goto out;
+
+	/* "params" parameter */
+	if (NULL != (param = get_rparam(&request, 1)) && '@' == *param)
+		zbx_vector_str_append_uniq(regexps, param + 1);
+
+	if (ZBX_KEY_EVENTLOG == item_key)
+	{
+		/* "severity" parameter */
+		if (NULL != (param = get_rparam(&request, 2)) && '@' == *param)
+			zbx_vector_str_append_uniq(regexps, param + 1);
+
+		/* "source" parameter */
+		if (NULL != (param = get_rparam(&request, 3)) && '@' == *param)
+			zbx_vector_str_append_uniq(regexps, param + 1);
+
+		/* "logeventid" parameter */
+		if (NULL != (param = get_rparam(&request, 4)) && '@' == *param)
+			zbx_vector_str_append_uniq(regexps, param + 1);
+	}
+out:
+	free_request(&request);
 }
 
 /******************************************************************************
@@ -297,11 +350,9 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	const char		*__function_name = "send_list_of_active_checks_json";
 
 #define ZBX_KEY_OTHER		0
-#define ZBX_KEY_LOG		1
-#define ZBX_KEY_EVENTLOG	2
 
-	char			host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
+	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
+				error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
@@ -309,7 +360,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 
-	unsigned char		item_key;
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
 
@@ -403,34 +453,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, dc_items[i].mtime);
 			zbx_json_close(&json);
 
-			if (0 == strncmp(dc_items[i].key, "log[", 4) || 0 == strncmp(dc_items[i].key, "logrt[", 6))
-				item_key = ZBX_KEY_LOG;
-			else if (0 == strncmp(dc_items[i].key, "eventlog[", 9))
-				item_key = ZBX_KEY_EVENTLOG;
-			else
-				item_key = ZBX_KEY_OTHER;
-
-			if (ZBX_KEY_OTHER != item_key && ZBX_COMMAND_WITH_PARAMS == parse_command(dc_items[i].key, NULL, 0, params, sizeof(params)))
-			{
-				/* "params" parameter */
-				if (0 == get_param(params, 2, tmp, sizeof(tmp)) && '@' == *tmp)
-					zbx_vector_str_append_uniq(&names, tmp + 1);
-
-				if (ZBX_KEY_EVENTLOG == item_key)
-				{
-					/* "severity" parameter */
-					if (0 == get_param(params, 3, tmp, sizeof(tmp)) && '@' == *tmp)
-						zbx_vector_str_append_uniq(&names, tmp + 1);
-
-					/* "source" parameter */
-					if (0 == get_param(params, 4, tmp, sizeof(tmp)) && '@' == *tmp)
-						zbx_vector_str_append_uniq(&names, tmp + 1);
-
-					/* "logeventid" parameter */
-					if (0 == get_param(params, 5, tmp, sizeof(tmp)) && '@' == *tmp)
-						zbx_vector_str_append_uniq(&names, tmp + 1);
-				}
-			}
+			zbx_itemkey_extract_global_regexps(dc_items[i].key, &names);
 
 			zbx_free(dc_items[i].key);
 		}
