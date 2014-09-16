@@ -8,7 +8,6 @@ Bug fixes:
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .D........ [ZBX-5166] minor man pages corrections ('-' escaped as '\-') (Andris)
 ...G...PS. [ZBX-8391] stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
-...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
 ....I..... [ZBX-8658] made various changes to odbc related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
