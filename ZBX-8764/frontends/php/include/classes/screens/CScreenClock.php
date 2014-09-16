@@ -38,6 +38,11 @@ class CScreenClock extends CScreenBase {
 					'selectHosts' => array('host'),
 					'output' => array('itemid', 'value_type')
 				));
+
+				if (!$items) {
+					return null;
+				}
+
 				$item = reset($items);
 				$host = reset($item['hosts']);
 
