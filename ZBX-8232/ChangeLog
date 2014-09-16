@@ -1,12 +1,33 @@
+Changes for 2.2.7rc1
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+........S. [ZBX-8719] optimized value cache database requests (wiper)
+..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'search' option, removed redundant code in CUserMedia class and corrected user link in user groups page (Ivo)
+..F....... [ZBX-8701] fixed disabled web scenarios being displayed in the web monitoring widget (Pavels)
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
+........S. [ZBX-8541] fixed queue calculation when hosts with active items return from no data maintenance (asaveljevs)
+........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
+........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
+..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.6
 
 New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
+--------------------------------------------------------------------------------
 Changes for 2.2.6rc1
 
 New features:
-..F....... [ZBX-8275] added a feature to automatically clone web scenarios when cloning a host or template (Ivo)
+..F....... [ZBX-8275] implemented web scenario cloning (Ivo)
 A.......S. [ZBX-8473] improved performance of deleting triggers by API and server - events will be deleted only by the housekeeper (Krists, Sasha)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 
@@ -1068,12 +1089,29 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.14rc1
+
+New features:
+A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
+..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.13
+
+2.0.13rc1 was released as 2.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.13rc1
 
 New features:
 A.F....... [ZBX-1357] updated Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
+...G...... [ZBX-8646] added a warning on UNIX/GNU/Linux platforms if logrt[] directory has no 'execute' permission (Andris)
 ...G...PS. [ZBX-8629] fixed crash in get_string() function when checking "Database monitor" items (asaveljevs)
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .....J.... [ZBX-6229] removed pretty formatting from Java gateway JSON responses (asaveljevs)
@@ -2640,8 +2678,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.22rc1
+
+
+Changes for 1.8.21
+
+1.8.21rc1 was released as 1.8.21 without any changes
+
 Changes for 1.8.21rc1
 
+..F....... [ZBX-3407] fixed NVPS query to not fail on DB2 (Krists)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxml versions; thanks to pnig0s@Freebuf for the report (Andrejs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
