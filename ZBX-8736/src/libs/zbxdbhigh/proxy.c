@@ -2293,7 +2293,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	const char		*p;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, values_num = 0;
-	int			ret = FAIL, processed = 0, total_num = 0;
+	int			ret = FAIL, processed = 0, total_num = 0, timestamp;
 	double			sec;
 	zbx_timespec_t		ts, proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
@@ -2347,14 +2347,20 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
-			if (FAIL == is_uint_n_range(tmp, tmp_alloc, NULL, 0, 0x0LL, 0x7FFFFFFFLL))
+			if (FAIL == is_uint31(tmp, &av->ts.sec))
 				break;
 
-			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
+			av->ts.sec += proxy_timediff.sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
-				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
+				if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
+					0LL, 999999999LL))
+				{
+					break;
+				}
+
+				av->ts.ns += proxy_timediff.ns;
 
 				if (av->ts.ns > 999999999)
 				{
