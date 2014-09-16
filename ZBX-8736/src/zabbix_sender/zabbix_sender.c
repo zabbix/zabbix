@@ -733,6 +733,14 @@ int	main(int argc, char **argv)
 					ret = FAIL;
 					break;
 				}
+
+				if (FAIL == is_uint_n_range(clock, sizeof(clock), NULL, 0, 0x0LL, 0x7FFFFFFFLL))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "[line %d] Invalid timestamp value detected.",
+							total_count);
+					ret = FAIL;
+					break;
+				}
 			}
 
 			if ('\0' != *p && '"' != *p)
@@ -757,7 +765,7 @@ int	main(int argc, char **argv)
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, atoi(clock));
+				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (unsigned int)atoi(clock));
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
