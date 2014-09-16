@@ -3,6 +3,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8753] fixed mass update to change host inventiry (Sasha)
 ........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
