@@ -383,6 +383,8 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
  */
 show_messages();
 
+$config = select_config();
+
 if (hasRequest('form')) {
 	$data = array(
 		'form' => getRequest('form'),

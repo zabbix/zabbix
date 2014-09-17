@@ -570,6 +570,8 @@ else {
 	}
 
 	if ($data['pageFilter']->hostsSelected) {
+		$config = select_config();
+
 		$options = array(
 			'editable' => true,
 			'output' => array('httptestid'),

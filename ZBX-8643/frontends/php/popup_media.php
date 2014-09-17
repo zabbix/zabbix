@@ -81,6 +81,8 @@ if (isset($_REQUEST['add'])) {
 	}
 }
 
+$config = select_config();
+
 $severityNames = array();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);

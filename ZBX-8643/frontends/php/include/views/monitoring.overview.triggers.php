@@ -96,7 +96,8 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'hostId' => $this->data['hostid'],
 		'groupId' => $this->data['groupid'],
 		'fullScreen' => $this->data['fullscreen']
-	)
+	),
+	'config' => $this->data['config']
 ));
 $filterForm = $filterFormView->render();
 
