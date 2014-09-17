@@ -82,11 +82,10 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 	}
 	request;
 
-	int			ret = FAIL, fd = -1, status = -1, i;
+	int			ret = FAIL, fd, status, i;
 	int			families[] = {AF_INET, AF_INET6, AF_UNSPEC};
 	unsigned int		sequence = 0x58425A;
 	struct timeval		timeout = { 1, 500 * 1000 };
-
 
 	struct sockaddr_nl	s_sa = { AF_NETLINK, 0, 0, 0 };
 	struct iovec		s_io[1] = { { &request, sizeof(request) } };
@@ -98,7 +97,9 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 	struct iovec		r_io[1] = { { buffer, BUFSIZ } };
 	struct msghdr		r_msg = { (void *)&r_sa, sizeof(struct sockaddr_nl), r_io, 1 };
 
-	struct nlmsghdr		*r_hdr = NULL;
+	struct nlmsghdr		*r_hdr;
+
+	*found = 0;
 
 	request.nlhdr.nlmsg_len = sizeof(request);
 	request.nlhdr.nlmsg_flags = NLM_F_REQUEST | NLM_F_ROOT | NLM_F_MATCH;
@@ -166,8 +167,8 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 						}
 						else
 						{
-							nlerr = (EOPNOTSUPP == -err->error) ? NLERR_OPNOTSUPPORTED :
-								NLERR_UNKNOWN;
+							nlerr = (EOPNOTSUPP == -err->error ? NLERR_OPNOTSUPPORTED :
+								NLERR_UNKNOWN);
 						}
 
 						goto out;
@@ -186,8 +187,6 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 			}
 		}
 	}
-
-	*found = 0;
 out:
 	if (-1 != fd)
 		close(fd);
@@ -573,7 +572,6 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_INET_DIAG
 	int		found;
 #endif
-
 	if (1 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -596,41 +594,39 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		char	*error = NULL;
+		const char	*error;
 
 		switch (nlerr)
 		{
 			case NLERR_UNKNOWN:
-				error = zbx_strdup(error, "unrecognized netlink error occurred");
+				error = "unrecognized netlink error occurred";
 				break;
 			case NLERR_SOCKCREAT:
-				error = zbx_strdup(error, "cannot create netlink socket");
+				error = "cannot create netlink socket";
 				break;
 			case NLERR_BADSEND:
-				error = zbx_strdup(error, "cannot send netlink message to kernel");
+				error = "cannot send netlink message to kernel";
 				break;
 			case NLERR_BADRECV:
-				error = zbx_strdup(error, "cannot receive netlink message from kernel");
+				error = "cannot receive netlink message from kernel";
 				break;
 			case NLERR_RECVTIMEOUT:
-				error = zbx_strdup(error, "receiving netlink response timed out");
+				error = "receiving netlink response timed out";
 				break;
 			case NLERR_RESPTRUNCAT:
-				error = zbx_strdup(error, "received truncated netlink response from kernel");
+				error = "received truncated netlink response from kernel";
 				break;
 			case NLERR_OPNOTSUPPORTED:
-				error = zbx_strdup(error, "netlink operation not supported");
+				error = "netlink operation not supported";
 				break;
 			case NLERR_UNKNOWNMSGTYPE:
-				error = zbx_strdup(error, "received message of unrecognized type from kernel");
+				error = "received message of unrecognized type from kernel";
 				break;
 			default:
-				error = zbx_strdup(error, "unknown error");
+				error = "unknown error";
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "netlink interface error: %s", error);
-		zbx_free(error);
-
 		zabbix_log(LOG_LEVEL_DEBUG, "falling back on reading /proc/net/tcp...");
 #endif
 		buffer = zbx_malloc(NULL, buffer_alloc);
