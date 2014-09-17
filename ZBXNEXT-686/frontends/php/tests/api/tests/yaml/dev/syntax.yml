@@ -1,11 +1,6 @@
 # fixture files to load for this test case
 
 fixtures:
-  users:
-    type: include
-    params:
-      file: users
-
   hostGroups:
     type: include
     params:

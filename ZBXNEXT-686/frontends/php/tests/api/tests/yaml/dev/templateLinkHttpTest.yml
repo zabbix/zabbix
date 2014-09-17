@@ -1,11 +1,6 @@
 # https://support.zabbix.com/browse/ZBX-8603
 
 fixtures:
-  users:
-    type: include
-    params:
-      file: users
-
   hostGroups:
     type: include
     params:

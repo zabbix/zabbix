@@ -8,6 +8,7 @@ use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Yaml\Yaml;
 use Respect\Validation\Validator as v;
+use Zabbix\Test\Fixtures\FixtureLoader;
 
 class FileApiTestCase extends ApiTestCase {
 
@@ -50,7 +51,18 @@ class FileApiTestCase extends ApiTestCase {
 
 	protected function runTestFile($file) {
 		$test = $this->parseTestFile($file);
-		$fixtures = $this->loadFixtures($test['fixtures']);
+
+		$fixtures = $test['fixtures'];
+
+		// always load a user and a user group
+		array_unshift($fixtures, array(
+			'type' => FixtureLoader::TYPE_INCLUDE,
+			'params' => array(
+				'file' => 'user'
+			)
+		));
+
+		$fixtures = $this->loadFixtures($fixtures);
 
 		$this->runSteps($test['steps'], $fixtures);
 	}

@@ -1,11 +1,6 @@
 # Create a host, link it to a template and verify the result using host.get.
 
 fixtures:
-  users:
-    type: include
-    params:
-      file: users
-
   hostGroups:
     type: include
     params:
