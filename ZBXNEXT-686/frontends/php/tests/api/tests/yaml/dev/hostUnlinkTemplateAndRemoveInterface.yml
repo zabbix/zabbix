@@ -48,6 +48,16 @@ fixtures:
             port: 10050
             bulk: 1
 
+  # get the IDs of the new interfaces
+  interfaces:
+    type: api
+    params:
+      method: host.get
+      params:
+        output: ["hostid"]
+        selectInterfaces: ["interfaceid"]
+        hostids: @fixtures.hostWithItem.result.hostid@
+
 steps:
 
   # unlink and clear the template and remove the interface used by the item
@@ -59,7 +69,7 @@ steps:
         templates_clear: [{ templateid: @fixtures.templateWithItem.result.templateid@] }]
         interfaces:
           -
-            interfaceid: 2
+            interfaceid: @fixtures.interfaces.result[0].interfaces[1].interfaceid@
             main: 1
             type: 1
             useip: 1
@@ -87,7 +97,7 @@ steps:
     expect: result
     response:
       -
-        hostid: 1
+        hostid: @fixtures.hostWithItem.result.hostid@
         parentTemplates: []
         items: []
-        interfaces: [{ interfaceid: 2 }]
+        interfaces: [{ interfaceid: @fixtures.interfaces.result[0].interfaces[1].interfaceid@ }]
