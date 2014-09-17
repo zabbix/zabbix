@@ -22,8 +22,7 @@ require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 
 $overview = $this->data['overview'];
 $filter = $this->data['filter'];
-
-$config = select_config();
+$config = $this->data['config'];
 
 $filterForm = new CFormTable(null, null, 'get');
 $filterForm->setTableClass('formtable old-filter');

@@ -23,13 +23,13 @@
  * Build user edit form data.
  *
  * @param string $userid			user ID
- * @param bool	 $isProfile			true if current user viewing his own profile
  * @param array	 $config			array of configuration parameters returned in $data['config'] parameter
  *									to later use when configuring user medias
+ * @param bool	 $isProfile			true if current user viewing his own profile
  *
  * @return array
  */
-function getUserFormData($userid, $isProfile = false, array $config) {
+function getUserFormData($userid, array $config, $isProfile = false) {
 	$data = array(
 		'is_profile' => $isProfile,
 		'config' => $config

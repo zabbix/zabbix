@@ -336,6 +336,8 @@ if (hasRequest('sform')) {
 
 	$sev_select = new CComboBox('priority', $priority);
 
+	$config = select_config();
+
 	$severityNames = array();
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$severityNames[] = getSeverityName($severity, $config);

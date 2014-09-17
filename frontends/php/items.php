@@ -980,6 +980,8 @@ else {
 
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
+	$config = select_config();
+
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),

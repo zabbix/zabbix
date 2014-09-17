@@ -285,6 +285,8 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'showInfoColumn' => false,
@@ -293,7 +295,8 @@ else {
 		'showdisabled' => getRequest('showdisabled', 1),
 		'triggers' => array(),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
