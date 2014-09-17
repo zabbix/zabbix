@@ -737,7 +737,7 @@ int	main(int argc, char **argv)
 
 				if (FAIL == is_uint31(clock, &timestamp))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "[line %d] Invalid timestamp value detected.",
+					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Timestamp' value detected",
 							total_count);
 					ret = FAIL;
 					break;
@@ -756,7 +756,7 @@ int	main(int argc, char **argv)
 			}
 			else if ('\0' != *p)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] Too many parameters", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] too many parameters", total_count);
 				ret = FAIL;
 				break;
 			}
