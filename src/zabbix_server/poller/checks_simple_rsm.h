@@ -28,8 +28,10 @@
 /* -1   .. -199    internal monitoring software errors */
 /* -200 .. -999    service errors (registry operator fault) */
 
+/* internal */
 #define ZBX_EC_INTERNAL			-1	/* general internal error */
 #define ZBX_EC_INTERNAL_IP_UNSUP	-2	/* IP version not supported by Probe */
+/* DNS */
 #define ZBX_EC_DNS_NS_NOREPLY		-200	/* no reply from Name Server */
 #define ZBX_EC_DNS_NS_EREPLY		-201	/* invalid reply from Name Server */
 #define ZBX_EC_DNS_NS_NOTS		-202	/* no UNIX timestamp */
@@ -37,6 +39,7 @@
 #define ZBX_EC_DNS_NS_EDNSSEC		-204	/* DNSSEC error */
 #define ZBX_EC_DNS_RES_NOREPLY		-205	/* no reply from resolver */
 #define ZBX_EC_DNS_RES_NOADBIT		-206	/* no AD bit in the answer from resolver */
+/* RDDS */
 #define ZBX_EC_RDDS43_NOREPLY		-200	/* no reply from RDDS43 server */
 #define ZBX_EC_RDDS43_NONS		-201	/* Whois server returned no NS */
 #define ZBX_EC_RDDS43_NOTS		-202	/* no Unix timestamp */
@@ -45,6 +48,7 @@
 #define ZBX_EC_RDDS_ERES		-205	/* cannot resolve a Whois server name */
 #define ZBX_EC_RDDS80_NOHTTPCODE	-206	/* no HTTP response code in response from RDDS80 server */
 #define ZBX_EC_RDDS80_EHTTPCODE		-207	/* invalid HTTP response code in response from RDDS80 server */
+/* EPP */
 #define ZBX_EC_EPP_NO_IP		-200	/* IP is missing for EPP server */
 #define ZBX_EC_EPP_CONNECT		-201	/* cannot connect to EPP server */
 #define ZBX_EC_EPP_CRYPT		-202	/* invalid certificate or private key */
@@ -57,8 +61,9 @@
 #define ZBX_EC_EPP_INFOTO		-209	/* INFO command timeout */
 #define ZBX_EC_EPP_INFOINVAL		-210	/* invalid reply to INFO command */
 #define ZBX_EC_EPP_SERVERCERT		-211	/* Server certificate validation failed */
-#define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
+
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
+#define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
 
 #define ZBX_NO_VALUE			-1000	/* no item value should be set */

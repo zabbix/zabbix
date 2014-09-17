@@ -45,10 +45,10 @@
 #define EPP_SUCCESS_CODE_GENERAL	"1000"
 #define EPP_SUCCESS_CODE_LOGOUT		"1500"
 
-#define COMMAND_LOGIN			"login"
-#define COMMAND_INFO			"info"
-#define COMMAND_UPDATE			"update"
-#define COMMAND_LOGOUT			"logout"
+#define COMMAND_LOGIN	"login"
+#define COMMAND_INFO	"info"
+#define COMMAND_UPDATE	"update"
+#define COMMAND_LOGOUT	"logout"
 
 extern const char	*CONFIG_LOG_FILE;
 extern const char	epp_passphrase[128];
