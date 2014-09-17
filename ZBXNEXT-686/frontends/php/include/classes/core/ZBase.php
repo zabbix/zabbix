@@ -160,6 +160,9 @@ class ZBase {
 				break;
 
 			case self::EXEC_MODE_COMMAND:
+				// TODO: load the API wrapper only for the frontend
+				API::setWrapper();
+
 				$this->loadConfigFile();
 				$this->initDB();
 				break;
