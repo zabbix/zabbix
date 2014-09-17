@@ -470,7 +470,7 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// do not show 'Info' column, if it is a template
-	if ($data['hostid'] > 0) {
+	if ($data['hostid']) {
 		$data['showInfoColumn'] = (bool) API::Host()->get(array(
 			'output' => array(),
 			'hostids' => $data['hostid']
