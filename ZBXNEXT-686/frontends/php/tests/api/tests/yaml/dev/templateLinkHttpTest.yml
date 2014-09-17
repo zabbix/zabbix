@@ -75,7 +75,7 @@ fixtures:
     params:
       method: host.update
       params:
-        hostid: 1
+        hostid: @fixtures.emptyHost.result.hostid@
         templates: { templateid: @fixtures.templateWithApplication.result.templateid@ }
 
 steps:
@@ -86,7 +86,7 @@ steps:
       params:
         output: extend
         selectSteps: extend
-        hostids: 1
+        hostids: @fixtures.emptyHost.result.hostid@
 
     expect: result
     response:
