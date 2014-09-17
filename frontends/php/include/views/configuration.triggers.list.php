@@ -73,7 +73,7 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$data['showInfoColumn'] ? _('Info') : null
+	$this->data['showInfoColumn'] ? _('Info') : null
 ));
 
 foreach ($this->data['triggers'] as $tnum => $trigger) {
@@ -156,8 +156,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 
 	// info
-	if ($data['showInfoColumn']) {
-		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && !zbx_empty($trigger['error'])) {
+	if ($this->data['showInfoColumn']) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
 			$info->setHint($trigger['error'], 'on');
 		}
