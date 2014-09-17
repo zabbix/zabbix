@@ -1,5 +1,4 @@
 # fixture files to load for this test case
-
 fixtures:
   hostGroup:
     type: include
