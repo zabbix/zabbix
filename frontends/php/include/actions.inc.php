@@ -145,12 +145,12 @@ function actionConditionValueToString(array $actions, array $config) {
 	$dRulesToSelect = array();
 	$dChecksToSelect = array();
 
-	foreach ($actions as $aIdx => $action) {
-		$result[$aIdx] = array();
+	foreach ($actions as $i => $action) {
+		$result[$i] = array();
 
-		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
+		foreach ($action['filter']['conditions'] as $j => $condition) {
 			// unknown types and all of the default values for other types are 'Unknown'
-			$result[$aIdx][$cIdx] = _('Unknown');
+			$result[$i][$j] = _('Unknown');
 
 			switch ($condition['conditiontype']) {
 				// gather hostgroup IDs for later querying
@@ -188,23 +188,23 @@ function actionConditionValueToString(array $actions, array $config) {
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
-					$result[$aIdx][$cIdx] = $condition['value'];
+					$result[$i][$j] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-					$result[$aIdx][$cIdx] = $condition['value'] ? _('Ack') : _('Not Ack');
+					$result[$i][$j] = $condition['value'] ? _('Ack') : _('Not Ack');
 					break;
 
 				case CONDITION_TYPE_MAINTENANCE:
-					$result[$aIdx][$cIdx] = _('maintenance');
+					$result[$i][$j] = _('maintenance');
 					break;
 
 				case CONDITION_TYPE_TRIGGER_VALUE:
-					$result[$aIdx][$cIdx] = trigger_value2str($condition['value']);
+					$result[$i][$j] = trigger_value2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$aIdx][$cIdx] = getSeverityName($condition['value'], $config);
+					$result[$i][$j] = getSeverityName($condition['value'], $config);
 					break;
 
 				// gather dicovery rule IDs for later querying
@@ -218,19 +218,19 @@ function actionConditionValueToString(array $actions, array $config) {
 					break;
 
 				case CONDITION_TYPE_DOBJECT:
-					$result[$aIdx][$cIdx] = discovery_object2str($condition['value']);
+					$result[$i][$j] = discovery_object2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_DSERVICE_TYPE:
-					$result[$aIdx][$cIdx] = discovery_check_type2str($condition['value']);
+					$result[$i][$j] = discovery_check_type2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_DSTATUS:
-					$result[$aIdx][$cIdx] = discovery_object_status2str($condition['value']);
+					$result[$i][$j] = discovery_object_status2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_EVENT_TYPE:
-					$result[$aIdx][$cIdx] = eventType($condition['value']);
+					$result[$i][$j] = eventType($condition['value']);
 			}
 		}
 	}
@@ -303,45 +303,45 @@ function actionConditionValueToString(array $actions, array $config) {
 	}
 
 	if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks) {
-		foreach ($actions as $aIdx => $action) {
-			foreach ($action['filter']['conditions'] as $cIdx => $condition) {
+		foreach ($actions as $i => $action) {
+			foreach ($action['filter']['conditions'] as $j => $condition) {
 				$id = $condition['value'];
 
 				switch ($condition['conditiontype']) {
 					case CONDITION_TYPE_HOST_GROUP:
 						if (isset($groups[$id])) {
-							$result[$aIdx][$cIdx] = $groups[$id]['name'];
+							$result[$i][$j] = $groups[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_TRIGGER:
 						if (isset($triggers[$id])) {
 							$host = reset($triggers[$id]['hosts']);
-							$result[$aIdx][$cIdx] = $host['name'].NAME_DELIMITER.$triggers[$id]['description'];
+							$result[$i][$j] = $host['name'].NAME_DELIMITER.$triggers[$id]['description'];
 						}
 						break;
 
 					case CONDITION_TYPE_HOST:
 						if (isset($hosts[$id])) {
-							$result[$aIdx][$cIdx] = $hosts[$id]['name'];
+							$result[$i][$j] = $hosts[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_TEMPLATE:
 						if (isset($templates[$id])) {
-							$result[$aIdx][$cIdx] = $templates[$id]['name'];
+							$result[$i][$j] = $templates[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_PROXY:
 						if (isset($proxies[$id])) {
-							$result[$aIdx][$cIdx] = $proxies[$id]['host'];
+							$result[$i][$j] = $proxies[$id]['host'];
 						}
 						break;
 
 					case CONDITION_TYPE_DRULE:
 						if (isset($dRules[$id])) {
-							$result[$aIdx][$cIdx] = $dRules[$id]['name'];
+							$result[$i][$j] = $dRules[$id]['name'];
 						}
 						break;
 
@@ -349,12 +349,12 @@ function actionConditionValueToString(array $actions, array $config) {
 						if (isset($dChecks[$id])) {
 							$drule = reset($dChecks[$id]['drules']);
 							$type = $dChecks[$id]['type'];
-							$key = $dChecks[$id]['key_'];
+							$key_ = $dChecks[$id]['key_'];
 							$ports = $dChecks[$id]['ports'];
 
-							$dCheck = discovery_check2str($type, $key, $ports);
+							$dCheck = discovery_check2str($type, $key_, $ports);
 
-							$result[$aIdx][$cIdx] = $drule['name'].NAME_DELIMITER.$dCheck;
+							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
 				}
 			}
@@ -429,11 +429,11 @@ function getActionOperationDescriptions(array $actions) {
 	$hostGroupsToSelect = array();
 	$templatesToSelect = array();
 
-	foreach ($actions as $aIdx => $action) {
-		$result[$aIdx] = array();
+	foreach ($actions as $i => $action) {
+		$result[$i] = array();
 
-		foreach ($action['operations'] as $oIdx => $operation) {
-			$result[$aIdx][$oIdx] = array();
+		foreach ($action['operations'] as $j => $operation) {
+			$result[$i][$j] = array();
 
 			switch ($operation['operationtype']) {
 				// gather media type IDs, user IDs and user group IDs for later querying
@@ -556,8 +556,8 @@ function getActionOperationDescriptions(array $actions) {
 	}
 
 	// format the HTML ouput
-	foreach ($actions as $aIdx => $action) {
-		foreach ($action['operations'] as $oIdx => $operation) {
+	foreach ($actions as $i => $action) {
+		foreach ($action['operations'] as $j => $operation) {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
 					$mediaType = _('all media');
@@ -579,11 +579,11 @@ function getActionOperationDescriptions(array $actions) {
 
 						order_result($userNamesList);
 
-						$result[$aIdx][$oIdx][] = bold(_('Send message to users').': ');
-						$result[$aIdx][$oIdx][] = array(implode(', ', $userNamesList), SPACE, _('via'), SPACE,
+						$result[$i][$j][] = bold(_('Send message to users').': ');
+						$result[$i][$j][] = array(implode(', ', $userNamesList), SPACE, _('via'), SPACE,
 							$mediaType
 						);
-						$result[$aIdx][$oIdx][] = BR();
+						$result[$i][$j][] = BR();
 					}
 
 					if (isset($operation['opmessage_grp']) && $operation['opmessage_grp']) {
@@ -597,11 +597,11 @@ function getActionOperationDescriptions(array $actions) {
 
 						order_result($userGroupsList);
 
-						$result[$aIdx][$oIdx][] = bold(_('Send message to user groups').': ');
-						$result[$aIdx][$oIdx][] = array(implode(', ', $userGroupsList), SPACE, _('via'), SPACE,
+						$result[$i][$j][] = bold(_('Send message to user groups').': ');
+						$result[$i][$j][] = array(implode(', ', $userGroupsList), SPACE, _('via'), SPACE,
 							$mediaType
 						);
-						$result[$aIdx][$oIdx][] = BR();
+						$result[$i][$j][] = BR();
 					}
 					break;
 
@@ -611,7 +611,7 @@ function getActionOperationDescriptions(array $actions) {
 
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] == 0) {
-								$result[$aIdx][$oIdx][] = array(
+								$result[$i][$j][] = array(
 									bold(_('Run remote commands on current host')),
 									BR()
 								);
@@ -624,8 +624,8 @@ function getActionOperationDescriptions(array $actions) {
 						if ($hostList) {
 							order_result($hostList);
 
-							$result[$aIdx][$oIdx][] = bold(_('Run remote commands on hosts').': ');
-							$result[$aIdx][$oIdx][] = array(implode(', ', $hostList), BR());
+							$result[$i][$j][] = bold(_('Run remote commands on hosts').': ');
+							$result[$i][$j][] = array(implode(', ', $hostList), BR());
 						}
 					}
 
@@ -640,25 +640,25 @@ function getActionOperationDescriptions(array $actions) {
 
 						order_result($hostGroupList);
 
-						$result[$aIdx][$oIdx][] = bold(_('Run remote commands on host groups').': ');
-						$result[$aIdx][$oIdx][] = array(implode(', ', $hostGroupList), BR());
+						$result[$i][$j][] = bold(_('Run remote commands on host groups').': ');
+						$result[$i][$j][] = array(implode(', ', $hostGroupList), BR());
 					}
 					break;
 
 				case OPERATION_TYPE_HOST_ADD:
-					$result[$aIdx][$oIdx][] = array(bold(_('Add host')), BR());
+					$result[$i][$j][] = array(bold(_('Add host')), BR());
 					break;
 
 				case OPERATION_TYPE_HOST_REMOVE:
-					$result[$aIdx][$oIdx][] = array(bold(_('Remove host')), BR());
+					$result[$i][$j][] = array(bold(_('Remove host')), BR());
 					break;
 
 				case OPERATION_TYPE_HOST_ENABLE:
-					$result[$aIdx][$oIdx][] = array(bold(_('Enable host')), BR());
+					$result[$i][$j][] = array(bold(_('Enable host')), BR());
 					break;
 
 				case OPERATION_TYPE_HOST_DISABLE:
-					$result[$aIdx][$oIdx][] = array(bold(_('Disable host')), BR());
+					$result[$i][$j][] = array(bold(_('Disable host')), BR());
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
@@ -674,13 +674,13 @@ function getActionOperationDescriptions(array $actions) {
 					order_result($hostGroupList);
 
 					if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
-						$result[$aIdx][$oIdx][] = bold(_('Add to host groups').': ');
+						$result[$i][$j][] = bold(_('Add to host groups').': ');
 					}
 					else {
-						$result[$aIdx][$oIdx][] = bold(_('Remove from host groups').': ');
+						$result[$i][$j][] = bold(_('Remove from host groups').': ');
 					}
 
-					$result[$aIdx][$oIdx][] = array(implode(', ', $hostGroupList), BR());
+					$result[$i][$j][] = array(implode(', ', $hostGroupList), BR());
 					break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
@@ -696,13 +696,13 @@ function getActionOperationDescriptions(array $actions) {
 					order_result($templateList);
 
 					if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
-						$result[$aIdx][$oIdx][] = bold(_('Link to templates').': ');
+						$result[$i][$j][] = bold(_('Link to templates').': ');
 					}
 					else {
-						$result[$aIdx][$oIdx][] = bold(_('Unlink from templates').': ');
+						$result[$i][$j][] = bold(_('Unlink from templates').': ');
 					}
 
-					$result[$aIdx][$oIdx][] = array(implode(', ', $templateList), BR());
+					$result[$i][$j][] = array(implode(', ', $templateList), BR());
 			}
 		}
 	}
@@ -728,7 +728,7 @@ function getActionOperationHints(array $operations) {
 
 	$scriptsToSelect = array();
 
-	foreach ($operations as $oIdx => $operation) {
+	foreach ($operations as $operation) {
 		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
 				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
 			$scriptId = $operation['opcommand']['scriptid'];
@@ -745,20 +745,20 @@ function getActionOperationHints(array $operations) {
 		));
 	}
 
-	foreach ($operations as $oIdx => $operation) {
-		$result[$oIdx] = array();
+	foreach ($operations as $key => $operation) {
+		$result[$key] = array();
 
 		switch ($operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
 				if (hasRequest('def_shortdata') && hasRequest('def_longdata')) {
-					$result[$oIdx][] = array(bold(_('Subject').': '), BR(), zbx_nl2br(getRequest('def_shortdata')));
-					$result[$oIdx][] = array(bold(_('Message').': '), BR(), zbx_nl2br(getRequest('def_longdata')));
+					$result[$key][] = array(bold(_('Subject').': '), BR(), zbx_nl2br(getRequest('def_shortdata')));
+					$result[$key][] = array(bold(_('Message').': '), BR(), zbx_nl2br(getRequest('def_longdata')));
 				}
 				else {
-					$result[$oIdx][] = array(bold(_('Subject').': '), BR(),
+					$result[$key][] = array(bold(_('Subject').': '), BR(),
 						zbx_nl2br($operation['opmessage']['subject'])
 					);
-					$result[$oIdx][] = array(bold(_('Message').': '), BR(),
+					$result[$key][] = array(bold(_('Message').': '), BR(),
 						zbx_nl2br($operation['opmessage']['message'])
 					);
 				}
@@ -767,31 +767,31 @@ function getActionOperationHints(array $operations) {
 			case OPERATION_TYPE_COMMAND:
 				switch ($operation['opcommand']['type']) {
 					case ZBX_SCRIPT_TYPE_IPMI:
-						$result[$oIdx][] = array(bold(_('Run IPMI command').': '), BR(),
+						$result[$key][] = array(bold(_('Run IPMI command').': '), BR(),
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						);
 						break;
 
 					case ZBX_SCRIPT_TYPE_SSH:
-						$result[$oIdx][] = array(bold(_('Run SSH commands').': '), BR(),
+						$result[$key][] = array(bold(_('Run SSH commands').': '), BR(),
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						);
 						break;
 
 					case ZBX_SCRIPT_TYPE_TELNET:
-						$result[$oIdx][] = array(bold(_('Run TELNET commands').': '), BR(),
+						$result[$key][] = array(bold(_('Run TELNET commands').': '), BR(),
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						);
 						break;
 
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 						if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-							$result[$oIdx][] = array(bold(_('Run custom commands on Zabbix agent').': '), BR(),
+							$result[$key][] = array(bold(_('Run custom commands on Zabbix agent').': '), BR(),
 								italic(zbx_nl2br($operation['opcommand']['command']))
 							);
 						}
 						else {
-							$result[$oIdx][] = array(bold(_('Run custom commands on Zabbix server').': '), BR(),
+							$result[$key][] = array(bold(_('Run custom commands on Zabbix server').': '), BR(),
 								italic(zbx_nl2br($operation['opcommand']['command']))
 							);
 						}
@@ -801,14 +801,14 @@ function getActionOperationHints(array $operations) {
 						$scriptId = $operation['opcommand']['scriptid'];
 
 						if (isset($scripts[$scriptId])) {
-							$result[$oIdx][] = array(bold(_('Run global script').': '),
+							$result[$key][] = array(bold(_('Run global script').': '),
 								italic($scripts[$scriptId]['name'])
 							);
 						}
 						break;
 
 					default:
-						$result[$oIdx][] = array(bold(_('Run commands').': '), BR(),
+						$result[$key][] = array(bold(_('Run commands').': '), BR(),
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						);
 				}
