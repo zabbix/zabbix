@@ -2293,7 +2293,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	const char		*p;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, values_num = 0;
-	int			ret = FAIL, processed = 0, total_num = 0, timestamp;
+	int			ret = FAIL, processed = 0, total_num = 0;
 	double			sec;
 	zbx_timespec_t		ts, proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
