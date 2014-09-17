@@ -2348,7 +2348,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
 			if (FAIL == is_uint31(tmp, &av->ts.sec))
-				break;
+				continue;
 
 			av->ts.sec += proxy_timediff.sec;
 
@@ -2357,7 +2357,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
 					0LL, 999999999LL))
 				{
-					break;
+					continue;
 				}
 
 				av->ts.ns += proxy_timediff.ns;
