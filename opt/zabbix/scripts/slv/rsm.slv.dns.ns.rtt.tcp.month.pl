@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # DNS monthly resolution RTT (TCP)
 #
@@ -8,6 +8,8 @@
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 

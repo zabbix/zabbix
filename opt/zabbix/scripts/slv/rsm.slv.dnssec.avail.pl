@@ -1,15 +1,17 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # DNSSEC proper resolution
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
+use TLD_constants qw(:ec);
 
 my $cfg_key_in = 'rsm.dns.udp.rtt[';
 my $cfg_key_out = 'rsm.slv.dnssec.avail';
-use constant ZBX_EC_DNS_NS_ERRSIG => -204; # DNSSEC error
 
 parse_opts();
 exit_if_running();

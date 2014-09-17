@@ -1,9 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # EPP availability
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 

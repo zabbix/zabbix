@@ -1,9 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # RDDS43 monthly resolution RTT
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 

@@ -24,8 +24,8 @@ use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
 use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 use constant MIN_LOGIN_ERROR => -205;
 use constant MAX_LOGIN_ERROR => -203;
-use constant MIN_UPDATE_ERROR => -208;
-use constant MAX_UPDATE_ERROR => -206;
+use constant MIN_UPDATE_ERROR => -208; # minimal UPDATE TIME error
+use constant MAX_UPDATE_ERROR => -206; # maximal UPDATE TIME error
 use constant MIN_INFO_ERROR => -211;
 use constant MAX_INFO_ERROR => -209;
 

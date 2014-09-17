@@ -1,9 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # DNSSEC rolling week
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 

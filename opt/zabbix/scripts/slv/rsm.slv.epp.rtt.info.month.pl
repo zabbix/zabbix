@@ -1,9 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # EPP info-command monthly resolution RTT
 
 use lib '/opt/zabbix/scripts';
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 

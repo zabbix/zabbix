@@ -74,7 +74,6 @@ use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
 
 use constant RSM_ROLLWEEK_THRESHOLDS => '0,5,10,25,50,75,100';
 
-use constant cfg_probe_status_delay => 60;
 use constant cfg_default_rdds_ns_string => 'Name Server:';
 
 use constant rsm_host => 'rsm'; # global config history
@@ -112,7 +111,7 @@ our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID V
                     ZBX_EC_EPP_CONNECT ZBX_EC_EPP_CRYPT ZBX_EC_EPP_FIRSTTO ZBX_EC_EPP_FIRSTINVAL ZBX_EC_EPP_LOGINTO ZBX_EC_EPP_LOGININVAL
                     ZBX_EC_EPP_UPDATETO ZBX_EC_EPP_UPDATETO ZBX_EC_EPP_UPDATEINVAL ZBX_EC_EPP_INFOTO ZBX_EC_EPP_INFOINVAL
 		    RSM_ROLLWEEK_THRESHOLDS rsm_host rsm_group rsm_value_mappings cfg_probe_status_delay
-		    cfg_probe_status_delay cfg_default_rdds_ns_string rsm_trigger_rollweek_thresholds cfg_global_macros
+		    cfg_default_rdds_ns_string rsm_trigger_rollweek_thresholds cfg_global_macros
 		    HOST_STATUS_MONITORED HOST_STATUS_NOT_MONITORED HOST_STATUS_PROXY_ACTIVE HOST_STATUS_PROXY_PASSIVE ITEM_STATUS_ACTIVE
 		    ITEM_STATUS_DISABLED INTERFACE_TYPE_AGENT
 		    ITEM_VALUE_TYPE_FLOAT ITEM_VALUE_TYPE_STR ITEM_VALUE_TYPE_LOG ITEM_VALUE_TYPE_UINT64 ITEM_VALUE_TYPE_TEXT
@@ -133,7 +132,7 @@ our %EXPORT_TAGS = ( general => [ qw(true false TIME_MINUTE TIME_HOUR TIME_DAY) 
 				ITEM_VALUE_TYPE_FLOAT ITEM_VALUE_TYPE_STR ITEM_VALUE_TYPE_LOG ITEM_VALUE_TYPE_UINT64 ITEM_VALUE_TYPE_TEXT
 				ITEM_TYPE_ZABBIX ITEM_TYPE_TRAPPER ITEM_TYPE_SIMPLE ITEM_TYPE_INTERNAL ITEM_TYPE_ZABBIX_ACTIVE
 				ITEM_TYPE_AGGREGATE ITEM_TYPE_EXTERNAL ITEM_TYPE_CALCULATED)],
-		    config => [ qw(cfg_probe_status_delay cfg_default_rdds_ns_string rsm_value_mappings cfg_probe_status_delay rsm_trigger_rollweek_thresholds
+		    config => [ qw(cfg_probe_status_delay cfg_default_rdds_ns_string rsm_value_mappings rsm_trigger_rollweek_thresholds
 				    cfg_global_macros) ],
 		    slv => [ qw(APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST APP_SLV_CURMON) ] );
 
