@@ -1,0 +1,23 @@
+params:
+  groupid: ~
+
+return:
+  templateid: @fixtures.template.result.templateids[0]@
+  applicationid: @fixtures.application.result.applicationids[0]@
+
+fixtures:
+  template:
+    type: api
+    params:
+      method: template.create
+      params:
+        host: "Template"
+        groups: [{ groupid: @params.groupid@ }]
+
+  application:
+    type: api
+    params:
+      method: application.create
+      params:
+        name: App
+        hostid: @fixtures.template.result.templateids[0]@

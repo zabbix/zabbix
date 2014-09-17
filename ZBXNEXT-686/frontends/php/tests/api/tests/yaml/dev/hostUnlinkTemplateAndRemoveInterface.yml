@@ -1,44 +1,37 @@
 # https://support.zabbix.com/browse/ZBX-8530
 
 fixtures:
-  hostGroups:
+  hostGroup:
     type: include
     params:
-      file: hostGroups
+      file: hostGroup
 
-  hosts:
+  hostWithItem:
     type: include
     params:
-      file: hosts
+      file: hostWithItem
       params:
-        groupid: @fixtures.hostGroups.result.groupid@
+        groupid: @fixtures.hostGroup.result.groupid@
 
-  hostItems:
+  templateWithItem:
     type: include
     params:
-      file: hostItems
+      file: templateWithItem
       params:
-        groupid: @fixtures.hosts.result.hostid@
+        groupid: @fixtures.hostGroup.result.groupid@
 
-  templates:
-    type: include
-    params:
-      file: templates
-      params:
-        groupid: @fixtures.hostGroups.result.groupid@
-
-steps:
   # link the template to the host
-  step1:
-    request:
+  linkTemplate:
+    type: api
+    params:
       method: host.update
       params:
-        # using host and template IDs here
-        hostid: 1
-        templates: { templateid: @fixtures.templates.result.templateid@ }
+        hostid: @fixtures.hostWithItem.result.hostid@
+        templates: { templateid: @fixtures.templateWithItem.result.templateid@ }
+        inventory: {}
         interfaces:
           -
-            interfaceid: 1
+            interfaceid: @fixtures.hostWithItem.result.interfaceid@
             main: 0
             type: 1
             useip: 1
@@ -55,38 +48,15 @@ steps:
             port: 10050
             bulk: 1
 
-    expect: result
-
-    response:
-      hostids: [1]
-
-  #intermediate step to make sure that the template has been linked correctly
-#  step1-2:
-#    request:
-#      method: host.get
-#      params:
-#        hostids: 1
-#        selectParentTemplates: [templateid]
-#        output: [host]
-#        selectItems: [name]
-#        selectInterfaces: [interfaceid]
-#
-#    expect: result
-#    response:
-#      -
-#        hostid: 1
-#        host: Zabbix server
-#        parentTemplates: [{ templateid: 1000 }]
-#        items: [{ name: Available memory }]
-#        interfaces: [{ interfaceid: 1 }, { interfaceid: 2 }]
+steps:
 
   # unlink and clear the template and remove the interface used by the item
-  step2:
+  step1:
     request:
       method: host.update
       params:
-        hostid: @steps.step1.request.params.hostid@
-        templates_clear: [{ templateid: @steps.step1.request.params.templates.templateid@] }]
+        hostid: @fixtures.hostWithItem.result.hostid@
+        templates_clear: [{ templateid: @fixtures.templateWithItem.result.templateid@] }]
         interfaces:
           -
             interfaceid: 2
@@ -101,10 +71,10 @@ steps:
 
     expect: result
     response:
-      hostids: [@steps.step1.request.params.hostid@]
+      hostids: [@fixtures.hostWithItem.result.hostid@]
 
   # make sure step2 has been executed correctly
-  step3:
+  step2:
     request:
       method: host.get
       params:

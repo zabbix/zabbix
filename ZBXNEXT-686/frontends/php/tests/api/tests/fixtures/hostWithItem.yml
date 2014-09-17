@@ -1,0 +1,48 @@
+params:
+  groupid: ~
+
+return:
+  hostid: @fixtures.host.result.hostids[0]@
+  interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+  itemid: @fixtures.item.result.itemids[0]@
+
+fixtures:
+  host:
+    type: api
+    params:
+      method: host.create
+      params:
+        host: "Zabbix server"
+        interfaces:
+          -
+            main: 1
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+        groups: [{ groupid: @params.groupid@ }]
+
+  # fetch the interface to create an item with it
+  interface:
+    type: api
+    params:
+      method: host.get
+      params:
+        output: ["hostid"]
+        selectInterfaces: ["interfaceid"]
+        hostids: @fixtures.host.result.hostids[0]@
+
+  item:
+    type: api
+    params:
+      method: item.create
+      params:
+        name: "Available memory"
+        key_: "vm.memory.size[available]"
+        hostid: @fixtures.host.result.hostids[0]@
+        type: 0
+        value_type: 3
+        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        delay: 30

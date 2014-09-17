@@ -1,10 +1,10 @@
 # Create a host, link it to a template and verify the result using host.get.
 
 fixtures:
-  hostGroups:
+  hostGroup:
     type: include
     params:
-      file: hostGroups
+      file: hostGroup
 
 steps:
   step1:
@@ -22,7 +22,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroups.result.groupid@
+            groupid: @fixtures.hostGroup.result.groupid@
 
     expect: result
 

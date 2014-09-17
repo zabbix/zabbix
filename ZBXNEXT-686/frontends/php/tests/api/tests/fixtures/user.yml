@@ -21,3 +21,5 @@ fixtures:
           alias: Admin
           passwd: 5fce1b3e34b520afeffb37ce08c7cd66
           type: 3
+
+# TODO: add the user - user group link

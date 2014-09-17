@@ -1,54 +1,86 @@
 # https://support.zabbix.com/browse/ZBX-8603
 
 fixtures:
-  hostGroups:
+  hostGroup:
     type: include
     params:
-      file: hostGroups
+      file: hostGroup
 
-  hosts:
+  emptyHost:
     type: include
     params:
-      file: hosts
+      file: emptyHost
       params:
-        groupid: @fixtures.hostGroups.result.groupid@
+        groupid: @fixtures.hostGroup.result.groupid@
 
-  templates:
+  templateWithApplication:
     type: include
     params:
-      file: templates
+      file: templateWithApplication
       params:
-        groupid: @fixtures.hostGroups.result.groupid@
+        groupid: @fixtures.hostGroup.result.groupid@
 
-  templateApplications:
-    type: include
+  httpTest:
+    type: api
     params:
-      file: templateApplications
+      method: httptest.create
       params:
-        hostid: @fixtures.templates.result.templateid@
+        name: "Web scenario"
+        applicationid: @fixtures.templateWithApplication.result.applicationid@
+        nextcheck: 0
+        delay: 100
+        status: 0
+        variables: "var=value"
+        agent: "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
+        authentication: 1
+        http_user: "user"
+        http_password: "password"
+        hostid: @fixtures.templateWithApplication.result.templateid@
+        http_proxy: "root@proxy"
+        retries: 3
+        ssl_cert_file: "certificate"
+        ssl_key_file: "key"
+        ssl_key_password: "password"
+        verify_peer: 1
+        verify_host: 1
+        headers: "Accept: text/html"
+        steps:
+          -
+            name: "Step 1"
+            no: 1
+            url: "http://zabbix.com"
+            timeout: 30
+            posts: "post=1"
+            required: "required string"
+            status_codes: 200
+            variables: "stepVar=1"
+            follow_redirects: 1
+            retrieve_mode: 0
+            headers: "Accept: text/plain"
+          -
+            name: "Step 2"
+            no: 2
+            url: "http://google.com"
+            timeout: 40
+            posts: ""
+            required: ""
+            status_codes: 302
+            variables: "stepVariable=2"
+            follow_redirects: 1
+            retrieve_mode: 1
+            headers: ""
 
-  templateHttpTests:
-    type: include
+  linkTemplate:
+    type: api
     params:
-      file: templateHttpTests
-      params:
-        hostid: @fixtures.templates.result.templateid@
-        applicationid: @fixtures.templateApplications.result.applicationid@
-
-steps:
-  step1:
-    request:
       method: host.update
       params:
         hostid: 1
-        templates: { templateid: @fixtures.templates.result.templateid@ }
+        templates: { templateid: @fixtures.templateWithApplication.result.templateid@ }
 
-    expect: result
-    response:
-      hostids: [1]
-
+steps:
   # make sure the HTTP test is inherited correctly
-  step2:
+  step1:
     request:
       method: httptest.get
       params:
@@ -70,7 +102,7 @@ steps:
         authentication: 1
         http_user: "user"
         http_password: "password"
-        hostid: @steps.step1.request.params.hostid@
+        hostid: @fixtures.emptyHost.result.hostid@
         http_proxy: "root@proxy"
         retries: 3
         ssl_cert_file: "certificate"
@@ -79,7 +111,7 @@ steps:
         verify_peer: 1
         verify_host: 1
         headers: "Accept: text/html"
-        templateid: @fixtures.templateHttpTests.result.httptestid@
+        templateid: @fixtures.httpTest.result.httptestids[0]@
         steps:
           -
             httpstepid: { _assert: string }
@@ -111,18 +143,18 @@ steps:
             headers: ""
 
   # make sure the scenario has been linked to the correct application
-  step3:
+  step2:
     request:
       method: application.get
       params:
         output: [name, hostid]
-        applicationids: @steps.step2.response[0].applicationid@
+        applicationids: @steps.step1.response[0].applicationid@
 
     expect: result
     response:
       -
-        applicationid: @steps.step2.response[0].applicationid@
+        applicationid: @steps.step1.response[0].applicationid@
         name: App
-        hostid: @steps.step1.request.params.hostid@
+        hostid: @fixtures.emptyHost.result.hostid@
 
   # TODO: check that web items have been created on the host

@@ -1,0 +1,23 @@
+params:
+  groupid: ~
+
+return:
+  hostid: @fixtures.host.result.hostids[0]@
+
+fixtures:
+  host:
+    type: api
+    params:
+      method: host.create
+      params:
+        host: "Zabbix server"
+        interfaces:
+          -
+            main: 1
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+        groups: [{ groupid: @params.groupid@ }]

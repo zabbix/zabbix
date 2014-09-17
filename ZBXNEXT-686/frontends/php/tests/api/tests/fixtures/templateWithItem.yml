@@ -1,0 +1,26 @@
+params:
+  groupid: ~
+
+return:
+  templateid: @fixtures.template.result.templateids[0]@
+
+fixtures:
+  template:
+    type: api
+    params:
+      method: template.create
+      params:
+        host: "Template"
+        groups: [{ groupid: @params.groupid@ }]
+
+  item:
+    type: api
+    params:
+      method: item.create
+      params:
+        name: "Available memory"
+        key_: "vm.memory.size[available]"
+        hostid: @fixtures.template.result.templateids[0]@
+        type: 0
+        delay: 30
+        value_type: 3

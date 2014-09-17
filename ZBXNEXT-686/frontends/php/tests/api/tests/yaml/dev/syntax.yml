@@ -1,10 +1,10 @@
 # fixture files to load for this test case
 
 fixtures:
-  hostGroups:
+  hostGroup:
     type: include
     params:
-      file: hostGroups
+      file: hostGroup
 
 # an array of steps that will be executed one-by-one
 steps:
@@ -26,7 +26,7 @@ steps:
         groups:
           -
             # macros can be used to reference values returned by fixtures
-            groupid: @fixtures.hostGroups.result.groupid@
+            groupid: @fixtures.hostGroup.result.groupid@
 
     # what to expect: either "result" or "error"
     expect: result
@@ -74,7 +74,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroups.result.groupid@
+            groupid: @fixtures.hostGroup.result.groupid@
 
     # in this step we expect an error
     expect: error
@@ -101,7 +101,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroups.result.groupid@
+            groupid: @fixtures.hostGroup.result.groupid@
 
     expect: result
 

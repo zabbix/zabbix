@@ -1,22 +1,15 @@
 fixtures:
-  hostGroups:
+  hostGroup:
     type: include
     params:
-      file: hostGroups
+      file: hostGroup
 
-  hosts:
+  hostWithItem:
     type: include
     params:
-      file: hosts
+      file: hostWithItem
       params:
-        groupid: @fixtures.hostGroups.result.groupid@
-
-  hostItems:
-    type: include
-    params:
-      file: hostItems
-      params:
-        hostid: @fixtures.hosts.result.hostid@
+        groupid: @fixtures.hostGroup.result.groupid@
 
 steps:
 
