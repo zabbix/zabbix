@@ -2347,11 +2347,20 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
-			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
+			if (FAIL == is_uint31(tmp, &av->ts.sec))
+				continue;
+
+			av->ts.sec += proxy_timediff.sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
-				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
+				if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
+					0LL, 999999999LL))
+				{
+					continue;
+				}
+
+				av->ts.ns += proxy_timediff.ns;
 
 				if (av->ts.ns > 999999999)
 				{

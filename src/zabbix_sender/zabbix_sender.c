@@ -630,7 +630,8 @@ int	main(int argc, char **argv)
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL,
+				timestamp;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -733,6 +734,14 @@ int	main(int argc, char **argv)
 					ret = FAIL;
 					break;
 				}
+
+				if (FAIL == is_uint31(clock, &timestamp))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Timestamp' value detected",
+							total_count);
+					ret = FAIL;
+					break;
+				}
 			}
 
 			if ('\0' != *p && '"' != *p)
@@ -747,7 +756,7 @@ int	main(int argc, char **argv)
 			}
 			else if ('\0' != *p)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] Too many parameters", total_count);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] too many parameters", total_count);
 				ret = FAIL;
 				break;
 			}
@@ -757,7 +766,7 @@ int	main(int argc, char **argv)
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, atoi(clock));
+				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
