@@ -49,20 +49,27 @@ function getSeverityStyle($severity, $type = true) {
  * @return string
  */
 function getSeverityName($severity, array $config) {
-	$severities = array(
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
-		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
-		TRIGGER_SEVERITY_WARNING => _($config['severity_name_2']),
-		TRIGGER_SEVERITY_AVERAGE => _($config['severity_name_3']),
-		TRIGGER_SEVERITY_HIGH => _($config['severity_name_4']),
-		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5'])
-	);
-
-	if (isset($severities[$severity])) {
-		return $severities[$severity];
-	}
-	else {
-		return _('Unknown');
+	switch ($severity) {
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return _($config['severity_name_0']);
+			break;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return _($config['severity_name_1']);
+			break;
+		case TRIGGER_SEVERITY_WARNING:
+			return _($config['severity_name_2']);
+			break;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return _($config['severity_name_3']);
+			break;
+		case TRIGGER_SEVERITY_HIGH:
+			return _($config['severity_name_4']);
+			break;
+		case TRIGGER_SEVERITY_DISASTER:
+			return _($config['severity_name_5']);
+			break;
+		default:
+			return _('Unknown');
 	}
 }
 
