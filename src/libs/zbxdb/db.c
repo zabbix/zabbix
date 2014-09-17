@@ -210,7 +210,9 @@ static int	is_recoverable_mysql_error(void)
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 	int		ret = ZBX_DB_OK;
-#if defined(HAVE_IBM_DB2)
+#if defined(HAVE_MYSQL)
+	my_bool		mysql_reconnect = 1;
+#elif defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
@@ -293,6 +295,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
+
+	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
