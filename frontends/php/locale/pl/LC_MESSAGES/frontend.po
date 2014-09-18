@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-16 15:14+0300\n"
-"PO-Revision-Date: 2014-09-15 12:32+0300\n"
+"PO-Revision-Date: 2014-09-17 10:12+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410777131.0\n"
+"X-POOTLE-MTIME: 1410941544.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -376,7 +376,7 @@ msgstr "Akcje"
 #: include/views/administration.proxy.edit.php:42
 #: include/views/administration.proxy.list.php:93
 msgid "Active"
-msgstr "Aktywne"
+msgstr "Aktywny"
 
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
@@ -620,7 +620,7 @@ msgstr "Dowolny"
 
 #: include/regexp.inc.php:193 include/views/js/adm.regexprs.edit.js.php:112
 msgid "Any character string included"
-msgstr "Dowolny ciąg znaków zawiera"
+msgstr "Zawiera dowolny ciąg znaków"
 
 #: applications.php:118 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:596
@@ -806,7 +806,7 @@ msgstr "Sierpień"
 
 #: include/menu.inc.php:247 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
-msgstr "Uwierzytelnienie"
+msgstr "Uwierzytelnianie"
 
 #: include/views/configuration.host.edit.php:745
 #: include/views/configuration.host.edit.php:757
@@ -947,21 +947,21 @@ msgstr "Raporty słupkowe"
 #: authentication.php:42
 #: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
-msgstr "Podstawowe DN"
+msgstr "Bazowa DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr "Podstawowe uwierzytelnienie"
+msgstr "Uwierzytelnianie podstawowe"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
-msgstr "DN do dowiązania"
+msgstr "DN dostępu"
 
 #: authentication.php:45
 #: include/views/administration.authentication.edit.php:99
 #: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
-msgstr "Hasło dowiązania"
+msgstr "Hasło dostępu"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
@@ -1478,11 +1478,11 @@ msgstr "Nie można wyczyścić historii"
 
 #: api/classes/CDiscoveryRule.php:953
 msgid "Cannot clone graph prototypes."
-msgstr "Nie można powielić prototypu wykresów."
+msgstr "Nie można powielić prototypów wykresów."
 
 #: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
-msgstr "Nie można powielić prototypu hosta."
+msgstr "Nie można powielić prototypów hostów."
 
 #: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
@@ -3756,7 +3756,7 @@ msgstr "Domyślnie"
 
 #: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
-msgstr "Domyślne uwierzytelnienie"
+msgstr "Domyślne uwierzytelnianie"
 
 #: include/views/configuration.slideconf.edit.php:41 slideconf.php:37
 msgid "Default delay (in seconds)"
@@ -5458,7 +5458,7 @@ msgstr "Zaktualizowano dostęp do interfejsu użytkownika"
 
 #: include/views/administration.users.edit.php:226
 msgid "Frontend messaging"
-msgstr "Wiadomości interfejsu użytkownika"
+msgstr "Komunikaty interfejsu użytkownika"
 
 #: include/views/configuration.host.edit.php:872
 #: include/views/configuration.template.edit.php:478
@@ -6040,7 +6040,7 @@ msgstr "Czyszczenie historii może zająć dużo czasu. Kontynuować?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr "Okres przechowywania danych historycznych"
+msgstr "Okres przechowywania danych historii"
 
 #: adm.housekeeper.php:112
 #, c-format
@@ -6550,7 +6550,7 @@ msgstr "Agent IPMI"
 
 #: include/views/configuration.host.massupdate.php:222
 msgid "IPMI authentication algorithm"
-msgstr "Algorytm uwierzytelnienia IPMI"
+msgstr "Algorytm uwierzytelniania IPMI"
 
 #: include/views/configuration.host.edit.php:300
 #: include/views/configuration.host.edit.php:376
@@ -7619,7 +7619,7 @@ msgstr "Interfejs z polem IP \"%1$s\" nie może mieć pustej nazwy DNS."
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
 msgid "Internal"
-msgstr "Wewnętrzna"
+msgstr "Wewnętrzne"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
@@ -7787,7 +7787,7 @@ msgstr "Tryb inwentarzowy"
 
 #: include/views/administration.users.list.php:60
 msgid "Is online?"
-msgstr "Czy jest włączony?"
+msgstr "Czy jest zalogowany?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
 #: include/blocks.inc.php:1509
@@ -7866,7 +7866,7 @@ msgstr "Dodano pozycję"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Item count"
-msgstr "Ilość pozycji"
+msgstr "Liczba pozycji"
 
 #: items.php:365 screenedit.php:202
 msgid "Item deleted"
@@ -8288,7 +8288,7 @@ msgstr "Ostatni z"
 
 #: include/views/administration.proxy.list.php:48
 msgid "Last seen (age)"
-msgstr "Ostatnio widziane (wiek)"
+msgstr "Ostatnio widziany (wiek)"
 
 #: latest.php:346 latest.php:347
 msgid "Last value"
@@ -9059,7 +9059,7 @@ msgstr "Komunikaty"
 
 #: include/views/administration.users.edit.php:368
 msgid "Messaging"
-msgstr "Komunikacja"
+msgstr "Komunikaty"
 
 #: api/rpc/class.cjsonrpc.php:191
 msgid "Method not found."
@@ -10255,7 +10255,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:256
 #: include/views/configuration.action.edit.php:1054
 msgid "Not Ack"
-msgstr "Nie zatwierdzone"
+msgstr "Niezatwierdzone"
 
 #: include/forms.inc.php:631 include/forms.inc.php:814
 msgid "Not Templated items"
@@ -10281,7 +10281,7 @@ msgstr "Niedostępne"
 #: adm.triggerseverities.php:54
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
-msgstr "Nie sklasyfikowany"
+msgstr "Niesklasyfikowane"
 
 #: include/page_footer.php:92
 msgid "Not connected"
@@ -11087,7 +11087,7 @@ msgstr "Błąd przetwarzania"
 #: include/views/administration.proxy.edit.php:43
 #: include/views/administration.proxy.list.php:93
 msgid "Passive"
-msgstr "Pasywne"
+msgstr "Pasywny"
 
 #: httpconf.php:55 include/setup.inc.php:326
 #: include/views/administration.mediatypes.edit.php:82
@@ -12725,12 +12725,12 @@ msgstr "Wyświetl zdarzenia, maksymalnie \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach)"
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach)"
 
 #: adm.gui.php:75
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach) \"%1$s\"."
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach) \"%1$s\"."
 
 #: include/views/monitoring.dashconf.php:87 tr_status.php:326
 msgid "Show hosts in maintenance"
@@ -13450,7 +13450,7 @@ msgstr "Test uwierzytelniania"
 
 #: include/views/administration.script.edit.php:110
 msgid "Test confirmation"
-msgstr "Potwierdzenie testu"
+msgstr "Test potwierdzenia"
 
 #: tr_testexpr.php:125
 msgid "Test data"
