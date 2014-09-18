@@ -153,27 +153,22 @@ function actionConditionValueToString(array $actions, array $config) {
 			$result[$i][$j] = _('Unknown');
 
 			switch ($condition['conditiontype']) {
-				// gather hostgroup IDs for later querying
 				case CONDITION_TYPE_HOST_GROUP:
 					$hostGroupIds[$condition['value']] = $condition['value'];
 					break;
 
-				// gather trigger IDs for later querying
 				case CONDITION_TYPE_TRIGGER:
 					$triggerIds[$condition['value']] = $condition['value'];
 					break;
 
-				// gether hosts IDs for later querying
 				case CONDITION_TYPE_HOST:
 					$hostIds[$condition['value']] = $condition['value'];
 					break;
 
-				// gether template IDs for later querying
 				case CONDITION_TYPE_TEMPLATE:
 					$templateIds[$condition['value']] = $condition['value'];
 					break;
 
-				// gether proxy IDs for later querying
 				case CONDITION_TYPE_PROXY:
 					$proxyIds[$condition['value']] = $condition['value'];
 					break;
@@ -207,12 +202,10 @@ function actionConditionValueToString(array $actions, array $config) {
 					$result[$i][$j] = getSeverityName($condition['value'], $config);
 					break;
 
-				// gather dicovery rule IDs for later querying
 				case CONDITION_TYPE_DRULE:
 					$dRuleIds[$condition['value']] = $condition['value'];
 					break;
 
-				// gather dicovery check IDs for later querying
 				case CONDITION_TYPE_DCHECK:
 					$dCheckIds[$condition['value']] = $condition['value'];
 					break;
@@ -436,7 +429,6 @@ function getActionOperationDescriptions(array $actions) {
 			$result[$i][$j] = array();
 
 			switch ($operation['operationtype']) {
-				// gather media type IDs, user IDs and user group IDs for later querying
 				case OPERATION_TYPE_MESSAGE:
 					$mediaTypeId = $operation['opmessage']['mediatypeid'];
 
@@ -457,7 +449,6 @@ function getActionOperationDescriptions(array $actions) {
 					}
 					break;
 
-				// gather host IDs and host group IDs for later querying
 				case OPERATION_TYPE_COMMAND:
 					if (isset($operation['opcommand_hst']) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
@@ -474,7 +465,6 @@ function getActionOperationDescriptions(array $actions) {
 					}
 					break;
 
-				// gather host group IDs for later querying
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					foreach ($operation['opgroup'] as $hostGroup) {
@@ -482,7 +472,6 @@ function getActionOperationDescriptions(array $actions) {
 					}
 					break;
 
-				// gather template IDs for later querying
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					foreach ($operation['optemplate'] as $template) {
