@@ -46,7 +46,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	const char	*param;
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		 ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
