@@ -41,6 +41,9 @@ class FileAPIGateway extends BaseAPIGateway {
 
 		$this->restoreStreamWrapper();
 
+		// TODO: the error handler should be unregistered by the application
+		restore_error_handler();
+
 		if (isset($json['result']) || isset($json['error'])) {
 			return $this->createResponse($json);
 		}
