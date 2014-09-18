@@ -77,6 +77,8 @@ fixtures:
       params:
         hostid: @fixtures.emptyHost.result.hostid@
         templates: { templateid: @fixtures.templateWithApplication.result.templateid@ }
+        # TODO: the inventory parameter has been added to avoid ZBX-8779
+        inventory: {}
 
 steps:
   # make sure the HTTP test is inherited correctly

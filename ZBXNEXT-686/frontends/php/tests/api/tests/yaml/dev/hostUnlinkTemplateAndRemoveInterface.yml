@@ -28,7 +28,7 @@ fixtures:
       params:
         hostid: @fixtures.hostWithItem.result.hostid@
         templates: { templateid: @fixtures.templateWithItem.result.templateid@ }
-		# TODO: the inventory parameter has been added to a voi
+        # TODO: the inventory parameter has been added to avoid ZBX-8779
         inventory: {}
         interfaces:
           -
