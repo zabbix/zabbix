@@ -249,9 +249,8 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
-				{
 					exit(EXIT_FAILURE);
-				}
+
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 #endif

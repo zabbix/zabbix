@@ -21,7 +21,7 @@
 
 static int	get_log_level_message(const char *opt, int command, int *scope, int *data)
 {
-	int		num = 0, allowed_pid_range;
+	int		num = 0;
 	const char	*rtc_options;
 
 	if (ZBX_RTC_LOG_LEVEL_INCREASE == command)
@@ -38,8 +38,6 @@ static int	get_log_level_message(const char *opt, int command, int *scope, int *
 		return FAIL;
 	}
 
-	allowed_pid_range = (1 << (8 * sizeof(unsigned short))) - 1;
-
 	if ('\0' == *rtc_options)
 	{
 		*scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
@@ -54,9 +52,8 @@ static int	get_log_level_message(const char *opt, int command, int *scope, int *
 	{
 		if (FAIL == is_ushort(rtc_options, &num) || 0 == num)
 		{
-			zbx_error("invalid runtime control option: %s (process identifier is outside allowed range "
-				" 1 - %d)", opt, allowed_pid_range);
-
+			zbx_error("invalid log level control target: %s (invalid or unsupported process identifier)",
+					opt);
 			return FAIL;
 		}
 
@@ -65,39 +62,45 @@ static int	get_log_level_message(const char *opt, int command, int *scope, int *
 	}
 	else
 	{
-		char	*proc_name = NULL, *ptr;
+		char	*proc_name = NULL, *proc_num;
 		int	proc_type;
 
 		if ('\0' == *rtc_options)
 		{
-			zbx_error("invalid log level control option: %s (unspecified process type)", opt);
+			zbx_error("invalid log level control target: %s (unspecified process identifier or type)", opt);
 			return FAIL;
 		}
 
 		proc_name = zbx_strdup(proc_name, rtc_options);
 
-		if (NULL != (ptr = strchr(proc_name, ',')))
-		{
-			*ptr++ = '\0';
+		if (NULL != (proc_num = strchr(proc_name, ',')))
+			*proc_num++ = '\0';
 
-			if ('\0' == *ptr)
-			{
-				zbx_error("invalid log level control option: %s (unspecified process number)", opt);
-				zbx_free(proc_name);
-				return FAIL;
-			}
-			else if (FAIL == is_ushort(ptr, &num) || 0 == num)
-			{
-				zbx_error("invalid runtime control option: %s (process identifier is outside "
-					"allowed range 1 - %d)", opt, allowed_pid_range);
-				zbx_free(proc_name);
-				return FAIL;
-			}
+		if ('\0' == *proc_name)
+		{
+			zbx_error("invalid log level control target: %s (unspecified process type)", opt);
+			zbx_free(proc_name);
+			return FAIL;
 		}
 
 		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
 		{
-			zbx_error("invalid log level control option: %s (unknown process type: %s)", opt, rtc_options);
+			zbx_error("invalid log level control target: %s (unknown process type \"%s\")", opt, proc_name);
+			zbx_free(proc_name);
+			return FAIL;
+		}
+
+		if ('\0' == *proc_num)
+		{
+			zbx_error("invalid log level control target: %s (unspecified process number)", opt);
+			zbx_free(proc_name);
+			return FAIL;
+		}
+
+		if (FAIL == is_ushort(proc_num, &num) || 0 == num)
+		{
+			zbx_error("invalid log level control target: %s (invalid or unsupported process number \"%s\")",
+					opt, proc_num);
 			zbx_free(proc_name);
 			return FAIL;
 		}
@@ -114,15 +117,16 @@ static int	get_log_level_message(const char *opt, int command, int *scope, int *
  *                                                                            *
  * Function: parse_rtc_options                                                *
  *                                                                            *
- * Purpose: create runtime control message based on the command line arguments*
+ * Purpose: parse runtime control options and create a runtime control        *
+ *          message                                                           *
  *                                                                            *
  * Parameters: opt         - [IN] the command line argument                   *
  *             daemon_type - [IN] the daemon type                             *
- *             message     - [OUT] the message containing options             *
- *                                 for log level change                       *
+ *             message     - [OUT] the message containing options for log     *
+ *                                 level change or cache reload               *
  *                                                                            *
  * Return value: SUCCEED - the message was created successfully               *
- *               FAIL    - otherwise                                          *
+ *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)

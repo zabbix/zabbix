@@ -667,9 +667,8 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t.flags))
-				{
 					exit(EXIT_FAILURE);
-				}
+
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
