@@ -17,7 +17,7 @@ Hostname or IP address of Zabbix server. If a host is monitored by a proxy, prox
 .IP "-p, --port \fI<port>\fR"
 Specify port number of server trapper running on the server. Default is 10051.
 .IP "-s, --host \fI<host>\fR"
-Specify host name as registered in Zabbix front-end. Host IP address and DNS name will not work.
+Specify host name as registered in Zabbix frontend. Host IP address and DNS name will not work.
 .IP "-I, --source-address \fI<IP>\fR"
 Specify source IP address.
 .IP "-k, --key \fI<key>\fR"
