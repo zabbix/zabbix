@@ -127,7 +127,6 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), &scope, &data))
 			return FAIL;
-
 	}
 	else if (0 == strncmp(opt, ZBX_LOG_LEVEL_DECREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 	{
