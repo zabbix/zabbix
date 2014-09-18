@@ -19,7 +19,7 @@
 
 #include "control.h"
 
-static int	parse_log_level_options(const char *opt, int len, int *scope, int *data)
+static int	parse_log_level_options(const char *opt, size_t len, int *scope, int *data)
 {
 	int		num = 0;
 	const char	*rtc_options;
