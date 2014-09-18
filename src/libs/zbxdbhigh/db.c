@@ -2560,7 +2560,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
  *                                                                            *
  * Return value: ZBX_DB_SERVER - server database                              *
  *               ZBX_DB_PROXY - proxy database                                *
- *               ZBX_DB_UNKNOWN - an error occured                            *
+ *               ZBX_DB_UNKNOWN - an error occurred                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_get_database_type(void)
