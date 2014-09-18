@@ -662,7 +662,7 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i;
+	int			db_mandatory, db_optional, required, ret = SUCCEED, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
@@ -752,8 +752,6 @@ int	DBcheck_version(void)
 			db_mandatory, db_optional);
 	zabbix_log(LOG_LEVEL_INFORMATION, "required mandatory version: %08d", required);
 
-	ret = SUCCEED;
-
 #ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
@@ -794,6 +792,9 @@ int	DBcheck_version(void)
 				last_completed = completed;
 			}
 		}
+
+		if (SUCCEED != ret)
+			break;
 	}
 
 	if (SUCCEED == ret)

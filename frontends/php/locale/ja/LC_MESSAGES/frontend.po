@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-07 08:36+0300\n"
+"POT-Creation-Date: 2014-09-16 15:57+0300\n"
 "PO-Revision-Date: 2014-09-10 02:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -5082,7 +5082,7 @@ msgstr "エラー"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 
-#: httpdetails.php:161 httpdetails.php:234
+#: httpdetails.php:162 httpdetails.php:234
 #, c-format
 msgid "Error: %1$s"
 msgstr "エラー: %1$s"
@@ -9604,7 +9604,7 @@ msgstr "ネットワークマップ"
 msgid "Never"
 msgstr "未監視"
 
-#: httpdetails.php:154 httpdetails.php:228
+#: httpdetails.php:155 httpdetails.php:228
 msgid "Never executed"
 msgstr "未実行"
 
@@ -10683,7 +10683,7 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:149 httpdetails.php:238
+#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:167 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -14439,7 +14439,7 @@ msgid "Units"
 msgstr "単位"
 
 #: events.php:568 events.php:569 events.php:579 events.php:580 events.php:581
-#: events.php:582 httpdetails.php:165 httpmon.php:174
+#: events.php:582 httpdetails.php:166 httpmon.php:174
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14470,7 +14470,7 @@ msgstr "不明"
 msgid "Unknown action"
 msgstr "不明なアクション"
 
-#: httpdetails.php:160 httpdetails.php:233 httpmon.php:149
+#: httpdetails.php:161 httpdetails.php:233 httpmon.php:149
 #: include/views/configuration.httpconf.list.php:99
 msgid "Unknown error"
 msgstr "不明なエラー"
