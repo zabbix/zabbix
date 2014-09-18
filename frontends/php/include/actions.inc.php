@@ -488,9 +488,6 @@ function getActionOperationDescriptions(array $actions) {
 					foreach ($operation['optemplate'] as $template) {
 						$templateIds[$template['templateid']] = $template['templateid'];
 					}
-					break;
-
-				default:
 			}
 		}
 	}
@@ -803,9 +800,6 @@ function getActionOperationHints(array $operations) {
 							italic(zbx_nl2br($operation['opcommand']['command']))
 						);
 				}
-				break;
-
-			default:
 		}
 	}
 
