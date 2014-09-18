@@ -80,7 +80,7 @@ $fields = array(
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-							IN('"host.export","host.massdelete","host.massdisable","host.massenable","host.massupdate"'.
+							IN('"host.export","host.massdelete","host.massdisable","host.massenable"'.
 								',"host.massupdateform"'
 							),
 							null
@@ -215,7 +215,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'full_clone';
 }
-elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
+elseif (hasRequest('action') && getRequest('action') == 'host.massupdateform' && hasRequest('masssave')) {
 	$hostIds = getRequest('hosts', array());
 	$visible = getRequest('visible', array());
 	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
@@ -361,7 +361,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		uncheckTableRows();
 		show_message(_('Hosts updated'));
 
-		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
+		unset($_REQUEST['form'], $_REQUEST['hosts']);
 	}
 	catch (Exception $e) {
 		DBend(false);
