@@ -235,13 +235,13 @@ function actionConditionValueToString(array $actions, array $config) {
 		}
 	}
 
-	$groups = null;
-	$triggers = null;
-	$hosts = null;
-	$templates = null;
-	$proxies = null;
-	$dRules = null;
-	$dChecks = null;
+	$groups = array();
+	$triggers = array();
+	$hosts = array();
+	$templates = array();
+	$proxies = array();
+	$dRules = array();
+	$dChecks = array();
 
 	if ($hostGroupsToSelect) {
 		$groups = API::HostGroup()->get(array(
@@ -495,12 +495,12 @@ function getActionOperationDescriptions(array $actions) {
 		}
 	}
 
-	$mediaTypes = null;
-	$users = null;
-	$userGroups = null;
-	$hosts = null;
-	$hostGroups = null;
-	$templates = null;
+	$mediaTypes = array();
+	$users = array();
+	$userGroups = array();
+	$hosts = array();
+	$hostGroups = array();
+	$templates = array();
 
 	if ($mediaTypesToSelect) {
 		$mediaTypes = API::Mediatype()->get(array(
@@ -736,7 +736,8 @@ function getActionOperationHints(array $operations) {
 		}
 	}
 
-	$scripts = null;
+	$scripts = array();
+
 	if ($scriptsToSelect) {
 		$scripts = API::Script()->get(array(
 			'output' => array('name'),
