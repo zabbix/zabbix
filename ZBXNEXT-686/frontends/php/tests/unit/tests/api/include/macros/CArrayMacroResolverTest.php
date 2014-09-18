@@ -44,6 +44,11 @@ class CArrayMacroResolverTest extends PHPUnit_Framework_TestCase {
 				array('correct')
 			),
 			array(
+				array('@array[0]@'),
+				array('array' => array('correct')),
+				array('correct')
+			),
+			array(
 				array('array' => array('@array.sub.value@')),
 				array('array' => array(
 					'sub' => array('value' => 'correct')
@@ -59,6 +64,11 @@ class CArrayMacroResolverTest extends PHPUnit_Framework_TestCase {
 					)
 				)),
 				array('array' => array('correct1', 'correct2'))
+			),
+			array(
+				array('@value_@'),
+				array('value_' => 'correct'),
+				array('correct')
 			),
 		);
 	}

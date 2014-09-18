@@ -37,7 +37,7 @@ class CArrayMacroResolver {
 
 			// TODO: this should be refactored to single regular expression like (@((([a-z0-9]+)[.[\]]*)+)@)
 			// extract variables
-			preg_match_all("/@(?:[a-z0-9[\\].]+)@/i", $value, $matches);
+			preg_match_all("/@(?:[a-z0-9[\\]._]+)@/i", $value, $matches);
 
 			if (count($matches) == 1 && count($matches[0]) > 0) {
 				foreach ($matches[0] as $macro) {

@@ -18,7 +18,7 @@ steps:
       method: trigger.create
       params:
         description: "Low memory on {HOST.NAME}"
-        expression: "{Zabbix server:vm.memory.size[available].last()}<1024"
+        expression: "{@fixtures.hostWithItem.result.host@:@fixtures.hostWithItem.result.itemKey@.last()}<1024"
 
     expect: result
 
@@ -84,4 +84,4 @@ steps:
       -
         triggerid: @steps.step1.response.triggerids[0]@
         expression: @steps.step1.request.params.expression@
-        description: "Low memory on Zabbix server"
+        description: "Low memory on @fixtures.hostWithItem.result.host@"

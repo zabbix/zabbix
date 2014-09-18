@@ -5,6 +5,8 @@ return:
   hostid: @fixtures.host.result.hostids[0]@
   interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
   itemid: @fixtures.item.result.itemids[0]@
+  host: @fixtures.host.params.params.host@
+  itemKey: @fixtures.item.params.params.key_@
 
 fixtures:
   host:
