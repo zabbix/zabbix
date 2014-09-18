@@ -19,24 +19,12 @@
 
 #include "control.h"
 
-static int	get_log_level_message(const char *opt, int command, int *scope, int *data)
+static int	parse_log_level_options(const char *opt, int len, int *scope, int *data)
 {
 	int		num = 0;
 	const char	*rtc_options;
 
-	if (ZBX_RTC_LOG_LEVEL_INCREASE == command)
-	{
-		rtc_options = opt + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE);
-	}
-	else if (ZBX_RTC_LOG_LEVEL_DECREASE == command)
-	{
-		rtc_options = opt + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE);
-	}
-	else
-	{
-		zbx_error("invalid runtime control option: %s", opt);
-		return FAIL;
-	}
+	rtc_options = opt + len;
 
 	if ('\0' == *rtc_options)
 	{
@@ -137,7 +125,7 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 	{
 		command = ZBX_RTC_LOG_LEVEL_INCREASE;
 
-		if (SUCCEED != get_log_level_message(opt, command, &scope, &data))
+		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), &scope, &data))
 			return FAIL;
 
 	}
@@ -145,7 +133,7 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 	{
 		command = ZBX_RTC_LOG_LEVEL_DECREASE;
 
-		if (SUCCEED != get_log_level_message(opt, command, &scope, &data))
+		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
 			return FAIL;
 	}
 	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
