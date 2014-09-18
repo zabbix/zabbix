@@ -271,6 +271,20 @@ class FileApiTestCase extends ApiTestCase {
 	}
 
 	protected function loadFixtures(array $fixtures) {
+		// expand the short include syntax
+		foreach ($fixtures as $name => &$fixture) {
+			if (!is_array($fixture) || !array_key_exists('type', $fixture) && !array_key_exists('params', $fixture)) {
+				$fixture = array(
+					'type' => FixtureLoader::TYPE_INCLUDE,
+					'params' => array(
+						'file' => $name,
+						'params' => $fixture
+					)
+				);
+			}
+		}
+		unset($fixture);
+
 		return $this->getFixtureLoader()->load($fixtures);
 	}
 }

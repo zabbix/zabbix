@@ -1,24 +1,13 @@
 # https://support.zabbix.com/browse/ZBX-8603
 
 fixtures:
-  hostGroup:
-    type: include
-    params:
-      file: hostGroup
+  hostGroup: ~
 
   emptyHost:
-    type: include
-    params:
-      file: emptyHost
-      params:
-        groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.hostGroup.result.groupid@
 
   templateWithApplication:
-    type: include
-    params:
-      file: templateWithApplication
-      params:
-        groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.hostGroup.result.groupid@
 
   httpTest:
     type: api

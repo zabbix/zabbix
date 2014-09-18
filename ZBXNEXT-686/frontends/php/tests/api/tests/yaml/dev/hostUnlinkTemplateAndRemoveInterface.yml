@@ -1,24 +1,13 @@
 # https://support.zabbix.com/browse/ZBX-8530
 
 fixtures:
-  hostGroup:
-    type: include
-    params:
-      file: hostGroup
+  hostGroup: ~
 
   hostWithItem:
-    type: include
-    params:
-      file: hostWithItem
-      params:
-        groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.hostGroup.result.groupid@
 
   templateWithItem:
-    type: include
-    params:
-      file: templateWithItem
-      params:
-        groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.hostGroup.result.groupid@
 
   # link the template to the host
   linkTemplate:
