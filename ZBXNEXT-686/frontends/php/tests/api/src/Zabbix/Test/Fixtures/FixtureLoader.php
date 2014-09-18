@@ -28,6 +28,8 @@ class FixtureLoader {
 	}
 
 	public function load(array $fixtures, array $params = array()) {
+		$fixtures = $this->expandShortenedSyntax($fixtures);
+
 		foreach ($fixtures as $name => $fixtureConf) {
 			if (!isset($fixtureConf['type'])) {
 				throw $this->getException($name, '"type" parameter missing');
@@ -48,6 +50,24 @@ class FixtureLoader {
 				throw $this->getException($name, $e->getMessage());
 			}
 		}
+
+		return $fixtures;
+	}
+
+	protected function expandShortenedSyntax(array $fixtures) {
+		// expand the short include syntax
+		foreach ($fixtures as $name => &$fixture) {
+			if (!is_array($fixture) || !array_key_exists('type', $fixture) && !array_key_exists('params', $fixture)) {
+				$fixture = array(
+					'type' => FixtureLoader::TYPE_INCLUDE,
+					'params' => array(
+						'file' => $name,
+						'params' => $fixture
+					)
+				);
+			}
+		}
+		unset($fixture);
 
 		return $fixtures;
 	}
