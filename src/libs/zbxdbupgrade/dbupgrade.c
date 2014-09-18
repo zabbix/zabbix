@@ -624,11 +624,13 @@ static int	DBset_version(int version, unsigned char mandatory)
 extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
 	{DBPATCH_VERSION(2020), "2.2 maintenance"},
 	{DBPATCH_VERSION(2030), "2.4 development"},
+	{DBPATCH_VERSION(2040), "2.4 maintenance"},
 	{NULL}
 };
 
@@ -660,7 +662,7 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i;
+	int			db_mandatory, db_optional, required, ret = SUCCEED, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
@@ -750,8 +752,6 @@ int	DBcheck_version(void)
 			db_mandatory, db_optional);
 	zabbix_log(LOG_LEVEL_INFORMATION, "required mandatory version: %08d", required);
 
-	ret = SUCCEED;
-
 #ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
@@ -792,6 +792,9 @@ int	DBcheck_version(void)
 				last_completed = completed;
 			}
 		}
+
+		if (SUCCEED != ret)
+			break;
 	}
 
 	if (SUCCEED == ret)

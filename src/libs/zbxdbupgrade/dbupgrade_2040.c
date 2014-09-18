@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
@@ -18,22 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+#include "common.h"
+#include "db.h"
+#include "zbxdbupgrade.h"
+#include "dbupgrade.h"
 
-class API_JSON_APIInfo extends CZabbixTest {
+/*
+ * 2.4 maintenance database patches
+ */
 
-	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', array(), $debug);
+#ifndef HAVE_SQLITE3
 
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.4.1');
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', array(), $debug);
-
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '2.4.1');
-	}
-
+static int	DBpatch_2040000(void)
+{
+	return SUCCEED;
 }
+
+#endif
+
+DBPATCH_START(2040)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(2040000, 0, 1)
+
+DBPATCH_END()

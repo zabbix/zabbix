@@ -18,12 +18,12 @@ Runtime control options
 .RS 4
 .TP 4
 log_level_increase[=<target>]
-Increase log level, affect all processes if target is not specified
+Increase log level, affects all processes if target is not specified
 .RE
 .RS 4
 .TP 4
-log_level_increase[=<target>]
-Decrease log level, affect all processes if target is not specified
+log_level_decrease[=<target>]
+Decrease log level, affects all processes if target is not specified
 .RE
 .RE
 .SS
