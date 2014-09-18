@@ -23,7 +23,6 @@
 
 #include "comms.h"
 #include "log.h"
-#include "module.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 
