@@ -4,12 +4,13 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-........S. [ZBX-8719] optimized value cache database requests (wiper)
+...G...PS. [ZBX-8736] added validation of timestamp values received by the server and sent via zabbix_sender (Juris)
+..F....... [ZBX-8560] fixed web scenario HTTP proxy field placeholder content not fitting into input field (Ivo)
+..F....... [ZBX-8570] fixed colons in frontend filters (Oleg)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
-.D........ [ZBX-5166] minor man pages corrections ('-' escaped as '\-') (Andris)
-...G...PS. [ZBX-8391] stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
-...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
-....I..... [ZBX-8658] made various changes to odbc related m4 scripts to improve readability and library function availability (Juris)
+.D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
+...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
+....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.1rc1
@@ -17,7 +18,9 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-8719] optimized value cache database requests (wiper)
+..F....... [ZBX-8753] fixed mass update to change host inventiry (Sasha)
+....I..... [ZBX-8744] fixed database upgrade procedure stopping when upgrade step was failed (Sasha)
+........S. [ZBX-8719] optimised value cache requests to better utilise database indexes (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
@@ -411,6 +414,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.7rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-8719] optimized value cache database requests (wiper)
@@ -1501,8 +1505,10 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.14rc1
 
 New features:
+A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 
 --------------------------------------------------------------------------------
