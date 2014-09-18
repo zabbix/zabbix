@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 16:06+0300\n"
-"PO-Revision-Date: 2014-09-15 12:32+0300\n"
+"POT-Creation-Date: 2014-09-18 13:02+0300\n"
+"PO-Revision-Date: 2014-09-16 13:43+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410777155.0\n"
+"X-POOTLE-MTIME: 1410867797.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -87,7 +87,7 @@ msgstr[1] "%1$s minuty"
 msgstr[2] "%1$s minut"
 
 #: include/classes/screens/CScreenActions.php:151
-#: include/views/administration.auditacts.list.php:90
+#: include/views/administration.auditacts.list.php:91
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
@@ -317,9 +317,9 @@ msgid "Acknowledging disabled"
 msgstr "Potwierdzanie wyłączone"
 
 #: include/audit.inc.php:28 include/classes/screens/CScreenActions.php:129
-#: include/views/administration.auditacts.list.php:70
-#: include/views/administration.auditlogs.list.php:62
-#: include/views/administration.auditlogs.list.php:89
+#: include/views/administration.auditacts.list.php:71
+#: include/views/administration.auditlogs.list.php:63
+#: include/views/administration.auditlogs.list.php:90
 #: include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
@@ -411,7 +411,7 @@ msgstr "Akcje"
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:90
 msgid "Active"
-msgstr "Aktywne"
+msgstr "Aktywny"
 
 #: include/views/configuration.maintenance.list.php:63
 msgctxt "maintenance status"
@@ -881,7 +881,7 @@ msgstr "Sierpień"
 #: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:290
 #: include/views/configuration.httpconf.list.php:68
 msgid "Authentication"
-msgstr "Uwierzytelnienie"
+msgstr "Uwierzytelnianie"
 
 #: include/views/configuration.host.edit.php:761
 #: include/views/configuration.host.edit.php:773
@@ -1025,7 +1025,7 @@ msgstr "Raporty słupkowe"
 #: authentication.php:43
 #: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
-msgstr "Podstawowe DN"
+msgstr "Bazowa DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1033,13 +1033,13 @@ msgstr "Podstawowy"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
-msgstr "DN do dowiązania"
+msgstr "DN dostępu"
 
 #: authentication.php:46
 #: include/views/administration.authentication.edit.php:99
 #: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
-msgstr "Hasło dowiązania"
+msgstr "Hasło dostępu"
 
 #: popup_trexpr.php:511
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
@@ -2943,7 +2943,7 @@ msgstr "Połączony wynik"
 
 #: include/actions.inc.php:917 include/actions.inc.php:958
 #: include/actions.inc.php:1002
-#: include/views/administration.auditacts.list.php:109
+#: include/views/administration.auditacts.list.php:110
 #: include/views/administration.script.edit.php:65
 msgid "Command"
 msgstr "Polecenie"
@@ -3848,7 +3848,7 @@ msgstr "Domyślnie"
 
 #: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
-msgstr "Domyślne uwierzytelnienie"
+msgstr "Domyślne uwierzytelnianie"
 
 #: include/views/configuration.slideconf.edit.php:41 slideconf.php:37
 msgid "Default delay (in seconds)"
@@ -4298,7 +4298,7 @@ msgid "Deployment status"
 msgstr "Stan instalacji"
 
 #: events.php:457 events.php:472 include/classes/screens/CScreenEvents.php:41
-#: include/views/administration.auditlogs.list.php:91
+#: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
 #: include/views/configuration.host.discovery.edit.php:256
@@ -4327,7 +4327,7 @@ msgstr "Zaktualizowano opis"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
 #: include/func.inc.php:1790
-#: include/views/administration.auditlogs.list.php:92
+#: include/views/administration.auditlogs.list.php:93
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
@@ -5286,7 +5286,7 @@ msgstr "Wykonuje zapytanie WMI i zwraca pierwszy wybrany obiekt."
 msgid "Execute on"
 msgstr "Wykonaj na"
 
-#: include/views/administration.auditacts.list.php:84
+#: include/views/administration.auditacts.list.php:85
 msgid "Executed"
 msgstr "Wykonano"
 
@@ -5530,8 +5530,8 @@ msgid "Filled region"
 msgstr "Obszar wypełniony"
 
 #: events.php:395 hosts.php:834 include/forms.inc.php:616
-#: include/views/administration.auditacts.list.php:49
-#: include/views/administration.auditlogs.list.php:65
+#: include/views/administration.auditacts.list.php:50
+#: include/views/administration.auditlogs.list.php:66
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
@@ -6264,7 +6264,7 @@ msgstr "Czyszczenie historii może zająć dużo czasu. Kontynuować?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr "Okres przechowywania danych historycznych"
+msgstr "Okres przechowywania danych historii"
 
 #: adm.housekeeper.php:112
 #, c-format
@@ -6709,7 +6709,7 @@ msgstr "Węgierski (hu_HU)"
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
-#: include/views/administration.auditlogs.list.php:90
+#: include/views/administration.auditlogs.list.php:91
 msgid "ID"
 msgstr "ID"
 
@@ -6719,7 +6719,7 @@ msgid "IMAP"
 msgstr "IMAP"
 
 #: events.php:455 hosts.php:830
-#: include/views/administration.auditlogs.list.php:87
+#: include/views/administration.auditlogs.list.php:88
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
@@ -6770,7 +6770,7 @@ msgstr "Agent IPMI"
 
 #: include/views/configuration.host.massupdate.php:242
 msgid "IPMI authentication algorithm"
-msgstr "Algorytm uwierzytelnienia IPMI"
+msgstr "Algorytm uwierzytelniania IPMI"
 
 #: include/views/configuration.host.edit.php:315
 #: include/views/configuration.host.edit.php:391
@@ -7082,7 +7082,7 @@ msgstr "W utrzymaniu"
 #: include/actions.inc.php:853 include/actions.inc.php:945
 #: include/actions.inc.php:991 include/actions.inc.php:1073
 #: include/classes/screens/CScreenActions.php:149
-#: include/views/administration.auditacts.list.php:88
+#: include/views/administration.auditacts.list.php:89
 msgid "In progress"
 msgstr "W trakcie"
 
@@ -7897,7 +7897,7 @@ msgstr "Indonezyjski (id_ID)"
 #: include/actions.inc.php:825 include/blocks.inc.php:1003
 #: include/blocks.inc.php:1298 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
-#: include/views/administration.auditacts.list.php:75
+#: include/views/administration.auditacts.list.php:76
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.hostgroups.list.php:53
 #: include/views/configuration.httpconf.list.php:72
@@ -7961,7 +7961,7 @@ msgstr "Interfejs z polem IP \"%1$s\" nie może mieć pustej nazwy DNS."
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
 msgid "Internal"
-msgstr "Wewnętrzna"
+msgstr "Wewnętrzne"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
@@ -8138,7 +8138,7 @@ msgstr "Tryb inwentarzowy"
 
 #: include/views/administration.users.list.php:59
 msgid "Is online?"
-msgstr "Czy jest włączony?"
+msgstr "Czy jest zalogowany?"
 
 #: include/blocks.inc.php:991 include/blocks.inc.php:1000
 #: include/blocks.inc.php:1296
@@ -8222,7 +8222,7 @@ msgstr "Dodano pozycję"
 
 #: include/views/administration.proxy.list.php:44
 msgid "Item count"
-msgstr "Ilość pozycji"
+msgstr "Liczba pozycji"
 
 #: items.php:388
 msgid "Item deleted"
@@ -8650,7 +8650,7 @@ msgstr "Ostatni z"
 
 #: include/views/administration.proxy.list.php:42
 msgid "Last seen (age)"
-msgstr "Ostatnio widziane (wiek)"
+msgstr "Ostatnio widziany (wiek)"
 
 #: latest.php:463 latest.php:464
 msgid "Last value"
@@ -9338,8 +9338,8 @@ msgstr "Menu"
 #: include/actions.inc.php:462 include/actions.inc.php:824
 #: include/actions.inc.php:871 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenActions.php:168
-#: include/views/administration.auditacts.list.php:73
-#: include/views/administration.auditacts.list.php:104
+#: include/views/administration.auditacts.list.php:74
+#: include/views/administration.auditacts.list.php:105
 #: include/views/configuration.action.edit.php:628
 msgid "Message"
 msgstr "Wiadomość"
@@ -9915,7 +9915,7 @@ msgid "No acknowledges found."
 msgstr "Nie znaleziono powiadomień."
 
 #: include/classes/screens/CScreenActions.php:126
-#: include/views/administration.auditacts.list.php:67
+#: include/views/administration.auditacts.list.php:68
 msgid "No action log entries found."
 msgstr "Nie znaleziono pozycji logu akcji."
 
@@ -9939,7 +9939,7 @@ msgstr "Brak aplikacji z ID \"%1$s\"."
 msgid "No applications found."
 msgstr "Nie znaleziono aplikacji."
 
-#: include/views/administration.auditlogs.list.php:83
+#: include/views/administration.auditlogs.list.php:84
 msgid "No audit log entries found."
 msgstr "Nie znaleziono pozycji logu audytu."
 
@@ -10564,7 +10564,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:232
 #: include/views/configuration.action.edit.php:1040
 msgid "Not Ack"
-msgstr "Nie zatw."
+msgstr "Niezatwierdzone"
 
 #: include/forms.inc.php:601 include/forms.inc.php:782
 msgid "Not Templated items"
@@ -10590,14 +10590,14 @@ msgstr "Niedostępne"
 #: adm.triggerseverities.php:55
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
-msgstr "Nie sklasyfikowany"
+msgstr "Niesklasyfikowane"
 
 #: include/page_footer.php:79
 msgid "Not connected"
 msgstr "Nie połączony"
 
 #: include/classes/screens/CScreenActions.php:155
-#: include/views/administration.auditacts.list.php:94
+#: include/views/administration.auditacts.list.php:95
 msgid "Not sent"
 msgstr "Nie wysłano"
 
@@ -11413,7 +11413,7 @@ msgstr "Błąd przetwarzania"
 #: include/views/administration.proxy.edit.php:41
 #: include/views/administration.proxy.list.php:90
 msgid "Passive"
-msgstr "Pasywne"
+msgstr "Pasywny"
 
 #: httpconf.php:55 include/classes/setup/CSetupWizard.php:326
 #: include/views/administration.mediatypes.edit.php:81
@@ -11854,7 +11854,7 @@ msgstr "Odbiorca (malejąco)"
 #: include/actions.inc.php:823 include/classes/screens/CScreenActions.php:74
 #: include/classes/screens/CScreenActions.php:80
 #: include/classes/screens/CScreenActions.php:131
-#: include/views/administration.auditacts.list.php:72
+#: include/views/administration.auditacts.list.php:73
 msgid "Recipient(s)"
 msgstr "Odbiorca(y)"
 
@@ -12121,8 +12121,8 @@ msgstr "Wymagany ciąg znaków"
 #: events.php:396 hosts.php:837 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
-#: include/views/administration.auditacts.list.php:51
-#: include/views/administration.auditlogs.list.php:67
+#: include/views/administration.auditacts.list.php:52
+#: include/views/administration.auditlogs.list.php:68
 #: include/views/common.filter.trigger.php:148
 #: include/views/inventory.host.list.php:55
 #: include/views/monitoring.overview.items.php:83 latest.php:423
@@ -12158,8 +12158,8 @@ msgstr "Przywróć domyślne"
 msgid "Resolved"
 msgstr "Rozwiązane"
 
-#: include/views/administration.auditlogs.list.php:63
-#: include/views/administration.auditlogs.list.php:88
+#: include/views/administration.auditlogs.list.php:64
+#: include/views/administration.auditlogs.list.php:89
 #: include/views/configuration.screen.constructor.edit.php:94
 #: popup_right.php:24
 msgid "Resource"
@@ -12779,8 +12779,8 @@ msgstr "Nazwa ochrony"
 #: events.php:377 include/classes/html/CButtonPopup.php:52
 #: include/classes/html/CMultiSelect.php:54 include/forms.inc.php:569
 #: include/reports.inc.php:414
-#: include/views/administration.auditacts.list.php:44
-#: include/views/administration.auditlogs.list.php:59
+#: include/views/administration.auditacts.list.php:45
+#: include/views/administration.auditlogs.list.php:60
 #: include/views/common.filter.trigger.php:100
 #: include/views/configuration.action.edit.php:253
 #: include/views/configuration.action.edit.php:266
@@ -12879,7 +12879,7 @@ msgid "Send to Users"
 msgstr "Wyślij do użytkowników"
 
 #: include/actions.inc.php:988 include/classes/screens/CScreenActions.php:145
-#: include/views/administration.auditacts.list.php:83
+#: include/views/administration.auditacts.list.php:84
 msgid "Sent"
 msgstr "Wysłano"
 
@@ -13053,12 +13053,12 @@ msgstr "Wyświetl zdarzenia, maksymalnie \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach)"
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach)"
 
 #: adm.gui.php:75
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach) \"%1$s\"."
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach) \"%1$s\"."
 
 #: include/classes/html/widget/CWidget.php:129
 msgid "Show filter"
@@ -13371,7 +13371,7 @@ msgstr "Stan usługi. 0 - uruchomiona, 1 - wstrzymana, 2 - trwa start, 3 - trwa 
 #: include/classes/screens/CScreenActions.php:133 include/events.inc.php:194
 #: include/events.inc.php:272 include/events.inc.php:275
 #: include/forms.inc.php:561 include/forms.inc.php:904
-#: include/views/administration.auditacts.list.php:74
+#: include/views/administration.auditacts.list.php:75
 #: include/views/administration.mediatypes.list.php:41
 #: include/views/administration.usergroups.list.php:50
 #: include/views/administration.users.list.php:63
@@ -13486,7 +13486,7 @@ msgstr "Podfiltr [wpływa tylko na przefiltrowane dane!]"
 #: include/actions.inc.php:446 include/actions.inc.php:455
 #: include/actions.inc.php:461 include/actions.inc.php:866
 #: include/classes/screens/CScreenActions.php:163
-#: include/views/administration.auditacts.list.php:99
+#: include/views/administration.auditacts.list.php:100
 #: include/views/configuration.action.edit.php:624
 msgid "Subject"
 msgstr "Temat"
@@ -13786,7 +13786,7 @@ msgstr "Test uwierzytelniania"
 
 #: include/views/administration.script.edit.php:108
 msgid "Test confirmation"
-msgstr "Potwierdzenie testu"
+msgstr "Test potwierdzenia"
 
 #: tr_testexpr.php:132
 msgid "Test data"
@@ -13950,8 +13950,8 @@ msgstr "Do"
 #: include/classes/screens/CScreenEvents.php:39 include/events.inc.php:176
 #: include/events.inc.php:193 include/events.inc.php:272
 #: include/events.inc.php:275
-#: include/views/administration.auditacts.list.php:69
-#: include/views/administration.auditlogs.list.php:85
+#: include/views/administration.auditacts.list.php:70
+#: include/views/administration.auditlogs.list.php:86
 #: include/views/configuration.services.edit.php:254
 #: include/views/configuration.services.edit.php:255
 #: include/views/configuration.services.edit.php:282
@@ -14403,7 +14403,7 @@ msgstr "Dwie pozycje (\"%1$s\" oraz \"%2$s\") nie mogą dotyczyć jednego pola i
 #: include/classes/screens/CScreenActions.php:56
 #: include/classes/screens/CScreenActions.php:130 include/forms.inc.php:512
 #: include/hosts.inc.php:105
-#: include/views/administration.auditacts.list.php:71
+#: include/views/administration.auditacts.list.php:72
 #: include/views/administration.general.image.list.php:27
 #: include/views/administration.mediatypes.edit.php:52
 #: include/views/administration.mediatypes.list.php:40
@@ -14952,7 +14952,7 @@ msgstr "Wykorzystywane w akcjach"
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:970
 #: include/audit.inc.php:24 include/classes/setup/CSetupWizard.php:319
 #: include/hosts.inc.php:67 include/views/administration.auditlogs.list.php:56
-#: include/views/administration.auditlogs.list.php:86
+#: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.users.edit.php:343
 #: include/views/configuration.action.edit.php:561
 #: include/views/configuration.httpconf.edit.php:168

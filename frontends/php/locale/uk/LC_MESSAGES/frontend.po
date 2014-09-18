@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 16:05+0300\n"
+"POT-Creation-Date: 2014-09-18 13:02+0300\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -93,7 +93,7 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: include/classes/screens/CScreenActions.php:151
-#: include/views/administration.auditacts.list.php:90
+#: include/views/administration.auditacts.list.php:91
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
@@ -327,9 +327,9 @@ msgid "Acknowledging disabled"
 msgstr "Підтвердження відключено"
 
 #: include/audit.inc.php:28 include/classes/screens/CScreenActions.php:129
-#: include/views/administration.auditacts.list.php:70
-#: include/views/administration.auditlogs.list.php:62
-#: include/views/administration.auditlogs.list.php:89
+#: include/views/administration.auditacts.list.php:71
+#: include/views/administration.auditlogs.list.php:63
+#: include/views/administration.auditlogs.list.php:90
 #: include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
@@ -2993,7 +2993,7 @@ msgstr "Комбінований результат"
 
 #: include/actions.inc.php:917 include/actions.inc.php:958
 #: include/actions.inc.php:1002
-#: include/views/administration.auditacts.list.php:109
+#: include/views/administration.auditacts.list.php:110
 #: include/views/administration.script.edit.php:65
 msgid "Command"
 msgstr "Команда"
@@ -4349,7 +4349,7 @@ msgid "Deployment status"
 msgstr "Статус розгортання"
 
 #: events.php:457 events.php:472 include/classes/screens/CScreenEvents.php:41
-#: include/views/administration.auditlogs.list.php:91
+#: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
 #: include/views/configuration.host.discovery.edit.php:256
@@ -4378,7 +4378,7 @@ msgstr ""
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
 #: include/func.inc.php:1790
-#: include/views/administration.auditlogs.list.php:92
+#: include/views/administration.auditlogs.list.php:93
 #: include/views/administration.mediatypes.list.php:43
 #: include/views/configuration.action.edit.php:370
 #: include/views/configuration.action.edit.php:374
@@ -5339,7 +5339,7 @@ msgstr ""
 msgid "Execute on"
 msgstr "Виконати на"
 
-#: include/views/administration.auditacts.list.php:84
+#: include/views/administration.auditacts.list.php:85
 msgid "Executed"
 msgstr ""
 
@@ -5583,8 +5583,8 @@ msgid "Filled region"
 msgstr "Заповнений регіон"
 
 #: events.php:395 hosts.php:834 include/forms.inc.php:616
-#: include/views/administration.auditacts.list.php:49
-#: include/views/administration.auditlogs.list.php:65
+#: include/views/administration.auditacts.list.php:50
+#: include/views/administration.auditlogs.list.php:66
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
@@ -6770,7 +6770,7 @@ msgstr "Угорська (hu_HU)"
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
-#: include/views/administration.auditlogs.list.php:90
+#: include/views/administration.auditlogs.list.php:91
 msgid "ID"
 msgstr "ID"
 
@@ -6780,7 +6780,7 @@ msgid "IMAP"
 msgstr "IMAP"
 
 #: events.php:455 hosts.php:830
-#: include/views/administration.auditlogs.list.php:87
+#: include/views/administration.auditlogs.list.php:88
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
@@ -7143,7 +7143,7 @@ msgstr "В періоді сервісу"
 #: include/actions.inc.php:853 include/actions.inc.php:945
 #: include/actions.inc.php:991 include/actions.inc.php:1073
 #: include/classes/screens/CScreenActions.php:149
-#: include/views/administration.auditacts.list.php:88
+#: include/views/administration.auditacts.list.php:89
 msgid "In progress"
 msgstr "В роботі"
 
@@ -7958,7 +7958,7 @@ msgstr "Індонезійська (id_ID)"
 #: include/actions.inc.php:825 include/blocks.inc.php:1003
 #: include/blocks.inc.php:1298 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
-#: include/views/administration.auditacts.list.php:75
+#: include/views/administration.auditacts.list.php:76
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.hostgroups.list.php:53
 #: include/views/configuration.httpconf.list.php:72
@@ -9409,8 +9409,8 @@ msgstr "Меню"
 #: include/actions.inc.php:462 include/actions.inc.php:824
 #: include/actions.inc.php:871 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenActions.php:168
-#: include/views/administration.auditacts.list.php:73
-#: include/views/administration.auditacts.list.php:104
+#: include/views/administration.auditacts.list.php:74
+#: include/views/administration.auditacts.list.php:105
 #: include/views/configuration.action.edit.php:628
 msgid "Message"
 msgstr "Повідомлення"
@@ -9987,7 +9987,7 @@ msgid "No acknowledges found."
 msgstr ""
 
 #: include/classes/screens/CScreenActions.php:126
-#: include/views/administration.auditacts.list.php:67
+#: include/views/administration.auditacts.list.php:68
 msgid "No action log entries found."
 msgstr ""
 
@@ -10011,7 +10011,7 @@ msgstr "Немає групи елементів даних з ID \"%1$s\"."
 msgid "No applications found."
 msgstr ""
 
-#: include/views/administration.auditlogs.list.php:83
+#: include/views/administration.auditlogs.list.php:84
 msgid "No audit log entries found."
 msgstr ""
 
@@ -10669,7 +10669,7 @@ msgid "Not connected"
 msgstr "Не підключено"
 
 #: include/classes/screens/CScreenActions.php:155
-#: include/views/administration.auditacts.list.php:94
+#: include/views/administration.auditacts.list.php:95
 msgid "Not sent"
 msgstr ""
 
@@ -11926,7 +11926,7 @@ msgstr "Отримувач (в порядку спадання)"
 #: include/actions.inc.php:823 include/classes/screens/CScreenActions.php:74
 #: include/classes/screens/CScreenActions.php:80
 #: include/classes/screens/CScreenActions.php:131
-#: include/views/administration.auditacts.list.php:72
+#: include/views/administration.auditacts.list.php:73
 msgid "Recipient(s)"
 msgstr "Отримувачі"
 
@@ -12194,8 +12194,8 @@ msgstr "Необхідна строка"
 #: events.php:396 hosts.php:837 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
-#: include/views/administration.auditacts.list.php:51
-#: include/views/administration.auditlogs.list.php:67
+#: include/views/administration.auditacts.list.php:52
+#: include/views/administration.auditlogs.list.php:68
 #: include/views/common.filter.trigger.php:148
 #: include/views/inventory.host.list.php:55
 #: include/views/monitoring.overview.items.php:83 latest.php:423
@@ -12231,8 +12231,8 @@ msgstr "Скинути по замовчуванню"
 msgid "Resolved"
 msgstr "Вирішено"
 
-#: include/views/administration.auditlogs.list.php:63
-#: include/views/administration.auditlogs.list.php:88
+#: include/views/administration.auditlogs.list.php:64
+#: include/views/administration.auditlogs.list.php:89
 #: include/views/configuration.screen.constructor.edit.php:94
 #: popup_right.php:24
 msgid "Resource"
@@ -12852,8 +12852,8 @@ msgstr ""
 #: events.php:377 include/classes/html/CButtonPopup.php:52
 #: include/classes/html/CMultiSelect.php:54 include/forms.inc.php:569
 #: include/reports.inc.php:414
-#: include/views/administration.auditacts.list.php:44
-#: include/views/administration.auditlogs.list.php:59
+#: include/views/administration.auditacts.list.php:45
+#: include/views/administration.auditlogs.list.php:60
 #: include/views/common.filter.trigger.php:100
 #: include/views/configuration.action.edit.php:253
 #: include/views/configuration.action.edit.php:266
@@ -12952,7 +12952,7 @@ msgid "Send to Users"
 msgstr "Надіслати користувачам"
 
 #: include/actions.inc.php:988 include/classes/screens/CScreenActions.php:145
-#: include/views/administration.auditacts.list.php:83
+#: include/views/administration.auditacts.list.php:84
 msgid "Sent"
 msgstr "Надіслано"
 
@@ -13446,7 +13446,7 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:133 include/events.inc.php:194
 #: include/events.inc.php:272 include/events.inc.php:275
 #: include/forms.inc.php:561 include/forms.inc.php:904
-#: include/views/administration.auditacts.list.php:74
+#: include/views/administration.auditacts.list.php:75
 #: include/views/administration.mediatypes.list.php:41
 #: include/views/administration.usergroups.list.php:50
 #: include/views/administration.users.list.php:63
@@ -13561,7 +13561,7 @@ msgstr "Суб-фільтр [впливає тільки на відфільтр
 #: include/actions.inc.php:446 include/actions.inc.php:455
 #: include/actions.inc.php:461 include/actions.inc.php:866
 #: include/classes/screens/CScreenActions.php:163
-#: include/views/administration.auditacts.list.php:99
+#: include/views/administration.auditacts.list.php:100
 #: include/views/configuration.action.edit.php:624
 msgid "Subject"
 msgstr "Тема"
@@ -14028,8 +14028,8 @@ msgstr "До"
 #: include/classes/screens/CScreenEvents.php:39 include/events.inc.php:176
 #: include/events.inc.php:193 include/events.inc.php:272
 #: include/events.inc.php:275
-#: include/views/administration.auditacts.list.php:69
-#: include/views/administration.auditlogs.list.php:85
+#: include/views/administration.auditacts.list.php:70
+#: include/views/administration.auditlogs.list.php:86
 #: include/views/configuration.services.edit.php:254
 #: include/views/configuration.services.edit.php:255
 #: include/views/configuration.services.edit.php:282
@@ -14484,7 +14484,7 @@ msgstr "Два елементи даних (\"%1$s\" та \"%2$s\") не мож�
 #: include/classes/screens/CScreenActions.php:56
 #: include/classes/screens/CScreenActions.php:130 include/forms.inc.php:512
 #: include/hosts.inc.php:105
-#: include/views/administration.auditacts.list.php:71
+#: include/views/administration.auditacts.list.php:72
 #: include/views/administration.general.image.list.php:27
 #: include/views/administration.mediatypes.edit.php:52
 #: include/views/administration.mediatypes.list.php:40
@@ -15033,7 +15033,7 @@ msgstr "Використовується в діях"
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:970
 #: include/audit.inc.php:24 include/classes/setup/CSetupWizard.php:319
 #: include/hosts.inc.php:67 include/views/administration.auditlogs.list.php:56
-#: include/views/administration.auditlogs.list.php:86
+#: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.users.edit.php:343
 #: include/views/configuration.action.edit.php:561
 #: include/views/configuration.httpconf.edit.php:168
