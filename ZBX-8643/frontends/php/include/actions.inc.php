@@ -751,18 +751,8 @@ function getActionOperationHints(array $operations) {
 
 		switch ($operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if (hasRequest('def_shortdata') && hasRequest('def_longdata')) {
-					$result[$key][] = array(bold(_('Subject').': '), BR(), zbx_nl2br(getRequest('def_shortdata')));
-					$result[$key][] = array(bold(_('Message').': '), BR(), zbx_nl2br(getRequest('def_longdata')));
-				}
-				else {
-					$result[$key][] = array(bold(_('Subject').': '), BR(),
-						zbx_nl2br($operation['opmessage']['subject'])
-					);
-					$result[$key][] = array(bold(_('Message').': '), BR(),
-						zbx_nl2br($operation['opmessage']['message'])
-					);
-				}
+				$result[$key][] = array(bold(_('Subject').': '), BR(), zbx_nl2br($operation['opmessage']['subject']));
+				$result[$key][] = array(bold(_('Message').': '), BR(), zbx_nl2br($operation['opmessage']['message']));
 				break;
 
 			case OPERATION_TYPE_COMMAND:
