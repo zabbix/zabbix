@@ -63,7 +63,9 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 		// selected item type
 		var type = parseInt(jQuery('#type').val());
 
-		jQuery('#keyButton').prop('disabled', type != 0 && type != 7 && type != 3 && type != 5 && type != 8 && type != 17)
+		jQuery('#keyButton').prop('disabled',
+			type != 0 && type != 7 && type != 3 && type != 5 && type != 8 && type != 17
+		)
 	}
 
 	jQuery(document).ready(function() {
