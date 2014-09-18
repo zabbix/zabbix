@@ -440,10 +440,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				syslog(LOG_WARNING, "%s", message);
 				break;
 			case LOG_LEVEL_DEBUG:
+			case LOG_LEVEL_TRACE:
 				syslog(LOG_DEBUG, "%s", message);
 				break;
 			case LOG_LEVEL_INFORMATION:
-			case LOG_LEVEL_TRACE:
 				syslog(LOG_INFO, "%s", message);
 				break;
 			default:
