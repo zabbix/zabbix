@@ -70,9 +70,10 @@ fixtures:
             retrieve_mode: 1
             headers: ""
 
-  linkTemplate:
-    type: api
-    params:
+steps:
+  # link the template to the host
+  step1:
+    request:
       method: host.update
       params:
         hostid: @fixtures.emptyHost.result.hostid@
@@ -80,9 +81,12 @@ fixtures:
         # TODO: the inventory parameter has been added to avoid ZBX-8779
         inventory: {}
 
-steps:
+    expect: result
+    response:
+      hostids: ["@fixtures.emptyHost.result.hostid@"]
+
   # make sure the HTTP test is inherited correctly
-  step1:
+  step2:
     request:
       method: httptest.get
       params:
@@ -145,17 +149,17 @@ steps:
             headers: ""
 
   # make sure the scenario has been linked to the correct application
-  step2:
+  step3:
     request:
       method: application.get
       params:
         output: [name, hostid]
-        applicationids: @steps.step1.response[0].applicationid@
+        applicationids: @steps.step2.response[0].applicationid@
 
     expect: result
     response:
       -
-        applicationid: @steps.step1.response[0].applicationid@
+        applicationid: @steps.step2.response[0].applicationid@
         name: App
         hostid: @fixtures.emptyHost.result.hostid@
 
