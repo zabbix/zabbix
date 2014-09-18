@@ -137,13 +137,13 @@ function actionConditionValueToString(array $actions, array $config) {
 		return $result;
 	}
 
-	$hostGroupsToSelect = array();
-	$triggersToSelect = array();
-	$hostsToSelect = array();
-	$templatesToSelect = array();
-	$proxiesToSelect = array();
-	$dRulesToSelect = array();
-	$dChecksToSelect = array();
+	$hostGroupIds = array();
+	$triggerIds = array();
+	$hostIds = array();
+	$templateIds = array();
+	$proxyIds = array();
+	$dRuleIds = array();
+	$dCheckIds = array();
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = array();
@@ -155,27 +155,27 @@ function actionConditionValueToString(array $actions, array $config) {
 			switch ($condition['conditiontype']) {
 				// gather hostgroup IDs for later querying
 				case CONDITION_TYPE_HOST_GROUP:
-					$hostGroupsToSelect[$condition['value']] = $condition['value'];
+					$hostGroupIds[$condition['value']] = $condition['value'];
 					break;
 
 				// gather trigger IDs for later querying
 				case CONDITION_TYPE_TRIGGER:
-					$triggersToSelect[$condition['value']] = $condition['value'];
+					$triggerIds[$condition['value']] = $condition['value'];
 					break;
 
 				// gether hosts IDs for later querying
 				case CONDITION_TYPE_HOST:
-					$hostsToSelect[$condition['value']] = $condition['value'];
+					$hostIds[$condition['value']] = $condition['value'];
 					break;
 
 				// gether template IDs for later querying
 				case CONDITION_TYPE_TEMPLATE:
-					$templatesToSelect[$condition['value']] = $condition['value'];
+					$templateIds[$condition['value']] = $condition['value'];
 					break;
 
 				// gether proxy IDs for later querying
 				case CONDITION_TYPE_PROXY:
-					$proxiesToSelect[$condition['value']] = $condition['value'];
+					$proxyIds[$condition['value']] = $condition['value'];
 					break;
 
 				// return values as is for following condition types
@@ -209,12 +209,12 @@ function actionConditionValueToString(array $actions, array $config) {
 
 				// gather dicovery rule IDs for later querying
 				case CONDITION_TYPE_DRULE:
-					$dRulesToSelect[$condition['value']] = $condition['value'];
+					$dRuleIds[$condition['value']] = $condition['value'];
 					break;
 
 				// gather dicovery check IDs for later querying
 				case CONDITION_TYPE_DCHECK:
-					$dChecksToSelect[$condition['value']] = $condition['value'];
+					$dCheckIds[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_DOBJECT:
@@ -243,60 +243,60 @@ function actionConditionValueToString(array $actions, array $config) {
 	$dRules = array();
 	$dChecks = array();
 
-	if ($hostGroupsToSelect) {
+	if ($hostGroupIds) {
 		$groups = API::HostGroup()->get(array(
 			'output' => array('name'),
-			'groupids' => $hostGroupsToSelect,
+			'groupids' => $hostGroupIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($triggersToSelect) {
+	if ($triggerIds) {
 		$triggers = API::Trigger()->get(array(
 			'output' => array('description'),
-			'triggerids' => $triggersToSelect,
+			'triggerids' => $triggerIds,
 			'expandDescription' => true,
 			'selectHosts' => array('name'),
 			'preservekeys' => true
 		));
 	}
 
-	if ($hostsToSelect) {
+	if ($hostIds) {
 		$hosts = API::Host()->get(array(
 			'output' => array('name'),
-			'hostids' => $hostsToSelect,
+			'hostids' => $hostIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($templatesToSelect) {
+	if ($templateIds) {
 		$templates = API::Template()->get(array(
 			'output' => array('name'),
-			'templateids' => $templatesToSelect,
+			'templateids' => $templateIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($proxiesToSelect) {
+	if ($proxyIds) {
 		$proxies = API::Proxy()->get(array(
 			'output' => array('host'),
-			'proxyids' => $proxiesToSelect,
+			'proxyids' => $proxyIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($dRulesToSelect) {
+	if ($dRuleIds) {
 		$dRules = API::DRule()->get(array(
 			'output' => array('name'),
-			'druleids' => $dRulesToSelect,
+			'druleids' => $dRuleIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($dChecksToSelect) {
+	if ($dCheckIds) {
 		$dChecks = API::DCheck()->get(array(
 			'output' => array('type', 'key_', 'ports'),
-			'dcheckids' => $dChecksToSelect,
+			'dcheckids' => $dCheckIds,
 			'selectDRules' => array('name'),
 			'preservekeys' => true
 		));
@@ -422,12 +422,12 @@ function getActionOperationDescriptions(array $actions) {
 		return $result;
 	}
 
-	$mediaTypesToSelect = array();
-	$usersToSelect = array();
-	$userGroupsToSelect = array();
-	$hostsToSelect = array();
-	$hostGroupsToSelect = array();
-	$templatesToSelect = array();
+	$mediaTypeIds = array();
+	$userIds = array();
+	$userGroupIds = array();
+	$hostIds = array();
+	$hostGroupIds = array();
+	$templateIds = array();
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = array();
@@ -441,18 +441,18 @@ function getActionOperationDescriptions(array $actions) {
 					$mediaTypeId = $operation['opmessage']['mediatypeid'];
 
 					if ($mediaTypeId != 0) {
-						$mediaTypesToSelect[$mediaTypeId] = $mediaTypeId;
+						$mediaTypeIds[$mediaTypeId] = $mediaTypeId;
 					}
 
 					if (isset($operation['opmessage_usr']) && $operation['opmessage_usr']) {
 						foreach ($operation['opmessage_usr'] as $users) {
-							$usersToSelect[$users['userid']] = $users['userid'];
+							$userIds[$users['userid']] = $users['userid'];
 						}
 					}
 
 					if (isset($operation['opmessage_grp']) && $operation['opmessage_grp']) {
 						foreach ($operation['opmessage_grp'] as $userGroups) {
-							$userGroupsToSelect[$userGroups['usrgrpid']] = $userGroups['usrgrpid'];
+							$userGroupIds[$userGroups['usrgrpid']] = $userGroups['usrgrpid'];
 						}
 					}
 					break;
@@ -462,14 +462,14 @@ function getActionOperationDescriptions(array $actions) {
 					if (isset($operation['opcommand_hst']) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] != 0) {
-								$hostsToSelect[$host['hostid']] = $host['hostid'];
+								$hostIds[$host['hostid']] = $host['hostid'];
 							}
 						}
 					}
 
 					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
 						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$hostGroupsToSelect[$hostGroup['groupid']] = $hostGroup['groupid'];
+							$hostGroupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
 						}
 					}
 					break;
@@ -478,7 +478,7 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					foreach ($operation['opgroup'] as $hostGroup) {
-						$hostGroupsToSelect[$hostGroup['groupid']] = $hostGroup['groupid'];
+						$hostGroupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
 					}
 					break;
 
@@ -486,7 +486,7 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					foreach ($operation['optemplate'] as $template) {
-						$templatesToSelect[$template['templateid']] = $template['templateid'];
+						$templateIds[$template['templateid']] = $template['templateid'];
 					}
 					break;
 
@@ -502,20 +502,20 @@ function getActionOperationDescriptions(array $actions) {
 	$hostGroups = array();
 	$templates = array();
 
-	if ($mediaTypesToSelect) {
+	if ($mediaTypeIds) {
 		$mediaTypes = API::Mediatype()->get(array(
 			'output' => array('description'),
-			'mediatypeids' => $mediaTypesToSelect,
+			'mediatypeids' => $mediaTypeIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($usersToSelect) {
+	if ($userIds) {
 		$fullnames = array();
 
 		$users = API::User()->get(array(
 			'output' => array('userid', 'alias', 'name', 'surname'),
-			'userids' => $usersToSelect
+			'userids' => $userIds
 		));
 
 		foreach ($users as $user) {
@@ -523,34 +523,34 @@ function getActionOperationDescriptions(array $actions) {
 		}
 	}
 
-	if ($userGroupsToSelect) {
+	if ($userGroupIds) {
 		$userGroups = API::UserGroup()->get(array(
 			'output' => array('name'),
-			'usrgrpids' => $userGroupsToSelect,
+			'usrgrpids' => $userGroupIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($hostsToSelect) {
+	if ($hostIds) {
 		$hosts = API::Host()->get(array(
 			'output' => array('name'),
-			'hostids' => $hostsToSelect,
+			'hostids' => $hostIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($hostGroupsToSelect) {
+	if ($hostGroupIds) {
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('name'),
-			'groupids' => $hostGroupsToSelect,
+			'groupids' => $hostGroupIds,
 			'preservekeys' => true
 		));
 	}
 
-	if ($templatesToSelect) {
+	if ($templateIds) {
 		$templates = API::Template()->get(array(
 			'output' => array('name'),
-			'templateids' => $templatesToSelect,
+			'templateids' => $templateIds,
 			'preservekeys' => true
 		));
 	}
@@ -726,22 +726,22 @@ function getActionOperationDescriptions(array $actions) {
 function getActionOperationHints(array $operations) {
 	$result = array();
 
-	$scriptsToSelect = array();
+	$scriptIds = array();
 
 	foreach ($operations as $operation) {
 		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
 				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
 			$scriptId = $operation['opcommand']['scriptid'];
-			$scriptsToSelect[$scriptId] = $scriptId;
+			$scriptIds[$scriptId] = $scriptId;
 		}
 	}
 
 	$scripts = array();
 
-	if ($scriptsToSelect) {
+	if ($scriptIds) {
 		$scripts = API::Script()->get(array(
 			'output' => array('name'),
-			'scriptids' => $scriptsToSelect,
+			'scriptids' => $scriptIds,
 			'preservekeys' => true
 		));
 	}
