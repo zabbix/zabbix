@@ -78,7 +78,7 @@ Default is 10051.
 .IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
 Specify source IP address.
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\fR"
-Specify host name the item belongs to (as registered in Zabbix front\-end).
+Specify host name the item belongs to (as registered in Zabbix frontend).
 Host IP address and DNS name will not work.
 .IP "\fB\-k\fR, \fB\-\-key\fR \fIkey\fR"
 Specify item key to send value to.
