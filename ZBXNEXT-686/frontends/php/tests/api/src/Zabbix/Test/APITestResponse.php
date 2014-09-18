@@ -11,7 +11,7 @@ class APITestResponse {
 	protected $type;
 
 
-	protected $data;
+	protected $result;
 
 	protected $error;
 
