@@ -163,7 +163,10 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 				$gotos['inventory'] = array('hostid' => $host['hostid']);
 
-				$gotos['latestData'] = array('hostid' => $host['hostid']);
+				$gotos['latestData'] = array(
+					'hostids' => array($host['hostid']),
+					'filter_set' => 1
+				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
