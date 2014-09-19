@@ -257,29 +257,29 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	memtype = get_rparam(request, 4);
 
-	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "VmSize"))
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vmsize"))
 		memtype_search = "VmSize:\t";
-	else if (0 == strcmp(memtype, "VmRSS"))
+	else if (0 == strcmp(memtype, "vmrss"))
 		memtype_search = "VmRSS:\t";
-	else if (0 == strcmp(memtype, "VmPeak"))
+	else if (0 == strcmp(memtype, "vmpeak"))
 		memtype_search = "VmPeak:\t";
-	else if (0 == strcmp(memtype, "VmSwap"))
+	else if (0 == strcmp(memtype, "vmswap"))
 		memtype_search = "VmSwap:\t";
-	else if (0 == strcmp(memtype, "VmLib"))
+	else if (0 == strcmp(memtype, "vmlib"))
 		memtype_search = "VmLib:\t";
-	else if (0 == strcmp(memtype, "VmLck"))
+	else if (0 == strcmp(memtype, "vmlck"))
 		memtype_search = "VmLck:\t";
-	else if (0 == strcmp(memtype, "VmPin"))
+	else if (0 == strcmp(memtype, "vmpin"))
 		memtype_search = "VmPin:\t";
-	else if (0 == strcmp(memtype, "VmHWM"))
+	else if (0 == strcmp(memtype, "vmhwm"))
 		memtype_search = "VmHWM:\t";
-	else if (0 == strcmp(memtype, "VmData"))
+	else if (0 == strcmp(memtype, "vmdata"))
 		memtype_search = "VmData:\t";
-	else if (0 == strcmp(memtype, "VmStk"))
+	else if (0 == strcmp(memtype, "vmstk"))
 		memtype_search = "VmStk:\t";
-	else if (0 == strcmp(memtype, "VmExe"))
+	else if (0 == strcmp(memtype, "vmexe"))
 		memtype_search = "VmExe:\t";
-	else if (0 == strcmp(memtype, "VmPTE"))
+	else if (0 == strcmp(memtype, "vmpte"))
 		memtype_search = "VmPTE:\t";
 	else
 	{
