@@ -2383,7 +2383,8 @@ out:
 		range = now - values->values[values->values_num - 1].timestamp.sec + 1;
 	}
 
-	if (item->range < range)
+	/* if the calculated range is zero we should force it to minimum range (that's why less or equal) */
+	if (item->range <= range)
 	{
 		if (VC_MIN_RANGE > (item->range = range))
 			item->range = VC_MIN_RANGE;
@@ -2533,9 +2534,10 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
 
-	if (item->range <= now - value->timestamp.sec)
+	/* if the calculated range is zero we should force it to minimum range (that's why less or equal) */
+	if (item->range <= now - value->timestamp.sec + 1)
 	{
-		item->range = now - value->timestamp.sec;
+		item->range = now - value->timestamp.sec + 1;
 
 		if (VC_MIN_RANGE > item->range)
 			item->range = VC_MIN_RANGE;
@@ -2544,7 +2546,10 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	*found = 1;
 out:
 	if (0 == *found)
+	{
+		item->range = 0;
 		item->status = ZBX_ITEM_STATUS_CACHED_ALL;
+	}
 
 	return ret;
 }
