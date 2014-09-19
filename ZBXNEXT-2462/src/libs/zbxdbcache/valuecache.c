@@ -490,7 +490,7 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: vc_db_read_values_by_count_in_time                                     *
+ * Function: vc_db_read_values_by_time_and_count                                    *
  *                                                                                  *
  * Purpose: reads item history data from database                                   *
  *                                                                                  *
@@ -510,7 +510,7 @@ out:
  *             count_timestamp < <value timestamp> <= read_timestamp                *
  *                                                                                  *
  ************************************************************************************/
-static int	vc_db_read_values_by_count_in_time(zbx_uint64_t itemid, int value_type,
+static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 		zbx_vector_history_record_t *values, int seconds, int count, int end_timestamp, zbx_uint64_t *queries)
 {
 	char			*sql = NULL;
@@ -532,7 +532,7 @@ static int	vc_db_read_values_by_count_in_time(zbx_uint64_t itemid, int value_typ
 	}
 	else
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d order by clock desc",
 				end_timestamp - seconds, end_timestamp);
 	}
 
@@ -2085,7 +2085,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_cache_values_by_count_in_time                           *
+ * Function: vch_item_cache_values_by_time_and_count                          *
  *                                                                            *
  * Purpose: cache the specified number of history data values for time period *
  *          since timeshift                                                   *
@@ -2102,7 +2102,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  *           and updates cache from database if necessary.                    *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_cache_values_by_count_in_time(zbx_vc_item_t *item, int seconds, int count, int timestamp)
+static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seconds, int count, int timestamp)
 {
 	int	ret = SUCCEED, cached_records = 0, update_end, start;
 
@@ -2152,7 +2152,7 @@ static int	vch_item_cache_values_by_count_in_time(zbx_vc_item_t *item, int secon
 
 		vc_try_unlock();
 
-		ret = vc_db_read_values_by_count_in_time(item->itemid, item->value_type, &records, seconds,
+		ret = vc_db_read_values_by_time_and_count(item->itemid, item->value_type, &records, seconds,
 				count - cached_records, timestamp < update_end ? timestamp : update_end, &queries);
 
 		if (SUCCEED == ret && update_end > timestamp)
@@ -2317,7 +2317,7 @@ static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_get_values_by_count_in_time                             *
+ * Function: vch_item_get_values_by_time_and_count                            *
  *                                                                            *
  * Purpose: retrieves item history data from cache                            *
  *                                                                            *
@@ -2332,7 +2332,7 @@ static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_
  *             timestamp - [IN] the target timestamp                          *
  *                                                                            *
  ******************************************************************************/
-static void	vch_item_get_values_by_count_in_time(zbx_vc_item_t *item, zbx_vector_history_record_t *values,
+static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vector_history_record_t *values,
 		int seconds, int count, int timestamp)
 {
 	int		index, now, range;
@@ -2380,7 +2380,7 @@ out:
 	else
 	{
 		/* the requested number of values was retrieved, set the range to the oldest value timestamp */
-		range = now - values->values[values->values_num - 1].timestamp.sec;
+		range = now - values->values[values->values_num - 1].timestamp.sec + 1;
 	}
 
 	if (item->range < range)
@@ -2444,19 +2444,19 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item, zbx_vector_history_reco
 
 		records_read = ret;
 
-		vch_item_get_values_by_count_in_time(item, values, timestamp, count, timestamp);
+		vch_item_get_values_by_time_and_count(item, values, timestamp, count, timestamp);
 
 		if (records_read > values->values_num)
 			records_read = values->values_num;
 	}
 	else
 	{
-		if (FAIL == (ret = vch_item_cache_values_by_count_in_time(item, seconds, count, timestamp)))
+		if (FAIL == (ret = vch_item_cache_values_by_time_and_count(item, seconds, count, timestamp)))
 			goto out;
 
 		records_read = ret;
 
-		vch_item_get_values_by_count_in_time(item, values, seconds, count, timestamp);
+		vch_item_get_values_by_time_and_count(item, values, seconds, count, timestamp);
 
 		if (records_read > values->values_num)
 			records_read = values->values_num;
@@ -2833,7 +2833,7 @@ out:
 			}
 			else
 			{
-				ret = vc_db_read_values_by_count_in_time(itemid, value_type, values, seconds, count,
+				ret = vc_db_read_values_by_time_and_count(itemid, value_type, values, seconds, count,
 						timestamp, &queries);
 			}
 
