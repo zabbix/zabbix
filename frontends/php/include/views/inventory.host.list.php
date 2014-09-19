@@ -41,7 +41,7 @@ $exactComboBox->addItem('0', _('like'));
 $exactComboBox->addItem('1', _('exactly'));
 $filterTable->addRow(array(
 	array(
-		array(bold(_('Field')), ':', SPACE, $inventoryFieldsComboBox),
+		array(bold(_('Field')), ' ', $inventoryFieldsComboBox),
 		array(
 			$exactComboBox,
 			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
