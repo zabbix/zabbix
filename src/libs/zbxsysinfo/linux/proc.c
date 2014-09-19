@@ -63,7 +63,7 @@ static int	cmp_status(FILE *f_stat, const char *procname)
 
 	rewind(f_stat);
 
-	while (NULL != fgets(tmp, sizeof(tmp), f_stat))
+	while (NULL != fgets(tmp, (int)sizeof(tmp), f_stat))
 	{
 		if (0 != strncmp(tmp, "Name:\t", 6))
 			continue;
@@ -118,7 +118,7 @@ static int	check_user(FILE *f_stat, struct passwd *usrinfo)
 
 	rewind(f_stat);
 
-	while (NULL != fgets(tmp, sizeof(tmp), f_stat))
+	while (NULL != fgets(tmp, (int)sizeof(tmp), f_stat))
 	{
 		if (0 != strncmp(tmp, "Uid:\t", 5))
 			continue;
@@ -173,7 +173,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 
 	rewind(f_stat);
 
-	while (NULL != fgets(tmp, sizeof(tmp), f_stat))
+	while (NULL != fgets(tmp, (int)sizeof(tmp), f_stat))
 	{
 		if (0 != strncmp(tmp, "State:\t", 7))
 			continue;
@@ -198,13 +198,13 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *p, *p1, *procname, *proccomm, *param;
+	char		tmp[MAX_STRING_LEN], *p, *p_unit, *procname, *proccomm, *param;
 	DIR		*dir;
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	value = 0;
-	int		do_task, proccount = 0;
+	int		do_task, proccount = 0, invalid_read = 0, memtype_tried = 0;
 	double		memsize = 0;
 	char		*memtype = NULL;
 	const char	*memtype_search;
@@ -324,48 +324,76 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		rewind(f_stat);
 
-		while (NULL != fgets(tmp, sizeof(tmp), f_stat))
+		if (0 == memtype_tried)
+			memtype_tried = 1;
+
+		while (NULL != fgets(tmp, (int)sizeof(tmp), f_stat))
 		{
 			if (0 != strncmp(tmp, memtype_search, memtype_search_len))
 				continue;
 
 			p = tmp + memtype_search_len;
 
-			if (NULL == (p1 = strrchr(p, ' ')))
+			if (NULL == (p_unit = strrchr(p, ' ')))
 				continue;
 
-			*p1++ = '\0';
+			*p_unit++ = '\0';
 
-			sscanf(p, ZBX_FS_UI64, &value);
+			if (1 != sscanf(p, ZBX_FS_UI64, &value))
+			{
+				invalid_read = 1;
+				goto out;
+			}
 
-			zbx_rtrim(p1, "\n");
+			zbx_rtrim(p_unit, "\n");
 
-			if (0 == strcasecmp(p1, "kB"))
+			if (0 == strcasecmp(p_unit, "kB"))
 				value <<= 10;
-			else if (0 == strcasecmp(p1, "mB"))
+			else if (0 == strcasecmp(p_unit, "mB"))
 				value <<= 20;
-			else if (0 == strcasecmp(p1, "GB"))
+			else if (0 == strcasecmp(p_unit, "GB"))
 				value <<= 30;
-			else if (0 == strcasecmp(p1, "TB"))
+			else if (0 == strcasecmp(p_unit, "TB"))
 				value <<= 40;
 
 			if (0 == proccount++)
-				memsize = value;
+				memsize = (double)value;
 			else
 			{
 				if (ZBX_DO_MAX == do_task)
-					memsize = MAX(memsize, value);
+					memsize = MAX(memsize, (double)value);
 				else if (ZBX_DO_MIN == do_task)
-					memsize = MIN(memsize, value);
+					memsize = MIN(memsize, (double)value);
 				else
-					memsize += value;
+					memsize += (double)value;
 			}
 			break;
 		}
 	}
+out:
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_stat);
 	closedir(dir);
+
+	if (0 != invalid_read)
+	{
+		*(p_unit - 1) = ' ';
+		zbx_rtrim(tmp, "\n");
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot convert to numeric value: %s", tmp));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 == proccount && 0 != memtype_tried)
+	{
+		char	*s = NULL;
+
+		s = zbx_strdup(NULL, memtype_search);
+		zbx_rtrim(s, ":\t");
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Process memory type \"%s\" is not supported on this host.",
+				s));
+		zbx_free(s);
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
