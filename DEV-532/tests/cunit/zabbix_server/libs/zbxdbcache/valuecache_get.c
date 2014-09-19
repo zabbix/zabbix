@@ -3173,11 +3173,13 @@ static void	cuvc_suite_get10_cleanup()
  *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
  *             1005.2, 1005.5, 1005.7}
  *
- * get_by_time_and_count(100001, STR, 1, 1, 1005)
+ * set_time(2000)
+ *
+ * get_by_time_and_count(100001, STR, 500, 1, 2000)
  *    returned:
- *       {1005.7}
+ *       {}
  *    cached:
- *       [100001] {1005.2, 1005.5, 1005.7}
+ *       [100001] {}
  *
  */
 static void	cuvc_suite_get11_test1()
@@ -3189,11 +3191,65 @@ static void	cuvc_suite_get11_test1()
 
 	ZBX_CU_LEAK_CHECK_START();
 
+	cuvc_time = 2000;
+	vc_time = cuvc_time_func;
+
 	zbx_history_record_vector_create(&records);
 
 	cuvc_snapshot(&s1);
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 1, 1, 1005));
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 500, 1, 2000));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	ZBX_CU_ASSERT_INT_EQ(records.values_num, 0);
+	cuvc_check_cache_str(item, NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 500);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time_and_count(100001, STR, 100, 1, 1005)
+ *    returned:
+ *       {1005.7}
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ */
+static void	cuvc_suite_get11_test2()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	cuvc_time = 2000;
+	vc_time = cuvc_time_func;
+
+	zbx_history_record_vector_create(&records);
+
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 1000, 1, 1005));
 
 	cuvc_snapshot(&s2);
 
@@ -3208,7 +3264,7 @@ static void	cuvc_suite_get11_test1()
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -3228,7 +3284,7 @@ static void	cuvc_suite_get11_test1()
  *       [100001] {1005.2, 1005.5, 1005.7}
  *
  */
-static void	cuvc_suite_get11_test2()
+static void	cuvc_suite_get11_test3()
 {
 	cuvc_snapshot_t			s1, s2;
 	zbx_vector_history_record_t	records;
@@ -3256,7 +3312,7 @@ static void	cuvc_suite_get11_test2()
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -3277,7 +3333,7 @@ static void	cuvc_suite_get11_test2()
  *       [100001] {1005.2, 1005.5, 1005.7}
  *
  */
-static void	cuvc_suite_get11_test3()
+static void	cuvc_suite_get11_test4()
 {
 	cuvc_snapshot_t			s1, s2;
 	zbx_vector_history_record_t	records;
@@ -3305,7 +3361,7 @@ static void	cuvc_suite_get11_test3()
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -3325,7 +3381,7 @@ static void	cuvc_suite_get11_test3()
  *       [100001] {1005.2, 1005.5, 1005.7}
  *
  */
-static void	cuvc_suite_get11_test4()
+static void	cuvc_suite_get11_test5()
 {
 	cuvc_snapshot_t			s1, s2;
 	zbx_vector_history_record_t	records;
@@ -3353,7 +3409,7 @@ static void	cuvc_suite_get11_test4()
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -3373,7 +3429,7 @@ static void	cuvc_suite_get11_test4()
  *       [100001] {1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
  */
-static void	cuvc_suite_get11_test5()
+static void	cuvc_suite_get11_test6()
 {
 	cuvc_snapshot_t			s1, s2;
 	zbx_vector_history_record_t	records;
@@ -3402,7 +3458,7 @@ static void	cuvc_suite_get11_test5()
 			"1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 998);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 9);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -3422,7 +3478,7 @@ static void	cuvc_suite_get11_test5()
  *       [100001] {1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
  */
-static void	cuvc_suite_get11_test6()
+static void	cuvc_suite_get11_test7()
 {
 	cuvc_snapshot_t			s1, s2;
 	zbx_vector_history_record_t	records;
@@ -3451,7 +3507,7 @@ static void	cuvc_suite_get11_test6()
 			"1004:200", "1004:500", "1004:700", "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_NE(item->range, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);

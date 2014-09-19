@@ -832,12 +832,13 @@ int	ZBX_CU_MODULE(valuecache)
 	if (NULL == (suite = CU_add_suite("valuecache basic count in time", cuvc_init_str, cuvc_clean_str)))
 		return CU_get_error();
 
-	ZBX_CU_ADD_TEST(suite, "get 1 value in 1s interval from 1005 timestamp", cuvc_suite_get11_test1);
-	ZBX_CU_ADD_TEST(suite, "get 2 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test2);
-	ZBX_CU_ADD_TEST(suite, "get 3 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test3);
-	ZBX_CU_ADD_TEST(suite, "get 4 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test4);
-	ZBX_CU_ADD_TEST(suite, "get 1 value in 1s interval from 1003 timestamp", cuvc_suite_get11_test5);
-	ZBX_CU_ADD_TEST(suite, "get 4 values in 2s interval from 1003 timestamp", cuvc_suite_get11_test6);
+	ZBX_CU_ADD_TEST(suite, "get 1 value in 500s interval from 2000 timestamp", cuvc_suite_get11_test1);
+	ZBX_CU_ADD_TEST(suite, "get 1 value in 100s interval from 1005 timestamp", cuvc_suite_get11_test2);
+	ZBX_CU_ADD_TEST(suite, "get 2 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test3);
+	ZBX_CU_ADD_TEST(suite, "get 3 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test4);
+	ZBX_CU_ADD_TEST(suite, "get 4 values in 1s interval from 1005 timestamp", cuvc_suite_get11_test5);
+	ZBX_CU_ADD_TEST(suite, "get 1 value in 1s interval from 1003 timestamp", cuvc_suite_get11_test6);
+	ZBX_CU_ADD_TEST(suite, "get 4 values in 2s interval from 1003 timestamp", cuvc_suite_get11_test7);
 	ZBX_CU_ADD_TEST(suite, "cleanup", cuvc_suite_get11_cleanup);
 
 	/* test suite: add1                                                                          */
