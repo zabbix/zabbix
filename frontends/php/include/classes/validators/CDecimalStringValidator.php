@@ -32,20 +32,19 @@ class CDecimalStringValidator extends CValidator {
 	public $messageInvalid;
 
 	/**
-	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
+	 * Returns true if the given $value is valid, or sets an error and returns false otherwise.
 	 *
 	 * @param $value
 	 *
 	 * @return bool
 	 */
 	public function validate($value) {
+		$isValid = false;
+
 		if (is_scalar($value)) {
-			$isValid = $this->validateCommon($value)
-				|| $this->validateDotNotation($value)
-				|| $this->validateScientificNotation($value);
-		}
-		else {
-			$isValid = false;
+			$isValid = ($this->isValidCommonNotation($value)
+				|| $this->isValidDotNotation($value)
+				|| $this->isValidScientificNotation($value));
 		}
 
 		if (!$isValid) {
@@ -62,7 +61,7 @@ class CDecimalStringValidator extends CValidator {
 	 *
 	 * @return boolean
 	 */
-	protected function validateCommon($value){
+	protected function isValidCommonNotation($value){
 		return preg_match('/^-?\d+(\.\d+)?$/', $value);
 	}
 
@@ -73,7 +72,7 @@ class CDecimalStringValidator extends CValidator {
 	 *
 	 * @return boolean
 	 */
-	protected function validateDotNotation($value) {
+	protected function isValidDotNotation($value) {
 		return preg_match('/^-?(\.\d+|\d+\.)$/', $value);
 	}
 
@@ -84,7 +83,7 @@ class CDecimalStringValidator extends CValidator {
 	 *
 	 * @return boolean
 	 */
-	protected function validateScientificNotation($value) {
+	protected function isValidScientificNotation($value) {
 		return preg_match('/^-?[0-9]+(\.[0-9]+)?e[+|-]?[0-9]+$/i', $value);
 	}
 }
