@@ -164,8 +164,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 				$gotos['inventory'] = array('hostid' => $host['hostid']);
 
 				$gotos['latestData'] = array(
-					'hostids' => array($host['hostid']),
-					'filter_set' => 1
+					'hostids' => array($host['hostid'])
 				);
 				break;
 
