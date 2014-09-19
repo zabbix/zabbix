@@ -619,7 +619,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1', 800, 450);", 'formlist'
 			);
 		}
-		$screenFormList->addRow(_('Parameter'), array(
+		$screenFormList->addRow(_('Item'), array(
 			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			$selectButton
 		));
