@@ -85,7 +85,7 @@ $config = select_config();
 
 $severityNames = array();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severityNames[] = getSeverityName($severity, $config);
+	$severityNames[$severity] = getSeverityName($severity, $config);
 }
 
 if (isset($_REQUEST['media']) && !isset($_REQUEST['form_refresh'])) {
