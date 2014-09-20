@@ -311,10 +311,9 @@ $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
-$dataConfig = select_config();
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -324,13 +323,13 @@ if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['
 	else {
 		$keepHistory[] = _x('global housekeeping settings', 'item_form');
 	}
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')';
+	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
 }
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -340,7 +339,7 @@ if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['i
 	else {
 		$keepTrend[] = _x('global housekeeping settings', 'item_form');
 	}
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')';
+	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
 }
 
 $itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');

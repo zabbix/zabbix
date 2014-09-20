@@ -268,15 +268,7 @@ if ($this->data['is_profile']) {
 	));
 
 	// trigger sounds
-	$severities = array(
-		TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		TRIGGER_SEVERITY_INFORMATION,
-		TRIGGER_SEVERITY_WARNING,
-		TRIGGER_SEVERITY_AVERAGE,
-		TRIGGER_SEVERITY_HIGH,
-		TRIGGER_SEVERITY_DISASTER
-	);
-	foreach ($severities as $severity) {
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$soundList = new CComboBox('messages[sounds.'.$severity.']', $this->data['messages']['sounds.'.$severity]);
 		foreach ($zbxSounds as $filename => $file) {
 			$soundList->addItem($file, $filename);
