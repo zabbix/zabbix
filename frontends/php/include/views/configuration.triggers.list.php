@@ -31,7 +31,7 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
-if ($this->data['hostid']) {
+if (!$this->data['hostid']) {
 	$createButton = new CSubmit('form', _('Create trigger (select host first)'));
 	$createButton->setEnabled(false);
 	$createForm->addItem($createButton);
