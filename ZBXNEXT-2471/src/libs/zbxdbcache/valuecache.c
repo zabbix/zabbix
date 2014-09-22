@@ -37,6 +37,9 @@
  * current time. The data is automatically fetched from DB whenever a request
  * exceeds cached value range.
  *
+ * In addition to total item range value cache tracks item range per last 24 hours. Once
+ * per day the total range is updated with current range and the current range is reset.
+ *
  * If an item is already being cached the new values are automatically added to the cache
  * after being written into database.
  *
@@ -75,7 +78,10 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 
 #define VC_MAX_NANOSECONDS	999999999
 
-#define VC_MIN_RANGE	SEC_PER_MIN
+#define VC_MIN_RANGE			SEC_PER_MIN
+
+/* the range synchronization period in hours */
+#define ZBX_VC_RANGE_SYNC_PERIOD	24
 
 /* the data chunk used to store data fragment */
 typedef struct _zbx_vc_chunk_t
@@ -130,6 +136,9 @@ typedef struct
 	/* the item status flags (ZBX_ITEM_STATUS_*)                  */
 	unsigned char	status;
 
+	/* the hour when the current/global range sync was done       */
+	unsigned char	range_sync_hour;
+
 	/* The total number of item values in cache.                  */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -147,6 +156,11 @@ typedef struct
 	/* The range of the largest request in seconds.               */
 	/* Used to determine if data can be removed from cache.       */
 	int		range;
+
+	/* The range for last 24 hours. Once per day the range is     */
+	/* synchronized (updated) with current_range and the current  */
+	/* range is reset.                                            */
+	int		current_range;
 
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
@@ -1237,6 +1251,43 @@ static void	vc_item_release(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vch_item_update_range                                            *
+ *                                                                            *
+ * Purpose: updates item range with current request range                     *
+ *                                                                            *
+ * Parameters: item   - [IN] the item                                         *
+ *             range  - [IN] the request range                                *
+ *             now    - [IN] the current timestamp                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
+{
+	int	hour, diff;
+
+	/* if the calculated range is zero we should force it to minimum range (that's why less or equal) */
+	if (item->current_range <= range)
+	{
+		item->current_range = range;
+
+		if (VC_MIN_RANGE > item->current_range)
+			item->current_range = VC_MIN_RANGE;
+	}
+
+	hour = (now / SEC_PER_HOUR) & 0xff;
+
+	if (0 > (diff = hour - item->range_sync_hour))
+		diff += 0xff;
+
+	if (item->range < item->current_range || ZBX_VC_RANGE_SYNC_PERIOD < diff)
+	{
+		item->range = item->current_range;
+		item->current_range = range;
+		item->range_sync_hour = hour;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vch_item_chunk_slot_count                                        *
  *                                                                            *
  * Purpose: calculates optimal number of slots for an item data chunk         *
@@ -2096,14 +2147,7 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_r
 	if (0 != item->range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
 		now = ZBX_VC_TIME();
-
-		if (item->range <= seconds + now - timestamp)
-		{
-			item->range = seconds + now - timestamp;
-
-			if (VC_MIN_RANGE > item->range)
-				item->range = VC_MIN_RANGE;
-		}
+		vch_item_update_range(item, seconds + now - timestamp, now);
 	}
 
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
@@ -2177,20 +2221,14 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item, zbx_vector_history_
 	/* Otherwise the current request range is unknown and can't be compared */
 	/* to the maximum request range.                                        */
 	if (values->values_num == count)
-	{
-		if (item->range <= now - values->values[values->values_num - 1].timestamp.sec)
-		{
-			item->range = now - values->values[values->values_num - 1].timestamp.sec;
+		vch_item_update_range(item, now - values->values[values->values_num - 1].timestamp.sec, now);
 
-			if (VC_MIN_RANGE > item->range)
-				item->range = VC_MIN_RANGE;
-		}
-	}
 out:
 	if (values->values_num < count)
 	{
 		/* not enough data in db to fulfill the request */
 		item->range = 0;
+		item->current_range = 0;
 		item->status = ZBX_ITEM_STATUS_CACHED_ALL;
 	}
 
@@ -2328,13 +2366,7 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
 
-	if (item->range <= now - value->timestamp.sec)
-	{
-		item->range = now - value->timestamp.sec;
-
-		if (VC_MIN_RANGE > item->range)
-			item->range = VC_MIN_RANGE;
-	}
+	vch_item_update_range(item, now - value->timestamp.sec, now);
 
 	*found = 1;
 out:
