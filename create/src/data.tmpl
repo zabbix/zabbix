@@ -23,11 +23,13 @@ ROW   |10001 |NULL        |Template OS Linux         |3     |0            |2    
 ROW   |10047 |NULL        |Template App Zabbix Server|3     |0            |2             |             |             |Template App Zabbix Server|
 ROW   |10050 |NULL        |Template App Zabbix Agent |3     |0            |2             |             |             |Template App Zabbix Agent |
 ROW   |10056 |NULL        |Template App Agentless    |3     |0            |2             |             |             |Template App Agentless    |
+ROW   |10057 |NULL        |Zabbix Server             |0     |-1           |2             |             |             |Zabbix Server             |
 
 TABLE |groups
 FIELDS|groupid|name            |internal|
 ROW   |1      |Templates       |0       |
 ROW   |5      |Discovered hosts|1       |
+ROW   |6      |Mon             |0       |
 
 TABLE |screens
 FIELDS|screenid|name                |hsize|vsize|templateid|
@@ -60,18 +62,33 @@ ROW   |5            |10001 |Filesystems       |NULL      |
 ROW   |7            |10001 |Network interfaces|NULL      |
 ROW   |9            |10001 |Processes         |NULL      |
 ROW   |207          |10001 |Zabbix agent      |206       |
+ROW   |215          |10057 |Zabbix server     |179       |
+ROW   |216          |10057 |CPU               |13        |
+ROW   |217          |10057 |Filesystems       |5         |
+ROW   |218          |10057 |General           |21        |
+ROW   |219          |10057 |Memory            |15        |
+ROW   |220          |10057 |Network interfaces|7         |
+ROW   |221          |10057 |OS                |1         |
+ROW   |222          |10057 |Performance       |17        |
+ROW   |223          |10057 |Processes         |9         |
+ROW   |224          |10057 |Security          |23        |
+ROW   |225          |10057 |Zabbix agent      |207       |
+
+TABLE |interface
+FIELDS|interfaceid|hostid|main|type|useip|ip       |dns|port |
+ROW   |1          |10057 |1   |1   |1    |127.0.0.1|   |10050|
 
 TABLE |valuemaps
-FIELDS|valuemapid|name                     |
-ROW   |16        |RSM DNS availability |
-ROW   |13        |RSM DNS result       |
-ROW   |19        |RSM EPP availability |
-ROW   |14        |RSM Probe            |
-ROW   |18        |RSM RDDS availability|
-ROW   |15        |RSM RDDS result      |
-ROW   |2         |Host status              |
-ROW   |1         |Service state            |
-ROW   |10        |Zabbix agent ping status |
+FIELDS|valuemapid|name                    |
+ROW   |2         |Host status             |
+ROW   |16        |RSM DNS availability    |
+ROW   |13        |RSM DNS result          |
+ROW   |19        |RSM EPP availability    |
+ROW   |14        |RSM Probe               |
+ROW   |18        |RSM RDDS availability   |
+ROW   |15        |RSM RDDS result         |
+ROW   |1         |Service state           |
+ROW   |10        |Zabbix agent ping status|
 
 TABLE |items
 FIELDS|itemid|type|snmp_community|snmp_oid|hostid|name                                        |key_                                         |delay|history|trends|status|value_type|trapper_hosts|units   |multiplier|delta|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|formula|logtimefmt|templateid|valuemapid|delay_flex|params|ipmi_sensor|data_type|authtype|username|password|publickey|privatekey|flags|filter                                     |interfaceid|port|description                                                                                                                      |inventory_link|lifetime|
@@ -157,6 +174,73 @@ ROW   |23318 |0   |              |        |10050 |Host name of zabbix_agentd run
 ROW   |10020 |0   |              |        |10001 |Agent ping                                  |agent.ping                                   |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22232     |10        |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.                  |0             |0       |
 ROW   |10059 |0   |              |        |10001 |Version of zabbix_agent(d) running          |agent.version                                |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22231     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
 ROW   |23319 |0   |              |        |10001 |Host name of zabbix_agentd running          |agent.hostname                               |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23318     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |30      |
+ROW   |23320 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,alerter,avg,busy]             |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22424     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23321 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,configuration syncer,avg,busy]|60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22412     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23322 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,db watchdog,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22410     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23323 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,discoverer,avg,busy]          |60   |7      |365   |0     |0         |localhost    |%       |0         |0    |                   |0                   |                     |                     |0      |          |22430     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23324 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,escalator,avg,busy]           |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22422     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23325 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,history syncer,avg,busy]      |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22406     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23326 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,housekeeper,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22408     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23327 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,http poller,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22402     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23328 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,icmp pinger,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22418     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23329 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,ipmi poller,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22416     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23330 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,java poller,avg,busy]         |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22689     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23331 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,node watcher,avg,busy]        |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22428     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23332 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,poller,avg,busy]              |60   |7      |365   |0     |0         |localhost    |%       |0         |0    |                   |0                   |                     |                     |0      |          |22399     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23333 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,proxy poller,avg,busy]        |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22420     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23334 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,self-monitoring,avg,busy]     |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22414     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23335 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,snmp trapper,avg,busy]        |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |23171     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |30      |
+ROW   |23336 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,timer,avg,busy]               |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22426     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23337 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,trapper,avg,busy]             |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22404     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23338 |5   |              |        |10057 |Zabbix $4 $2 processes, in %                |zabbix[process,unreachable poller,avg,busy]  |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22400     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23339 |5   |              |        |10057 |Zabbix queue over $2                        |zabbix[queue,10m]                            |600  |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22219     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23340 |5   |              |        |10057 |Zabbix queue                                |zabbix[queue]                                |600  |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23251     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |30      |
+ROW   |23341 |5   |              |        |10057 |Zabbix configuration cache, % free          |zabbix[rcache,buffer,pfree]                  |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22189     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23342 |5   |              |        |10057 |Zabbix $2 write cache, % free               |zabbix[wcache,history,pfree]                 |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22183     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23343 |5   |              |        |10057 |Zabbix $2 write cache, % free               |zabbix[wcache,text,pfree]                    |60   |7      |365   |0     |0         |localhost    |        |0         |0    |                   |0                   |                     |                     |0      |          |22396     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23344 |5   |              |        |10057 |Zabbix $2 write cache, % free               |zabbix[wcache,trend,pfree]                   |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22185     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23345 |5   |              |        |10057 |Values processed by Zabbix server per second|zabbix[wcache,values]                        |60   |7      |365   |0     |0         |             |        |0         |1    |                   |0                   |                     |                     |1      |          |22187     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |NULL       |    |                                                                                                                                 |0             |0       |
+ROW   |23346 |0   |              |        |10057 |Network interface discovery                 |net.if.discovery                             |3600 |90     |365   |0     |4         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22444     |NULL      |          |      |           |0        |0       |        |        |         |          |1    |{#IFNAME}:@Network interfaces for discovery|1          |    |Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".                      |0             |30      |
+ROW   |23347 |0   |              |        |10057 |Mounted filesystem discovery                |vfs.fs.discovery                             |3600 |90     |365   |0     |4         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22450     |NULL      |          |      |           |0        |0       |        |        |         |          |1    |{#FSNAME}:@File systems for discovery      |1          |    |Discovery of file systems of different types as defined in global regular expression "File systems for discovery".               |0             |30      |
+ROW   |23348 |0   |              |        |10057 |Incoming network traffic on $1              |net.if.in[{#IFNAME}]                         |60   |7      |365   |0     |3         |             |bps     |1         |1    |                   |0                   |                     |                     |8      |          |22446     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23349 |0   |              |        |10057 |Outgoing network traffic on $1              |net.if.out[{#IFNAME}]                        |60   |7      |365   |0     |3         |             |bps     |1         |1    |                   |0                   |                     |                     |8      |          |22448     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23350 |0   |              |        |10057 |Free inodes on $1 (percentage)              |vfs.fs.inode[{#FSNAME},pfree]                |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22454     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23351 |0   |              |        |10057 |Free disk space on $1                       |vfs.fs.size[{#FSNAME},free]                  |60   |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |1      |          |22452     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23352 |0   |              |        |10057 |Free disk space on $1 (percentage)          |vfs.fs.size[{#FSNAME},pfree]                 |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22686     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23353 |0   |              |        |10057 |Total disk space on $1                      |vfs.fs.size[{#FSNAME},total]                 |3600 |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |1      |          |22456     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23354 |0   |              |        |10057 |Used disk space on $1                       |vfs.fs.size[{#FSNAME},used]                  |60   |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |1      |          |22458     |NULL      |          |      |           |0        |0       |        |        |         |          |2    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23355 |0   |              |        |10057 |Host name of zabbix_agentd running          |agent.hostname                               |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23319     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |30      |
+ROW   |23356 |0   |              |        |10057 |Agent ping                                  |agent.ping                                   |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10020     |10        |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.                  |0             |0       |
+ROW   |23357 |0   |              |        |10057 |Version of zabbix_agent(d) running          |agent.version                                |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10059     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23358 |0   |              |        |10057 |Maximum number of opened files              |kernel.maxfiles                              |3600 |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10056     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.                                               |0             |0       |
+ROW   |23359 |0   |              |        |10057 |Maximum number of processes                 |kernel.maxproc                               |3600 |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10055     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.                                               |0             |0       |
+ROW   |23360 |0   |              |        |10057 |Number of running processes                 |proc.num[,,run]                              |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10013     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |Number of processes in running state.                                                                                            |0             |0       |
+ROW   |23361 |0   |              |        |10057 |Number of processes                         |proc.num[]                                   |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10009     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |Total number of processes in any state.                                                                                          |0             |0       |
+ROW   |23362 |0   |              |        |10057 |Host boot time                              |system.boottime                              |600  |7      |365   |0     |3         |             |unixtime|0         |0    |                   |0                   |                     |                     |1      |          |17318     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23363 |0   |              |        |10057 |Interrupts per second                       |system.cpu.intr                              |60   |7      |365   |0     |3         |             |ips     |0         |1    |                   |0                   |                     |                     |1      |          |22683     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23364 |0   |              |        |10057 |Processor load (15 min average per core)    |system.cpu.load[percpu,avg15]                |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22677     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The processor load is calculated as system CPU load divided by number of CPU cores.                                              |0             |0       |
+ROW   |23365 |0   |              |        |10057 |Processor load (1 min average per core)     |system.cpu.load[percpu,avg1]                 |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10010     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The processor load is calculated as system CPU load divided by number of CPU cores.                                              |0             |0       |
+ROW   |23366 |0   |              |        |10057 |Processor load (5 min average per core)     |system.cpu.load[percpu,avg5]                 |60   |7      |365   |0     |0         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22674     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The processor load is calculated as system CPU load divided by number of CPU cores.                                              |0             |0       |
+ROW   |23367 |0   |              |        |10057 |Context switches per second                 |system.cpu.switches                          |60   |7      |365   |0     |3         |             |sps     |0         |1    |                   |0                   |                     |                     |1      |          |22680     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23368 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,idle]                       |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17354     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The time the CPU has spent doing nothing.                                                                                        |0             |0       |
+ROW   |23369 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,interrupt]                  |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22671     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The amount of time the CPU has been servicing hardware interrupts.                                                               |0             |0       |
+ROW   |23370 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,iowait]                     |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17362     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |Amount of time the CPU has been waiting for I/O to complete.                                                                     |0             |0       |
+ROW   |23371 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,nice]                       |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17358     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The time the CPU has spent running users' proccess that have been niced.                                                         |0             |0       |
+ROW   |23372 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,softirq]                    |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22668     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The amount of time the CPU has been servicing software interrupts.                                                               |0             |0       |
+ROW   |23373 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,steal]                      |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |22665     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).|0             |0       |
+ROW   |23374 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,system]                     |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17360     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The time the CPU has spent running the kernel and its processes.                                                                 |0             |0       |
+ROW   |23375 |0   |              |        |10057 |CPU $2 time                                 |system.cpu.util[,user]                       |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17356     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The time the CPU has spent running users' processes that are not niced.                                                          |0             |0       |
+ROW   |23376 |0   |              |        |10057 |Host name                                   |system.hostname                              |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10057     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |System host name.                                                                                                                |3             |0       |
+ROW   |23377 |0   |              |        |10057 |Host local time                             |system.localtime                             |60   |7      |365   |0     |3         |             |unixtime|0         |0    |                   |0                   |                     |                     |1      |          |17352     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23378 |0   |              |        |10057 |Free swap space                             |system.swap.size[,free]                      |60   |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |0      |          |10014     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23379 |0   |              |        |10057 |Free swap space in %                        |system.swap.size[,pfree]                     |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |17350     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23380 |0   |              |        |10057 |Total swap space                            |system.swap.size[,total]                     |3600 |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |1      |          |10030     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23381 |0   |              |        |10057 |System information                          |system.uname                                 |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10058     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |The information as normally returned by 'uname -a'.                                                                              |5             |0       |
+ROW   |23382 |0   |              |        |10057 |System uptime                               |system.uptime                                |600  |7      |365   |0     |3         |             |uptime  |0         |0    |                   |0                   |                     |                     |1      |          |10025     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23383 |0   |              |        |10057 |Number of logged in users                   |system.users.num                             |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10016     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |Number of users who are currently logged in.                                                                                     |0             |0       |
+ROW   |23384 |0   |              |        |10057 |Checksum of $1                              |vfs.file.cksum[/etc/passwd]                  |3600 |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |10019     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
+ROW   |23385 |0   |              |        |10057 |Available memory                            |vm.memory.size[available]                    |60   |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |1      |          |22181     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |Available memory is defined as free+cached+buffers memory.                                                                       |0             |0       |
+ROW   |23386 |0   |              |        |10057 |Total memory                                |vm.memory.size[total]                        |3600 |7      |365   |0     |3         |             |B       |0         |0    |                   |0                   |                     |                     |0      |          |10026     |NULL      |          |      |           |0        |0       |        |        |         |          |0    |                                           |1          |    |                                                                                                                                 |0             |0       |
 
 TABLE |media_type
 FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|
@@ -241,68 +325,154 @@ ROW   |13283    |{12667}=0   |SMTP service is down on {HOST.NAME}               
 ROW   |13285    |{12669}=0   |Telnet service is down on {HOST.NAME}                           |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13441    |{12829}>75  |Zabbix snmp trapper processes more than 75% busy                |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13507    |{12936}>0   |Host name of zabbix_agentd was changed on {HOST.NAME}           |   |0     |1       |                                                                                                                                      |NULL      |0   |0    |
+ROW   |13509    |{12938}=0   |Time on {HOST.HOST} is differ > 2 min                           |   |0     |4       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |10045    |{12927}>0   |Version of zabbix_agent(d) was changed on {HOST.NAME}           |   |0     |1       |                                                                                                                                      |13026     |0   |0    |
 ROW   |10047    |{12550}=1   |Zabbix agent on {HOST.NAME} is unreachable for 5 minutes        |   |0     |3       |                                                                                                                                      |13025     |0   |0    |
 ROW   |13508    |{12937}>0   |Host name of zabbix_agentd was changed on {HOST.NAME}           |   |0     |1       |                                                                                                                                      |13507     |0   |0    |
+ROW   |13510    |{12939}>75  |Zabbix alerter processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13080     |0   |0    |
+ROW   |13511    |{12940}>75  |Zabbix configuration syncer processes more than 75% busy        |   |0     |3       |                                                                                                                                      |13081     |0   |0    |
+ROW   |13512    |{12941}>75  |Zabbix db watchdog processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13082     |0   |0    |
+ROW   |13513    |{12942}>75  |Zabbix discoverer processes more than 75% busy                  |   |0     |3       |                                                                                                                                      |13083     |0   |0    |
+ROW   |13514    |{12943}>75  |Zabbix escalator processes more than 75% busy                   |   |0     |3       |                                                                                                                                      |13084     |0   |0    |
+ROW   |13515    |{12944}>75  |Zabbix history syncer processes more than 75% busy              |   |0     |3       |                                                                                                                                      |13085     |0   |0    |
+ROW   |13516    |{12945}>75  |Zabbix housekeeper processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13086     |0   |0    |
+ROW   |13517    |{12946}>75  |Zabbix http poller processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13087     |0   |0    |
+ROW   |13518    |{12947}>75  |Zabbix icmp pinger processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13088     |0   |0    |
+ROW   |13519    |{12948}>75  |Zabbix ipmi poller processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13089     |0   |0    |
+ROW   |13520    |{12949}>75  |Zabbix java poller processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |13275     |0   |0    |
+ROW   |13521    |{12950}>75  |Zabbix node watcher processes more than 75% busy                |   |0     |3       |                                                                                                                                      |13090     |0   |0    |
+ROW   |13522    |{12951}>75  |Zabbix poller processes more than 75% busy                      |   |0     |3       |                                                                                                                                      |13091     |0   |0    |
+ROW   |13523    |{12952}>75  |Zabbix proxy poller processes more than 75% busy                |   |0     |3       |                                                                                                                                      |13092     |0   |0    |
+ROW   |13524    |{12953}>75  |Zabbix self-monitoring processes more than 75% busy             |   |0     |3       |                                                                                                                                      |13093     |0   |0    |
+ROW   |13525    |{12954}>75  |Zabbix snmp trapper processes more than 75% busy                |   |0     |3       |                                                                                                                                      |13441     |0   |0    |
+ROW   |13526    |{12955}>75  |Zabbix timer processes more than 75% busy                       |   |0     |3       |Timer processes usually are busy because they have to process time based trigger functions                                            |13094     |0   |0    |
+ROW   |13527    |{12956}>75  |Zabbix trapper processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13095     |0   |0    |
+ROW   |13528    |{12957}>75  |Zabbix unreachable poller processes more than 75% busy          |   |0     |3       |                                                                                                                                      |13096     |0   |0    |
+ROW   |13529    |{12958}>100 |More than 100 items having missing data for more than 10 minutes|   |0     |2       |zabbix[queue,10m] item is collecting data about how many items are missing data for more than 10 minutes (next parameter)             |13023     |0   |0    |
+ROW   |13530    |{12959}<25  |Less than 25% free in the configuration cache                   |   |0     |3       |Consider increasing CacheSize in the zabbix_server.conf configuration file                                                            |13015     |0   |0    |
+ROW   |13531    |{12960}<25  |Less than 25% free in the history cache                         |   |0     |3       |                                                                                                                                      |13073     |0   |0    |
+ROW   |13532    |{12961}<25  |Less than 25% free in the text history cache                    |   |0     |3       |                                                                                                                                      |13017     |0   |0    |
+ROW   |13533    |{12962}<25  |Less than 25% free in the trends cache                          |   |0     |3       |                                                                                                                                      |13019     |0   |0    |
+ROW   |13534    |{12963}>0   |Host name of zabbix_agentd was changed on {HOST.NAME}           |   |0     |1       |                                                                                                                                      |13508     |0   |0    |
+ROW   |13535    |{12964}=1   |Zabbix agent on {HOST.NAME} is unreachable for 5 minutes        |   |0     |3       |                                                                                                                                      |10047     |0   |0    |
+ROW   |13536    |{12965}>0   |Version of zabbix_agent(d) was changed on {HOST.NAME}           |   |0     |1       |                                                                                                                                      |10045     |0   |0    |
+ROW   |13537    |{12966}<1024|Configured max number of opened files is too low on {HOST.NAME} |   |0     |1       |                                                                                                                                      |10042     |0   |0    |
+ROW   |13538    |{12967}<256 |Configured max number of processes is too low on {HOST.NAME}    |   |0     |1       |                                                                                                                                      |10041     |0   |0    |
+ROW   |13539    |{12968}>30  |Too many processes running on {HOST.NAME}                       |   |0     |2       |                                                                                                                                      |10011     |0   |0    |
+ROW   |13540    |{12969}>300 |Too many processes on {HOST.NAME}                               |   |0     |2       |                                                                                                                                      |10190     |0   |0    |
+ROW   |13541    |{12970}>5   |Processor load is too high on {HOST.NAME}                       |   |0     |2       |                                                                                                                                      |10010     |0   |0    |
+ROW   |13542    |{12971}>20  |Disk I/O is overloaded on {HOST.NAME}                           |   |0     |2       |OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.|13243     |0   |0    |
+ROW   |13543    |{12972}>0   |Hostname was changed on {HOST.NAME}                             |   |0     |1       |                                                                                                                                      |10043     |0   |0    |
+ROW   |13544    |{12973}=0   |Time on {HOST.HOST} is differ > 2 min                           |   |0     |4       |                                                                                                                                      |13509     |0   |0    |
+ROW   |13545    |{12974}<50  |Lack of free swap space on {HOST.NAME}                          |   |0     |2       |It probably means that the systems requires more physical memory.                                                                     |10012     |0   |0    |
+ROW   |13546    |{12975}>0   |Host information was changed on {HOST.NAME}                     |   |0     |1       |                                                                                                                                      |10044     |0   |0    |
+ROW   |13547    |{12976}<0   |{HOST.NAME} has just been restarted                             |   |0     |1       |                                                                                                                                      |10021     |0   |0    |
+ROW   |13548    |{12977}>0   |/etc/passwd has been changed on {HOST.NAME}                     |   |0     |2       |                                                                                                                                      |10016     |0   |0    |
+ROW   |13549    |{12978}<20M |Lack of available memory on server {HOST.NAME}                  |   |0     |3       |                                                                                                                                      |13000     |0   |0    |
+ROW   |13550    |{12979}<20  |Free inodes is less than 20% on volume {#FSNAME}                |   |0     |2       |                                                                                                                                      |13272     |0   |2    |
+ROW   |13551    |{12980}<20  |Free disk space is less than 20% on volume {#FSNAME}            |   |0     |2       |                                                                                                                                      |13266     |0   |2    |
 
 TABLE |functions
-FIELDS|functionid|itemid|triggerid|function|parameter|
-ROW   |10199     |10019 |10016    |diff    |0        |
-ROW   |10204     |10055 |10041    |last    |0        |
-ROW   |10207     |10058 |10044    |diff    |0        |
-ROW   |10208     |10057 |10043    |diff    |0        |
-ROW   |10233     |10009 |10190    |last    |0        |
-ROW   |12144     |22181 |13000    |last    |0        |
-ROW   |12333     |22550 |13134    |last    |0        |
-ROW   |12334     |22549 |13135    |last    |0        |
-ROW   |12335     |22551 |13136    |last    |0        |
-ROW   |12336     |22552 |13137    |last    |0        |
-ROW   |12345     |22553 |13138    |last    |0        |
-ROW   |12549     |22232 |13025    |nodata  |5m       |
-ROW   |12550     |10020 |10047    |nodata  |5m       |
-ROW   |12553     |10056 |10042    |last    |0        |
-ROW   |12555     |10013 |10011    |last    |0        |
-ROW   |12580     |17350 |10012    |last    |0        |
-ROW   |12583     |10025 |10021    |change  |0        |
-ROW   |12586     |10010 |10010    |last    |0        |
-ROW   |12589     |17362 |13243    |last    |0        |
-ROW   |12592     |22686 |13266    |last    |0        |
-ROW   |12598     |22454 |13272    |last    |0        |
-ROW   |12605     |22399 |13091    |min     |600      |
-ROW   |12607     |22426 |13094    |min     |600      |
-ROW   |12609     |22420 |13092    |min     |600      |
-ROW   |12611     |22404 |13095    |min     |600      |
-ROW   |12613     |22400 |13096    |min     |600      |
-ROW   |12615     |22414 |13093    |min     |600      |
-ROW   |12617     |22428 |13090    |min     |600      |
-ROW   |12619     |22416 |13089    |min     |600      |
-ROW   |12621     |22418 |13088    |min     |600      |
-ROW   |12623     |22402 |13087    |min     |600      |
-ROW   |12627     |22406 |13085    |min     |600      |
-ROW   |12629     |22422 |13084    |min     |600      |
-ROW   |12631     |22430 |13083    |min     |600      |
-ROW   |12635     |22410 |13082    |min     |600      |
-ROW   |12637     |22412 |13081    |min     |600      |
-ROW   |12639     |22424 |13080    |min     |600      |
-ROW   |12641     |22189 |13015    |min     |600      |
-ROW   |12645     |22183 |13073    |min     |600      |
-ROW   |12647     |22689 |13275    |min     |600      |
-ROW   |12649     |22185 |13019    |min     |600      |
-ROW   |12651     |22396 |13017    |min     |600      |
-ROW   |12653     |22219 |13023    |min     |600      |
-ROW   |12655     |22408 |13086    |min     |1800     |
-ROW   |12657     |22554 |13139    |last    |0        |
-ROW   |12659     |22696 |13277    |last    |0        |
-ROW   |12661     |22691 |13133    |last    |0        |
-ROW   |12663     |22694 |13279    |last    |0        |
-ROW   |12665     |22692 |13281    |last    |0        |
-ROW   |12667     |22548 |13283    |last    |0        |
-ROW   |12669     |22698 |13285    |last    |0        |
-ROW   |12829     |23171 |13441    |min     |600      |
-ROW   |12926     |22231 |13026    |diff    |0        |
-ROW   |12927     |10059 |10045    |diff    |0        |
-ROW   |12936     |23318 |13507    |diff    |0        |
-ROW   |12937     |23319 |13508    |diff    |0        |
+FIELDS|functionid|itemid|triggerid|function |parameter|
+ROW   |10199     |10019 |10016    |diff     |0        |
+ROW   |10204     |10055 |10041    |last     |0        |
+ROW   |10207     |10058 |10044    |diff     |0        |
+ROW   |10208     |10057 |10043    |diff     |0        |
+ROW   |10233     |10009 |10190    |last     |0        |
+ROW   |12144     |22181 |13000    |last     |0        |
+ROW   |12333     |22550 |13134    |last     |0        |
+ROW   |12334     |22549 |13135    |last     |0        |
+ROW   |12335     |22551 |13136    |last     |0        |
+ROW   |12336     |22552 |13137    |last     |0        |
+ROW   |12345     |22553 |13138    |last     |0        |
+ROW   |12549     |22232 |13025    |nodata   |5m       |
+ROW   |12550     |10020 |10047    |nodata   |5m       |
+ROW   |12553     |10056 |10042    |last     |0        |
+ROW   |12555     |10013 |10011    |last     |0        |
+ROW   |12580     |17350 |10012    |last     |0        |
+ROW   |12583     |10025 |10021    |change   |0        |
+ROW   |12586     |10010 |10010    |last     |0        |
+ROW   |12589     |17362 |13243    |last     |0        |
+ROW   |12592     |22686 |13266    |last     |0        |
+ROW   |12598     |22454 |13272    |last     |0        |
+ROW   |12605     |22399 |13091    |min      |600      |
+ROW   |12607     |22426 |13094    |min      |600      |
+ROW   |12609     |22420 |13092    |min      |600      |
+ROW   |12611     |22404 |13095    |min      |600      |
+ROW   |12613     |22400 |13096    |min      |600      |
+ROW   |12615     |22414 |13093    |min      |600      |
+ROW   |12617     |22428 |13090    |min      |600      |
+ROW   |12619     |22416 |13089    |min      |600      |
+ROW   |12621     |22418 |13088    |min      |600      |
+ROW   |12623     |22402 |13087    |min      |600      |
+ROW   |12627     |22406 |13085    |min      |600      |
+ROW   |12629     |22422 |13084    |min      |600      |
+ROW   |12631     |22430 |13083    |min      |600      |
+ROW   |12635     |22410 |13082    |min      |600      |
+ROW   |12637     |22412 |13081    |min      |600      |
+ROW   |12639     |22424 |13080    |min      |600      |
+ROW   |12641     |22189 |13015    |min      |600      |
+ROW   |12645     |22183 |13073    |min      |600      |
+ROW   |12647     |22689 |13275    |min      |600      |
+ROW   |12649     |22185 |13019    |min      |600      |
+ROW   |12651     |22396 |13017    |min      |600      |
+ROW   |12653     |22219 |13023    |min      |600      |
+ROW   |12655     |22408 |13086    |min      |1800     |
+ROW   |12657     |22554 |13139    |last     |0        |
+ROW   |12659     |22696 |13277    |last     |0        |
+ROW   |12661     |22691 |13133    |last     |0        |
+ROW   |12663     |22694 |13279    |last     |0        |
+ROW   |12665     |22692 |13281    |last     |0        |
+ROW   |12667     |22548 |13283    |last     |0        |
+ROW   |12669     |22698 |13285    |last     |0        |
+ROW   |12829     |23171 |13441    |min      |600      |
+ROW   |12926     |22231 |13026    |diff     |0        |
+ROW   |12927     |10059 |10045    |diff     |0        |
+ROW   |12936     |23318 |13507    |diff     |0        |
+ROW   |12937     |23319 |13508    |diff     |0        |
+ROW   |12938     |17352 |13509    |fuzzytime|2m       |
+ROW   |12939     |23320 |13510    |min      |600      |
+ROW   |12940     |23321 |13511    |min      |600      |
+ROW   |12941     |23322 |13512    |min      |600      |
+ROW   |12942     |23323 |13513    |min      |600      |
+ROW   |12943     |23324 |13514    |min      |600      |
+ROW   |12944     |23325 |13515    |min      |600      |
+ROW   |12945     |23326 |13516    |min      |1800     |
+ROW   |12946     |23327 |13517    |min      |600      |
+ROW   |12947     |23328 |13518    |min      |600      |
+ROW   |12948     |23329 |13519    |min      |600      |
+ROW   |12949     |23330 |13520    |min      |600      |
+ROW   |12950     |23331 |13521    |min      |600      |
+ROW   |12951     |23332 |13522    |min      |600      |
+ROW   |12952     |23333 |13523    |min      |600      |
+ROW   |12953     |23334 |13524    |min      |600      |
+ROW   |12954     |23335 |13525    |min      |600      |
+ROW   |12955     |23336 |13526    |min      |600      |
+ROW   |12956     |23337 |13527    |min      |600      |
+ROW   |12957     |23338 |13528    |min      |600      |
+ROW   |12958     |23339 |13529    |min      |600      |
+ROW   |12959     |23341 |13530    |min      |600      |
+ROW   |12960     |23342 |13531    |min      |600      |
+ROW   |12961     |23343 |13532    |min      |600      |
+ROW   |12962     |23344 |13533    |min      |600      |
+ROW   |12963     |23355 |13534    |diff     |0        |
+ROW   |12964     |23356 |13535    |nodata   |5m       |
+ROW   |12965     |23357 |13536    |diff     |0        |
+ROW   |12966     |23358 |13537    |last     |0        |
+ROW   |12967     |23359 |13538    |last     |0        |
+ROW   |12968     |23360 |13539    |last     |0        |
+ROW   |12969     |23361 |13540    |last     |0        |
+ROW   |12970     |23365 |13541    |last     |0        |
+ROW   |12971     |23370 |13542    |last     |0        |
+ROW   |12972     |23376 |13543    |diff     |0        |
+ROW   |12973     |23377 |13544    |fuzzytime|2m       |
+ROW   |12974     |23379 |13545    |last     |0        |
+ROW   |12975     |23381 |13546    |diff     |0        |
+ROW   |12976     |23382 |13547    |change   |0        |
+ROW   |12977     |23384 |13548    |diff     |0        |
+ROW   |12978     |23385 |13549    |last     |0        |
+ROW   |12979     |23350 |13550    |last     |0        |
+ROW   |12980     |23352 |13551    |last     |0        |
 
 TABLE |graphs
 FIELDS|graphid|name                                |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
@@ -316,6 +486,16 @@ ROW   |433    |CPU load                            |900  |200   |0.0000  |100.00
 ROW   |436    |Swap usage                          |600  |340   |0.0000  |0.0000  |NULL      |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
 ROW   |439    |CPU jumps                           |900  |200   |0.0000  |100.0000|NULL      |1               |1            |0        |1          |0      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
 ROW   |442    |Disk space usage {#FSNAME}          |600  |340   |0.0000  |0.0000  |NULL      |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |2    |
+ROW   |443    |Zabbix server performance           |900  |200   |0.0000  |100.0000|392       |1               |1            |0        |1          |0      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
+ROW   |444    |Zabbix data gathering process busy %|900  |200   |0.0000  |100.0000|404       |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |1        |NULL       |NULL       |0    |
+ROW   |445    |Zabbix internal process busy %      |900  |200   |0.0000  |100.0000|406       |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |1        |NULL       |NULL       |0    |
+ROW   |446    |Zabbix cache usage, % free          |900  |200   |0.0000  |100.0000|410       |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |1        |NULL       |NULL       |0    |
+ROW   |447    |Network traffic on {#IFNAME}        |900  |200   |0.0000  |100.0000|420       |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |0        |NULL       |NULL       |2    |
+ROW   |448    |Disk space usage {#FSNAME}          |600  |340   |0.0000  |0.0000  |442       |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |2    |
+ROW   |449    |CPU utilization                     |900  |200   |0.0000  |100.0000|387       |1               |0            |1        |1          |0      |0.0000      |0.0000       |1        |1        |NULL       |NULL       |0    |
+ROW   |450    |CPU load                            |900  |200   |0.0000  |100.0000|433       |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |0        |NULL       |NULL       |0    |
+ROW   |451    |Swap usage                          |600  |340   |0.0000  |0.0000  |436       |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
+ROW   |452    |CPU jumps                           |900  |200   |0.0000  |100.0000|439       |1               |1            |0        |1          |0      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
 
 TABLE |graphs_items
 FIELDS|gitemid|graphid|itemid|drawtype|sortorder|color |yaxisside|calc_fnc|type|
@@ -363,6 +543,50 @@ ROW   |1632   |404    |22420 |0       |6        |CCCC00|0        |2       |0   |
 ROW   |1633   |404    |22400 |0       |7        |33FFFF|0        |2       |0   |
 ROW   |1634   |404    |22689 |0       |8        |DD0000|0        |2       |0   |
 ROW   |1635   |404    |23171 |0       |9        |000099|0        |7       |0   |
+ROW   |1636   |443    |23345 |5       |0        |00C800|0        |2       |0   |
+ROW   |1637   |443    |23340 |5       |1        |C80000|1        |2       |0   |
+ROW   |1638   |444    |23337 |0       |0        |990099|0        |2       |0   |
+ROW   |1639   |444    |23332 |0       |1        |990000|0        |2       |0   |
+ROW   |1640   |444    |23329 |0       |2        |0000EE|0        |2       |0   |
+ROW   |1641   |444    |23323 |0       |3        |FF33FF|0        |2       |0   |
+ROW   |1642   |444    |23328 |0       |4        |00EE00|0        |2       |0   |
+ROW   |1643   |444    |23327 |0       |5        |003300|0        |2       |0   |
+ROW   |1644   |444    |23333 |0       |6        |CCCC00|0        |2       |0   |
+ROW   |1645   |444    |23338 |0       |7        |33FFFF|0        |2       |0   |
+ROW   |1646   |444    |23330 |0       |8        |DD0000|0        |2       |0   |
+ROW   |1647   |444    |23335 |0       |9        |000099|0        |7       |0   |
+ROW   |1648   |445    |23336 |0       |0        |00EE00|0        |2       |0   |
+ROW   |1649   |445    |23331 |0       |1        |007777|0        |2       |0   |
+ROW   |1650   |445    |23324 |0       |2        |0000EE|0        |2       |0   |
+ROW   |1651   |445    |23326 |0       |3        |FFAA00|0        |2       |0   |
+ROW   |1652   |445    |23320 |0       |4        |00EEEE|0        |2       |0   |
+ROW   |1653   |445    |23321 |0       |5        |990099|0        |2       |0   |
+ROW   |1654   |445    |23322 |0       |6        |666600|0        |2       |0   |
+ROW   |1655   |445    |23325 |0       |7        |EE0000|0        |2       |0   |
+ROW   |1656   |445    |23334 |0       |8        |FF66FF|0        |2       |0   |
+ROW   |1657   |446    |23344 |0       |0        |009900|0        |2       |0   |
+ROW   |1658   |446    |23341 |0       |1        |DD0000|0        |2       |0   |
+ROW   |1659   |446    |23343 |0       |2        |00DDDD|0        |2       |0   |
+ROW   |1660   |446    |23342 |0       |3        |3333FF|0        |2       |0   |
+ROW   |1661   |447    |23348 |5       |0        |00AA00|0        |2       |0   |
+ROW   |1662   |447    |23349 |5       |1        |3333FF|0        |2       |0   |
+ROW   |1663   |448    |23353 |0       |0        |C80000|0        |2       |2   |
+ROW   |1664   |448    |23351 |0       |1        |00C800|0        |2       |0   |
+ROW   |1665   |449    |23373 |1       |1        |FF5555|0        |2       |0   |
+ROW   |1666   |449    |23372 |1       |2        |55FF55|0        |2       |0   |
+ROW   |1667   |449    |23369 |1       |3        |009999|0        |2       |0   |
+ROW   |1668   |449    |23371 |1       |4        |990099|0        |2       |0   |
+ROW   |1669   |449    |23370 |1       |5        |999900|0        |2       |0   |
+ROW   |1670   |449    |23374 |1       |6        |990000|0        |2       |0   |
+ROW   |1671   |449    |23375 |1       |7        |000099|0        |2       |0   |
+ROW   |1672   |449    |23368 |1       |8        |009900|0        |2       |0   |
+ROW   |1673   |450    |23365 |0       |0        |009900|0        |2       |0   |
+ROW   |1674   |450    |23366 |0       |1        |000099|0        |2       |0   |
+ROW   |1675   |450    |23364 |0       |2        |990000|0        |2       |0   |
+ROW   |1676   |451    |23380 |0       |0        |AA0000|0        |2       |2   |
+ROW   |1677   |451    |23378 |0       |1        |00AA00|0        |2       |0   |
+ROW   |1678   |452    |23367 |0       |1        |009900|0        |2       |0   |
+ROW   |1679   |452    |23363 |0       |2        |000099|0        |2       |0   |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|description  |theme       |backgroundcolor|graphcolor|graphbordercolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
@@ -529,10 +753,13 @@ ROW   |1          |10001 |1      |
 ROW   |47         |10047 |1      |
 ROW   |50         |10050 |1      |
 ROW   |56         |10056 |1      |
+ROW   |57         |10057 |6      |
 
 TABLE |hosts_templates
 FIELDS|hosttemplateid|hostid|templateid|
 ROW   |4             |10001 |10050     |
+ROW   |6             |10057 |10001     |
+ROW   |5             |10057 |10047     |
 
 TABLE |items_applications
 FIELDS|itemappid|applicationid|itemid|
@@ -635,6 +862,90 @@ ROW   |4711     |214          |22692 |
 ROW   |4713     |214          |22694 |
 ROW   |4715     |214          |22696 |
 ROW   |4717     |214          |22698 |
+ROW   |5516     |215          |23320 |
+ROW   |5517     |215          |23321 |
+ROW   |5518     |215          |23322 |
+ROW   |5519     |215          |23323 |
+ROW   |5520     |215          |23324 |
+ROW   |5521     |215          |23325 |
+ROW   |5522     |215          |23326 |
+ROW   |5523     |215          |23327 |
+ROW   |5524     |215          |23328 |
+ROW   |5525     |215          |23329 |
+ROW   |5526     |215          |23330 |
+ROW   |5527     |215          |23331 |
+ROW   |5528     |215          |23332 |
+ROW   |5529     |215          |23333 |
+ROW   |5530     |215          |23334 |
+ROW   |5531     |215          |23335 |
+ROW   |5532     |215          |23336 |
+ROW   |5533     |215          |23337 |
+ROW   |5534     |215          |23338 |
+ROW   |5535     |215          |23339 |
+ROW   |5536     |215          |23340 |
+ROW   |5537     |215          |23341 |
+ROW   |5538     |215          |23342 |
+ROW   |5539     |215          |23343 |
+ROW   |5540     |215          |23344 |
+ROW   |5541     |215          |23345 |
+ROW   |5558     |216          |23363 |
+ROW   |5560     |216          |23364 |
+ROW   |5562     |216          |23365 |
+ROW   |5564     |216          |23366 |
+ROW   |5566     |216          |23367 |
+ROW   |5568     |216          |23368 |
+ROW   |5570     |216          |23369 |
+ROW   |5572     |216          |23370 |
+ROW   |5574     |216          |23371 |
+ROW   |5576     |216          |23372 |
+ROW   |5578     |216          |23373 |
+ROW   |5580     |216          |23374 |
+ROW   |5582     |216          |23375 |
+ROW   |5544     |217          |23350 |
+ROW   |5545     |217          |23351 |
+ROW   |5546     |217          |23352 |
+ROW   |5547     |217          |23353 |
+ROW   |5548     |217          |23354 |
+ROW   |5557     |218          |23362 |
+ROW   |5585     |218          |23376 |
+ROW   |5587     |218          |23377 |
+ROW   |5592     |218          |23381 |
+ROW   |5594     |218          |23382 |
+ROW   |5588     |219          |23378 |
+ROW   |5589     |219          |23379 |
+ROW   |5590     |219          |23380 |
+ROW   |5598     |219          |23385 |
+ROW   |5599     |219          |23386 |
+ROW   |5542     |220          |23348 |
+ROW   |5543     |220          |23349 |
+ROW   |5552     |221          |23358 |
+ROW   |5553     |221          |23359 |
+ROW   |5556     |221          |23362 |
+ROW   |5584     |221          |23376 |
+ROW   |5586     |221          |23377 |
+ROW   |5591     |221          |23381 |
+ROW   |5593     |221          |23382 |
+ROW   |5595     |221          |23383 |
+ROW   |5559     |222          |23363 |
+ROW   |5561     |222          |23364 |
+ROW   |5563     |222          |23365 |
+ROW   |5565     |222          |23366 |
+ROW   |5567     |222          |23367 |
+ROW   |5569     |222          |23368 |
+ROW   |5571     |222          |23369 |
+ROW   |5573     |222          |23370 |
+ROW   |5575     |222          |23371 |
+ROW   |5577     |222          |23372 |
+ROW   |5579     |222          |23373 |
+ROW   |5581     |222          |23374 |
+ROW   |5583     |222          |23375 |
+ROW   |5554     |223          |23360 |
+ROW   |5555     |223          |23361 |
+ROW   |5596     |224          |23383 |
+ROW   |5597     |224          |23384 |
+ROW   |5549     |225          |23355 |
+ROW   |5550     |225          |23356 |
+ROW   |5551     |225          |23357 |
 
 TABLE |mappings
 FIELDS|mappingid|valuemapid|value|newvalue                             |
@@ -662,8 +973,8 @@ ROW   |90       |15        |-204 |No reply from RDDS80 server          |
 ROW   |91       |15        |-205 |Cannot resolve a Whois host name     |
 ROW   |92       |15        |-206 |no HTTP status code                  |
 ROW   |93       |15        |-207 |invalid HTTP status code             |
-ROW   |94       |16        |0    |Down 	                               |
-ROW   |95       |16        |1    |Up   	                               |
+ROW   |94       |16        |0    |Down                                 |
+ROW   |95       |16        |1    |Up                                   |
 ROW   |96       |18        |0    |Down                                 |
 ROW   |97       |18        |1    |Up                                   |
 ROW   |98       |18        |2    |RDDS43 only                          |
@@ -689,12 +1000,12 @@ ROW   |2       |Network interfaces for discovery  |eth0       |
 ROW   |3       |Storage devices for SNMP discovery|/boot      |
 
 TABLE |expressions
-FIELDS|expressionid|regexpid|expression                                                                                                                                        |expression_type|exp_delimiter|case_sensitive|
-ROW   |1           |2       |^lo$                                                                                                                                              |4              |,            |1             |
-ROW   |2           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                    |4              |,            |1             |
-ROW   |3           |2       |^Software Loopback Interface                                                                                                                      |4              |,            |1             |
-ROW   |4           |2       |^Software Loopback Interface                                                                                                                      |4              |,            |1             |
-ROW   |5           |1       |^(\/&pipe;\/boot&pipe;\/usr&pipe;\/var&pipe;\/tmp&pipe;\/home&pipe;\/root)$                                                                       |3              |,            |0             |
+FIELDS|expressionid|regexpid|expression                                                                                    |expression_type|exp_delimiter|case_sensitive|
+ROW   |1           |2       |^lo$                                                                                          |4              |,            |1             |
+ROW   |2           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$|4              |,            |1             |
+ROW   |3           |2       |^Software Loopback Interface                                                                  |4              |,            |1             |
+ROW   |4           |2       |^Software Loopback Interface                                                                  |4              |,            |1             |
+ROW   |5           |1       |^(\/&pipe;\/boot&pipe;\/usr&pipe;\/var&pipe;\/tmp&pipe;\/home&pipe;\/root)$                   |3              |,            |0             |
 
 TABLE |item_discovery
 FIELDS|itemdiscoveryid|itemid|parent_itemid|
@@ -705,4 +1016,11 @@ ROW   |7              |22454 |22450        |
 ROW   |9              |22456 |22450        |
 ROW   |11             |22458 |22450        |
 ROW   |65             |22686 |22450        |
+ROW   |66             |23348 |23346        |
+ROW   |67             |23349 |23346        |
+ROW   |68             |23350 |23347        |
+ROW   |69             |23351 |23347        |
+ROW   |70             |23352 |23347        |
+ROW   |71             |23353 |23347        |
+ROW   |72             |23354 |23347        |
 
