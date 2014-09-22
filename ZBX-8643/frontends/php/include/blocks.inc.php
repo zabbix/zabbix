@@ -432,11 +432,11 @@ function make_system_status($filter) {
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$groupRow->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum, $config));
+					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, !$allTriggersNum));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$groupRow->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum, $config));
+					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum, !$unackTriggersNum));
 					break;
 
 				case EXTACK_OPTION_BOTH:
@@ -449,9 +449,10 @@ function make_system_status($filter) {
 						$unackTriggersNum = null;
 					}
 
-					$groupRow->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum),
-						!$allTriggersNum,
-						$config
+					$groupRow->addItem(getSeverityCell($severity,
+						$config,
+						array($unackTriggersNum, $span, $allTriggersNum),
+						!$allTriggersNum
 					));
 			}
 		}
@@ -1348,7 +1349,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $trigger['description'], false, $config),
+			getSeverityCell($trigger['priority'], $config, $trigger['description']),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,

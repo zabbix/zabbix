@@ -176,7 +176,7 @@ foreach ($triggers as $trigger) {
 	$table->addRow(array(
 		$hostName,
 		$triggerDescription,
-		getSeverityCell($trigger['priority'], null, false, $config),
+		getSeverityCell($trigger['priority'], $config),
 		$trigger['cnt_event']
 	));
 }

@@ -37,7 +37,7 @@ $overviewWidget->addHeader(_('Overview'), $headerForm);
 $hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
 $hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow(array(getSeverityCell($severity, null, false, $this->data['config']), _('PROBLEM')));
+	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
 }
 
 // blinking preview in help popup (only if blinking is enabled)
