@@ -103,13 +103,13 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
  * @param int	 $severity			trigger severity
+ * @param array  $config			array of configuration parameters to get trigger severity name
  * @param string $text				trigger severity name
  * @param bool	 $forceNormal		true to return 'normal' class, false to return corresponding severity class
- * @param array  $config			array of configuration parameters to get trigger severity name
  *
  * @return CCol
  */
-function getSeverityCell($severity, $text = null, $forceNormal = false, array $config) {
+function getSeverityCell($severity, $config, $text = null, $forceNormal = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -1492,7 +1492,7 @@ function make_trigger_details($trigger) {
 		new CCol(_('Trigger')),
 		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
 	));
-	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], null, false, $config)));
+	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], $config)));
 	$table->addRow(array(
 		new CCol(_('Expression')),
 		new CCol(explode_exp($trigger['expression'], true, true), 'trigger-expression')

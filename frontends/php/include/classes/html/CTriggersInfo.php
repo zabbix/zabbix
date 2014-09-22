@@ -112,15 +112,15 @@ class CTriggersInfo extends CTable {
 			$this->addRow($header);
 		}
 
-		$severityCells = array(getSeverityCell(null, $triggersOkState.SPACE._('Ok'), true, $config));
+		$severityCells = array(getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true));
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityCount = isset($triggersProblemState[$severity]) ? $triggersProblemState[$severity] : 0;
 
 			$severityCells[] = getSeverityCell($severity,
+				$config,
 				$severityCount.SPACE.getSeverityName($severity, $config),
-				!$severityCount,
-				$config
+				!$severityCount
 			);
 		}
 

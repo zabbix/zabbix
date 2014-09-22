@@ -64,7 +64,7 @@ class CScreenEvents extends CScreenBase {
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,
-				getSeverityCell($trigger['priority'], null, false, $config)
+				getSeverityCell($trigger['priority'], $config)
 			));
 		}
 

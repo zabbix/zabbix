@@ -847,7 +847,7 @@ else {
 						$hostName,
 						$triggerDescription,
 						$statusSpan,
-						getSeverityCell($trigger['priority'], null, !$event['value'], $config),
+						getSeverityCell($trigger['priority'], $config, null, !$event['value']),
 						$event['duration'],
 						$config['event_ack_enable'] ? $ack : null,
 						$action
