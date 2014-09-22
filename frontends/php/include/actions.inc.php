@@ -695,17 +695,21 @@ function getActionOperationDescriptions(array $actions) {
 /**
  * Gathers action operation script details and returns the HTML items representing action operation with hint.
  *
- * @param array  $operations						array of action operations
- * @param string $operation['operationtype']		action operation type.
- *													Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
- * @param string $operation['opcommand']['type']	action operation command type.
- *													Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
- *													ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
- *													and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ * @param array  $operations								array of action operations
+ * @param string $operation['operationtype']				action operation type.
+ *															Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
+ * @param string $operation['opcommand']['type']			action operation command type.
+ *															Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+ *															ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+ *															and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+ * @param string $operation['opmessage']['default_msg']		'1' to show default message (optional)
+ * @param array  $defaultMessage							array containing default subject and message set via action
+ * @param string $defaultMessage['subject']					default subject
+ * @param string $defaultMessage['message']					default message text
  *
- * @return array									returns an array of action operation hints
+ * @return array											returns an array of action operation hints
  */
-function getActionOperationHints(array $operations) {
+function getActionOperationHints(array $operations, array $defaultMessage) {
 	$result = array();
 
 	$scriptIds = array();
@@ -733,8 +737,18 @@ function getActionOperationHints(array $operations) {
 
 		switch ($operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				$result[$key][] = array(bold(_('Subject').': '), BR(), zbx_nl2br($operation['opmessage']['subject']));
-				$result[$key][] = array(bold(_('Message').': '), BR(), zbx_nl2br($operation['opmessage']['message']));
+				// show default entered action subject and message or show custom subject and message for each operation
+				$subject = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
+					? $defaultMessage['subject']
+					: $operation['opmessage']['subject'];
+
+				$result[$key][] = array(bold(_('Subject').': '), BR(), zbx_nl2br($subject));
+
+				$message = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
+					? $defaultMessage['message']
+					: $operation['opmessage']['message'];
+
+				$result[$key][] = array(bold(_('Message').': '), BR(), zbx_nl2br($message));
 				break;
 
 			case OPERATION_TYPE_COMMAND:
