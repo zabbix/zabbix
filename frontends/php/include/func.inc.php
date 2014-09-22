@@ -1894,3 +1894,12 @@ function getSLV($itemId) {
 
 	return $slv['lastvalue'];
 }
+
+/**
+ * Clears table rows selection's cookies.
+ *
+ * @param string $id	parent id, is used as cookie suffix
+ */
+function uncheckTableRows() {
+	insert_js('cookie.eraseArray("'.$_SERVER['SCRIPT_NAME'].'")');
+}

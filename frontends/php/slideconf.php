@@ -139,9 +139,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	show_messages($go_result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray(\''.$path.'\')');
+	uncheckTableRows();
 }
 
 /*

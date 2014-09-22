@@ -321,12 +321,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
-?>
-<?php
+
 $_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
 CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 

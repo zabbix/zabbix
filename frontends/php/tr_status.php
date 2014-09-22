@@ -137,9 +137,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	}
 
 	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
+		uncheckTableRows();
 	}
 //--
 

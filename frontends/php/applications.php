@@ -218,9 +218,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	}
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
 
 /*

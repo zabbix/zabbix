@@ -146,9 +146,7 @@ elseif (isset($_REQUEST['go'])) {
 			unset($_REQUEST['form']);
 			unset($_REQUEST['regexpid']);
 
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
+			uncheckTableRows();
 		}
 	}
 }

@@ -293,9 +293,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
 
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
+		uncheckTableRows();
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -545,9 +543,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
 
 /*

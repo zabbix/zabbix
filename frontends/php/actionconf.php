@@ -309,9 +309,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
 
 /*

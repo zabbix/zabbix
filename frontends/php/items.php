@@ -651,9 +651,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	show_messages(DBend($go_result), _('Items deleted'), _('Cannot delete items'));
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
 
 /*

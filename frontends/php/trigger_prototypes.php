@@ -290,9 +290,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 }
 
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray(\''.$path.'\')');
+	uncheckTableRows();
 	$_REQUEST['go'] = 'none';
 }
 

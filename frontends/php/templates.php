@@ -397,9 +397,7 @@ else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 }
 
 if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	uncheckTableRows();
 }
 
 
