@@ -693,12 +693,12 @@ static void	cuvc_suite_add2_cleanup()
  *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
  *             1005.2, 1005.5, 1005.7}
  *
- * set_low_memory(on)
+ * set_mode(lowmem)
  *
  * get_value(100001, STR, 1006.0)
  *    cached:
  *
- * set_low_memory(off)
+ * set_mode(normal)
  *
  */
 static void	cuvc_suite_add3_test1()
@@ -711,14 +711,14 @@ static void	cuvc_suite_add3_test1()
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
 
 	CU_ASSERT(FAIL == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NULL_FATAL(item);
 
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -740,7 +740,7 @@ static void	cuvc_suite_add3_test1()
  *   cached:
  *     [100001] {1005.2, 1005.5, 1005.7}
  *
- * set_low_memory()
+ * set_mode(lowmem)
  *
  * add_value(100001, STR, 1006.0)
  *   cached:
@@ -748,7 +748,7 @@ static void	cuvc_suite_add3_test1()
  *
  * remove(100001)
  *
- * set_low_memory(off)
+ * set_mode(normal)
  */
 static void	cuvc_suite_add3_test2()
 {
@@ -762,7 +762,7 @@ static void	cuvc_suite_add3_test2()
 
 	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
 
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
 
 	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
 
@@ -775,7 +775,7 @@ static void	cuvc_suite_add3_test2()
 
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -791,7 +791,7 @@ static void	cuvc_suite_add3_test2()
  *   cached:
  *     [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
- * set_low_memory()
+ * set_mode(lowmem)
  *
  * add_value(100001, STR, 1005.0)
  *   cached:
@@ -799,7 +799,7 @@ static void	cuvc_suite_add3_test2()
  *
  * remove(100001)
  *
- * set_low_memory(off)
+ * set_mode(normal)
  */
 static void	cuvc_suite_add3_test3()
 {
@@ -813,7 +813,7 @@ static void	cuvc_suite_add3_test3()
 
 	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
 
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
 
 	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
 
@@ -827,7 +827,7 @@ static void	cuvc_suite_add3_test3()
 
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -843,7 +843,7 @@ static void	cuvc_suite_add3_test3()
  *   cached:
  *     [100001] {1005.2, 1005.5, 1005.7}
  *
- * set_low_memory()
+ * set_mode(lowmem)
  *
  * add_value(100001, STR, 1005.0)
  *   cached:
@@ -851,7 +851,7 @@ static void	cuvc_suite_add3_test3()
  *
  * remove(100001)
  *
- * set_low_memory(off)
+ * set_mode(normal)
  */
 static void	cuvc_suite_add3_test4()
 {
@@ -865,7 +865,7 @@ static void	cuvc_suite_add3_test4()
 
 	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
 
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
 
 	ts.ns = 0;
 	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
@@ -879,7 +879,7 @@ static void	cuvc_suite_add3_test4()
 
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
 
 	ZBX_CU_LEAK_CHECK_END();
 }

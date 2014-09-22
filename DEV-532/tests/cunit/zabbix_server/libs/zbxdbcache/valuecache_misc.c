@@ -258,7 +258,7 @@ static void	cuvc_suite_misc2_test1()
 		CU_ASSERT_PTR_NULL(item);
 	}
 
-	ZBX_CU_ASSERT_INT_EQ(vc_cache->low_memory, 0);
+	ZBX_CU_ASSERT_INT_EQ(vc_cache->mode, ZBX_VC_MODE_NORMAL);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -337,7 +337,6 @@ static void	cuvc_suite_misc2_test2()
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 		cuvc_suite_misc2_test2_hittype(i);
 
-
 	/* generate hits */
 	for (i = 0; i < 10; i++)
 		cuvc_suite_misc2_test2_hittype(ITEM_VALUE_TYPE_FLOAT);
@@ -381,7 +380,52 @@ static void	cuvc_suite_misc2_test2()
 		vc_remove_item(item);
 	}
 
-	ZBX_CU_ASSERT_INT_EQ(vc_cache->low_memory, 1);
+	ZBX_CU_ASSERT_INT_EQ(vc_cache->mode, ZBX_VC_MODE_LOWMEM);
+	ZBX_CU_ASSERT_INT_EQ(vc_cache->mode_time, cuvc_time);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+static void	cuvc_suite_misc2_test3()
+{
+	cuvc_snapshot_t			s1, s2;
+	zbx_vector_history_record_t	records;
+	zbx_vc_item_t			*item;
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	cuvc_time += SEC_PER_DAY + 1;
+
+	zbx_history_record_vector_create(&records);
+
+	/* first request */
+	cuvc_snapshot(&s1);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 1, 0, 1005));
+
+	cuvc_snapshot(&s2);
+
+	ZBX_CU_ASSERT_INT_EQ(vc_cache->mode, ZBX_VC_MODE_NORMAL);
+	ZBX_CU_ASSERT_INT_EQ(vc_cache->mode_time, cuvc_time);
+
+	ZBX_CU_ASSERT_UINT64_EQ(s2.misses - s1.misses, 3);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.hits - s1.hits, 0);
+	ZBX_CU_ASSERT_UINT64_EQ(s2.db_queries - s1.db_queries, 1);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_records_str(&records, "1005:700", "1005:500", "1005:200", NULL);
+	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->range, SEC_PER_DAY * 2 + 4);
+	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	vc_remove_item(item);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -389,7 +433,7 @@ static void	cuvc_suite_misc2_test2()
 static void	cuvc_suite_misc2_cleanup()
 {
 	vc_time = time;
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
 
 	ZBX_CU_ASSERT_UINT64_EQ(vc_mem->free_size, cuvc_free_space);
 }

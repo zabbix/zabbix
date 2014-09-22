@@ -582,13 +582,15 @@ static int	cuvc_clean_str()
 
 static int	cuvc_init_str_lowmem()
 {
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
+	vc_cache->mode_time = time(NULL);
 	return cuvc_init_str();
 }
 
 static int	cuvc_clean_str_lowmem()
 {
-	vc_cache->low_memory = 0;
+	vc_cache->mode = ZBX_VC_MODE_NORMAL;
+	vc_cache->mode_time = time(NULL);
 	return cuvc_clean_str();
 }
 
@@ -929,6 +931,7 @@ int	ZBX_CU_MODULE(valuecache)
 
 	ZBX_CU_ADD_TEST(suite, "remove items not accessed for a day", cuvc_suite_misc2_test1);
 	ZBX_CU_ADD_TEST(suite, "remove less accessed data in low memory mode", cuvc_suite_misc2_test2);
+	ZBX_CU_ADD_TEST(suite, "switch back to normal mode after 24h", cuvc_suite_misc2_test3);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc2_cleanup);
 
 	/* test suite: misc3                                                                       */
