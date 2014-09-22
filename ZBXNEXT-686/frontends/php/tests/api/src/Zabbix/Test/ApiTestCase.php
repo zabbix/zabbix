@@ -26,7 +26,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var TestDatabase
 	 */
-	protected $database;
+	private $database;
 
 	/**
 	 * @var APIGateway\FileAPIGateway
@@ -84,7 +84,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected function tearDown() {
-		$this->database->clear();
+		$this->clearDatabase();
 	}
 
 	/**
@@ -99,6 +99,10 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function getFixtureLoader() {
 		return $this->fixtureLoader;
+	}
+
+	protected function clearDatabase() {
+		$this->database->clear();
 	}
 
 }

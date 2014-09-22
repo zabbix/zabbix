@@ -1,13 +1,11 @@
 # https://support.zabbix.com/browse/ZBX-8603
 
 fixtures:
-  hostGroup: ~
-
   emptyHost:
-    groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.base.result.groupid@
 
   templateWithApplication:
-    groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.base.result.groupid@
 
   httpTest:
     type: api

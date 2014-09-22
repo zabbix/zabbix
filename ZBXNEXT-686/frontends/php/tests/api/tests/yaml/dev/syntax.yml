@@ -1,6 +1,5 @@
-# fixture files to load for this test case
-fixtures:
-  hostGroup: ~
+# this test requires no additional fixtures, only the "base" fixture will be loaded
+# fixtures: []
 
 # an array of steps that will be executed one-by-one
 steps:
@@ -22,7 +21,7 @@ steps:
         groups:
           -
             # macros can be used to reference values returned by fixtures
-            groupid: @fixtures.hostGroup.result.groupid@
+            groupid: @fixtures.base.result.groupid@
 
     # what to expect: either "result" or "error"
     expect: result
@@ -70,7 +69,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroup.result.groupid@
+            groupid: @fixtures.base.result.groupid@
 
     # in this step we expect an error
     expect: error
@@ -97,7 +96,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroup.result.groupid@
+            groupid: @fixtures.base.result.groupid@
 
     expect: result
 

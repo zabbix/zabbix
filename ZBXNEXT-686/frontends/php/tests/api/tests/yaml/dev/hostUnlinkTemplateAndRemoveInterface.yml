@@ -1,13 +1,11 @@
 # https://support.zabbix.com/browse/ZBX-8530
 
 fixtures:
-  hostGroup: ~
-
   hostWithItem:
-    groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.base.result.groupid@
 
   templateWithItem:
-    groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.base.result.groupid@
 
   # link the template to the host
   linkTemplate:

@@ -52,15 +52,20 @@ class FileApiTestCase extends ApiTestCase {
 	protected function runTestFile($file) {
 		$test = $this->parseTestFile($file);
 
-		$fixtures = $test['fixtures'];
+		$fixtures = (isset($test['fixtures'])) ? $test['fixtures'] : array();
 
 		// always load a user and a user group
-		array_unshift($fixtures, array(
-			'type' => FixtureLoader::TYPE_INCLUDE,
-			'params' => array(
-				'file' => 'user'
-			)
-		));
+		$fixtures = array_merge(
+			array(
+				'base' => array(
+					'type' => FixtureLoader::TYPE_INCLUDE,
+					'params' => array(
+						'file' => 'base'
+					)
+				)
+			),
+			$fixtures
+		);
 
 		$fixtures = $this->loadFixtures($fixtures);
 
@@ -271,6 +276,15 @@ class FileApiTestCase extends ApiTestCase {
 	}
 
 	protected function loadFixtures(array $fixtures) {
-		return $this->getFixtureLoader()->load($fixtures);
+		try {
+			$fixtures = $this->getFixtureLoader()->load($fixtures);
+		}
+		catch (\Exception $e) {
+			$this->clearDatabase();
+
+			throw $e;
+		}
+
+		return $fixtures;
 	}
 }

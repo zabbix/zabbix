@@ -1,8 +1,5 @@
 # Create a host, link it to a template and verify the result using host.get.
 
-fixtures:
-  hostGroup: ~
-
 steps:
   step1:
     request:
@@ -18,7 +15,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.hostGroup.result.groupid@
+            groupid: @fixtures.base.result.groupid@
 
     expect: error
 

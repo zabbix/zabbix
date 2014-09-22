@@ -1,0 +1,112 @@
+return:
+  groupid: @fixtures.hostgroup.result[0]@
+
+fixtures:
+  group:
+    type: data
+    params:
+      table: usrgrp
+      values:
+        -
+          usrgrpid: 1
+          name: 'Zabbix administrators'
+          gui_access: 0
+          users_status: 0
+          debug_mode: 0
+
+  users:
+    type: data
+    params:
+      table: users
+      values:
+        -
+          userid: 1
+          alias: Admin
+          passwd: 5fce1b3e34b520afeffb37ce08c7cd66
+          type: 3
+
+  userGroups:
+    type: data
+    params:
+      table: users_groups
+      values:
+        -
+          usrgrpid: @fixtures.group.result[0]@
+          userid: @fixtures.users.result[0]@
+
+  hostgroup:
+    type: data
+    params:
+      table: groups
+      values:
+        -
+          name: Zabbix servers
+          internal: 1
+          flags: 0
+
+  config:
+    type: data
+    params:
+      table: config
+      values:
+        -
+          refresh_unsupported: 600
+          work_period: "1-5,09:00-18:00;"
+          alert_usrgrpid: @fixtures.group.result[0]@
+          event_ack_enable: 1
+          event_expire: 7
+          event_show_max: 100
+          default_theme: "originalblue"
+          authentication_type: 0
+          ldap_host: ""
+          ldap_port: 389
+          ldap_base_dn: ""
+          ldap_bind_dn: ""
+          ldap_bind_password: ""
+          ldap_search_attribute: ""
+          dropdown_first_entry: 1
+          dropdown_first_remember: 1
+          discovery_groupid: @fixtures.hostgroup.result[0]@
+          max_in_table: 50
+          search_limit: 1000
+          severity_color_0: "DBDBDB"
+          severity_color_1: "D6F6FF"
+          severity_color_2: "FFF6A5"
+          severity_color_3: "FFB689"
+          severity_color_4: "FF9999"
+          severity_color_5: "FF3838"
+          severity_name_0: "Not classified"
+          severity_name_1: "Information"
+          severity_name_2: "Warning"
+          severity_name_3: "Average"
+          severity_name_4: "High"
+          severity_name_5: "Disaster"
+          ok_period: 1800
+          blink_period: 1800
+          problem_unack_color: "DC0000"
+          problem_ack_color: "DC0000"
+          ok_unack_color: "00AA00"
+          ok_ack_color: "00AA00"
+          problem_unack_style: 1
+          problem_ack_style: 1
+          ok_unack_style: 1
+          ok_ack_style: 1
+          snmptrap_logging: 1
+          server_check_interval: 10
+          hk_events_mode: 1
+          hk_events_trigger: 365
+          hk_events_internal: 365
+          hk_events_discovery: 365
+          hk_events_autoreg: 365
+          hk_services_mode: 1
+          hk_services: 365
+          hk_audit_mode: 1
+          hk_audit: 365
+          hk_sessions_mode: 1
+          hk_sessions: 365
+          hk_history_mode: 1
+          hk_history_global: 0
+          hk_history: 90
+          hk_trends_mode: 1
+          hk_trends_global: 0
+          hk_trends: 365

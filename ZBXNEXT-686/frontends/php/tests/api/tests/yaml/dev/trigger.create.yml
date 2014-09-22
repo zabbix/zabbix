@@ -1,8 +1,6 @@
 fixtures:
-  hostGroup: ~
-
   hostWithItem:
-    groupid: @fixtures.hostGroup.result.groupid@
+    groupid: @fixtures.base.result.groupid@
 
 steps:
 
