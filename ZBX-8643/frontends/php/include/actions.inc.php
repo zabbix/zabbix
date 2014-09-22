@@ -224,6 +224,7 @@ function actionConditionValueToString(array $actions, array $config) {
 
 				case CONDITION_TYPE_EVENT_TYPE:
 					$result[$i][$j] = eventType($condition['value']);
+					break;
 			}
 		}
 	}
@@ -349,6 +350,7 @@ function actionConditionValueToString(array $actions, array $config) {
 
 							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
+						break;
 				}
 			}
 		}
@@ -477,6 +479,7 @@ function getActionOperationDescriptions(array $actions) {
 					foreach ($operation['optemplate'] as $template) {
 						$templateIds[$template['templateid']] = $template['templateid'];
 					}
+					break;
 			}
 		}
 	}
@@ -689,6 +692,7 @@ function getActionOperationDescriptions(array $actions) {
 					}
 
 					$result[$i][$j][] = array(implode(', ', $templateList), BR());
+					break;
 			}
 		}
 	}
