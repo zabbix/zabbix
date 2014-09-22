@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-23 01:32+0300\n"
-"PO-Revision-Date: 2014-09-16 13:43+0300\n"
+"POT-Creation-Date: 2014-09-23 02:07+0300\n"
+"PO-Revision-Date: 2014-09-18 14:04+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410867797.0\n"
+"X-POOTLE-MTIME: 1411041840.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -8013,13 +8013,13 @@ msgstr "Internet Explorer"
 #: include/views/configuration.services.edit.php:131 latest.php:474
 #: latest.php:475
 msgid "Interval"
-msgstr "Okres"
+msgstr "Interwał"
 
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
-msgstr "Okres (w sek)"
+msgstr "Interwał (w sek)"
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -14856,7 +14856,7 @@ msgstr "Aktualizuj istniejące"
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:66
 #: items.php:161
 msgid "Update interval"
-msgstr "Okres aktualizacji"
+msgstr "Interwał aktualizacji"
 
 #: disc_prototypes.php:46 host_discovery.php:54 httpconf.php:45
 #: include/views/configuration.host.discovery.edit.php:192
@@ -14864,7 +14864,7 @@ msgstr "Okres aktualizacji"
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
-msgstr "Okres aktualizacji (w sek)"
+msgstr "Interwał aktualizacji (w sek)"
 
 #: auditlogs.php:127 include/classes/html/CServerInfo.php:40
 msgid "Updated"
@@ -16048,7 +16048,7 @@ msgstr "Nie ustawiono adresu IP lub numeru portu serwera Zabbix'a!"
 
 #: adm.gui.php:43
 msgid "Zabbix server activity check interval"
-msgstr "Okres sprawdzania aktywności serwera Zabbix"
+msgstr "Interwał sprawdzania aktywności serwera Zabbix"
 
 #: include/classes/html/CServerInfo.php:39
 msgid "Zabbix server info"
@@ -16065,7 +16065,7 @@ msgstr "Serwer Zabbixa jest uruchomiony"
 #: adm.gui.php:80
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "Serwer Zabbix działa, okres sprawdzania \"%1$s\"."
+msgstr "Serwer Zabbix działa, interwał sprawdzania \"%1$s\"."
 
 #: include/classes/setup/CSetupWizard.php:434
 msgid "Zabbix server name"
