@@ -931,6 +931,17 @@ int	ZBX_CU_MODULE(valuecache)
 	ZBX_CU_ADD_TEST(suite, "remove less accessed data in low memory mode", cuvc_suite_misc2_test2);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc2_cleanup);
 
+	/* test suite: misc3                                                                       */
+	if (NULL == (suite = CU_add_suite("valuecache range synchronization",  cuvc_init_str, cuvc_clean_str)))
+	{
+		return CU_get_error();
+	}
+
+	ZBX_CU_ADD_TEST(suite, "get 1000s interval of values from 1000000 timestamp", cuvc_suite_misc3_test1);
+	ZBX_CU_ADD_TEST(suite, "get 800s interval of values from +1.1 day timestamp", cuvc_suite_misc3_test2);
+	ZBX_CU_ADD_TEST(suite, "get 600s interval of values from +1.1 day timestamp", cuvc_suite_misc3_test3);
+	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_misc3_cleanup);
+
 	return CUE_SUCCESS;
 }
 
