@@ -133,7 +133,7 @@ function discovery_object2str($object = null) {
 function actionConditionValueToString(array $actions, array $config) {
 	$result = array();
 
-	$hostGroupIds = array();
+	$groupIds = array();
 	$triggerIds = array();
 	$hostIds = array();
 	$templateIds = array();
@@ -150,7 +150,7 @@ function actionConditionValueToString(array $actions, array $config) {
 
 			switch ($condition['conditiontype']) {
 				case CONDITION_TYPE_HOST_GROUP:
-					$hostGroupIds[$condition['value']] = $condition['value'];
+					$groupIds[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
@@ -233,10 +233,10 @@ function actionConditionValueToString(array $actions, array $config) {
 	$dRules = array();
 	$dChecks = array();
 
-	if ($hostGroupIds) {
+	if ($groupIds) {
 		$groups = API::HostGroup()->get(array(
 			'output' => array('name'),
-			'groupids' => $hostGroupIds,
+			'groupids' => $groupIds,
 			'preservekeys' => true
 		));
 	}
@@ -411,9 +411,9 @@ function getActionOperationDescriptions(array $actions) {
 
 	$mediaTypeIds = array();
 	$userIds = array();
-	$userGroupIds = array();
+	$usrGrpIds = array();
 	$hostIds = array();
-	$hostGroupIds = array();
+	$groupIds = array();
 	$templateIds = array();
 
 	foreach ($actions as $i => $action) {
@@ -438,7 +438,7 @@ function getActionOperationDescriptions(array $actions) {
 
 					if (isset($operation['opmessage_grp']) && $operation['opmessage_grp']) {
 						foreach ($operation['opmessage_grp'] as $userGroups) {
-							$userGroupIds[$userGroups['usrgrpid']] = $userGroups['usrgrpid'];
+							$usrGrpIds[$userGroups['usrgrpid']] = $userGroups['usrgrpid'];
 						}
 					}
 					break;
@@ -454,7 +454,7 @@ function getActionOperationDescriptions(array $actions) {
 
 					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
 						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$hostGroupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+							$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
 						}
 					}
 					break;
@@ -462,7 +462,7 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					foreach ($operation['opgroup'] as $hostGroup) {
-						$hostGroupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+						$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
 					}
 					break;
 
@@ -504,10 +504,10 @@ function getActionOperationDescriptions(array $actions) {
 		}
 	}
 
-	if ($userGroupIds) {
+	if ($usrGrpIds) {
 		$userGroups = API::UserGroup()->get(array(
 			'output' => array('name'),
-			'usrgrpids' => $userGroupIds,
+			'usrgrpids' => $usrGrpIds,
 			'preservekeys' => true
 		));
 	}
@@ -520,10 +520,10 @@ function getActionOperationDescriptions(array $actions) {
 		));
 	}
 
-	if ($hostGroupIds) {
+	if ($groupIds) {
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('name'),
-			'groupids' => $hostGroupIds,
+			'groupids' => $groupIds,
 			'preservekeys' => true
 		));
 	}
