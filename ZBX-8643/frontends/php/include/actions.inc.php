@@ -133,10 +133,6 @@ function discovery_object2str($object = null) {
 function actionConditionValueToString(array $actions, array $config) {
 	$result = array();
 
-	if (!$actions) {
-		return $result;
-	}
-
 	$hostGroupIds = array();
 	$triggerIds = array();
 	$hostIds = array();
@@ -412,10 +408,6 @@ function getConditionDescription($conditionType, $operator, $value) {
  */
 function getActionOperationDescriptions(array $actions) {
 	$result = array();
-
-	if (!$actions) {
-		return $result;
-	}
 
 	$mediaTypeIds = array();
 	$userIds = array();

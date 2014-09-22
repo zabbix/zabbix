@@ -73,44 +73,46 @@ $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
 
-$actionConditionStringValues = actionConditionValueToString(array($this->data['action']), $this->data['config']);
+if ($this->data['action']['filter']['conditions']) {
+	$actionConditionStringValues = actionConditionValueToString(array($this->data['action']), $this->data['config']);
 
-foreach ($this->data['action']['filter']['conditions'] as $cIdx => $condition) {
-	if (!isset($condition['conditiontype'])) {
-		$condition['conditiontype'] = 0;
-	}
-	if (!isset($condition['operator'])) {
-		$condition['operator'] = 0;
-	}
-	if (!isset($condition['value'])) {
-		$condition['value'] = '';
-	}
-	if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
-		continue;
-	}
+	foreach ($this->data['action']['filter']['conditions'] as $cIdx => $condition) {
+		if (!isset($condition['conditiontype'])) {
+			$condition['conditiontype'] = 0;
+		}
+		if (!isset($condition['operator'])) {
+			$condition['operator'] = 0;
+		}
+		if (!isset($condition['value'])) {
+			$condition['value'] = '';
+		}
+		if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
+			continue;
+		}
 
-	$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
 
-	$labelSpan = new CSpan($label, 'label');
-	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-formulaid', $label);
+		$labelSpan = new CSpan($label, 'label');
+		$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
+		$labelSpan->setAttribute('data-formulaid', $label);
 
-	$conditionTable->addRow(
-		array(
-			$labelSpan,
-			getConditionDescription($condition['conditiontype'], $condition['operator'],
-				$actionConditionStringValues[0][$cIdx]
-			),
+		$conditionTable->addRow(
 			array(
-				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
-				new CVar('conditions['.$i.']', $condition)
+				$labelSpan,
+				getConditionDescription($condition['conditiontype'], $condition['operator'],
+					$actionConditionStringValues[0][$cIdx]
+				),
+				array(
+					new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
+					new CVar('conditions['.$i.']', $condition)
+				),
+				new CVar('conditions[' . $i . '][formulaid]', $label)
 			),
-			new CVar('conditions[' . $i . '][formulaid]', $label)
-		),
-		null, 'conditions_'.$i
-	);
+			null, 'conditions_'.$i
+		);
 
-	$i++;
+		$i++;
+	}
 }
 
 $formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
@@ -383,78 +385,93 @@ else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
 }
 
-$actionOperationDescriptions = getActionOperationDescriptions(array($this->data['action']));
-$actionOperationHints = getActionOperationHints($this->data['action']['operations']);
+if ($this->data['action']['operations']) {
+	$actionOperationDescriptions = getActionOperationDescriptions(array($this->data['action']));
+	$actionOperationHints = getActionOperationHints($this->data['action']['operations']);
 
-foreach ($this->data['action']['operations'] as $operationid => $operation) {
-	if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
-		continue;
-	}
-	if (!isset($operation['opconditions'])) {
-		$operation['opconditions'] = array();
-	}
-	if (!isset($operation['mediatypeid'])) {
-		$operation['mediatypeid'] = 0;
-	}
-
-	$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-	$details->setHint($actionOperationHints[$operationid]);
-
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-		$esc_steps_txt = null;
-		$esc_period_txt = null;
-		$esc_delay_txt = null;
-
-		if ($operation['esc_step_from'] < 1) {
-			$operation['esc_step_from'] = 1;
+	foreach ($this->data['action']['operations'] as $operationid => $operation) {
+		if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
+			continue;
+		}
+		if (!isset($operation['opconditions'])) {
+			$operation['opconditions'] = array();
+		}
+		if (!isset($operation['mediatypeid'])) {
+			$operation['mediatypeid'] = 0;
 		}
 
-		$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+		$details->setHint($actionOperationHints[$operationid]);
 
-		// display N-N as N
-		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
-			? $operation['esc_step_from']
-			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+		if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS
+				|| $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+			$esc_steps_txt = null;
+			$esc_period_txt = null;
+			$esc_delay_txt = null;
 
-		$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-		$esc_delay_txt = $delay[$operation['esc_step_from']]
-			? convert_units(array('value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'))
-			: _('Immediately');
+			if ($operation['esc_step_from'] < 1) {
+				$operation['esc_step_from'] = 1;
+			}
 
-		$operationRow = array(
-			$esc_steps_txt,
-			$details,
-			$esc_delay_txt,
-			$esc_period_txt,
-			array(
-				new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
-				SPACE, SPACE, SPACE,
+			$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			// display N-N as N
+			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
+				? $operation['esc_step_from']
+				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
+			$esc_delay_txt = $delay[$operation['esc_step_from']]
+				? convert_units(array('value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'))
+				: _('Immediately');
+
+			$operationRow = array(
+				$esc_steps_txt,
+				$details,
+				$esc_delay_txt,
+				$esc_period_txt,
 				array(
-					new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');', 'link_menu'),
-					new CVar('operations['.$operationid.']', $operation)
+					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					SPACE, SPACE, SPACE,
+					array(
+						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
+							'link_menu'
+						),
+						new CVar('operations['.$operationid.']', $operation)
+					)
 				)
-			)
-		);
-	}
-	else {
-		$operationRow = array(
-			$details,
-			array(
-				new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
-				SPACE, SPACE, SPACE,
+			);
+		}
+		else {
+			$operationRow = array(
+				$details,
 				array(
-					new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');', 'link_menu'),
-					new CVar('operations['.$operationid.']', $operation)
+					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					SPACE, SPACE, SPACE,
+					array(
+						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
+							'link_menu'
+						),
+						new CVar('operations['.$operationid.']', $operation)
+					)
 				)
-			)
-		);
-	}
-	$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
+			);
+		}
+		$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
 
-	$operation['opmessage_grp'] = isset($operation['opmessage_grp']) ? zbx_toHash($operation['opmessage_grp'], 'usrgrpid') : null;
-	$operation['opmessage_usr'] = isset($operation['opmessage_usr']) ? zbx_toHash($operation['opmessage_usr'], 'userid') : null;
-	$operation['opcommand_grp'] = isset($operation['opcommand_grp']) ? zbx_toHash($operation['opcommand_grp'], 'groupid') : null;
-	$operation['opcommand_hst'] = isset($operation['opcommand_hst']) ? zbx_toHash($operation['opcommand_hst'], 'hostid') : null;
+		$operation['opmessage_grp'] = isset($operation['opmessage_grp'])
+			? zbx_toHash($operation['opmessage_grp'], 'usrgrpid')
+			: null;
+		$operation['opmessage_usr'] = isset($operation['opmessage_usr'])
+			? zbx_toHash($operation['opmessage_usr'], 'userid')
+			: null;
+		$operation['opcommand_grp'] = isset($operation['opcommand_grp'])
+			? zbx_toHash($operation['opcommand_grp'], 'groupid')
+			: null;
+		$operation['opcommand_hst'] = isset($operation['opcommand_hst'])
+			? zbx_toHash($operation['opcommand_hst'], 'hostid')
+			: null;
+	}
 }
 
 $footer = array();

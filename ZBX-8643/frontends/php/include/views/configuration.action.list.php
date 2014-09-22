@@ -54,48 +54,50 @@ $actionTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 ));
 
-$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
-$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions']);
+if ($this->data['actions']) {
+	$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
+	$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions']);
 
-foreach ($this->data['actions'] as $aIdx => $action) {
-	$conditions = array();
-	$operations = array();
+	foreach ($this->data['actions'] as $aIdx => $action) {
+		$conditions = array();
+		$operations = array();
 
-	order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+		order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
-	foreach ($action['filter']['conditions'] as $cIdx => $condition) {
-		$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
-			$actionConditionStringValues[$aIdx][$cIdx]
-		);
-		$conditions[] = BR();
+		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
+			$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
+				$actionConditionStringValues[$aIdx][$cIdx]
+			);
+			$conditions[] = BR();
+		}
+
+		sortOperations($this->data['eventsource'], $action['operations']);
+
+		foreach ($action['operations'] as $oIdx => $operation) {
+			$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
+		}
+
+		if ($action['status'] == ACTION_STATUS_DISABLED) {
+			$status = new CLink(_('Disabled'),
+				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
+				'disabled'
+			);
+		}
+		else {
+			$status = new CLink(_('Enabled'),
+				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
+				'enabled'
+			);
+		}
+
+		$actionTable->addRow(array(
+			new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
+			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
+			$conditions,
+			new CCol($operations, 'wraptext'),
+			$status
+		));
 	}
-
-	sortOperations($this->data['eventsource'], $action['operations']);
-
-	foreach ($action['operations'] as $oIdx => $operation) {
-		$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
-	}
-
-	if ($action['status'] == ACTION_STATUS_DISABLED) {
-		$status = new CLink(_('Disabled'),
-			'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-			'disabled'
-		);
-	}
-	else {
-		$status = new CLink(_('Enabled'),
-			'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-			'enabled'
-		);
-	}
-
-	$actionTable->addRow(array(
-		new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
-		new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
-		$conditions,
-		new CCol($operations, 'wraptext'),
-		$status
-	));
 }
 
 // create go buttons
