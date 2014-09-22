@@ -387,7 +387,13 @@ else {
 
 if ($this->data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions(array($this->data['action']));
-	$actionOperationHints = getActionOperationHints($this->data['action']['operations']);
+
+	$defaultMessage = array(
+		'subject' => $this->data['action']['def_shortdata'],
+		'message' => $this->data['action']['def_longdata']
+	);
+
+	$actionOperationHints = getActionOperationHints($this->data['action']['operations'], $defaultMessage);
 
 	foreach ($this->data['action']['operations'] as $operationid => $operation) {
 		if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
