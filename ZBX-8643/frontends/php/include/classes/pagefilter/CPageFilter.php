@@ -215,7 +215,6 @@ class CPageFilter {
 	 * @param array  $options['severitiesMin']
 	 * @param int    $options['severitiesMin']['default']
 	 * @param string $options['severitiesMin']['mapId']
-	 * @param array  $options['severitiesMin']['config']
 	 * @param string $options['severityMin']
 	 */
 	public function __construct(array $options = array()) {
@@ -274,8 +273,7 @@ class CPageFilter {
 
 		// severities min
 		if (isset($options['severitiesMin'])) {
-			$options['severitiesMin']['config'] = $config;
-			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin']);
+			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin'], $config);
 		}
 	}
 
@@ -615,11 +613,11 @@ class CPageFilter {
 	 * @param array  $options				array of options
 	 * @param int    $options['default']	default severity
 	 * @param string $options['mapId']		ID of a map
-	 * @param array	 $options['config']		array of configuration parameters for getting severity names
+	 * @param array	 $config				array of configuration parameters for getting severity names
 	 *
 	 * @return void
 	 */
-	private function _initSeveritiesMin($severityMin, array $options) {
+	private function _initSeveritiesMin($severityMin, array $options, array $config) {
 		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		$mapId = isset($options['mapId']) ? $options['mapId'] : 0;
 		$severityMinProfile = isset($this->_profileIds['severityMin']) ? $this->_profileIds['severityMin'] : null;
@@ -639,7 +637,7 @@ class CPageFilter {
 
 		$this->data['severitiesMin'] = array();
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severityName = getSeverityName($severity, $options['config']);
+			$severityName = getSeverityName($severity, $config);
 
 			if ($severity == $default) {
 				$this->data['severitiesMin'][] = $severityName.SPACE.'('._('default').')';
