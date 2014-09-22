@@ -52,22 +52,16 @@ function getSeverityName($severity, array $config) {
 	switch ($severity) {
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
 			return _($config['severity_name_0']);
-			break;
 		case TRIGGER_SEVERITY_INFORMATION:
 			return _($config['severity_name_1']);
-			break;
 		case TRIGGER_SEVERITY_WARNING:
 			return _($config['severity_name_2']);
-			break;
 		case TRIGGER_SEVERITY_AVERAGE:
 			return _($config['severity_name_3']);
-			break;
 		case TRIGGER_SEVERITY_HIGH:
 			return _($config['severity_name_4']);
-			break;
 		case TRIGGER_SEVERITY_DISASTER:
 			return _($config['severity_name_5']);
-			break;
 		default:
 			return _('Unknown');
 	}
