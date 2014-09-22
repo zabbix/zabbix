@@ -6,11 +6,14 @@ namespace Zabbix\Test\Fixtures;
 class DataFixture extends Fixture {
 
 	public function load(array $params) {
+		// TODO: automatically handle cases when IDs shouldn't be incremented
+		$generateIds = isset($params['generateIds']) ? $params['generateIds'] : true;
+
 		try {
 			DBstart();
 
 			// TODO: enable ID generation
-			$ids = \DB::insert($params['table'], $params['values']);
+			$ids = \DB::insert($params['table'], $params['values'], $generateIds);
 
 			DBend();
 		}
