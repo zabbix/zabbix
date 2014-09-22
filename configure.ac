@@ -121,6 +121,15 @@ AC_CHECK_HEADERS(devstat.h, [], [], [
 #  include <sys/dkstat.h>
 #endif
 ])
+AC_CHECK_HEADERS(linux/netlink.h, [
+	AC_CHECK_HEADERS(linux/inet_diag.h, [
+		AC_DEFINE([HAVE_INET_DIAG], 1, [Define to 1 if you have NETLINK INET_DIAG support.])
+	])
+], [], [
+#ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+])
 
 dnl *****************************************************************
 dnl *                                                               *
