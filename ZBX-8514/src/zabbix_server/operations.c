@@ -56,10 +56,10 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
-					" and h.status in (%d,%d)"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
 					" and ds.dhostid=" ZBX_FS_UI64
@@ -73,10 +73,10 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
-					" and h.status in (%d,%d)"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
 					" and ds.dserviceid =" ZBX_FS_UI64
@@ -268,8 +268,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						"select distinct h.hostid"
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
-							" and h.status in (%d,%d)"
 							" and i.ip=ds.ip"
+							" and h.status in (%d,%d)"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 							ZBX_SQL_NODE
