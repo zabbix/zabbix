@@ -697,12 +697,7 @@ class CItem extends CItemGeneral {
 
 		DB::delete('screens_items', array(
 			'resourceid' => $itemIds,
-			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)
-		));
-		DB::delete('screens_items', array(
-				'resourceid' => $itemIds,
-				'resourcetype' => array(SCREEN_RESOURCE_CLOCK),
-				'style' => array(TIME_TYPE_HOST)
+			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK)
 		));
 
 		DB::delete('items', array('itemid' => $itemIds));

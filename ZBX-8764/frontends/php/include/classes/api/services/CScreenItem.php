@@ -206,11 +206,33 @@ class CScreenItem extends CApiService {
 
 		$screenItems = zbx_toHash($screenItems, 'screenitemid');
 
-		$update = $screenItemIds = array();
+		$update = array();
+		$screenItemIds = array();
 
 		foreach ($screenItems as $screenItem) {
 			$screenItemId = $screenItem['screenitemid'];
 			unset($screenItem['screenitemid']);
+
+			// If screen item type (field "resourcetype") is set to one that does not use "resourceid" field,
+			// value of field "resourceid" is set to 0 for those resource types. Clock screen item type has
+			// case with more refined check.
+			if (isset($screenItem['resourcetype'])) {
+				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_CLOCK:
+						if (isset($screenItem['style']) && $screenItem['style'] != TIME_TYPE_HOST) {
+							$screenItem['resourceid'] = 0;
+						}
+						break;
+
+					case SCREEN_RESOURCE_ACTIONS:
+					case SCREEN_RESOURCE_HISTORY:
+					case SCREEN_RESOURCE_SERVER_INFO:
+					case SCREEN_RESOURCE_SYSTEM_STATUS:
+					case SCREEN_RESOURCE_URL:
+						$screenItem['resourceid'] = 0;
+						break;
+				}
+			}
 
 			$update[] = array(
 				'values' => $screenItem,
