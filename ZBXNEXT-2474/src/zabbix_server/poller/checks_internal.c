@@ -496,6 +496,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, stats.hits + stats.misses);
 			else if (0 == strcmp(tmp1, "misses"))
 				SET_UI64_RESULT(result, stats.misses);
+			else if (0 == strcmp(tmp1, "mode"))
+				SET_UI64_RESULT(result, stats.mode);
 			else
 				goto notsupported;
 		}
