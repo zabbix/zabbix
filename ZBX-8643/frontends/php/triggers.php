@@ -93,21 +93,29 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-if (getRequest('triggerid')) {
-	$triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['triggerid'],
-		'output' => array('triggerid'),
-		'preservekeys' => true,
+$triggerId = getRequest('triggerid');
+if ($triggerId) {
+	$trigger = (bool) API::Trigger()->get(array(
+		'output' => array(),
+		'triggerids' => $triggerId,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (!$triggers) {
+	if (!$trigger) {
 		access_deny();
 	}
 }
-if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
+
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
+	access_deny();
+}
+
 /*
  * Actions
  */
@@ -464,11 +472,11 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
-	// determine, show or not column of errors
-	if ($data['hostid'] > 0) {
+	// do not show 'Info' column, if it is a template
+	if ($data['hostid']) {
 		$data['showInfoColumn'] = (bool) API::Host()->get(array(
-			'hostids' => $data['hostid'],
-			'output' => array('status')
+			'output' => array(),
+			'hostids' => $data['hostid']
 		));
 	}
 	else {

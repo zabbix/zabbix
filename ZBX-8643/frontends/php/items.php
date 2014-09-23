@@ -201,31 +201,45 @@ $subfiltersList = array('subfilter_apps', 'subfilter_types', 'subfilter_value_ty
 /*
  * Permissions
  */
-if (getRequest('itemid', false)) {
+$itemId = getRequest('itemid');
+if ($itemId) {
 	$item = API::Item()->get(array(
-		'itemids' => $_REQUEST['itemid'],
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'itemids' => $itemId,
+		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
-	if (empty($item)) {
+	if (!$item) {
 		access_deny();
 	}
 	$item = reset($item);
 	$hosts = $item['hosts'];
 }
-elseif (getRequest('hostid', 0) > 0) {
-	$hosts = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status'),
-		'templated_hosts' => true,
-		'editable' => true
-	));
-	if (empty($hosts)) {
-		access_deny();
+else {
+	$hostId = getRequest('hostid');
+	if ($hostId) {
+		$hosts = API::Host()->get(array(
+			'output' => array('status'),
+			'hostids' => $hostId,
+			'templated_hosts' => true,
+			'editable' => true
+		));
+		if (!$hosts) {
+			access_deny();
+		}
 	}
+}
+
+$filterGroupId = getRequest('filter_groupid');
+if ($filterGroupId && !API::HostGroup()->isWritable(array($filterGroupId))) {
+	access_deny();
+}
+
+$filterHostId = getRequest('filter_hostid');
+if ($filterHostId && !API::Host()->isWritable(array($filterHostId))) {
+	access_deny();
 }
 
 /*
