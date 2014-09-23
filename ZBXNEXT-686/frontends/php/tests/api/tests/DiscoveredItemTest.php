@@ -73,10 +73,11 @@ class DiscoveredItemTest extends ApiTestCase {
 		));
 
 		$this->assertError($result);
-
-		// the message is imprecise and is likely to change
-		$error = $result->getError();
-		$this->assertEquals('Cannot delete a discovered item.', $error['data']);
+		$this->assertResponse(array(
+			'code' => -32500,
+			'message' => 'Application error.',
+			'data' => 'Cannot delete a discovered item.'
+		), $result);
 	}
 
 	protected function getItem($itemId) {
