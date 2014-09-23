@@ -301,6 +301,8 @@ else {
 	);
 
 	if ($pageFilter->hostsSelected) {
+		$config = select_config();
+
 		// get application ids
 		$applications = API::Application()->get(array(
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,

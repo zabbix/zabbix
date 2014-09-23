@@ -99,6 +99,8 @@ $from = zbxDateToTime($data['stime']);
 $till = $from + $effectivePeriod;
 
 // get audit
+$config = select_config();
+
 $sqlWhere = array();
 if (!empty($data['alias'])) {
 	$sqlWhere['alias'] = ' AND u.alias='.zbx_dbstr($data['alias']);

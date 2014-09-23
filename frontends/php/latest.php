@@ -304,10 +304,6 @@ if ($items) {
 	}
 }
 
-if ($filter['showDetails']) {
-	$config = select_config();
-}
-
 // multiselect hosts
 $multiSelectHostData = array();
 if ($filter['hostids']) {
@@ -517,6 +513,8 @@ else {
 }
 
 $tab_rows = array();
+
+$config = select_config();
 
 foreach ($items as $key => $item){
 	if (!$item['applications']) {

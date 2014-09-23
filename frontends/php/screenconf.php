@@ -292,6 +292,8 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
 		'templateid' => getRequest('templateid'),
 		'sort' => $sortField,

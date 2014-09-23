@@ -844,6 +844,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$data = getItemFormData($item);
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
 	$data['inventory_link'] = getRequest('inventory_link');
+	$data['config'] = select_config();
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
@@ -994,11 +995,14 @@ else {
 
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
+	$config = select_config();
+
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	// items
