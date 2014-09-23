@@ -172,7 +172,7 @@ abstract class CItemGeneral extends CApiService {
 		if ($update) {
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('itemid', 'status'),
-				'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s"!')
+				'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s".')
 			));
 			foreach ($items as $item) {
 				// check permissions

@@ -585,7 +585,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('triggerid', 'status'),
-				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
+				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s"')
 			));
 			foreach ($triggers as $trigger) {
 				$triggerId = $trigger['triggerid'];
