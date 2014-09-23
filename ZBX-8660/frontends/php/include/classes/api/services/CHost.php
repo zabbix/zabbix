@@ -1645,7 +1645,7 @@ class CHost extends CHostGeneral {
 
 		foreach ($dbHosts as $dbHost) {
 			if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%s"!', $dbHost['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
 			}
 		}
 
