@@ -1,0 +1,250 @@
+params:
+  groupid: ~
+
+return:
+  hostid: @fixtures.host.result.hostids[0]@
+  itemid: @fixtures.discoveredItem.result[0]@
+  graphid: @fixtures.discoveredItem.result[0]@
+  triggerid: @fixtures.discoveredItem.result[0]@
+
+fixtures:
+  # create host
+  host:
+    type: api
+    params:
+      method: host.create
+      params:
+        host: "Zabbix server"
+        interfaces:
+          -
+            main: 1
+            type: 1
+            useip: 1
+            ip: "0.0.0.0"
+            dns: ""
+            port: 10050
+            bulk: 1
+        groups: [{ groupid: @params.groupid@ }]
+
+  interface:
+    type: api
+    params:
+      method: host.get
+      params:
+        output: ["hostid"]
+        selectInterfaces: ["interfaceid"]
+        hostids: @fixtures.host.result.hostids[0]@
+
+  # discovery rule
+  rule:
+    type: api
+    params:
+      method: discoveryrule.create
+      params:
+        name: LLD rule
+        key_: lld
+        hostid: @fixtures.host.result.hostids[0]@
+        type: 0
+        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        delay: 30
+
+  # item prototype
+  itemPrototype:
+    type: api
+    params:
+      method: itemprototype.create
+      params:
+        name: item prototype
+        key_: llditem[{#MACRO}]
+        hostid: @fixtures.host.result.hostids[0]@
+        ruleid: @fixtures.rule.result.itemids[0]@
+        type: 0
+        value_type: 3
+        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        delay: 30
+
+  # trigger prototype
+  triggerPrototype:
+    type: api
+    params:
+      method: triggerprototype.create
+      params:
+        description: trigger prototype
+        expression: "{@fixtures.host.params.params.host@:@fixtures.itemPrototype.params.params.key_@.last(0)}<20"
+
+  # graph prototype
+  graphPrototype:
+    type: api
+    params:
+      method: graphprototype.create
+      params:
+        name: graph prototype
+        width: 900
+        height: 200
+        gitems:
+          -
+            itemid: @fixtures.itemPrototype.result.itemids[0]@
+            color: 00AA00
+
+  # discovered item
+  discoveredItem:
+    type: data
+    params:
+      table: items
+      values:
+        -
+          type: 0
+          snmp_community: ""
+          snmp_oid: ""
+          hostid: @fixtures.host.result.hostids[0]@
+          name: item prototype
+          key_: llditem[test]
+          delay: 30
+          history: 7
+          trends: 365
+          status: 0
+          value_type: 3
+          trapper_hosts: ""
+          units: ""
+          multiplier: 0
+          delta: 0
+          snmpv3_securityname: ""
+          snmpv3_securitylevel: 0
+          snmpv3_authpassphrase: ""
+          snmpv3_privpassphrase: ""
+          formula: 1
+          error: ""
+          lastlogsize: 0
+          logtimefmt: ""
+          delay_flex: ""
+          params: ""
+          ipmi_sensor: ""
+          data_type: 0
+          authtype: 0
+          username: ""
+          password: ""
+          publickey: ""
+          privatekey: ""
+          mtime: 0
+          flags: 4
+          port: ""
+          description: ""
+          inventory_link: 0
+          lifetime: 0
+          snmpv3_authprotocol: 0
+          snmpv3_privprotocol: 0
+          state: 0
+          snmpv3_contextname: ""
+          evaltype: 0
+          interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+
+  itemDiscovery:
+    type: data
+    params:
+      table: item_discovery
+      values:
+        -
+          itemid: @fixtures.discoveredItem.result[0]@
+          parent_itemid: @fixtures.itemPrototype.result.itemids[0]@
+          key_: ""
+          lastcheck: 0
+          ts_delete:  0
+
+  # discovered trigger
+  discoveredTrigger:
+    type: data
+    params:
+      table: triggers
+      values:
+        -
+          expression: ""
+          description: trigger prototype
+          url: ""
+          status: 0
+          value: 0
+          priority: 2
+          lastchange: 0
+          comments: ""
+          error: ""
+          type: 0
+          state: 0
+          flags: 4
+
+  function:
+    type: data
+    generateIds: false
+    params:
+      table: functions
+      values:
+        -
+          itemid: @fixtures.discoveredItem.result[0]@
+          triggerid: @fixtures.discoveredTrigger.result[0]@
+          function: last
+          parameter: 0
+
+  discoveredTriggerExpression:
+    type: update
+    params:
+      table: triggers
+      values:
+        expression: "{@fixtures.function.result[0]@}<20"
+      where:
+        triggerid: @fixtures.discoveredTrigger.result[0]@
+
+  triggerDiscovery:
+    type: data
+    params:
+      table: trigger_discovery
+      generateIds: false
+      values:
+        -
+          triggerid: @fixtures.discoveredTrigger.result[0]@
+          parent_triggerid: @fixtures.triggerPrototype.result.triggerids[0]@
+
+  # graph prototype
+  discoveredGraph:
+    type: data
+    params:
+      table: graphs
+      values:
+        -
+          name: graph prototype
+          width: 900
+          height: 200
+          yaxismin: 0.0000
+          yaxismax: 0.0000
+          show_work_period: 0
+          show_triggers: 0
+          graphtype: 0
+          show_legend: 1
+          show_3d: 0
+          percent_left: 0.0000
+          percent_right: 0.0000
+          ymin_type: 0
+          ymax_type: 0
+          flags: 4
+
+  graphItems:
+    type: data
+    params:
+      table: graphs_items
+      values:
+        -
+          graphid: @fixtures.discoveredGraph.result[0]@
+          itemid: @fixtures.discoveredItem.result[0]@
+          drawtype: 1
+          sortorder: 0
+          color: 00AA00
+          yaxisside: 0
+          calc_fnc: 2
+          type: 0
+
+  graphDiscovery:
+    type: data
+    params:
+      table: graph_discovery
+      generateIds: false
+      values:
+        -
+          graphid: @fixtures.discoveredGraph.result[0]@
+          parent_graphid: @fixtures.graphPrototype.result.graphids[0]@

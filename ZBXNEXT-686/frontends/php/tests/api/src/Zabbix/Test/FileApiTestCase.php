@@ -81,8 +81,6 @@ class FileApiTestCase extends ApiTestCase {
 	 * @throws \Exception
 	 */
 	protected function runSteps(array $steps, array $fixtures) {
-		$gateway = $this->getGateway();
-
 		foreach ($steps as $stepName => &$definition) {
 			if (!isset($definition['request'])) {
 				throw new \Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
@@ -99,17 +97,7 @@ class FileApiTestCase extends ApiTestCase {
 				throw new \Exception(sprintf('Each step should have string "method" and array "params" (failing step: "%s")', $stepName));
 			}
 
-			$request = array_merge(
-				array(
-					'jsonrpc' => '2.0',
-					'id' => rand(),
-					'params' => $request['params']
-				), $request
-			);
-
-			$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
-
-			$apiResponse = $gateway->execute($apiRequest);
+			$apiResponse = $this->callMethod($request['method'], $request['params']);
 
 			$steps[$stepName]['response'] = $apiResponse->getResult();
 
@@ -134,7 +122,7 @@ class FileApiTestCase extends ApiTestCase {
 			if ($expectation == 'result' || $expectation == 'error') {
 				$expectedResponse = $this->resolveStepMacros($expectedResponse, $steps, $fixtures);
 
-				$this->validate($expectedResponse, $apiResponse->getResponseData());
+				$this->assertResponse($expectedResponse, $apiResponse);
 			}
 			else {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
@@ -259,32 +247,5 @@ class FileApiTestCase extends ApiTestCase {
 			'steps' => $steps,
 			'fixtures' => $fixtures
 		));
-	}
-
-	/**
-	 * Validate data according to rules; path holds current validator chain
-	 *
-	 * @param $definition
-	 * @param $data
-	 * @throws \Exception
-	 */
-	protected function validate($definition, $data) {
-		$validator = new \CTestSchemaValidator(array('schema' => $definition));
-		if (!$validator->validate($data)) {
-			throw new \Exception($validator->getError());
-		}
-	}
-
-	protected function loadFixtures(array $fixtures) {
-		try {
-			$fixtures = $this->getFixtureLoader()->load($fixtures);
-		}
-		catch (\Exception $e) {
-			$this->clearDatabase();
-
-			throw $e;
-		}
-
-		return $fixtures;
 	}
 }

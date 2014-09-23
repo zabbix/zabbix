@@ -72,8 +72,21 @@ class CTestSchemaValidatorTest extends CValidatorTest {
 				array(
 					'schema' => array('_each' => 'string')
 				),
-				array('string', 'string2'),
-				'Value [[]] for path "" doesn\'t match assertion "string"'
+				array('string', 'string2')
+			),
+
+			// don't validate values defined as nulls in the schema
+			array(
+				array(
+					'schema' => array('value' => null)
+				),
+				array('value' => 3)
+			),
+			array(
+				array(
+					'schema' => null
+				),
+				array('value' => 3)
 			),
 
 		);

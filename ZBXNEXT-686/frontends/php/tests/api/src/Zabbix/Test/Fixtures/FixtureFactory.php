@@ -8,6 +8,7 @@ class FixtureFactory {
 	const TYPE_INCLUDE = 'include';
 	const TYPE_API = 'api';
 	const TYPE_DATA = 'data';
+	const TYPE_UPDATE = 'update';
 
 	/**
 	 * @var FixtureLoader
@@ -39,6 +40,10 @@ class FixtureFactory {
 				break;
 			case self::TYPE_DATA:
 				return new DataFixture();
+
+				break;
+			case self::TYPE_UPDATE:
+				return new UpdateFixture();
 
 				break;
 		}

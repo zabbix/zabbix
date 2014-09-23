@@ -23,10 +23,19 @@ class TestDatabase {
 	}
 
 	protected function getTablesToClear() {
+		$bumpTables = array(
+			'items',
+			'httptest',
+			'config',
+			'trigger_discovery',
+			'graph_discovery',
+			'item_discovery',
+		);
+
 		// TODO: implement a better ordering algorithm
 		$tables = array();
 		foreach (\DB::getSchema() as $tableName => $tableData) {
-			if (in_array($tableName, array('dbversion', 'items', 'httptest'))) {
+			if (in_array($tableName, $bumpTables) || $tableName == 'dbversion') {
 				continue;
 			}
 
@@ -34,8 +43,9 @@ class TestDatabase {
 		}
 
 		// clear the items table first to avoid integrity check errors
-		array_unshift($tables, 'items');
-		array_unshift($tables, 'httptest');
+		foreach ($bumpTables as $table) {
+			array_unshift($tables, $table);
+		}
 
 		return $tables;
 	}

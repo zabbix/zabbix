@@ -94,15 +94,73 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		return $this->pdo;
 	}
 
-	/**
-	 * @return FixtureLoader
-	 */
-	protected function getFixtureLoader() {
-		return $this->fixtureLoader;
-	}
-
 	protected function clearDatabase() {
 		$this->database->clear();
+	}
+
+	protected function loadFixtures(array $fixtures) {
+		try {
+			$fixtures = $this->fixtureLoader->load($fixtures);
+		}
+		catch (\Exception $e) {
+			$this->clearDatabase();
+
+			throw $e;
+		}
+
+		return $fixtures;
+	}
+
+	/**
+	 * @param $method
+	 * @param array $params
+	 *
+	 * @return APITestResponse
+	 */
+	protected function callMethod($method, array $params) {
+		$request = array(
+			'jsonrpc' => '2.0',
+			'id' => rand(),
+			'params' => $params,
+			'method' => $method
+		);
+
+		$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
+
+		return $this->gateway->execute($apiRequest);
+	}
+
+	protected function assertError(APITestResponse $response, $message = '') {
+		if ($message === '') {
+			$message = 'Failed asserting that the response contains an error.';
+		}
+
+		return $this->assertTrue($response->isError(), $message);
+	}
+
+	protected function assertResult(APITestResponse $response, $message = '') {
+		if ($message === '') {
+			$message = 'Failed asserting that the response contains a result.';
+		}
+
+		return $this->assertFalse($response->isError(), $message);
+	}
+
+	/**
+	 * Validate data according to rules; path holds current validator chain
+	 *
+	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
+	 *
+	 * @param $definition
+	 * @param APITestResponse $response
+	 *
+	 * @throws \Exception
+	 */
+	protected function assertResponse($definition, APITestResponse $response) {
+		$validator = new \CTestSchemaValidator(array('schema' => $definition));
+		if (!$validator->validate($response->getResponseData())) {
+			throw new \Exception($validator->getError());
+		}
 	}
 
 }

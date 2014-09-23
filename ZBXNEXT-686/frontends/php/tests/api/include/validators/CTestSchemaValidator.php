@@ -49,7 +49,7 @@ class CTestSchemaValidator extends CValidator {
 			}
 		}
 		// a literal scalar value
-		elseif ($values != $schema) {
+		elseif ($schema !== null && $values != $schema) {
 			throw new InvalidArgumentException(
 				'Unexpected value '.json_encode($values).' for path "'.implode('->', $path).'", expected '.json_encode($schema)
 			);
@@ -64,15 +64,13 @@ class CTestSchemaValidator extends CValidator {
 			$subpath[] = $field;
 
 			// check if the field is defined in the schema
-			if (!isset($schema[$field])) {
+			if (!array_key_exists($field, $schema)) {
 				throw new InvalidArgumentException(
 					'Unexpected key "'.$field.'" for path "'.implode('->', $path).'"'
 				);
 			}
 
-			if ($schema[$field] !== null) {
-				$this->checkRecursive($value, $schema[$field], $subpath);
-			}
+			$this->checkRecursive($value, $schema[$field], $subpath);
 
 			unset($schema[$field]);
 		}
