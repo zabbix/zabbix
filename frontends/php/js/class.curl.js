@@ -140,17 +140,7 @@ Curl.prototype = {
 	},
 
 	formatQuery: function() {
-		if (this.args.lenght < 1) {
-			return;
-		}
-
-		var query = [];
-		for (var key in this.args) {
-			if (typeof(this.args[key]) != 'undefined' && !is_null(this.args[key])) {
-				query.push(key + '=' + encodeURIComponent(this.args[key]));
-			}
-		}
-		this.query = query.join('&');
+		this.query = jQuery.param(this.args);
 	},
 
 	formatArguments: function() {
