@@ -361,7 +361,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 	elseif ($type == T_ZBX_DBL_STR) {
 		$decimalStringValidator = new CDecimalStringValidator(array(
-			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
+			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.')
 		));
 		$decimalStringValidator->setObjectName($caption);
 
