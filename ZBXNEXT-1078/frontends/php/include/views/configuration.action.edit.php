@@ -72,40 +72,47 @@ $conditionTable->attr('style', 'min-width: 350px;');
 $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
-foreach ($this->data['action']['filter']['conditions'] as $condition) {
-	if (!isset($condition['conditiontype'])) {
-		$condition['conditiontype'] = 0;
-	}
-	if (!isset($condition['operator'])) {
-		$condition['operator'] = 0;
-	}
-	if (!isset($condition['value'])) {
-		$condition['value'] = '';
-	}
-	if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
-		continue;
-	}
 
-	$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+if ($this->data['action']['filter']['conditions']) {
+	$actionConditionStringValues = actionConditionValueToString(array($this->data['action']), $this->data['config']);
 
-	$labelSpan = new CSpan($label, 'label');
-	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-formulaid', $label);
+	foreach ($this->data['action']['filter']['conditions'] as $cIdx => $condition) {
+		if (!isset($condition['conditiontype'])) {
+			$condition['conditiontype'] = 0;
+		}
+		if (!isset($condition['operator'])) {
+			$condition['operator'] = 0;
+		}
+		if (!isset($condition['value'])) {
+			$condition['value'] = '';
+		}
+		if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
+			continue;
+		}
 
-	$conditionTable->addRow(
-		array(
-			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
+		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+
+		$labelSpan = new CSpan($label, 'label');
+		$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
+		$labelSpan->setAttribute('data-formulaid', $label);
+
+		$conditionTable->addRow(
 			array(
-				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
-				new CVar('conditions['.$i.']', $condition)
+				$labelSpan,
+				getConditionDescription($condition['conditiontype'], $condition['operator'],
+					$actionConditionStringValues[0][$cIdx]
+				),
+				array(
+					new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
+					new CVar('conditions['.$i.']', $condition)
+				),
+				new CVar('conditions[' . $i . '][formulaid]', $label)
 			),
-			new CVar('conditions[' . $i . '][formulaid]', $label)
-		),
-		null, 'conditions_'.$i
-	);
+			null, 'conditions_'.$i
+		);
 
-	$i++;
+		$i++;
+	}
 }
 
 $formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
@@ -238,7 +245,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
 		$condition = new CComboBox('new_condition[value]');
-		$condition->addItems(getSeverityCaption());
+		$severityNames = array();
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severityNames[] = getSeverityName($severity, $this->data['config']);
+		}
+		$condition->addItems($severityNames);
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
@@ -349,7 +360,7 @@ $conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
-$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted ui-corner-all'));
 
 /*
  * Operation tab
@@ -374,75 +385,99 @@ else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
 }
 
-foreach ($this->data['action']['operations'] as $operationid => $operation) {
-	if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
-		continue;
-	}
-	if (!isset($operation['opconditions'])) {
-		$operation['opconditions'] = array();
-	}
-	if (!isset($operation['mediatypeid'])) {
-		$operation['mediatypeid'] = 0;
-	}
+if ($this->data['action']['operations']) {
+	$actionOperationDescriptions = getActionOperationDescriptions(array($this->data['action']));
 
-	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
-	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
+	$defaultMessage = array(
+		'subject' => $this->data['action']['def_shortdata'],
+		'message' => $this->data['action']['def_longdata']
+	);
 
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-		$esc_steps_txt = null;
-		$esc_period_txt = null;
-		$esc_delay_txt = null;
+	$actionOperationHints = getActionOperationHints($this->data['action']['operations'], $defaultMessage);
 
-		if ($operation['esc_step_from'] < 1) {
-			$operation['esc_step_from'] = 1;
+	foreach ($this->data['action']['operations'] as $operationid => $operation) {
+		if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
+			continue;
+		}
+		if (!isset($operation['opconditions'])) {
+			$operation['opconditions'] = array();
+		}
+		if (!isset($operation['mediatypeid'])) {
+			$operation['mediatypeid'] = 0;
 		}
 
-		$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+		$details->setHint($actionOperationHints[$operationid]);
 
-		// display N-N as N
-		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
-			? $operation['esc_step_from']
-			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+		if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS
+				|| $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+			$esc_steps_txt = null;
+			$esc_period_txt = null;
+			$esc_delay_txt = null;
 
-		$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-		$esc_delay_txt = $delay[$operation['esc_step_from']]
-			? convert_units(array('value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'))
-			: _('Immediately');
+			if ($operation['esc_step_from'] < 1) {
+				$operation['esc_step_from'] = 1;
+			}
 
-		$operationRow = array(
-			$esc_steps_txt,
-			$details,
-			$esc_delay_txt,
-			$esc_period_txt,
-			array(
-				new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
-				SPACE, SPACE, SPACE,
+			$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			// display N-N as N
+			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
+				? $operation['esc_step_from']
+				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
+			$esc_delay_txt = $delay[$operation['esc_step_from']]
+				? convert_units(array('value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'))
+				: _('Immediately');
+
+			$operationRow = array(
+				$esc_steps_txt,
+				$details,
+				$esc_delay_txt,
+				$esc_period_txt,
 				array(
-					new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');', 'link_menu'),
-					new CVar('operations['.$operationid.']', $operation)
+					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					SPACE, SPACE, SPACE,
+					array(
+						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
+							'link_menu'
+						),
+						new CVar('operations['.$operationid.']', $operation)
+					)
 				)
-			)
-		);
-	}
-	else {
-		$operationRow = array(
-			$details,
-			array(
-				new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
-				SPACE, SPACE, SPACE,
+			);
+		}
+		else {
+			$operationRow = array(
+				$details,
 				array(
-					new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');', 'link_menu'),
-					new CVar('operations['.$operationid.']', $operation)
+					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					SPACE, SPACE, SPACE,
+					array(
+						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
+							'link_menu'
+						),
+						new CVar('operations['.$operationid.']', $operation)
+					)
 				)
-			)
-		);
-	}
-	$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
+			);
+		}
+		$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
 
-	$operation['opmessage_grp'] = isset($operation['opmessage_grp']) ? zbx_toHash($operation['opmessage_grp'], 'usrgrpid') : null;
-	$operation['opmessage_usr'] = isset($operation['opmessage_usr']) ? zbx_toHash($operation['opmessage_usr'], 'userid') : null;
-	$operation['opcommand_grp'] = isset($operation['opcommand_grp']) ? zbx_toHash($operation['opcommand_grp'], 'groupid') : null;
-	$operation['opcommand_hst'] = isset($operation['opcommand_hst']) ? zbx_toHash($operation['opcommand_hst'], 'hostid') : null;
+		$operation['opmessage_grp'] = isset($operation['opmessage_grp'])
+			? zbx_toHash($operation['opmessage_grp'], 'usrgrpid')
+			: null;
+		$operation['opmessage_usr'] = isset($operation['opmessage_usr'])
+			? zbx_toHash($operation['opmessage_usr'], 'userid')
+			: null;
+		$operation['opcommand_grp'] = isset($operation['opcommand_grp'])
+			? zbx_toHash($operation['opcommand_grp'], 'groupid')
+			: null;
+		$operation['opcommand_hst'] = isset($operation['opcommand_hst'])
+			? zbx_toHash($operation['opcommand_hst'], 'hostid')
+			: null;
+	}
 }
 
 $footer = array();
@@ -455,7 +490,6 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 // create new operation table
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = new CTable(null, 'formElementTable');
-	$newOperationsTable->addItem(new CVar('new_operation[action]', $this->data['new_operation']['action']));
 	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
@@ -926,7 +960,7 @@ if (!empty($this->data['new_operation'])) {
 				? _('Link with templates')
 				: _('Unlink from templates');
 
-			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup inlineblock border_dotted ui-corner-all')));
+			$newOperationsTable->addRow(array($caption, new CDiv($templateList, 'objectgroup border_dotted ui-corner-all')));
 			break;
 	}
 
@@ -948,7 +982,12 @@ if (!empty($this->data['new_operation'])) {
 		$operationConditionsTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 		$i = 0;
-		foreach ($this->data['new_operation']['opconditions'] as $opcondition) {
+
+		$operationConditionStringValues = actionOperationConditionValueToString(
+			$this->data['new_operation']['opconditions']
+		);
+
+		foreach ($this->data['new_operation']['opconditions'] as $cIdx => $opcondition) {
 			if (!isset($opcondition['conditiontype'])) {
 				$opcondition['conditiontype'] = 0;
 			}
@@ -969,7 +1008,9 @@ if (!empty($this->data['new_operation'])) {
 			$operationConditionsTable->addRow(
 				array(
 					$labelCol,
-					get_condition_desc($opcondition['conditiontype'], $opcondition['operator'], $opcondition['value']),
+					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
+						$operationConditionStringValues[$cIdx]
+					),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),
@@ -1054,11 +1095,11 @@ if (!empty($this->data['new_operation'])) {
 	}
 
 	$footer = array(
-		new CSubmit('add_operation', ($this->data['new_operation']['action'] == 'update') ? _('Update') : _('Add'), null, 'link_menu'),
+		new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add'), null, 'link_menu'),
 		SPACE.SPACE,
 		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 	);
-	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup floatleft border_dotted ui-corner-all'));
 }
 
 // append tabs to form

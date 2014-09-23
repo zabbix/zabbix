@@ -26,20 +26,27 @@
 #include "zbxgetopt.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix get";
+const char	title_message[] = "zabbix_get";
 const char	syslog_app_name[] = "zabbix_get";
-const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
+const char	*usage_message[] = {
+	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
+	"Get data from Zabbix agent.",
+	"",
 	"Options:",
-	"  -s --host <host name or IP>          Specify host name or IP address of a host",
-	"  -p --port <port number>              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
-	"  -I --source-address <IP address>     Specify source IP address",
+	"  -s --host host-name-or-IP          Specify host name or IP address of a host",
+	"  -p --port port-number              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
+	"  -I --source-address IP-address     Specify source IP address",
 	"",
-	"  -k --key <key of metric>             Specify key of item to retrieve value for",
+	"  -k --key item-key                  Specify key of the item to retrieve value for",
 	"",
-	"  -h --help                            Display help information",
-	"  -V --version                         Display version number",
+	"  -h --help                          Display this help message",
+	"  -V --version                       Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
 	NULL	/* end of text */
@@ -60,7 +67,7 @@ struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char     shortopts[] = "s:p:k:I:hV";
+static char	shortopts[] = "s:p:k:I:hV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -150,7 +157,7 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 int	main(int argc, char **argv)
 {
 	unsigned short	port = ZBX_DEFAULT_AGENT_PORT;
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, opt_k = 0, opt_p = 0, opt_s = 0, opt_i = 0;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 
 	progname = get_program_name(argv[0]);
@@ -161,16 +168,26 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'k':
-				key = strdup(zbx_optarg);
+				opt_k++;
+
+				if (NULL == key)
+					key = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'p':
+				opt_p++;
 				port = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
-				host = strdup(zbx_optarg);
+				opt_s++;
+
+				if (NULL == host)
+					host = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'I':
-				source_ip = strdup(zbx_optarg);
+				opt_i++;
+
+				if (NULL == source_ip)
+					source_ip = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -193,6 +210,36 @@ int	main(int argc, char **argv)
 		ret = FAIL;
 	}
 
+	/* every option may be specified only once */
+	if (1 < opt_k || 1 < opt_p || 1 < opt_s || 1 < opt_i)
+	{
+		if (1 < opt_k)
+			zbx_error("option \"-k\" specified multiple times");
+		if (1 < opt_p)
+			zbx_error("option \"-p\" specified multiple times");
+		if (1 < opt_s)
+			zbx_error("option \"-s\" specified multiple times");
+		if (1 < opt_i)
+			zbx_error("option \"-I\" specified multiple times");
+
+		ret = FAIL;
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		ret = FAIL;
+	}
+
+	if (FAIL == ret)
+		printf("Try '%s --help' for more information.\n", progname);
+
 	if (SUCCEED == ret)
 	{
 #if !defined(_WINDOWS)
@@ -206,6 +253,7 @@ int	main(int argc, char **argv)
 
 	zbx_free(host);
 	zbx_free(key);
+	zbx_free(source_ip);
 
 	return ret;
 }

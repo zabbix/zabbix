@@ -201,31 +201,45 @@ $subfiltersList = array('subfilter_apps', 'subfilter_types', 'subfilter_value_ty
 /*
  * Permissions
  */
-if (getRequest('itemid', false)) {
+$itemId = getRequest('itemid');
+if ($itemId) {
 	$item = API::Item()->get(array(
-		'itemids' => $_REQUEST['itemid'],
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'itemids' => $itemId,
+		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
-	if (empty($item)) {
+	if (!$item) {
 		access_deny();
 	}
 	$item = reset($item);
 	$hosts = $item['hosts'];
 }
-elseif (getRequest('hostid', 0) > 0) {
-	$hosts = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status'),
-		'templated_hosts' => true,
-		'editable' => true
-	));
-	if (empty($hosts)) {
-		access_deny();
+else {
+	$hostId = getRequest('hostid');
+	if ($hostId) {
+		$hosts = API::Host()->get(array(
+			'output' => array('status'),
+			'hostids' => $hostId,
+			'templated_hosts' => true,
+			'editable' => true
+		));
+		if (!$hosts) {
+			access_deny();
+		}
 	}
+}
+
+$filterGroupId = getRequest('filter_groupid');
+if ($filterGroupId && !API::HostGroup()->isWritable(array($filterGroupId))) {
+	access_deny();
+}
+
+$filterHostId = getRequest('filter_hostid');
+if ($filterHostId && !API::Host()->isWritable(array($filterHostId))) {
+	access_deny();
 }
 
 /*
@@ -528,7 +542,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 // mass update
 elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$visible = getRequest('visible', array());
-	if (isset($visible['delay_flex_visible'])) {
+	if (isset($visible['delay_flex'])) {
 		$delay_flex = getRequest('delay_flex');
 		if (!is_null($delay_flex)) {
 			$db_delay_flex = '';
@@ -830,6 +844,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$data = getItemFormData($item);
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
 	$data['inventory_link'] = getRequest('inventory_link');
+	$data['config'] = select_config();
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
@@ -843,6 +858,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform') || hasRequest('massupdate')) && hasRequest('group_itemid')) {
 	$data = array(
 		'form' => getRequest('form'),
+		'action' => 'item.massupdateform',
 		'hostid' => getRequest('hostid'),
 		'itemids' => getRequest('group_itemid', array()),
 		'description' => getRequest('description', ''),
@@ -979,11 +995,14 @@ else {
 
 	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
 
+	$config = select_config();
+
 	$data = array(
 		'form' => getRequest('form'),
 		'hostid' => getRequest('hostid'),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	// items

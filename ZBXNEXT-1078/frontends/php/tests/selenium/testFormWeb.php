@@ -518,7 +518,7 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('http_proxy');
 		$this->assertAttribute("//input[@id='http_proxy']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='http_proxy']/@size", 50);
-		$this->assertElementPresent("//input[@placeholder='http://[username[:password]@]proxy.example.com[:port]']");
+		$this->assertElementPresent("//input[@placeholder='http://[user[:password]@]proxy.example.com[:port]']");
 
 		$this->zbxTestTextPresent('Variables');
 		$this->assertVisible('variables');

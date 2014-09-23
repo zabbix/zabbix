@@ -265,10 +265,12 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
-		'config' => select_config(),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	$data['proxies'] = API::Proxy()->get(array(
@@ -288,7 +290,7 @@ else {
 
 	// calculate performance
 	$dbPerformance = DBselect(
-		'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
+		'SELECT h.proxy_hostid,SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) AS qps'.
 		' FROM items i,hosts h'.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.hostid=h.hostid'.

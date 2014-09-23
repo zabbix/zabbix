@@ -81,18 +81,25 @@ if (isset($_REQUEST['add'])) {
 	}
 }
 
-if (isset($_REQUEST['media']) && !isset($_REQUEST['form_refresh'])) {
-	$rq_severity = getRequest('severity', 63);
+$config = select_config();
 
-	$severity = array();
-	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		if ($rq_severity & (1 << $i)) {
-			$severity[$i] = $i;
+$severityNames = array();
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$severityNames[$severity] = getSeverityName($severity, $config);
+}
+
+if (isset($_REQUEST['media']) && !isset($_REQUEST['form_refresh'])) {
+	$severityRequest = getRequest('severity', 63);
+
+	$severities = array();
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		if ($severityRequest & (1 << $severity)) {
+			$severities[$severity] = $severity;
 		}
 	}
 }
 else {
-	$severity = getRequest('severity', array(0, 1, 2, 3, 4, 5));
+	$severities = getRequest('severity', array_keys($severityNames));
 }
 
 $media = getRequest('media', -1);
@@ -119,10 +126,11 @@ $frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
 $frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
 
 $frm_row = array();
-foreach (getSeverityCaption() as $i => $caption) {
+
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$frm_row[] = array(
-		new CCheckBox('severity['.$i.']', str_in_array($i, $severity), null, $i),
-		$caption
+		new CCheckBox('severity['.$severity.']', str_in_array($severity, $severities), null, $severity),
+		getSeverityName($severity, $config)
 	);
 	$frm_row[] = BR();
 }

@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[2.3.5])
+AC_INIT([Zabbix],[2.5.0])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -119,6 +119,15 @@ AC_CHECK_HEADERS(sys/ucontext.h, [], [], [
 AC_CHECK_HEADERS(devstat.h, [], [], [
 #ifdef HAVE_SYS_DKSTAT_H
 #  include <sys/dkstat.h>
+#endif
+])
+AC_CHECK_HEADERS(linux/netlink.h, [
+	AC_CHECK_HEADERS(linux/inet_diag.h, [
+		AC_DEFINE([HAVE_INET_DIAG], 1, [Define to 1 if you have NETLINK INET_DIAG support.])
+	])
+], [], [
+#ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
 #endif
 ])
 
@@ -1100,7 +1109,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	dnl Checking for Oracle support
 	AX_LIB_ORACLE_OCI([10.0])
-	if test "x$WANT_ORACLE_OCI" = "xyes"; then
+	if test "x$want_oracle_oci" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
@@ -1147,7 +1156,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	dnl Checking for SQLite3 support
 	AX_LIB_SQLITE3()
-	if test "x$WANT_SQLITE3" = "xyes"; then
+	if test "x$want_sqlite3" = "xyes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
@@ -1156,7 +1165,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_db="SQLite v3.x"
 
 			saved_CPPFLAGS="$CPPFLAGS"
-			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS $SQLITE3_LDFLAGS"
+			saved_LDFLAGS="$LDFLAGS"
+
+			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_TRY_LINK([#include <sqlite3.h>],
@@ -1168,6 +1180,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 				AC_MSG_RESULT(no))
 
 			CPPFLAGS="$saved_CPPFLAGS"
+			LDFLAGS="$saved_LDFLAGS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1236,8 +1249,8 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
-		if test "x$found_unixodbc" != "xyes"; then
-			AC_MSG_ERROR($found_unixodbc)
+		if test "x$unixodbc_error" != "x"; then
+			AC_MSG_ERROR($unixodbc_error)
 		fi
 		have_unixodbc="yes"
 	fi
