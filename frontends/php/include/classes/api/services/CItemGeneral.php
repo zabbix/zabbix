@@ -172,7 +172,7 @@ abstract class CItemGeneral extends CApiService {
 		if ($update) {
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('itemid', 'status'),
-				'messageAllowedField' => _('Cannot update "%1$s" for a discovered item.')
+				'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s"!')
 			));
 			foreach ($items as $item) {
 				// check permissions
@@ -181,6 +181,7 @@ abstract class CItemGeneral extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 
+				$updateDiscoveredValidator->setObjectName($item['name']);
 				// discovered fields, except status, cannot be updated
 				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItems[$item['itemid']]);
 			}

@@ -530,22 +530,29 @@ class CGraph extends CGraphGeneral {
 		}
 
 		$delGraphs = $this->get(array(
+			'output' => API_OUTPUT_EXTEND,
 			'graphids' => $graphids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('name'),
-			'filter' => array('flags' => $nopermissions ? null : ZBX_FLAG_DISCOVERY_NORMAL)
+			'selectHosts' => array('name')
 		));
 
 		if (!$nopermissions) {
 			foreach ($graphids as $graphid) {
-				if (!isset($delGraphs[$graphid])) {
+				$delGraph = $delGraphs[$graphid];
+
+				if (!isset($delGraph)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 
-				if (!empty($delGraphs[$graphid]['templateid'])) {
+				if (!empty($delGraph['templateid'])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs.'));
+				}
+
+				if ($delGraph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot delete discovered graph "%s"!', $delGraph['name']
+					));
 				}
 			}
 		}
