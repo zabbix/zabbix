@@ -109,6 +109,15 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
+	access_deny();
+}
+
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->get(array('groupids' => $groupId))) {
+	access_deny();
+}
 
 /*
  * Actions

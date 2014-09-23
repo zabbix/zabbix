@@ -696,7 +696,7 @@ while (0)
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
-extern const char	usage_message[];
+extern const char	*usage_message[];
 extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
@@ -713,11 +713,16 @@ typedef enum
 	ZBX_TASK_PRINT_SUPPORTED,
 	ZBX_TASK_TEST_METRIC,
 	ZBX_TASK_SHOW_USAGE,
+	ZBX_TASK_SHOW_VERSION,
+	ZBX_TASK_SHOW_HELP,
+#ifdef _WINDOWS
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE,
+	ZBX_TASK_STOP_SERVICE
+#else
 	ZBX_TASK_RUNTIME_CONTROL
+#endif
 }
 zbx_task_t;
 

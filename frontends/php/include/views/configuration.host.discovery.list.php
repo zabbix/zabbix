@@ -109,21 +109,21 @@ foreach ($data['discoveries'] as $discovery) {
 		array(
 			new CLink(
 				_('Item prototypes'),
-				'disc_prototypes.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'disc_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['items'].')'
 		),
 		array(
 			new CLink(
 				_('Trigger prototypes'),
-				'trigger_prototypes.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'trigger_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['triggers'].')'
 		),
 		array(
 			new CLink(
 				_('Graph prototypes'),
-				'graphs.php?hostid='.getRequest('hostid').'&parent_discoveryid='.$discovery['itemid']
+				'graphs.php?parent_discoveryid='.$discovery['itemid']
 			),
 			' ('.$discovery['graphs'].')'
 		),

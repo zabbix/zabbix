@@ -827,10 +827,10 @@ else {
 	// filter
 	$filterTable = new CTable('', 'filter filter-center');
 	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
+		array(array(bold(_('Name')), ' '._('like').' '), new CTextBox('filter_host', $filter['host'], 20)),
+		array(array(bold(_('DNS')), ' '._('like').' '), new CTextBox('filter_dns', $filter['dns'], 20)),
+		array(array(bold(_('IP')), ' '._('like').' '), new CTextBox('filter_ip', $filter['ip'], 20)),
+		array(bold(_('Port')), ' ', new CTextBox('filter_port', $filter['port'], 20))
 	));
 
 	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
