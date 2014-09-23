@@ -585,16 +585,21 @@ class CTrigger extends CTriggerGeneral {
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('triggerid', 'status'),
-				'messageAllowedField' => _('Cannot update "%1$s" for a discovered trigger.')
+				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
 			));
 			foreach ($triggers as $trigger) {
+				$triggerId = $trigger['triggerid'];
 				// check permissions
-				if (!isset($dbTriggers[$trigger['triggerid']])) {
+				if (!isset($dbTriggers[$triggerId])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+				$dbTrigger = $dbTriggers[$triggerId];
+
+				$triggerName = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
+				$updateDiscoveredValidator->setObjectName($triggerName);
 
 				// discovered fields, except status, cannot be updated
-				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTriggers[$trigger['triggerid']]);
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTrigger);
 			}
 
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
@@ -1850,15 +1855,22 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $triggerIds
 	 */
 	protected function checkPermissions(array $triggerIds) {
-		$triggerCount = $this->get(array(
-			'output' => array('triggerid'),
+		$dbTriggers = $this->get(array(
+			'output' => array('triggerid', 'flags', 'description'),
 			'triggerids' => $triggerIds,
 			'editable' => true,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'countOutput' => true
+			'filter' => array('flags' => null)
 		));
 
-		if ($triggerCount != count($triggerIds)) {
+		foreach ($dbTriggers as $dbTrigger) {
+			if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
+				);
+			}
+		}
+
+		if (count($dbTriggers) != count($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}

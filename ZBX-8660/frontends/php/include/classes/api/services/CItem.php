@@ -623,11 +623,11 @@ class CItem extends CItemGeneral {
 	 * Delete items.
 	 *
 	 * @param array $itemIds
-	 * @param bool  $noPermissions
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemIds, $noPermissions = false) {
+	public function delete(array $itemIds, $nopermissions = false) {
 		if (!$itemIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -635,22 +635,29 @@ class CItem extends CItemGeneral {
 		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get(array(
-			'output' => array('name', 'templateid'),
+			'output' => array('name', 'templateid', 'flags'),
 			'selectHosts' => array('name'),
 			'itemids' => $itemIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'filter' => array('flags' => $noPermissions ? null : ZBX_FLAG_DISCOVERY_NORMAL)
+			'preservekeys' => true
 		));
 
 		// TODO: remove $nopermissions hack
-		if (!$noPermissions) {
+		if (!$nopermissions) {
 			foreach ($itemIds as $itemId) {
 				if (!isset($delItems[$itemId])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delItems[$itemId]['templateid'] != 0) {
+				$delItem = $delItems[$itemId];
+
+				if ($delItem['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
+				}
+
+				if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot delete discovered item "%s"!', $delItem['name']
+					));
 				}
 			}
 		}

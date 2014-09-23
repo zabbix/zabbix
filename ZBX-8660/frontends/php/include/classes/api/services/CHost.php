@@ -553,6 +553,11 @@ class CHost extends CHostGeneral {
 			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		));
 
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+			'allowed' => array('hostid', 'status', 'inventory', 'description'),
+			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
+		));
+
 		$hostNames = array();
 		foreach ($hosts as &$host) {
 			if (!check_db_fields($hostDBfields, $host)) {
@@ -560,9 +565,10 @@ class CHost extends CHostGeneral {
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			if (isset($host['status'])) {
-				$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
+			$dbHost = $dbHosts[$host['hostid']];
+			$hostName = (isset($host['host'])) ? $host['host'] : $dbHost['host'];
 
+			if (isset($host['status'])) {
 				$statusValidator->setObjectName($hostName);
 				$this->checkValidator($host['status'], $statusValidator);
 			}
@@ -580,17 +586,14 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-				'allowed' => array('hostid', 'status', 'inventory', 'description'),
-				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
-			));
 			if ($update) {
 				// cannot update certain fields for discovered hosts
-				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
+				$updateDiscoveredValidator->setObjectName($hostName);
+				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHost);
 			}
 			else {
 				// if visible name is not given or empty it should be set to host name
-				if (!isset($host['name']) || zbx_empty(trim($host['name']))) {
+				if (!isset($host['name']) || !trim($host['name'])) {
 					$host['name'] = $host['host'];
 				}
 
@@ -1634,7 +1637,19 @@ class CHost extends CHostGeneral {
 	 * @param array $hostIds
 	 */
 	protected function checkPermissions(array $hostIds) {
-		if (!$this->isWritable($hostIds)) {
+		$dbHosts = API::Host()->get(array(
+			'output' => array('hostid', 'name', 'flags'),
+			'preservekeys' => true,
+			'editable' => true
+		));
+
+		foreach ($dbHosts as $dbHost) {
+			if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%s"!', $dbHost['name']));
+			}
+		}
+
+		if (count($dbHosts) != count($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
