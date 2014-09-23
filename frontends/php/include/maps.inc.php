@@ -1053,8 +1053,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						$i['problem_unack']++;
 					}
 
-					$config = select_config();
-
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 				}
 			}
@@ -1497,6 +1495,8 @@ function drawMapSelements(&$im, $map, $mapInfo) {
 }
 
 function drawMapHighligts(&$im, $map, $mapInfo) {
+	$config = select_config();
+
 	$selements = $map['selements'];
 
 	foreach ($selements as $selementId => $selement) {
@@ -1591,7 +1591,6 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 					imagecolorallocate($im, 120, 120, 120)
 				);
 
-				$config = select_config();
 				if (isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable']) {
 					imagesetthickness($im, 5);
 					imagearc($im,

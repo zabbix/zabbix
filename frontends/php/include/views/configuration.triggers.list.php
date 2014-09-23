@@ -199,7 +199,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	$triggersTable->addRow(array(
 		$checkBox,
-		getSeverityCell($trigger['priority']),
+		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
 		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
