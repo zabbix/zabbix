@@ -35,7 +35,8 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
+extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num);
 
 #ifdef HAVE_SIGQUEUE
 extern void	zbx_sigusr_handler(int flags);
@@ -111,6 +112,10 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	{
 		common_sigusr_handler(flags);
 	}
+	else if (NULL == threads)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: shutdown in progress");
+	}
 	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
 	{
 		extern unsigned char	daemon_type;
@@ -138,13 +143,10 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (-1 != sigqueue(threads[i], SIGUSR1, s))
 				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to the configuration syncer");
 			else
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
 		}
 		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal to configuration syncer:"
-					" process not found");
-		}
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal to configuration syncer: process not found");
 	}
 	else if (ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
 			ZBX_RTC_LOG_LEVEL_DECREASE == ZBX_RTC_GET_MSG(flags))
@@ -166,13 +168,13 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 							threads[i]);
 				}
 				else
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
+					zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
 			}
 
 			if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: process pid:%d is not a Zabbix"
-						" child process", ZBX_RTC_GET_DATA(flags));
+				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: process pid:%d is not a Zabbix child"
+						" process", ZBX_RTC_GET_DATA(flags));
 			}
 		}
 		else
@@ -202,20 +204,20 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 							" pid:%d", get_process_type_string(process_type), threads[i]);
 				}
 				else
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s", zbx_strerror(errno));
+					zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
 			}
 
 			if (0 == found)
 			{
 				if (0 == ZBX_RTC_GET_DATA(flags))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+					zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
 							" \"%s\" process does not exist",
 							get_process_type_string(ZBX_RTC_GET_SCOPE(flags)));
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal:"
+					zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
 							" \"%s #%d\" process does not exist",
 							get_process_type_string(ZBX_RTC_GET_SCOPE(flags)),
 							ZBX_RTC_GET_DATA(flags));
