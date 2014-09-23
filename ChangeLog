@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
 ..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
 ...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
