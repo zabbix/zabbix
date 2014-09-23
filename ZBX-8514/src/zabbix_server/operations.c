@@ -274,8 +274,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 							" and ds.dhostid=" ZBX_FS_UI64
 							ZBX_SQL_NODE
 						" order by h.hostid",
-						HOST_STATUS_MONITORED,
-						HOST_STATUS_NOT_MONITORED,
+						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 						DBsql_id_cmp(proxy_hostid),
 						dhostid,
 						DBand_node_local("h.hostid"));
