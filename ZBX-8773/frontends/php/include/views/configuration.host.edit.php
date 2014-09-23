@@ -41,7 +41,7 @@ $ipmi_privilege = get_request('ipmi_privilege', 2);
 $ipmi_username = get_request('ipmi_username', '');
 $ipmi_password = get_request('ipmi_password', '');
 $inventoryMode = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
-$host_inventory = get_request('host_inventory', array());
+$hostInventory = getRequest('host_inventory', array());
 $macros = get_request('macros', array());
 $interfaces = get_request('interfaces', array());
 $templateIds = get_request('templates', array());
@@ -111,9 +111,9 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$macros = order_macros($dbHost['macros'], 'macro');
 	$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
-	$host_inventory = $dbHost['inventory'];
-	$inventoryMode = isset($dbHost['inventory']['inventory_mode'])
-		? $dbHost['inventory']['inventory_mode']
+	$hostInventory = $dbHost['inventory'];
+	$inventoryMode = isset($hostInventory['inventory_mode'])
+		? $hostInventory['inventory_mode']
 		: $inventoryMode;
 
 	$templateIds = array();
@@ -811,17 +811,17 @@ $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
 
 foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
-	if (!isset($host_inventory[$inventoryInfo['db_field']])) {
-		$host_inventory[$inventoryInfo['db_field']] = '';
+	if (!isset($hostInventory[$inventoryInfo['db_field']])) {
+		$hostInventory[$inventoryInfo['db_field']] = '';
 	}
 
 	if ($hostInventoryTable['fields'][$inventoryInfo['db_field']]['type'] == DB::FIELD_TYPE_TEXT) {
-		$input = new CTextArea('host_inventory['.$inventoryInfo['db_field'].']', $host_inventory[$inventoryInfo['db_field']]);
+		$input = new CTextArea('host_inventory['.$inventoryInfo['db_field'].']', $hostInventory[$inventoryInfo['db_field']]);
 		$input->addStyle('width: 64em;');
 	}
 	else {
 		$fieldLength = $hostInventoryTable['fields'][$inventoryInfo['db_field']]['length'];
-		$input = new CTextBox('host_inventory['.$inventoryInfo['db_field'].']', $host_inventory[$inventoryInfo['db_field']]);
+		$input = new CTextBox('host_inventory['.$inventoryInfo['db_field'].']', $hostInventory[$inventoryInfo['db_field']]);
 		$input->setAttribute('maxlength', $fieldLength);
 		$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 	}
