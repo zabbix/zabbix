@@ -79,7 +79,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
-					" and ds.dserviceid =" ZBX_FS_UI64
+					" and ds.dserviceid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
