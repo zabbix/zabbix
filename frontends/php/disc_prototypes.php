@@ -352,6 +352,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
 	$data['is_item_prototype'] = true;
+	$data['config'] = select_config();
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
@@ -364,6 +365,8 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+	$config = select_config();
 
 	$data = array(
 		'form' => getRequest('form'),

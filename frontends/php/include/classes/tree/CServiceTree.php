@@ -36,6 +36,7 @@ class CServiceTree extends CTree {
 	 */
 	protected function makeCol($rowId, $colName) {
 		$class = null;
+		$config = select_config();
 
 		if ($colName == 'status' && zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
 			$status = $this->tree[$rowId][$colName];
@@ -45,7 +46,7 @@ class CServiceTree extends CTree {
 				$this->tree[$rowId][$colName] = new CSpan(_('OK'), 'green');
 			}
 			else {
-				$this->tree[$rowId][$colName] = getSeverityCaption($status);
+				$this->tree[$rowId][$colName] = getSeverityName($status, $config);
 				$class = getSeverityStyle($status);
 			}
 		}
