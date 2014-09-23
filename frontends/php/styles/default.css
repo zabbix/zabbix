@@ -90,7 +90,7 @@ img.bottom { vertical-align: text-bottom; }
 /* header */
 .header { height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px; }
 .header .header_l { padding-left: 5px; }
-.header .header_r { padding-right: 5px; }
+.header .header_r { padding: 1px 5px 1px 0; }
 .header a { color: #FFFFFF; }
 
 /* link */
