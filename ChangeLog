@@ -17,6 +17,7 @@ A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'searc
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
 ..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.6
@@ -1098,6 +1099,7 @@ A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators 
 Bug fixes:
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.13
@@ -2681,6 +2683,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.22rc1
 
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 Changes for 1.8.21
 
