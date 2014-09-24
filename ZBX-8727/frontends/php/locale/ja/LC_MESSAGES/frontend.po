@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-07 08:36+0300\n"
+"POT-Creation-Date: 2014-09-23 01:32+0300\n"
 "PO-Revision-Date: 2014-09-10 02:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1132,14 +1132,14 @@ msgstr "イメージの設定"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "ITサービスの設定"
 
-#: disc_prototypes.php:367
+#: disc_prototypes.php:353
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "アイテムのプロトタイプの設定"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:831
-#: items.php:967
+#: include/views/configuration.item.massupdate.php:28 items.php:845
+#: items.php:981
 msgid "CONFIGURATION OF ITEMS"
 msgstr "アイテムの設定"
 
@@ -1192,8 +1192,8 @@ msgstr "スライドショーの設定"
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "テンプレートの設定"
 
+#: include/views/configuration.trigger.prototype.list.php:33
 #: include/views/configuration.triggers.edit.php:37
-#: include/views/configuration.triggers.list.php:42
 #: include/views/configuration.triggers.massupdate.php:39
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr "トリガーのプロトタイプの設定"
@@ -1203,8 +1203,8 @@ msgid "CONFIGURATION OF TRIGGER SEVERITIES"
 msgstr "トリガー深刻度の設定"
 
 #: include/views/configuration.triggers.edit.php:40
-#: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:351
+#: include/views/configuration.triggers.list.php:43
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:359
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "トリガーの設定"
 
@@ -1349,11 +1349,11 @@ msgstr "トリガー\"%1$s:%2$s\"から存在しないトリガー\"%3$s:%4$s\"�
 msgid "Cannot add discovery rule"
 msgstr "ディスカバリのルールを追加できません"
 
-#: graphs.php:255
+#: graphs.php:254
 msgid "Cannot add graph"
 msgstr "グラフを追加できません"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot add graph prototype"
 msgstr "グラフのプロトタイプを追加できません"
 
@@ -1382,7 +1382,7 @@ msgstr "イメージを追加できません"
 msgid "Cannot add image."
 msgstr "イメージを追加できません。"
 
-#: items.php:499
+#: items.php:513
 msgid "Cannot add item"
 msgstr "アイテムを追加できません"
 
@@ -1391,7 +1391,7 @@ msgstr "アイテムを追加できません"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "\"%2$s\"のアイテム\"%1$s\"を\"%4$s\"のアプリケーション\"%3$s\"に追加できません"
 
-#: disc_prototypes.php:302
+#: disc_prototypes.php:288
 msgid "Cannot add item prototype"
 msgstr "アイテムのプロトタイプが追加できません"
 
@@ -1425,7 +1425,7 @@ msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値は2つ以
 msgid "Cannot add network map"
 msgstr "ネットワークマップを追加できません"
 
-#: httpconf.php:262
+#: httpconf.php:271
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "新規アプリケーション\"%1$s\"を追加できません。"
@@ -1458,11 +1458,11 @@ msgstr "スライドショーを追加できません"
 msgid "Cannot add template"
 msgstr "テンプレートを追加できません"
 
-#: triggers.php:190 triggers.php:320 tr_logform.php:149
+#: triggers.php:198 triggers.php:328 tr_logform.php:149
 msgid "Cannot add trigger"
 msgstr "トリガーを追加できません"
 
-#: trigger_prototypes.php:172
+#: trigger_prototypes.php:166
 msgid "Cannot add trigger prototype"
 msgstr "トリガーのプロトタイプが追加できません"
 
@@ -1482,7 +1482,7 @@ msgstr "ユーザーを追加できません"
 msgid "Cannot add value map"
 msgstr "値のマッピングを追加できません"
 
-#: httpconf.php:199
+#: httpconf.php:208
 msgid "Cannot add web scenario"
 msgstr "Webシナリオを追加できません"
 
@@ -1502,7 +1502,7 @@ msgstr "認証方式をLDAPに変更できません"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "認証方式をZabbix内部データベースに変更できません"
 
-#: httpconf.php:187 httpconf.php:408 items.php:526
+#: httpconf.php:196 httpconf.php:417 items.php:540
 msgid "Cannot clear history"
 msgstr "ヒストリを削除できません"
 
@@ -1526,11 +1526,11 @@ msgstr "トリガーのプロトタイプを複製できません"
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "ZabbixサーバーデーモンのTrapperポートに接続できません。スクリプトを実行するためには適切に設定を行ってください。"
 
-#: graphs.php:374
+#: graphs.php:373
 msgid "Cannot copy graphs"
 msgstr "グラフをコピーできません"
 
-#: items.php:749
+#: items.php:763
 msgid "Cannot copy items"
 msgstr "アイテムをコピーできません"
 
@@ -1579,7 +1579,7 @@ msgstr "\"%s\"と同名のアイコンのマッピングは作成できません
 msgid "Cannot create map \"%s\"."
 msgstr "マップ\"%s\"を作成できません。"
 
-#: httpconf.php:206
+#: httpconf.php:215
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "新規アプリケーションを作成できません。Webシナリオがアプリケーションに割り当てられています。"
 
@@ -1618,19 +1618,19 @@ msgstr "ディスカバリのルールを削除できません"
 msgid "Cannot delete discovery rules"
 msgstr "ディスカバリルールを削除できません"
 
-#: graphs.php:298
+#: graphs.php:297
 msgid "Cannot delete graph"
 msgstr "グラフを削除できません"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot delete graph prototype"
 msgstr "グラフのプロトタイプを削除できません"
 
-#: graphs.php:314
+#: graphs.php:313
 msgid "Cannot delete graph prototypes"
 msgstr "グラフのプロトタイプを削除できません"
 
-#: graphs.php:322
+#: graphs.php:321
 msgid "Cannot delete graphs"
 msgstr "グラフを削除できません"
 
@@ -1671,19 +1671,19 @@ msgstr "イメージを削除できません"
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
-#: items.php:388
+#: items.php:402
 msgid "Cannot delete item"
 msgstr "アイテムを削除できません"
 
-#: disc_prototypes.php:203
+#: disc_prototypes.php:189
 msgid "Cannot delete item prototype"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: disc_prototypes.php:343
+#: disc_prototypes.php:329
 msgid "Cannot delete item prototypes"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: items.php:806
+#: items.php:820
 msgid "Cannot delete items"
 msgstr "アイテムを削除できません"
 
@@ -1782,19 +1782,19 @@ msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "テンプレートのWebシナリオ\"%1$s\"を削除できません。"
 
-#: triggers.php:208
+#: triggers.php:216
 msgid "Cannot delete trigger"
 msgstr "トリガーを削除できません"
 
-#: trigger_prototypes.php:187
+#: trigger_prototypes.php:181
 msgid "Cannot delete trigger prototype"
 msgstr "トリガープロトタイプを削除できません"
 
-#: trigger_prototypes.php:263
+#: trigger_prototypes.php:258
 msgid "Cannot delete trigger prototypes"
 msgstr "トリガーのプロトタイプを削除できません"
 
-#: triggers.php:332
+#: triggers.php:340
 msgid "Cannot delete triggers"
 msgstr "トリガーを削除できません"
 
@@ -1810,7 +1810,7 @@ msgstr "ユーザーのメディアを削除できません"
 msgid "Cannot delete value map"
 msgstr "値のマッピングを削除できません"
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:163 httpconf.php:425
 msgid "Cannot delete web scenario"
 msgstr "Webシナリオを削除できません"
 
@@ -1839,12 +1839,12 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] "ホストのプロトタイプを無効にできません"
 
-#: applications.php:249 items.php:714
+#: applications.php:249 items.php:728
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "アイテムを無効にできません"
 
-#: disc_prototypes.php:327
+#: disc_prototypes.php:313
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "アイテムのプロトタイプを無効にできません"
@@ -1854,12 +1854,12 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "メディアタイプを無効にできません"
 
-#: triggers.php:281
+#: triggers.php:289
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "トリガーを無効にできません"
 
-#: trigger_prototypes.php:253
+#: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] "トリガーのプロトタイプを無効にできません"
@@ -1869,7 +1869,7 @@ msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "ユーザーグループを無効にできません"
 
-#: httpconf.php:369
+#: httpconf.php:378
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Webシナリオを無効にできません"
@@ -1907,12 +1907,12 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] "ホストのプロトタイプを有効にできません"
 
-#: applications.php:248 items.php:713
+#: applications.php:248 items.php:727
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "アイテムを有効にできません"
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:312
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "アイテムのプロトタイプを有効にできません"
@@ -1922,12 +1922,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "メディアタイプを有効にできません"
 
-#: triggers.php:280
+#: triggers.php:288
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "トリガーを有効にできません"
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] "トリガーのプロトタイプを有効にできません"
@@ -1937,7 +1937,7 @@ msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "ユーザーグループを有効にできません"
 
-#: httpconf.php:368
+#: httpconf.php:377
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Webシナリオを有効にできません"
@@ -2413,11 +2413,11 @@ msgstr "ディスカバリのルールを更新できません"
 msgid "Cannot update frontend access"
 msgstr "Webインターフェースのアクセスを更新できません"
 
-#: graphs.php:249
+#: graphs.php:248
 msgid "Cannot update graph"
 msgstr "グラフを更新できません"
 
-#: graphs.php:231
+#: graphs.php:230
 msgid "Cannot update graph prototype"
 msgstr "グラフのプロトタイプを更新できません"
 
@@ -2465,15 +2465,15 @@ msgstr "イメージを更新できません。"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のインターフェースを更新できません"
 
-#: items.php:496
+#: items.php:510
 msgid "Cannot update item"
 msgstr "アイテムを更新できません"
 
-#: disc_prototypes.php:298
+#: disc_prototypes.php:284
 msgid "Cannot update item prototype"
 msgstr "アイテムのプロトタイプを更新できません"
 
-#: items.php:693
+#: items.php:707
 msgid "Cannot update items"
 msgstr "アイテムを更新できません"
 
@@ -2545,15 +2545,15 @@ msgstr "テンプレートのアプリケーションを更新できません。
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のテンプレートを更新できません"
 
-#: triggers.php:186 triggers.php:247 tr_logform.php:124
+#: triggers.php:194 triggers.php:255 tr_logform.php:124
 msgid "Cannot update trigger"
 msgstr "トリガーを更新できません"
 
-#: trigger_prototypes.php:167
+#: trigger_prototypes.php:161
 msgid "Cannot update trigger prototype"
 msgstr "トリガーのプロトタイプが更新できません"
 
-#: trigger_prototypes.php:214
+#: trigger_prototypes.php:209
 msgid "Cannot update trigger prototypes"
 msgstr "トリガーのプロトタイプが更新できません"
 
@@ -2573,7 +2573,7 @@ msgstr "ユーザーを更新できません。パスワードが一致してい
 msgid "Cannot update value map"
 msgstr "値のマッピングを更新できません"
 
-#: httpconf.php:194
+#: httpconf.php:203
 msgid "Cannot update web scenario"
 msgstr "Webシナリオを更新できません"
 
@@ -3190,7 +3190,7 @@ msgstr[0] "項目%1$sをコピー ..."
 
 #: include/views/configuration.graph.list.php:156
 #: include/views/configuration.item.list.php:276
-#: include/views/configuration.triggers.list.php:303
+#: include/views/configuration.triggers.list.php:225
 msgid "Copy selected to ..."
 msgstr "選択をコピー..."
 
@@ -3265,7 +3265,7 @@ msgstr "アイコンの作成"
 msgid "Create icon map"
 msgstr "アイコンのマッピングの作成"
 
-#: include/views/configuration.item.list.php:37 items.php:812
+#: include/views/configuration.item.list.php:37 items.php:826
 msgid "Create item"
 msgstr "アイテムの作成"
 
@@ -3321,15 +3321,15 @@ msgstr "スライドショーの作成"
 msgid "Create template"
 msgstr "テンプレートの作成"
 
-#: include/views/configuration.triggers.list.php:51 jsLoader.php:185
+#: include/views/configuration.triggers.list.php:40 jsLoader.php:185
 msgid "Create trigger"
 msgstr "トリガーの作成"
 
-#: include/views/configuration.triggers.list.php:46
+#: include/views/configuration.triggers.list.php:35
 msgid "Create trigger (select host first)"
 msgstr "トリガーの作成 (先にホストを選択)"
 
-#: include/views/configuration.triggers.list.php:40
+#: include/views/configuration.trigger.prototype.list.php:31
 msgid "Create trigger prototype"
 msgstr "トリガーのプロトタイプの作成"
 
@@ -3453,7 +3453,7 @@ msgstr "カスタムラベル"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "マップ\"%2$s\"のカスタムラベルのタイプ要素\"%1$s\"を設定してください。"
 
-#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
+#: disc_prototypes.php:107 include/views/configuration.item.massupdate.php:300
 #: items.php:115
 msgid "Custom multiplier"
 msgstr "乗数"
@@ -3935,7 +3935,8 @@ msgstr "スクリプトを削除しますか？"
 #: include/views/configuration.screen.list.php:70
 #: include/views/configuration.slideconf.list.php:57
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:307 templates.php:669
+#: include/views/configuration.trigger.prototype.list.php:146
+#: include/views/configuration.triggers.list.php:228 templates.php:669
 msgid "Delete selected"
 msgstr "選択を削除"
 
@@ -4045,11 +4046,11 @@ msgstr "選択したスライドショーを削除しますか？"
 msgid "Delete selected templates?"
 msgstr "選択したテンプレートを削除しますか？"
 
-#: include/views/configuration.triggers.list.php:310
+#: include/views/configuration.trigger.prototype.list.php:147
 msgid "Delete selected trigger prototypes?"
 msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
-#: include/views/configuration.triggers.list.php:310
+#: include/views/configuration.triggers.list.php:229
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 
@@ -4195,7 +4196,7 @@ msgstr "依存先"
 
 #: include/triggers.inc.php:1217
 #: include/views/configuration.services.edit.php:117
-#: include/views/configuration.triggers.list.php:166 popup.php:1030
+#: include/views/configuration.triggers.list.php:125 popup.php:1030
 #: tr_status.php:560
 msgid "Depends on"
 msgstr "依存先"
@@ -4363,7 +4364,8 @@ msgstr "選択したプロキシによるホストの監視を無効にします
 #: include/views/configuration.httpconf.list.php:145
 #: include/views/configuration.item.list.php:269
 #: include/views/configuration.item.prototype.list.php:116
-#: include/views/configuration.triggers.list.php:292
+#: include/views/configuration.trigger.prototype.list.php:139
+#: include/views/configuration.triggers.list.php:218
 msgid "Disable selected"
 msgstr "選択を無効"
 
@@ -4404,11 +4406,11 @@ msgstr "選択したアイテムを無効にしますか？"
 msgid "Disable selected media types?"
 msgstr "選択したメディアタイプを削除しますか？"
 
-#: include/views/configuration.triggers.list.php:295
+#: include/views/configuration.trigger.prototype.list.php:140
 msgid "Disable selected trigger prototypes?"
 msgstr "選択したトリガーのプロトタイプを無効にしますか？"
 
-#: include/views/configuration.triggers.list.php:295
+#: include/views/configuration.triggers.list.php:219
 msgid "Disable selected triggers?"
 msgstr "選択したトリガーを無効にしますか？"
 
@@ -4983,7 +4985,8 @@ msgstr "データの削除処理を有効"
 #: include/views/configuration.httpconf.list.php:141
 #: include/views/configuration.item.list.php:265
 #: include/views/configuration.item.prototype.list.php:112
-#: include/views/configuration.triggers.list.php:285
+#: include/views/configuration.trigger.prototype.list.php:135
+#: include/views/configuration.triggers.list.php:214
 msgid "Enable selected"
 msgstr "選択を有効"
 
@@ -5024,11 +5027,11 @@ msgstr "選択したアイテムを有効にしますか？"
 msgid "Enable selected media types?"
 msgstr "選択したメディアタイプを有効にしますか？"
 
-#: include/views/configuration.triggers.list.php:288
+#: include/views/configuration.trigger.prototype.list.php:136
 msgid "Enable selected trigger prototypes?"
 msgstr "選択したトリガーのプロトタイプを有効にしますか？"
 
-#: include/views/configuration.triggers.list.php:288
+#: include/views/configuration.triggers.list.php:215
 msgid "Enable selected triggers?"
 msgstr "選択したトリガーを有効にしますか？"
 
@@ -5082,7 +5085,7 @@ msgstr "エラー"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 
-#: httpdetails.php:161 httpdetails.php:234
+#: httpdetails.php:162 httpdetails.php:234
 #, c-format
 msgid "Error: %1$s"
 msgstr "エラー: %1$s"
@@ -5240,9 +5243,10 @@ msgstr "CSVエクスポート"
 #: include/views/administration.general.regularexpressions.edit.php:51
 #: include/views/administration.general.regularexpressions.edit.php:73
 #: include/views/configuration.item.list.php:150
+#: include/views/configuration.trigger.prototype.list.php:62
 #: include/views/configuration.triggers.edit.php:142
 #: include/views/configuration.triggers.edit.php:153
-#: include/views/configuration.triggers.list.php:103 trigger_prototypes.php:40
+#: include/views/configuration.triggers.list.php:74 trigger_prototypes.php:39
 #: triggers.php:42 triggers.php:48 tr_logform.php:268 tr_logform.php:278
 #: tr_testexpr.php:138
 msgid "Expression"
@@ -5695,7 +5699,8 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.screen.list.php:74
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:68
-#: include/views/configuration.triggers.list.php:314 latest.php:895
+#: include/views/configuration.trigger.prototype.list.php:150
+#: include/views/configuration.triggers.list.php:232 latest.php:895
 #: templates.php:677 tr_status.php:819
 msgid "Go"
 msgstr "実行"
@@ -5779,11 +5784,11 @@ msgstr "グラフ\"%1$s\"はスキップされました - ユーザの指定。"
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他のホストのアイテムを設定できません。"
 
-#: graphs.php:254
+#: graphs.php:253
 msgid "Graph added"
 msgstr "グラフを追加しました"
 
-#: graphs.php:298
+#: graphs.php:297
 msgid "Graph deleted"
 msgstr "グラフを削除しました"
 
@@ -5824,11 +5829,11 @@ msgstr "テンプレートのアイテムを含むグラフのプロトタイプ
 msgid "Graph prototype \"%s\" deleted."
 msgstr "グラフのプロトタイプ\"%s\"を削除しました。"
 
-#: graphs.php:236
+#: graphs.php:235
 msgid "Graph prototype added"
 msgstr "グラフのプロトタイプを追加しました"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graph prototype deleted"
 msgstr "グラフのプロトタイプを削除しました"
 
@@ -5836,7 +5841,7 @@ msgstr "グラフのプロトタイプを削除しました"
 msgid "Graph prototype not found."
 msgstr "グラフのプロトタイプが見つかりません。"
 
-#: graphs.php:230
+#: graphs.php:229
 msgid "Graph prototype updated"
 msgstr "グラフのプロトタイプを更新しました"
 
@@ -5847,7 +5852,7 @@ msgstr "グラフのプロトタイプを更新しました"
 msgid "Graph prototypes"
 msgstr "グラフのプロトタイプ"
 
-#: graphs.php:314
+#: graphs.php:313
 msgid "Graph prototypes deleted"
 msgstr "グラフのプロトタイプを削除しました"
 
@@ -5865,7 +5870,7 @@ msgstr "グラフの合計値"
 msgid "Graph type"
 msgstr "グラフのタイプ"
 
-#: graphs.php:248
+#: graphs.php:247
 msgid "Graph updated"
 msgstr "グラフを更新しました"
 
@@ -5896,11 +5901,11 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 msgid "Graphs"
 msgstr "グラフ"
 
-#: graphs.php:374
+#: graphs.php:373
 msgid "Graphs copied"
 msgstr "グラフをコピーしました"
 
-#: graphs.php:322
+#: graphs.php:321
 msgid "Graphs deleted"
 msgstr "グラフを削除しました"
 
@@ -5928,7 +5933,7 @@ msgstr "グリッド"
 #: include/views/configuration.screen.constructor.edit.php:387
 #: include/views/configuration.screen.constructor.edit.php:489
 #: include/views/configuration.screen.constructor.edit.php:562
-#: include/views/configuration.triggers.list.php:74
+#: include/views/configuration.triggers.list.php:47
 #: include/views/inventory.host.list.php:25
 #: include/views/inventory.host.list.php:75
 #: include/views/monitoring.charts.php:25
@@ -6118,11 +6123,11 @@ msgstr "すべてを隠す"
 msgid "Hide disabled scenarios"
 msgstr "無効なシナリオを非表示"
 
-#: include/views/configuration.triggers.list.php:63
+#: include/views/configuration.trigger.prototype.list.php:43
 msgid "Hide disabled trigger prototypes"
 msgstr "無効なトリガーのプロトタイプを非表示"
 
-#: include/views/configuration.triggers.list.php:81
+#: include/views/configuration.triggers.list.php:54
 msgid "Hide disabled triggers"
 msgstr "無効なトリガーを非表示"
 
@@ -6153,8 +6158,8 @@ msgstr "重度の障害"
 msgid "History"
 msgstr "ヒストリ"
 
-#: httpconf.php:187 httpconf.php:408 items.php:520 items.php:526 items.php:767
-#: items.php:776
+#: httpconf.php:196 httpconf.php:417 items.php:534 items.php:540 items.php:781
+#: items.php:790
 msgid "History cleared"
 msgstr "ヒストリを削除しました"
 
@@ -6176,7 +6181,7 @@ msgstr "ヒストリデータ保存期間(日) \"%1$s\""
 msgid "History of events"
 msgstr "イベント履歴"
 
-#: disc_prototypes.php:115 items.php:54
+#: disc_prototypes.php:114 items.php:54
 msgid "History storage period"
 msgstr "ヒストリ保存期間"
 
@@ -6214,9 +6219,9 @@ msgstr "横位置"
 #: include/views/configuration.httpconf.list.php:62
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.screen.constructor.edit.php:415
-#: include/views/configuration.triggers.list.php:75
-#: include/views/configuration.triggers.list.php:101
-#: include/views/configuration.triggers.list.php:121
+#: include/views/configuration.triggers.list.php:48
+#: include/views/configuration.triggers.list.php:72
+#: include/views/configuration.triggers.list.php:91
 #: include/views/inventory.host.list.php:74
 #: include/views/inventory.host.view.php:227
 #: include/views/inventory.host.view.php:239
@@ -6226,8 +6231,8 @@ msgstr "横位置"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:520 items.php:767
-#: items.php:796 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:534 items.php:781
+#: items.php:810 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
 #: popup.php:501 popup.php:1087 queue.php:229 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:296
 msgid "Host"
@@ -6678,7 +6683,7 @@ msgstr "IPMIパスワード"
 msgid "IPMI privilege level"
 msgstr "IPMI特権レベル"
 
-#: disc_prototypes.php:100 host_discovery.php:103
+#: disc_prototypes.php:99 host_discovery.php:103
 #: include/views/configuration.host.discovery.edit.php:157
 #: include/views/configuration.item.edit.php:163 items.php:107
 msgid "IPMI sensor"
@@ -7793,7 +7798,7 @@ msgstr "インドネシア語 (id_ID)"
 #: include/views/configuration.hostgroups.list.php:53
 #: include/views/configuration.httpconf.list.php:72
 #: include/views/configuration.item.list.php:74
-#: include/views/configuration.triggers.list.php:105 latest.php:486
+#: include/views/configuration.triggers.list.php:76 latest.php:486
 #: latest.php:487 tr_status.php:291
 msgid "Info"
 msgstr "情報"
@@ -7819,7 +7824,7 @@ msgstr "インストール"
 msgid "Installer name"
 msgstr "インストーラ名"
 
-#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:866
+#: disc_prototypes.php:40 host_discovery.php:48 hosts.php:866
 #: include/views/administration.proxy.edit.php:69 items.php:40
 msgid "Interface"
 msgstr "インターフェース"
@@ -8001,7 +8006,7 @@ msgstr "2つ目のパラメータが正しくありません。"
 msgid "Invalid third parameter."
 msgstr "3つ目のパラメータが正しくありません。"
 
-#: disc_prototypes.php:192 host_discovery.php:175 items.php:375
+#: disc_prototypes.php:178 host_discovery.php:175 items.php:389
 msgid "Invalid time period"
 msgstr "時間の指定が正しくありません。"
 
@@ -8056,8 +8061,8 @@ msgstr "イタリア語 (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:519
-#: items.php:767 items.php:796 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:533
+#: items.php:781 items.php:810 tr_logform.php:251
 msgid "Item"
 msgstr "アイテム"
 
@@ -8107,7 +8112,7 @@ msgstr "アイテム\"%1$s\"はスキップされました - ユーザの指定�
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "アイテム\"%1$s:%2$s\"のポート\"%3$s\"は正しくありません。"
 
-#: items.php:499
+#: items.php:513
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
@@ -8115,16 +8120,16 @@ msgstr "アイテムを追加しました"
 msgid "Item count"
 msgstr "アイテム数"
 
-#: items.php:388
+#: items.php:402
 msgid "Item deleted"
 msgstr "アイテムを削除しました"
 
-#: applications.php:246 items.php:711
+#: applications.php:246 items.php:725
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "アイテムを無効にしました"
 
-#: applications.php:245 items.php:710
+#: applications.php:245 items.php:724
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
@@ -8155,25 +8160,25 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: disc_prototypes.php:302
+#: disc_prototypes.php:288
 msgid "Item prototype added"
 msgstr "アイテムのプロトタイプを追加しました"
 
-#: disc_prototypes.php:203
+#: disc_prototypes.php:189
 msgid "Item prototype deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
-#: disc_prototypes.php:324
+#: disc_prototypes.php:310
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "アイテムのプロトタイプを無効にしました"
 
-#: disc_prototypes.php:323
+#: disc_prototypes.php:309
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "アイテムにプロトタイプを有効にしました"
 
-#: disc_prototypes.php:298
+#: disc_prototypes.php:284
 msgid "Item prototype updated"
 msgstr "アイテムのプロトタイプを更新しました"
 
@@ -8184,7 +8189,7 @@ msgstr "アイテムのプロトタイプを更新しました"
 msgid "Item prototypes"
 msgstr "アイテムのプロトタイプ"
 
-#: disc_prototypes.php:343
+#: disc_prototypes.php:329
 msgid "Item prototypes deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
@@ -8192,7 +8197,7 @@ msgstr "アイテムのプロトタイプを削除しました"
 msgid "Item prototypes of"
 msgstr "アイテムのプロトタイプ:"
 
-#: items.php:496
+#: items.php:510
 msgid "Item updated"
 msgstr "アイテムを更新しました"
 
@@ -8269,11 +8274,11 @@ msgstr "アイテム"
 msgid "Items (m/d/n)"
 msgstr "アイテム数 (有効/無効/取得不可)"
 
-#: items.php:749
+#: items.php:763
 msgid "Items copied"
 msgstr "アイテムをコピーしました"
 
-#: items.php:806
+#: items.php:820
 msgid "Items deleted"
 msgstr "アイテムを削除しました"
 
@@ -8281,7 +8286,7 @@ msgstr "アイテムを削除しました"
 msgid "Items list"
 msgstr "アイテムのリスト"
 
-#: items.php:693
+#: items.php:707
 msgid "Items updated"
 msgstr "アイテムを更新しました"
 
@@ -8367,7 +8372,7 @@ msgstr "K"
 msgid "Keep lost resources period (in days)"
 msgstr "存在しなくなったリソースの保持期間(日)"
 
-#: disc_prototypes.php:44 host_discovery.php:51 include/forms.inc.php:606
+#: disc_prototypes.php:43 host_discovery.php:51 include/forms.inc.php:606
 #: include/views/configuration.host.discovery.edit.php:68
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.item.edit.php:68
@@ -9055,7 +9060,8 @@ msgstr "マスク"
 
 #: hosts.php:1066 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.trigger.prototype.list.php:143
+#: include/views/configuration.triggers.list.php:222
 msgid "Mass update"
 msgstr "一括更新"
 
@@ -9478,7 +9484,7 @@ msgid "NTLM"
 msgstr "NTLM"
 
 #: actionconf.php:37 actionconf.php:169 adm.regexps.php:37 adm.regexps.php:147
-#: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
+#: adm.regexps.php:178 applications.php:38 disc_prototypes.php:41
 #: graphs.php:41 host_discovery.php:49 hosts.php:828 hosts.php:859
 #: httpconf.php:44 httpmon.php:92 include/classes/setup/CSetupWizard.php:384
 #: include/forms.inc.php:591 include/hosts.inc.php:115
@@ -9532,9 +9538,10 @@ msgstr "NTLM"
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:43
 #: include/views/configuration.template.edit.php:409
+#: include/views/configuration.trigger.prototype.list.php:61
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:282
-#: include/views/configuration.triggers.list.php:102
+#: include/views/configuration.triggers.list.php:73
 #: include/views/configuration.triggers.massupdate.php:87
 #: include/views/inventory.host.list.php:76
 #: include/views/js/configuration.sysmaps.js.php:183 items.php:44
@@ -9546,7 +9553,7 @@ msgstr "NTLM"
 #: popup.php:1590 popup.php:1617 popup.php:1638 popup.php:1664 popup.php:1693
 #: popup.php:1700 popup_right.php:53 popup_usrgrp.php:89 queue.php:230
 #: report2.php:394 screenconf.php:50 services.php:41 slideconf.php:36
-#: sysmaps.php:48 trigger_prototypes.php:39 triggers.php:41 tr_status.php:297
+#: sysmaps.php:48 trigger_prototypes.php:38 triggers.php:41 tr_status.php:297
 msgid "Name"
 msgstr "名前"
 
@@ -9604,7 +9611,7 @@ msgstr "ネットワークマップ"
 msgid "Never"
 msgstr "未監視"
 
-#: httpdetails.php:154 httpdetails.php:228
+#: httpdetails.php:155 httpdetails.php:228
 msgid "Never executed"
 msgstr "未実行"
 
@@ -9629,7 +9636,7 @@ msgstr "新規条件"
 msgid "New element"
 msgstr "新規要素"
 
-#: disc_prototypes.php:49 host_discovery.php:58
+#: disc_prototypes.php:48 host_discovery.php:58
 #: include/views/configuration.host.discovery.edit.php:245
 #: include/views/configuration.item.edit.php:312
 #: include/views/configuration.item.massupdate.php:376 items.php:51
@@ -10347,11 +10354,11 @@ msgstr "スライドが設定されていません。"
 msgid "No status for proxy."
 msgstr "プロキシにステータスが設定されていません。"
 
-#: triggers.php:323
+#: triggers.php:331
 msgid "No target selected"
 msgstr "何も選択されていません"
 
-#: graphs.php:377 items.php:752
+#: graphs.php:376 items.php:766
 msgid "No target selected."
 msgstr "何も選択されていません。"
 
@@ -10374,6 +10381,10 @@ msgstr "時間が設定されていません。24x7として動作します。"
 msgid "No trigger"
 msgstr "トリガーがありません"
 
+#: include/views/configuration.trigger.prototype.list.php:57
+msgid "No trigger prototypes found."
+msgstr ""
+
 #: include/triggers.inc.php:259
 #, c-format
 msgid "No trigger with triggerid \"%1$s\"."
@@ -10384,7 +10395,7 @@ msgid "No triggers defined."
 msgstr "トリガーが設定されていません。"
 
 #: include/triggers.inc.php:1069
-#: include/views/configuration.triggers.list.php:97
+#: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:116 popup.php:967
 #: report2.php:391 report5.php:56 tr_status.php:285
 msgid "No triggers found."
@@ -10683,7 +10694,7 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:149 httpdetails.php:238
+#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:167 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -11428,7 +11439,7 @@ msgstr "ポーランド語 (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "ホストインベントリフィールドの自動設定"
 
-#: authentication.php:41 disc_prototypes.php:82 host_discovery.php:85
+#: authentication.php:41 disc_prototypes.php:81 host_discovery.php:85
 #: hosts.php:831 include/classes/setup/CSetupWizard.php:379
 #: include/forms.inc.php:470
 #: include/views/administration.authentication.edit.php:71
@@ -12277,14 +12288,14 @@ msgstr "SNMP"
 msgid "SNMP Key"
 msgstr "SNMPキー"
 
-#: disc_prototypes.php:79 host_discovery.php:82 include/forms.inc.php:463
+#: disc_prototypes.php:78 host_discovery.php:82 include/forms.inc.php:463
 #: include/views/configuration.host.discovery.edit.php:103
 #: include/views/configuration.item.edit.php:109
 #: include/views/js/configuration.discovery.edit.js.php:434 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: disc_prototypes.php:76 host_discovery.php:79 include/forms.inc.php:449
+#: disc_prototypes.php:75 host_discovery.php:79 include/forms.inc.php:449
 #: include/views/configuration.host.discovery.edit.php:111
 #: include/views/configuration.item.edit.php:117
 #: include/views/configuration.item.massupdate.php:95
@@ -12411,11 +12422,11 @@ msgstr "横軸の目盛"
 msgid "Scenario"
 msgstr "シナリオ"
 
-#: httpconf.php:198
+#: httpconf.php:207
 msgid "Scenario added"
 msgstr "シナリオを追加しました"
 
-#: httpconf.php:193
+#: httpconf.php:202
 msgid "Scenario updated"
 msgstr "シナリオを更新しました"
 
@@ -12869,8 +12880,9 @@ msgstr "セッションが切断されました。再度ログインしてくだ
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
 #: include/triggers.inc.php:1479 include/views/configuration.item.list.php:148
+#: include/views/configuration.trigger.prototype.list.php:60
 #: include/views/configuration.triggers.edit.php:253
-#: include/views/configuration.triggers.list.php:100
+#: include/views/configuration.triggers.list.php:71
 #: include/views/configuration.triggers.massupdate.php:69 popup.php:972
 #: report5.php:60 tr_logform.php:340 tr_status.php:289
 msgid "Severity"
@@ -12907,11 +12919,11 @@ msgstr "詳細を表示"
 msgid "Show disabled scenarios"
 msgstr "無効なシナリオを表示"
 
-#: include/views/configuration.triggers.list.php:63
+#: include/views/configuration.trigger.prototype.list.php:43
 msgid "Show disabled trigger prototypes"
 msgstr "無効なトリガーのプロトタイプを表示"
 
-#: include/views/configuration.triggers.list.php:81
+#: include/views/configuration.triggers.list.php:54
 msgid "Show disabled triggers"
 msgstr "無効なトリガーを表示"
 
@@ -13252,7 +13264,8 @@ msgstr "サービスの状態。0 - 実行中、1 - 一時停止中、2 - 開始
 #: include/views/configuration.item.list.php:151
 #: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
-#: include/views/configuration.triggers.list.php:104 popup_media.php:134
+#: include/views/configuration.trigger.prototype.list.php:63
+#: include/views/configuration.triggers.list.php:75 popup_media.php:134
 #: popup.php:973 popup.php:1095 srv_status.php:140 tr_status.php:290
 msgid "Status"
 msgstr "ステータス"
@@ -13526,7 +13539,7 @@ msgstr "Telnet"
 #: include/forms.inc.php:597 include/forms.inc.php:914
 #: include/html.inc.php:323 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:398
-#: include/views/configuration.triggers.list.php:121 report2.php:267
+#: include/views/configuration.trigger.prototype.list.php:79 report2.php:267
 #: search.php:393
 msgid "Template"
 msgstr "テンプレート"
@@ -13939,7 +13952,7 @@ msgstr "トレンドデータ保存期間"
 msgid "Trend data storage period (in days) \"%1$s\"."
 msgstr "トレンドデータ保存期間(日) \"%1$s\"。"
 
-#: disc_prototypes.php:119 items.php:62
+#: disc_prototypes.php:118 items.php:62
 msgid "Trend storage period"
 msgstr "トレンド保存期間"
 
@@ -13993,7 +14006,7 @@ msgstr "トリガー\"%1$s\"はスキップされました - ユーザの指定�
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "トリガー\"%s\"はリンクされている他のテンプレートに含まれています"
 
-#: triggers.php:190 triggers.php:320 tr_logform.php:149
+#: triggers.php:198 triggers.php:328 tr_logform.php:149
 msgid "Trigger added"
 msgstr "トリガーを追加しました"
 
@@ -14005,7 +14018,7 @@ msgstr "トリガーは自身を継承したトリガーと依存関係を持つ
 msgid "Trigger data storage period (in days)"
 msgstr "トリガーデータ保存期間(日)"
 
-#: triggers.php:208
+#: triggers.php:216
 msgid "Trigger deleted"
 msgstr "トリガーを削除しました"
 
@@ -14013,7 +14026,7 @@ msgstr "トリガーを削除しました"
 msgid "Trigger description"
 msgstr "トリガーの説明"
 
-#: triggers.php:278
+#: triggers.php:286
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "トリガーを無効にしました"
@@ -14026,7 +14039,7 @@ msgstr[0] "トリガーを無効にしました"
 msgid "Trigger displaying options"
 msgstr "トリガー表示オプション"
 
-#: triggers.php:277
+#: triggers.php:285
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "トリガーを有効にしました"
@@ -14097,25 +14110,25 @@ msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリ�
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "トリガーのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
 
-#: trigger_prototypes.php:172
+#: trigger_prototypes.php:166
 msgid "Trigger prototype added"
 msgstr "トリガーのプロトタイプを追加しました"
 
-#: trigger_prototypes.php:187
+#: trigger_prototypes.php:181
 msgid "Trigger prototype deleted"
 msgstr "トリガーのプロトタイプを削除しました"
 
-#: trigger_prototypes.php:250
+#: trigger_prototypes.php:245
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
 msgstr[0] "トリガーのプロトタイプを無効にしました"
 
-#: trigger_prototypes.php:249
+#: trigger_prototypes.php:244
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] "トリガーのプロトタイプを有効にしました"
 
-#: trigger_prototypes.php:167
+#: trigger_prototypes.php:161
 msgid "Trigger prototype updated"
 msgstr "トリガーのプロトタイプを更新しました"
 
@@ -14126,15 +14139,15 @@ msgstr "トリガーのプロトタイプを更新しました"
 msgid "Trigger prototypes"
 msgstr "トリガーのプロトタイプ"
 
-#: trigger_prototypes.php:263
+#: trigger_prototypes.php:258
 msgid "Trigger prototypes deleted"
 msgstr "トリガーのプロトタイプを削除しました"
 
-#: include/views/configuration.triggers.list.php:59
+#: include/views/configuration.trigger.prototype.list.php:37
 msgid "Trigger prototypes of"
 msgstr "トリガーのプロトタイプ:"
 
-#: trigger_prototypes.php:214
+#: trigger_prototypes.php:209
 msgid "Trigger prototypes updated"
 msgstr "トリガーのプロトタイプを更新しました"
 
@@ -14158,7 +14171,7 @@ msgstr "トリガーのステータス \"正常\""
 msgid "Trigger status \"Problem\""
 msgstr "トリガーのステータス \"障害\""
 
-#: triggers.php:186 triggers.php:247 tr_logform.php:124
+#: triggers.php:194 triggers.php:255 tr_logform.php:124
 msgid "Trigger updated"
 msgstr "トリガーを更新しました"
 
@@ -14175,7 +14188,7 @@ msgstr "トリガーの値"
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.list.php:207
 #: include/views/configuration.template.edit.php:241
-#: include/views/configuration.triggers.list.php:77
+#: include/views/configuration.triggers.list.php:50
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:232
 #: include/views/inventory.host.view.php:242
@@ -14192,7 +14205,7 @@ msgstr "トリガー"
 msgid "Triggers (e/d)[p/o]"
 msgstr "トリガー数 (有効/無効)[障害/正常]"
 
-#: triggers.php:332
+#: triggers.php:340
 msgid "Triggers deleted"
 msgstr "トリガーを削除しました"
 
@@ -14439,7 +14452,7 @@ msgid "Units"
 msgstr "単位"
 
 #: events.php:568 events.php:569 events.php:579 events.php:580 events.php:581
-#: events.php:582 httpdetails.php:165 httpmon.php:174
+#: events.php:582 httpdetails.php:166 httpmon.php:174
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14470,7 +14483,7 @@ msgstr "不明"
 msgid "Unknown action"
 msgstr "不明なアクション"
 
-#: httpdetails.php:160 httpdetails.php:233 httpmon.php:149
+#: httpdetails.php:161 httpdetails.php:233 httpmon.php:149
 #: include/views/configuration.httpconf.list.php:99
 msgid "Unknown error"
 msgstr "不明なエラー"
@@ -14697,7 +14710,7 @@ msgstr "既存の設定を上書"
 msgid "Update interval"
 msgstr "更新間隔"
 
-#: disc_prototypes.php:47 host_discovery.php:54 httpconf.php:45
+#: disc_prototypes.php:46 host_discovery.php:54 httpconf.php:45
 #: include/views/configuration.host.discovery.edit.php:192
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.item.edit.php:259
@@ -14917,7 +14930,7 @@ msgstr "ユーザーはグループ\"%s\"のメンバーになることにより
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のシステムステータスを変更することはできません。"
 
-#: disc_prototypes.php:66 host_discovery.php:67
+#: disc_prototypes.php:65 host_discovery.php:67
 #: include/views/configuration.action.edit.php:763
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.item.edit.php:173
@@ -15393,16 +15406,16 @@ msgstr "Webシナリオ\"%1$s\"はホスト\"%2$s\"にすでに存在します�
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Webシナリオ\"%1$s\"はすでに存在します。"
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:163 httpconf.php:425
 msgid "Web scenario deleted"
 msgstr "Webシナリオを削除しました"
 
-#: httpconf.php:366
+#: httpconf.php:375
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Webシナリオを無効にしました"
 
-#: httpconf.php:365
+#: httpconf.php:374
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Webシナリオを有効にしました"

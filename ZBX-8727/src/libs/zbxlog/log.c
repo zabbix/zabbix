@@ -425,6 +425,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				syslog(LOG_WARNING, "%s", message);
 				break;
 			case LOG_LEVEL_DEBUG:
+			case LOG_LEVEL_TRACE:
 				syslog(LOG_DEBUG, "%s", message);
 				break;
 			case LOG_LEVEL_INFORMATION:
@@ -454,6 +455,9 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 			case LOG_LEVEL_DEBUG:
 				zbx_error("DEBUG: %s", message);
+				break;
+			case LOG_LEVEL_TRACE:
+				zbx_error("TRACE: %s", message);
 				break;
 			default:
 				zbx_error("%s", message);
