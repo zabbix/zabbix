@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2014-08-19 04:41+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -850,7 +850,7 @@ msgstr "自動登録イベントとアラートデータの保存期間"
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "自動登録イベントとアラートデータの保存期間(日) \"%1$s\"。"
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2726,7 +2726,7 @@ msgstr "時刻"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2763,7 +2763,7 @@ msgid "Colour"
 msgstr "色"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
@@ -3905,7 +3905,7 @@ msgstr "選択したホストのプロトタイプを削除しますか？"
 msgid "Delete selected host prototypes?"
 msgstr "選択したホストのプロトタイプを削除しますか？"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "選択したホストを削除しますか？"
 
@@ -4336,7 +4336,7 @@ msgstr "選択したトリガーを無効にしますか？"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4402,7 +4402,6 @@ msgstr "ディスカバリオブジェクト"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "ディスカバリルール"
@@ -4450,6 +4449,7 @@ msgid "Discovery rule updated"
 msgstr "ディスカバリルールを更新しました"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5190,7 +5190,7 @@ msgstr "フィールド"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "フィールド\"%1$s\"は必須です。"
@@ -5215,12 +5215,12 @@ msgstr "フィールド\"%1$s\"はリストや指定された範囲内の整数�
 msgid "Field \"%1$s\" is not integer."
 msgstr "フィールド\"%1$s\"は整数値ではありません。"
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "フィールド\"%1$s\"は文字列ではありません。"
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
@@ -5379,7 +5379,7 @@ msgstr "Webインターフェースへのアクセスを更新しました"
 msgid "Frontend messaging"
 msgstr "Webインターフェースのアラート表示"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "すべて複製"
@@ -6154,7 +6154,7 @@ msgstr "ホストインターフェース"
 msgid "Host inventories"
 msgstr "ホストインベントリ"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "ホストインベントリ"
@@ -7408,12 +7408,12 @@ msgstr "\"get_accessible_nodes_by_user\"中のユーザーデータが正しく�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
@@ -7438,7 +7438,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の値が正しくありません。"
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
@@ -8626,7 +8626,7 @@ msgstr "データ収集なしのメンテナンス"
 msgid "Mandatory parameter is missing."
 msgstr "必須のパラメータが設定されていません。"
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10584,7 +10584,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "認証されていないリクエストのため操作を実行できません。"
 
@@ -10911,7 +10911,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "障害"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
@@ -12071,7 +12071,7 @@ msgstr "土曜"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13434,7 +13434,7 @@ msgstr[0] "GUIアクセスの権限があるグループが%1$dつあります�
 msgid "Third"
 msgstr "第3週"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "このフィールドはアイテム\"%s\"によって自動的に設定されます。"
@@ -14793,6 +14793,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2048文字以内で設定してください。"
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありません。"
@@ -15435,7 +15436,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -862,7 +862,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2768,7 +2768,7 @@ msgstr "Klok"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2805,7 +2805,7 @@ msgid "Colour"
 msgstr "Kleur"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Kleur \"%1$s\" is niet juist: hexadecimale kleurcode (6 symbolen) wordt verwacht."
@@ -3947,7 +3947,7 @@ msgstr "Verwijder geselecteerde gastheer prototype?"
 msgid "Delete selected host prototypes?"
 msgstr "Wis geselecteerde gastheer prototypes?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Geselecteerde host verwijderen?"
 
@@ -4379,7 +4379,7 @@ msgstr "Geselecteerde trigger uitschakelen?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4445,7 +4445,6 @@ msgstr "Ontdekking object"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Ontdekking regel"
@@ -4495,6 +4494,7 @@ msgid "Discovery rule updated"
 msgstr "Ontdekkingsregel aangepast"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5235,7 +5235,7 @@ msgstr "Veld"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Veld \"%1$s\" kan niet worden ingesteld op NULL."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Veld \"%1$s\" is verplicht."
@@ -5260,12 +5260,12 @@ msgstr "Veld \"%1$s\" is geen integer lijst of bereik."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Veld \"%1$s\" is geen integer."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Veld \"%1$s\" is geen string."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Veld \"%1$s\" moet ontbreken."
@@ -5424,7 +5424,7 @@ msgstr "Voorkant toegang geupdate"
 msgid "Frontend messaging"
 msgstr "Voorkant Berichten"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Volledige klone"
@@ -6201,7 +6201,7 @@ msgstr "Host interface"
 msgid "Host inventories"
 msgstr "Host inventarissen"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Host inventaris"
@@ -7458,12 +7458,12 @@ msgstr "Verkeerde gebruikersgegevens in \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Verkeerde gebruikersgroep."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld: moet zijn tussen de %3$s en %4$s."
@@ -7488,7 +7488,7 @@ msgstr "Onjuiste waarde \"%1$s\" voor unsigned int veld \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Onjuiste waarde voor veld \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Onjuiste waarde voor veld \"%1$s\": kan niet leeg zijn."
@@ -8685,7 +8685,7 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10651,7 +10651,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -10978,7 +10978,7 @@ msgstr ""
 msgid "PROBLEM"
 msgstr ""
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -12139,7 +12139,7 @@ msgstr ""
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13505,7 +13505,7 @@ msgstr[1] ""
 msgid "Third"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
@@ -14870,6 +14870,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr ""
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15514,7 +15515,7 @@ msgstr "ZABBIX agent (actief)"
 msgid "Zabbix aggregate"
 msgstr "ZABBIX aggregate"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 
