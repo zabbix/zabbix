@@ -3,7 +3,6 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
 ..F....... [ZBX-8753] fixed mass update to change host inventory (Sasha)
 ....I..... [ZBX-8744] fixed database upgrade procedure stopping when upgrade step was failed (Sasha)
 ........S. [ZBX-8719] optimised value cache requests to better utilise database indexes (wiper)
