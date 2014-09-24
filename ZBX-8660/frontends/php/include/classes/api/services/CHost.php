@@ -566,7 +566,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$dbHost = $dbHosts[$host['hostid']];
-			$hostName = (isset($host['host'])) ? $host['host'] : $dbHost['host'];
+			$hostName = isset($host['host']) ? $host['host'] : $dbHost['host'];
 
 			if (isset($host['status'])) {
 				$statusValidator->setObjectName($hostName);
