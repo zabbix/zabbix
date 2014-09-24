@@ -53,32 +53,36 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 	{
 		case EVENT_OBJECT_DHOST:
 			sql = zbx_dsprintf(sql,
-				"select h.hostid"
+				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
 					" and ds.dhostid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		case EVENT_OBJECT_DSERVICE:
 			sql = zbx_dsprintf(sql,
-				"select h.hostid"
+				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
-					" and ds.dserviceid =" ZBX_FS_UI64
+					" and ds.dserviceid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		default:
@@ -265,10 +269,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
+							" and h.status in (%d,%d)"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 							ZBX_SQL_NODE
 						" order by h.hostid",
+						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 						DBsql_id_cmp(proxy_hostid),
 						dhostid,
 						DBand_node_local("h.hostid"));
