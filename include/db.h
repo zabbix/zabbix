@@ -479,8 +479,7 @@ typedef struct
 ZBX_GRAPH_ITEMS;
 
 void	process_triggers(zbx_vector_ptr_t *triggers);
-int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger,
-		zbx_hashset_t *trigger_cache);
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);
