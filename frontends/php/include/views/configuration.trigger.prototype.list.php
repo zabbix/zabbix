@@ -122,7 +122,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	$triggersTable->addRow(array(
 		$checkBox,
-		getSeverityCell($trigger['priority']),
+		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
 		$status
