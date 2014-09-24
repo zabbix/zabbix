@@ -7,6 +7,7 @@ Bug fixes:
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.13
@@ -1591,6 +1592,7 @@ New features:
 Changes for 1.8.22rc1
 
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 Changes for 1.8.21
 
