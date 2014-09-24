@@ -1,0 +1,8 @@
+#mmenu, .page_header, .history, .page_footer, .hide-all-children * { display: none !important; }
+
+table tr.header input, table tr.header form, table tr.header select, table tr.header .menu_icon,
+table tr.footer input, table tr.footer form, table tr.footer select, table tr.footer .menu_icon {
+	display: none !important;
+}
+
+.printless { display: block !important; }
