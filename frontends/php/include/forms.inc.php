@@ -19,9 +19,21 @@
 **/
 
 
-function getUserFormData($userid, $isProfile = false) {
-	$config = select_config();
-	$data = array('is_profile' => $isProfile);
+/**
+ * Build user edit form data.
+ *
+ * @param string $userid			user ID
+ * @param array	 $config			array of configuration parameters returned in $data['config'] parameter
+ *									to later use when configuring user medias
+ * @param bool	 $isProfile			true if current user viewing his own profile
+ *
+ * @return array
+ */
+function getUserFormData($userid, array $config, $isProfile = false) {
+	$data = array(
+		'is_profile' => $isProfile,
+		'config' => $config
+	);
 
 	if (isset($userid)) {
 		$users = API::User()->get(array(
@@ -168,6 +180,7 @@ function getUserFormData($userid, $isProfile = false) {
 			array_push($data['user_rights'], array('id' => $id, 'permission' => $permition));
 		}
 	}
+
 	return $data;
 }
 
@@ -425,7 +438,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	// update interval
-	$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').NAME_DELIMITER));
+	$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), ' '._('(in sec)')));
 	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
 	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
@@ -490,7 +503,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$table->addRow(array(
-		new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
+		new CCol(bold(_('Host group')), 'label col1'),
 		new CCol(array(
 			new CMultiSelect(array(
 				'name' => 'filter_groupid',
@@ -509,11 +522,11 @@ function getItemFilterForm(&$items) {
 				)
 			))
 		), 'col1'),
-		new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
+		new CCol(bold(_('Type')), 'label col2'),
 		new CCol($cmbType, 'col2'),
-		new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
+		new CCol(bold(_('Type of information')), 'label col3'),
 		new CCol($cmbValType, 'col3'),
-		new CCol(bold(_('State').NAME_DELIMITER), 'label'),
+		new CCol(bold(_('State')), 'label'),
 		new CCol($cmbState, 'col4')
 	), 'item-list-row');
 	// row 2
@@ -534,7 +547,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$table->addRow(array(
-		new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
+		new CCol(bold(_('Host')), 'label'),
 		new CCol(array(
 			new CMultiSelect(array(
 				'name' => 'filter_hostid',
@@ -558,12 +571,12 @@ function getItemFilterForm(&$items) {
 		new CCol($updateIntervalInput),
 		new CCol($dataTypeLabel, 'label'),
 		new CCol($dataTypeInput),
-		new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
+		new CCol(bold(_('Status')), 'label col4'),
 		new CCol($cmbStatus, 'col4')
 	), 'item-list-row');
 	// row 3
 	$table->addRow(array(
-		new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
+		new CCol(bold(_('Application')), 'label'),
 		new CCol(array(
 			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
 			new CButton('btn_app', _('Select'),
@@ -577,9 +590,9 @@ function getItemFilterForm(&$items) {
 		), 'col1'),
 		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 		new CCol(array($snmpCommunityField, $snmpSecurityField)),
-		new CCol(array(bold(_('History')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+		new CCol(array(bold(_('History')), ' '._('(in days)')), 'label'),
 		new CCol(new CNumericBox('filter_history', $filter_history, 8, false, true)),
-		new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
+		new CCol(bold(_('Triggers')), 'label'),
 		new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 			-1 => _('all'),
 			1 => _('With triggers'),
@@ -588,13 +601,13 @@ function getItemFilterForm(&$items) {
 	), 'item-list-row');
 	// row 4
 	$table->addRow(array(
-		new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
+		new CCol(array(bold(_('Name')), ' '._('like')), 'label'),
 		new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 		new CCol($snmpOidLabel, 'label'),
 		new CCol($snmpOidField),
-		new CCol(array(bold(_('Trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
+		new CCol(array(bold(_('Trends')), ' '._('(in days)')), 'label'),
 		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, false, true)),
-		new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
+		new CCol(bold(_('Template')), 'label'),
 		new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
 			-1 => _('all'),
 			1 => _('Templated items'),
@@ -603,7 +616,7 @@ function getItemFilterForm(&$items) {
 	), 'item-list-row');
 	// row 5
 	$table->addRow(array(
-		new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
+		new CCol(array(bold(_('Key')), ' '._('like')), 'label'),
 		new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 		new CCol($portLabel, 'label'),
 		new CCol($portField),
