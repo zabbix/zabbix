@@ -328,7 +328,9 @@ function getPosition(obj) {
 function getSelectedText(obj) {
 	if (IE) {
 		obj.focus();
-		return document.selection.createRange().text;
+		return document.selection
+			? document.selection.createRange().text
+			: document.getSelection().text;
 	}
 	else if (obj.selectionStart) {
 		if (obj.selectionStart != obj.selectionEnd) {
