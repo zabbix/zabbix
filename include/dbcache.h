@@ -404,14 +404,4 @@ void	DCget_grouped_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vec
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	zbx_idset_free(zbx_idset_t *idset);
 
-/* local trigger cache support */
-void	zbx_triggercache_init(zbx_hashset_t *cache);
-void	zbx_triggercache_destroy(zbx_hashset_t *cache);
-int	zbx_triggercache_check_dependencies(zbx_hashset_t *cache, zbx_uint64_t triggerid);
-void	zbx_triggercache_update_trigger(zbx_hashset_t *cache, zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange);
-
-void	zbx_triggercache_load(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers);
-void	zbx_triggercache_flush(zbx_hashset_t *cache);
-
 #endif
