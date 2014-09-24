@@ -112,9 +112,7 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	$hostInventory = $dbHost['inventory'];
-	$inventoryMode = isset($hostInventory['inventory_mode'])
-		? $hostInventory['inventory_mode']
-		: $inventoryMode;
+	$inventoryMode = isset($hostInventory['inventory_mode']) ? $hostInventory['inventory_mode']	: $inventoryMode;
 
 	$templateIds = array();
 	foreach ($original_templates as $tpl) {
