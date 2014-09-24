@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 13:50+0300\n"
+"POT-Creation-Date: 2014-09-24 23:01+0300\n"
 "PO-Revision-Date: 2013-08-27 14:55+0200\n"
 "Last-Translator: Saulute <salomejazelskyte@gmail.com>\n"
 "Language-Team: none\n"
@@ -3754,7 +3754,6 @@ msgstr ""
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1114 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
 msgstr ""
@@ -3792,6 +3791,7 @@ msgid "Discovery rule updated"
 msgstr ""
 
 #: include/html.inc.php:489 include/html.inc.php:493
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
