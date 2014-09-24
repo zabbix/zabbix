@@ -457,7 +457,6 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
 		))
 	);
-	$screenFormList->addVar('resourceid', 0);
 }
 
 /*
@@ -597,8 +596,6 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 	}
 
-	$screenFormList->addVar('resourceid', $resourceId);
-
 	$styleComboBox = new CComboBox('style', $style, 'javascript: submit();');
 	$styleComboBox->addItem(TIME_TYPE_LOCAL, _('Local time'));
 	$styleComboBox->addItem(TIME_TYPE_SERVER, _('Server time'));
@@ -606,6 +603,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	$screenFormList->addRow(_('Time type'), $styleComboBox);
 
 	if (TIME_TYPE_HOST == $style) {
+		$screenFormList->addVar('resourceid', $resourceId);
+
 		if ($this->data['screen']['templateid']) {
 			$selectButton = new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
@@ -627,9 +626,6 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	else {
 		$screenFormList->addVar('caption', $caption);
 	}
-}
-else {
-	$screenFormList->addVar('resourceid', 0);
 }
 
 /*
