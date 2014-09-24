@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-09-24 23:09+0300\n"
 "PO-Revision-Date: 2013-11-04 19:10+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2888,7 +2888,7 @@ msgid "Colour"
 msgstr "Farbe"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farb-Angabe \"%1$s\" falsch: Erwarte hexadekadischen Farb-Code (6 Stellen)."
@@ -4573,7 +4573,6 @@ msgstr "Suchlaufobjekt"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Host-Suchläufe"
@@ -4626,6 +4625,7 @@ msgid "Discovery rule updated"
 msgstr "Suchlauf geändert"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5448,7 +5448,7 @@ msgstr "Feld"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Feld \"%1$s\" darf nicht NULL sein."
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "\"%1$s\" ist ein Pflichtfeld."
@@ -5473,12 +5473,12 @@ msgstr "Feld \"%1$s\" ist keine Liste oder ein Bereich von Ganzzahlen."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Feld \"%1$s\" ist keine Ganzzahl."
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Feld \"%1$s\" ist keine Zeichenfolge."
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Feld \"%1$s\" muss fehlen."
@@ -7818,13 +7818,13 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr "Falsche Benutzergruppe."
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\": Muss zwischen %3$s und %4$s liegen"
@@ -7849,7 +7849,7 @@ msgstr "Falscher Wert \"%1$s\" für das vorzeichenlose Ganzzahl-Feld \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Falscher Wert für Feld \"%1$s\"."
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
@@ -11001,7 +11001,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" existiert bereits."
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operation kann wegen unautorisierter Anfrage nicht ausgeführt werden."
 
@@ -11346,7 +11346,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEM"
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr "Seite hat falsche Daten erhalten"
 
@@ -15359,6 +15359,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Wert \"%1$s\" ist zu lang für Feld \"%2$s\" - %3$d Zeichen. Die erlaubte Länge beträgt 2048 Zeichen."
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -16000,7 +16001,7 @@ msgstr "Zabbix-Agent (aktiv)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix Aggregat"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix hat eine falsche Anfrage erhalten."
 
