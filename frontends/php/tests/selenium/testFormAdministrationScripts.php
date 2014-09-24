@@ -73,9 +73,10 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	public function testFormAdministrationScripts_testLayout() {
-		$this->zbxTestLogin('scripts.php?form=1');
+		$this->zbxTestLogin('scripts.php?form');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 
+		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
 		$this->zbxTestTextPresent('Script');
 
 		$this->zbxTestTextPresent(array('Name'));
@@ -90,16 +91,16 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->assertElementPresent('execute_on_1');
 		$this->assertElementPresent('execute_on_2');
 
-		$this->zbxTestTextPresent(array('Command'));
+		$this->zbxTestTextPresent(array('Commands'));
 		$this->assertElementPresent('command');
 
 		$this->zbxTestTextPresent(array('Description'));
 		$this->assertElementPresent('description');
 
-		$this->zbxTestTextPresent(array('User groups'));
+		$this->zbxTestTextPresent(array('User group'));
 		$this->assertElementPresent('usrgrpid');
 
-		$this->zbxTestTextPresent(array('Host groups'));
+		$this->zbxTestTextPresent(array('Host group'));
 		$this->assertElementPresent('groupid');
 
 		$this->zbxTestTextPresent(array('Required host permissions'));
@@ -118,11 +119,10 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * @dataProvider providerScripts
 	 */
-	public function testFormAdministrationScripts_testCreate($data, $resultSave, $DBvalues) {
-
+	public function testFormAdministrationScripts_testCreate($data, $resultSave, $dbValues) {
 		DBsave_tables('scripts');
 
-		$this->zbxTestLogin('scripts.php?form=1');
+		$this->zbxTestLogin('scripts.php?form');
 
 		foreach ($data as $field) {
 			switch ($field['type']) {
@@ -142,9 +142,10 @@ class testFormAdministrationScripts extends CWebTest {
 			}
 		}
 
-		$sql = 'SELECT '.implode(', ', array_keys($DBvalues)).' FROM scripts';
-		if ($resultSave && isset($keyField))
+		$sql = 'SELECT '.implode(', ', array_keys($dbValues)).' FROM scripts';
+		if ($resultSave && isset($keyField)) {
 			$sql .= ' WHERE name='.zbx_dbstr($keyField);
+		}
 
 		if (!$resultSave) {
 			$sql = 'SELECT * FROM scripts';
@@ -158,12 +159,12 @@ class testFormAdministrationScripts extends CWebTest {
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach ($dbres as $field => $value) {
-				$this->assertEquals($value, $DBvalues[$field], "Value for '$field' was not updated.");
+				$this->assertEquals($value, $dbValues[$field]);
 			}
 		}
 		else {
 			$this->zbxTestTextPresent('ERROR:');
-			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
+			$this->assertEquals($DBhash, DBhash($sql));
 		}
 
 		DBrestore_tables('scripts');
