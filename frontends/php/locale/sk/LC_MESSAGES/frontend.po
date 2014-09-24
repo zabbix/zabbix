@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-09-24 23:09+0300\n"
 "PO-Revision-Date: 2014-08-17 12:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2912,7 +2912,7 @@ msgid "Colour"
 msgstr "Farba"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farba \"%1$s\" nie je v správnom formáte: očakávaný je kód farby v 16-kovej sústave (6 znakov)."
@@ -4591,7 +4591,6 @@ msgstr "Objekt zisťovania"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Pravidlá zisťovania"
@@ -4646,6 +4645,7 @@ msgid "Discovery rule updated"
 msgstr "Zisťovacie pravidlo aktualizované"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5461,7 +5461,7 @@ msgstr "Pole"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Pole \"%1$s\" nemôže byť nastavené na NULL."
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Pole \"%1$s\" je povinné."
@@ -5486,12 +5486,12 @@ msgstr "Pole \"%1$s\" nie je celé číslo alebo rozsah."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Pole \"%1$s\" nie je desiatkové číslo."
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Pole \"%1$s\" nie je reťazec."
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musí chýbať."
@@ -7828,13 +7828,13 @@ msgstr "Nesprávny typ výpočtu pre zisťovacie pravidlo \"%1$s\"."
 msgid "Incorrect user group."
 msgstr "Neplatná používateľská skupina."
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Neplatná hodnota \"%1$s\" pre pole \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Neplatná hodnota \"%1$s\" pre \"%2$s\" pole: musí byť medzi %3$s a %4$s."
@@ -7859,7 +7859,7 @@ msgstr "Neplatná hodnota \"%1$s\" pre unsigned int pole \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Neplatná hodnota pre pole \"%1$s\"."
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Neplatná hodnota pre pole \"%1$s\": nemôže byť prázdna."
@@ -11012,7 +11012,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operácia \"%s\" už existuje."
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operácia nemôže byť vykonaná vzhľadom k neoprávnenej požiadavke."
 
@@ -11354,7 +11354,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLÉM"
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr "Stránka prijala nesprávne údaje"
 
@@ -15358,6 +15358,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Hodnota \"%1$s\" je príliš dlhá pre pole \"%2$s\" - %3$d znakov. Povolená dĺžka je do 2048 znakov."
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "Hodnota \"%2$s\" z \"%1$s\" má nesprávny desiatkový formát."
@@ -16000,7 +16001,7 @@ msgstr "Zabbix agent (aktívny)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix súhrnne"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix prijal neplatnú požiadavku."
 
