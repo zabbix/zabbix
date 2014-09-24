@@ -24,12 +24,19 @@ class TestDatabase {
 
 	protected function getTablesToClear() {
 		$bumpTables = array(
+			'usrgrp',
+			'scripts',
+			'opgroup',
+			'opmessage_grp',
+			'optemplate',
 			'items',
+			'graphs',
 			'httptest',
 			'config',
 			'trigger_discovery',
 			'graph_discovery',
 			'item_discovery',
+			'host_discovery',
 		);
 
 		// TODO: implement a better ordering algorithm
