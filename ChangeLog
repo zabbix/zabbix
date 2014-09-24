@@ -6,7 +6,6 @@ New features:
 Bug fixes:
 ..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
-..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
 ...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
 ...G...PS. [ZBX-8763] fixed log message printing to syslog and undefined type log if debug level 5 is set (igors)
@@ -26,7 +25,6 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
 ..F....... [ZBX-8753] fixed mass update to change host inventory (Sasha)
 ....I..... [ZBX-8744] fixed database upgrade procedure stopping when upgrade step was failed (Sasha)
 ........S. [ZBX-8719] optimised value cache requests to better utilise database indexes (wiper)
