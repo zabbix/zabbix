@@ -78,19 +78,22 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 			return FAIL;
 		}
 
-		if ('\0' == *proc_num)
+		if (NULL != proc_num)
 		{
-			zbx_error("invalid log level control target: %s (unspecified process number)", opt);
-			zbx_free(proc_name);
-			return FAIL;
-		}
+			if ('\0' == *proc_num)
+			{
+				zbx_error("invalid log level control target: %s (unspecified process number)", opt);
+				zbx_free(proc_name);
+				return FAIL;
+			}
 
-		if (FAIL == is_ushort(proc_num, &num) || 0 == num)
-		{
-			zbx_error("invalid log level control target: %s (invalid or unsupported process number \"%s\")",
-					opt, proc_num);
-			zbx_free(proc_name);
-			return FAIL;
+			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
+			{
+				zbx_error("invalid log level control target: %s (invalid or unsupported process number "
+						"\"%s\")", opt, proc_num);
+				zbx_free(proc_name);
+				return FAIL;
+			}
 		}
 
 		zbx_free(proc_name);
