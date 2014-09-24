@@ -30,7 +30,6 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "macrocache.h"
-#include "triggercache.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
@@ -5449,6 +5448,70 @@ void	DChost_update_availability(const zbx_host_availability_t *availability, int
 
 /******************************************************************************
  *                                                                            *
+ * Comments: helper function for DCconfig_check_trigger_dependencies()        *
+ *                                                                            *
+ ******************************************************************************/
+static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
+{
+	int				i;
+	const ZBX_DC_TRIGGER		*next_trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
+
+	if (32 < level)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
+				trigdep->triggerid);
+		return SUCCEED;
+	}
+
+	if (NULL != trigdep->dependencies)
+	{
+		for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
+		{
+			if (NULL != (next_trigger = next_trigdep->trigger) &&
+					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
+					TRIGGER_STATE_NORMAL == next_trigger->state)
+			{
+				return FAIL;
+			}
+
+			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
+				return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_check_trigger_dependencies                              *
+ *                                                                            *
+ * Purpose: check whether any of trigger dependencies have value PROBLEM      *
+ *                                                                            *
+ * Return value: SUCCEED - trigger can change its value                       *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
+{
+	int				ret = SUCCEED;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+
+	LOCK_CACHE;
+
+	if (NULL != (trigdep = zbx_hashset_search(&config->trigdeps, &triggerid)))
+		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0);
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Comments: helper function for DCconfig_sort_triggers_topologically()       *
  *                                                                            *
  ******************************************************************************/
@@ -5525,6 +5588,34 @@ static void	DCconfig_sort_triggers_topologically()
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_set_trigger_value                                       *
+ *                                                                            *
+ * Purpose: set trigger value, value flags, and error                         *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
+		unsigned char state, const char *error, int *lastchange)
+{
+	ZBX_DC_TRIGGER	*dc_trigger;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+	{
+		DCstrpool_replace(1, &dc_trigger->error, error);
+		dc_trigger->value = value;
+		dc_trigger->state = state;
+		if (NULL != lastchange)
+			dc_trigger->lastchange = *lastchange;
+	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -6530,149 +6621,3 @@ void	zbx_idset_free(zbx_idset_t *idset)
 	zbx_vector_uint64_destroy(&idset->ids);
 	zbx_free(idset);
 }
-
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_triggercache_load_trigger                                    *
- *                                                                            *
- * Purpose: load a trigger into local trigger cache                           *
- *                                                                            *
- * Parameters: cache     - [IN] the trigger cache                             *
- *             triggerid - [IN] the trigger id                                *
- *             trigdep   - [IN] trigger dependency list (can be NULL)         *
- *             level     - [IN] recursion level                               *
- *                                                                            *
- ******************************************************************************/
-static zbx_triggercache_trigger_t	*zbx_triggercache_load_trigger(zbx_hashset_t *cache, zbx_uint64_t triggerid,
-		const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
-{
-	zbx_triggercache_trigger_t	*trigger, trigger_data = {triggerid};
-	int				i;
-	ZBX_DC_TRIGGER			*dc_trigger = NULL;
-
-	/* check if the trigger has not been cached already */
-	if (NULL != (trigger = zbx_hashset_search(cache, &triggerid)))
-		goto out;
-
-	if (32 < level)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep, triggerid:" ZBX_FS_UI64,
-				triggerid);
-		goto out;
-	}
-
-	/* add trigger to cache */
-	trigger = zbx_hashset_insert(cache, &trigger_data, sizeof(zbx_triggercache_trigger_t));
-	zbx_vector_ptr_create(&trigger->dependencies);
-
-	if (NULL == trigdep)
-		trigdep = zbx_hashset_search(&config->trigdeps, &triggerid);
-
-	if (NULL != trigdep)
-		dc_trigger = trigdep->trigger;
-	else
-		dc_trigger = zbx_hashset_search(&config->triggers, &triggerid);
-
-	if (NULL != dc_trigger)
-	{
-		trigger->state = dc_trigger->state;
-		trigger->value = dc_trigger->value;
-		trigger->lastchange = dc_trigger->lastchange;
-		trigger->loaded = 1;
-	}
-
-	if (NULL == trigdep || NULL == trigdep->dependencies)
-		goto out;
-
-	/* load trigger dependencies */
-	for (i = 0; NULL != trigdep->dependencies[i]; i++)
-	{
-		zbx_triggercache_trigger_t	*dep;
-		const ZBX_DC_TRIGGER_DEPLIST		*trdep = trigdep->dependencies[i];
-
-		if (NULL != (dep = zbx_triggercache_load_trigger(cache, trdep->triggerid, trdep, level + 1)))
-		{
-			zbx_vector_ptr_append(&trigger->dependencies, dep);
-		}
-	}
-out:
-	return trigger;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_triggercache_load                                            *
- *                                                                            *
- * Purpose: load trigger dependencies into local trigger cache                *
- *                                                                            *
- * Parameters: cache    - [IN] the trigger cache                              *
- *             triggers - [IN] the triggers to load                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_triggercache_load(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers)
-{
-	const char	*__function_name = "zbx_triggercache_load";
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() loading %d trigger(s)", __function_name, triggers->values_num);
-
-	LOCK_CACHE;
-
-	for (i = 0; i < triggers->values_num; i++)
-	{
-		DC_TRIGGER	*trigger = (DC_TRIGGER *)triggers->values[i];
-
-		zbx_triggercache_load_trigger(cache, trigger->triggerid, NULL, 0);
-	}
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): cached %d trigger(s)", __function_name, cache->num_data);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_triggercache_flush                                           *
- *                                                                            *
- * Purpose: write changes made to triggers in local trigger cache to the      *
- *          configuration cache                                               *
- *                                                                            *
- * Parameters: cache    - [IN] the trigger cache                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_triggercache_flush(zbx_hashset_t *cache)
-{
-	const char			*__function_name = "zbx_triggercache_flush";
-	zbx_hashset_iter_t		iter;
-	zbx_triggercache_trigger_t	*trigger;
-	ZBX_DC_TRIGGER			*dc_trigger;
-	int				updated = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_hashset_iter_reset(cache, &iter);
-
-	LOCK_CACHE;
-
-	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
-	{
-		if (0 == trigger->modified)
-			continue;
-
-		if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &trigger->triggerid)))
-			continue;
-
-		DCstrpool_replace(1, &dc_trigger->error, trigger->error);
-		dc_trigger->value = trigger->value;
-		dc_trigger->state = trigger->state;
-		dc_trigger->lastchange = trigger->lastchange;
-
-		updated++;
-	}
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): updated %d trigger(s)", __function_name, updated);
-}
-
