@@ -42,9 +42,9 @@ class testPageDiscovery extends CWebTest {
 	*/
 	public function testPageDiscovery_SimpleUpdate($drule) {
 		$sqlDRules = 'SELECT * FROM drules WHERE druleid='.$drule['druleid'];
-		/*$sqlDChecks = 'SELECT * FROM dchecks WHERE druleid='.$drule['druleid'].' ORDER BY dcheckid';*/
+		$sqlDChecks = 'SELECT * FROM dchecks WHERE druleid='.$drule['druleid'].' ORDER BY dcheckid';
 		$oldHashDRules = DBhash($sqlDRules);
-		/*$oldHashDChecks = DBhash($sqlDChecks);*/
+		$oldHashDChecks = DBhash($sqlDChecks);
 
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -56,7 +56,7 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestTextPresent($drule['name']);
 
 		$this->assertEquals($oldHashDRules, DBhash($sqlDRules));
-		/*$this->assertEquals($oldHashDChecks, DBhash($sqlDChecks));*/
+		$this->assertEquals($oldHashDChecks, DBhash($sqlDChecks));
 	}
 
 	/**
