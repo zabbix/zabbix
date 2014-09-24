@@ -177,7 +177,7 @@ retry:
 			{
 				/* Format the message from the message DLL with the insert strings */
 				if (0 != FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-						FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM |
+						FORMAT_MESSAGE_ARGUMENT_ARRAY |
 						FORMAT_MESSAGE_MAX_WIDTH_MASK,	/* do not generate new line breaks */
 						hLib,				/* the messagetable DLL handle */
 						pELR->EventID,			/* message ID */
