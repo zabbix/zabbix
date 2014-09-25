@@ -1501,7 +1501,7 @@ function getTriggerFormData($exprAction) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
 		$data['expression_field_readonly'] = $data['limited'];
-		$data['expression_field_params'] = 'getSelectedText(this.form.elements["'.$data['expression_field_name'].'"])';
+		$data['expression_field_params'] = '""';
 	}
 
 	if (empty($data['parent_discoveryid'])) {
