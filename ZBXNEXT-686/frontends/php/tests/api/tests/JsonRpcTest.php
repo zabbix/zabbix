@@ -12,6 +12,7 @@ class JsonRpcTest extends FileApiTestCase {
 			'jsonrpc/invalid/incorrectAuth',
 			'jsonrpc/invalid/incorrectCall',
 			'jsonrpc/valid/validCall',
+			'jsonrpc/valid/caseInsensitiveCall',
 		);
 
 		$data = array();
