@@ -2687,8 +2687,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.22rc1
 
-...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 Changes for 1.8.21
 
