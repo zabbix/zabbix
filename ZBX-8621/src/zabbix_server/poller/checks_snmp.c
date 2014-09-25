@@ -1013,7 +1013,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
 	struct snmp_pdu		*pdu, *response;
-	struct variable_list	*var;
+	struct variable_list	*pdu_var, *var;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __function_name, num, level);
 
@@ -1066,11 +1066,67 @@ retry:
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
-		if (*max_succeed < mapping_num)
-			*max_succeed = mapping_num;
+		int	succeed = 1;
 
-		for (i = 0, var = response->variables; NULL != var; i++, var = var->next_variable)
+		pdu_var = pdu->variables;
+		var = response->variables;
+
+		for (i = 0;; i++)
 		{
+			/* check that response variable binding matches the request variable binding */
+
+			if (i == mapping_num)
+			{
+				if (NULL != var)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+							" too many variable bindings", items[0].host.host);
+					succeed = 0;
+				}
+
+				break;
+			}
+
+			if (NULL == var)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
+						" all of the requested variable bindings", items[0].host.host);
+
+				do
+				{
+					j = mapping[i++];
+
+					SET_MSG_RESULT(&results[j], "This OID not included in the response.");
+					errcodes[j] = NOTSUPPORTED;
+				}
+				while (i < mapping_num);
+
+				succeed = 0;
+				break;
+			}
+
+			if (pdu_var->name_length != var->name_length ||
+					0 != memcmp(pdu_var->name, var->name, pdu_var->name_length * sizeof(oid)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
+						" variable bindings in the requested order", items[0].host.host);
+
+				do
+				{
+					j = mapping[i++];
+
+					SET_MSG_RESULT(&results[j], "Variable binding in the response does not match"
+							" the variable binding in the request.");
+					errcodes[j] = NOTSUPPORTED;
+				}
+				while (i < mapping_num);
+
+				succeed = 0;
+				break;
+			}
+
+			/* process received data */
+
 			j = mapping[i];
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
@@ -1082,6 +1138,20 @@ retry:
 				errcodes[j] = zbx_snmp_set_result(var, items[j].value_type, items[j].data_type,
 						&results[j]);
 			}
+
+			pdu_var = pdu_var->next_variable;
+			var = var->next_variable;
+		}
+
+		if (1 == succeed)
+		{
+			if (*max_succeed < mapping_num)
+				*max_succeed = mapping_num;
+		}
+		else if (1 < mapping_num)
+		{
+			if (*min_fail > mapping_num)
+				*min_fail = mapping_num;
 		}
 	}
 	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex &&
