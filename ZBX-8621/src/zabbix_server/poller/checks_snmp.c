@@ -1164,6 +1164,19 @@ retry:
 		/* get this error with SNMPv1, we fix the PDU by removing the bad variable and retry the request. */
 
 		i = response->errindex - 1;
+
+		if (0 > i || i >= mapping_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+					" an out of bounds error index", items[0].host.host);
+
+			zbx_snprintf(error, max_error_len, "Error index in the response is out of bounds (%ld).",
+					response->errindex);
+
+			ret = NOTSUPPORTED;
+			goto exit;
+		}
+
 		j = mapping[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() errindex:%ld oid:'%s'", __function_name,
