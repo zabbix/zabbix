@@ -1094,7 +1094,8 @@ retry:
 				{
 					j = mapping[i++];
 
-					SET_MSG_RESULT(&results[j], "This OID not included in the response.");
+					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
+							" cannot find variable binding for this OID."));
 					errcodes[j] = NOTSUPPORTED;
 				}
 				while (i < mapping_num);
@@ -1115,8 +1116,8 @@ retry:
 				{
 					j = mapping[i++];
 
-					SET_MSG_RESULT(&results[j], "Variable binding in the response does not match"
-							" the variable binding in the request.");
+					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
+							" variable binding order does not match the request."));
 					errcodes[j] = NOTSUPPORTED;
 				}
 				while (i < mapping_num);
@@ -1165,7 +1166,7 @@ retry:
 			zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
 					" an out of bounds error index", items[0].host.host);
 
-			zbx_snprintf(error, max_error_len, "Error index in the response is out of bounds (%ld).",
+			zbx_snprintf(error, max_error_len, "Invalid SNMP response: error index out of bounds (%ld).",
 					response->errindex);
 
 			ret = NOTSUPPORTED;
