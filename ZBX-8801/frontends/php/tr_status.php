@@ -42,7 +42,10 @@ $fields = array(
 	// filter
 	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,
+		IN(array(TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL, TRIGGERS_OPTION_IN_PROBLEM)),
+		null
+	),
 	'show_events' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'ack_status' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'show_severity' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
@@ -117,13 +120,6 @@ if (hasRequest('filter_set')) {
 	);
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
-	// show triggers
-	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
-	// whole page inaccessible on large installations.
-	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
-	}
-
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
 	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED || $showEvents != EVENTS_OPTION_NOT_ACK) {
@@ -151,7 +147,6 @@ if (hasRequest('filter_set')) {
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
-	CProfile::delete('web.tr_status.filter.show_triggers');
 	CProfile::delete('web.tr_status.filter.show_details');
 	CProfile::delete('web.tr_status.filter.show_maintenance');
 	CProfile::delete('web.tr_status.filter.show_events');
@@ -166,11 +161,11 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
-	$showTriggers = TRIGGERS_OPTION_ALL;
+if (hasRequest('filter_set')) {
+	$showTriggers = getRequest('show_triggers');
 }
 else {
-	$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+	$showTriggers = TRIGGERS_OPTION_IN_PROBLEM;
 }
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
 $showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
