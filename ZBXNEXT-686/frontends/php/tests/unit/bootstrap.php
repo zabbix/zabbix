@@ -55,6 +55,7 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/services',
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
+	__DIR__.'/../../include/classes/json',
 	__DIR__.'/../../tests/api/include/validators',
 	__DIR__.'/../../tests/api/include/macros',
 	__DIR__.'/include/classes/html',

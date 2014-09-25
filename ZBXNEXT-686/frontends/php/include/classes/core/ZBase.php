@@ -78,7 +78,7 @@ class ZBase {
 		// initialize API classes
 		$apiServiceFactory = new CApiServiceFactory();
 
-		$client = new CLocalApiClient();
+		$client = new CLocalApiClient(new CJson());
 		$client->setServiceFactory($apiServiceFactory);
 		$wrapper = new CFrontendApiWrapper($client);
 		$wrapper->setProfiler(CProfiler::getInstance());

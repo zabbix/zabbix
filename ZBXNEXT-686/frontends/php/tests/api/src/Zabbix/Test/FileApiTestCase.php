@@ -86,18 +86,19 @@ class FileApiTestCase extends ApiTestCase {
 				throw new \Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
 			}
 
-			$definition['request']['params'] = $this->resolveStepMacros($definition['request']['params'], $steps, $fixtures);
-
-			$request = $definition['request'];
-			$expectedResponse = $definition['response'];
-
-			if (!isset($request['method']) || !is_string($request['method']) ||
-				!isset($request['params']) || !is_array($request['params'])
-			) {
-				throw new \Exception(sprintf('Each step should have string "method" and array "params" (failing step: "%s")', $stepName));
+			if (is_array($definition['request']['params'])) {
+				$definition['request']['params'] = $this->resolveStepMacros($definition['request']['params'], $steps, $fixtures);
 			}
 
-			$apiResponse = $this->callMethod($request['method'], $request['params']);
+			$request = array_merge(array(
+				'jsonrpc' => '2.0',
+				'id' => rand(),
+				'method' => null,
+				'params' => null
+			), $definition['request']);
+			$expectedResponse = $definition['response'];
+
+			$apiResponse = $this->callMethod($request['method'], $request['params'], $request['id'], $request['jsonrpc']);
 
 			$steps[$stepName]['response'] = $apiResponse->getResult();
 

@@ -47,40 +47,45 @@ class CLocalApiClient extends CApiClient {
 		$this->serviceFactory = $factory;
 	}
 
-	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
+	public function callMethod($method, $params, $auth = null, $id = null, $jsonRpc = '2.0') {
 		global $DB;
 
-		$api = strtolower($requestApi);
-		$method = strtolower($requestMethod);
+		$lowerCaseMethod = strtolower($method);
 
-		$response = new CApiClientResponse();
-
-		// check API
-		if (!$this->isValidApi($api)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('Incorrect API "%1$s".', $requestApi);
-
-			return $response;
+		if ($jsonRpc === null) {
+			return $this->createErrorResponse(-32600, _('JSON-rpc version is not specified.'), $id, $jsonRpc);
+		}
+		elseif ($jsonRpc !== '2.0') {
+			return $this->createErrorResponse(-32600, _s('Expecting JSON-rpc version 2.0, "%s" is given.', $jsonRpc),
+				$id, $jsonRpc
+			);
 		}
 
 		// check method
-		if (!$this->isValidMethod($api, $method)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('Incorrect method "%1$s.%2$s".', $requestApi, $requestMethod);
-
-			return $response;
+		if ($lowerCaseMethod === '') {
+			return $this->createErrorResponse(-32600, _('JSON-rpc method is not defined.'), $id, $jsonRpc);
+		}
+		elseif (!$this->isValidMethod($lowerCaseMethod)) {
+			return $this->createErrorResponse(-32600, _s('Incorrect method "%1$s".', $method),
+				$id, $jsonRpc
+			);
 		}
 
-		$requiresAuthentication = $this->requiresAuthentication($api, $method);
+		// check params
+		if ($params !== null && !is_array($params)) {
+			return $this->createErrorResponse(-32602, _('JSON-rpc params is not an Array.'), $id, $jsonRpc);
+		}
+
+		$requiresAuthentication = $this->requiresAuthentication($lowerCaseMethod);
 
 		// check that no authentication token is passed to methods that don't require it
 		if (!$requiresAuthentication && $auth !== null) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
-				$requestApi, $requestMethod
+			return $this->createErrorResponse(
+				$this->getJsonRpcErrorCode(ZBX_API_ERROR_PARAMETERS),
+				_s('The "%1$s" method must be called without the "auth" parameter.', $method),
+				$id,
+				$jsonRpc
 			);
-
-			return $response;
 		}
 
 		$newTransaction = false;
@@ -100,20 +105,21 @@ class CLocalApiClient extends CApiClient {
 			}
 
 			// call API method
-			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $method), array($params));
+			list($api, $apiMethod) = explode('.', $lowerCaseMethod);
+			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $apiMethod), array($params));
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
 				DBend(true);
 			}
 
-			$response->data = $result;
+			return $this->createResultResponse($result, $id, $jsonRpc);
 		}
 		catch (Exception $e) {
 			if ($newTransaction) {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
 				// failed attempt data
-				if ($api === 'user' && $method === 'login') {
+				if ($lowerCaseMethod === 'user.login') {
 					DBend(true);
 				}
 				// otherwise - revert the transaction
@@ -122,16 +128,13 @@ class CLocalApiClient extends CApiClient {
 				}
 			}
 
-			$response->errorCode = ($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL;
-			$response->errorMessage = $e->getMessage();
+			$errorCode = $this->getJsonRpcErrorCode(
+				($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL
+			);
+			$debug = ($this->debug) ? $e->getTrace() : null;
 
-			// add debug data
-			if ($this->debug) {
-				$response->debug = $e->getTrace();
-			}
+			return $this->createErrorResponse($errorCode, $e->getMessage(), $id, $jsonRpc, $debug);
 		}
-
-		return $response;
 	}
 
 	/**
@@ -151,25 +154,23 @@ class CLocalApiClient extends CApiClient {
 	}
 
 	/**
-	 * Returns true if the given API is valid.
-	 *
-	 * @param string $api
-	 *
-	 * @return bool
-	 */
-	protected function isValidApi($api) {
-		return $this->serviceFactory->hasObject($api);
-	}
-
-	/**
 	 * Returns true if the given method is valid.
 	 *
-	 * @param string $api
 	 * @param string $method
 	 *
 	 * @return bool
 	 */
-	protected function isValidMethod($api, $method) {
+	protected function isValidMethod($method) {
+		if (strpos($method, '.') === false) {
+			return false;
+		}
+
+		list($api, $method) = explode('.', $method);
+
+		if (!$this->serviceFactory->hasObject($api)) {
+			return false;
+		}
+
 		$apiService = $this->serviceFactory->getObject($api);
 
 		// validate the method
@@ -185,14 +186,32 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Returns true if calling the given method requires a valid authentication token.
 	 *
-	 * @param $api
 	 * @param $method
 	 *
 	 * @return bool
 	 */
-	protected function requiresAuthentication($api, $method) {
-		return !(($api === 'user' && $method === 'login')
-			|| ($api === 'user' && $method === 'checkauthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+	protected function requiresAuthentication($method) {
+		return !in_array($method, array('user.login', 'user.checkauthentication', 'apiinfo.version'), true);
 	}
+
+	/**
+	 * Get a JSON RPC error code for an internal service error code.
+	 *
+	 * @param int $serviceErrorCode
+	 *
+	 * @return int
+	 */
+	protected function getJsonRpcErrorCode($serviceErrorCode) {
+		$errors = array(
+			ZBX_API_ERROR_NO_METHOD => -32601,
+			ZBX_API_ERROR_PARAMETERS => -32602,
+			ZBX_API_ERROR_NO_AUTH => -32602,
+			ZBX_API_ERROR_PERMISSIONS => -32500,
+			ZBX_API_ERROR_INTERNAL => -32500
+		);
+
+		return $errors[$serviceErrorCode];
+	}
+
+
 }

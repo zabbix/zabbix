@@ -60,10 +60,16 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * @param string 	$method		API method name
 	 * @param array 	$params		API method parameters
 	 *
-	 * @return CApiClientResponse
+	 * @return CApiResponse
 	 */
 	public function __call($method, array $params) {
-		return $this->callMethod($this->api, $method, reset($params));
+		$response = $this->callMethod($this->api, $method, reset($params));
+
+		if ($response->isError()) {
+			return false;
+		}
+
+		return $response->getResult();
 	}
 
 	/**
@@ -71,12 +77,6 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 *
 	 * If the API call has been unsuccessful - return only the result value.
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
-	 *
-	 * @param string    $api
-	 * @param string 	$method
-	 * @param array 	$params
-	 *
-	 * @return mixed
 	 */
 	public function callMethod($api, $method, array $params) {
 		API::setWrapper();
@@ -85,21 +85,18 @@ class CFrontendApiWrapper extends CApiWrapper {
 
 		// call profiling
 		if ($this->debug) {
-			$this->profiler->profileApiCall($this->api, $method, $params, $response->data);
+			$this->profiler->profileApiCall($this->api, $method, $params, $response->getResponseData());
 		}
 
-		if (!$response->errorCode) {
-			return $response->data;
-		}
-		else {
+		if ($response->isError()) {
 			// add an error message
-			$trace = $response->errorMessage;
-			if ($response->debug) {
-				$trace .= ' ['.$this->profiler->formatCallStack($response->debug).']';
+			$trace = $response->getErrorData();
+			if ($response->getDebug()) {
+				$trace .= ' ['.$this->profiler->formatCallStack($response->getDebug()).']';
 			}
 			error($trace);
-
-			return false;
 		}
+
+		return $response;
 	}
 }

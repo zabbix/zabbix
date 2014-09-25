@@ -47,11 +47,11 @@ class APITestRequest {
 	 */
 	protected $params;
 
-	public function __construct($method, array $params = array(), $id = null, array $request = array()) {
+	public function __construct($method, $params = array(), $id = null, array $request = array()) {
 		$this->method = $method;
 		$this->params = $params;
 		$this->id = is_null($id) ? rand() : $id;
-		$this->version = isset($request['version']) ? $request['version'] : '2.0';
+		$this->version = array_key_exists('version', $request) ? $request['version'] : '2.0';
 		$this->token = isset($request['token']) ? $request['token'] : null;
 	}
 

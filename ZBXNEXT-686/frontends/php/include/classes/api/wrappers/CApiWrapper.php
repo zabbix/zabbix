@@ -70,12 +70,12 @@ class CApiWrapper {
 	 * @param string 	$method		API method name
 	 * @param array 	$params		API method parameters
 	 *
-	 * @return CApiClientResponse
+	 * @return CApiResponse
 	 */
 	public function callMethod($api, $method, array $params) {
 		$auth = ($this->requiresAuthentication($api, $method)) ? $this->auth : null;
 
-		return $this->client->callMethod($api, $method, $params, $auth);
+		return $this->client->callMethod($api.'.'.$method, $params, $auth);
 	}
 
 	/**

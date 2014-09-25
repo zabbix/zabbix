@@ -1,0 +1,14 @@
+steps:
+
+  # test request with non-array params
+  step1:
+    request:
+      method: host.get
+      params: string
+
+    expect: error
+
+    response:
+      code: -32602
+      message: 'Invalid params.'
+      data: 'JSON-rpc params is not an Array.'

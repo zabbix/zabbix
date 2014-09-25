@@ -1,0 +1,29 @@
+steps:
+
+  # test request without a json rpc version
+  step1:
+    request:
+      jsonrpc: null
+      method: host.get
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32600
+      message: 'Invalid Request.'
+      data: 'JSON-rpc version is not specified.'
+
+  # test request with an incorrect json rpc version
+  step2:
+    request:
+      jsonrpc: 1
+      method: host.get
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32600
+      message: 'Invalid Request.'
+      data: 'Expecting JSON-rpc version 2.0, "@steps.step2.request.jsonrpc@" is given.'

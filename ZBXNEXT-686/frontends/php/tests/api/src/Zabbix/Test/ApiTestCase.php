@@ -67,7 +67,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 			'password' => 'zabbix'
 		));
 
-		$client = new \CLocalApiClient();
+		$client = new \CLocalApiClient(new \CJson());
 		$client->setServiceFactory(new \CApiServiceFactory());
 
 		$this->fixtureLoader = new FixtureLoader(
@@ -114,13 +114,15 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @param $method
 	 * @param array $params
+	 * @param string $id
+	 * @param string $jsonRpc
 	 *
 	 * @return APITestResponse
 	 */
-	protected function callMethod($method, array $params) {
+	protected function callMethod($method, $params, $id = null, $jsonRpc = '2.0') {
 		$request = array(
-			'jsonrpc' => '2.0',
-			'id' => rand(),
+			'version' => $jsonRpc,
+			'id' => ($id) ? $id : rand(),
 			'params' => $params,
 			'method' => $method
 		);

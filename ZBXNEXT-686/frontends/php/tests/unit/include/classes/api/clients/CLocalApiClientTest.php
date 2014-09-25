@@ -27,7 +27,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	protected $client;
 
 	public function setUp() {
-		$this->client = new CLocalApiClient();
+		$this->client = new CLocalApiClient(new CJson());
 	}
 
 	/**
@@ -39,25 +39,45 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 
 	public function incorrectCallProvider() {
 		return array(
-			// incorrect api
-			array('Api', 'method', array(), 'token',
-				ZBX_API_ERROR_PARAMETERS, 'Incorrect API "Api".'
+			// missing version
+			array('user.incorrectMethod', array(), 'token', 1, null,
+				-32600, 'Invalid Request.', 'JSON-rpc version is not specified.'
+			),
+			// incorrect version
+			array('user.incorrectMethod', array(), 'token', 1, '3',
+				-32600, 'Invalid Request.', 'Expecting JSON-rpc version 2.0, "3" is given.'
+			),
+			// missing method
+			array(null, array(), 'token', 1, '2.0',
+				-32600, 'Invalid Request.', 'JSON-rpc method is not defined.'
 			),
 			// incorrect method
-			array('user', 'incorrectMethod', array(), 'token',
-				ZBX_API_ERROR_PARAMETERS, 'Incorrect method "user.incorrectMethod".'
+			array('method', array(), 'token', 1, '2.0',
+				-32600, 'Invalid Request.', 'Incorrect method "method".'
+			),
+			// incorrect method
+			array('invalidapi.method', array(), 'token', 1, '2.0',
+				-32600, 'Invalid Request.', 'Incorrect method "invalidapi.method".'
+			),
+			// incorrect method
+			array('user.incorrectMethod', array(), 'token', 1, '2.0',
+				-32600, 'Invalid Request.', 'Incorrect method "user.incorrectMethod".'
+			),
+			// invalid param type
+			array('apiinfo.version', 'string', null, 1, '2.0',
+				-32602, 'Invalid params.', 'JSON-rpc params is not an Array.'
 			),
 			// no auth token
-			array('user', 'get', array(), null,
-				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
+			array('user.get', array(), null, 1, '2.0',
+				-32602, 'Invalid params.', 'Not authorised.'
 			),
 			// empty auth token
-			array('user', 'get', array(), '',
-				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
+			array('user.get', array(), '', 1, '2.0',
+				-32602, 'Invalid params.', 'Not authorised.'
 			),
 			// unnecessary auth token
-			array('Apiinfo', 'Version', array(), '',
-				ZBX_API_ERROR_PARAMETERS, 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
+			array('Apiinfo.Version', array(), '', 1, '2.0',
+				-32602, 'Invalid params.', 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
 			),
 		);
 	}
@@ -67,7 +87,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @dataProvider incorrectCallProvider()
 	 */
-	public function testCallIncorrect($api, $method, array $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
+	public function testCallIncorrect($method, $params, $auth, $id, $jsonRpc, $expectedErrorCode, $expectedErrorMessage, $expectedErrorData) {
 		// setup a mock user API to authenticate the user
 		$userMock = $this->getMock('CUser', array('checkAuthentication'));
 		$userMock->expects($this->any())->method('checkAuthentication')->will($this->returnValue(array(
@@ -82,11 +102,37 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			}
 		)));
 
-		$response = $this->client->callMethod($api, $method, $params, $auth);
-		$this->assertTrue($response instanceof CApiClientResponse);
-		$this->assertEquals($expectedErrorCode, $response->errorCode);
-		$this->assertEquals($expectedErrorMessage, $response->errorMessage);
-		$this->assertNull($response->data);
-		$this->assertNull($response->debug);
+		$response = $this->client->callMethod($method, $params, $auth, $id, $jsonRpc);
+		$this->assertTrue($response instanceof CApiResponse);
+		$this->assertEquals($expectedErrorCode, $response->getErrorCode());
+		$this->assertEquals($expectedErrorMessage, $response->getErrorMessage());
+		$this->assertEquals($expectedErrorData, $response->getErrorData());
+		$this->assertEquals($id, $response->getId());
+		$this->assertEquals($jsonRpc, $response->getJsonRpc());
+		$this->assertNull($response->getResult());
+		$this->assertNull($response->getDebug());
+	}
+
+	/**
+	 * Test that invalid JSON strings are handled correctly.
+	 */
+	public function testCallJsonIncorrectJson() {
+		$response = $this->client->callJson('asdf');
+
+		$this->assertTrue($response instanceof CApiResponse);
+		$this->assertEquals(-32700, $response->getErrorCode());
+		$this->assertEquals('Parse error', $response->getErrorMessage());
+		$this->assertEquals('Incorrect JSON string.', $response->getErrorData());
+		$this->assertNull($response->getResult());
+		$this->assertNull($response->getDebug());
+		$this->assertNull(null, $response->getId());
+		$this->assertNull(null, $response->getId());
+	}
+
+	/**
+	 * Test JSON calls with correct parameters.
+	 */
+	public function testCallJson() {
+		$this->markTestIncomplete();
 	}
 }

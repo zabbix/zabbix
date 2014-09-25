@@ -45,7 +45,7 @@ class CAPITest extends PHPUnit_Framework_TestCase {
 	 * Test that the API::getApi() method returns correct results with a wrapper.
 	 */
 	public function testGetGetApiWrapper() {
-		$client = new CLocalApiClient();
+		$client = new CLocalApiClient(new CJson());
 		API::setWrapper(new CFrontendApiWrapper($client));
 
 		$item = API::getApi('item');

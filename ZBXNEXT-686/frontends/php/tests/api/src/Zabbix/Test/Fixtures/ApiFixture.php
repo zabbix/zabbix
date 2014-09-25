@@ -21,22 +21,22 @@ class ApiFixture extends Fixture {
 				'password' => 'zabbix'
 			));
 
-			if ($rs->errorCode) {
+			if ($rs->isError()) {
 				throw new \Exception(sprintf('Cannot authenticate to load API fixture: %1$s', $rs->errorMessage));
 			}
 
-			$this->apiWrapper->auth = $rs->data;
+			$this->apiWrapper->auth = $rs->getResult();
 		}
 
 		list($api, $method) = explode('.', $params['method']);
 
 		$rs = $this->apiWrapper->callMethod($api, $method, $params['params']);
 
-		if ($rs->errorCode) {
-			throw new \Exception($rs->errorMessage);
+		if ($rs->isError()) {
+			throw new \Exception($rs->getErrorData());
 		}
 
-		return $rs->data;
+		return $rs->getResult();
 	}
 
 }

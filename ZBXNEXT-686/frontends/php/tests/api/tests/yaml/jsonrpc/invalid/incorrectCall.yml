@@ -1,0 +1,17 @@
+steps:
+
+  # test that invalid API calls are handled correctly
+  # the exact API call performed here is unimportant, so long as it won't execute successfully
+  step1:
+    request:
+      method: user.login
+      params:
+        user: ""
+        password: zabbix
+
+    expect: error
+
+    response:
+      code: -32602
+      message: 'Invalid params.'
+      data: 'Login name or password is incorrect.'

@@ -1,0 +1,30 @@
+steps:
+
+  # test request with a missing auth token
+  step1:
+    request:
+      auth: null
+      method: host.get
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32602
+      message: 'Invalid params.'
+      data: 'Not authorised.'
+
+
+  # test request with an unnecessary auth token
+  step2:
+    request:
+      auth: sometoken
+      method: apiinfo.version
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32602
+      message: 'Invalid params.'
+      data: 'The "@steps.step2.request.method@" method must be called without the "auth" parameter.'

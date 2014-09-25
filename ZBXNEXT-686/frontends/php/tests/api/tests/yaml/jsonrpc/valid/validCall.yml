@@ -1,0 +1,16 @@
+steps:
+
+  # test that valid API calls are executed correctly
+  # the exact API call performed here is unimportant, so long as it can be executed successfully
+  # and validated
+  step1:
+    request:
+      method: user.login
+      params:
+        user: Admin
+        password: zabbix
+
+    expect: result
+
+    response:
+      _assert: 'string|length(32, 32)'

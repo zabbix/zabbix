@@ -1,0 +1,27 @@
+steps:
+
+  # test request with no method
+  step1:
+    request:
+      method: null
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32600
+      message: 'Invalid Request.'
+      data: 'JSON-rpc method is not defined.'
+
+  # test request with an incorrect method
+  step2:
+    request:
+      method: host.incorrect
+      params: {}
+
+    expect: error
+
+    response:
+      code: -32602
+      message: 'Invalid params.'
+      data: 'Incorrect method "@steps.step2.request.method@".'
