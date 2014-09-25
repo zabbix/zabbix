@@ -317,7 +317,6 @@ if ($allow_discovery) {
 $events_wdgt->addHeader(_('Events'), $r_form);
 $events_wdgt->addHeaderRowNumber();
 
-// FILTER {{{
 $filterForm = null;
 
 if (EVENT_SOURCE_TRIGGERS == $source) {
@@ -380,7 +379,6 @@ $events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0
 $scroll_div = new CDiv();
 $scroll_div->setAttribute('id', 'scrollbar_cntr');
 $events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
-// }}} FILTER
 
 $table = new CTableInfo(_('No events defined.'));
 
@@ -403,7 +401,7 @@ if ($source == EVENT_SOURCE_DISCOVERY || $availableTriggers) {
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_UP,
-		'nopermissions' => 1,
+		'nopermissions' => true,
 		'limit' => 1
 	);
 }
@@ -422,7 +420,6 @@ $firstEvent = array();
 if ($source == EVENT_SOURCE_DISCOVERY || $availableTriggers) {
 	$firstEvent = API::Event()->get($options);
 }
-// }}} CHECK IF EVENTS EXISTS
 
 $_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 $effectiveperiod = navigation_bar_calc();
@@ -634,7 +631,7 @@ else {
 				'select_acknowledges' => API_OUTPUT_COUNT,
 				'sortfield' => 'eventid',
 				'sortorder' => ZBX_SORT_DOWN,
-				'nopermissions' => 1
+				'nopermissions' => true
 			);
 			$events = API::Event()->get($options);
 
