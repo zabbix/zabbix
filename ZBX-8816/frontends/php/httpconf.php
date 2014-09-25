@@ -453,7 +453,7 @@ if (isset($_REQUEST['form'])) {
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
-				$data['is_template'] = (int)$dbTest['status'] === HOST_STATUS_TEMPLATE;
+				$data['is_template'] = $dbTest['status'] == HOST_STATUS_TEMPLATE;
 			}
 		}
 		$data['templates'] = array_reverse($data['templates']);

@@ -309,7 +309,8 @@ if (!empty($this->data['httptestid'])) {
 			_('Clear history and trends'),
 			_('History clearing can take a long time. Continue?')
 		);
-	} else {
+	}
+	else {
 		$buttonDelHistory = null;
 	}
 
