@@ -1591,6 +1591,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.22rc1
 
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
