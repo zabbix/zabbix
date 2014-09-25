@@ -3,6 +3,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
 ........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
 ..F....... [ZBX-8753] fixed mass update to change host inventory (Sasha)

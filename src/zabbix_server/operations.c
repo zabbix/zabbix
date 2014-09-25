@@ -140,7 +140,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (FAIL == (i = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_uint64_search(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -158,6 +158,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+
+		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		for (i = 0; i < groupids->values_num; i++)
 		{
