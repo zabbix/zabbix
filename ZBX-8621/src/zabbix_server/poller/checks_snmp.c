@@ -1012,8 +1012,10 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
+	oid			parsed_oids[MAX_SNMP_ITEMS][MAX_OID_LEN];
+	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
-	struct variable_list	*pdu_var, *var;
+	struct variable_list	*var;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __function_name, num, level);
 
@@ -1026,16 +1028,15 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 	for (i = 0; i < num; i++)
 	{
-		oid	anOID[MAX_OID_LEN];
-		size_t	anOID_len = MAX_OID_LEN;
-
 		if (SUCCEED != errcodes[i])
 			continue;
 
 		if (NULL != query_and_ignore_type && 0 == query_and_ignore_type[i])
 			continue;
 
-		if (NULL == snmp_parse_oid(oids[i], anOID, &anOID_len))
+		parsed_oid_lens[i] = MAX_OID_LEN;
+
+		if (NULL == snmp_parse_oid(oids[i], parsed_oids[i], &parsed_oid_lens[i]))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".",
 					oids[i]));
@@ -1043,7 +1044,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 			continue;
 		}
 
-		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))
+		if (NULL == snmp_add_null_var(pdu, parsed_oids[i], parsed_oid_lens[i]))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 			errcodes[i] = CONFIG_ERROR;
@@ -1068,10 +1069,7 @@ retry:
 	{
 		int	succeed = 1;
 
-		pdu_var = pdu->variables;
-		var = response->variables;
-
-		for (i = 0;; i++)
+		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
 			/* check that response variable binding matches the request variable binding */
 
@@ -1105,8 +1103,10 @@ retry:
 				break;
 			}
 
-			if (pdu_var->name_length != var->name_length ||
-					0 != memcmp(pdu_var->name, var->name, pdu_var->name_length * sizeof(oid)))
+			j = mapping[i];
+
+			if (parsed_oid_lens[j] != var->name_length ||
+					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
 						" variable bindings in the requested order", items[0].host.host);
@@ -1127,8 +1127,6 @@ retry:
 
 			/* process received data */
 
-			j = mapping[i];
-
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
 			{
 				(void)zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &results[j]);
@@ -1138,9 +1136,6 @@ retry:
 				errcodes[j] = zbx_snmp_set_result(var, items[j].value_type, items[j].data_type,
 						&results[j]);
 			}
-
-			pdu_var = pdu_var->next_variable;
-			var = var->next_variable;
 		}
 
 		if (1 == succeed)
