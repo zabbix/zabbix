@@ -303,22 +303,15 @@ if (!empty($this->data['httptestid'])) {
 		$btnDelete = null;
 	}
 
-	if (!$this->data['is_template']) {
-		$buttonDelHistory = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
-		);
-	}
-	else {
-		$buttonDelHistory = null;
-	}
-
 	$httpForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			$buttonDelHistory,
+			new CButtonQMessage(
+				'del_history',
+				_('Clear history and trends'),
+				_('History clearing can take a long time. Continue?')
+			),
 			$btnDelete,
 			new CButtonCancel()
 		)
