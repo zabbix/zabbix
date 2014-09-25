@@ -389,7 +389,7 @@ A......... [ZBX-7483] fixed user group delete validation (Eduard)
 A.F....... [ZBX-6348] fixed possibility to create host groups and update all other existing objects with name containing only zeros (Ivo)
 .......PS. [ZBX-7288] improved error logging for server-proxy communication (Andris)
 A.F....... [ZBX-7407] fixed being able to change event source for existing actions (Ivo)
-...G...PS. [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
+...G...... [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
 ........S. [ZBX-7397] reduced value cache memory usage (wiper)
 ........S. [ZBX-7516] fixed typo in SQL query: changed "impi_disable_until" to "ipmi_disable_until" (asaveljevs)
 A......... [ZBX-7509] changed "value_flag" to proper name "value_flags" in triggers API (Ivo)
@@ -1100,6 +1100,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
@@ -2687,6 +2688,7 @@ New features:
 Changes for 1.8.22rc1
 
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
+........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 
 Changes for 1.8.21
 
