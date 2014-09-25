@@ -209,7 +209,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (1 < request->nparam)
 	{
