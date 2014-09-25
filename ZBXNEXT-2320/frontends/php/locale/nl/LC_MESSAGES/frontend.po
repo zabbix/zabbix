@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-17 11:45+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -121,7 +121,7 @@ msgstr "(geen proxy)"
 msgid "(with warnings)"
 msgstr ""
 
-#: include/blocks.inc.php:1538
+#: include/blocks.inc.php:1539
 msgid "-"
 msgstr "-"
 
@@ -241,7 +241,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "Account is geblokkeerd voor %s seconden"
 
 #: events.php:590 events.php:603 include/actions.inc.php:256
-#: include/blocks.inc.php:936 include/blocks.inc.php:1511
+#: include/blocks.inc.php:936 include/blocks.inc.php:1512
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
@@ -359,7 +359,7 @@ msgid "Action updated"
 msgstr "Actie bijgewerkt"
 
 #: events.php:591 events.php:604 include/blocks.inc.php:937
-#: include/blocks.inc.php:1512 include/events.inc.php:205
+#: include/blocks.inc.php:1513 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -389,9 +389,9 @@ msgstr "Actief sinds"
 msgid "Active till"
 msgstr "Actief tot"
 
-#: include/blocks.inc.php:1232 include/blocks.inc.php:1238
-#: include/blocks.inc.php:1356 include/blocks.inc.php:1401
-#: include/blocks.inc.php:1407 include/reports.inc.php:122
+#: include/blocks.inc.php:1233 include/blocks.inc.php:1239
+#: include/blocks.inc.php:1357 include/blocks.inc.php:1402
+#: include/blocks.inc.php:1408 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -513,7 +513,7 @@ msgstr "Beheer"
 msgid "Advanced labels"
 msgstr "Geavanceerde labels"
 
-#: include/blocks.inc.php:934 include/blocks.inc.php:1509
+#: include/blocks.inc.php:934 include/blocks.inc.php:1510
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -562,9 +562,9 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Iconen uitlijnen"
 
-#: include/blocks.inc.php:1334 include/blocks.inc.php:1343
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1473
-#: include/blocks.inc.php:1482 include/nodes.inc.php:174
+#: include/blocks.inc.php:1335 include/blocks.inc.php:1344
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1474
+#: include/blocks.inc.php:1483 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -862,7 +862,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2768,7 +2768,7 @@ msgstr "Klok"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2805,7 +2805,7 @@ msgid "Colour"
 msgstr "Kleur"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Kleur \"%1$s\" is niet juist: hexadecimale kleurcode (6 symbolen) wordt verwacht."
@@ -3947,7 +3947,7 @@ msgstr "Verwijder geselecteerde gastheer prototype?"
 msgid "Delete selected host prototypes?"
 msgstr "Wis geselecteerde gastheer prototypes?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Geselecteerde host verwijderen?"
 
@@ -4379,7 +4379,7 @@ msgstr "Geselecteerde trigger uitschakelen?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4443,9 +4443,8 @@ msgid "Discovery object"
 msgstr "Ontdekking object"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1203 include/forms.inc.php:1150
+#: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Ontdekking regel"
@@ -4495,6 +4494,7 @@ msgid "Discovery rule updated"
 msgstr "Ontdekkingsregel aangepast"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -4549,7 +4549,7 @@ msgstr "Afgerond"
 msgid "Dot"
 msgstr "Punt"
 
-#: include/blocks.inc.php:1205
+#: include/blocks.inc.php:1206
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Uit"
@@ -4971,7 +4971,7 @@ msgstr "Fout"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Fout in opzoek verzoek voor tabel \"%1$s\"."
 
-#: httpdetails.php:163 httpdetails.php:236
+#: httpdetails.php:164 httpdetails.php:236
 #, c-format
 msgid "Error: %1$s"
 msgstr "Fout: %1$s"
@@ -5201,15 +5201,15 @@ msgstr "Mislukt om template te updaten."
 msgid "Failure Audit"
 msgstr "Controle op mislukking"
 
-#: dashboard.php:311 include/blocks.inc.php:1225
+#: dashboard.php:311 include/blocks.inc.php:1226
 msgid "Favourite graphs"
 msgstr "Favoriete grafieken"
 
-#: dashboard.php:339 include/blocks.inc.php:1354
+#: dashboard.php:339 include/blocks.inc.php:1355
 msgid "Favourite maps"
 msgstr "Favoriete kaarten"
 
-#: dashboard.php:325 include/blocks.inc.php:1399
+#: dashboard.php:325 include/blocks.inc.php:1400
 msgid "Favourite screens"
 msgstr "Favourite schermen"
 
@@ -5235,7 +5235,7 @@ msgstr "Veld"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Veld \"%1$s\" kan niet worden ingesteld op NULL."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Veld \"%1$s\" is verplicht."
@@ -5260,12 +5260,12 @@ msgstr "Veld \"%1$s\" is geen integer lijst of bereik."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Veld \"%1$s\" is geen integer."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Veld \"%1$s\" is geen string."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Veld \"%1$s\" moet ontbreken."
@@ -5424,7 +5424,7 @@ msgstr "Voorkant toegang geupdate"
 msgid "Frontend messaging"
 msgstr "Voorkant Berichten"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Volledige klone"
@@ -5570,7 +5570,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Verlooplijn"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1232
+#: include/audit.inc.php:29 include/blocks.inc.php:1233
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:283
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:448 latest.php:621
@@ -5721,7 +5721,7 @@ msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototyp
 msgid "Graph with same name but other type exist."
 msgstr "Grafiek met dezelfde naam maar andere soort bestaat reeds."
 
-#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1334
+#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1335
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5865,7 +5865,7 @@ msgstr "H:i"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -6040,7 +6040,7 @@ msgstr "Horizontale uitlijning"
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:615 include/blocks.inc.php:662
 #: include/blocks.inc.php:920 include/blocks.inc.php:931
-#: include/blocks.inc.php:1507 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1508 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6201,7 +6201,7 @@ msgstr "Host interface"
 msgid "Host inventories"
 msgstr "Host inventarissen"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Host inventaris"
@@ -7458,12 +7458,12 @@ msgstr "Verkeerde gebruikersgegevens in \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Verkeerde gebruikersgroep."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld: moet zijn tussen de %3$s en %4$s."
@@ -7488,7 +7488,7 @@ msgstr "Onjuiste waarde \"%1$s\" voor unsigned int veld \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Onjuiste waarde voor veld \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Onjuiste waarde voor veld \"%1$s\": kan niet leeg zijn."
@@ -7521,7 +7521,7 @@ msgstr "Verkeerd y min item voor grafiek \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indonesisch (id_ID)"
 
-#: include/blocks.inc.php:935 include/blocks.inc.php:1510
+#: include/blocks.inc.php:935 include/blocks.inc.php:1511
 #: include/classes/class.cformlist.php:72 latest.php:365 latest.php:366
 #: tr_status.php:371
 msgid "Info"
@@ -7751,7 +7751,7 @@ msgid "Is online?"
 msgstr "Is verbonden?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
-#: include/blocks.inc.php:1508
+#: include/blocks.inc.php:1509
 msgid "Issue"
 msgstr "Probleem"
 
@@ -7763,7 +7763,7 @@ msgstr "Het is niet mogelijk om te filteren op gebruikerswachtwoord."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "Het is niet mogelijk om uit te loggen uit HTTP-authenticatie."
 
-#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
+#: api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "Het is niet mogelijk om te zoeken op gebruikerswachtwoord."
 
@@ -8685,7 +8685,7 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -8695,7 +8695,7 @@ msgstr "Handmatig"
 msgid "Manual Logout"
 msgstr "Handmatig uitloggen"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1356
+#: include/audit.inc.php:40 include/blocks.inc.php:1357
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8755,7 +8755,7 @@ msgstr ""
 msgid "Mappings"
 msgstr ""
 
-#: dashboard.php:340 include/blocks.inc.php:1389 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1390 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:96
@@ -9388,7 +9388,7 @@ msgstr "Netwerk mappen"
 msgid "Never"
 msgstr ""
 
-#: httpdetails.php:156 httpdetails.php:230
+#: httpdetails.php:157 httpdetails.php:230
 msgid "Never executed"
 msgstr ""
 
@@ -9653,7 +9653,7 @@ msgstr ""
 msgid "No errors found."
 msgstr ""
 
-#: include/blocks.inc.php:1009 include/blocks.inc.php:1529 tr_status.php:734
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1530 tr_status.php:734
 msgid "No events"
 msgstr ""
 
@@ -10129,7 +10129,7 @@ msgstr ""
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
-#: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
+#: include/blocks.inc.php:1203 include/classes/screens/CScreenEvents.php:40
 #: include/page_header.php:324 include/triggers.inc.php:1625
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
@@ -10455,7 +10455,7 @@ msgstr "Numeriek (integer 64bit)"
 msgid "OEM"
 msgstr ""
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
+#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
 #: include/maps.inc.php:956 include/setup.inc.php:198
@@ -10651,7 +10651,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -10978,7 +10978,7 @@ msgstr ""
 msgid "PROBLEM"
 msgstr ""
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -11574,10 +11574,10 @@ msgstr ""
 msgid "Remote command"
 msgstr "Remote commando"
 
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1334
-#: include/blocks.inc.php:1343 include/blocks.inc.php:1361
-#: include/blocks.inc.php:1389 include/blocks.inc.php:1412
-#: include/blocks.inc.php:1473 include/blocks.inc.php:1482
+#: include/blocks.inc.php:1246 include/blocks.inc.php:1335
+#: include/blocks.inc.php:1344 include/blocks.inc.php:1362
+#: include/blocks.inc.php:1390 include/blocks.inc.php:1413
+#: include/blocks.inc.php:1474 include/blocks.inc.php:1483
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -12139,7 +12139,7 @@ msgstr ""
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -12197,7 +12197,7 @@ msgstr ""
 msgid "Scheduled check"
 msgstr ""
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1401
+#: include/audit.inc.php:41 include/blocks.inc.php:1402
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12277,7 +12277,7 @@ msgstr ""
 msgid "Screen updated"
 msgstr "Scherm bijgewerkt"
 
-#: dashboard.php:326 include/blocks.inc.php:1473 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1474 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:371
@@ -12757,11 +12757,11 @@ msgstr "Simpel"
 msgid "Simple check"
 msgstr "Simple check"
 
-#: include/blocks.inc.php:1238 include/screens.inc.php:38
+#: include/blocks.inc.php:1239 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Simpel grafiek"
 
-#: include/blocks.inc.php:1343 jsLoader.php:114
+#: include/blocks.inc.php:1344 jsLoader.php:114
 msgid "Simple graphs"
 msgstr ""
 
@@ -12820,7 +12820,7 @@ msgstr ""
 msgid "Slide"
 msgstr ""
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1407
+#: include/audit.inc.php:45 include/blocks.inc.php:1408
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr ""
@@ -12857,7 +12857,7 @@ msgstr ""
 msgid "Slide shows"
 msgstr ""
 
-#: include/blocks.inc.php:1482
+#: include/blocks.inc.php:1483
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr ""
@@ -13505,7 +13505,7 @@ msgstr[1] ""
 msgid "Third"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
@@ -14174,7 +14174,7 @@ msgid "Units"
 msgstr "Eenheden"
 
 #: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:956 httpdetails.php:167 httpmon.php:170
+#: events.php:545 hosts.php:956 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14206,7 +14206,7 @@ msgstr "Onbekend"
 msgid "Unknown action"
 msgstr "Onbekende actie"
 
-#: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
+#: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
 msgstr ""
 
@@ -14337,7 +14337,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/blocks.inc.php:1204
+#: include/blocks.inc.php:1205
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -14384,7 +14384,7 @@ msgstr "Werk de status van de host bij"
 
 #: include/blocks.inc.php:390 include/blocks.inc.php:730
 #: include/blocks.inc.php:799 include/blocks.inc.php:1054
-#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
+#: include/blocks.inc.php:1162 include/blocks.inc.php:1220
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14870,6 +14870,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr ""
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15514,7 +15515,7 @@ msgstr "ZABBIX agent (actief)"
 msgid "Zabbix aggregate"
 msgstr "ZABBIX aggregate"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 

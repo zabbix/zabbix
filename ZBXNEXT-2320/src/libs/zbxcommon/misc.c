@@ -1851,7 +1851,7 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
  *               that the array is still sorted                               *
  *                                                                            *
  ******************************************************************************/
-int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
+int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id)
 {
 	int		first_index, last_index, index;
 	zbx_uint64_t	element_id;
@@ -1866,7 +1866,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		if (id == (element_id = *(zbx_uint64_t *)((char *)p + index * sz)))
+		if (id == (element_id = *(const zbx_uint64_t *)((const char *)p + index * sz)))
 			return index;
 
 		if (last_index == first_index)
@@ -1944,7 +1944,7 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
+int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
 {
 	int	index;
 
@@ -1964,7 +1964,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
+void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num)
 {
 	int	rindex, index;
 
