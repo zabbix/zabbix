@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-09-24 23:09+0300\n"
 "PO-Revision-Date: 2013-11-21 15:44+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -2875,7 +2875,7 @@ msgid "Colour"
 msgstr "Kleur"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Kleur \"%1$s\" is niet juist: hexadecimale kleurcode (6 symbolen) wordt verwacht."
@@ -4550,7 +4550,6 @@ msgstr "Ontdekking object"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Ontdekking regel"
@@ -4603,6 +4602,7 @@ msgid "Discovery rule updated"
 msgstr "Ontdekkingsregel aangepast"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5418,7 +5418,7 @@ msgstr "Veld"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Veld \"%1$s\" kan niet worden ingesteld op NULL."
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Veld \"%1$s\" is verplicht."
@@ -5443,12 +5443,12 @@ msgstr "Veld \"%1$s\" is geen integer lijst of bereik."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Veld \"%1$s\" is geen integer."
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Veld \"%1$s\" is geen string."
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Veld \"%1$s\" moet ontbreken."
@@ -7781,13 +7781,13 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr "Verkeerde gebruikersgroep."
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld."
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Onjuiste waarde \"%1$s\" voor \"%2$s\" veld: moet zijn tussen de %3$s en %4$s."
@@ -7812,7 +7812,7 @@ msgstr "Onjuiste waarde \"%1$s\" voor unsigned int veld \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Onjuiste waarde voor veld \"%1$s\"."
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Onjuiste waarde voor veld \"%1$s\": kan niet leeg zijn."
@@ -10956,7 +10956,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -11298,7 +11298,7 @@ msgstr ""
 msgid "PROBLEM"
 msgstr ""
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -15289,6 +15289,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr ""
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15929,7 +15930,7 @@ msgstr "ZABBIX agent (actief)"
 msgid "Zabbix aggregate"
 msgstr "ZABBIX aggregate"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 
