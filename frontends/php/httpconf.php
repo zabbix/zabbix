@@ -436,8 +436,7 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'templates' => array(),
-		'is_template' => false
+		'templates' => array()
 	);
 
 	if (isset($data['httptestid'])) {
@@ -445,7 +444,7 @@ if (isset($_REQUEST['form'])) {
 		$httpTestId = $data['httptestid'];
 		while ($httpTestId) {
 			$dbTest = DBfetch(DBselect(
-				'SELECT h.hostid,h.name,h.status,ht.httptestid,ht.templateid'.
+				'SELECT h.hostid,h.name,ht.httptestid,ht.templateid'.
 					' FROM hosts h,httptest ht'.
 					' WHERE ht.hostid=h.hostid'.
 					' AND ht.httptestid='.zbx_dbstr($httpTestId)
@@ -462,7 +461,6 @@ if (isset($_REQUEST['form'])) {
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
-				$data['is_template'] = $dbTest['status'] == HOST_STATUS_TEMPLATE;
 			}
 		}
 		$data['templates'] = array_reverse($data['templates']);
