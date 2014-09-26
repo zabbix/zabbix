@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -870,7 +870,7 @@ msgstr "Autoînregistrare evenimente si avertizări perioadă de stocare a datel
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Autoînregistrare evenimente si avertizări perioadă de stocare a datelor (în zile) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2800,7 +2800,7 @@ msgstr "Ceas"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2837,7 +2837,7 @@ msgid "Colour"
 msgstr "Culoare"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Culoarea \"%1$s\" nu este corectă: trebuie un cod hexadecimal (6 simboluri)."
@@ -3979,7 +3979,7 @@ msgstr "Ștergere prototipuri de servere selectați?"
 msgid "Delete selected host prototypes?"
 msgstr "Ștergere prototipuri de servere selectați?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Ștergere server selectat?"
 
@@ -4412,7 +4412,7 @@ msgstr "Dezactivare triggeri selectați?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4478,7 +4478,6 @@ msgstr "Obiect detectat"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Regulă de detecție"
@@ -4530,6 +4529,7 @@ msgid "Discovery rule updated"
 msgstr "Regulă de detecție actualizată"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5270,7 +5270,7 @@ msgstr "Câmp"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Câmpul \"%1$s\" nu poate fi pus NULL."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Câmpul \"%1$s\" este opțional. "
@@ -5295,12 +5295,12 @@ msgstr "Câmpul \"%1$s\" nu este un număr întreg sau șir."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Câmpul \"%1$s\" nu este număr întreg."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Câmpul \"%1$s\" nu este șir."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Câmpul \"%1$s\" trebuie să lipsească."
@@ -5459,7 +5459,7 @@ msgstr "Acces la interfață actualizat"
 msgid "Frontend messaging"
 msgstr "Mesaje de interfață"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Clonă completă"
@@ -6238,7 +6238,7 @@ msgstr "Interfață server"
 msgid "Host inventories"
 msgstr "Inventare server"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inventar server"
@@ -7496,12 +7496,12 @@ msgstr "Date utilizator incorecte în \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Grup utilizator incorect."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Valoare incorectă \"%1$s\" pentru câmpul \"%2$s\"."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Valoare incorectă \"%1$s\" pentru câmpul \"%2$s\": trebuie să fie între %3$s și %4$s."
@@ -7526,7 +7526,7 @@ msgstr "Valoare incorectă \"%1$s\" pentru câmpul int nesemnat \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Valoare incorectă pentru câmpul \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Valoare incorectă pentru câmpul \"%1$s\": nu poate fi vidă."
@@ -8724,7 +8724,7 @@ msgstr "Mentenanță fără colecție de date"
 msgid "Mandatory parameter is missing."
 msgstr "Lipsește parametrul obligatoriu."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10698,7 +10698,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operaţiunea \"%s\" există deja."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operațiunea nu poate fi executată datorită unei cereri neautorizate."
 
@@ -11025,7 +11025,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEMĂ"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Pagina a primit date incorecte"
 
@@ -12187,7 +12187,7 @@ msgstr "Sâmbătă"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13556,7 +13556,7 @@ msgstr[2] "Există grupuri \"%1$d\" acces Intern GUI."
 msgid "Third"
 msgstr "A treia"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Acest câmp este populat automat de itemul \"%s\"."
@@ -14927,6 +14927,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Valoarea \"%1$s\" este prea mare pentru caracterele câmpului \"%2$s\" - %3$d. Lungimea permisă este de 2048 caractere."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "Valoarea \"%2$s\" din \"%1$s\" are un format zecimal incorect."
@@ -15573,7 +15574,7 @@ msgstr "Agent (activ) Zabbix"
 msgid "Zabbix aggregate"
 msgstr "Agregat Zabbix"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix a primit o cerere incorectă."
 

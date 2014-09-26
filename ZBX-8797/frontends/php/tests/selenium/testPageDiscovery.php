@@ -21,164 +21,154 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageDiscovery extends CWebTest {
-	// Returns all discovery rules
-	public static function allRules() {
-		return DBdata('select * from drules');
-	}
-
-	/**
-	* @dataProvider allRules
-	*/
-	public function testPageDiscovery_CheckLayout($rule) {
+	public function testPageDiscovery_CheckLayout() {
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 
-		$this->zbxTestTextPresent('DISCOVERY');
+		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestTextPresent('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(array('Name', 'IP range', 'Delay', 'Checks', 'Status'));
-		$this->zbxTestTextPresent($rule['name']);
-		$this->zbxTestTextPresent($rule['iprange']);
-		$this->zbxTestTextPresent($rule['delay']);
 		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
-	/**
-	* @dataProvider allRules
-	*/
-	public function testPageDiscovery_SimpleUpdate($rule) {
-		$name = $rule['name'];
-		$druleid = $rule['druleid'];
-
-		$sqlRules = "select * from drules where name='$name' order by druleid";
-		$oldHashRules = DBhash($sqlRules);
-		$sqlChecks = "select * from dchecks where druleid=$druleid order by dcheckid";
-		$oldHashChecks = DBhash($sqlChecks);
-
-		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
-		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestTextPresent('Discovery rule updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('DISCOVERY');
-
-		$this->assertEquals($oldHashRules, DBhash($sqlRules));
-		$this->assertEquals($oldHashChecks, DBhash($sqlChecks));
+	// returns all discovery rules
+	public static function allRules() {
+		return DBdata('SELECT druleid,name FROM drules');
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassDelete($rule) {
-		$druleid=$rule['druleid'];
+	public function testPageDiscovery_SimpleUpdate($drule) {
+		$sqlDRules = 'SELECT * FROM drules WHERE druleid='.$drule['druleid'];
+		/*$sqlDChecks = 'SELECT * FROM dchecks WHERE druleid='.$drule['druleid'].' ORDER BY dcheckid';*/
+		$oldHashDRules = DBhash($sqlDRules);
+		/*$oldHashDChecks = DBhash($sqlDChecks);*/
 
+		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestClickWait('link='.$drule['name']);
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->zbxTestTextPresent($drule['name']);
+
+		$this->assertEquals($oldHashDRules, DBhash($sqlDRules));
+		/*$this->assertEquals($oldHashDChecks, DBhash($sqlDChecks));*/
+	}
+
+	/**
+	* @dataProvider allRules
+	*/
+	public function testPageDiscovery_MassDelete($drule) {
 		DBsave_tables('drules');
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
 
-		$sql = "select * from drules where druleid=$druleid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from dchecks where druleid=$druleid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE druleid='.$drule['druleid']));
+		$this->assertEquals(0, DBcount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
 
 		DBrestore_tables('drules');
 	}
 
 	public function testPageDiscovery_MassEnableAll() {
-		DBexecute('update drules set status='.DRULE_STATUS_DISABLED);
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules enabled');
 
-		$sql = "select * from drules where status=".DRULE_STATUS_DISABLED;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE status='.DRULE_STATUS_DISABLED));
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassEnable($rule) {
-		$druleid=$rule['druleid'];
-
-		DBexecute('update drules set status='.DRULE_STATUS_DISABLED.' where druleid='.$druleid);
+	public function testPageDiscovery_MassEnable($drule) {
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule enabled');
 
-		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_ACTIVE;
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, DBcount(
+			'SELECT *'.
+			' FROM drules'.
+			' WHERE druleid='.$drule['druleid'].
+				' AND status='.DRULE_STATUS_ACTIVE
+		));
 	}
 
 	public function testPageDiscovery_MassDisableAll() {
-		DBexecute('update drules set status='.DRULE_STATUS_ACTIVE);
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE);
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules disabled');
 
-		$sql = "select * from drules where status=".DRULE_STATUS_ACTIVE;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE status='.DRULE_STATUS_ACTIVE));
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassDisable($rule) {
-		$druleid = $rule['druleid'];
-
-		DBexecute('update drules set status='.DRULE_STATUS_ACTIVE.' where druleid='.$druleid);
+	public function testPageDiscovery_MassDisable($drule) {
+		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE.' WHERE druleid='.$drule['druleid']);
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('discoveryconf.php');
-		$this->zbxTestCheckTitle('Configuration of discovery');
-		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('g_druleid['.$drule['druleid'].']');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of discovery');
+		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule disabled');
 
-		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, DBcount(
+			'SELECT *'.
+			' FROM drules'.
+			' WHERE druleid='.$drule['druleid'].
+				' AND status='.DRULE_STATUS_DISABLED
+		));
 	}
 
 }
