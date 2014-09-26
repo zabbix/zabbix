@@ -3497,7 +3497,6 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 	int			*errcodes = NULL;
 	zbx_ifunc_t		*ifunc;
 	zbx_func_t		*func;
-	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -3513,8 +3512,9 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 
 		if (NULL == (ifunc = zbx_hashset_search(ifuncs, &functions[i].itemid)))
 		{
-			zbx_ifunc_t	new_ifunc = {functions[i].itemid};
+			zbx_ifunc_t	new_ifunc;
 
+			new_ifunc.itemid = functions[i].itemid;
 			zbx_vector_ptr_create(&new_ifunc.functions);
 			ifunc = zbx_hashset_insert(ifuncs, &new_ifunc, sizeof(zbx_ifunc_t));
 		}
@@ -3544,10 +3544,6 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 
 	zbx_free(errcodes);
 	zbx_free(functions);
-
-	zbx_hashset_iter_reset(ifuncs, &iter);
-	while (NULL != (ifunc = zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_sort(&ifunc->functions, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __function_name, ifuncs->num_data);
 }
@@ -3686,9 +3682,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 
 		for (i = 0; i < ifunc->functions.values_num; i++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[i];
-			item.functionid = func->functionid;
-			item.function = func;
+			item.function = (zbx_func_t *)ifunc->functions.values[i];
+			item.functionid = item.function->functionid;
 			zbx_hashset_insert(&func_index, &item, sizeof(zbx_func_index_t));
 		}
 	}
@@ -3832,7 +3827,6 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers)
 		zbx_evaluate_item_functions(&ifuncs);
 		zbx_substitute_functions_results(&ifuncs, triggers);
 	}
-
 
 	zbx_free_item_functions(&ifuncs);
 	zbx_hashset_destroy(&ifuncs);
