@@ -2089,8 +2089,8 @@ class CTrigger extends CTriggerGeneral {
 			);
 			$disabledTriggerIds = array();
 			while ($row = DBfetch($dbResult)) {
-				$triggerId = $row['triggerid'];
-				$disabledTriggerIds[$triggerId] = $triggerId;
+				$resultTriggerId = $row['triggerid'];
+				$disabledTriggerIds[$resultTriggerId] = $resultTriggerId;
 			}
 
 			// Dive and collect IDs of ALL valid "up" triggers for each result trigger.
@@ -2113,25 +2113,17 @@ class CTrigger extends CTriggerGeneral {
 
 			// Go through all result triggers and check for "up" triggers with problems. Skip "up" triggers if host,
 			// item or trigger itself is disabled.
-			$resultTriggerIdsToUnset = array();
 			foreach ($resultTriggerIds as $resultTriggerId) {
 				foreach ($upTriggerMap[$resultTriggerId] as $upTriggerId) {
-					// If "up" trigger is in problem state, dependent trigger should not be returned.
+					// If "up" trigger is in problem state, dependent trigger should not be returned and is removed
+					// from results.
 					if ($upTriggerValues[$upTriggerId] == TRIGGER_VALUE_TRUE) {
-						$resultTriggerIdsToUnset[] = $resultTriggerId;
+						unset($triggers[$resultTriggerId]);
 					}
 				}
-			}
-
-			// Remove triggers that depend on triggers with in problem state.
-			foreach ($resultTriggerIdsToUnset as $triggerId) {
-				unset($triggers[$triggerId]);
-			}
-
-			// Remove disabled triggers from result set.
-			foreach ($resultTriggerIds as $triggerId) {
-				if (isset($disabledTriggerIds[$triggerId])) {
-					unset($triggers[$triggerId]);
+				// Check if result trigger is disabled and if so, remove from results.
+				if (isset($disabledTriggerIds[$resultTriggerId])) {
+					unset($triggers[$resultTriggerId]);
 				}
 			}
 		}
@@ -2160,9 +2152,9 @@ class CTrigger extends CTriggerGeneral {
 					' AND e.acknowledged=0'
 			), 'objectid');
 
-			foreach ($triggers as $triggerId => $trigger) {
-				if (!isset($correctTriggerIds[$triggerId])) {
-					unset($triggers[$triggerId]);
+			foreach ($triggers as $resultTriggerId => $trigger) {
+				if (!isset($correctTriggerIds[$resultTriggerId])) {
+					unset($triggers[$resultTriggerId]);
 				}
 			}
 		}
