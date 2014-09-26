@@ -2117,7 +2117,7 @@ class CTrigger extends CTriggerGeneral {
 			foreach ($resultTriggerIds as $resultTriggerId) {
 				foreach ($upTriggerMap[$resultTriggerId] as $upTriggerId) {
 					// If "up" trigger is in problem state, dependent trigger should not be returned.
-					if (TRIGGER_VALUE_TRUE == $upTriggerValues[$upTriggerId]) {
+					if ($upTriggerValues[$upTriggerId] == TRIGGER_VALUE_TRUE) {
 						$resultTriggerIdsToUnset[] = $resultTriggerId;
 					}
 				}
