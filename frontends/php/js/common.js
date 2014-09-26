@@ -325,20 +325,6 @@ function getPosition(obj) {
 	return pos;
 }
 
-function getSelectedText(obj) {
-	if (IE) {
-		obj.focus();
-		return document.selection.createRange().text;
-	}
-	else if (obj.selectionStart) {
-		if (obj.selectionStart != obj.selectionEnd) {
-			return obj.value.substring(obj.selectionStart, obj.selectionEnd);
-		}
-	}
-
-	return obj.value;
-}
-
 function get_bodywidth() {
 	var w = parseInt(document.body.scrollWidth);
 	var w2 = parseInt(document.body.offsetWidth);
