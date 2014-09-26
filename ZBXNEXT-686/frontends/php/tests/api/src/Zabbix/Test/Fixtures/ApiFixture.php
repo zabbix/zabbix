@@ -16,7 +16,7 @@ class ApiFixture extends Fixture {
 	public function load(array $params) {
 		// if the client is not authenticated - log in
 		if (!$this->apiWrapper->auth) {
-			$rs = $this->apiWrapper->callMethod('user', 'login', array(
+			$rs = $this->apiWrapper->callMethod('user.login', array(
 				'user' => 'Admin',
 				'password' => 'zabbix'
 			));
@@ -28,9 +28,7 @@ class ApiFixture extends Fixture {
 			$this->apiWrapper->auth = $rs->getResult();
 		}
 
-		list($api, $method) = explode('.', $params['method']);
-
-		$rs = $this->apiWrapper->callMethod($api, $method, $params['params']);
+		$rs = $this->apiWrapper->callMethod($params['method'], $params['params']);
 
 		if ($rs->isError()) {
 			throw new \Exception($rs->getErrorData());

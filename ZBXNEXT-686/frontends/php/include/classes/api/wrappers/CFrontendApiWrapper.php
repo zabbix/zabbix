@@ -63,7 +63,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * @return CApiResponse
 	 */
 	public function __call($method, array $params) {
-		$response = $this->callMethod($this->api, $method, reset($params));
+		$response = $this->callMethod($this->api.'.'.$method, reset($params));
 
 		if ($response->isError()) {
 			return false;
@@ -78,14 +78,14 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * If the API call has been unsuccessful - return only the result value.
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
 	 */
-	public function callMethod($api, $method, array $params) {
+	public function callMethod($method, array $params) {
 		API::setWrapper();
-		$response = parent::callMethod($api, $method, $params);
+		$response = parent::callMethod($method, $params);
 		API::setWrapper($this);
 
 		// call profiling
 		if ($this->debug) {
-			$this->profiler->profileApiCall($this->api, $method, $params, $response->getResponseData());
+			$this->profiler->profileApiCall($method, $params, $response->getResponseData());
 		}
 
 		if ($response->isError()) {

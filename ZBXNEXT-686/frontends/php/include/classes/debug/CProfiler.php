@@ -150,10 +150,10 @@ class CProfiler {
 
 		foreach ($this->apiLog as $i => $apiCall) {
 			$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
-			list($class, $method, $params, $result, $file, $line) = $apiCall;
+			list($method, $params, $result, $file, $line) = $apiCall;
 			// api method
 			$debug_str .= '<div style="padding-bottom: 10px;">';
-			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b> ['.$file.':'.$line.']';
+			$debug_str .= ($i + 1).'. <b>'.$method.'</b> ['.$file.':'.$line.']';
 			$debug_str .= '</div>';
 			// parameters
 			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
@@ -220,12 +220,11 @@ class CProfiler {
 	/**
 	 * Store api call data.
 	 *
-	 * @param string $class
 	 * @param string $method
 	 * @param array  $params
 	 * @param array  $result
 	 */
-	public function profileApiCall($class, $method, $params, $result) {
+	public function profileApiCall($method, $params, $result) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -235,7 +234,6 @@ class CProfiler {
 		$file = basename($backtrace[2]['file']);
 		$line = basename($backtrace[2]['line']);
 		$this->apiLog[] = array(
-			$class,
 			$method,
 			$params,
 			$result,

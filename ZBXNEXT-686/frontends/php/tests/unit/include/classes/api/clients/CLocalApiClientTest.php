@@ -19,16 +19,7 @@
 **/
 
 
-class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
-
-	/**
-	 * @var CLocalApiClient
-	 */
-	protected $client;
-
-	public function setUp() {
-		$this->client = new CLocalApiClient(new CJson());
-	}
+class CLocalApiClientTest extends CApiClientTest {
 
 	/**
 	 * Test API calls with correct parameters.
@@ -94,7 +85,8 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			'debug_mode' => false
 		)));
 
-		$this->client->setServiceFactory(new CRegistryFactory(array(
+		$client = $this->createClient();
+		$client->setServiceFactory(new CRegistryFactory(array(
 			'host' => 'CHost',
 			'apiinfo' => 'CAPIInfo',
 			'user' => function() use ($userMock) {
@@ -102,7 +94,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			}
 		)));
 
-		$response = $this->client->callMethod($method, $params, $auth, $id, $jsonRpc);
+		$response = $client->callMethod($method, $params, $auth, $id, $jsonRpc);
 		$this->assertTrue($response instanceof CApiResponse);
 		$this->assertEquals($expectedErrorCode, $response->getErrorCode());
 		$this->assertEquals($expectedErrorMessage, $response->getErrorMessage());
@@ -117,7 +109,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 * Test that invalid JSON strings are handled correctly.
 	 */
 	public function testCallJsonIncorrectJson() {
-		$response = $this->client->callJson('asdf');
+		$response = $this->createClient()->callJson('asdf');
 
 		$this->assertTrue($response instanceof CApiResponse);
 		$this->assertEquals(-32700, $response->getErrorCode());
@@ -134,5 +126,9 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testCallJson() {
 		$this->markTestIncomplete();
+	}
+
+	protected function createClient() {
+		return new CLocalApiClient(new CJson());
 	}
 }

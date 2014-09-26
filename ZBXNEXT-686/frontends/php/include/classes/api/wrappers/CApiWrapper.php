@@ -66,29 +66,14 @@ class CApiWrapper {
 	/**
 	 * Pre-process and call the client method.
 	 *
-	 * @param string    $api        API name
-	 * @param string 	$method		API method name
+	 * @param string    $method        API name
 	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiResponse
 	 */
-	public function callMethod($api, $method, array $params) {
-		$auth = ($this->requiresAuthentication($api, $method)) ? $this->auth : null;
+	public function callMethod($method, array $params) {
+		$auth = ($this->client->requiresAuthentication($method)) ? $this->auth : null;
 
-		return $this->client->callMethod($api.'.'.$method, $params, $auth);
-	}
-
-	/**
-	 * Returns true if calling the given method requires an authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
-		return !(($api === 'user' && $method === 'login')
-			|| ($api === 'user' && $method === 'checkAuthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+		return $this->client->callMethod($method, $params, $auth);
 	}
 }

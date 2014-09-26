@@ -75,6 +75,17 @@ abstract class CApiClient {
 	}
 
 	/**
+	 * Returns true if calling the given method requires a valid authentication token.
+	 *
+	 * @param $method
+	 *
+	 * @return bool
+	 */
+	public function requiresAuthentication($method) {
+		return !in_array(strtolower($method), array('user.login', 'user.checkauthentication', 'apiinfo.version'), true);
+	}
+
+	/**
 	 * Create a response containing an error.
 	 *
 	 * @param string 	$errorCode

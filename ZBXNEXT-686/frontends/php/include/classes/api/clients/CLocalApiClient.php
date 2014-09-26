@@ -184,17 +184,6 @@ class CLocalApiClient extends CApiClient {
 	}
 
 	/**
-	 * Returns true if calling the given method requires a valid authentication token.
-	 *
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($method) {
-		return !in_array($method, array('user.login', 'user.checkauthentication', 'apiinfo.version'), true);
-	}
-
-	/**
 	 * Get a JSON RPC error code for an internal service error code.
 	 *
 	 * @param int $serviceErrorCode
