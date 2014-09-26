@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
@@ -408,6 +409,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
 ........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
@@ -1505,6 +1507,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
