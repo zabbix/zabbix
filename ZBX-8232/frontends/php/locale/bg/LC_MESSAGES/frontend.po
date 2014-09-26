@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -859,7 +859,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2770,7 +2770,7 @@ msgstr "Часовник"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2807,7 +2807,7 @@ msgid "Colour"
 msgstr "Цвят"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, fuzzy, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвят \"%1$s\" не е коректен: очаква шестнадесетичен код на цвят (6 символа)."
@@ -3953,7 +3953,7 @@ msgstr ""
 msgid "Delete selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Изтриване на избрания хост?"
 
@@ -4385,7 +4385,7 @@ msgstr "Изключване на избраните тригери?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4451,7 +4451,6 @@ msgstr "Обект за откриване"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Правило за откриване"
@@ -4501,6 +4500,7 @@ msgid "Discovery rule updated"
 msgstr "Правило за откриване актуализирано"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5241,7 +5241,7 @@ msgstr "Поле"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
@@ -5266,12 +5266,12 @@ msgstr ""
 msgid "Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
@@ -5430,7 +5430,7 @@ msgstr "Достъп до уеб интерфейс актуализиран"
 msgid "Frontend messaging"
 msgstr "Съобщения в уеб интерфейс"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Пълен клонинг"
@@ -6207,7 +6207,7 @@ msgstr "Хост интерфейс"
 msgid "Host inventories"
 msgstr "Инвентарни данни на хост"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Инвентарни данни на хост"
@@ -7470,12 +7470,12 @@ msgstr "Неправилни потребителски данни в \"get_acce
 msgid "Incorrect user group."
 msgstr "Неправилна потребителска група."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
@@ -7500,7 +7500,7 @@ msgstr "Неправилна стойност \"%1$s\" за поле цяло п
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -8693,7 +8693,7 @@ msgstr "Поддръжка без събиране на данни"
 msgid "Mandatory parameter is missing."
 msgstr "Задължителния параметър липсва."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10665,7 +10665,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" вече съществува."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операцията не може да се извърши поради неоторизирано искане."
 
@@ -10992,7 +10992,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМ"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Страницата получи неверни данни"
 
@@ -12157,7 +12157,7 @@ msgstr "Събота"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13524,7 +13524,7 @@ msgstr[1] "Съществуват \"%1$d\" групи с вътрешен дос
 msgid "Third"
 msgstr "Трети"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Това поле се попълва автоматично от елемент на данните \"%s\"."
@@ -14890,6 +14890,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Стойност \"%1$s\" е твърде дълъга за поле \"%2$s\" - %3$d символа. Допустимата дължина е 2048 символа."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15538,7 +15539,7 @@ msgstr "Zabbix агент (активен)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегат"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получи невалидна заявка."
 

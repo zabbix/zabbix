@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2014-08-19 20:07+0300\n"
 "Last-Translator: Marcelo <marcelo.leandro@qualitek.com.br>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -863,7 +863,7 @@ msgstr "Período de retenção dos dados de eventos e alertas"
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Período de retenção dos dados de eventos e alertas relacionados ao auto-registro (em dias) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2768,7 +2768,7 @@ msgstr "Relógio"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2805,7 +2805,7 @@ msgid "Colour"
 msgstr "Cor"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "A cor \"%1$s\" não é correta: é esperada cor no formato hexadecimal (6 símbolos)."
@@ -3948,7 +3948,7 @@ msgstr "Excluir os protótipos de host selecionados?"
 msgid "Delete selected host prototypes?"
 msgstr "Excluir os protótipos de host selecionados?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Remover host selecionado?"
 
@@ -4380,7 +4380,7 @@ msgstr "Desativar triggers selecionadas?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4446,7 +4446,6 @@ msgstr "Objeto de descoberta"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Regra de autobusca"
@@ -4496,6 +4495,7 @@ msgid "Discovery rule updated"
 msgstr "Regra de autobusca atualizada"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5236,7 +5236,7 @@ msgstr "Campo"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "O campo \"%1$s\" não pode ser definido como NULO."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "O campo \"%1$s\" é obrigatório."
@@ -5261,12 +5261,12 @@ msgstr "O campo \"%1$s\" não é uma lista de inteiros ou um range."
 msgid "Field \"%1$s\" is not integer."
 msgstr "O campo \"%1$s\" não é um inteiro."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "O campo \"%1$s\" não é um texto."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "O campo \"%1$s\" não é deve estar faltando."
@@ -5425,7 +5425,7 @@ msgstr "Acesso à interface web atualizado"
 msgid "Frontend messaging"
 msgstr "Mensagem da interface web"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Clone completo"
@@ -6202,7 +6202,7 @@ msgstr "Interface do host"
 msgid "Host inventories"
 msgstr "Inventários de host"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inventário do host"
@@ -7460,12 +7460,12 @@ msgstr "Dados de usuário inválidos em \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Grupo de usuários inválido."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "O valor \"%1$s\" não é válido para o campo \"%2$s\"."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "O valor \"%1$s\" não é válido para o campo \"%2$s\": seu valor deve estar entre %3$s e %4$s."
@@ -7490,7 +7490,7 @@ msgstr "O valor \"%1$s\" é inválido para o campo \"%2$s\" - espera-se um núme
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Valor incorreto para o campo \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Valor inválido para o campo \"%1$s\": ele não pode ser nulo."
@@ -8692,7 +8692,7 @@ msgstr "Manutenção sem coleta de dados"
 msgid "Mandatory parameter is missing."
 msgstr "Um parâmetro obrigatório está faltando."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10667,7 +10667,7 @@ msgstr "Ópera"
 msgid "Operation \"%s\" already exists."
 msgstr "A operação \"%s\" já existe."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "A operação não pode ser executada devido a requisição não autorizada."
 
@@ -10994,7 +10994,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "INCIDENTE"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "A página recebeu dados inválidos"
 
@@ -12155,7 +12155,7 @@ msgstr "Sábado"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13526,7 +13526,7 @@ msgstr[1] "Existem \"%1$d\" grupos com acesso interno à interface web."
 msgid "Third"
 msgstr "Terceiro"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Este campo é automaticamente preenchido pelo item \"%s\"."
@@ -14892,6 +14892,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "O valor \"%1$s\" é muito grande para o campo \"%2$s\" - %3$d caracteres. O máximo permitido é de 2048 caracteres."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "O valor \"%2$s\" de \"%1$s\" possui formato decimal inválido."
@@ -15537,7 +15538,7 @@ msgstr "Agente Zabbix (ativo)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix agregado"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix recebeu uma solicitação incorreta."
 

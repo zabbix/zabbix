@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2014-06-10 10:47+0300\n"
 "Last-Translator: flo <florian.koch1981@googlemail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -864,7 +864,7 @@ msgstr "Automatische-Registrierungs Ereignis und Warnungsdaten Aufbewahrungsfris
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Automatische-Registrierungs Ereignis und Warnungsdaten Aufbewahrungsfrist (in Tagen) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2778,7 +2778,7 @@ msgstr "Uhr"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2815,7 +2815,7 @@ msgid "Colour"
 msgstr "Farbe"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farb-Angabe \"%1$s\" falsch: Erwarte hexadekadischen Farb-Code (6 Stellen)."
@@ -3964,7 +3964,7 @@ msgstr ""
 msgid "Delete selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Ausgewählte Hosts löschen?"
 
@@ -4397,7 +4397,7 @@ msgstr "Ausgewählte Auslöser deaktivieren?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4465,7 +4465,6 @@ msgstr "Suchlaufobjekt"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Host-Suchläufe"
@@ -4515,6 +4514,7 @@ msgid "Discovery rule updated"
 msgstr "Suchlauf geändert"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5262,7 +5262,7 @@ msgstr "Feld"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Feld \"%1$s\" darf nicht NULL sein."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "\"%1$s\" ist ein Pflichtfeld."
@@ -5287,12 +5287,12 @@ msgstr "Feld \"%1$s\" ist keine Liste oder ein Bereich von Ganzzahlen."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Feld \"%1$s\" ist keine Ganzzahl."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Feld \"%1$s\" ist keine Zeichenfolge."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Feld \"%1$s\" muss fehlen."
@@ -5452,7 +5452,7 @@ msgid "Frontend messaging"
 msgstr "Benachrichtigung in Oberfläche"
 
 # Das heißt nicht überall gleich.
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Vollständig klonen"
@@ -6235,7 +6235,7 @@ msgstr "Hostschnittstelle"
 msgid "Host inventories"
 msgstr "Hostinventare"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Hostinventar"
@@ -7492,12 +7492,12 @@ msgstr "Falsche Benutzerdaten in \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Falsche Benutzergruppe."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\"."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Falscher Wert \"%1$s\" für Feld \"%2$s\": Muss zwischen %3$s und %4$s liegen"
@@ -7522,7 +7522,7 @@ msgstr "Falscher Wert \"%1$s\" für das vorzeichenlose Ganzzahl-Feld \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Falscher Wert für Feld \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
@@ -8716,7 +8716,7 @@ msgstr "Wartung ohne Datensammlung"
 msgid "Mandatory parameter is missing."
 msgstr "Pflichtparameter fehlt."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10687,7 +10687,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" existiert bereits."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operation kann wegen unautorisierter Anfrage nicht ausgeführt werden."
 
@@ -11017,7 +11017,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEM"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Seite hat falsche Daten erhalten"
 
@@ -12186,7 +12186,7 @@ msgstr "Samstag"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13565,7 +13565,7 @@ msgstr[1] "Es gibt \"%1$d\" Gruppen mit interner Authentifizierung."
 msgid "Third"
 msgstr "Dritten"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Dieses Feld wird automatisch befüllt aus dem Datenpunkt \"%s\"."
@@ -14932,6 +14932,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Wert \"%1$s\" ist zu lang für Feld \"%2$s\" - %3$d Zeichen. Die erlaubte Länge beträgt 2048 Zeichen."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15577,7 +15578,7 @@ msgstr "Zabbix-Agent (aktiv)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix Aggregat"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix hat eine falsche Anfrage erhalten."
 

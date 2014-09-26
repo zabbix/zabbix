@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 14:46+0300\n"
+"POT-Creation-Date: 2014-09-24 23:03+0300\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -861,7 +861,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2764,7 +2764,7 @@ msgstr "Saat"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2801,7 +2801,7 @@ msgid "Colour"
 msgstr "Renk"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
@@ -3943,7 +3943,7 @@ msgstr "Seçili konak prototipi silinsin mi?"
 msgid "Delete selected host prototypes?"
 msgstr "Seçili konak prototipleri silinsin mi?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Seçilen konak silinsin mi?"
 
@@ -4375,7 +4375,7 @@ msgstr "Seçilen tetikler devre dışı bırakılsın mı?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4441,7 +4441,6 @@ msgstr "Keşif objesi"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Keşif kuralı"
@@ -4491,6 +4490,7 @@ msgid "Discovery rule updated"
 msgstr "Keşif kuralı güncellendi"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5231,7 +5231,7 @@ msgstr "Alan"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
@@ -5256,12 +5256,12 @@ msgstr ""
 msgid "Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
@@ -5420,7 +5420,7 @@ msgstr ""
 msgid "Frontend messaging"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Tüm klon"
@@ -6197,7 +6197,7 @@ msgstr "Konak arabirimi"
 msgid "Host inventories"
 msgstr "Konak envanterleri"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Konak envanteri"
@@ -7453,12 +7453,12 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr ""
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
@@ -7483,7 +7483,7 @@ msgstr "\"%2$s\" işaretsiz tamsayı alanı için geçersiz değer \"%1$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -8676,7 +8676,7 @@ msgstr "Veri toplamayarak bakım"
 msgid "Mandatory parameter is missing."
 msgstr "Zorunlu parametre eksik."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -10642,7 +10642,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -10969,7 +10969,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "SORUN"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Sayfa geçersiz bir veri aldı"
 
@@ -12130,7 +12130,7 @@ msgstr "Cumartesi"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -13496,7 +13496,7 @@ msgstr[1] ""
 msgid "Third"
 msgstr "Üçüncü"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Bu alan \"%s\" öğesi tarafında otomatik doldurulmuş."
@@ -14861,6 +14861,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk 2048 karakter."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15505,7 +15506,7 @@ msgstr "Zabbix ajanı (aktif)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix Kümeleme"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix geçersiz bir istek aldı."
 

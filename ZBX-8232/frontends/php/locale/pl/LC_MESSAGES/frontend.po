@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:14+0300\n"
-"PO-Revision-Date: 2014-09-15 12:32+0300\n"
+"POT-Creation-Date: 2014-09-24 23:07+0300\n"
+"PO-Revision-Date: 2014-09-23 05:45+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410777131.0\n"
+"X-POOTLE-MTIME: 1411443952.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -376,7 +376,7 @@ msgstr "Akcje"
 #: include/views/administration.proxy.edit.php:42
 #: include/views/administration.proxy.list.php:93
 msgid "Active"
-msgstr "Aktywne"
+msgstr "Aktywny"
 
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
@@ -620,7 +620,7 @@ msgstr "Dowolny"
 
 #: include/regexp.inc.php:193 include/views/js/adm.regexprs.edit.js.php:112
 msgid "Any character string included"
-msgstr "Dowolny ciąg znaków zawiera"
+msgstr "Zawiera dowolny ciąg znaków"
 
 #: applications.php:118 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:596
@@ -806,7 +806,7 @@ msgstr "Sierpień"
 
 #: include/menu.inc.php:247 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
-msgstr "Uwierzytelnienie"
+msgstr "Uwierzytelnianie"
 
 #: include/views/configuration.host.edit.php:745
 #: include/views/configuration.host.edit.php:757
@@ -870,7 +870,7 @@ msgstr "Okres przechowywania danych auto-rejestracji i alarmów"
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Okres przechowywania danych auto-rejestracji i alarmów (w dniach) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -947,21 +947,21 @@ msgstr "Raporty słupkowe"
 #: authentication.php:42
 #: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
-msgstr "Podstawowe DN"
+msgstr "Bazowa DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr "Podstawowe uwierzytelnienie"
+msgstr "Uwierzytelnianie podstawowe"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
-msgstr "DN do dowiązania"
+msgstr "DN dostępu"
 
 #: authentication.php:45
 #: include/views/administration.authentication.edit.php:99
 #: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
-msgstr "Hasło dowiązania"
+msgstr "Hasło dostępu"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
@@ -1478,11 +1478,11 @@ msgstr "Nie można wyczyścić historii"
 
 #: api/classes/CDiscoveryRule.php:953
 msgid "Cannot clone graph prototypes."
-msgstr "Nie można powielić prototypu wykresów."
+msgstr "Nie można powielić prototypów wykresów."
 
 #: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
-msgstr "Nie można powielić prototypu hosta."
+msgstr "Nie można powielić prototypów hostów."
 
 #: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
@@ -2800,7 +2800,7 @@ msgstr "Zegar"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2837,7 +2837,7 @@ msgid "Colour"
 msgstr "Kolor"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Kolor \"%1$s\" jest nieprawidłowy: oczekiwano heksadecymalnego kodu koloru (6 znaków)."
@@ -3756,7 +3756,7 @@ msgstr "Domyślnie"
 
 #: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
-msgstr "Domyślne uwierzytelnienie"
+msgstr "Domyślne uwierzytelnianie"
 
 #: include/views/configuration.slideconf.edit.php:41 slideconf.php:37
 msgid "Default delay (in seconds)"
@@ -3980,7 +3980,7 @@ msgstr "Usunąć wybrany prototyp hosta?"
 msgid "Delete selected host prototypes?"
 msgstr "Usunąć wybrane prototypy hostów?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Usunąć wybranego hosta?"
 
@@ -4413,7 +4413,7 @@ msgstr "Wyłączyć wybrane wyzwalacze?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4479,7 +4479,6 @@ msgstr "Obiekt wykrywania"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Reguła wykrywania"
@@ -4531,6 +4530,7 @@ msgid "Discovery rule updated"
 msgstr "Zaktualizowano regułę wykrywania"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -5271,7 +5271,7 @@ msgstr "Pole"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Pole \"%1$s\" nie może być ustawione na NULL."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Pole \"%1$s\" jest wymagane."
@@ -5296,12 +5296,12 @@ msgstr "Pole \"%1$s\" nie zawiera listy liczb całkowitych lub zakresu."
 msgid "Field \"%1$s\" is not integer."
 msgstr "Pole \"%1$s\" nie zawiera liczby całkowitej."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Pole \"%1$s\" nie zawiera ciągu znaków."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musi być puste."
@@ -5458,9 +5458,9 @@ msgstr "Zaktualizowano dostęp do interfejsu użytkownika"
 
 #: include/views/administration.users.edit.php:226
 msgid "Frontend messaging"
-msgstr "Wiadomości interfejsu użytkownika"
+msgstr "Komunikaty interfejsu użytkownika"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Pełne powielenie"
@@ -6040,7 +6040,7 @@ msgstr "Czyszczenie historii może zająć dużo czasu. Kontynuować?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr "Okres przechowywania danych historycznych"
+msgstr "Okres przechowywania danych historii"
 
 #: adm.housekeeper.php:112
 #, c-format
@@ -6239,7 +6239,7 @@ msgstr "Interfejs hosta"
 msgid "Host inventories"
 msgstr "Inwentarze hostów"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inwentarz hosta"
@@ -6550,7 +6550,7 @@ msgstr "Agent IPMI"
 
 #: include/views/configuration.host.massupdate.php:222
 msgid "IPMI authentication algorithm"
-msgstr "Algorytm uwierzytelnienia IPMI"
+msgstr "Algorytm uwierzytelniania IPMI"
 
 #: include/views/configuration.host.edit.php:300
 #: include/views/configuration.host.edit.php:376
@@ -7497,12 +7497,12 @@ msgstr "Błędne dane użytkownika w funkcji \"get_accessible_nodes_by_user\"."
 msgid "Incorrect user group."
 msgstr "Błędna grupa użytkownika."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Błędna wartość \"%1$s\" dla pola \"%2$s\"."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Błędna wartość \"%1$s\" dla pola \"%2$s\": musi być pomiędzy %3$s a %4$s."
@@ -7527,7 +7527,7 @@ msgstr "Błędna wartość \"%1$s\" dla pola całkowitego bez znaku \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Błędna wartość dla pola \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Błędna wartość dla pola \"%1$s\": nie może być puste."
@@ -7619,7 +7619,7 @@ msgstr "Interfejs z polem IP \"%1$s\" nie może mieć pustej nazwy DNS."
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
 msgid "Internal"
-msgstr "Wewnętrzna"
+msgstr "Wewnętrzne"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
@@ -7665,12 +7665,12 @@ msgstr "Internet Explorer"
 #: include/views/configuration.services.edit.php:128 latest.php:353
 #: latest.php:354
 msgid "Interval"
-msgstr "Okres"
+msgstr "Interwał"
 
 #: include/views/configuration.item.edit.php:307
 #: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
-msgstr "Okres (w sek)"
+msgstr "Interwał (w sek)"
 
 #: api/rpc/class.cjsonrpc.php:182
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -7787,7 +7787,7 @@ msgstr "Tryb inwentarzowy"
 
 #: include/views/administration.users.list.php:60
 msgid "Is online?"
-msgstr "Czy jest włączony?"
+msgstr "Czy jest zalogowany?"
 
 #: include/blocks.inc.php:922 include/blocks.inc.php:932
 #: include/blocks.inc.php:1509
@@ -7866,7 +7866,7 @@ msgstr "Dodano pozycję"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Item count"
-msgstr "Ilość pozycji"
+msgstr "Liczba pozycji"
 
 #: items.php:365 screenedit.php:202
 msgid "Item deleted"
@@ -8288,7 +8288,7 @@ msgstr "Ostatni z"
 
 #: include/views/administration.proxy.list.php:48
 msgid "Last seen (age)"
-msgstr "Ostatnio widziane (wiek)"
+msgstr "Ostatnio widziany (wiek)"
 
 #: latest.php:346 latest.php:347
 msgid "Last value"
@@ -8725,7 +8725,7 @@ msgstr "Utrzymanie bez zbierania danych"
 msgid "Mandatory parameter is missing."
 msgstr "Brak wymaganego parametru."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -9059,7 +9059,7 @@ msgstr "Komunikaty"
 
 #: include/views/administration.users.edit.php:368
 msgid "Messaging"
-msgstr "Komunikacja"
+msgstr "Komunikaty"
 
 #: api/rpc/class.cjsonrpc.php:191
 msgid "Method not found."
@@ -10255,7 +10255,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:256
 #: include/views/configuration.action.edit.php:1054
 msgid "Not Ack"
-msgstr "Nie zatwierdzone"
+msgstr "Niezatwierdzone"
 
 #: include/forms.inc.php:631 include/forms.inc.php:814
 msgid "Not Templated items"
@@ -10281,7 +10281,7 @@ msgstr "Niedostępne"
 #: adm.triggerseverities.php:54
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
-msgstr "Nie sklasyfikowany"
+msgstr "Niesklasyfikowane"
 
 #: include/page_footer.php:92
 msgid "Not connected"
@@ -10699,7 +10699,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operacja \"%s\" już istnieje."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operacja nie może być wykonana z powodu nieupoważnionego żądania."
 
@@ -11026,7 +11026,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEM"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Strona zawiera nieprawidłowe dane"
 
@@ -11087,7 +11087,7 @@ msgstr "Błąd przetwarzania"
 #: include/views/administration.proxy.edit.php:43
 #: include/views/administration.proxy.list.php:93
 msgid "Passive"
-msgstr "Pasywne"
+msgstr "Pasywny"
 
 #: httpconf.php:55 include/setup.inc.php:326
 #: include/views/administration.mediatypes.edit.php:82
@@ -12036,7 +12036,7 @@ msgstr "SMTP"
 #: include/views/administration.mediatypes.edit.php:59
 #: include/views/administration.mediatypes.list.php:53
 msgid "SMTP email"
-msgstr "Poczta SMTP"
+msgstr "SMTP email"
 
 #: include/views/administration.mediatypes.edit.php:58
 #: include/views/administration.mediatypes.list.php:52
@@ -12188,7 +12188,7 @@ msgstr "Sobota"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -12725,12 +12725,12 @@ msgstr "Wyświetl zdarzenia, maksymalnie \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach)"
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach)"
 
 #: adm.gui.php:75
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach) \"%1$s\"."
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach) \"%1$s\"."
 
 #: include/views/monitoring.dashconf.php:87 tr_status.php:326
 msgid "Show hosts in maintenance"
@@ -13450,7 +13450,7 @@ msgstr "Test uwierzytelniania"
 
 #: include/views/administration.script.edit.php:110
 msgid "Test confirmation"
-msgstr "Potwierdzenie testu"
+msgstr "Test potwierdzenia"
 
 #: tr_testexpr.php:125
 msgid "Test data"
@@ -13557,7 +13557,7 @@ msgstr[2] "Istnieje \"%1$d\" grup z dostępem do wewnętrznego interfejsu użytk
 msgid "Third"
 msgstr "Trzeci"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "To pole jest automatycznie uzupełniane przez pozycję \"%s\"."
@@ -14422,14 +14422,14 @@ msgstr "Aktualizuj istniejące"
 #: include/forms.inc.php:456 include/views/configuration.httpconf.list.php:65
 #: items.php:155
 msgid "Update interval"
-msgstr "Okres aktualizacji"
+msgstr "Interwał aktualizacji"
 
 #: disc_prototypes.php:47 host_discovery.php:48 httpconf.php:45
 #: include/views/configuration.httpconf.edit.php:87
 #: include/views/configuration.item.edit.php:270
 #: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
-msgstr "Okres aktualizacji (w sek)"
+msgstr "Interwał aktualizacji (w sek)"
 
 #: auditlogs.php:137 include/classes/class.cserverinfo.php:41
 msgid "Updated"
@@ -14929,6 +14929,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Wartość \"%1$s\" jest zbyt długa dla pola \"%2$s\" - %3$d znaków. Dozwolona długość to 2048 znaków."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "Wartość \\\"%2$s\\\" z \\\"%1$s\\\" ma niepoprawny format dziesiętny."
@@ -15575,7 +15576,7 @@ msgstr "Agent Zabbixa (aktywny)"
 msgid "Zabbix aggregate"
 msgstr "Agregat Zabbixa"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix otrzymał nieprawidłowe żądanie."
 
@@ -15612,7 +15613,7 @@ msgstr "Nie ustawiono adresu IP lub numeru portu serwera Zabbix'a!"
 
 #: adm.gui.php:43
 msgid "Zabbix server activity check interval"
-msgstr "Okres sprawdzania aktywności serwera Zabbix"
+msgstr "Interwał sprawdzania aktywności serwera Zabbix"
 
 #: include/classes/class.cserverinfo.php:40
 msgid "Zabbix server info"
@@ -15629,7 +15630,7 @@ msgstr "Serwer Zabbixa jest uruchomiony"
 #: adm.gui.php:80
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "Serwer Zabbix działa, okres sprawdzania \"%1$s\"."
+msgstr "Serwer Zabbix działa, interwał sprawdzania \"%1$s\"."
 
 #: include/setup.inc.php:434
 msgid "Zabbix server name"
