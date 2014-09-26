@@ -29,6 +29,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
+.......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
