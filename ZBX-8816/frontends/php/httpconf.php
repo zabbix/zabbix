@@ -428,7 +428,7 @@ if (isset($_REQUEST['form'])) {
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'templates' => array(),
-		'is_template' => false
+		'show_history_cleanup_button' => false
 	);
 
 	if (isset($data['httptestid'])) {
@@ -453,7 +453,7 @@ if (isset($_REQUEST['form'])) {
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
-				$data['is_template'] = $dbTest['status'] == HOST_STATUS_TEMPLATE;
+				$data['show_history_cleanup_button'] = ($dbTest['status'] != HOST_STATUS_TEMPLATE);
 			}
 		}
 		$data['templates'] = array_reverse($data['templates']);

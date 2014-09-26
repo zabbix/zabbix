@@ -303,7 +303,7 @@ if (!empty($this->data['httptestid'])) {
 		$btnDelete = null;
 	}
 
-	if (!$this->data['is_template']) {
+	if ($this->data['show_history_cleanup_button']) {
 		$buttonDelHistory = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),

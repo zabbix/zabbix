@@ -1218,6 +1218,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 
 	// template
 	$data['is_template'] = isTemplate($data['hostid']);
+	$data['show_history_cleanup_button'] = (!$data['is_template'] && ($data['itemid'] != 0));
 
 	// unset snmpv3 fields
 	if ($data['type'] != ITEM_TYPE_SNMPV3) {
