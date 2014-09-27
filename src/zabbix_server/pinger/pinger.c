@@ -190,7 +190,10 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(key, &request))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid item key format.");
 		goto out;
+	}
 
 	if (0 == strcmp(get_rkey(&request), SERVER_ICMPPING_KEY))
 	{
