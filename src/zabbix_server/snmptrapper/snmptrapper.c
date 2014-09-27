@@ -129,14 +129,14 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		if (1 < get_rparams_num(&request))
 			goto next;
 
-		if (NULL == (regex = get_rparam(&request, 0)))
-			goto next;
+		if (NULL != (regex = get_rparam(&request, 0)))
+		{
+			if ('@' == *regex)
+				DCget_expressions_by_name(&regexps, regex + 1);
 
-		if ('@' == *regex)
-			DCget_expressions_by_name(&regexps, regex + 1);
-
-		if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
-			goto next;
+			if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
+				goto next;
+		}
 
 		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
 			errcodes[i] = SUCCEED;
