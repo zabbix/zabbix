@@ -54,23 +54,25 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	init_result(result);
 	init_request(&request);
 
-	if (0 != strncmp(item->key, "zabbix[", 7))
-		goto out;
-
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		error = zbx_strdup(error, "Invalid item key format.");
 		goto out;
 	}
 
+	if (0 != strcmp("zabbix", get_rkey(&request)))
+	{
+		error = zbx_strdup(error, "Unsupported item key for this item type.");
+		goto out;
+	}
 
-	if (NULL == (tmp = get_rparam(&request, 0)))
+	if (0 == (nparams = get_rparams_num(&request)))
 	{
 		error = zbx_strdup(error, "Invalid number of parameters.");
 		goto out;
 	}
 
-	nparams = get_rparams_num(&request);
+	tmp = get_rparam(&request, 0);
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
