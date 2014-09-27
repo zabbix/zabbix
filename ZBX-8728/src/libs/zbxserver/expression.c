@@ -372,20 +372,12 @@ static void	DCexpand_trigger_expression(char **expression)
  * Purpose: substitute key parameters and user macros in                      *
  *          the item description string with real values                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
 	AGENT_REQUEST	request;
 	const char	*param;
-	char	c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
+	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
 
 	init_request(&request);
 
@@ -417,7 +409,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9')		/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9')				/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
@@ -446,7 +438,6 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 	}
 out:
 	free_request(&request);
-
 }
 
 /******************************************************************************
