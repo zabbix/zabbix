@@ -281,8 +281,8 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str
  *                                                                            *
  * Purpose: extract global regular expression names from item key             *
  *                                                                            *
- * Parameters: key    - [IN] the item key to parse                            *
- *             vector - [OUT] the extracted regular expression names          *
+ * Parameters: key     - [IN] the item key to parse                           *
+ *             regexps - [OUT] the extracted regular expression names         *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t *regexps)
