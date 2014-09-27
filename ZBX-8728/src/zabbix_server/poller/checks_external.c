@@ -43,7 +43,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
-	const char	*param;
+
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = NOTSUPPORTED;
@@ -68,18 +68,15 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (1 < get_rparams_num(&request) || (NULL != (param = get_rparam(&request, 0)) && '\0' != *param))
+	if (0 != get_rparams_num(&request))
 	{
-		int	i;
-		char	*param_esc;
+		int		i;
+		const char	*param;
+		char		*param_esc;
 
 		for (i = 0; i < get_rparams_num(&request); i++)
 		{
-			if (NULL == (param = get_rparam(&request, i)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				param = "";
-			}
+			param = get_rparam(&request, i);
 
 			param_esc = zbx_dyn_escape_string(param, "\"\\");
 			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
