@@ -968,15 +968,13 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 #ifdef _WINDOWS
 	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *key_severity, *key_source, *key_logeventid, *maxlines_persec, *skip;
-	int		rate, s_count, p_count, send_err = SUCCEED, i;
-	char		*value = NULL;
+	const char	*filename, *pattern, *key_severity, *key_source, *key_logeventid, *maxlines_persec, *skip,
+			*str_severity;
+	int		rate, s_count, p_count, send_err = SUCCEED;
+	char		*value = NULL, *provider = NULL, *source = NULL, str_logeventid[8];
 	zbx_uint64_t	lastlogsize;
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
-	char		str_severity[32];	/* for `regex_match_ex' */
-	char		*provider = NULL, *source = NULL;
-	char		str_logeventid[8];	/* for `regex_match_ex' */
 	OSVERSIONINFO	versionInfo;
 	zbx_uint64_t	keywords;
 	EVT_HANDLE	eventlog6_render_context = NULL;
@@ -1081,34 +1079,34 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 						if (0 != (keywords & WINEVENT_KEYWORD_AUDIT_FAILURE))
 						{
 							severity = ITEM_LOGTYPE_FAILURE_AUDIT;
-							strscpy(str_severity, AUDIT_FAILURE);
+							str_severity = AUDIT_FAILURE;
 							break;
 						}
 						else if (0 != (keywords & WINEVENT_KEYWORD_AUDIT_SUCCESS))
 						{
 							severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
-							strscpy(str_severity, AUDIT_SUCCESS);
+							str_severity = AUDIT_SUCCESS;
 							break;
 						}
 						else
 							severity = ITEM_LOGTYPE_INFORMATION;
-							strscpy(str_severity, INFORMATION_TYPE);
+							str_severity = INFORMATION_TYPE;
 							break;
 					case WINEVENT_LEVEL_WARNING:
 						severity = ITEM_LOGTYPE_WARNING;
-						strscpy(str_severity, WARNING_TYPE);
+						str_severity = WARNING_TYPE;
 						break;
 					case WINEVENT_LEVEL_ERROR:
 						severity = ITEM_LOGTYPE_ERROR;
-						strscpy(str_severity, ERROR_TYPE);
+						str_severity = ERROR_TYPE;
 						break;
 					case WINEVENT_LEVEL_CRITICAL:
 						severity = ITEM_LOGTYPE_CRITICAL;
-						strscpy(str_severity, CRITICAL_TYPE);
+						str_severity = CRITICAL_TYPE;
 						break;
 					case WINEVENT_LEVEL_VERBOSE:
 						severity = ITEM_LOGTYPE_VERBOSE;
-						strscpy(str_severity, VERBOSE_TYPE);
+						str_severity = VERBOSE_TYPE;
 						break;
 				}
 
@@ -1181,23 +1179,23 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				case EVENTLOG_SUCCESS:
 				case EVENTLOG_INFORMATION_TYPE:
 					severity = ITEM_LOGTYPE_INFORMATION;
-					strscpy(str_severity, INFORMATION_TYPE);
+					str_severity = INFORMATION_TYPE;
 					break;
 				case EVENTLOG_WARNING_TYPE:
 					severity = ITEM_LOGTYPE_WARNING;
-					strscpy(str_severity, WARNING_TYPE);
+					str_severity = WARNING_TYPE;
 					break;
 				case EVENTLOG_ERROR_TYPE:
 					severity = ITEM_LOGTYPE_ERROR;
-					strscpy(str_severity, ERROR_TYPE);
+					str_severity = ERROR_TYPE;
 					break;
 				case EVENTLOG_AUDIT_FAILURE:
 					severity = ITEM_LOGTYPE_FAILURE_AUDIT;
-					strscpy(str_severity, AUDIT_FAILURE);
+					str_severity = AUDIT_FAILURE;
 					break;
 				case EVENTLOG_AUDIT_SUCCESS:
 					severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
-					strscpy(str_severity, AUDIT_SUCCESS);
+					str_severity = AUDIT_SUCCESS;
 					break;
 			}
 
