@@ -954,7 +954,6 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	/* too many errors, time to go NOTSUPPORTED */
 	if (2 < metric->error_count)
 		ret = FAIL;
-
 out:
 	zbx_free(encoding_uc);
 
@@ -975,9 +974,9 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	zbx_uint64_t	lastlogsize;
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
-	char		str_severity[32]; /* for `regex_match_ex' */
+	char		str_severity[32];	/* for `regex_match_ex' */
 	char		*provider = NULL, *source = NULL;
-	char		str_logeventid[8]; /* for `regex_match_ex' */
+	char		str_logeventid[8];	/* for `regex_match_ex' */
 	OSVERSIONINFO	versionInfo;
 	zbx_uint64_t	keywords;
 	EVT_HANDLE	eventlog6_render_context = NULL;
@@ -1141,7 +1140,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				{
 					/* buffer is full, stop processing active checks*/
 					/* till the buffer is cleared */
-					lastlogsize = active_metrics[i].lastlogsize;
+					lastlogsize = metric->lastlogsize;
 					break;
 				}
 
@@ -1211,9 +1210,8 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE))
 			{
-				send_err = process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, value, ITEM_STATE_NORMAL,
-						&lastlogsize, NULL, &timestamp, source, &severity,
+				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
 						&logeventid, 1);
 				s_count++;
 			}
@@ -1308,7 +1306,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			const char	*perror;
 
-			perror = NULL != error ? error : ZBX_NOTSUPPORTED;
+			perror = (NULL != error ? error : ZBX_NOTSUPPORTED);
 			active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 			active_metrics[i].error_count = 0;
 
