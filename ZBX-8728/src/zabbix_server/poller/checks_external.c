@@ -46,7 +46,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		ret = NOTSUPPORTED;
+	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
@@ -68,21 +68,16 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (0 != get_rparams_num(&request))
+	for (i = 0; i < get_rparams_num(&request); i++)
 	{
-		int		i;
 		const char	*param;
 		char		*param_esc;
 
-		for (i = 0; i < get_rparams_num(&request); i++)
-		{
-			param = get_rparam(&request, i);
+		param = get_rparam(&request, i);
 
-			param_esc = zbx_dyn_escape_string(param, "\"\\");
-			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
-			zbx_free(param_esc);
-		}
-
+		param_esc = zbx_dyn_escape_string(param, "\"\\");
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
+		zbx_free(param_esc);
 	}
 
 	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
