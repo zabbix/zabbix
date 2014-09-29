@@ -1014,7 +1014,7 @@ jQuery(function($) {
 			item.addClass(options.css);
 		}
 
-		var result = item.append(link);
+		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
 			var menu = $('<ul>');
@@ -1026,7 +1026,7 @@ jQuery(function($) {
 			item.append(menu);
 		}
 
-		return result;
+		return item;
 	}
 
 	/**
