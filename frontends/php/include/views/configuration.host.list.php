@@ -14,6 +14,7 @@ $sortOrder = $this->data['sortOrder'];
 $groupId = $this->data['groupId'];
 
 $config = $this->data['config'];
+$templates = $this->data['templates'];
 
 
 $frmForm = new CForm();
