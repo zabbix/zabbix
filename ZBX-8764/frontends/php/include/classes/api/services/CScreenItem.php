@@ -213,27 +213,6 @@ class CScreenItem extends CApiService {
 			$screenItemId = $screenItem['screenitemid'];
 			unset($screenItem['screenitemid']);
 
-			// If screen item type (field "resourcetype") is set to one that does not use "resourceid" field,
-			// value of field "resourceid" is set to 0 for those resource types. Clock screen item type has
-			// case with more refined check.
-			if (isset($screenItem['resourcetype'])) {
-				switch ($screenItem['resourcetype']) {
-					case SCREEN_RESOURCE_CLOCK:
-						if (isset($screenItem['style']) && $screenItem['style'] != TIME_TYPE_HOST) {
-							$screenItem['resourceid'] = 0;
-						}
-						break;
-
-					case SCREEN_RESOURCE_ACTIONS:
-					case SCREEN_RESOURCE_HISTORY:
-					case SCREEN_RESOURCE_SERVER_INFO:
-					case SCREEN_RESOURCE_SYSTEM_STATUS:
-					case SCREEN_RESOURCE_URL:
-						$screenItem['resourceid'] = 0;
-						break;
-				}
-			}
-
 			$update[] = array(
 				'values' => $screenItem,
 				'where' => array('screenitemid' => $screenItemId)
@@ -287,13 +266,15 @@ class CScreenItem extends CApiService {
 		}
 
 		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid'),
+			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
+					'style'),
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 
-		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan', 'colspan'));
+		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan',
+				'colspan', 'style'));
 
 		$this->checkInput($screenItems, $dbScreenItems);
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
@@ -547,12 +528,17 @@ class CScreenItem extends CApiService {
 					break;
 
 				case SCREEN_RESOURCE_CLOCK:
-					if (isset($screenItem['style']) && $screenItem['style'] == TIME_TYPE_HOST) {
-						if (!$screenItem['resourceid']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
-						}
+						if (isset($screenItem['style'])) {
+						if ($screenItem['style'] == TIME_TYPE_HOST) {
+							if (!$screenItem['resourceid']) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
+							}
 
-						$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+						}
+						else if ($screenItem['resourceid']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Resource ID provided for resource-less screen element.'));
+						}
 					}
 					break;
 
@@ -570,6 +556,15 @@ class CScreenItem extends CApiService {
 					}
 
 					$screenIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+					break;
+
+				case SCREEN_RESOURCE_ACTIONS:
+				case SCREEN_RESOURCE_SERVER_INFO:
+				case SCREEN_RESOURCE_SYSTEM_STATUS:
+				case SCREEN_RESOURCE_URL:
+					if ($screenItem['resourceid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Resource ID provided for resource-less screen element.'));
+					}
 					break;
 			}
 
