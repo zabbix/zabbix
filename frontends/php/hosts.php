@@ -858,7 +858,8 @@ else {
 	$templates = API::Template()->get(array(
 		'output' => array('templateid', 'name'),
 		'templateids' => $templateIds,
-		'selectParentTemplates' => array('hostid', 'name')
+		'selectParentTemplates' => array('hostid', 'name'),
+		'preservekeys' => true
 	));
 
 	// get proxy host IDs that that are not 0
@@ -887,7 +888,7 @@ else {
 		'sortOrder' => $sortOrder,
 		'groupId' => $pageFilter->groupid,
 		'config' => $config,
-		'templates' => zbx_toHash($templates, 'templateid'),
+		'templates' => array_keys($templates),
 		'proxies' => $proxies
 	);
 
