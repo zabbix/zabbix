@@ -22,7 +22,7 @@ class ApiFixture extends Fixture {
 			));
 
 			if ($rs->isError()) {
-				throw new \Exception(sprintf('Cannot authenticate to load API fixture: %1$s', $rs->errorMessage));
+				throw new \Exception(sprintf('Cannot authenticate to load API fixture: %1$s', $rs->getErrorData()));
 			}
 
 			$this->apiWrapper->auth = $rs->getResult();

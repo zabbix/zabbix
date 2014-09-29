@@ -57,7 +57,7 @@ abstract class CApiClient {
 	 * @return CApiResponse
 	 */
 	public function callJson($jsonString) {
-		$request = $this->json->decode($jsonString, true);
+		$request = $this->decode($jsonString);
 
 		if (!$request) {
 			return $this->createErrorResponse(-32700, _('Incorrect JSON string.'), null, null);
@@ -86,6 +86,45 @@ abstract class CApiClient {
 	}
 
 	/**
+	 * Encode array as a JSON string.
+	 *
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	protected function encode(array $data) {
+		return $this->json->encode($data);
+	}
+
+	/**
+	 * Decode JSON string as an array.
+	 *
+	 * @param string $json
+	 *
+	 * @return array
+	 */
+	protected function decode($json) {
+		return $this->json->decode($json, true);
+	}
+
+	/**
+	 * Create any response object.
+	 *
+	 * @param array 	$response
+	 *
+	 * @return CApiResponse
+	 */
+	protected function createResponse(array $response) {
+		return new CApiResponse(
+			isset($response['result']) ? $response['result'] : null,
+			isset($response['error']) ? $response['error'] : null,
+			$response['id'],
+			$response['jsonrpc'],
+			isset($response['debug']) ? $response['debug'] : null
+		);
+	}
+
+	/**
 	 * Create a response containing an error.
 	 *
 	 * @param string 	$errorCode
@@ -97,13 +136,16 @@ abstract class CApiClient {
 	 * @return CApiResponse
 	 */
 	protected function createErrorResponse($errorCode, $errorData, $id, $version, array $debug = null) {
-		$error = array(
-			'code' => $errorCode,
-			'message' => $this->getJsonRpcErrorMessage($errorCode),
-			'data' => $errorData
-		);
-
-		return new CApiResponse(null, $error, $id, $version, $debug);
+		return $this->createResponse(array(
+			'error' => array(
+				'code' => $errorCode,
+				'message' => $this->getJsonRpcErrorMessage($errorCode),
+				'data' => $errorData
+			),
+			'id' => $id,
+			'jsonrpc' => $version,
+			'debug' => $debug
+		));
 	}
 
 	/**
@@ -116,7 +158,11 @@ abstract class CApiClient {
 	 * @return CApiResponse
 	 */
 	protected function createResultResponse($result, $id, $version) {
-		return new CApiResponse($result, null, $id, $version);
+		return $this->createResponse(array(
+			'result' => $result,
+			'id' => $id,
+			'jsonrpc' => $version
+		));
 	}
 
 	/**

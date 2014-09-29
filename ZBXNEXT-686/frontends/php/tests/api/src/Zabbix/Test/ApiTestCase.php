@@ -29,9 +29,11 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	private $database;
 
 	/**
-	 * @var APIGateway\FileAPIGateway
+	 * @var CApiWrapper
 	 */
-	private $gateway;
+	private $api;
+
+	private $auth;
 
 	/**
 	 * @var FixtureLoader
@@ -59,13 +61,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 
 		$this->database = new TestDatabase();
 
-		// TODO: use an API client instead of the gateway
-		$this->gateway = new FileAPIGateway();
-		// TODO: make the user name and password configurable
-		$this->gateway->configure($this->gatewayConfiguration, array(
-			'username' => 'Admin',
-			'password' => 'zabbix'
-		));
+		$this->api = new \CIncludeFileApiClient(new \CJson());
 
 		$client = new \CLocalApiClient(new \CJson());
 		$client->setServiceFactory(new \CApiServiceFactory());
@@ -74,13 +70,6 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 			new FixtureFactory(new \CApiWrapper($client)),
 			new \CArrayMacroResolver()
 		);
-	}
-
-	/**
-	 * @return APIGatewayInterface
-	 */
-	protected function getGateway() {
-		return $this->gateway;
 	}
 
 	protected function tearDown() {
@@ -117,22 +106,27 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @param string $id
 	 * @param string $jsonRpc
 	 *
-	 * @return APITestResponse
+	 * @return \CApiResponse
 	 */
 	protected function callMethod($method, $params, $id = null, $jsonRpc = '2.0') {
-		$request = array(
-			'version' => $jsonRpc,
-			'id' => ($id) ? $id : rand(),
-			'params' => $params,
-			'method' => $method
-		);
+		$auth = null;
+		if ($this->api->requiresAuthentication($method)) {
+			if ($this->auth === null) {
+				// TODO: allow to log in as a different user
+				$response = $this->api->callMethod('user.login', array(
+					'user' => 'Admin',
+					'password' => 'zabbix'
+				));
+				$this->auth = $response->getResult();
+			}
 
-		$apiRequest = new APITestRequest($request['method'], $request['params'], $request['id'], $request);
+			$auth = $this->auth;
+		}
 
-		return $this->gateway->execute($apiRequest);
+		return $this->api->callMethod($method, $params, $auth, $id, $jsonRpc);
 	}
 
-	protected function assertError(APITestResponse $response, $message = '') {
+	protected function assertError(\CApiResponse $response, $message = '') {
 		if ($message === '') {
 			$message = 'Failed asserting that the response contains an error.';
 		}
@@ -140,7 +134,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		return $this->assertTrue($response->isError(), $message);
 	}
 
-	protected function assertResult(APITestResponse $response, $message = '') {
+	protected function assertResult(\CApiResponse $response, $message = '') {
 		if ($message === '') {
 			$message = 'Failed asserting that the response contains a result.';
 		}
@@ -154,11 +148,11 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
 	 *
 	 * @param $definition
-	 * @param APITestResponse $response
+	 * @param \CApiResponse $response
 	 *
 	 * @throws \Exception
 	 */
-	protected function assertResponse($definition, APITestResponse $response) {
+	protected function assertResponse($definition, \CApiResponse $response) {
 		$validator = new \CTestSchemaValidator(array('schema' => $definition));
 		if (!$validator->validate($response->getResponseData())) {
 			throw new \Exception($validator->getError());
