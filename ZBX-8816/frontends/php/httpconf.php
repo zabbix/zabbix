@@ -427,9 +427,15 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'templates' => array(),
-		'show_history_cleanup_button' => false
+		'templates' => array()
 	);
+
+	$host = API::Host()->get(array(
+		'output' => array('status'),
+		'hostids' => $data['hostid'],
+		'templated_hosts' => true
+	));
+	$data['host'] = reset($host);
 
 	if (isset($data['httptestid'])) {
 		// get templates
@@ -453,7 +459,6 @@ if (isset($_REQUEST['form'])) {
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
-				$data['show_history_cleanup_button'] = ($dbTest['status'] != HOST_STATUS_TEMPLATE);
 			}
 		}
 		$data['templates'] = array_reverse($data['templates']);
