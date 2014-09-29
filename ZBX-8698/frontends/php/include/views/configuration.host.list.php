@@ -29,7 +29,7 @@ $frmForm->addItem(new CVar('groupid', getRequest('groupid'), 'filter_groupid_id'
 $hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
 
 $frmGroup = new CForm('get');
-$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$frmGroup->addItem(array(_('Group').' ', $pageFilter->getGroupsCB()));
 
 $hostsWidget->addHeader(_('Hosts'), $frmGroup);
 $hostsWidget->addHeaderRowNumber();
@@ -38,9 +38,9 @@ $hostsWidget->setRootClass('host-list');
 // filter
 $filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(
-	array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-	array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-	array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
+	array(array(bold(_('Name')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
+	array(array(bold(_('DNS')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
+	array(array(bold(_('IP')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
 	array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
 ));
 
@@ -50,7 +50,7 @@ $filterButton->useJQueryStyle('main');
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 $resetButton->useJQueryStyle();
 
-$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons = new CDiv(array($filterButton, ' ', $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
