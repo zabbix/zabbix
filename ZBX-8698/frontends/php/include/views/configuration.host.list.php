@@ -15,6 +15,7 @@ $groupId = $this->data['groupId'];
 
 $config = $this->data['config'];
 $templates = $this->data['templates'];
+$proxies = $this->data['proxies'];
 
 
 $frmForm = new CForm();
