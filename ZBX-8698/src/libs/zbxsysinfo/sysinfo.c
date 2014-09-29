@@ -46,6 +46,69 @@ extern ZBX_METRIC      parameter_hostname;
 
 static ZBX_METRIC	*commands = NULL;
 
+#define ZBX_COMMAND_ERROR		0
+#define ZBX_COMMAND_WITHOUT_PARAMS	1
+#define ZBX_COMMAND_WITH_PARAMS		2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_command                                                    *
+ *                                                                            *
+ * Purpose: parses item key and splits it into command and parameters         *
+ *                                                                            *
+ * Return value: ZBX_COMMAND_ERROR - error                                    *
+ *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters      *
+ *               ZBX_COMMAND_WITH_PARAMS - command with parameters            *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
+{
+	const char	*pl, *pr;
+	size_t		sz;
+
+	for (pl = key; SUCCEED == is_key_char(*pl); pl++)
+		;
+
+	if (pl == key)
+		return ZBX_COMMAND_ERROR;
+
+	if (NULL != cmd)
+	{
+		if (cmd_max_len <= (sz = (size_t)(pl - key)))
+			return ZBX_COMMAND_ERROR;
+
+		memcpy(cmd, key, sz);
+		cmd[sz] = '\0';
+	}
+
+	if ('\0' == *pl)	/* no parameters specified */
+	{
+		if (NULL != param)
+			*param = '\0';
+		return ZBX_COMMAND_WITHOUT_PARAMS;
+	}
+
+	if ('[' != *pl)		/* unsupported character */
+		return ZBX_COMMAND_ERROR;
+
+	for (pr = ++pl; '\0' != *pr; pr++)
+		;
+
+	if (']' != *--pr)
+		return ZBX_COMMAND_ERROR;
+
+	if (NULL != param)
+	{
+		if (param_max_len <= (sz = (size_t)(pr - pl)))
+			return ZBX_COMMAND_ERROR;
+
+		memcpy(param, pl, sz);
+		param[sz] = '\0';
+	}
+
+	return ZBX_COMMAND_WITH_PARAMS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_metric                                                       *
@@ -308,65 +371,6 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 	request->key = zbx_strdup(NULL, key);
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: parse_command                                                    *
- *                                                                            *
- * Purpose: parses item key and splits it into command and parameters         *
- *                                                                            *
- * Return value: ZBX_COMMAND_ERROR - error                                    *
- *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters      *
- *               ZBX_COMMAND_WITH_PARAMS - command with parameters            *
- *                                                                            *
- ******************************************************************************/
-int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
-{
-	const char	*pl, *pr;
-	size_t		sz;
-
-	for (pl = key; SUCCEED == is_key_char(*pl); pl++)
-		;
-
-	if (pl == key)
-		return ZBX_COMMAND_ERROR;
-
-	if (NULL != cmd)
-	{
-		if (cmd_max_len <= (sz = (size_t)(pl - key)))
-			return ZBX_COMMAND_ERROR;
-
-		memcpy(cmd, key, sz);
-		cmd[sz] = '\0';
-	}
-
-	if ('\0' == *pl)	/* no parameters specified */
-	{
-		if (NULL != param)
-			*param = '\0';
-		return ZBX_COMMAND_WITHOUT_PARAMS;
-	}
-
-	if ('[' != *pl)		/* unsupported character */
-		return ZBX_COMMAND_ERROR;
-
-	for (pr = ++pl; '\0' != *pr; pr++)
-		;
-
-	if (']' != *--pr)
-		return ZBX_COMMAND_ERROR;
-
-	if (NULL != param)
-	{
-		if (param_max_len <= (sz = (size_t)(pr - pl)))
-			return ZBX_COMMAND_ERROR;
-
-		memcpy(param, pl, sz);
-		param[sz] = '\0';
-	}
-
-	return ZBX_COMMAND_WITH_PARAMS;
 }
 
 void	test_parameter(const char *key)

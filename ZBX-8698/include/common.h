@@ -696,7 +696,7 @@ while (0)
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
-extern const char	usage_message[];
+extern const char	*usage_message[];
 extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
@@ -713,11 +713,16 @@ typedef enum
 	ZBX_TASK_PRINT_SUPPORTED,
 	ZBX_TASK_TEST_METRIC,
 	ZBX_TASK_SHOW_USAGE,
+	ZBX_TASK_SHOW_VERSION,
+	ZBX_TASK_SHOW_HELP,
+#ifdef _WINDOWS
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE,
+	ZBX_TASK_STOP_SERVICE
+#else
 	ZBX_TASK_RUNTIME_CONTROL
+#endif
 }
 zbx_task_t;
 
@@ -923,11 +928,6 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
-
-#define ZBX_COMMAND_ERROR		0
-#define ZBX_COMMAND_WITHOUT_PARAMS	1
-#define ZBX_COMMAND_WITH_PARAMS		2
-int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 
 /* misc functions */
 #ifdef HAVE_IPV6
