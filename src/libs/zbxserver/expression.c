@@ -372,29 +372,17 @@ static void	DCexpand_trigger_expression(char **expression)
  * Purpose: substitute key parameters and user macros in                      *
  *          the item description string with real values                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
-	char	c, *p, *m, *n, *str_out = NULL, *replace_to = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+	AGENT_REQUEST	request;
+	const char	*param;
+	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
 
-	switch (parse_command(key, NULL, 0, params, sizeof(params)))
-	{
-		case ZBX_COMMAND_ERROR:
-			return;
-		case ZBX_COMMAND_WITHOUT_PARAMS:
-			*params = '\0';
-		case ZBX_COMMAND_WITH_PARAMS:
-			/* do nothing */
-			;
-	}
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key(key, &request))
+		goto out;
 
 	p = *data;
 
@@ -421,16 +409,15 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)		/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9')				/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
 			*m++ = '$';
 
-			if (0 != get_param(params, *m - '0', param, sizeof(param)))
-				*param = '\0';
+			if (NULL != (param = get_rparam(&request, *m - '0' - 1)))
+				str_out = zbx_strdcat(str_out, param);
 
-			str_out = zbx_strdcat(str_out, param);
 			p = m + 1;
 		}
 		else									/* just a dollar sign */
@@ -449,6 +436,8 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		zbx_free(*data);
 		*data = str_out;
 	}
+out:
+	free_request(&request);
 }
 
 /******************************************************************************
