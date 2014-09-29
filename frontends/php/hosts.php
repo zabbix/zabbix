@@ -789,7 +789,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['dbHost'] = $dbHost;
 	}
 
-	$data['form'] = getRequest('form', 1);
+	$data['form'] = getRequest('form', 'update');
 
 	$hostForm = new CView('configuration.host.edit', $data);
 	$hostsWidget->addItem($hostForm->render());
