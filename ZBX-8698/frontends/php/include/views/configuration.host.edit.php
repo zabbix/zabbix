@@ -214,10 +214,10 @@ if (!$isDiscovered) {
 	$newgroupTB->setAttribute('maxlength', 64);
 	$tmp_label = _('New group');
 	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$tmp_label .= SPACE._('(Only super admins can create groups)');
+		$tmp_label .= ' '._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
+	$hostList->addRow(' ', array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
 // groups for discovered hosts
 else {
@@ -246,13 +246,13 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'agent');
 
 	// headers with sizes
-	$iconLabel = new CCol(SPACE, 'interface-drag-control');
+	$iconLabel = new CCol(' ', 'interface-drag-control');
 	$ipLabel = new CCol(_('IP address'), 'interface-ip');
 	$dnsLabel = new CCol(_('DNS name'), 'interface-dns');
 	$connectToLabel = new CCol(_('Connect to'), 'interface-connect-to');
 	$portLabel = new CCol(_('Port'), 'interface-port');
 	$defaultLabel = new CCol(_('Default'), 'interface-default');
-	$removeLabel = new CCol(SPACE, 'interface-control');
+	$removeLabel = new CCol(' ', 'interface-control');
 	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel, $removeLabel));
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
@@ -333,13 +333,13 @@ else {
 
 	// header
 	$ifTab->addRow(array(
-		new CCol(SPACE, 'interface-drag-control'),
+		new CCol(' ', 'interface-drag-control'),
 		new CCol(_('IP address'), 'interface-ip'),
 		new CCol(_('DNS name'), 'interface-dns'),
 		new CCol(_('Connect to'), 'interface-connect-to'),
 		new CCol(_('Port'), 'interface-port'),
 		new CCol(_('Default'), 'interface-default'),
-		new CCol(SPACE, 'interface-control')
+		new CCol(' ', 'interface-control')
 	));
 
 	$row = new CRow(null, null, 'agentIterfacesFooter');
@@ -692,16 +692,17 @@ if (!$isDiscovered) {
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 		$templateLink->setTarget('_blank');
 
+		$cloneOrFullClone = in_array($this->data['form'], array('full_clone', 'clone'));
 		$linkedTemplateTable->addRow(
 			array(
 				$templateLink,
 				array(
 					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
-					SPACE,
-					SPACE,
-					isset($originalTemplates[$template['templateid']]) && ($this->data['form'] != 'full_clone')
+					' ',
+					' ',
+					isset($originalTemplates[$template['templateid']]) && !$cloneOrFullClone
 						? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
-						: SPACE
+						: ' '
 				)
 			),
 			null, 'conditions_'.$template['templateid']
@@ -819,7 +820,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(' ', new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
