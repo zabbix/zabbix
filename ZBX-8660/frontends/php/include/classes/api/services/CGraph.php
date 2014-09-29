@@ -551,7 +551,7 @@ class CGraph extends CGraphGeneral {
 
 				if ($delGraph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered graph "%s".', $delGraph['name']
+						'Cannot delete discovered graph "%1$s".', $delGraph['name']
 					));
 				}
 			}
