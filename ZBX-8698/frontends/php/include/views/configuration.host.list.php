@@ -21,9 +21,9 @@ $proxies = $this->data['proxies'];
 $frmForm = new CForm();
 $frmForm->cleanItems();
 $frmForm->addItem(new CDiv(array(
-		new CSubmit('form', _('Create host')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	)));
+	new CSubmit('form', _('Create host')),
+	new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
+)));
 $frmForm->addItem(new CVar('groupid', getRequest('groupid'), 'filter_groupid_id'));
 
 $hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
@@ -38,11 +38,11 @@ $hostsWidget->setRootClass('host-list');
 // filter
 $filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
-	));
+	array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
+	array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
+	array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
+	array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
+));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
 $filterButton->useJQueryStyle('main');
