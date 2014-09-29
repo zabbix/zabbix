@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)

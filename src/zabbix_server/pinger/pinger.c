@@ -183,107 +183,119 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
 		int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error, int max_error_len)
 {
-	char	cmd[16], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	int	num_params;
+	const char	*tmp;
+	int		ret = NOTSUPPORTED;
+	AGENT_REQUEST	request;
 
-	if (ZBX_COMMAND_ERROR == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
-		return NOTSUPPORTED;
+	init_request(&request);
 
-	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
+	if (SUCCEED != parse_item_key(key, &request))
+	{
+		zbx_snprintf(error, max_error_len, "Invalid item key format.");
+		goto out;
+	}
+
+	if (0 == strcmp(get_rkey(&request), SERVER_ICMPPING_KEY))
 	{
 		*icmpping = ICMPPING;
 	}
-	else if (0 == strcmp(cmd, SERVER_ICMPPINGLOSS_KEY))
+	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGLOSS_KEY))
 	{
 		*icmpping = ICMPPINGLOSS;
 	}
-	else if (0 == strcmp(cmd, SERVER_ICMPPINGSEC_KEY))
+	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGSEC_KEY))
 	{
 		*icmpping = ICMPPINGSEC;
 	}
 	else
 	{
 		zbx_snprintf(error, max_error_len, "Unsupported pinger key.");
-		return NOTSUPPORTED;
+		goto out;
 	}
 
-	num_params = num_param(params);
-
-	if (6 < num_params || (ICMPPINGSEC != *icmpping && 5 < num_params))
+	if (6 < get_rparams_num(&request) || (ICMPPINGSEC != *icmpping && 5 < get_rparams_num(&request)))
 	{
 		zbx_snprintf(error, max_error_len, "Too many arguments.");
-		return NOTSUPPORTED;
+		goto out;
 	}
 
-	if (0 != get_param(params, 2, buffer, sizeof(buffer)) || '\0' == *buffer)
+	if (NULL == (tmp = get_rparam(&request, 1)) || '\0' == *tmp)
 	{
 		*count = 3;
 	}
-	else if (FAIL == is_uint31(buffer, (uint32_t*)count) || MIN_COUNT > *count || *count > MAX_COUNT)
+	else if (FAIL == is_uint31(tmp, (uint32_t*)count) || MIN_COUNT > *count || *count > MAX_COUNT)
 	{
 		zbx_snprintf(error, max_error_len, "Number of packets \"%s\" is not between %d and %d.",
-				buffer, MIN_COUNT, MAX_COUNT);
-		return NOTSUPPORTED;
+				tmp, MIN_COUNT, MAX_COUNT);
+		goto out;
 	}
 
-	if (0 != get_param(params, 3, buffer, sizeof(buffer)) || '\0' == *buffer)
+	if (NULL == (tmp = get_rparam(&request, 2)) || '\0' == *tmp)
 	{
 		*interval = 0;
 	}
-	else if (FAIL == is_uint31(buffer, (uint32_t*)interval) || MIN_INTERVAL > *interval)
+	else if (FAIL == is_uint31(tmp, (uint32_t*)interval) || MIN_INTERVAL > *interval)
 	{
-		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", buffer, MIN_INTERVAL);
-		return NOTSUPPORTED;
+		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
+		goto out;
 	}
 
-	if (0 != get_param(params, 4, buffer, sizeof(buffer)) || '\0' == *buffer)
+	if (NULL == (tmp = get_rparam(&request, 3)) || '\0' == *tmp)
 	{
 		*size = 0;
 	}
-	else if (FAIL == is_uint31(buffer, (uint32_t*)size) || MIN_SIZE > *size || *size > MAX_SIZE)
+	else if (FAIL == is_uint31(tmp, (uint32_t*)size) || MIN_SIZE > *size || *size > MAX_SIZE)
 	{
 		zbx_snprintf(error, max_error_len, "Packet size \"%s\" is not between %d and %d.",
-				buffer, MIN_SIZE, MAX_SIZE);
-		return NOTSUPPORTED;
+				tmp, MIN_SIZE, MAX_SIZE);
+		goto out;
 	}
 
-	if (0 != get_param(params, 5, buffer, sizeof(buffer)) || '\0' == *buffer)
-		*timeout = 0;
-	else if (FAIL == is_uint31(buffer, (uint32_t*)timeout) || MIN_TIMEOUT > *timeout)
+	if (NULL == (tmp = get_rparam(&request, 4)) || '\0' == *tmp)
 	{
-		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", buffer, MIN_TIMEOUT);
-		return NOTSUPPORTED;
+		*timeout = 0;
+	}
+	else if (FAIL == is_uint31(tmp, (uint32_t*)timeout) || MIN_TIMEOUT > *timeout)
+	{
+		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
+		goto out;
 	}
 
-	if (0 != get_param(params, 6, buffer, sizeof(buffer)) || '\0' == *buffer)
+	if (NULL == (tmp = get_rparam(&request, 5)) || '\0' == *tmp)
+	{
 		*type = ICMPPINGSEC_AVG;
+	}
 	else
 	{
-		if (0 == strcmp(buffer, "min"))
+		if (0 == strcmp(tmp, "min"))
 		{
 			*type = ICMPPINGSEC_MIN;
 		}
-		else if (0 == strcmp(buffer, "avg"))
+		else if (0 == strcmp(tmp, "avg"))
 		{
 			*type = ICMPPINGSEC_AVG;
 		}
-		else if (0 == strcmp(buffer, "max"))
+		else if (0 == strcmp(tmp, "max"))
 		{
 			*type = ICMPPINGSEC_MAX;
 		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", buffer);
-			return NOTSUPPORTED;
+			zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", tmp);
+			goto out;
 		}
 	}
 
-	if (0 != get_param(params, 1, buffer, sizeof(buffer)) || '\0' == *buffer)
+	if (NULL == (tmp = get_rparam(&request, 0)) || '\0' == *tmp)
 		*addr = strdup(host_addr);
 	else
-		*addr = strdup(buffer);
+		*addr = strdup(tmp);
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	free_request(&request);
+
+	return ret;
 }
 
 static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int count, int interval, int size, int timeout)
