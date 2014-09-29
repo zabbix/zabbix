@@ -888,7 +888,7 @@ else {
 		'sortOrder' => $sortOrder,
 		'groupId' => $pageFilter->groupid,
 		'config' => $config,
-		'templates' => array_keys($templates),
+		'templates' => $templates,
 		'proxies' => $proxies
 	);
 
