@@ -565,8 +565,13 @@ class CHost extends CHostGeneral {
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			$dbHost = $dbHosts[$host['hostid']];
-			$hostName = isset($host['host']) ? $host['host'] : $dbHost['host'];
+			if ($update) {
+				$dbHost = $dbHosts[$host['hostid']];
+				$hostName = isset($host['host']) ? $host['host'] : $dbHost['host'];
+			}
+			else {
+				$hostName = $host['host'];
+			}
 
 			if (isset($host['status'])) {
 				$statusValidator->setObjectName($hostName);
@@ -1639,6 +1644,7 @@ class CHost extends CHostGeneral {
 	protected function checkPermissions(array $hostIds) {
 		$dbHosts = API::Host()->get(array(
 			'output' => array('hostid', 'name', 'flags'),
+			'hostids' => $hostIds,
 			'preservekeys' => true,
 			'editable' => true
 		));
