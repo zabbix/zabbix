@@ -428,11 +428,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 			goto notsupported;
 		}
-	}
-	else
-		goto notsupported;
 
-	ret = SUCCEED;
+		ret = SUCCEED;
+	}
 
 notsupported:
 
