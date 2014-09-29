@@ -19,9 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.4.0rc2');
-define('ZABBIX_API_VERSION',	'2.4.0');
-define('ZABBIX_DB_VERSION',		2030118);
+define('ZABBIX_VERSION',		'2.5.0');
+define('ZABBIX_API_VERSION',	'2.5.0');
+define('ZABBIX_DB_VERSION',		2040000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2014');
@@ -130,6 +130,7 @@ define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
 define('T_ZBX_DBL_BIG',		9);
+define('T_ZBX_DBL_STR',		10);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
@@ -343,6 +344,7 @@ define('ITEM_TYPE_SSH',				13);
 define('ITEM_TYPE_TELNET',			14);
 define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
+define('ITEM_TYPE_SNMPTRAP',		17);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
 define('ITEM_VALUE_TYPE_STR',		1); // aka Character
@@ -372,8 +374,6 @@ define('ITEM_STATUS_NOTSUPPORTED',	3);
 
 define('ITEM_STATE_NORMAL',			0);
 define('ITEM_STATE_NOTSUPPORTED',	1);
-
-define('ITEM_TYPE_SNMPTRAP', 17);
 
 define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
 define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',		1);
@@ -941,10 +941,6 @@ define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
-
-// actions
-define('LONG_DESCRIPTION',	0);
-define('SHORT_DESCRIPTION',	1);
 
 // availability report modes
 define('AVAILABILITY_REPORT_BY_HOST', 0);

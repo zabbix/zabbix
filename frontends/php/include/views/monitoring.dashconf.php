@@ -91,7 +91,7 @@ $severities = array();
 foreach ($this->data['severities'] as $severity) {
 	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']', isset($this->data['severity'][$severity]), '', 1);
 	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
-	$severities[] = array($serverityCheckBox, getSeverityCaption($severity));
+	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
 	$severities[] = BR();
 }
 array_pop($severities);

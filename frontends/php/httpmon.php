@@ -98,6 +98,8 @@ $paging = null;
 
 
 if ($pageFilter->hostsSelected) {
+	$config = select_config();
+
 	$options = array(
 		'output' => array('httptestid'),
 		'templated' => false,

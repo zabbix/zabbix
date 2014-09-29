@@ -140,6 +140,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		state = ZBX_CPU_STATE_SOFTIRQ;
 	else if (0 == strcmp(tmp, "steal"))
 		state = ZBX_CPU_STATE_STEAL;
+	else if (0 == strcmp(tmp, "guest"))
+		state = ZBX_CPU_STATE_GCPU;
+	else if (0 == strcmp(tmp, "guest_nice"))
+		state = ZBX_CPU_STATE_GNICE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

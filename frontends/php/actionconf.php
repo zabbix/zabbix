@@ -383,12 +383,15 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
  */
 show_messages();
 
+$config = select_config();
+
 if (hasRequest('form')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid'),
 		'new_condition' => getRequest('new_condition', array()),
-		'new_operation' => getRequest('new_operation')
+		'new_operation' => getRequest('new_operation'),
+		'config' => $config
 	);
 
 	$action = null;
@@ -428,8 +431,10 @@ if (hasRequest('form')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
-			$data['action']['def_shortdata'] = getRequest('def_shortdata');
-			$data['action']['def_longdata'] = getRequest('def_longdata');
+			$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
+			$data['action']['def_longdata'] = getRequest('def_longdata', '');
+			$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
+			$data['action']['r_longdata'] = getRequest('r_longdata', '');
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
@@ -447,10 +452,10 @@ if (hasRequest('form')) {
 				$data['action']['def_longdata'] = getRequest('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
 			}
 			else {
-				$data['action']['def_shortdata'] = getRequest('def_shortdata');
-				$data['action']['def_longdata'] = getRequest('def_longdata');
-				$data['action']['r_shortdata'] = getRequest('r_shortdata');
-				$data['action']['r_longdata'] = getRequest('r_longdata');
+				$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
+				$data['action']['def_longdata'] = getRequest('def_longdata', '');
+				$data['action']['r_shortdata'] = getRequest('r_shortdata', '');
+				$data['action']['r_longdata'] = getRequest('r_longdata', '');
 			}
 		}
 	}
@@ -520,7 +525,8 @@ else {
 	$data = array(
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'config' => $config
 	);
 
 	$data['actions'] = API::Action()->get(array(
