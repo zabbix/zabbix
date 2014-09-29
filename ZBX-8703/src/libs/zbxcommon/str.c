@@ -519,7 +519,7 @@ void	compress_signs(char *str)
 		}
 	}
 
-	/* Remove '-', '+' where needed, Convert -123 to +D123 */
+	/* Remove '-', '+' where needed, Convert -123 to +N123 */
 	for(i=0;str[i]!='\0';i++)
 	{
 		cur=str[i];
@@ -534,7 +534,7 @@ void	compress_signs(char *str)
 			else
 			{
 				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				if(!isdigit(prev) && prev!='.' && strchr("KMGTsmhdw",prev)==NULL)
 				{
 					for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
 				}
@@ -550,7 +550,7 @@ void	compress_signs(char *str)
 			else
 			{
 				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				if(!isdigit(prev) && prev!='.' && strchr("KMGTsmhdw",prev)==NULL)
 				{
 					str[i]='N';
 				}
