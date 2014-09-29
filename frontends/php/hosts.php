@@ -807,70 +807,6 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$frmForm = new CForm();
-	$frmForm->cleanItems();
-	$frmForm->addItem(new CDiv(array(
-		new CSubmit('form', _('Create host')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	)));
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
-
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
-
-	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-
-	$hostsWidget->addHeader(_('Hosts'), $frmGroup);
-	$hostsWidget->addHeaderRowNumber();
-	$hostsWidget->setRootClass('host-list');
-
-	// filter
-	$filterTable = new CTable('', 'filter filter-center');
-	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
-	));
-
-	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$filterButton->useJQueryStyle('main');
-
-	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$resetButton->useJQueryStyle();
-
-	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
-	$divButtons->setAttribute('style', 'padding: 4px 0;');
-
-	$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-	$filterForm = new CForm('get');
-	$filterForm->setAttribute('name', 'zbx_filter');
-	$filterForm->setAttribute('id', 'zbx_filter');
-	$filterForm->addItem($filterTable);
-
-	$hostsWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
-
-	// table hosts
-	$form = new CForm();
-	$form->setName('hosts');
-
-	$table = new CTableInfo(_('No hosts found.'));
-	$table->setHeader(array(
-		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-		_('Applications'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Discovery'),
-		_('Web'),
-		_('Interface'),
-		_('Templates'),
-		make_sorting_header(_('Status'), 'status', $sortField, $sortOrder),
-		_('Availability')
-	));
-
 	// get Hosts
 	$hosts = array();
 	if ($pageFilter->groupsSelected) {
@@ -893,6 +829,8 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
+	$pagingLine = getPagingLine($hosts);
+
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
@@ -905,7 +843,8 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => array('itemid', 'name'),
-		'selectHostDiscovery' => array('ts_delete')
+		'selectHostDiscovery' => array('ts_delete'),
+		'limit' => $config['search_limit'] + 1
 	));
 	order_result($hosts, $sortField, $sortOrder);
 
@@ -942,7 +881,7 @@ else {
 		'hostsWidget' => $hostsWidget,
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
-		'paging' => getPagingLine($hosts),
+		'paging' => $pagingLine,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
