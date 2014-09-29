@@ -54,28 +54,35 @@
 #include "setproctitle.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix proxy";
+const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
-const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -R runtime-option",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
+	"A Zabbix daemon that collects monitoring data from devices and sends it to Zabbix server.",
+	"",
 	"Options:",
-	"  -c --config <file>              Absolute path to the configuration file",
-	"  -R --runtime-control <option>   Perform administrative functions",
+	"  -c --config config-file               Absolute path to the configuration file",
+	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
-	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
-	"  " ZBX_LOG_LEVEL_INCREASE "=<target>     Increase log level, affect all processes if target is not specified",
-	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
+	"    Runtime control options:",
+	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
-	"Log level control targets:",
-	"  <pid>                           Process identifier",
-	"  <process type>                  All processes of specified type (e.g., poller)",
-	"  <process type,N>                Process type and number (e.g., poller,3)",
+	"      Log level control targets:",
+	"        pid                             Process identifier",
+	"        process-type                    All processes of specified type (e.g., poller)",
+	"        process-type,N                  Process type and number (e.g., poller,3)",
 	"",
-	"Other options:",
-	"  -h --help                       Display help information",
-	"  -V --version                    Display version number",
+	"  -h --help                             Display this help message",
+	"  -V --version                          Display version number",
 	NULL	/* end of text */
 };
 
@@ -208,94 +215,96 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 #endif
 
-int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
 	int	server_count = 0;
 
-	if (0 == server_num)
+	if (0 == local_server_num)
 	{
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
-		*process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
+		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
-		*process_num = server_num - server_count + CONFIG_HEARTBEAT_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
+		*local_process_num = local_server_num - server_count + CONFIG_HEARTBEAT_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_DATASENDER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_DATASENDER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_DATASENDER;
-		*process_num = server_num - server_count + CONFIG_DATASENDER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_DATASENDER;
+		*local_process_num = local_server_num - server_count + CONFIG_DATASENDER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_POLLER;
-		*process_num = server_num - server_count + CONFIG_POLLER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		*process_num = server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		*process_num = server_num - server_count + CONFIG_TRAPPER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_PINGER;
-		*process_num = server_num - server_count + CONFIG_PINGER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
+		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
-		*process_num = server_num - server_count + CONFIG_HOUSEKEEPER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
+		*local_process_num = local_server_num - server_count + CONFIG_HOUSEKEEPER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
-		*process_num = server_num - server_count + CONFIG_HTTPPOLLER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_HTTPPOLLER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*process_num = server_num - server_count + CONFIG_DISCOVERER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
+		*local_process_num = local_server_num - server_count + CONFIG_DISCOVERER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
-		*process_num = server_num - server_count + CONFIG_HISTSYNCER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
+		*local_process_num = local_server_num - server_count + CONFIG_HISTSYNCER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-		*process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
-		*process_num = server_num - server_count + CONFIG_JAVAPOLLER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_JAVAPOLLER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
-		*process_num = server_num - server_count + CONFIG_SNMPTRAPPER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_SNMPTRAPPER_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_SELFMON_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_SELFMON;
-		*process_num = server_num - server_count + CONFIG_SELFMON_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_SELFMON;
+		*local_process_num = local_server_num - server_count + CONFIG_SELFMON_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_VMWARE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_VMWARE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_VMWARE;
-		*process_num = server_num - server_count + CONFIG_VMWARE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
+		*local_process_num = local_server_num - server_count + CONFIG_VMWARE_FORKS;
 	}
 	else
 		return FAIL;
@@ -649,6 +658,7 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -661,9 +671,12 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'R':
+				opt_r++;
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
 					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
@@ -708,6 +721,29 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 		}
+	}
+
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_r)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
 	}
 
 	if (NULL == CONFIG_FILE)

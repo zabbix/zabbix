@@ -32,7 +32,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_min                                       *
+ * Function: evaluate_history_func_min                                        *
  *                                                                            *
  * Purpose: calculate minimum value from the history value vector             *
  *                                                                            *
@@ -64,7 +64,7 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_max                                       *
+ * Function: evaluate_history_func_max                                        *
  *                                                                            *
  * Purpose: calculate maximum value from the history value vector             *
  *                                                                            *
@@ -96,7 +96,7 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_sum                                       *
+ * Function: evaluate_history_func_sum                                        *
  *                                                                            *
  * Purpose: calculate sum of values from the history value vector             *
  *                                                                            *
@@ -126,7 +126,7 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_sum                                       *
+ * Function: evaluate_history_func_avg                                        *
  *                                                                            *
  * Purpose: calculate average value of values from the history value vector   *
  *                                                                            *
@@ -148,7 +148,7 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_count                                     *
+ * Function: evaluate_history_func_count                                      *
  *                                                                            *
  * Purpose: calculate number of values in value vector                        *
  *                                                                            *
@@ -169,7 +169,7 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, int
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_value                                     *
+ * Function: evaluate_history_func_last                                       *
  *                                                                            *
  * Purpose: calculate the last (newest) value in value vector                 *
  *                                                                            *
@@ -187,7 +187,7 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func                                           *
+ * Function: evaluate_history_func                                            *
  *                                                                            *
  * Purpose: calculate function with values from value vector                  *
  *                                                                            *
@@ -195,10 +195,10 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
  *             value_type  - [IN] the type of values. Only float/uint64       *
  *                           values are supported.                            *
  *             func        - [IN] the function to calculate. Only             *
- *                           ZBX_DB_GET_HIST_MIN, ZBX_DB_GET_HIST_VALUE       *
- *                           ZBX_DB_GET_HIST_AVG, ZBX_DB_GET_HIST_MAX,        *
- *                           ZBX_DB_GET_HIST_SUM, ZBX_DB_GET_HIST_COUNT       *
- *                           ZBX_DB_GET_HIST_VALUE functions are supported.   *
+ *                           ZBX_VALUE_FUNC_MIN, ZBX_VALUE_FUNC_AVG,          *
+ *                           ZBX_VALUE_FUNC_MAX, ZBX_VALUE_FUNC_SUM,          *
+ *                           ZBX_VALUE_FUNC_COUNT, ZBX_VALUE_FUNC_LAST        *
+ *                           functions are supported.                         *
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
@@ -451,8 +451,6 @@ clean1:
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)

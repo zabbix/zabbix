@@ -134,7 +134,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Graph name'), array(
+	$screenFormList->addRow(_('Graph'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	), false, null, 'nowrap');
@@ -182,7 +182,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Graph name'), array(
+	$screenFormList->addRow(_('Graph prototype'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	), false, null, 'nowrap');
@@ -231,7 +231,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Parameter'), array(
+	$screenFormList->addRow(_('Item'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	), false, null, 'nowrap');
@@ -279,7 +279,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Parameter'), array(
+	$screenFormList->addRow(_('Item prototype'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	), false, null, 'nowrap');
@@ -305,7 +305,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Parameter'), array(
+	$screenFormList->addRow(_('Map'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
@@ -357,7 +357,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Parameter'), array(
+	$screenFormList->addRow(_('Item'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		$selectButton
 	), false, null, 'nowrap');
@@ -530,7 +530,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Parameter'), array(
+	$screenFormList->addRow(_('Screen'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 		new CButton('select', _('Select'),
 			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
@@ -619,7 +619,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1', 800, 450);", 'formlist'
 			);
 		}
-		$screenFormList->addRow(_('Parameter'), array(
+		$screenFormList->addRow(_('Item'), array(
 			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
 			$selectButton
 		));
