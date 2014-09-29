@@ -457,45 +457,58 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_aggregate";
 
-	char		tmp[8], params[MAX_STRING_LEN], groups[MAX_STRING_LEN], itemkey[MAX_STRING_LEN], funcp[32];
-	int		grp_func, item_func, ret = SUCCEED;
+	AGENT_REQUEST	request;
+	int		ret = NOTSUPPORTED;
+	const char	*tmp, *groups, *itemkey, *funcp;
+	int		grp_func, item_func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+
+	init_request(&request);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value type must be Numeric for aggregate items"));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
-	if (ZBX_COMMAND_WITH_PARAMS != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
-		return NOTSUPPORTED;
+	if (SUCCEED != parse_item_key(item->key, &request))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		goto out;
+	}
 
-	if (0 == strcmp(tmp, "grpmin"))
-		grp_func =ZBX_VALUE_FUNC_MIN;
-	else if (0 == strcmp(tmp, "grpavg"))
-		grp_func =ZBX_VALUE_FUNC_AVG;
-	else if (0 == strcmp(tmp, "grpmax"))
-		grp_func =ZBX_VALUE_FUNC_MAX;
-	else if (0 == strcmp(tmp, "grpsum"))
-		grp_func =ZBX_VALUE_FUNC_SUM;
+	if (0 == strcmp(get_rkey(&request), "grpmin"))
+	{
+		grp_func = ZBX_VALUE_FUNC_MIN;
+	}
+	else if (0 == strcmp(get_rkey(&request), "grpavg"))
+	{
+		grp_func = ZBX_VALUE_FUNC_AVG;
+	}
+	else if (0 == strcmp(get_rkey(&request), "grpmax"))
+	{
+		grp_func = ZBX_VALUE_FUNC_MAX;
+	}
+	else if (0 == strcmp(get_rkey(&request), "grpsum"))
+	{
+		grp_func = ZBX_VALUE_FUNC_SUM;
+	}
 	else
-		return NOTSUPPORTED;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key."));
+		goto out;
+	}
 
-	if (4 != num_param(params))
+	if (4 != get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
-	if (0 != get_param(params, 1, groups, sizeof(groups)))
-		return NOTSUPPORTED;
-
-	if (0 != get_param(params, 2, itemkey, sizeof(itemkey)))
-		return NOTSUPPORTED;
-
-	if (0 != get_param(params, 3, tmp, sizeof(tmp)))
-		return NOTSUPPORTED;
+	groups = get_rparam(&request, 0);
+	itemkey = get_rparam(&request, 1);
+	tmp = get_rparam(&request, 2);
 
 	if (0 == strcmp(tmp, "min"))
 		item_func = ZBX_VALUE_FUNC_MIN;
@@ -512,14 +525,17 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
-	if (0 != get_param(params, 4, funcp, sizeof(funcp)))
-		return NOTSUPPORTED;
+	funcp = get_rparam(&request, 3);
 
 	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
-		ret = NOTSUPPORTED;
+		goto out;
+
+	ret = SUCCEED;
+out:
+	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
