@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-09-24 23:09+0300\n"
 "PO-Revision-Date: 2014-09-10 02:33+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -2823,7 +2823,7 @@ msgid "Colour"
 msgstr "色"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
@@ -4496,7 +4496,6 @@ msgstr "ディスカバリオブジェクト"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "ディスカバリルール"
@@ -4547,6 +4546,7 @@ msgid "Discovery rule updated"
 msgstr "ディスカバリのルールを更新しました"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5362,7 +5362,7 @@ msgstr "フィールド"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "フィールド\"%1$s\"は必須です。"
@@ -5387,12 +5387,12 @@ msgstr "フィールド\"%1$s\"はリストや指定された範囲内の整数�
 msgid "Field \"%1$s\" is not integer."
 msgstr "フィールド\"%1$s\"は整数値ではありません。"
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "フィールド\"%1$s\"は文字列ではありません。"
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
@@ -7716,13 +7716,13 @@ msgstr "ディスカバリルール\"%1$s\"の計算のタイプが正しくあ�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
@@ -7747,7 +7747,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の値が正しくありません。"
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
@@ -10882,7 +10882,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "認証されていないリクエストのため操作を実行できません。"
 
@@ -11224,7 +11224,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "障害"
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
@@ -15203,6 +15203,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2048文字以内で設定してください。"
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありません。"
@@ -15841,7 +15842,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 
