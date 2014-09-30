@@ -66,6 +66,8 @@ class CHost extends CHostGeneral {
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
+		var_dump($asdf);
+
 		$sqlParts = array(
 			'select'	=> array('hosts' => 'h.hostid'),
 			'from'		=> array('hosts' => 'hosts h'),

@@ -149,8 +149,10 @@ class CProfiler {
 		$debug_str .= '<br>';
 
 		foreach ($this->apiLog as $i => $apiCall) {
+			list($class, $method, $params, $result, $error, $debug, $file, $line) = $apiCall;
+
 			$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
-			list($class, $method, $params, $result, $file, $line) = $apiCall;
+
 			// api method
 			$debug_str .= '<div style="padding-bottom: 10px;">';
 			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b> ['.$file.':'.$line.']';
@@ -159,9 +161,14 @@ class CProfiler {
 			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
 			$debug_str .= '<pre>'.print_r(CHtml::encode($params), true).'</pre>';
 			$debug_str .= '</td>';
-			// result
-			$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';
-
+			if (isset($error['code'])) {
+				// error
+				$debug_str .= '<td valign="top" style="color: red;">Error:<pre>'.print_r(CHtml::encode($error), true).'</pre>Details: <p>'.$debug['message'].' ['.$this->formatCallStack($debug['trace']).']</p></td>';
+			}
+			else {
+				// result
+				$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';
+			}
 			$debug_str .= '</tr></table>';
 			$debug_str .= '</div>';
 		}
@@ -225,7 +232,7 @@ class CProfiler {
 	 * @param array  $params
 	 * @param array  $result
 	 */
-	public function profileApiCall($class, $method, $params, $result) {
+	public function profileApiCall($class, $method, $params, $result, array $error = null, array $debug = null) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -239,6 +246,8 @@ class CProfiler {
 			$method,
 			$params,
 			$result,
+			$error,
+			$debug,
 			$file,
 			$line
 		);

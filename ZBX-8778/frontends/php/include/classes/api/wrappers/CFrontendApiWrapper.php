@@ -65,7 +65,10 @@ class CFrontendApiWrapper extends CApiWrapper {
 
 		// call profiling
 		if ($this->debug) {
-			$this->profiler->profileApiCall($this->api, $method, $params, $response->data);
+			$this->profiler->profileApiCall($this->api, $method, $params, $response->data, array(
+				'code' => $response->errorCode,
+				'error' => $response->errorMessage
+			), $response->debug);
 		}
 
 		if (!$response->errorCode) {
@@ -75,7 +78,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 			// add an error message
 			$trace = $response->errorMessage;
 			if ($response->debug) {
-				$trace .= ' ['.$this->profiler->formatCallStack($response->debug).']';
+				$trace .= ' ['.$this->profiler->formatCallStack($response->debug['trace']).']';
 			}
 			error($trace);
 

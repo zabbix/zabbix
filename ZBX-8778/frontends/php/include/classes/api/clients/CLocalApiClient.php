@@ -50,6 +50,15 @@ class CLocalApiClient extends CApiClient {
 	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
 		global $DB;
 
+		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+			// necessary to surpress errors when calling with error control operator like @function_name()
+			if (error_reporting() === 0) {
+				return true;
+			}
+
+			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+		});
+
 		$api = strtolower($requestApi);
 		$method = strtolower($requestMethod);
 
@@ -109,6 +118,30 @@ class CLocalApiClient extends CApiClient {
 
 			$response->data = $result;
 		}
+		catch (ErrorException $e) {
+			if ($newTransaction) {
+				// if we're calling user.login and authentication failed - commit the transaction to save the
+				// failed attempt data
+				if ($api === 'user' && $method === 'login') {
+					DBend(true);
+				}
+				// otherwise - revert the transaction
+				else {
+					DBend(false);
+				}
+			}
+
+			$response->errorCode = ($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL;
+			$response->errorMessage = 'Internal API error.';
+
+			// add debug data
+			if ($this->debug) {
+				$response->debug = array(
+					'message' => $e->getMessage(),
+					'trace' => $e->getTrace()
+				);
+			}
+		}
 		catch (Exception $e) {
 			if ($newTransaction) {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
@@ -127,9 +160,14 @@ class CLocalApiClient extends CApiClient {
 
 			// add debug data
 			if ($this->debug) {
-				$response->debug = $e->getTrace();
+				$response->debug = array(
+					'message' => $e->getMessage(),
+					'trace' => $e->getTrace()
+				);
 			}
 		}
+
+		restore_error_handler();
 
 		return $response;
 	}
