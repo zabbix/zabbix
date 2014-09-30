@@ -74,10 +74,10 @@ function httptest_status2style($status) {
 function delete_history_by_httptestid($httptestid) {
 	$db_items = DBselect(
 		'SELECT DISTINCT i.itemid'.
-		' FROM items i,httpstepitem si,httpstep s'.
-		' WHERE i.itemid=si.itemid'.
-			' AND si.httpstepid=s.httpstepid'.
-			' AND s.httptestid='.zbx_dbstr($httptestid)
+		' FROM items i,httptest ht,httptestitem hti,httpstep hs,httpstepitem hsi'.
+		' WHERE (i.itemid=hti.itemid AND hti.httptestid=ht.httptestid)'.
+			' OR (i.itemid=hsi.itemid AND hsi.httpstepid=hs.httpstepid)'.
+			' AND ht.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($item_data = DBfetch($db_items)) {
 		if (!delete_history_by_itemid($item_data['itemid'])) {
