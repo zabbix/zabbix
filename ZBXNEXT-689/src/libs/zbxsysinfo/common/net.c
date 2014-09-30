@@ -181,7 +181,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	size_t			offset = 0;
-	int			res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
+	int			res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL, use_tcp = 0;
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
@@ -224,6 +224,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	wchar_t		*wzone;
 	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	DWORD		options;
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -255,7 +256,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	*buffer = '\0';
 
-	if (5 < request->nparam)
+	if (6 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -311,9 +312,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (NULL != (param = get_rparam(request, 5)))
+	{
+		if (0 == strcmp(param, "tcp"))
+			use_tcp = 1;
+		else if ('\0' != *param && 0 != strcmp(param, "udp"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
 #ifdef _WINDOWS
+	options = DNS_QUERY_STANDARD;
+	if (0 != use_tcp)
+		options |= DNS_QUERY_USE_TCP_ONLY;
+
 	wzone = zbx_utf8_to_unicode(zone);
-	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pQueryResults, NULL);
+	res = DnsQuery(wzone, type, options, NULL, &pQueryResults, NULL);
 	zbx_free(wzone);
 
 	if (1 == short_answer)
@@ -455,6 +471,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (0 != use_tcp)
+		_res.options |= RES_USEVC;
 
 	if (NULL != ip && '\0' != *ip)
 	{
