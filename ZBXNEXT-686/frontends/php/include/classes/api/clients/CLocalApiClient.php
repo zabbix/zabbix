@@ -66,7 +66,7 @@ class CLocalApiClient extends CApiClient {
 			return $this->createErrorResponse(-32600, _('JSON-rpc method is not defined.'), $id, $jsonRpc);
 		}
 		elseif (!$this->isValidMethod($lowerCaseMethod)) {
-			return $this->createErrorResponse(-32600, _s('Incorrect method "%1$s".', $method),
+			return $this->createErrorResponse(-32602, _s('Incorrect method "%1$s".', $method),
 				$id, $jsonRpc
 			);
 		}
