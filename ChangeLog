@@ -3,6 +3,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8665] fixed incorrect display of period in graph filter time bar, dragging the scrollbar beyond year 1970 and calendar months to run in loop for years 1970 and 2038 (Ivo)
 ..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
 .......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
