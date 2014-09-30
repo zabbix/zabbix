@@ -3,6 +3,7 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
 .......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
@@ -410,8 +411,10 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
 ........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
 ..F....... [ZBX-8773] fixed inventory mode resetting when adding template to a host (Ivo)
@@ -1509,6 +1512,7 @@ A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators 
 
 Bug fixes:
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
