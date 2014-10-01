@@ -148,6 +148,29 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		else
 			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal to configuration syncer: process not found");
 	}
+	else if (ZBX_RTC_HOUSEKEEPER_WAKEUP == ZBX_RTC_GET_MSG(flags))
+	{
+		for (i = 0; i < threads_num; i++)
+		{
+			if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+				continue;
+
+			if (ZBX_PROCESS_TYPE_HOUSEKEEPER == process_type)
+				break;
+		}
+
+		if (i != threads_num)
+		{
+			s.ZBX_SIVAL_INT = flags;
+
+			if (-1 != sigqueue(threads[i], SIGUSR1, s))
+				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to the housekeeper");
+			else
+				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal to the housekeeper: process not found");
+	}
 	else if (ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
 			ZBX_RTC_LOG_LEVEL_DECREASE == ZBX_RTC_GET_MSG(flags))
 	{

@@ -77,6 +77,7 @@ const char	*help_message[] = {
 	"",
 	"    Runtime control options:",
 	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_WAKEUP "                Wake up the housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
@@ -592,6 +593,10 @@ void	zbx_sigusr_handler(int flags)
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 			zbx_wakeup();
 			break;
+		case ZBX_RTC_HOUSEKEEPER_WAKEUP:
+			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+			zbx_wakeup();
+			break;
 		default:
 			break;
 	}
@@ -645,6 +650,10 @@ int	main(int argc, char **argv)
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
 					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
+				}
+				else if (0 == strcmp(zbx_optarg, ZBX_HOUSEKEEPER_WAKEUP))
+				{
+					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_HOUSEKEEPER_WAKEUP, 0, 0);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
