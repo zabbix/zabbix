@@ -1477,7 +1477,6 @@ function getTriggerFormData($exprAction) {
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = true;
-			$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 		}
 		else {
 			show_messages(false, '', _('Expression Syntax Error.'));
@@ -1488,7 +1487,6 @@ function getTriggerFormData($exprAction) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
 		$data['expression_field_readonly'] = $data['limited'];
-		$data['expression_field_params'] = 'getSelectedText(this.form.elements["'.$data['expression_field_name'].'"])';
 	}
 
 	if (empty($data['parent_discoveryid'])) {

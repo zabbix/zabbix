@@ -3,7 +3,11 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8665] fixed incorrect display of period in graph filter time bar, dragging the scrollbar beyond year 1970 and calendar months to run in loop for years 1970 and 2038 (Ivo)
+..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
+.......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
@@ -109,7 +113,7 @@ A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Kr
 ...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
 ....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
 A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing; thanks to Leann for the report (Krists)
-........S. [ZBX-8444] database queries for enabled items, triggers and hosts replaced with queries from configuration cache to improve performance for processing sleeping escalations (igors)
+........S. [ZBX-8444] improved sleeping escalation processing by using configuration cache to get enabled items, triggers and hosts (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 ........S. [ZBX-8608] fixed clearing of discovered services with using CIDR notation in ip lists (Sasha)
 ........S. [ZBX-8415] fixed possible server crash on LLD host or host group update (dimir, Sasha)
@@ -408,7 +412,10 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
 ........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
 ..F....... [ZBX-8773] fixed inventory mode resetting when adding template to a host (Ivo)
@@ -447,7 +454,7 @@ Bug fixes:
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
 .......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
-........S. [ZBX-8444] increased the interval for checking sleeping escalations to improve performance (igors)
+........S. [ZBX-8444] changed the interval for checking sleeping escalations to improve performance (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not updating properly when linking template to host (Ivo)
 ........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
@@ -1505,6 +1512,8 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
