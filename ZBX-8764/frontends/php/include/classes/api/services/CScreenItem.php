@@ -267,14 +267,15 @@ class CScreenItem extends CApiService {
 
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
-					'style'),
+				'style'),
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 
-		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan',
-				'colspan', 'style'));
+		$screenItems = $this->extendObjects($this->tableName(), $screenItems,
+			array('screenid', 'x', 'y', 'rowspan', 'colspan', 'style')
+		);
 
 		$this->checkInput($screenItems, $dbScreenItems);
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
@@ -528,7 +529,7 @@ class CScreenItem extends CApiService {
 					break;
 
 				case SCREEN_RESOURCE_CLOCK:
-						if (isset($screenItem['style'])) {
+					if (isset($screenItem['style'])) {
 						if ($screenItem['style'] == TIME_TYPE_HOST) {
 							if (!$screenItem['resourceid']) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
@@ -536,7 +537,7 @@ class CScreenItem extends CApiService {
 
 							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 						}
-						else if ($screenItem['resourceid']) {
+						elseif ($screenItem['resourceid']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Resource ID provided for resource-less screen element.'));
 						}
 					}
