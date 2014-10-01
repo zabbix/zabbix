@@ -328,6 +328,7 @@ void	test_parameters()
 				zbx_strcpy_alloc(&key, &key_alloc, &key_offset, commands[i].test_param);
 				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, ']');
 			}
+
 			test_parameter(key);
 		}
 	}
@@ -395,7 +396,10 @@ static int	replace_param(const char *cmd, const char *param, char **out, size_t 
 			if (NULL != (tmp = get_param_dyn(param, (int)(*pr - '0'))))
 			{
 				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, error, max_error_len)))
+				{
+					zbx_free(tmp);
 					break;
+				}
 
 				zbx_strcpy_alloc(out, out_alloc, &out_offset, tmp);
 
