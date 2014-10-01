@@ -43,51 +43,41 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
-	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX],
-			*cmd = NULL, *buf = NULL;
+
+	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		rc, ret = NOTSUPPORTED;
+	int		i, ret = NOTSUPPORTED;
+	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	if (ZBX_COMMAND_ERROR == (rc = parse_command(item->key, key, sizeof(key), params, sizeof(params))))
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
-		goto notsupported;
+		goto out;
 	}
 
 	cmd = zbx_malloc(cmd, cmd_alloc);
-	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, key);
+	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, get_rkey(&request));
 
 	if (-1 == access(cmd, X_OK))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
-		goto notsupported;
+		goto out;
 	}
 
-	if (ZBX_COMMAND_WITH_PARAMS == rc)
+	for (i = 0; i < get_rparams_num(&request); i++)
 	{
-		int	i, n;
-		char	param[MAX_STRING_LEN], *param_esc;
+		const char	*param;
+		char		*param_esc;
 
-		if (0 == (n = num_param(params)))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
-			goto notsupported;
-		}
+		param = get_rparam(&request, i);
 
-		for (i = 1; i <= n; i++)
-		{
-			if (0 != get_param(params, i, param, sizeof(param)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				*param = '\0';
-			}
-
-			param_esc = zbx_dyn_escape_string(param, "\"\\");
-			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
-			zbx_free(param_esc);
-		}
+		param_esc = zbx_dyn_escape_string(param, "\"\\");
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
+		zbx_free(param_esc);
 	}
 
 	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
@@ -101,8 +91,10 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-notsupported:
+out:
 	zbx_free(cmd);
+
+	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

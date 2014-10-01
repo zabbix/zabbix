@@ -63,7 +63,7 @@ const char	*progname = NULL;
 #endif
 
 /* application TITLE */
-const char	title_message[] = APPLICATION_NAME
+const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
 				" Win64"
 #elif defined(WIN32)
@@ -80,46 +80,60 @@ const char	title_message[] = APPLICATION_NAME
 const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
-const char	usage_message[] =
-#ifndef _WINDOWS
-	"[-Vhp] [-R <runtime option>]"
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -p",
+	"[-c config-file] -t item-key",
+#ifdef _WINDOWS
+	"[-c config-file] -i [-m]",
+	"[-c config-file] -d [-m]",
+	"[-c config-file] -s [-m]",
+	"[-c config-file] -x [-m]",
 #else
-	"[-Vhp] [-idsx] [-m]"
+	"[-c config-file] -R runtime-option",
 #endif
-	" [-c <config-file>] [-t <item key>]";
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 /* end of application USAGE message */
 
 /* application HELP message */
 const char	*help_message[] = {
+	"A Zabbix daemon for monitoring of various server parameters.",
+	"",
 	"Options:",
-	"  -c --config <config-file>       Absolute path to the configuration file",
-	"  -p --print                      Print known items and exit",
-	"  -t --test <item key>            Test specified item and exit",
-	"  -h --help                       Display help information",
-	"  -V --version                    Display version number",
-#ifndef _WINDOWS
-	"  -R --runtime-control <option>   Perform administrative functions",
-	"",
-	"Runtime control options:",
-	"  " ZBX_LOG_LEVEL_INCREASE "=<target>     Increase log level, affect all processes if target is not specified",
-	"  " ZBX_LOG_LEVEL_DECREASE "=<target>     Decrease log level, affect all processes if target is not specified",
-	"",
-	"Log level control targets:",
-	"  <pid>                           Process identifier",
-	"  <process type>                  All processes of specified type (e.g., listener)",
-	"  <process type,N>                Process type and number (e.g., listener,3)",
-#else
+	"  -c --config config-file               Absolute path to the configuration file",
+	"  -p --print                            Print known items and exit",
+	"  -t --test item-key                    Test specified item and exit",
+#ifdef _WINDOWS
 	"",
 	"Functions:",
 	"",
-	"  -i --install          Install Zabbix agent as service",
-	"  -d --uninstall        Uninstall Zabbix agent from service",
+	"  -i --install                          Install Zabbix agent as service",
+	"  -d --uninstall                        Uninstall Zabbix agent from service",
 
-	"  -s --start            Start Zabbix agent service",
-	"  -x --stop             Stop Zabbix agent service",
+	"  -s --start                            Start Zabbix agent service",
+	"  -x --stop                             Stop Zabbix agent service",
 
-	"  -m --multiple-agents  Service name will include hostname",
+	"  -m --multiple-agents                  Service name will include hostname",
+#else
+	"  -R --runtime-control runtime-option   Perform administrative functions",
+	"",
+	"    Runtime control options:",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
+	"",
+	"      Log level control targets:",
+	"        pid                             Process identifier",
+	"        process-type                    All processes of specified type (e.g., listener)",
+	"        process-type,N                  Process type and number (e.g., listener,3)",
 #endif
+	"",
+	"  -h --help                             Display this help message",
+	"  -V --version                          Display version number",
+	"",
+	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
 	NULL	/* end of text */
 };
 /* end of application HELP message */
@@ -154,8 +168,8 @@ static char	shortopts[] =
 	"idsxm"
 #endif
 	;
-
 /* end of COMMAND LINE OPTIONS */
+
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
@@ -199,30 +213,32 @@ char	*opt = NULL;
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
 	int	server_count = 0;
 
-	if (0 == server_num)
+	if (0 == local_server_num)
 	{
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_COLLECTOR;
+		*local_process_num = local_server_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_LISTENER;
+		*local_process_num = local_server_num - server_count + CONFIG_PASSIVE_FORKS;
 
 	}
-	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
+		*local_process_num = local_server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
 		return FAIL;
@@ -230,9 +246,14 @@ int	get_process_info_by_thread(int server_num, unsigned char *process_type, int 
 	return SUCCEED;
 }
 
-static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
+static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char	ch;
+	char		ch = '\0';
+	int		opt_c = 0, opt_p = 0, opt_t = 0, opt_r = 0, ret = SUCCEED;
+#ifdef _WINDOWS
+	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+	unsigned int	opt_mask = 0;
+#endif
 
 	t->task = ZBX_TASK_START;
 
@@ -242,10 +263,13 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 #ifndef _WINDOWS
 			case 'R':
+				opt_r++;
 				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 				{
@@ -276,21 +300,18 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #endif
 			case 'h':
-				help();
-				exit(EXIT_SUCCESS);
-				break;
+				t->task = ZBX_TASK_SHOW_HELP;
+				goto out;
 			case 'V':
-				version();
-#ifdef _AIX
-				tl_version();
-#endif
-				exit(EXIT_SUCCESS);
-				break;
+				t->task = ZBX_TASK_SHOW_VERSION;
+				goto out;
 			case 'p':
+				opt_p++;
 				if (ZBX_TASK_START == t->task)
 					t->task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
+				opt_t++;
 				if (ZBX_TASK_START == t->task)
 				{
 					t->task = ZBX_TASK_TEST_METRIC;
@@ -299,29 +320,154 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifdef _WINDOWS
 			case 'i':
+				opt_i++;
 				t->task = ZBX_TASK_INSTALL_SERVICE;
 				break;
 			case 'd':
+				opt_d++;
 				t->task = ZBX_TASK_UNINSTALL_SERVICE;
 				break;
 			case 's':
+				opt_s++;
 				t->task = ZBX_TASK_START_SERVICE;
 				break;
 			case 'x':
+				opt_x++;
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
+				opt_m++;
 				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
 			default:
 				t->task = ZBX_TASK_SHOW_USAGE;
-				break;
+				goto out;
 		}
+	}
+
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_p || 1 < opt_t || 1 < opt_r)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
+		if (1 < opt_p)
+			zbx_error("option \"-p\" or \"--print\" specified multiple times");
+		if (1 < opt_t)
+			zbx_error("option \"-t\" or \"--test\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
+
+		ret = FAIL;
+		goto out;
+	}
+#ifdef _WINDOWS
+	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
+	{
+		if (1 < opt_i)
+			zbx_error("option \"-i\" or \"--install\" specified multiple times");
+		if (1 < opt_d)
+			zbx_error("option \"-d\" or \"--uninstall\" specified multiple times");
+		if (1 < opt_s)
+			zbx_error("option \"-s\" or \"--start\" specified multiple times");
+		if (1 < opt_x)
+			zbx_error("option \"-x\" or \"--stop\" specified multiple times");
+		if (1 < opt_m)
+			zbx_error("option \"-m\" or \"--multiple-agents\" specified multiple times");
+
+		ret = FAIL;
+		goto out;
+	}
+
+	/* check for mutually exclusive options */
+	/* Allowed option combinations.		*/
+	/* Option 'c' is always optional.	*/
+	/*   p  t  i  d  s  x  m    opt_mask	*/
+	/* ---------------------    --------	*/
+	/*   -  -  -  -  -  -  - 	0x00	*/
+	/*   p  -  -  -  -  -  -	0x40	*/
+	/*   -  t  -  -  -  -  -	0x20	*/
+	/*   -  -  i  -  -  -  -	0x10	*/
+	/*   -  -  -  d  -  -  -	0x08	*/
+	/*   -  -  -  -  s  -  -	0x04	*/
+	/*   -  -  -  -  -  x  -	0x02	*/
+	/*   -  -  i  -  -  -  m	0x11	*/
+	/*   -  -  -  d  -  -  m	0x09	*/
+	/*   -  -  -  -  s  -  m	0x05	*/
+	/*   -  -  -  -  -  x  m	0x03	*/
+	/*   -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
+
+	if (0 < opt_p)
+		opt_mask |= 0x40;
+	if (0 < opt_t)
+		opt_mask |= 0x20;
+	if (0 < opt_i)
+		opt_mask |= 0x10;
+	if (0 < opt_d)
+		opt_mask |= 0x08;
+	if (0 < opt_s)
+		opt_mask |= 0x04;
+	if (0 < opt_x)
+		opt_mask |= 0x02;
+	if (0 < opt_m)
+		opt_mask |= 0x01;
+
+	switch (opt_mask)
+	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x08:
+		case 0x09:
+		case 0x10:
+		case 0x11:
+		case 0x20:
+		case 0x40:
+			break;
+		default:
+			zbx_error("mutually exclusive options used");
+			usage();
+			ret = FAIL;
+			goto out;
+	}
+#else
+	/* check for mutually exclusive options */
+	if (1 < opt_p + opt_t + opt_r)
+	{
+		zbx_error("only one of options \"-p\", \"--print\", \"-t\", \"--test\", \"-R\" or \"--runtime-control\""
+				" can be used");
+		ret = FAIL;
+		goto out;
+	}
+#endif
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		ret = FAIL;
+		goto out;
 	}
 
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+out:
+	if (FAIL == ret)
+	{
+		zbx_free(TEST_METRIC);
+
+		if (DEFAULT_CONFIG_FILE != CONFIG_FILE)
+			zbx_free(CONFIG_FILE);
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -885,7 +1031,8 @@ int	main(int argc, char **argv)
 #endif
 	progname = get_program_name(argv[0]);
 
-	parse_commandline(argc, argv, &t);
+	if (SUCCEED != parse_commandline(argc, argv, &t))
+		exit(EXIT_FAILURE);
 
 	import_symbols();
 
@@ -958,6 +1105,18 @@ int	main(int argc, char **argv)
 #endif
 			free_metrics();
 			alias_list_free();
+			exit(EXIT_SUCCESS);
+			break;
+		case ZBX_TASK_SHOW_VERSION:
+			version();
+#ifdef _AIX
+			printf("\n");
+			tl_version();
+#endif
+			exit(EXIT_SUCCESS);
+			break;
+		case ZBX_TASK_SHOW_HELP:
+			help();
 			exit(EXIT_SUCCESS);
 			break;
 		default:

@@ -38,8 +38,9 @@ class CSeverity extends CTag {
 		$items = array();
 		$jsIds = '';
 		$jsLabels = '';
+		$config = select_config();
 
-		foreach (getSeverityCaption() as $severity => $caption) {
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$items[] = new CRadioButton(
 				$options['name'],
 				$severity,
@@ -50,7 +51,9 @@ class CSeverity extends CTag {
 
 			$css = getSeverityStyle($severity);
 
-			$label = new CLabel($caption, $options['name'].'_'.$severity, $options['name'].'_label_'.$severity);
+			$label = new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity,
+				$options['name'].'_label_'.$severity
+			);
 			$label->attr('data-severity', $severity);
 			$label->attr('data-severity-style', $css);
 
