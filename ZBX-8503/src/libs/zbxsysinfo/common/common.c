@@ -168,19 +168,20 @@ int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	command[MAX_STRING_LEN], flag[9];
+	char	*command = NULL, flag[9];
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
-		return SYSINFO_RET_FAIL;
+		goto out;
 
 	if (2 < num_param(param))
-		return SYSINFO_RET_FAIL;
+		goto out;
 
-	if (0 != get_param(param, 1, command, sizeof(command)))
-		return SYSINFO_RET_FAIL;
+	if (NULL == (command = get_param_dyn(param, 1)))
+		goto out;
 
 	if ('\0' == *command)
-		return SYSINFO_RET_FAIL;
+		goto out;
 
 	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
 		zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", command);
@@ -191,11 +192,18 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 		*flag = '\0';
 
 	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
-		return EXECUTE_STR(cmd, command, flags, result);
+	{
+		ret = EXECUTE_STR(cmd, command, flags, result);
+		goto out;
+	}
 	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
-		return SYSINFO_RET_FAIL;
+		goto out;
 
 	SET_UI64_RESULT(result, 1);
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+out:
+	zbx_free(command);
+
+	return ret;
 }

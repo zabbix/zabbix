@@ -74,18 +74,19 @@ void	alias_list_free()
 	aliasList = NULL;
 }
 
-void	alias_expand(const char *orig, char *expanded, size_t exp_buf_len)
+void	alias_expand_dyn(const char *orig, char **expanded, size_t *expanded_alloc)
 {
 	ALIAS	*alias;
+	size_t	expanded_offset = 0;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
 		if (0 == strcmp(alias->name, orig))
 		{
-			zbx_strlcpy(expanded, alias->value, exp_buf_len);
+			zbx_strcpy_alloc(expanded, expanded_alloc, &expanded_offset, alias->value);
 			return;
 		}
 	}
 
-	zbx_strlcpy(expanded, orig, exp_buf_len);
+	zbx_strcpy_alloc(expanded, expanded_alloc, &expanded_offset, orig);
 }
