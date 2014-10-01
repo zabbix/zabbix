@@ -538,7 +538,7 @@ class CScreenItem extends CApiService {
 							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 						}
 						elseif ($screenItem['resourceid']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Resource ID provided for resource-less screen element.'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
 						}
 					}
 					break;
@@ -564,7 +564,7 @@ class CScreenItem extends CApiService {
 				case SCREEN_RESOURCE_SYSTEM_STATUS:
 				case SCREEN_RESOURCE_URL:
 					if ($screenItem['resourceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Resource ID provided for resource-less screen element.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
 					}
 					break;
 			}
