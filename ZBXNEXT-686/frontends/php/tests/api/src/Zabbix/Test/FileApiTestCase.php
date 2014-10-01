@@ -2,36 +2,15 @@
 
 namespace Zabbix\Test;
 
-use Respect\Validation\Exceptions\ValidationException;
-use Respect\Validation\Rules\AbstractRule;
-use Symfony\Component\Console\Helper\TableHelper;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Yaml\Yaml;
-use Respect\Validation\Validator as v;
 use Zabbix\Test\Fixtures\FixtureLoader;
 
 class FileApiTestCase extends ApiTestCase {
 
 	/**
-	 * Parsed step data.
-	 *
-	 * @var string
-	 */
-	protected $stepData;
-
-	/**
 	 * @var \CArrayMacroResolver
 	 */
 	protected $macroResolver;
-
-	/**
-	 * Stack of requests / responses
-	 *
-	 * TODO: remove it and replace with a local variable
-	 *
-	 * @var array
-	 */
-	protected $stepStack;
 
 	public function __construct($name = null, array $data = array(), $dataName = '') {
 		parent::__construct($name, $data, $dataName);
@@ -124,109 +103,10 @@ class FileApiTestCase extends ApiTestCase {
 				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
 			}
 
-			$this->processSqlAssertions($definition, $stepName);
-
 			// each step is one assertion
 			$this->addToAssertionCount(1);
 		}
 		unset($definition);
-	}
-
-	protected function processSqlAssertions($definition, $stepName) {
-		if (isset($definition['sqlAssertions']) && is_array($definition['sqlAssertions'])) {
-			foreach ($definition['sqlAssertions'] as $assertion) {
-				if (!isset($assertion['sqlQuery'])) {
-					throw new \Exception('Each "sqlAssertions" member must have sqlQuery parameter');
-				}
-
-				if (!isset($assertion['singleScalarResult']) && !isset($assertion['rowResult'])) {
-					throw new \Exception('Each "sqlAssertions" member should contain "singleScalarResult" or "rowResult" parameter');
-				}
-
-				if (isset($assertion['singleScalarResult']) && isset($assertion['rowResult'])) {
-					throw new \Exception('Each "sqlAssertions" member can not have both "singleScalarResult" and "rowResult" parameters');
-				}
-
-				$pdo = $this->getPdo();
-
-				$result = $pdo->query($assertion['sqlQuery']);
-
-				if (isset($assertion['singleScalarResult'])) {
-					$value = $result->fetchColumn();
-
-					if ($value != $assertion['singleScalarResult']) {
-						throw new \Exception(
-							sprintf('Sql assertion "singleScalarResult" failed, step "%s", query "%s", expected "%s", got "%s"',
-								$stepName, $assertion['sqlQuery'],
-								$assertion['singleScalarResult'], $value
-							));
-					}
-
-					$this->addToAssertionCount(1);
-				}
-				elseif (isset($assertion['rowResult'])) {
-					$expectation = $this->resolveStepMacros($assertion['rowResult']);
-
-					$realResult = array();
-
-					while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-						$realResult[] = $row;
-					}
-
-					foreach ($expectation as $key => $expectedRow) {
-						foreach ($realResult as $resultKey => $resultRow) {
-							if ($resultRow == $expectedRow) {
-								unset($expectation[$key]);
-								unset($realResult[$resultKey]);
-							}
-						}
-					}
-
-					if (count($expectation) != 0) {
-						$table = new TableHelper();
-
-						$table->addRows($expectation);
-
-						$output = new BufferedOutput();
-						$table->render($output);
-
-						throw new \Exception(
-							sprintf('Sql assertion for step "%s" failed for query "%s": the following rows are expected but not present in the result set:%s',
-								$stepName,
-								$assertion['sqlQuery'],
-								PHP_EOL.$output->fetch()
-							)
-						);
-					}
-
-					if (count($realResult) != 0) {
-						$table = new TableHelper();
-
-						$table->addRows($realResult);
-
-						$output = new BufferedOutput();
-						$table->render($output);
-
-						throw new \Exception(
-							sprintf('Sql assertion for step "%s" failed for query "%s": the following extra rows are present in a result set:%s',
-								$stepName,
-								$assertion['sqlQuery'],
-								PHP_EOL.$output->fetch()
-							)
-						);
-					}
-
-					$this->addToAssertionCount(1);
-				}
-				else {
-					throw new \Exception(
-						sprintf('Hm. Do not know what to do with sql assertions in step "%s", probably unfinished case?',
-							$stepName
-						)
-					);
-				}
-			}
-		}
 	}
 
 	/**

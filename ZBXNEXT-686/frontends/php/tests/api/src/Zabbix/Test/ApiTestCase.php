@@ -2,26 +2,10 @@
 
 namespace Zabbix\Test;
 
-use Zabbix\Test\APIGateway\APIGatewayInterface;
-use Zabbix\Test\APIGateway\FileAPIGateway;
 use Zabbix\Test\Fixtures\FixtureFactory;
 use Zabbix\Test\Fixtures\FixtureLoader;
 
 class ApiTestCase extends \PHPUnit_Framework_TestCase {
-
-	/**
-	 * Current gateway config
-	 *
-	 * @var array
-	 */
-	protected $gatewayConfiguration = array();
-
-	/**
-	 * PDO instance
-	 *
-	 * @var \PDO
-	 */
-	private $pdo;
 
 	/**
 	 * @var TestDatabase
@@ -44,13 +28,6 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @var FixtureLoader
 	 */
 	private $fixtureLoader;
-
-	/**
-	 * Current settings file name
-	 *
-	 * @var string
-	 */
-	protected $config = 'settings';
 
 	/**
 	 * Parsed config file as defined by $config above
@@ -109,13 +86,6 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function getAuth() {
 		return $this->auth;
-	}
-
-	/**
-	 * @return \PDO
-	 */
-	protected function getPdo() {
-		return $this->pdo;
 	}
 
 	protected function clearDatabase() {
