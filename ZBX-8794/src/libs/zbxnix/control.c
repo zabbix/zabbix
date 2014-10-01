@@ -40,8 +40,7 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 	{
 		if (FAIL == is_ushort(rtc_options, &num) || 0 == num)
 		{
-			zbx_error("invalid log level control target: %s (invalid or unsupported process identifier)",
-					opt);
+			zbx_error("invalid log level control target: invalid or unsupported process identifier");
 			return FAIL;
 		}
 
@@ -55,7 +54,7 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 
 		if ('\0' == *rtc_options)
 		{
-			zbx_error("invalid log level control target: %s (unspecified process identifier or type)", opt);
+			zbx_error("invalid log level control target: unspecified process identifier or type");
 			return FAIL;
 		}
 
@@ -66,14 +65,14 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 
 		if ('\0' == *proc_name)
 		{
-			zbx_error("invalid log level control target: %s (unspecified process type)", opt);
+			zbx_error("invalid log level control target: unspecified process type");
 			zbx_free(proc_name);
 			return FAIL;
 		}
 
 		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
 		{
-			zbx_error("invalid log level control target: %s (unknown process type \"%s\")", opt, proc_name);
+			zbx_error("invalid log level control target: unknown process type \"%s\"", proc_name);
 			zbx_free(proc_name);
 			return FAIL;
 		}
@@ -82,15 +81,15 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 		{
 			if ('\0' == *proc_num)
 			{
-				zbx_error("invalid log level control target: %s (unspecified process number)", opt);
+				zbx_error("invalid log level control target: unspecified process number");
 				zbx_free(proc_name);
 				return FAIL;
 			}
 
 			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
 			{
-				zbx_error("invalid log level control target: %s (invalid or unsupported process number "
-						"\"%s\")", opt, proc_num);
+				zbx_error("invalid log level control target: invalid or unsupported process number "
+						"\"%s\"", proc_num);
 				zbx_free(proc_name);
 				return FAIL;
 			}
