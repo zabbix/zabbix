@@ -91,7 +91,7 @@ class CUrl {
 
 				if (strpos($arg, '=') !== false) {
 					list($name, $value) = explode('=', $arg);
-					$this->arguments[urldecode($name)] = isset($value) ? urldecode($value) : '';
+					$this->arguments[urldecode($name)] = urldecode($value);
 				}
 				else {
 					$this->arguments[$arg] = '';
