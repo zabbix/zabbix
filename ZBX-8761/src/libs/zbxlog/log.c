@@ -254,7 +254,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	long			milliseconds;
 	static zbx_uint64_t	old_size = 0;
 	va_list			args;
-	struct tm		*tm, tm_local;
+	struct tm		*tm;
 	zbx_stat_t		buf;
 #ifdef _WINDOWS
 	struct _timeb		current_time;
@@ -263,6 +263,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 #else
 	struct timeval		current_time;
 	sigset_t		mask, orig_mask;
+	struct tm		tm_local;
 #endif
 
 #ifndef _WINDOWS
@@ -301,8 +302,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 						milliseconds = current_time.millitm;
 #else
 						gettimeofday(&current_time,NULL);
-						localtime_r(&current_time.tv_sec, &tm_local);
-						tm = &tm_local;
+						tm = localtime_r(&current_time.tv_sec, &tm_local);
 						milliseconds = current_time.tv_usec / 1000;
 #endif
 						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
