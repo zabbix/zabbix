@@ -69,6 +69,7 @@ class FileApiTestCase extends ApiTestCase {
 
 		$fixtures = $this->loadFixtures($fixtures);
 
+		$this->login('Admin', 'zabbix');
 		$this->runSteps($test['steps'], $fixtures);
 	}
 
@@ -90,15 +91,9 @@ class FileApiTestCase extends ApiTestCase {
 				$definition['request']['params'] = $this->resolveStepMacros($definition['request']['params'], $steps, $fixtures);
 			}
 
-			$request = array_merge(array(
-				'jsonrpc' => '2.0',
-				'id' => rand(),
-				'method' => null,
-				'params' => null
-			), $definition['request']);
 			$expectedResponse = $definition['response'];
 
-			$apiResponse = $this->callMethod($request['method'], $request['params'], $request['id'], $request['jsonrpc']);
+			$apiResponse = $this->executeRequest($this->createRequest($definition['request']));
 
 			$steps[$stepName]['response'] = $apiResponse->getResult();
 
@@ -248,5 +243,30 @@ class FileApiTestCase extends ApiTestCase {
 			'steps' => $steps,
 			'fixtures' => $fixtures
 		));
+	}
+
+	/**
+	 * Create a request array from the request defined in the YAML file.
+	 *
+	 * The values in the request definition will override any default values.
+	 *
+	 * @param array $requestDefinition
+	 *
+	 * @return array
+	 */
+	protected function createRequest(array $requestDefinition) {
+		// if the method request authentication - use the session of currently authenticated user
+		$auth = null;
+		if (isset($requestDefinition['method']) && $this->requiresAuthentication($requestDefinition['method'])) {
+			$auth = $this->getAuth();
+		}
+
+		return array_merge(array(
+			'jsonrpc' => '2.0',
+			'id' => rand(),
+			'method' => null,
+			'params' => null,
+			'auth' => $auth
+		), $requestDefinition);
 	}
 }

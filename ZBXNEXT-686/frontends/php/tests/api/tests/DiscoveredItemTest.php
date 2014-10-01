@@ -14,11 +14,12 @@ class DiscoveredItemTest extends ApiTestCase {
 				'groupid' => '@fixtures.base.result.groupid@'
 			)
 		));
+		$this->login('Admin', 'zabbix');
 
 		$item = $this->getItem($fixtures['hostWithDiscoveredObjects']['result']['itemid']);
 
 		foreach (array('status') as $field) {
-			$result = $this->callMethod('item.update', array(
+			$result = $this->call('item.update', array(
 				'itemid' => $item['itemid'],
 				$field => $item[$field]
 			));
@@ -38,12 +39,13 @@ class DiscoveredItemTest extends ApiTestCase {
 				'groupid' => '@fixtures.base.result.groupid@'
 			)
 		));
+		$this->login('Admin', 'zabbix');
 
 		$item = $this->getItem($fixtures['hostWithDiscoveredObjects']['result']['itemid']);
 
 		// the set of properties is random and incomplete
 		foreach (array('delay', 'interfaceid', 'key_', 'name', 'type', 'value_type') as $field) {
-			$result = $this->callMethod('item.update', array(
+			$result = $this->call('item.update', array(
 				'itemid' => $item['itemid'],
 				$field => $item[$field]
 			));
@@ -67,8 +69,9 @@ class DiscoveredItemTest extends ApiTestCase {
 				'groupid' => '@fixtures.base.result.groupid@'
 			)
 		));
+		$this->login('Admin', 'zabbix');
 
-		$result = $this->callMethod('item.delete', array(
+		$result = $this->call('item.delete', array(
 			$fixtures['hostWithDiscoveredObjects']['result']['itemid']
 		));
 
@@ -81,7 +84,7 @@ class DiscoveredItemTest extends ApiTestCase {
 	}
 
 	protected function getItem($itemId) {
-		$items = $this->callMethod('item.get', array(
+		$items = $this->call('item.get', array(
 			'itemid' => $itemId
 		));
 		$item = $items->getResult();

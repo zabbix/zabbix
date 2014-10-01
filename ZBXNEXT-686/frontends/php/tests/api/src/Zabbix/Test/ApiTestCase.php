@@ -33,6 +33,11 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	private $api;
 
+	/**
+	 * Authentication token of the currently logged in user.
+	 *
+	 * @var string
+	 */
 	private $auth;
 
 	/**
@@ -77,6 +82,36 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Log the user in.
+	 *
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @throws Exception
+	 */
+	protected function login($user, $password) {
+		$response = $this->api->callMethod('user.login', array(
+			'user' => $user,
+			'password' => $password
+		));
+
+		if ($response->isError()) {
+			throw new Exception(sprintf('Cannot authenticate user: %1$s', $response->getErrorData()));
+		}
+
+		$this->auth = $response->getResult();
+	}
+
+	/**
+	 * Return the authentication token of the currently logged in user.
+	 *
+	 * @return string
+	 */
+	protected function getAuth() {
+		return $this->auth;
+	}
+
+	/**
 	 * @return \PDO
 	 */
 	protected function getPdo() {
@@ -101,29 +136,52 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param $method
-	 * @param array $params
-	 * @param string $id
-	 * @param string $jsonRpc
+	 * Returns true of the given method requires an authentication token in the request.
+	 *
+	 * @param string $method
+	 *
+	 * @return bool
+	 */
+	protected function requiresAuthentication($method) {
+		return $this->api->requiresAuthentication($method);
+	}
+
+	/**
+	 * Call an API method with the given parameters.
+	 *
+	 * @param string 		$method
+	 * @param array	 		$params
+	 * @param string|null 	$id			defaults to a random number
+	 * @param string 		$jsonRpc	defaults to "2.0"
+	 * @param string 		$auth		defaults to authentication token of the base user
 	 *
 	 * @return \CApiResponse
 	 */
-	protected function callMethod($method, $params, $id = null, $jsonRpc = '2.0') {
-		$auth = null;
-		if ($this->api->requiresAuthentication($method)) {
-			if ($this->auth === null) {
-				// TODO: allow to log in as a different user
-				$response = $this->api->callMethod('user.login', array(
-					'user' => 'Admin',
-					'password' => 'zabbix'
-				));
-				$this->auth = $response->getResult();
-			}
+	protected function call($method, $params, $auth = null, $id = null, $jsonRpc = '2.0') {
+		if ($id === null) {
+			$id = rand();
+		}
 
-			$auth = $this->auth;
+		if ($auth === null && $this->api->requiresAuthentication($method)) {
+			$auth = $this->getAuth();
 		}
 
 		return $this->api->callMethod($method, $params, $auth, $id, $jsonRpc);
+	}
+
+	/**
+	 * Executes the given request and returns the result.
+	 *
+	 * This method should provide the ability to make invalid requests.
+	 *
+	 * @param array $request	a JSON RPC request
+	 *
+	 * @return \CApiResponse
+	 */
+	protected function executeRequest(array $request) {
+		return $this->api->callMethod(
+			$request['method'], $request['params'], $request['auth'], $request['id'], $request['jsonrpc']
+		);
 	}
 
 	protected function assertError(\CApiResponse $response, $message = '') {
