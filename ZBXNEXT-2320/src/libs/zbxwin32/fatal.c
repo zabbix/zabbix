@@ -27,7 +27,7 @@
 
 #define STACKWALK_MAX_NAMELEN 4096
 
-#define ZBX_LSHIFT(value, bits)		(((unsigned __int64)value) << bits)
+#define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
 
 #ifdef _M_X64
 
@@ -35,7 +35,7 @@
 
 static void	print_register(const char *name, unsigned __int64 value)
 {
-	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", name, value, value, value);
+	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16I64x = %20I64u = %20I64d", name, value, value, value);
 }
 
 static void	print_fatal_info(CONTEXT *pctx)

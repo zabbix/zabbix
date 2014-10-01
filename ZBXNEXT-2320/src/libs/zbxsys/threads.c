@@ -85,8 +85,6 @@ static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 
 #endif
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_thread_start                                                 *
