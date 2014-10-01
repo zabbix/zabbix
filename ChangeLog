@@ -138,7 +138,7 @@ A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Kr
 ...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
 ....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
 A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing; thanks to Leann for the report (Krists)
-........S. [ZBX-8444] fixed database queries for enabled items, triggers and hosts by replacing them with queries from configuration cache to improve performance for processing sleeping escalations (igors)
+........S. [ZBX-8444] improved sleeping escalation processing by using configuration cache to get enabled items, triggers and hosts (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 ........S. [ZBX-8608] fixed clearing of discovered services with using CIDR notation in ip lists (Sasha)
 ........S. [ZBX-8415] fixed possible server crash on LLD host or host group update (dimir, Sasha)
