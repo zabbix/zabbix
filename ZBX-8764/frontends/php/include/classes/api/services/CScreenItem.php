@@ -448,7 +448,7 @@ class CScreenItem extends CApiService {
 		$itemPrototypeIds = array();
 		$graphPrototypeIds = array();
 
-		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype', 'resourceid'));
+		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype'));
 
 		foreach ($screenItems as $screenItem) {
 			// check permissions

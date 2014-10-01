@@ -633,16 +633,16 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
  */
 if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style == STYLE_HORIZONTAL),
+		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style != STYLE_VERTICAL),
 		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
 		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
 		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
 	);
 	$screenFormList->addRow(_('Style'), new CDiv($styleRadioButton, 'jqueryinputset'));
 }
-elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))) {
+elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_LEFT, null, 'style_'.STYLE_LEFT, $style == STYLE_LEFT),
+		new CRadioButton('style', STYLE_LEFT, null, 'style_'.STYLE_LEFT, $style != STYLE_TOP),
 		new CLabel(_('Left'), 'style_'.STYLE_LEFT),
 		new CRadioButton('style', STYLE_TOP, null, 'style_'.STYLE_TOP, $style == STYLE_TOP),
 		new CLabel(_('Top'), 'style_'.STYLE_TOP)
