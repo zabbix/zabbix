@@ -251,7 +251,13 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	if (*offset + n >= *alloc_len)
+	if (NULL == *str)
+	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
 	{
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;

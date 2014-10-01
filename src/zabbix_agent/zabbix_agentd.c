@@ -725,7 +725,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
-				test_parameter(TEST_METRIC, PROCESS_TEST);
+				test_parameter(TEST_METRIC);
 			else
 				test_parameters();
 #ifdef _WINDOWS
