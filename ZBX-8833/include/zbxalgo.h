@@ -71,6 +71,8 @@ void	zbx_default_mem_free_func(void *ptr);
 #define ZBX_DEFAULT_MEM_REALLOC_FUNC	zbx_default_mem_realloc_func
 #define ZBX_DEFAULT_MEM_FREE_FUNC	zbx_default_mem_free_func
 
+typedef void (*zbx_mem_clear_func_t)(void *data);
+
 #define ZBX_RETURN_IF_NOT_EQUAL(a, b)	\
 					\
 	if ((a) < (b))			\
@@ -122,6 +124,7 @@ typedef struct
 	zbx_mem_malloc_func_t	mem_malloc_func;
 	zbx_mem_realloc_func_t	mem_realloc_func;
 	zbx_mem_free_func_t	mem_free_func;
+	zbx_mem_clear_func_t	mem_clear_func;
 }
 zbx_hashset_t;
 
@@ -133,7 +136,8 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_compare_func_t compare_func,
 				zbx_mem_malloc_func_t mem_malloc_func,
 				zbx_mem_realloc_func_t mem_realloc_func,
-				zbx_mem_free_func_t mem_free_func);
+				zbx_mem_free_func_t mem_free_func,
+				zbx_mem_clear_func_t mem_clear_func);
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
@@ -307,10 +311,10 @@ void	zbx_ptr_free(void *ptr);
 /* 128 bit unsigned integer handling */
 #define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
 
-void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
-void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
-void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
+void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
+void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
+void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
+void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);
 

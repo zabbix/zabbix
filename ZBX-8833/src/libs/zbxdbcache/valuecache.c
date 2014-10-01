@@ -2429,7 +2429,7 @@ void	zbx_vc_init(void)
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func,
-			__vc_mem_free_func);
+			__vc_mem_free_func, NULL);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -2438,7 +2438,7 @@ void	zbx_vc_init(void)
 	}
 
 	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE, vc_strpool_hash_func, vc_strpool_compare_func,
-			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
+			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func, NULL);
 
 	if (NULL == vc_cache->strpool.slots)
 	{

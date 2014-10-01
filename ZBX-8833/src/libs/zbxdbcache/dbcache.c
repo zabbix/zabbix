@@ -2895,7 +2895,7 @@ static void	init_trend_cache()
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func, NULL);
 
 #undef INIT_HASHSET_SIZE
 
