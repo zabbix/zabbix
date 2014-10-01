@@ -34,6 +34,8 @@ thread_cache_size = 512
 query_cache_limit               = 8M
 query_cache_size                = 64M
 
+wait_timeout = 86400
+
 thread_concurrency = <number of cores>
 
 log-bin=mysql-bin
