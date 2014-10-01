@@ -28,8 +28,7 @@ typedef struct
 	char		*oid;
 	char		*value;
 	char		*idx;
-	zbx_uint64_t	hostid;
-	unsigned short	port;
+	zbx_uint64_t	interfaceid;
 }
 zbx_snmp_index_t;
 
@@ -112,8 +111,7 @@ static int	zbx_snmp_index_compare(const zbx_snmp_index_t *s1, const zbx_snmp_ind
 {
 	int	rc;
 
-	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
-	ZBX_RETURN_IF_NOT_EQUAL(s1->port, s2->port);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->interfaceid, s2->interfaceid);
 
 	if (0 != (rc = strcmp(s1->oid, s2->oid)))
 		return rc;
@@ -135,8 +133,8 @@ static int	get_snmpidx_nearestindex(const zbx_snmp_index_t *s)
 	const char	*__function_name = "get_snmpidx_nearestindex";
 	int		first_index, last_index, index = 0, cmp_res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " port:%hu oid:'%s' value:'%s'",
-			__function_name, s->hostid, s->port, s->oid, s->value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " oid:'%s' value:'%s'",
+			__function_name, s->interfaceid, s->oid, s->value);
 
 	if (0 == snmpidx_count)
 		goto end;
@@ -181,8 +179,7 @@ static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, cha
 	if (NULL == snmpidx)
 		goto end;
 
-	s.hostid = item->host.hostid;
-	s.port = item->interface.port;
+	s.interfaceid = item->interface.interfaceid;
 	s.oid = oid;
 	s.value = value;
 
@@ -209,8 +206,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	if (NULL == snmpidx)
 		snmpidx = zbx_malloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
 
-	s.hostid = item->host.hostid;
-	s.port = item->interface.port;
+	s.interfaceid = item->interface.interfaceid;
 	s.oid = oid;
 	s.value = value;
 
@@ -225,8 +221,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 	memmove(&snmpidx[i + 1], &snmpidx[i], sizeof(zbx_snmp_index_t) * (snmpidx_count - i));
 
-	snmpidx[i].hostid = item->host.hostid;
-	snmpidx[i].port = item->interface.port;
+	snmpidx[i].interfaceid = item->interface.interfaceid;
 	snmpidx[i].oid = zbx_strdup(NULL, oid);
 	snmpidx[i].value = zbx_strdup(NULL, value);
 	snmpidx[i].idx = zbx_strdup(NULL, idx);
@@ -255,8 +250,7 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 	if (NULL == snmpidx)
 		goto end;
 
-	s.hostid = item->host.hostid;
-	s.port = item->interface.port;
+	s.interfaceid = item->interface.interfaceid;
 	s.oid = (char *)oid;
 	s.value = "";
 
@@ -264,7 +258,7 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 
 	while (i < snmpidx_count)
 	{
-		if (snmpidx[i].hostid != s.hostid || snmpidx[i].port != s.port || 0 != strcmp(snmpidx[i].oid, s.oid))
+		if (snmpidx[i].interfaceid != s.interfaceid || 0 != strcmp(snmpidx[i].oid, s.oid))
 			break;
 
 		cache_del_snmp_index_by_position(i);
