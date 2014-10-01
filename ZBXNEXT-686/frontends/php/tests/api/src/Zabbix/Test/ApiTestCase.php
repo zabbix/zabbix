@@ -29,13 +29,6 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	private $fixtureLoader;
 
-	/**
-	 * Parsed config file as defined by $config above
-	 *
-	 * @var array
-	 */
-	protected $parsedConfig;
-
 	public function __construct($name = null, array $data = array(), $dataName = '') {
 		parent::__construct($name, $data, $dataName);
 
