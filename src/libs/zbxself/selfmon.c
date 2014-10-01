@@ -557,17 +557,10 @@ static int	sleep_remains;
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)
 {
-	int	*delay;
-
-	sleep_remains = sleeptime;
-
-	if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
-		delay = &sleep_remains;
-	else
-		delay = &sleeptime;
-
 	if (0 >= sleeptime)
 		return;
+
+	sleep_remains = sleeptime;
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -575,7 +568,7 @@ void	zbx_sleep_loop(int sleeptime)
 	{
 		sleep(1);
 	}
-	while (0 < --(*delay));
+	while (0 < --sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
