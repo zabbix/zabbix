@@ -257,7 +257,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	memtype = get_rparam(request, 4);
 
-	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vmsize"))
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vmsize") || 0 == strcmp(memtype, "vsize"))
 		memtype_search = "VmSize:\t";
 	else if (0 == strcmp(memtype, "vmrss"))
 		memtype_search = "VmRSS:\t";
