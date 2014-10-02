@@ -1175,6 +1175,7 @@ class CHost extends CHostGeneral {
 			$updateGroups = zbx_toArray($updateGroups);
 
 			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
 				'hostids' => $hostids,
 				'editable' => true
 			));

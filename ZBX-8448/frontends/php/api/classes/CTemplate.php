@@ -938,7 +938,11 @@ class CTemplate extends CHostGeneral {
 		// UPDATE HOSTGROUPS LINKAGE {{{
 		if (isset($data['groups']) && !is_null($data['groups'])) {
 			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
+			$templateGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $templateids,
+				'editable' => true
+			));
 			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
 			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
 
