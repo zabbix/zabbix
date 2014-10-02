@@ -1301,6 +1301,19 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$dbHosts = API::Host()->get(array(
+			'output' => array('hostid', 'name', 'flags'),
+			'hostids' => $hostIds,
+			'preservekeys' => true,
+			'editable' => true
+		));
+
+		foreach ($dbHosts as $dbHost) {
+			if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
+			}
+		}
+
 		if (!$nopermissions) {
 			$this->checkPermissions($hostIds);
 		}
@@ -1642,20 +1655,7 @@ class CHost extends CHostGeneral {
 	 * @param array $hostIds
 	 */
 	protected function checkPermissions(array $hostIds) {
-		$dbHosts = API::Host()->get(array(
-			'output' => array('hostid', 'name', 'flags'),
-			'hostids' => $hostIds,
-			'preservekeys' => true,
-			'editable' => true
-		));
-
-		foreach ($dbHosts as $dbHost) {
-			if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
-			}
-		}
-
-		if (count($dbHosts) != count($hostIds)) {
+		if (!$this->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
