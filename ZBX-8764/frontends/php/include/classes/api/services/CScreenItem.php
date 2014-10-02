@@ -213,6 +213,27 @@ class CScreenItem extends CApiService {
 			$screenItemId = $screenItem['screenitemid'];
 			unset($screenItem['screenitemid']);
 
+			// If screen item type (field "resourcetype") is set to one that does not use "resourceid" field,
+			// value of field "resourceid" is set to 0 for those resource types. Clock screen item type has
+			// more refined check.
+			if (isset($screenItem['resourcetype'])) {
+				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_CLOCK:
+						if (isset($screenItem['style']) && $screenItem['style'] != TIME_TYPE_HOST) {
+							$screenItem['resourceid'] = 0;
+						}
+						break;
+
+					case SCREEN_RESOURCE_ACTIONS:
+					case SCREEN_RESOURCE_HISTORY:
+					case SCREEN_RESOURCE_SERVER_INFO:
+					case SCREEN_RESOURCE_SYSTEM_STATUS:
+					case SCREEN_RESOURCE_URL:
+						$screenItem['resourceid'] = 0;
+						break;
+				}
+			}
+
 			$update[] = array(
 				'values' => $screenItem,
 				'where' => array('screenitemid' => $screenItemId)
@@ -450,6 +471,14 @@ class CScreenItem extends CApiService {
 
 		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype'));
 
+		$validStyles = array(
+			SCREEN_RESOURCE_CLOCK => array(TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST),
+			SCREEN_RESOURCE_DATA_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
+			SCREEN_RESOURCE_HOSTS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL),
+			SCREEN_RESOURCE_TRIGGERS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL)
+		);
+
 		foreach ($screenItems as $screenItem) {
 			// check permissions
 			if (isset($screenItem['screenitemid']) && !isset($dbScreenItems[$screenItem['screenitemid']])) {
@@ -607,6 +636,11 @@ class CScreenItem extends CApiService {
 				if ($error) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect max columns provided for screen element.'));
 				}
+			}
+
+			if (isset($validStyles[$screenItem['resourcetype']])
+					&& !in_array($screenItem['style'], $validStyles[$screenItem['resourcetype']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect style provided for screen element.'));
 			}
 		}
 
