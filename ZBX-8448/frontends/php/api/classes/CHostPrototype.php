@@ -538,6 +538,44 @@ class CHostPrototype extends CHostBase {
 		// update related objects
 		$inventoryCreate = array();
 		$inventoryDeleteIds = array();
+		$groupIds = array();
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
+
+			$exGroupPrototypes = array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']);
+			foreach ($exGroupPrototypes as $exGroupPrototype) {
+				$groupIds[$exGroupPrototype['group_prototypeid']] = $exGroupPrototype['groupid'];
+			}
+		}
+
+		// get group IDs that user has permissions to
+		$groups = API::HostGroup()->get(array(
+			'output' => array('groupid'),
+			'groupids' => array_keys(array_flip($groupIds)),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		$groupIdsToPreserve = array();
+
+		if ($groups) {
+			$groupIdsToPreserve = array_diff($groupIds, array_keys($groups));
+
+			if ($groupIdsToPreserve) {
+				// preserve keys that user has no permissions to remove
+				foreach ($groupIds as $groupPrototypeId => $groupId) {
+					if (isset($groupIdsToPreserve[$groupPrototypeId])) {
+						unset($groupIds[$groupPrototypeId]);
+					}
+				}
+			}
+			else {
+				// preserve all keys if no difference found
+				$groupIds = array();
+			}
+		}
+
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
 
@@ -548,21 +586,18 @@ class CHostPrototype extends CHostBase {
 				}
 				unset($groupPrototype);
 
-				// save group prototypes
-				$exGroupPrototypes = zbx_toHash(
-					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
-					'group_prototypeid'
-				);
 				$modifiedGroupPrototypes = array();
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+					// preserve groups that are not modified
 					if (isset($groupPrototype['group_prototypeid'])) {
-						unset($exGroupPrototypes[$groupPrototype['group_prototypeid']]);
+						unset($groupIds[$groupPrototype['group_prototypeid']]);
 					}
 
 					$modifiedGroupPrototypes[] = $groupPrototype;
 				}
-				if ($exGroupPrototypes) {
-					$this->deleteGroupPrototypes(array_keys($exGroupPrototypes));
+
+				if ($groupIds) {
+					$this->deleteGroupPrototypes(array_keys($groupIds));
 				}
 				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
 			}
