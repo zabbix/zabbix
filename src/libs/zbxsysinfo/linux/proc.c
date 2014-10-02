@@ -259,7 +259,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vmsize") || 0 == strcmp(memtype, "vsize"))
 		memtype_search = "VmSize:\t";
-	else if (0 == strcmp(memtype, "vmrss"))
+	else if (0 == strcmp(memtype, "vmrss") || 0 == strcmp(memtype, "rss"))
 		memtype_search = "VmRSS:\t";
 	else if (0 == strcmp(memtype, "vmpeak"))
 		memtype_search = "VmPeak:\t";
