@@ -10,12 +10,12 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var TestDatabase
 	 */
-	private $database;
+	private static $database;
 
 	/**
 	 * @var CApiWrapper
 	 */
-	private $api;
+	private static $api;
 
 	/**
 	 * Authentication token of the currently logged in user.
@@ -27,21 +27,17 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var FixtureLoader
 	 */
-	private $fixtureLoader;
+	private static $fixtureLoader;
 
-	public function __construct($name = null, array $data = array(), $dataName = '') {
-		parent::__construct($name, $data, $dataName);
+	public static function setUpBeforeClass() {
+		self::$database = new TestDatabase();
 
-		// TODO: move all of this to setUpBeforeClass()
-
-		$this->database = new TestDatabase();
-
-		$this->api = new \CIncludeFileApiClient(new \CJson());
+		self::$api = new \CIncludeFileApiClient(new \CJson());
 
 		$client = new \CLocalApiClient(new \CJson());
 		$client->setServiceFactory(new \CApiServiceFactory());
 
-		$this->fixtureLoader = new FixtureLoader(
+		self::$fixtureLoader = new FixtureLoader(
 			new FixtureFactory(new \CApiWrapper($client)),
 			new \CArrayMacroResolver()
 		);
@@ -60,7 +56,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @throws Exception
 	 */
 	protected function login($user, $password) {
-		$response = $this->api->callMethod('user.login', array(
+		$response = self::$api->callMethod('user.login', array(
 			'user' => $user,
 			'password' => $password
 		));
@@ -82,12 +78,12 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected function clearDatabase() {
-		$this->database->clear();
+		self::$database->clear();
 	}
 
 	protected function loadFixtures(array $fixtures) {
 		try {
-			$fixtures = $this->fixtureLoader->load($fixtures);
+			$fixtures = self::$fixtureLoader->load($fixtures);
 		}
 		catch (\Exception $e) {
 			$this->clearDatabase();
@@ -106,7 +102,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @return bool
 	 */
 	protected function requiresAuthentication($method) {
-		return $this->api->requiresAuthentication($method);
+		return self::$api->requiresAuthentication($method);
 	}
 
 	/**
@@ -125,11 +121,11 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 			$id = rand();
 		}
 
-		if ($auth === null && $this->api->requiresAuthentication($method)) {
+		if ($auth === null && self::$api->requiresAuthentication($method)) {
 			$auth = $this->getAuth();
 		}
 
-		return $this->api->callMethod($method, $params, $auth, $id, $jsonRpc);
+		return self::$api->callMethod($method, $params, $auth, $id, $jsonRpc);
 	}
 
 	/**
@@ -142,7 +138,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @return \CApiResponse
 	 */
 	protected function executeRequest(array $request) {
-		return $this->api->callMethod(
+		return self::$api->callMethod(
 			$request['method'], $request['params'], $request['auth'], $request['id'], $request['jsonrpc']
 		);
 	}

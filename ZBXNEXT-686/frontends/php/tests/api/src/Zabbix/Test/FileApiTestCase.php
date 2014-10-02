@@ -10,12 +10,12 @@ class FileApiTestCase extends ApiTestCase {
 	/**
 	 * @var \CArrayMacroResolver
 	 */
-	protected $macroResolver;
+	private static $macroResolver;
 
-	public function __construct($name = null, array $data = array(), $dataName = '') {
-		parent::__construct($name, $data, $dataName);
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
 
-		$this->macroResolver = new \CArrayMacroResolver();
+		self::$macroResolver = new \CArrayMacroResolver();
 	}
 
 	protected function parseTestFile($name) {
@@ -119,7 +119,7 @@ class FileApiTestCase extends ApiTestCase {
 	 * @return array
 	 */
 	protected function resolveStepMacros(array $data, array $steps, array $fixtures) {
-		return $this->macroResolver->resolve($data, array(
+		return self::$macroResolver->resolve($data, array(
 			'steps' => $steps,
 			'fixtures' => $fixtures
 		));
