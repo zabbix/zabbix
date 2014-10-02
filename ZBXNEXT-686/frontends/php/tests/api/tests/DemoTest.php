@@ -1,8 +1,6 @@
 <?php
 
-use Zabbix\Test\FileApiTestCase;
-
-class DemoTest extends FileApiTestCase {
+class DemoTest extends CFileApiTestCase {
 
 	public function fileProvider() {
 		$files = array(

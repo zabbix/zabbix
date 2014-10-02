@@ -1,8 +1,6 @@
 <?php
 
-namespace Zabbix\Test;
-
-class TestDatabase {
+class CTestDatabase {
 
 	public function clear() {
 		DBstart();
@@ -15,7 +13,7 @@ class TestDatabase {
 
 				global $ZBX_MESSAGES;
 				$lastMessage = array_pop($ZBX_MESSAGES);
-				throw new \Exception($lastMessage['message']);
+				throw new Exception($lastMessage['message']);
 			}
 		}
 
@@ -41,7 +39,7 @@ class TestDatabase {
 
 		// TODO: implement a better ordering algorithm
 		$tables = array();
-		foreach (\DB::getSchema() as $tableName => $tableData) {
+		foreach (DB::getSchema() as $tableName => $tableData) {
 			if (in_array($tableName, $bumpTables) || $tableName == 'dbversion') {
 				continue;
 			}

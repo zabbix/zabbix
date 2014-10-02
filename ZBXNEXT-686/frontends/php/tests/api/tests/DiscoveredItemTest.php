@@ -1,8 +1,6 @@
 <?php
 
-use Zabbix\Test\ApiTestCase;
-
-class DiscoveredItemTest extends ApiTestCase {
+class DiscoveredItemTest extends CApiTestCase {
 
 	/**
 	 * Test properties that can be set for discovered items.

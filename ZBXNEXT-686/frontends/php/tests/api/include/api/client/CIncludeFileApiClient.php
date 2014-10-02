@@ -77,7 +77,7 @@ class CIncludeFileApiClient extends CApiClient {
 
 	protected function setStreamWrapper($contents) {
 		stream_wrapper_unregister('php');
-		stream_wrapper_register('php', 'Zabbix\Test\Util\InputStreamWrapper');
+		stream_wrapper_register('php', 'CInputStreamWrapper');
 
 		file_put_contents('php://input', $contents);
 	}

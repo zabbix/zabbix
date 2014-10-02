@@ -1,19 +1,14 @@
 <?php
 
-namespace Zabbix\Test;
-
-use Zabbix\Test\Fixtures\FixtureFactory;
-use Zabbix\Test\Fixtures\FixtureLoader;
-
-class ApiTestCase extends \PHPUnit_Framework_TestCase {
+class CApiTestCase extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var TestDatabase
+	 * @var CTestDatabase
 	 */
 	private static $database;
 
 	/**
-	 * @var CApiWrapper
+	 * @var CApiClient
 	 */
 	private static $api;
 
@@ -25,21 +20,21 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	private $auth;
 
 	/**
-	 * @var FixtureLoader
+	 * @var CFixtureLoader
 	 */
 	private static $fixtureLoader;
 
 	public static function setUpBeforeClass() {
-		self::$database = new TestDatabase();
+		self::$database = new CTestDatabase();
 
-		self::$api = new \CIncludeFileApiClient(new \CJson());
+		self::$api = new CIncludeFileApiClient(new CJson());
 
-		$client = new \CLocalApiClient(new \CJson());
-		$client->setServiceFactory(new \CApiServiceFactory());
+		$client = new CLocalApiClient(new CJson());
+		$client->setServiceFactory(new CApiServiceFactory());
 
-		self::$fixtureLoader = new FixtureLoader(
-			new FixtureFactory(new \CApiWrapper($client)),
-			new \CArrayMacroResolver()
+		self::$fixtureLoader = new CFixtureLoader(
+			new CFixtureFactory(new CApiWrapper($client)),
+			new CArrayMacroResolver()
 		);
 	}
 
@@ -85,7 +80,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		try {
 			$fixtures = self::$fixtureLoader->load($fixtures);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->clearDatabase();
 
 			throw $e;
@@ -114,7 +109,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @param string 		$jsonRpc	defaults to "2.0"
 	 * @param string 		$auth		defaults to authentication token of the base user
 	 *
-	 * @return \CApiResponse
+	 * @return CApiResponse
 	 */
 	protected function call($method, $params, $auth = null, $id = null, $jsonRpc = '2.0') {
 		if ($id === null) {
@@ -135,7 +130,7 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @param array $request	a JSON RPC request
 	 *
-	 * @return \CApiResponse
+	 * @return CApiResponse
 	 */
 	protected function executeRequest(array $request) {
 		return self::$api->callMethod(
@@ -148,23 +143,23 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @param mixed $definition
 	 *
-	 * @param \CApiResponse $response
+	 * @param CApiResponse $response
 	 */
-	protected function assertResponse($definition, \CApiResponse $response) {
-		return $this->assertArraySchema($definition, $response->getBody());
+	protected function assertResponse($definition, CApiResponse $response) {
+		 $this->assertArraySchema($definition, $response->getBody());
 	}
 
 	/**
 	 * Check that the error data of a failed request matches the given schema.
 	 *
 	 * @param mixed $definition
-	 * @param \CApiResponse $response
+	 * @param CApiResponse $response
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	protected function assertError($definition, \CApiResponse $response) {
+	protected function assertError($definition, CApiResponse $response) {
 		if (!$response->isError()) {
-			throw new \Exception(
+			throw new Exception(
 				sprintf('Cannot use "assertError" for a successfull request.')
 			);
 		}
@@ -175,13 +170,13 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * Check that the result of a successful request matches the given schema.
 	 *
 	 * @param mixed $definition
-	 * @param \CApiResponse $response
+	 * @param CApiResponse $response
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	protected function assertResult($definition, \CApiResponse $response) {
+	protected function assertResult($definition, CApiResponse $response) {
 		if ($response->isError()) {
-			throw new \Exception(
+			throw new Exception(
 				sprintf('Cannot use "assertResult" for a failed request.')
 			);
 		}
@@ -196,12 +191,12 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 	 * @param mixed $definition
 	 * @param mixed $response
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function assertArraySchema($definition, $response) {
-		$validator = new \CTestSchemaValidator(array('schema' => $definition));
+		$validator = new CTestSchemaValidator(array('schema' => $definition));
 		if (!$validator->validate($response)) {
-			throw new \Exception($validator->getError());
+			throw new Exception($validator->getError());
 		}
 	}
 

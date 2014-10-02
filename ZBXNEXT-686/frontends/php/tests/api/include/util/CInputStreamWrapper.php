@@ -1,15 +1,13 @@
 <?php
 
-namespace Zabbix\Test\Util;
-
-class InputStreamWrapper {
+class CInputStreamWrapper {
 	protected static $data;
 	protected static $length;
 	protected static $position = 0;
 
 	public function stream_open($path, $mode, $options, &$opened_path) {
 		if ($path !== 'php://input') {
-			throw new \Exception('Sorry, we support nothing but php://input at the moment');
+			throw new Exception('Sorry, we support nothing but php://input at the moment');
 		}
 
 		self::$position = 0;

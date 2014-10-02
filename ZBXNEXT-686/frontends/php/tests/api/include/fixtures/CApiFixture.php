@@ -1,15 +1,13 @@
 <?php
 
-namespace Zabbix\Test\Fixtures;
-
-class ApiFixture extends Fixture {
+class CApiFixture extends CFixture {
 
 	/**
-	 * @var \CApiWrapper
+	 * @var CApiWrapper
 	 */
 	protected $apiWrapper;
 
-	public function __construct(\CApiWrapper $apiWrapper) {
+	public function __construct(CApiWrapper $apiWrapper) {
 		$this->apiWrapper = $apiWrapper;
 	}
 
@@ -22,7 +20,7 @@ class ApiFixture extends Fixture {
 			));
 
 			if ($rs->isError()) {
-				throw new \Exception(sprintf('Cannot authenticate to load API fixture: %1$s', $rs->getErrorData()));
+				throw new Exception(sprintf('Cannot authenticate to load API fixture: %1$s', $rs->getErrorData()));
 			}
 
 			$this->apiWrapper->auth = $rs->getResult();
@@ -31,7 +29,7 @@ class ApiFixture extends Fixture {
 		$rs = $this->apiWrapper->callMethod($params['method'], $params['params']);
 
 		if ($rs->isError()) {
-			throw new \Exception($rs->getErrorData());
+			throw new Exception($rs->getErrorData());
 		}
 
 		return $rs->getResult();

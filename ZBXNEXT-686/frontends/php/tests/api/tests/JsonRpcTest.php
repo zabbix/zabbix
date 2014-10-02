@@ -1,8 +1,6 @@
 <?php
 
-use Zabbix\Test\FileApiTestCase;
-
-class JsonRpcTest extends FileApiTestCase {
+class JsonRpcTest extends CFileApiTestCase {
 
 	public function fileProvider() {
 		$files = array(

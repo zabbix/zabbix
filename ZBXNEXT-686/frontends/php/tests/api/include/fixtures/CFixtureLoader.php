@@ -1,25 +1,22 @@
 <?php
 
-namespace Zabbix\Test\Fixtures;
-
-
-class FixtureLoader {
+class CFixtureLoader {
 
 	const TYPE_INCLUDE = 'include';
 	const TYPE_API = 'api';
 	const TYPE_DATA = 'data';
 
 	/**
-	 * @var FixtureFactory
+	 * @var CFixtureFactory
 	 */
 	protected $fixtureFactory;
 
 	/**
-	 * @var \CArrayMacroResolver
+	 * @var CArrayMacroResolver
 	 */
 	protected $macroResolver;
 
-	public function __construct(FixtureFactory $fixtureFactory, \CArrayMacroResolver $macroResolver) {
+	public function __construct(CFixtureFactory $fixtureFactory, CArrayMacroResolver $macroResolver) {
 		$this->macroResolver = $macroResolver;
 
 		$fixtureFactory->setFixtureLoader($this);
@@ -46,7 +43,7 @@ class FixtureLoader {
 
 				$fixtures[$name]['result'] = $result;
 			}
-			catch (\Exception $e) {
+			catch (Exception $e) {
 				throw $this->getException($name, $e->getMessage());
 			}
 		}
@@ -59,7 +56,7 @@ class FixtureLoader {
 		foreach ($fixtures as $name => &$fixture) {
 			if (!is_array($fixture) || !array_key_exists('type', $fixture) && !array_key_exists('params', $fixture)) {
 				$fixture = array(
-					'type' => FixtureLoader::TYPE_INCLUDE,
+					'type' => CFixtureLoader::TYPE_INCLUDE,
 					'params' => array(
 						'file' => $name,
 						'params' => $fixture
@@ -73,7 +70,7 @@ class FixtureLoader {
 	}
 
 	protected function getException($fixtureName, $message) {
-		return new \Exception(sprintf('Error loading fixture "%1$s": %2$s', $fixtureName, $message));
+		return new Exception(sprintf('Error loading fixture "%1$s": %2$s', $fixtureName, $message));
 	}
 
 	public function resolveMacros(array $array, array $fixtures, array $params) {

@@ -1,28 +1,25 @@
 <?php
 
-namespace Zabbix\Test;
-
 use Symfony\Component\Yaml\Yaml;
-use Zabbix\Test\Fixtures\FixtureLoader;
 
-class FileApiTestCase extends ApiTestCase {
+class CFileApiTestCase extends CApiTestCase {
 
 	/**
-	 * @var \CArrayMacroResolver
+	 * @var CArrayMacroResolver
 	 */
 	private static $macroResolver;
 
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 
-		self::$macroResolver = new \CArrayMacroResolver();
+		self::$macroResolver = new CArrayMacroResolver();
 	}
 
 	protected function parseTestFile($name) {
 		$path = ZABBIX_NEW_TEST_DIR . '/tests/yaml/'.$name.'.yml';
 
 		if (!is_readable($path)) {
-			throw new \Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
+			throw new Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
 		}
 
 		return Yaml::parse(file_get_contents($path));
@@ -37,7 +34,7 @@ class FileApiTestCase extends ApiTestCase {
 		$fixtures = array_merge(
 			array(
 				'base' => array(
-					'type' => FixtureLoader::TYPE_INCLUDE,
+					'type' => CFixtureLoader::TYPE_INCLUDE,
 					'params' => array(
 						'file' => 'base'
 					)
@@ -58,12 +55,12 @@ class FileApiTestCase extends ApiTestCase {
 	 * @param array $steps
 	 * @param array $fixtures
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function runSteps(array $steps, array $fixtures) {
 		foreach ($steps as $stepName => &$definition) {
 			if (!isset($definition['request'])) {
-				throw new \Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
+				throw new Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
 			}
 
 			if (is_array($definition['request']['params'])) {

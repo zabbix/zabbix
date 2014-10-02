@@ -21,6 +21,9 @@ Z::getInstance()->run(ZBase::EXEC_MODE_COMMAND);
 $autoloader = new CAutoloader(array(
 	__DIR__.'/include/validators',
 	__DIR__.'/include/macros',
+	__DIR__.'/include/tests',
+	__DIR__.'/include/util',
+	__DIR__.'/include/fixtures',
 	__DIR__.'/include/api/client',
 ));
 $autoloader->register();

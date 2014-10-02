@@ -1,9 +1,7 @@
 <?php
 
-namespace Zabbix\Test\Fixtures;
 
-
-class DataFixture extends Fixture {
+class CDataFixture extends CFixture {
 
 	public function load(array $params) {
 		// TODO: automatically handle cases when IDs shouldn't be incremented
@@ -17,12 +15,12 @@ class DataFixture extends Fixture {
 
 			DBend();
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			DBend(false);
 
 			global $ZBX_MESSAGES;
 			$lastMessage = array_pop($ZBX_MESSAGES);
-			throw new \Exception($lastMessage['message']);
+			throw new Exception($lastMessage['message']);
 		}
 
 		return $ids;
