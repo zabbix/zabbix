@@ -28,6 +28,8 @@ Changes for 2.4.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
+..F....... [ZBX-8665] fixed incorrect display of period in graph filter time bar, dragging the scrollbar beyond year 1970 and calendar months to run in loop for years 1970 and 2038 (Ivo)
 ..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
 .......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
 ...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
@@ -137,7 +139,7 @@ A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Kr
 ...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
 ....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
 A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing; thanks to Leann for the report (Krists)
-........S. [ZBX-8444] database queries for enabled items, triggers and hosts replaced with queries from configuration cache to improve performance for processing sleeping escalations (igors)
+........S. [ZBX-8444] improved sleeping escalation processing by using configuration cache to get enabled items, triggers and hosts (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 ........S. [ZBX-8608] fixed clearing of discovered services with using CIDR notation in ip lists (Sasha)
 ........S. [ZBX-8415] fixed possible server crash on LLD host or host group update (dimir, Sasha)
@@ -478,7 +480,7 @@ Bug fixes:
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
 .......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
-........S. [ZBX-8444] increased the interval for checking sleeping escalations to improve performance (igors)
+........S. [ZBX-8444] changed the interval for checking sleeping escalations to improve performance (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not updating properly when linking template to host (Ivo)
 ........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
@@ -1533,6 +1535,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.14rc1
 
 New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:

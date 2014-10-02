@@ -219,8 +219,18 @@ function get_min_itemclock_by_itemid($itemIds) {
 				' FROM items i'.
 				' WHERE '.dbConditionInt('i.itemid', $itemIdsNumeric);
 		if ($tableForNumeric = DBfetch(DBselect($sql))) {
+			// look for data in one of the tables
 			$sqlFromNum = ($tableForNumeric['history'] > $tableForNumeric['trends']) ? 'history' : 'trends';
+
 			$result = time() - (SEC_PER_DAY * max($tableForNumeric['history'], $tableForNumeric['trends']));
+
+			/*
+			 * In case history storage exceeds the maximum time difference between current year and minimum 1970
+			 * (for example year 2014 - 200 years < year 1970), correct year to 1970 (unix time timestamp 0).
+			 */
+			if ($result < 0) {
+				$result = 0;
+			}
 		}
 	}
 
@@ -261,7 +271,8 @@ function get_min_itemclock_by_itemid($itemIds) {
 		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
 	}
 
-	return $min ? $min: $result;
+	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
+	return ($min > 0) ? $min : $result;
 }
 
 function getGraphByGraphId($graphId) {
