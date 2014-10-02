@@ -838,22 +838,22 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbTriggers = $this->get(array(
-			'output' => array('triggerid', 'flags', 'description'),
-			'triggerids' => $triggerIds,
-			'editable' => true,
-			'filter' => array('flags' => null)
-		));
-
-		foreach ($dbTriggers as $dbTrigger) {
-			if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
-				);
-			}
-		}
-
 		if (!$nopermissions) {
+			$dbTriggers = $this->get(array(
+				'output' => array('triggerid', 'flags', 'description'),
+				'triggerids' => $triggerIds,
+				'editable' => true,
+				'filter' => array('flags' => null)
+			));
+
+			foreach ($dbTriggers as $dbTrigger) {
+				if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
+					);
+				}
+			}
+
 			$this->checkPermissions($triggerIds);
 			$this->checkNotInherited($triggerIds);
 		}

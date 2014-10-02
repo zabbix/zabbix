@@ -1301,20 +1301,20 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbHosts = API::Host()->get(array(
-			'output' => array('hostid', 'name', 'flags'),
-			'hostids' => $hostIds,
-			'preservekeys' => true,
-			'editable' => true
-		));
-
-		foreach ($dbHosts as $dbHost) {
-			if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
-			}
-		}
-
 		if (!$nopermissions) {
+			$dbHosts = API::Host()->get(array(
+				'output' => array('hostid', 'name', 'flags'),
+				'hostids' => $hostIds,
+				'preservekeys' => true,
+				'editable' => true
+			));
+
+			foreach ($dbHosts as $dbHost) {
+				if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
+				}
+			}
+
 			$this->checkPermissions($hostIds);
 		}
 	}
