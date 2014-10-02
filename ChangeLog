@@ -26,6 +26,7 @@ Bug fixes:
 Changes for 2.4.1rc2
 
 Bug fixes:
+..F....... [ZBX-8847] fixed mass actions in lists only affecting the selected elements on the current page (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.1rc1
