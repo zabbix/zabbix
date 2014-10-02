@@ -19,13 +19,12 @@ class DiscoveredItemTest extends ApiTestCase {
 		$item = $this->getItem($fixtures['hostWithDiscoveredObjects']['result']['itemid']);
 
 		foreach (array('status') as $field) {
-			$result = $this->call('item.update', array(
+			$response = $this->call('item.update', array(
 				'itemid' => $item['itemid'],
 				$field => $item[$field]
 			));
 
-			$this->assertResult($result, sprintf('Shouldn be able to update "%1$s".', $field));
-			$this->assertResponse(array('itemids' => array($item['itemid'])), $result);
+			$this->assertResult(array('itemids' => array($item['itemid'])), $response);
 		}
 	}
 
@@ -45,17 +44,16 @@ class DiscoveredItemTest extends ApiTestCase {
 
 		// the set of properties is random and incomplete
 		foreach (array('delay', 'interfaceid', 'key_', 'name', 'type', 'value_type') as $field) {
-			$result = $this->call('item.update', array(
+			$response = $this->call('item.update', array(
 				'itemid' => $item['itemid'],
 				$field => $item[$field]
 			));
 
-			$this->assertError($result, sprintf('Shouldn\'t be able to update "%1$s".', $field));
-			$this->assertResponse(array(
+			$this->assertError(array(
 				'code' => -32500,
 				'message' => 'Application error.',
 				'data' => sprintf('Cannot update "%1$s" for a discovered item.', $field)
-			), $result);
+			), $response);
 		}
 	}
 
@@ -71,16 +69,15 @@ class DiscoveredItemTest extends ApiTestCase {
 		));
 		$this->login('Admin', 'zabbix');
 
-		$result = $this->call('item.delete', array(
+		$response = $this->call('item.delete', array(
 			$fixtures['hostWithDiscoveredObjects']['result']['itemid']
 		));
 
-		$this->assertError($result);
-		$this->assertResponse(array(
+		$this->assertError(array(
 			'code' => -32500,
 			'message' => 'Application error.',
 			'data' => 'Cannot delete a discovered item.'
-		), $result);
+		), $response);
 	}
 
 	protected function getItem($itemId) {

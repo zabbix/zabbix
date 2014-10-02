@@ -23,12 +23,8 @@ steps:
             # macros can be used to reference values returned by fixtures
             groupid: @fixtures.base.result.groupid@
 
-    # what to expect: either "result" or "error"
-    expect: result
-
-    # validate the received response
-    # depending on the value of "expect", the rules will be matched against the data contained in "result" or "error"
-    response:
+    # validate the received result
+    assertResult:
       hostids:
         # "_assert" makes sure that the value passes the given validator
         - { _assert: string }
@@ -40,15 +36,13 @@ steps:
       params:
         output: [host, host, status]
         # macros can be used to reference values from the previous steps
-        hostids: ["@steps.step1.response.hostids[0]@"]
+        hostids: ["@steps.step1.response.result.hostids[0]@"]
 
-    expect: result
-
-    response:
+    assertResult:
       -
         # macros can be used in the response as well
         # this will match the value of "hostid" to the ID returned by host.create in step1
-        hostid: @steps.step1.response.hostids[0]@
+        hostid: @steps.step1.response.result.hostids[0]@
         host: @steps.step1.request.params.host@
         # a simple match
         status: "0"
@@ -72,9 +66,7 @@ steps:
             groupid: @fixtures.base.result.groupid@
 
     # in this step we expect an error
-    expect: error
-
-    response:
+    assertError:
       message: "Invalid params."
       # macros can also be used inside of strings
       data: "Host with the same name \"@steps.step1.request.params.host@\" already exists."
@@ -98,9 +90,7 @@ steps:
           -
             groupid: @fixtures.base.result.groupid@
 
-    expect: result
-
-    response:
+    assertResult:
       hostids:
         # check that "hostis" is an array containing one element
         _assert: arr|length(1)
@@ -108,3 +98,22 @@ steps:
         _keys: sequence
         # check that each element is a string
         _each: string
+
+  # Step 5, try to call the host.create method without an authentication token
+  step5:
+    request:
+      method: host.create
+      params: {}
+      # don't send an authentication token
+      auth: null
+      # set a custon request id
+      id: 1
+
+    # validate the whole response
+    assertResponse:
+      jsonrpc: "2.0"
+      error:
+        code: -32602
+        message: "Invalid params."
+        data: "Not authorised."
+      id: @steps.step5.request.id@

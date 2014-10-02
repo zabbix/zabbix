@@ -11,9 +11,7 @@ steps:
         description: "Low memory on {HOST.NAME}"
         expression: "{@fixtures.hostWithItem.result.host@:@fixtures.hostWithItem.result.itemKey@.last()}<1024"
 
-    expect: result
-
-    response:
+    assertResult:
       triggerids:
         _assert: arr|length(1)
 
@@ -23,12 +21,11 @@ steps:
       params:
         selectFunctions: extend
         selectHosts: [host]
-        triggerids: @steps.step1.response.triggerids[0]@
+        triggerids: @steps.step1.response.result.triggerids[0]@
 
-    expect: result
-    response:
+    assertResult:
       -
-        triggerid: @steps.step1.response.triggerids[0]@
+        triggerid: @steps.step1.response.result.triggerids[0]@
 
         # since we don't know the ID of the function, validate the expression using a regex
         expression: { _assert: "regex(\"^{[0-9]+}<1024$\")" }
@@ -51,7 +48,7 @@ steps:
             functionid: { _assert: string }
             itemid: { _assert: string }
 
-            triggerid: @steps.step1.response.triggerids[0]@
+            triggerid: @steps.step1.response.result.triggerids[0]@
             function: "last"
             parameter: ""
 
@@ -70,9 +67,8 @@ steps:
         expandDescription: true
         expandExpression: true
 
-    expect: result
-    response:
+    assertResult:
       -
-        triggerid: @steps.step1.response.triggerids[0]@
+        triggerid: @steps.step1.response.result.triggerids[0]@
         expression: @steps.step1.request.params.expression@
         description: "Low memory on @fixtures.hostWithItem.result.host@"

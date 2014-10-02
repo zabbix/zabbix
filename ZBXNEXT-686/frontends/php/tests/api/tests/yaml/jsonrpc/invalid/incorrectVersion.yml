@@ -7,9 +7,7 @@ steps:
       method: host.get
       params: {}
 
-    expect: error
-
-    response:
+    assertError:
       code: -32600
       message: 'Invalid Request.'
       data: 'JSON-rpc version is not specified.'
@@ -21,9 +19,7 @@ steps:
       method: host.get
       params: {}
 
-    expect: error
-
-    response:
+    assertError:
       code: -32600
       message: 'Invalid Request.'
       data: 'Expecting JSON-rpc version 2.0, "@steps.step2.request.jsonrpc@" is given.'

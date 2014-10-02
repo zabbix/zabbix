@@ -82,6 +82,13 @@ class CApiResponse {
 	}
 
 	/**
+	 * @return array|null
+	 */
+	public function getError() {
+		return $this->error;
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function getDebug() {

@@ -17,9 +17,7 @@ steps:
           -
             groupid: @fixtures.base.result.groupid@
 
-    expect: error
-
-    response:
+    assertError:
       message: "Invalid params."
       data: "Wrong fields for host \"\"."
       code: -32602

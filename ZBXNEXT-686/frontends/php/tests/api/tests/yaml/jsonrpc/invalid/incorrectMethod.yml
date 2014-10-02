@@ -6,9 +6,7 @@ steps:
       method: null
       params: {}
 
-    expect: error
-
-    response:
+    assertError:
       code: -32600
       message: 'Invalid Request.'
       data: 'JSON-rpc method is not defined.'
@@ -19,9 +17,7 @@ steps:
       method: host.incorrect
       params: {}
 
-    expect: error
-
-    response:
+    assertError:
       code: -32602
       message: 'Invalid params.'
       data: 'Incorrect method "@steps.step2.request.method@".'

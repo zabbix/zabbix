@@ -18,9 +18,7 @@ steps:
           -
             groupid: @fixtures.base.result.groupid@
 
-    expect: result
-
-    response:
+    assertResult:
       hostids:
         - { _assert: string }
 
@@ -28,16 +26,14 @@ steps:
     request:
       method: host.get
       params:
-        hostids: ["@steps.step1.response.hostids[0]@"]
+        hostids: ["@steps.step1.response.result.hostids[0]@"]
         selectGroups: [groupid]
         selectInterfaces: [ip]
         selectParentTemplate: [templateid]
 
-    expect: result
-
-    response:
+    assertResult:
       -
-        hostid: @steps.step1.response.hostids[0]@
+        hostid: @steps.step1.response.result.hostids[0]@
         host: @steps.step1.request.params.host@
         name: @steps.step1.request.params.host@
         proxy_hostid: "0"

@@ -10,7 +10,5 @@ steps:
         user: Admin
         password: zabbix
 
-    expect: result
-
-    response:
+    assertResult:
       _assert: 'string|length(32, 32)'

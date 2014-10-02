@@ -6,9 +6,7 @@ steps:
       method: host.get
       params: string
 
-    expect: error
-
-    response:
+    assertError:
       code: -32602
       message: 'Invalid params.'
       data: 'JSON-rpc params is not an Array.'

@@ -5,12 +5,14 @@ steps:
   # and validated
   step1:
     request:
+      id: 1
       method: user.login
       params:
         user: Admin
         password: zabbix
 
-    expect: result
-
-    response:
-      _assert: 'string|length(32, 32)'
+    assertResponse:
+      jsonrpc: "2.0"
+      result:
+        _assert: 'string|length(32, 32)'
+      id: 1

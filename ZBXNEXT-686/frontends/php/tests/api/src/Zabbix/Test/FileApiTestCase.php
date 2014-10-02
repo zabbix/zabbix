@@ -70,41 +70,27 @@ class FileApiTestCase extends ApiTestCase {
 				$definition['request']['params'] = $this->resolveStepMacros($definition['request']['params'], $steps, $fixtures);
 			}
 
-			$expectedResponse = $definition['response'];
+			$response = $this->executeRequest($this->createRequest($definition['request']));
 
-			$apiResponse = $this->executeRequest($this->createRequest($definition['request']));
+			$steps[$stepName]['response'] = $response->getBody();
 
-			$steps[$stepName]['response'] = $apiResponse->getResult();
-
-			// now we verify that the response is what we expected
-			if (!isset($definition['expect']) || !in_array($definition['expect'], array('result', 'error'))) {
-				throw new \Exception('Wrong step definition: do not know what to expect, must be "expect: result|error"');
+			// assert error
+			if (isset($definition['assertError'])) {
+				$expectedError = $this->resolveStepMacros($definition['assertError'], $steps, $fixtures);
+				$this->assertError($expectedError, $response);
 			}
 
-			$expectation = $definition['expect'];
-
-			if ($apiResponse->isError() && $expectation !== 'error' || !$apiResponse->isError() && $expectation === 'error') {
-				throw new \Exception(
-					sprintf('Expected "%s" from api on step "%s", got "%s" instead: %s',
-						$expectation,
-						$stepName,
-						$apiResponse->isError() ? 'error' : 'result',
-						json_encode($apiResponse->getResponseData())
-					))
-				;
+			// assert result
+			if (isset($definition['assertResult'])) {
+				$expectedResult = $this->resolveStepMacros($definition['assertResult'], $steps, $fixtures);
+				$this->assertResult($expectedResult, $response);
 			}
 
-			if ($expectation == 'result' || $expectation == 'error') {
-				$expectedResponse = $this->resolveStepMacros($expectedResponse, $steps, $fixtures);
-
-				$this->assertResponse($expectedResponse, $apiResponse);
+			// assert response
+			if (isset($definition['assertResponse'])) {
+				$expectedResponse = $this->resolveStepMacros($definition['assertResponse'], $steps, $fixtures);
+				$this->assertResponse($expectedResponse, $response);
 			}
-			else {
-				throw new \Exception(sprintf('\Expectation "%s" is not yet supported', $expectation));
-			}
-
-			// each step is one assertion
-			$this->addToAssertionCount(1);
 		}
 		unset($definition);
 	}

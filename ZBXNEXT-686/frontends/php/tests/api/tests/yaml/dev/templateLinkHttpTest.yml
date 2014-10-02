@@ -68,8 +68,7 @@ steps:
         # TODO: the inventory parameter has been added to avoid ZBX-8779
         inventory: {}
 
-    expect: result
-    response:
+    assertResult:
       hostids: ["@fixtures.emptyHost.result.hostid@"]
 
   # make sure the HTTP test is inherited correctly
@@ -81,8 +80,7 @@ steps:
         selectSteps: extend
         hostids: @fixtures.emptyHost.result.hostid@
 
-    expect: result
-    response:
+    assertResult:
       -
         httptestid: { _assert: string }
         name: "Web scenario"
@@ -141,12 +139,11 @@ steps:
       method: application.get
       params:
         output: [name, hostid]
-        applicationids: @steps.step2.response[0].applicationid@
+        applicationids: @steps.step2.response.result[0].applicationid@
 
-    expect: result
-    response:
+    assertRestult:
       -
-        applicationid: @steps.step2.response[0].applicationid@
+        applicationid: @steps.step2.response.result[0].applicationid@
         name: App
         hostid: @fixtures.emptyHost.result.hostid@
 

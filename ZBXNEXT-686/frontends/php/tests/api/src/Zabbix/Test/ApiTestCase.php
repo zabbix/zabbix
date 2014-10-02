@@ -143,35 +143,64 @@ class ApiTestCase extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
-	protected function assertError(\CApiResponse $response, $message = '') {
-		if ($message === '') {
-			$message = 'Failed asserting that the response contains an error.';
-		}
-
-		return $this->assertTrue($response->isError(), $message);
-	}
-
-	protected function assertResult(\CApiResponse $response, $message = '') {
-		if ($message === '') {
-			$message = 'Failed asserting that the response contains a result.';
-		}
-
-		return $this->assertFalse($response->isError(), $message);
+	/**
+	 * Check that the body of a response matches the given schema.
+	 *
+	 * @param mixed $definition
+	 *
+	 * @param \CApiResponse $response
+	 */
+	protected function assertResponse($definition, \CApiResponse $response) {
+		return $this->assertArraySchema($definition, $response->getBody());
 	}
 
 	/**
-	 * Validate data according to rules; path holds current validator chain
+	 * Check that the error data of a failed request matches the given schema.
 	 *
-	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
-	 *
-	 * @param $definition
+	 * @param mixed $definition
 	 * @param \CApiResponse $response
 	 *
 	 * @throws \Exception
 	 */
-	protected function assertResponse($definition, \CApiResponse $response) {
+	protected function assertError($definition, \CApiResponse $response) {
+		if (!$response->isError()) {
+			throw new \Exception(
+				sprintf('Cannot use "assertError" for a successfull request.')
+			);
+		}
+		$this->assertArraySchema($definition, $response->getError());
+	}
+
+	/**
+	 * Check that the result of a successful request matches the given schema.
+	 *
+	 * @param mixed $definition
+	 * @param \CApiResponse $response
+	 *
+	 * @throws \Exception
+	 */
+	protected function assertResult($definition, \CApiResponse $response) {
+		if ($response->isError()) {
+			throw new \Exception(
+				sprintf('Cannot use "assertResult" for a failed request.')
+			);
+		}
+		$this->assertArraySchema($definition, $response->getResult());
+	}
+
+	/**
+	 * Check that the array matches the given schema.
+	 *
+	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
+	 *
+	 * @param mixed $definition
+	 * @param mixed $response
+	 *
+	 * @throws \Exception
+	 */
+	protected function assertArraySchema($definition, $response) {
 		$validator = new \CTestSchemaValidator(array('schema' => $definition));
-		if (!$validator->validate($response->getResponseData())) {
+		if (!$validator->validate($response)) {
 			throw new \Exception($validator->getError());
 		}
 	}

@@ -66,9 +66,7 @@ steps:
             port: 10050
             bulk: 1
 
-
-    expect: result
-    response:
+    assertResult:
       hostids: [@fixtures.hostWithItem.result.hostid@]
 
   # make sure step2 has been executed correctly
@@ -82,8 +80,7 @@ steps:
         selectItems: [name]
         selectInterfaces: [interfaceid]
 
-    expect: result
-    response:
+    assertResult:
       -
         hostid: @fixtures.hostWithItem.result.hostid@
         parentTemplates: []
