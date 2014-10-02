@@ -55,8 +55,6 @@ static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	zbx_strlcpy(NULL, NULL, 0);
-
 	SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
 
 	return SYSINFO_RET_OK;
