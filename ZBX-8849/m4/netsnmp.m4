@@ -55,7 +55,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 			esac
 		done
 
-		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
+		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs`"
 		for i in $_full_libnetsnmp_libs; do
 			case $i in
 				-L*)
