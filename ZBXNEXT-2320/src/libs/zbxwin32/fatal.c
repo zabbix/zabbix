@@ -113,11 +113,9 @@ static void	print_backtrace(CONTEXT *pctx)
 	PSYMBOL_INFO		pSym = NULL;
 	HMODULE			hModule;
 	HANDLE			hProcess, hThread;
-	BOOL			bPrintSymbols = FALSE;
 	DWORD64			offset;
 	wchar_t			szProcessName[MAX_PATH];
-	char			*process_name = NULL, *process_path = NULL;
-	char			*frame = NULL;
+	char			*process_name = NULL, *process_path = NULL, *frame = NULL;
 	size_t			frame_alloc = 0, frame_offset;
 	int			nframes = 0;
 
@@ -168,8 +166,6 @@ static void	print_backtrace(CONTEXT *pctx)
 
 		if (FALSE != SymInitialize(hProcess, process_path, TRUE))
 		{
-			bPrintSymbols = TRUE;
-
 			pSym = (PSYMBOL_INFO) zbx_malloc(NULL, sizeof(SYMBOL_INFO) + MAX_SYM_NAME);
 			memset(pSym, 0, sizeof(SYMBOL_INFO) + MAX_SYM_NAME);
 			pSym->SizeOfStruct = sizeof(SYMBOL_INFO);
@@ -180,6 +176,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	scount = s;
 	ctxcount = ctx;
 
+	/* get number of frames, ctxcount may be modified during StackWalk64() calls */
 	while (TRUE == StackWalk64(ZBX_IMAGE_FILE_MACHINE, hProcess, hThread, &scount, &ctxcount, NULL, NULL, NULL,
 			NULL))
 	{
@@ -194,7 +191,7 @@ static void	print_backtrace(CONTEXT *pctx)
 		zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%d: %s", nframes--,
 				NULL == process_name ? "(unknown)" : process_name);
 
-		if (TRUE == bPrintSymbols)
+		if (NULL != pSym)
 		{
 			DWORD		dwDisplacement;
 			IMAGEHLP_LINE64	line = {sizeof(IMAGEHLP_LINE64)};
