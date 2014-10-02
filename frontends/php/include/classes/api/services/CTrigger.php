@@ -848,7 +848,7 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($dbTriggers as $dbTrigger) {
 			if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
+					'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
 				);
 			}
 		}
