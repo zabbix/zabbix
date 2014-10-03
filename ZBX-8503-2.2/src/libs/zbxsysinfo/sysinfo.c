@@ -410,21 +410,29 @@ void	test_parameter(const char *key)
 void	test_parameters()
 {
 	int	i;
-	char	tmp[MAX_STRING_LEN];
+	char	*key = NULL;
+	size_t	key_alloc = 0;
 
 	for (i = 0; NULL != commands[i].key; i++)
 	{
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
 		{
+			size_t	key_offset = 0;
+
+			zbx_strcpy_alloc(&key, &key_alloc, &key_offset, commands[i].key);
+
 			if (0 == (commands[i].flags & CF_USERPARAMETER) && NULL != commands[i].test_param)
 			{
-				zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", commands[i].key, commands[i].test_param);
-				test_parameter(tmp);
+				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, '[');
+				zbx_strcpy_alloc(&key, &key_alloc, &key_offset, commands[i].test_param);
+				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, ']');
 			}
-			else
-				test_parameter(commands[i].key);
+
+			test_parameter(key);
 		}
 	}
+
+	zbx_free(key);
 
 	test_aliases();
 }
