@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 05:40+0300\n"
-"PO-Revision-Date: 2014-08-16 19:09+0300\n"
+"POT-Creation-Date: 2014-10-03 05:43+0300\n"
+"PO-Revision-Date: 2014-10-02 19:46+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408208996.0\n"
+"X-POOTLE-MTIME: 1412272001.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -55,8 +55,8 @@ msgstr "%1$s (ano %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ITEM"
+msgstr[1] "%1$s ITENS"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -1264,7 +1264,7 @@ msgstr "Carga da(s) CPU(s). Carga de processamento. A cpu e o modo são opcionai
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Utilização da(s) CPU(s). Carga percentual do processador. O parâmetros <cpu>, <type> e <mode> são opcionais. Se <cpu> estiver ausente, serão consideradas todas. Se o <type> estiver ausente, será usado tipo usuário. Se o <modo> estiver ausente, avg1 é utilizado."
+msgstr "Utilização da(s) CPU(s). Carga percentual do processador. O parâmetros <cpu>, <type> e <mode> são opcionais. Se <cpu> estiver ausente, serão consideradas todas. Se o <type> estiver ausente, será usado tipo usuário. Se o <modo> estiver ausente, <avg1> é utilizado."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -2069,22 +2069,22 @@ msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como 
 #: include/classes/import/CConfigurationImport.php:1172
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo gráfico \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pela trigger \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de trigger \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -3186,7 +3186,8 @@ msgstr ""
 "A conexão com o servidor Zabbix \"%s\" foi recusada. Possíveis causas:\n"
 "1. IP/DNS incorreto no arquivo \"zabbix.conf.php\";\n"
 "2. Definição de segurança (por exemplo SELinux) está bloqueando a conexão;\n"
-"3. Firewall bloqueando conexão TCP.\n"
+"3. Servidor Zabbix não está em execução\n"
+"4. Firewall bloqueando conexão TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:278
 #, c-format
@@ -3337,7 +3338,7 @@ msgstr "Criar tipo de mídia"
 
 #: include/views/conf.import.php:24
 msgid "Create new"
-msgstr ""
+msgstr "Criar novo"
 
 #: include/views/administration.proxy.list.php:27
 msgid "Create proxy"
@@ -3854,7 +3855,7 @@ msgstr "Remover"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Excluir todos os elementos que não estão presentes no arquivo XML?"
 
 #: include/views/configuration.template.edit.php:486
 msgid "Delete and clear"
@@ -3928,7 +3929,7 @@ msgstr "Remover período de manutenção?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "Excluir os ausentes"
 
 #: include/views/configuration.sysmap.edit.php:193
 msgid "Delete network map?"
@@ -4619,11 +4620,11 @@ msgstr "Mostrar as triggers OK para"
 
 #: latest.php:892
 msgid "Display graph"
-msgstr ""
+msgstr "Exibir gráfico"
 
 #: latest.php:891
 msgid "Display stacked graph"
-msgstr ""
+msgstr "Exibir pilha de gráficos"
 
 #: include/func.inc.php:1568
 msgid "Displaying"
@@ -5229,7 +5230,7 @@ msgstr "Erro de execução de SQL: [%1$s] em [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Executar a consulta WMI e retornar o primeiro objeto selecionado."
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
@@ -5884,7 +5885,7 @@ msgstr "Protótipo de gráfico excluído"
 
 #: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "O protótipo de gráfico não foi encontrado."
 
 #: graphs.php:230
 msgid "Graph prototype updated"
@@ -7381,7 +7382,7 @@ msgstr "Foi informado o ID de gráfico \"%1$s\" e ele é inválido para o elemen
 #: include/classes/api/services/CScreenItem.php:661
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de protótipo de gráfico \"%1$s\" e ele é inválido para o elemento da tela."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7467,7 +7468,7 @@ msgstr "Foi informada uma chave de item inválida \"%1$s\" para a expressão da 
 #: include/classes/api/services/CScreenItem.php:698
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de protótipo de item \"%1$s\" e ele é inválido para o elemento da tela."
 
 #: include/classes/validators/CFunctionValidator.php:254
 #, c-format
@@ -7484,7 +7485,7 @@ msgstr "Lista de itens inválida."
 
 #: maintenance.php:330
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038."
+msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038"
 
 #: maintenance.php:358
 msgid "Incorrect maintenance date"
@@ -7531,7 +7532,7 @@ msgstr "Foi informado um comprimento inválido para o mapa \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:590
 msgid "Incorrect max columns provided for screen element."
-msgstr ""
+msgstr "O máximo de colunas informado é inválido para o elemento da tela."
 
 #: include/classes/api/services/CScript.php:563
 #, c-format
@@ -7749,11 +7750,11 @@ msgstr "Foi informada uma função de trigger inválida \"%1$s\" na expressão."
 #: include/classes/api/services/CTriggerPrototype.php:976
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "O protótipo de trigger possui expressão inválida. O host \"%1$s\" não existe ou você não possui acesso a este host."
 
 #: include/classes/api/services/CTriggerPrototype.php:987
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "O protótipo de trigger possui expressão inválida. A expressão não pode possuir referencia a host e template simultaneamente."
 
 #: include/func.inc.php:1004
 msgid "Incorrect type of asort_by_key."
@@ -7904,7 +7905,7 @@ msgstr "A interface com o IP \"%1$s\" não pode possuir nome de DNS nulo enquant
 #: include/classes/api/services/CHostInterface.php:315
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr "A interface com IP \"%s$s\" não pode possuir nome de DNS nulo."
+msgstr "A interface com IP \"%1$s\" não pode possuir nome de DNS nulo."
 
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
@@ -8271,7 +8272,7 @@ msgstr "O item usa uma interface de tipo inválido."
 
 #: chart.php:89
 msgid "Item values"
-msgstr ""
+msgstr "Valores do item"
 
 #: include/classes/api/services/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -9063,7 +9064,7 @@ msgstr "O mapa \"%s\" foi atualizado."
 
 #: sysmap.php:85
 msgid "Map is updated! Return?"
-msgstr ""
+msgstr "O mapa foi atualizado! Retornar para a lista de mapas?"
 
 #: include/views/configuration.sysmap.edit.php:99
 msgid "Map label type"
@@ -9071,7 +9072,7 @@ msgstr "Tipo de rótulo no mapa"
 
 #: sysmap.php:88
 msgid "Map update failed."
-msgstr ""
+msgstr "A atualização do mapa falhou."
 
 #: include/classes/api/services/CMap.php:513
 #, c-format
@@ -9138,7 +9139,7 @@ msgstr "Atualização em massa de elementos"
 #: include/views/configuration.screen.constructor.edit.php:287
 #: screenedit.php:71
 msgid "Max columns"
-msgstr ""
+msgstr "Máximo de colunas"
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
@@ -10010,7 +10011,7 @@ msgstr "Não foi localizado um gráfico com o graphid \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:501
 msgid "No graph prototype ID provided for screen element."
-msgstr ""
+msgstr "Não foi informado o ID do protótipo de gráfico para o elemento da tela."
 
 #: include/views/configuration.graph.list.php:73 popup.php:1290
 msgid "No graph prototypes found."
@@ -10143,7 +10144,7 @@ msgstr "Nenhuma chave de item encontrada."
 
 #: include/classes/api/services/CScreenItem.php:511
 msgid "No item prototype ID provided for screen element."
-msgstr ""
+msgstr "Não foi informado o ID do protótipo de item para o elemento da tela."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:1085
 msgid "No item prototypes found."
@@ -10516,11 +10517,11 @@ msgstr "Visão normal"
 #: include/actions.inc.php:232
 #: include/views/configuration.action.edit.php:1040
 msgid "Not Ack"
-msgstr "Não reconhecer"
+msgstr "Não reconhecido"
 
 #: include/forms.inc.php:601 include/forms.inc.php:782
 msgid "Not Templated items"
-msgstr "Itens fora do emplate"
+msgstr "Itens fora do template"
 
 #: include/classes/api/services/CTrigger.php:1452
 #, c-format
@@ -13097,7 +13098,7 @@ msgstr "Gráfico simples"
 
 #: include/screens.inc.php:46
 msgid "Simple graph prototype"
-msgstr ""
+msgstr "Protótipo simples de gráfico"
 
 #: include/hosts.inc.php:370
 msgid "Site ZIP / postal"
@@ -13280,11 +13281,11 @@ msgstr "O script informado não existe ou você não possui privilégios para ex
 
 #: include/views/configuration.item.list.php:59
 msgid "Specify some filter condition to see the items."
-msgstr ""
+msgstr "Especifique alguma condição de filtro para visualizar os itens."
 
 #: latest.php:442
 msgid "Specify some filter condition to see the values."
-msgstr ""
+msgstr "Especifique alguma condição de filtro para visualizar os valores."
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -14777,11 +14778,11 @@ msgstr "Ligado"
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:177
 #: popup_media.php:137 popup_period.php:145 tr_logform.php:347
 msgid "Update"
-msgstr "Atualiza"
+msgstr "Atualizar"
 
 #: acknow.php:229
 msgid "Update and return"
-msgstr ""
+msgstr "Atualizar e retornar"
 
 #: include/views/conf.import.php:24
 msgid "Update existing"
