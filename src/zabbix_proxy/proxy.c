@@ -663,7 +663,7 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
-	int		opt_c = 0, opt_r = 0, scope;
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -684,13 +684,11 @@ int	main(int argc, char **argv)
 				opt_r++;
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 				{
-					scope = ZBX_RTC_LOG_SCOPE_PROC | ZBX_PROCESS_TYPE_CONFSYNCER;
-					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, scope, 1);
+					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
 				}
 				else if (0 == strcmp(zbx_optarg, ZBX_HOUSEKEEPER_WAKEUP))
 				{
-					scope = ZBX_RTC_LOG_SCOPE_PROC | ZBX_PROCESS_TYPE_HOUSEKEEPER;
-					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_HOUSEKEEPER_WAKEUP, scope, 1);
+					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_HOUSEKEEPER_WAKEUP, 0, 0);
 				}
 				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
 						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
