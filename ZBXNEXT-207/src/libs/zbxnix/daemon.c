@@ -215,7 +215,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, flags);
 			break;
-		case ZBX_RTC_HOUSEKEEPER_WAKEUP:
+		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_HOUSEKEEPER, 1, flags);
 			break;
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
