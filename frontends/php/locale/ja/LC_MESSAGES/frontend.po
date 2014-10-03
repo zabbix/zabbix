@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 06:07+0300\n"
-"PO-Revision-Date: 2014-09-10 02:33+0300\n"
+"POT-Creation-Date: 2014-10-03 06:24+0300\n"
+"PO-Revision-Date: 2014-09-30 08:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410309239.0\n"
+"X-POOTLE-MTIME: 1412059782.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -10385,7 +10385,7 @@ msgstr "トリガーがありません"
 
 #: include/views/configuration.trigger.prototype.list.php:57
 msgid "No trigger prototypes found."
-msgstr ""
+msgstr "トリガーのプロトタイプが設定されていません。"
 
 #: include/triggers.inc.php:273
 #, c-format
