@@ -532,9 +532,10 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		rc, ret = NOTSUPPORTED;
+	static char	*usr_command = NULL;
+	static size_t	usr_command_alloc = 0;
 	char		key[MAX_STRING_LEN];
 	char		parameters[MAX_STRING_LEN];
-	char		tmp[MAX_STRING_LEN];
 	char		error[MAX_STRING_LEN];
 
 	ZBX_METRIC	*command = NULL;
@@ -544,9 +545,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	init_result(result);
 	init_request(&request);
 
-	alias_expand(in_command, tmp, sizeof(tmp));
+	alias_expand_dyn(in_command, &usr_command, &usr_command_alloc);
 
-	if (ZBX_COMMAND_ERROR == (rc = parse_command(tmp, key, sizeof(key), parameters, sizeof(parameters))))
+	if (ZBX_COMMAND_ERROR == (rc = parse_command(usr_command, key, sizeof(key), parameters, sizeof(parameters))))
 		goto notsupported;
 
 	/* system.run is not allowed by default except for getting hostname for daemons */
@@ -599,7 +600,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 	else
 	{
-		if (SUCCEED != parse_item_key(tmp, &request))
+		if (SUCCEED != parse_item_key(usr_command, &request))
 			goto notsupported;
 	}
 
