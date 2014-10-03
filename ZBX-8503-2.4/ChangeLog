@@ -1,6 +1,7 @@
 Changes for 2.4.1rc2
 
 New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, German and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
@@ -417,6 +418,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.7rc1
 
 New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
