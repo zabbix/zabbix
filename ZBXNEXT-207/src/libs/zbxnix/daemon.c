@@ -83,7 +83,7 @@ static void	common_sigusr_handler(int flags)
 }
 #endif
 
-static void	zbx_signal_process_by_type(int flags)
+static void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags)
 {
 	int		process_num, found = 0, i;
 	union sigval	s;
@@ -91,77 +91,80 @@ static void	zbx_signal_process_by_type(int flags)
 
 	s.ZBX_SIVAL_INT = flags;
 
-	if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
+	for (i = 0; i < threads_num; i++)
 	{
-		for (i = 0; i < threads_num; i++)
-		{
-			if (0 != ZBX_RTC_GET_DATA(flags) && threads[i] != ZBX_RTC_GET_DATA(flags))
-				continue;
+		if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+			break;
 
-			found = 1;
-
-			if (-1 != sigqueue(threads[i], SIGUSR1, s))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
-						threads[i]);
-			}
-			else
-				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
-		}
-
-		if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
+		if (proc_type != process_type)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: process pid:%d is not a Zabbix child"
-					" process", ZBX_RTC_GET_DATA(flags));
-		}
-	}
-	else
-	{
-		for (i = 0; i < threads_num; i++)
-		{
-			if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+			/* check if we have already checked processes of target type */
+			if (1 == found)
 				break;
 
-			if (ZBX_RTC_GET_SCOPE(flags) != process_type)
-			{
-				/* check if we have already checked processes of target type */
-				if (1 == found)
-					break;
-
-				continue;
-			}
-
-			if (0 != ZBX_RTC_GET_DATA(flags) && ZBX_RTC_GET_DATA(flags) != process_num)
-				continue;
-
-			found = 1;
-
-			if (-1 != sigqueue(threads[i], SIGUSR1, s))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
-						" pid:%d", get_process_type_string(process_type), threads[i]);
-			}
-			else
-				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+			continue;
 		}
 
-		if (0 == found)
+		if (0 != proc_num && proc_num != process_num)
+			continue;
+
+		found = 1;
+
+		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			if (0 == ZBX_RTC_GET_DATA(flags))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
-						" \"%s\" process does not exist",
-						get_process_type_string(ZBX_RTC_GET_SCOPE(flags)));
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
-						" \"%s #%d\" process does not exist",
-						get_process_type_string(ZBX_RTC_GET_SCOPE(flags)),
-						ZBX_RTC_GET_DATA(flags));
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
+					" pid:%d", get_process_type_string(process_type), threads[i]);
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+	}
+
+	if (0 == found)
+	{
+		if (0 == proc_num)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
+					" \"%s\" process does not exist",
+					get_process_type_string(proc_type));
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal:"
+					" \"%s #%d\" process does not exist",
+					get_process_type_string(proc_type), proc_num);
 		}
 	}
+}
+
+static void	zbx_signal_process_by_pid(int pid, int flags)
+{
+	union sigval	s;
+	int		i, found;
+
+	s.ZBX_SIVAL_INT = flags;
+
+	for (i = 0; i < threads_num; i++)
+	{
+		if (0 != pid && threads[i] != ZBX_RTC_GET_DATA(flags))
+			continue;
+
+		found = 1;
+
+		if (-1 != sigqueue(threads[i], SIGUSR1, s))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
+					threads[i]);
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+	}
+
+	if (0 != ZBX_RTC_GET_DATA(flags) && 0 == found)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: process pid:%d is not a Zabbix child"
+				" process", ZBX_RTC_GET_DATA(flags));
+	}
+
 }
 
 /******************************************************************************
@@ -174,7 +177,8 @@ static void	zbx_signal_process_by_type(int flags)
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
-	int		flags;
+	int			flags;
+	extern unsigned char	daemon_type;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -190,29 +194,37 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (!SIG_PARENT_PROCESS)
 	{
 		common_sigusr_handler(flags);
+		return;
 	}
-	else if (NULL == threads)
+
+	if (NULL == threads)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: shutdown in progress");
+		return;
 	}
-	else if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-	{
-		extern unsigned char	daemon_type;
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
-					" cannot be performed for a passive proxy");
-			return;
-		}
-
-		zbx_signal_process_by_type(flags);
-	}
-	else if (ZBX_RTC_HOUSEKEEPER_WAKEUP == ZBX_RTC_GET_MSG(flags) ||
-			ZBX_RTC_LOG_LEVEL_INCREASE == ZBX_RTC_GET_MSG(flags) ||
-			ZBX_RTC_LOG_LEVEL_DECREASE == ZBX_RTC_GET_MSG(flags))
+	switch (ZBX_RTC_GET_MSG(flags))
 	{
-		zbx_signal_process_by_type(flags);
+		case ZBX_RTC_CONFIG_CACHE_RELOAD:
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
+						" cannot be performed for a passive proxy");
+				return;
+			}
+
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, flags);
+			break;
+		case ZBX_RTC_HOUSEKEEPER_WAKEUP:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_HOUSEKEEPER, 1, flags);
+			break;
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
+				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags);
+			else
+				zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
+			break;
 	}
 #endif
 }
