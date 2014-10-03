@@ -30,9 +30,9 @@ typedef struct zbx_alias
 }
 ALIAS;
 
-void	test_aliases();
-void	add_alias(const char *name, const char *value);
-void	alias_list_free();
-void	alias_expand_dyn(const char *orig, char **expanded, size_t *expanded_alloc);
+void		test_aliases();
+void		add_alias(const char *name, const char *value);
+void		alias_list_free();
+const char	*zbx_alias_get(const char *orig);
 
 #endif	/* ZABBIX_ALIAS_H */

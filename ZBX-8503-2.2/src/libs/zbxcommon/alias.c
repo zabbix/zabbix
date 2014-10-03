@@ -83,19 +83,15 @@ void	alias_list_free()
 	aliasList = NULL;
 }
 
-void	alias_expand_dyn(const char *orig, char **expanded, size_t *expanded_alloc)
+const char	*zbx_alias_get(const char *orig)
 {
 	ALIAS	*alias;
-	size_t	expanded_offset = 0;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
 	{
 		if (0 == strcmp(alias->name, orig))
-		{
-			zbx_strcpy_alloc(expanded, expanded_alloc, &expanded_offset, alias->value);
-			return;
-		}
+			return alias->value;
 	}
 
-	zbx_strcpy_alloc(expanded, expanded_alloc, &expanded_offset, orig);
+	return orig;
 }
