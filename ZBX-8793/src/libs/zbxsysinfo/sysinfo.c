@@ -924,7 +924,6 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 	else if (0 != ISSET_DBL(result))
 	{
 		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
-		del_zeroes(result->str);
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -953,7 +952,6 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 	else if (0 != ISSET_DBL(result))
 	{
 		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
-		del_zeroes(result->text);
 	}
 	/* skip AR_MESSAGE - it is information field */
 

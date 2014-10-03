@@ -557,6 +557,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
 	int		ret = SUCCEED;
+	char		buffer[64];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d value_type:%d data_type:%d", __function_name,
 			(int)var->type, (int)value_type, (int)data_type);
@@ -605,7 +606,12 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ret = NOTSUPPORTED;
 		}
 		else
-			SET_DBL_RESULT(result, *var->val.integer);
+		{
+			zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
+
+			if (SUCCEED != set_result_type(result, value_type, data_type, buffer))
+				ret = NOTSUPPORTED;
+		}
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_FLOAT == var->type)
