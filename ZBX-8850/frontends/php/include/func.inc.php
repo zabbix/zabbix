@@ -623,7 +623,7 @@ function convert_units($options = array()) {
 		if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
 			$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
-		$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
+		$options['value'] = sprintf('%.'.ZBX_UNITS_FORMAT_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
 		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
 		$options['value'] = rtrim($options['value'], '.');
 
