@@ -354,7 +354,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
  *                                                                            *
  * Function: parse_item_key                                                   *
  *                                                                            *
- * Purpose: parse item command (key) and fill AGET_REQUEST structure          *
+ * Purpose: parse item command (key) and fill AGENT_REQUEST structure         *
  *                                                                            *
  * Parameters: itemkey - complete item key                                    *
  *                                                                            *
