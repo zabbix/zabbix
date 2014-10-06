@@ -42,7 +42,7 @@ $fields = array(
 	'filter_dnssec' =>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 	'filter_rdds' =>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 	'filter_epp' =>		array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
-	'filter_slv' =>		array(T_ZBX_INT, O_OPT,  null,	null,		null),
+	'filter_slv' =>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
 	'filter_status' =>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
 	// ajax
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
@@ -137,14 +137,11 @@ if ($data['filter_search']) {
 
 $notEmptyResult = true;
 
-if ($data['filter_slv'] > 0
+if ($data['filter_slv'] !== ''
 		&& ($data['filter_dns'] || $data['filter_dnssec'] || $data['filter_rdds']
 			|| $data['filter_epp'])) {
 	$slvValues = explode(',', $data['slv']);
-	if (!in_array($data['filter_slv'], $slvValues)) {
-		show_error_message(_('Not allowed value for "Exceeding or equal to" field'));
-	}
-	else {
+	if ($data['filter_slv'] == SLA_MONITORING_SLV_FILTER_NON_ZERO || in_array($data['filter_slv'], $slvValues)) {
 		$itemCount = 0;
 
 		if ($data['filter_dns']) {
@@ -164,10 +161,17 @@ if ($data['filter_slv'] > 0
 			$itemCount++;
 		}
 
+		if ($data['filter_slv'] == SLA_MONITORING_SLV_FILTER_NON_ZERO) {
+			$filterSlvCondition = '>0';
+		}
+		else {
+			$filterSlvCondition = '>='.$data['filter_slv'];
+		}
+
 		$itemsHostids = DBselect(
 			'SELECT DISTINCT i.hostid'.
 			' FROM items i'.
-			' WHERE i.lastvalue>='.$data['filter_slv'].
+			' WHERE i.lastvalue'.$filterSlvCondition.
 				' AND '.dbConditionString('i.key_', $items['key'])
 		);
 
@@ -178,6 +182,9 @@ if ($data['filter_slv'] > 0
 		if (!isset($options['hostids'])) {
 			$notEmptyResult = false;
 		}
+	}
+	else {
+		show_error_message(_('Not allowed value for "Exceeding or equal to" field'));
 	}
 }
 

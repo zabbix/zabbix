@@ -43,6 +43,9 @@ $filterStatus->addItem(2, _('disabled'));
 
 $filterValue = new CComboBox('filter_slv', isset($this->data['filter_slv']) ? $this->data['filter_slv'] : null);
 $slvs = explode(',', $this->data['slv']);
+$filterValue->addItem('', _('any'));
+$filterValue->addItem(SLA_MONITORING_SLV_FILTER_NON_ZERO, _('non-zero'));
+
 foreach ($slvs as $slv) {
 	$filterValue->addItem($slv, $slv.'%');
 }

@@ -904,6 +904,9 @@ define('RSM_ROLLWEEK_SHIFT_BACK', 180);
 // SLA monitoring start year
 define('SLA_MONITORING_START_YEAR',	2014);
 
+// SLA monitoring extra filter value
+define('SLA_MONITORING_SLV_FILTER_NON_ZERO',	-1);
+
 // SLA monitoring services
 define('RSM_DNS',			0);
 define('RSM_DNSSEC',		1);
