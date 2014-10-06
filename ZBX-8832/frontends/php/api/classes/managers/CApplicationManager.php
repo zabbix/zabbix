@@ -382,9 +382,9 @@ class CApplicationManager {
 	 * is linked to as value.
 	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
 	 *
-	 * For example we have template T1 with application A1 linked to host H1 and H2.
-	 * When we pass A1 to this function it should return array like:
-	 *     array(H1_id => T1_id, H2_id => T1_id);
+	 * For example we have template T1 with application A1 and template T1 with application A2 both linked to hosts H1
+	 * and H2 when we pass A1 to this function it should return array like:
+	 *     array(H1_id => array(T1_id, T2_id), H2_id => array(T1_id, T2_id));
 	 *
 	 * @param array $applications
 	 * @param array $hostIds
@@ -402,7 +402,13 @@ class CApplicationManager {
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
-			$hostsTemplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
+			$hostId = $dbHost['hostid'];
+			$templateId = $dbHost['templateid'];
+
+			if (!isset($hostsTemplatesMap[$hostId])) {
+				$hostsTemplatesMap[$hostId] = array();
+			}
+			$hostsTemplatesMap[$hostId][$templateId] = $templateId;
 		}
 
 		return $hostsTemplatesMap;
@@ -425,7 +431,7 @@ class CApplicationManager {
 			$appId = $application['applicationid'];
 			foreach ($hostApps as $hostId => $hostApp) {
 				// if application template is not linked to host we skip it
-				if ($hostsTemplatesMap[$hostId] != $application['hostid']) {
+				if (!isset($hostsTemplatesMap[$hostId][$application['hostid']])) {
 					continue;
 				}
 
