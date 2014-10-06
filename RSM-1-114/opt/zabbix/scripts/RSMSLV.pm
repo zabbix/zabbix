@@ -33,6 +33,7 @@ use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
 use constant EVENT_OBJECT_TRIGGER => 0;
 use constant EVENT_SOURCE_TRIGGERS => 0;
+use constant TRIGGER_VALUE_FALSE => 0;
 use constant TRIGGER_VALUE_TRUE => 1;
 use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
 use constant SENDER_BATCH_COUNT => 250;
@@ -614,7 +615,7 @@ sub handle_db_error
 {
     my $msg = shift;
 
-    fail("cannot connect to database: $msg");
+    fail("database error: $msg");
 }
 
 sub db_connect
@@ -1554,22 +1555,20 @@ sub get_downtime
     my $till = shift;
     my $no_incidents_check = shift;
 
-    my $eventtimes = ($no_incidents_check) ? [$from, $till] : __get_eventtimes($itemid, $from, $till);
+    my $incidents = ($no_incidents_check) ? [$from, $till] : __get_incidents($itemid, $from, $till);
 
     my $count = 0;
 
-    my $total = scalar(@$eventtimes);
+    my $total = scalar(@$incidents);
     my $i = 0;
     my $downtime = 0;
 
     while ($i < $total)
     {
-	my $event_from = $eventtimes->[$i++];
-	my $event_till = $eventtimes->[$i++];
+	my $event_from = $incidents->[$i++];
+	my $event_till = $incidents->[$i++];
 
-	next if (($event_from < $from) and ($event_till < $from));
-
-	$event_from = $from if ($event_from < $from);
+	fail("internal error handling incidents, check function __get_incidents()") if (($event_from < $from) and ($event_till < $from));
 
 	my $rows_ref = db_select(
 	    "select value,clock".
@@ -1962,15 +1961,19 @@ sub __get_pidfile
 #   1386340290, 1386340470
 # ]
 #
-# if the incident is still onoing at the passed $from time that time will be used
-# as end time
-sub __get_eventtimes
+# An incident is a period when the problem was active. This period is
+# limited by 2 events, the PROBLEM event and the first OK event after
+# that.
+#
+# first ongoing incident will have start time specified as $from
+# last ongoing incident will have end time specified as $till
+sub __get_incidents
 {
     my $itemid = shift;
     my $from = shift;
     my $till = shift;
 
-    my (@eventtimes, $rows_ref);
+    my (@incidents, $rows_ref, $row_ref);
 
     $rows_ref = db_select(
 	"select distinct t.triggerid".
@@ -1984,40 +1987,57 @@ sub __get_eventtimes
     unless ($rows == 1)
     {
 	wrn("item $itemid must have one not classified trigger (found: $rows)");
-	return \@eventtimes;
+	return \@incidents;
     }
 
     my $triggerid = $rows_ref->[0]->[0];
 
-    # select events, where time_from < filter_from and value = TRIGGER_VALUE_TRUE
+    # select previous event to see if $from time gets into PROBLEM state of a trigger
     $rows_ref = db_select(
-	"select clock,value,false_positive".
+	"select max(clock)".
 	" from events".
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
 		" and clock<$from".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-	" order by clock desc,ns desc".
-	" limit 1");
+		" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")");
 
-    my $add_event = 0;
+    my $last_trigger_value = TRIGGER_VALUE_FALSE;
 
-    foreach my $row_ref (@$rows_ref)
+    $row_ref = $rows_ref->[0];
+
+    if (defined($row_ref) and defined($row_ref->[0]))
     {
-	my $clock = $row_ref->[0];
-	my $value = $row_ref->[1];
-	my $false_positive = $row_ref->[2];
+	my $preincident_clock = $row_ref->[0];
 
-	dbg("incident before rolling week detected, clock:$clock, false_positive:$false_positive");
+	$rows_ref = db_select(
+	    "select value,false_positive".
+	    " from events".
+	    " where object=".EVENT_OBJECT_TRIGGER.
+	    	" and source=".EVENT_SOURCE_TRIGGERS.
+	    	" and objectid=$triggerid".
+	    	" and clock=$preincident_clock".
+	    	" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
+	    	" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")".
+	    " order by ns desc".
+	    " limit 1");
+
+	$row_ref = $rows_ref->[0];
+
+	my $value = $row_ref->[0];
+	my $false_positive = $row_ref->[1];
+
+	dbg("event before rolling week detected: value:$value false_positive:$false_positive");
 
 	# we cannot add 'value=TRIGGER_VALUE_TRUE' and 'false_positive!=INCIDENT_FALSE_POSITIVE'
 	# to the SQL query above as we need the latest event before $from
-	if ($value == TRIGGER_VALUE_TRUE)
+	if ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE)
 	{
-	    $add_event = ($false_positive == INCIDENT_FALSE_POSITIVE) ? 0 : 1;
+	    push(@incidents, $from);
+
+	    $last_trigger_value = $value;
 	}
-	push(@eventtimes, $clock) if ($add_event == 1);
     }
 
     $rows_ref = db_select(
@@ -2028,9 +2048,10 @@ sub __get_eventtimes
 		" and objectid=$triggerid".
 		" and clock between $from and $till".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
+		" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")".
 	" order by clock,ns");
 
-    my @unsorted_eventtimes;
+    my @unsorted_incidents;
 
     foreach my $row_ref (@$rows_ref)
     {
@@ -2038,20 +2059,30 @@ sub __get_eventtimes
 	my $value = $row_ref->[1];
 	my $false_positive = $row_ref->[2];
 
-	if ($value == TRIGGER_VALUE_TRUE)
-	{
-	    $add_event = ($false_positive == INCIDENT_FALSE_POSITIVE) ? 0 : 1;
-	}
+	dbg("event: clock:$clock value:$value false_positive:$false_positive");
 
-	push(@unsorted_eventtimes, $clock) if ($add_event == 1);
+	$value = TRIGGER_VALUE_FALSE if ($value == TRIGGER_VALUE_TRUE and $false_positive == INCIDENT_FALSE_POSITIVE);
+
+	next if ($value == $last_trigger_value);
+
+	push(@incidents, $clock);
+
+	$last_trigger_value = $value;
     }
 
-    push(@eventtimes, $_) foreach (sort(@unsorted_eventtimes));
-    push(@eventtimes, $till) unless ((scalar(@eventtimes) % 2) == 0);
+    push(@incidents, $_) foreach (sort(@unsorted_incidents));
+    push(@incidents, $till) if ($last_trigger_value == TRIGGER_VALUE_TRUE);
 
-    dbg("eventtimes: ", join(',', @eventtimes));
+    # debug
+    my $i = 0;
+    while ($i < scalar(@incidents))
+    {
+	my $inc_from = $incidents[$i++];
+	my $inc_till = $incidents[$i++];
+	dbg(ts_str($inc_from), " ($inc_from) -> ", ts_str($inc_till), " ($inc_till)");
+    }
 
-    return \@eventtimes;
+    return \@incidents;
 }
 
 # Times when probe "lastaccess" under limit.
