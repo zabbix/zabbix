@@ -52,65 +52,6 @@ static ZBX_METRIC	*commands = NULL;
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_command                                                    *
- *                                                                            *
- * Purpose: parses item key and splits it into command and parameters         *
- *                                                                            *
- * Return value: ZBX_COMMAND_ERROR - error                                    *
- *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters      *
- *               ZBX_COMMAND_WITH_PARAMS - command with parameters            *
- *                                                                            *
- ******************************************************************************/
-static int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
-{
-	const char	*pl, *pr;
-	size_t		sz;
-
-	for (pl = key; SUCCEED == is_key_char(*pl); pl++)
-		;
-
-	if (pl == key)
-		return ZBX_COMMAND_ERROR;
-
-	if (NULL != cmd)
-	{
-		if (cmd_max_len <= (sz = (size_t)(pl - key)))
-			return ZBX_COMMAND_ERROR;
-
-		memcpy(cmd, key, sz);
-		cmd[sz] = '\0';
-	}
-
-	if ('\0' == *pl)	/* no parameters specified */
-	{
-		if (NULL != param)
-			*param = '\0';
-		return ZBX_COMMAND_WITHOUT_PARAMS;
-	}
-
-	if ('[' != *pl)		/* unsupported character */
-		return ZBX_COMMAND_ERROR;
-
-	for (pr = ++pl; '\0' != *pr; pr++)
-		;
-
-	if (']' != *--pr)
-		return ZBX_COMMAND_ERROR;
-
-	if (NULL != param)
-	{
-		if (param_max_len <= (sz = (size_t)(pr - pl)))
-			return ZBX_COMMAND_ERROR;
-
-		memcpy(param, pl, sz);
-		param[sz] = '\0';
-	}
-
-	return ZBX_COMMAND_WITH_PARAMS;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: parse_command_dyn                                                *
  *                                                                            *
  * Purpose: parses item key and splits it into command and parameters         *
@@ -188,32 +129,34 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
-	int		i;
-	char		key[MAX_STRING_LEN], parameters[MAX_STRING_LEN];
+	int		ret;
 	unsigned	flag = CF_USERPARAMETER;
 	ZBX_METRIC	metric;
+	AGENT_REQUEST	request;
 
-	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), parameters, sizeof(parameters))))
+	init_request(&request);
+
+	if (SUCCEED == (ret = parse_item_key(itemkey, &request)))
 	{
-		zbx_strlcpy(error, "syntax error", max_error_len);
-		return FAIL;
-	}
-	else if (ZBX_COMMAND_WITH_PARAMS == i)
-	{
-		if (0 != strcmp(parameters, "*"))	/* must be '*' parameters */
-		{
-			zbx_strlcpy(error, "syntax error", max_error_len);
-			return FAIL;
-		}
-		flag |= CF_HAVEPARAMS;
+		if (1 == get_rparams_num(&request) && 0 == strcmp("[*]", itemkey + strlen(get_rkey(&request))))
+			flag |= CF_HAVEPARAMS;
+		else if (0 != get_rparams_num(&request))
+			ret = FAIL;
 	}
 
-	metric.key = key;
-	metric.flags = flag;
-	metric.function = &EXECUTE_USER_PARAMETER;
-	metric.test_param = command;
+	if (SUCCEED == ret)
+	{
+		metric.key = get_rkey(&request);
+		metric.flags = flag;
+		metric.function = &EXECUTE_USER_PARAMETER;
+		metric.test_param = command;
 
-	return add_metric(&metric, error, max_error_len);
+		ret = add_metric(&metric, error, max_error_len);
+	}
+
+	free_request(&request);
+
+	return ret;
 }
 
 void	init_metrics()
