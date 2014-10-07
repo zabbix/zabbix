@@ -336,7 +336,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : (double)pct_size / (double)proccount);
+			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
