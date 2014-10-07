@@ -843,8 +843,7 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => array('itemid', 'name'),
-		'selectHostDiscovery' => array('ts_delete'),
-		'limit' => $config['search_limit'] + 1
+		'selectHostDiscovery' => array('ts_delete')
 	));
 	order_result($hosts, $sortField, $sortOrder);
 
