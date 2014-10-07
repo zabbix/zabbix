@@ -67,8 +67,7 @@ if (isset($_REQUEST['mark_incident']) && CWebUser::getType() >= USER_TYPE_ZABBIX
 		'eventids' => get_request('eventid'),
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array(
-			'value' => TRIGGER_VALUE_TRUE,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			'value' => TRIGGER_VALUE_TRUE
 		)
 	));
 
@@ -320,7 +319,6 @@ if ($host || $data['filter_search']) {
 					' FROM events e'.
 					' WHERE e.objectid='.$triggerId.
 						' AND e.clock<'.$filterTimeFrom.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND source='.EVENT_SOURCE_TRIGGERS.
 					' ORDER BY e.clock DESC',
@@ -340,10 +338,7 @@ if ($host || $data['filter_search']) {
 				'object' => EVENT_OBJECT_TRIGGER,
 				'selectTriggers' => API_OUTPUT_REFER,
 				'time_from' => $filterTimeFrom,
-				'time_till' => $filterTimeTill,
-				'filter' => array(
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES
-				)
+				'time_till' => $filterTimeTill
 			));
 
 			if ($newEventIds) {
@@ -360,10 +355,19 @@ if ($host || $data['filter_search']) {
 
 			$i = 0;
 			$incidents = array();
+			$lastEventValue = array();
 
 			// data generation
 			foreach ($events as $event) {
 				$getHistory = false;
+
+				if (isset($lastEventValue[$event['objectid']])
+						&& $lastEventValue[$event['objectid']] == $event['value']) {
+					continue;
+				}
+				else {
+					$lastEventValue[$event['objectid']] = $event['value'];
+				}
 
 				if ($event['value'] == TRIGGER_VALUE_TRUE) {
 					if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
@@ -376,8 +380,7 @@ if ($host || $data['filter_search']) {
 							'selectTriggers' => API_OUTPUT_REFER,
 							'time_from' => $filterTimeTill,
 							'filter' => array(
-								'value' => TRIGGER_VALUE_FALSE,
-								'value_changed' => TRIGGER_VALUE_CHANGED_YES
+								'value' => TRIGGER_VALUE_FALSE
 							),
 							'limit' => 1,
 							'sortorder' => ZBX_SORT_UP
@@ -506,8 +509,7 @@ if ($host || $data['filter_search']) {
 							'selectTriggers' => API_OUTPUT_REFER,
 							'time_till' => $event['clock'] - 1,
 							'filter' => array(
-								'value' => TRIGGER_VALUE_TRUE,
-								'value_changed' => TRIGGER_VALUE_CHANGED_YES
+								'value' => TRIGGER_VALUE_TRUE
 							),
 							'limit' => 1,
 							'sortorder' => ZBX_SORT_DOWN
@@ -650,8 +652,7 @@ if ($host || $data['filter_search']) {
 					'selectTriggers' => API_OUTPUT_REFER,
 					'time_from' => $filterTimeTill,
 					'filter' => array(
-						'value' => TRIGGER_VALUE_FALSE,
-						'value_changed' => TRIGGER_VALUE_CHANGED_YES
+						'value' => TRIGGER_VALUE_FALSE
 					),
 					'limit' => 1,
 					'sortorder' => ZBX_SORT_UP
