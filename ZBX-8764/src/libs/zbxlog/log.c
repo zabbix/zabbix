@@ -489,7 +489,8 @@ char	*strerror_from_system(unsigned long error)
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
+	/* we don't know the inserts so we pass NULL and enable appropriate flag */
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, ZBX_MESSAGE_BUF_SIZE, NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
@@ -513,19 +514,18 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	char		*strings[2];
 	HMODULE		hmodule;
 	/* !!! Attention: static !!! not thread-safe for Win32 */
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
-	memset(strings, 0, sizeof(char *) * 2);
 	*utf8_string = '\0';
 	hmodule = GetModuleHandle(module);
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY, hmodule, error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), strings))
+	/* we don't know the inserts so we pass NULL and enable appropriate flag */
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS, hmodule, error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
 				"unable to find message text: %s", strerror_from_system(GetLastError()));
