@@ -130,7 +130,7 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		ret;
-	unsigned	flag = CF_USERPARAMETER;
+	unsigned	flags = CF_USERPARAMETER;
 	ZBX_METRIC	metric;
 	AGENT_REQUEST	request;
 
@@ -139,7 +139,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 	if (SUCCEED == (ret = parse_item_key(itemkey, &request)))
 	{
 		if (1 == get_rparams_num(&request) && 0 == strcmp("[*]", itemkey + strlen(get_rkey(&request))))
-			flag |= CF_HAVEPARAMS;
+			flags |= CF_HAVEPARAMS;
 		else if (0 != get_rparams_num(&request))
 			ret = FAIL;
 	}
@@ -147,7 +147,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 	if (SUCCEED == ret)
 	{
 		metric.key = get_rkey(&request);
-		metric.flags = flag;
+		metric.flags = flags;
 		metric.function = &EXECUTE_USER_PARAMETER;
 		metric.test_param = command;
 
@@ -500,7 +500,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "0x%02x", *c);
 		}
 
-		zbx_snprintf(error, max_error_len, "special characters \"%s\" are not allowed in the parameters", buf);
+		zbx_snprintf(error, max_error_len, "Special characters \"%s\" are not allowed in the parameters.", buf);
 
 		zbx_free(buf);
 
