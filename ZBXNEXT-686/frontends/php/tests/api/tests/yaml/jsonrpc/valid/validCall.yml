@@ -14,5 +14,5 @@ steps:
     assertResponse:
       jsonrpc: "2.0"
       result:
-        _assert: 'string|length(32, 32)'
+        _assert: { string: { regex: "/^[a-zA-Z0-9]{32}$/" } }
       id: 1

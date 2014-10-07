@@ -58,19 +58,19 @@ class CTestSchemaValidatorTest extends CValidatorTest {
 			// assertions
 			array(
 				array(
-					'schema' => array('_assert' => 'string')
+					'schema' => array('_assert' => array('string' => null))
 				),
 				'string2',
 			),
 			array(
 				array(
-					'schema' => array('_keys' => 'arr')
+					'schema' => array('_keys' => array('collection' => null))
 				),
 				array(1, 2, 3)
 			),
 			array(
 				array(
-					'schema' => array('_each' => 'string')
+					'schema' => array('_each' => array('string' => null))
 				),
 				array('string', 'string2')
 			),
@@ -182,21 +182,21 @@ class CTestSchemaValidatorTest extends CValidatorTest {
 			// assertions
 			array(
 				array(
-					'schema' => array('_assert' => 'arr')
+					'schema' => array('_assert' => array('collection' => null))
 				),
 				'string2',
-				'Value "string2" for path "" doesn\'t match assertion "arr"'
+				'Value "string2" for path "" doesn\'t match assertion "collection"'
 			),
 			array(
 				array(
-					'schema' => array('_keys' => 'string')
+					'schema' => array('_keys' => array('string' => null))
 				),
 				array(1, 2, 3),
 				'Value [0,1,2] for path "" doesn\'t match assertion "string"'
 			),
 			array(
 				array(
-					'schema' => array('_each' => 'string')
+					'schema' => array('_each' => array('string' => null))
 				),
 				array(array()),
 				'Value [] for path "0" doesn\'t match assertion "string"'

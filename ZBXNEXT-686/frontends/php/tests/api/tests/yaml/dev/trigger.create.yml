@@ -13,7 +13,7 @@ steps:
 
     assertResult:
       triggerids:
-        _assert: arr|length(1)
+        _assert: { collection: ~ }
 
   step2:
     request:
@@ -28,7 +28,7 @@ steps:
         triggerid: @steps.step1.response.result.triggerids[0]@
 
         # since we don't know the ID of the function, validate the expression using a regex
-        expression: { _assert: "regex(\"^{[0-9]+}<1024$\")" }
+        expression: { _assert: { string: { regex: "/^{[0-9]+}<1024$/" } } }
 
         description: @steps.step1.request.params.description@
         url: ""
@@ -45,8 +45,8 @@ steps:
         functions:
           -
             # assert that IDs are strings
-            functionid: { _assert: string }
-            itemid: { _assert: string }
+            functionid: { _assert: { id: ~ } }
+            itemid: { _assert: { id: ~ } }
 
             triggerid: @steps.step1.response.result.triggerids[0]@
             function: "last"
@@ -55,7 +55,7 @@ steps:
         # make sure that the trigger was created on the correct host
         hosts:
           -
-            hostid: { _assert: string }
+            hostid: { _assert: { id: ~ } }
             host: Zabbix server
 
   # validate that the expression and descriptions are expanded correctly

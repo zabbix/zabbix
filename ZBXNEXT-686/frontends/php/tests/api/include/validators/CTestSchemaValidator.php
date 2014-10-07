@@ -21,8 +21,31 @@
 
 class CTestSchemaValidator extends CValidator {
 
-	public $schema = false;
+	/**
+	 * Schema to compare the value against.
+	 *
+	 * The schema and each of it's elements can contain the following values:
+	 * - null 					- the value will not be validated;
+	 * - a literal value 		- can be a string, array, int etc; the value will be compared to the given literal;
+	 * 							arrays will be compared recursively;
+	 * - an "assertion array" 	- an array containing one of these reserved keys used to perform advanced checks.
+	 *
+	 * The following keys are supported for assertion arrays:
+	 * - _assert	- a validator schema to compare the value against where keys are validator names and
+	 * 				values - arrays of parameters that will be passed to the validator; validator names will be translated
+	 * 				to class names, for instance, "string" into "CStringValidator";
+	 * - _keys		- a validator schema that will be used to validate keys of array values;
+	 * - _each		- a validator schema that will be used to validate each array value.
+	 *
+	 * @var mixed
+	 */
+	public $schema;
 
+	/**
+	 * Error message for invalid values.
+	 *
+	 * @var string
+	 */
 	public $messageError = '%s';
 
 	public function validate($values) {
@@ -38,6 +61,17 @@ class CTestSchemaValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Recursively checks the value against the schema.
+	 *
+	 * @param mixed $values
+	 * @param mixed $schema		see self::$schema
+	 * @param array $path		the path to the current value
+	 *
+	 * @return bool
+	 *
+	 * @throws InvalidArgumentException
+	 */
 	protected function checkRecursive($values, $schema, array $path = array()) {
 		// a literal array
 		if (is_array($schema)) {
@@ -58,6 +92,15 @@ class CTestSchemaValidator extends CValidator {
 		return true;
 	}
 
+	/**
+	 * Recursively check a literal array
+	 *
+	 * @param array $values
+	 * @param mixed	$schema
+	 * @param array $path
+	 *
+	 * @throws InvalidArgumentException
+	 */
 	protected function checkLiteralArray(array $values, $schema, array $path) {
 		foreach ($values as $field => $value) {
 			$subpath = $path;
@@ -84,7 +127,14 @@ class CTestSchemaValidator extends CValidator {
 		}
 	}
 
-	protected function checkAssertArray($values, array $schema, $path) {
+	/**
+	 * Check an assertion array.
+	 *
+	 * @param mixed $values
+	 * @param array $schema
+	 * @param array $path
+	 */
+	protected function checkAssertArray($values, array $schema, array $path) {
 		if (isset($schema['_assert'])) {
 			$this->checkAssert($values, $schema['_assert'], $path);
 		}
@@ -103,42 +153,35 @@ class CTestSchemaValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Returns true if the schema in an assertion array.
+	 *
+	 * @param $schema
+	 * @return bool
+	 */
 	protected function isAssertArray($schema) {
 		return array_key_exists('_assert', $schema)
 				|| array_key_exists('_each', $schema)
 				|| array_key_exists('_keys', $schema);
 	}
 
-
-	protected function checkAssert($value, $assert, array $path) {
-		$rules = explode('|', $assert);
-		$validator = Respect\Validation\Validator::create();
-
-		foreach ($rules as $rule) {
-			preg_match("/^(?'rule'[a-z]+)(\((?'params'[^)]+)\)){0,1}$/i", $rule, $matches);
-
-			if (!isset($matches['rule'])) {
-				throw new \Exception(sprintf('Can not parse validation rule "%s"', $rule));
-			}
-
-			$rule = $matches['rule'];
-
-			if (isset($matches['params'])) {
-				$params = explode(',', $matches['params']);
-				$params = array_map(function ($value) {
-					return trim($value);
-				}, $params);
-			} else {
-				$params = array();
-			}
-
-			$validatorInstance = call_user_func_array(array($validator, $rule), $params);
-			/* @var $validatorInstance AbstractRule */
-			try {
-				$validatorInstance->assert($value);
-			} catch (\InvalidArgumentException $e) {
+	/**
+	 * Check a particular assertion.
+	 *
+	 * @param mixed $value
+	 * @param array $assert
+	 * @param array $path
+	 *
+	 * @throws InvalidArgumentException
+	 */
+	protected function checkAssert($value, array $assert, array $path) {
+		foreach ($assert as $name => $params) {
+			$validatorClass = 'C'.ucfirst($name).'Validator';
+			$validator = new $validatorClass(($params === null) ? array() : $params);
+			/* @var $validator CValidator */
+			if (!$validator->validate($value)) {
 				throw new InvalidArgumentException(
-					'Value '.json_encode($value).' for path "'.implode('->', $path).'" doesn\'t match assertion "'.$assert.'"'
+					'Value '.json_encode($value).' for path "'.implode('->', $path).'" doesn\'t match assertion "'.$name.'"'
 				);
 			}
 		}

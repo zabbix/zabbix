@@ -11,4 +11,4 @@ steps:
         password: zabbix
 
     assertResult:
-      _assert: 'string|length(32, 32)'
+       _assert: { string: { regex: "/^[a-zA-Z0-9]{32}$/" } }

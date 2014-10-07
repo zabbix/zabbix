@@ -20,7 +20,7 @@ steps:
 
     assertResult:
       hostids:
-        - { _assert: string }
+        - { _assert: { id: ~ } }
 
   step2:
     request:

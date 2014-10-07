@@ -27,7 +27,7 @@ steps:
     assertResult:
       hostids:
         # "_assert" makes sure that the value passes the given validator
-        - { _assert: string }
+        - { _assert: { id: ~ } }
 
   # Step 2, retrieve the newly created host and check that it has a correct host name and status
   step2:
@@ -92,12 +92,15 @@ steps:
 
     assertResult:
       hostids:
-        # check that "hostis" is an array containing one element
-        _assert: arr|length(1)
+        # check that "hostis" is a non-empty array
+        _assert:
+          collection: { empty: false }
         # check that the keys are sequential, i.e., 0, 1, 2 etc
-        _keys: sequence
-        # check that each element is a string
-        _each: string
+        _keys:
+          collection: { empty: false }
+        # check that each element is an ID
+        _each:
+          id: ~
 
   # Step 5, try to call the host.create method without an authentication token
   step5:

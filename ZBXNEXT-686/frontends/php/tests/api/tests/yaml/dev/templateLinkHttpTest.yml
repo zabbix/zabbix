@@ -82,9 +82,9 @@ steps:
 
     assertResult:
       -
-        httptestid: { _assert: string }
+        httptestid: { _assert: { id: ~ } }
         name: "Web scenario"
-        applicationid: { _assert: string }
+        applicationid: { _assert: { id: ~ } }
         nextcheck: 0
         delay: 100
         status: 0
@@ -105,8 +105,8 @@ steps:
         templateid: @fixtures.httpTest.result.httptestids[0]@
         steps:
           -
-            httpstepid: { _assert: string }
-            httptestid: { _assert: string }
+            httpstepid: { _assert: { id: ~ } }
+            httptestid: { _assert: { id: ~ } }
             name: "Step 1"
             no: 1
             url: "http://zabbix.com"
@@ -119,8 +119,8 @@ steps:
             retrieve_mode: 0
             headers: "Accept: text/plain"
           -
-            httpstepid: { _assert: string }
-            httptestid: { _assert: string }
+            httpstepid: { _assert: { id: ~ } }
+            httptestid: { _assert: { id: ~ } }
             name: "Step 2"
             no: 2
             url: "http://google.com"
