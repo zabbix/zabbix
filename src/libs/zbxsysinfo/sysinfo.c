@@ -153,6 +153,8 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 
 		ret = add_metric(&metric, error, max_error_len);
 	}
+	else
+		zbx_strlcpy(error, "syntax error", max_error_len);
 
 	free_request(&request);
 
