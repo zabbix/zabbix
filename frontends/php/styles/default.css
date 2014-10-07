@@ -193,6 +193,7 @@ textarea.textarea_big { height: auto; }
 .link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
 .link_menu[disabled] { color: #ddd; cursor: default; border: 0; background-color: white; }
 .link_menu[disabled]:hover { border: 0; }
+.link_menu.first { margin-right: 10px; }
 
 /* transparent - must be after input! */
 .transparent { border: 0; background-color: transparent; }

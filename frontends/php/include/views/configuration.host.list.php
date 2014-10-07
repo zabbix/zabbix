@@ -50,7 +50,7 @@ $filterButton->useJQueryStyle('main');
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 $resetButton->useJQueryStyle();
 
-$divButtons = new CDiv(array($filterButton, ' ', $resetButton));
+$divButtons = new CDiv(array($filterButton, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
