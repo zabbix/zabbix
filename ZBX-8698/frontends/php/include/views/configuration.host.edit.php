@@ -217,7 +217,7 @@ if (!$isDiscovered) {
 		$tmp_label .= ' '._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(' ', array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
+	$hostList->addRow(null, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
 // groups for discovered hosts
 else {
@@ -333,13 +333,13 @@ else {
 
 	// header
 	$ifTab->addRow(array(
-		new CCol(' ', 'interface-drag-control'),
+		new CCol(null, 'interface-drag-control'),
 		new CCol(_('IP address'), 'interface-ip'),
 		new CCol(_('DNS name'), 'interface-dns'),
 		new CCol(_('Connect to'), 'interface-connect-to'),
 		new CCol(_('Port'), 'interface-port'),
 		new CCol(_('Default'), 'interface-default'),
-		new CCol(' ', 'interface-control')
+		new CCol(null, 'interface-control')
 	));
 
 	$row = new CRow(null, null, 'agentIterfacesFooter');
@@ -697,13 +697,11 @@ if (!$isDiscovered) {
 			array(
 				$templateLink,
 				array(
-					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
-					' ',
-					' ',
+					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu first'),
 					isset($originalTemplates[$template['templateid']]) && !$cloneOrFullClone
 						? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
-						: ' '
-				)
+						: null
+					)
 			),
 			null, 'conditions_'.$template['templateid']
 		);
@@ -820,7 +818,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(' ', new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(null, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
