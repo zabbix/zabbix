@@ -30,7 +30,6 @@ use constant MIN_INFO_ERROR => -211;
 use constant MAX_INFO_ERROR => -209;
 
 use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
-use constant TRIGGER_VALUE_CHANGED_YES => 1;
 use constant EVENT_OBJECT_TRIGGER => 0;
 use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant TRIGGER_VALUE_FALSE => 0;
@@ -1999,9 +1998,7 @@ sub __get_incidents
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
-		" and clock<$from".
-		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-		" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")");
+		" and clock<$from");
 
     my $last_trigger_value = TRIGGER_VALUE_FALSE;
 
@@ -2018,8 +2015,6 @@ sub __get_incidents
 	    	" and source=".EVENT_SOURCE_TRIGGERS.
 	    	" and objectid=$triggerid".
 	    	" and clock=$preincident_clock".
-	    	" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-	    	" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")".
 	    " order by ns desc".
 	    " limit 1");
 
@@ -2047,8 +2042,6 @@ sub __get_incidents
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
 		" and clock between $from and $till".
-		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-		" and value in (".TRIGGER_VALUE_TRUE.",".TRIGGER_VALUE_FALSE.")".
 	" order by clock,ns");
 
     my @unsorted_incidents;
@@ -2061,7 +2054,11 @@ sub __get_incidents
 
 	dbg("event: clock:$clock value:$value false_positive:$false_positive");
 
-	$value = TRIGGER_VALUE_FALSE if ($value == TRIGGER_VALUE_TRUE and $false_positive == INCIDENT_FALSE_POSITIVE);
+	# incident is stopped unless PROBLEM and NOT FALSE POSITIVE event
+	if ($value != TRIGGER_VALUE_FALSE)
+	{
+	    $value = TRIGGER_VALUE_FALSE unless ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE);
+	}
 
 	next if ($value == $last_trigger_value);
 
