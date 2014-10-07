@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 13:50+0300\n"
+"POT-Creation-Date: 2014-09-28 11:18+0300\n"
 "PO-Revision-Date: 2014-03-25 02:18+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -348,8 +348,8 @@ msgstr "終了日時"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
-#: include/blocks.inc.php:1314 include/forms.inc.php:1703
-#: include/forms.inc.php:2007 include/reports.inc.php:332
+#: include/blocks.inc.php:1314 include/forms.inc.php:1702
+#: include/forms.inc.php:2006 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
@@ -625,7 +625,7 @@ msgstr "メンテナンス待ち"
 msgid "Apr"
 msgstr "4月"
 
-#: include/forms.inc.php:1554 include/func.inc.php:107
+#: include/forms.inc.php:1553 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "4月"
@@ -666,7 +666,7 @@ msgstr "資産タグ"
 msgid "At"
 msgstr "開始時刻"
 
-#: include/forms.inc.php:1680
+#: include/forms.inc.php:1679
 msgid "At (hour:minute)"
 msgstr "開始時刻 (時:分)"
 
@@ -698,7 +698,7 @@ msgstr "監査ログ"
 msgid "Aug"
 msgstr "8月"
 
-#: include/forms.inc.php:1546 include/func.inc.php:111
+#: include/forms.inc.php:1545 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "8月"
@@ -1099,7 +1099,7 @@ msgid "Canada (136 characters)"
 msgstr "カナダ (136文字)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
-#: include/forms.inc.php:1705 include/forms.inc.php:2008
+#: include/forms.inc.php:1704 include/forms.inc.php:2007
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.action.edit.php:962
@@ -2028,7 +2028,7 @@ msgstr "値のマッピングを更新できません"
 msgid "Caption"
 msgstr "説明"
 
-#: include/forms.inc.php:1906 include/forms.inc.php:2002
+#: include/forms.inc.php:1905 include/forms.inc.php:2001
 msgid "Case sensitive"
 msgstr "大文字小文字を区別"
 
@@ -2159,7 +2159,7 @@ msgstr "リンク削除時にクリア"
 msgid "Clock"
 msgstr "時刻"
 
-#: include/forms.inc.php:1870
+#: include/forms.inc.php:1869
 #: include/views/administration.general.iconmap.edit.php:141
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
@@ -2221,7 +2221,7 @@ msgstr "スクリーンの要素の列結合の位置 X - %1$s と Y - %2$s が�
 msgid "Columns"
 msgstr "列"
 
-#: include/forms.inc.php:1842
+#: include/forms.inc.php:1841
 msgid "Combined result"
 msgstr "最終結果"
 
@@ -2895,7 +2895,7 @@ msgstr "DNS名"
 msgid "DOWN"
 msgstr "DOWN"
 
-#: include/forms.inc.php:1503 include/maintenances.inc.php:35
+#: include/forms.inc.php:1502 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
 #: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
@@ -2985,7 +2985,7 @@ msgstr "データベースタイプ"
 msgid "Database user"
 msgstr "データベースユーザー"
 
-#: include/forms.inc.php:1589 include/forms.inc.php:1674 jsrpc.php:137
+#: include/forms.inc.php:1588 include/forms.inc.php:1673 jsrpc.php:137
 msgid "Date"
 msgstr "日付"
 
@@ -3005,12 +3005,12 @@ msgstr "ハードウェアメンテナンス終了日"
 msgid "Date HW purchased"
 msgstr "ハードウェア購入日"
 
-#: include/forms.inc.php:1589 report3.php:126 report4.php:161 report5.php:45
+#: include/forms.inc.php:1588 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
 msgstr "日"
 
-#: include/forms.inc.php:1617
+#: include/forms.inc.php:1616
 msgid "Day of month"
 msgstr "日"
 
@@ -3030,8 +3030,8 @@ msgstr "現在の月の日付 > N"
 msgid "Day of month is NOT N"
 msgstr "現在の月の日付 NOT N"
 
-#: include/forms.inc.php:1532 include/forms.inc.php:1589
-#: include/forms.inc.php:1613
+#: include/forms.inc.php:1531 include/forms.inc.php:1588
+#: include/forms.inc.php:1612
 msgid "Day of week"
 msgstr "曜日"
 
@@ -3051,7 +3051,7 @@ msgstr "現在の曜日 > N"
 msgid "Day of week is NOT N"
 msgstr "現在の曜日 NOT N"
 
-#: include/forms.inc.php:1695 tr_status.php:207 tr_status.php:209
+#: include/forms.inc.php:1694 tr_status.php:207 tr_status.php:209
 msgid "Days"
 msgstr "日"
 
@@ -3073,7 +3073,7 @@ msgstr "デバッグモードを更新しました"
 msgid "Dec"
 msgstr "12月"
 
-#: include/forms.inc.php:1566 include/func.inc.php:115
+#: include/forms.inc.php:1565 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "12月"
@@ -3137,7 +3137,7 @@ msgstr "間隔 (秒)"
 msgid "Delayed by"
 msgstr "遅延時間"
 
-#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1936
+#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1935
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:328 tr_logform.php:345
@@ -3214,7 +3214,7 @@ msgstr "ネットワークマップを削除しますか？"
 msgid "Delete proxy?"
 msgstr "プロキシを削除しますか？"
 
-#: include/forms.inc.php:1872
+#: include/forms.inc.php:1871
 msgid "Delete regular expression?"
 msgstr "正規表現を削除しますか？"
 
@@ -3461,8 +3461,8 @@ msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
-#: include/forms.inc.php:1833 include/forms.inc.php:1914
-#: include/forms.inc.php:1994
+#: include/forms.inc.php:1832 include/forms.inc.php:1913
+#: include/forms.inc.php:1993
 msgid "Delimiter"
 msgstr "区切り文字"
 
@@ -3733,7 +3733,6 @@ msgstr "ディスカバリオブジェクト"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1114 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
 msgstr "ディスカバリルール"
@@ -3771,6 +3770,7 @@ msgid "Discovery rule updated"
 msgstr "ディスカバリのルールを更新しました"
 
 #: include/html.inc.php:489 include/html.inc.php:493
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -3987,7 +3987,7 @@ msgstr "イベント"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "各URLの名前は重複できません。同じURL名が利用されていないか確認してください"
 
-#: include/forms.inc.php:1907 include/forms.inc.php:1921
+#: include/forms.inc.php:1906 include/forms.inc.php:1920
 #: include/views/administration.users.edit.php:164
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:377
@@ -4293,11 +4293,11 @@ msgstr "イベントソースの詳細"
 msgid "Events"
 msgstr "イベント"
 
-#: include/forms.inc.php:1515
+#: include/forms.inc.php:1514
 msgid "Every day(s)"
 msgstr "繰返し間隔(日)"
 
-#: include/forms.inc.php:1522
+#: include/forms.inc.php:1521
 msgid "Every week(s)"
 msgstr "繰返し間隔(週)"
 
@@ -4343,7 +4343,7 @@ msgstr "マクロの展開"
 msgid "Expand single problem"
 msgstr "障害が1つのときに詳細を展開"
 
-#: include/forms.inc.php:1774 include/forms.inc.php:1905
+#: include/forms.inc.php:1773 include/forms.inc.php:1904
 msgid "Expected result"
 msgstr "期待値"
 
@@ -4370,8 +4370,8 @@ msgstr "選択をエクスポート"
 msgid "Export to CSV"
 msgstr "CSVエクスポート"
 
-#: include/forms.inc.php:1773 include/forms.inc.php:1904
-#: include/forms.inc.php:1977 include/triggers.inc.php:1646
+#: include/forms.inc.php:1772 include/forms.inc.php:1903
+#: include/forms.inc.php:1976 include/triggers.inc.php:1646
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4398,7 +4398,7 @@ msgstr "条件式は必須のパラメータです"
 msgid "Expression constructor"
 msgstr "条件式ビルダー"
 
-#: include/forms.inc.php:1986
+#: include/forms.inc.php:1985
 msgid "Expression type"
 msgstr "条件式の形式"
 
@@ -4421,7 +4421,7 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "F"
 
-#: include/forms.inc.php:1829 include/forms.inc.php:1849
+#: include/forms.inc.php:1828 include/forms.inc.php:1848
 msgid "FALSE"
 msgstr "偽"
 
@@ -4472,7 +4472,7 @@ msgstr "お気に入り"
 msgid "Feb"
 msgstr "2月"
 
-#: include/forms.inc.php:1544 include/func.inc.php:105
+#: include/forms.inc.php:1543 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "2月"
@@ -4549,7 +4549,7 @@ msgstr "終了"
 msgid "Finnish (fi_FI)"
 msgstr "フィンランド語 (fi_FI)"
 
-#: include/forms.inc.php:1595 include/maintenances.inc.php:103
+#: include/forms.inc.php:1594 include/maintenances.inc.php:103
 msgid "First"
 msgstr "第1週"
 
@@ -4580,7 +4580,7 @@ msgstr "ゲストのパスワードは空白である必要があります"
 msgid "Formula"
 msgstr "式"
 
-#: include/forms.inc.php:1598 include/maintenances.inc.php:106
+#: include/forms.inc.php:1597 include/maintenances.inc.php:106
 msgid "Fourth"
 msgstr "第4週"
 
@@ -4592,7 +4592,7 @@ msgstr "フランス語 (fr_FR)"
 msgid "Fri"
 msgstr "金"
 
-#: include/forms.inc.php:1529 include/forms.inc.php:1610
+#: include/forms.inc.php:1528 include/forms.inc.php:1609
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
 msgstr "金曜"
@@ -5196,7 +5196,7 @@ msgstr "ホスト(昇順)"
 msgid "Host IP"
 msgstr "ホストのIPアドレス"
 
-#: include/forms.inc.php:1715
+#: include/forms.inc.php:1714
 msgid "Host Inventory"
 msgstr "ホストインベントリ"
 
@@ -5402,7 +5402,7 @@ msgstr "ホストを更新しました"
 msgid "Hourly"
 msgstr "毎時間"
 
-#: include/forms.inc.php:1697
+#: include/forms.inc.php:1696
 msgid "Hours"
 msgstr "時間"
 
@@ -6739,7 +6739,7 @@ msgstr "JabberID"
 msgid "Jan"
 msgstr "1月"
 
-#: include/forms.inc.php:1539 include/func.inc.php:104
+#: include/forms.inc.php:1538 include/func.inc.php:104
 #: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "1月"
@@ -6752,7 +6752,7 @@ msgstr "日本語 (ja_JP)"
 msgid "Jul"
 msgstr "7月"
 
-#: include/forms.inc.php:1541 include/func.inc.php:110
+#: include/forms.inc.php:1540 include/func.inc.php:110
 #: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "7月"
@@ -6761,7 +6761,7 @@ msgstr "7月"
 msgid "Jun"
 msgstr "6月"
 
-#: include/forms.inc.php:1564 include/func.inc.php:109
+#: include/forms.inc.php:1563 include/func.inc.php:109
 #: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "6月"
@@ -6883,7 +6883,7 @@ msgstr "ラベルの位置"
 msgid "Language"
 msgstr "言語"
 
-#: include/forms.inc.php:1599 include/maintenances.inc.php:107
+#: include/forms.inc.php:1598 include/maintenances.inc.php:107
 msgid "Last"
 msgstr "最新"
 
@@ -7323,7 +7323,7 @@ msgstr "メンテナンスを追加しました"
 msgid "Maintenance deleted"
 msgstr "メンテナンスを削除しました"
 
-#: include/forms.inc.php:1692
+#: include/forms.inc.php:1691
 msgid "Maintenance period length"
 msgstr "メンテナンス期間"
 
@@ -7439,7 +7439,7 @@ msgstr "マップ"
 msgid "Mar"
 msgstr "3月"
 
-#: include/forms.inc.php:1549 include/func.inc.php:106
+#: include/forms.inc.php:1548 include/func.inc.php:106
 #: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "3月"
@@ -7535,7 +7535,7 @@ msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d cha
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "ホストの表示名は最大%2$d文字です。\"%3$s\"は%1$d文字あります。"
 
-#: include/forms.inc.php:1559 include/func.inc.php:108
+#: include/forms.inc.php:1558 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "5月"
@@ -7716,7 +7716,7 @@ msgstr "期間Tの値の最小値 > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "期間Tの値の最小値 NOT N"
 
-#: include/forms.inc.php:1699
+#: include/forms.inc.php:1698
 msgid "Minutes"
 msgstr "分"
 
@@ -7760,7 +7760,7 @@ msgstr "モデル"
 msgid "Mon"
 msgstr "月"
 
-#: include/forms.inc.php:1525 include/forms.inc.php:1606
+#: include/forms.inc.php:1524 include/forms.inc.php:1605
 #: include/func.inc.php:123 include/func.inc.php:207
 msgid "Monday"
 msgstr "月曜"
@@ -7784,11 +7784,11 @@ msgstr "監視中のホスト"
 msgid "Monitoring"
 msgstr "監視データ"
 
-#: include/forms.inc.php:1568 report3.php:108 report4.php:143 report5.php:47
+#: include/forms.inc.php:1567 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
 msgstr "月"
 
-#: include/forms.inc.php:1505 include/maintenances.inc.php:39
+#: include/forms.inc.php:1504 include/maintenances.inc.php:39
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
@@ -7848,7 +7848,7 @@ msgstr "NTLM認証"
 #: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
-#: include/forms.inc.php:1768 include/hosts.inc.php:114
+#: include/forms.inc.php:1767 include/hosts.inc.php:114
 #: include/reports.inc.php:382 include/setup.inc.php:318
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
@@ -7937,7 +7937,7 @@ msgstr "未監視"
 msgid "Never executed"
 msgstr "未実行"
 
-#: include/forms.inc.php:1935 include/views/configuration.action.edit.php:396
+#: include/forms.inc.php:1934 include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:603
 #: include/views/configuration.action.edit.php:903
 #: include/views/configuration.discovery.edit.php:54
@@ -8010,7 +8010,7 @@ msgid "Next check"
 msgstr "次のチェック"
 
 #: events.php:760 include/config.inc.php:568 include/events.inc.php:302
-#: include/events.inc.php:320 include/forms.inc.php:1920
+#: include/events.inc.php:320 include/forms.inc.php:1919
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
@@ -8722,7 +8722,7 @@ msgstr "通知レポート"
 msgid "Nov"
 msgstr "11月"
 
-#: include/forms.inc.php:1561 include/func.inc.php:114
+#: include/forms.inc.php:1560 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "11月"
@@ -8865,7 +8865,7 @@ msgstr "10月"
 msgid "Octal"
 msgstr "8進数"
 
-#: include/forms.inc.php:1556 include/func.inc.php:113
+#: include/forms.inc.php:1555 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "10月"
@@ -8893,7 +8893,7 @@ msgstr "ステータスが変化したトリガーの点滅期間"
 msgid "Once"
 msgstr "一度だけ"
 
-#: include/forms.inc.php:1502 include/maintenances.inc.php:33
+#: include/forms.inc.php:1501 include/maintenances.inc.php:33
 msgid "One time only"
 msgstr "一度限り"
 
@@ -9435,7 +9435,7 @@ msgstr "パーセンタイルライン (右)"
 msgid "Period"
 msgstr "期間"
 
-#: include/forms.inc.php:1507
+#: include/forms.inc.php:1506
 #: include/views/configuration.maintenance.edit.php:133
 msgid "Period type"
 msgstr "期間のタイプ"
@@ -10087,7 +10087,7 @@ msgstr "レスポンスタイム"
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスタイム"
 
-#: include/forms.inc.php:1775 include/forms.inc.php:1857 tr_testexpr.php:135
+#: include/forms.inc.php:1774 include/forms.inc.php:1856 tr_testexpr.php:135
 #: tr_testexpr.php:167
 msgid "Result"
 msgstr "結果"
@@ -10388,13 +10388,13 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "土"
 
-#: include/forms.inc.php:1530 include/forms.inc.php:1611
+#: include/forms.inc.php:1529 include/forms.inc.php:1610
 #: include/func.inc.php:128 include/func.inc.php:212
 msgid "Saturday"
 msgstr "土曜"
 
-#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1703
-#: include/forms.inc.php:1861 include/forms.inc.php:2007
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1702
+#: include/forms.inc.php:1860 include/forms.inc.php:2006
 #: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
@@ -10653,7 +10653,7 @@ msgstr "検索パターンが空白です"
 msgid "Search/Filter elements limit"
 msgstr "検索/フィルターの項目の上限値"
 
-#: include/forms.inc.php:1596 include/maintenances.inc.php:104
+#: include/forms.inc.php:1595 include/maintenances.inc.php:104
 msgid "Second"
 msgstr "第2週"
 
@@ -10816,7 +10816,7 @@ msgstr "9月"
 msgid "Separated"
 msgstr "障害数と未対応数を表示"
 
-#: include/forms.inc.php:1551 include/func.inc.php:112
+#: include/forms.inc.php:1550 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr "9月"
@@ -11416,7 +11416,7 @@ msgstr "期間Tの値の合計値 NOT N"
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1531 include/forms.inc.php:1612
+#: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:130 include/func.inc.php:206
 msgid "Sunday"
 msgstr "日曜"
@@ -11482,7 +11482,7 @@ msgstr "合計"
 msgid "TRIGGER COMMENTS"
 msgstr "トリガーのコメント"
 
-#: include/forms.inc.php:1827 include/forms.inc.php:1846
+#: include/forms.inc.php:1826 include/forms.inc.php:1845
 msgid "TRUE"
 msgstr "真"
 
@@ -11629,7 +11629,7 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 msgid "Tera"
 msgstr "テラ"
 
-#: include/forms.inc.php:1866
+#: include/forms.inc.php:1865
 #: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
@@ -11648,7 +11648,7 @@ msgstr "テストの確認"
 msgid "Test data"
 msgstr "テストデータ"
 
-#: adm.regexps.php:37 include/forms.inc.php:1769
+#: adm.regexps.php:37 include/forms.inc.php:1768
 msgid "Test string"
 msgstr "テスト文字列"
 
@@ -11697,7 +11697,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "GUIアクセスの権限があるグループが%1$dつあります。"
 
-#: include/forms.inc.php:1597 include/maintenances.inc.php:105
+#: include/forms.inc.php:1596 include/maintenances.inc.php:105
 msgid "Third"
 msgstr "第3週"
 
@@ -11730,7 +11730,7 @@ msgstr "今年"
 msgid "Thu"
 msgstr "木"
 
-#: include/forms.inc.php:1528 include/forms.inc.php:1609
+#: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:126 include/func.inc.php:210
 msgid "Thursday"
 msgstr "木曜"
@@ -12076,7 +12076,7 @@ msgstr "アクセスできないプロパティ\"%s\"を参照しようとして
 msgid "Tue"
 msgstr "火"
 
-#: include/forms.inc.php:1526 include/forms.inc.php:1607
+#: include/forms.inc.php:1525 include/forms.inc.php:1606
 #: include/func.inc.php:124 include/func.inc.php:208
 msgid "Tuesday"
 msgstr "火曜"
@@ -12931,7 +12931,7 @@ msgstr "ウェブ監視は1つ以上のステップを設定する必要があ�
 msgid "Wed"
 msgstr "水"
 
-#: include/forms.inc.php:1527 include/forms.inc.php:1608
+#: include/forms.inc.php:1526 include/forms.inc.php:1607
 #: include/func.inc.php:125 include/func.inc.php:209
 msgid "Wednesday"
 msgstr "水曜"
@@ -12940,7 +12940,7 @@ msgstr "水曜"
 msgid "Week"
 msgstr "週"
 
-#: include/forms.inc.php:1504 include/maintenances.inc.php:37
+#: include/forms.inc.php:1503 include/maintenances.inc.php:37
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
@@ -13192,7 +13192,7 @@ msgstr "毎年"
 #: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:305 include/events.inc.php:323
-#: include/forms.inc.php:1920 include/triggers.inc.php:1648
+#: include/forms.inc.php:1919 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "はい"

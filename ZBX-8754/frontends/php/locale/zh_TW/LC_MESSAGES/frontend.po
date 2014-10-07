@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 13:50+0300\n"
+"POT-Creation-Date: 2014-09-28 11:18+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -350,8 +350,8 @@ msgstr "作用中直到"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
-#: include/blocks.inc.php:1314 include/forms.inc.php:1703
-#: include/forms.inc.php:2007 include/reports.inc.php:332
+#: include/blocks.inc.php:1314 include/forms.inc.php:1702
+#: include/forms.inc.php:2006 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
@@ -627,7 +627,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1554 include/func.inc.php:107
+#: include/forms.inc.php:1553 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "四月"
@@ -668,7 +668,7 @@ msgstr "區域標籤"
 msgid "At"
 msgstr "於"
 
-#: include/forms.inc.php:1680
+#: include/forms.inc.php:1679
 msgid "At (hour:minute)"
 msgstr "於(時:分)"
 
@@ -700,7 +700,7 @@ msgstr "審計紀錄"
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1546 include/func.inc.php:111
+#: include/forms.inc.php:1545 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "八月"
@@ -1101,7 +1101,7 @@ msgid "Canada (136 characters)"
 msgstr "加拿大 (136 字元)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
-#: include/forms.inc.php:1705 include/forms.inc.php:2008
+#: include/forms.inc.php:1704 include/forms.inc.php:2007
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.action.edit.php:962
@@ -2030,7 +2030,7 @@ msgstr "無法更新值對應"
 msgid "Caption"
 msgstr "提示"
 
-#: include/forms.inc.php:1906 include/forms.inc.php:2002
+#: include/forms.inc.php:1905 include/forms.inc.php:2001
 msgid "Case sensitive"
 msgstr "區分大小寫"
 
@@ -2161,7 +2161,7 @@ msgstr "清除當無連結時"
 msgid "Clock"
 msgstr "Clock"
 
-#: include/forms.inc.php:1870
+#: include/forms.inc.php:1869
 #: include/views/administration.general.iconmap.edit.php:141
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
@@ -2223,7 +2223,7 @@ msgstr ""
 msgid "Columns"
 msgstr "列數"
 
-#: include/forms.inc.php:1842
+#: include/forms.inc.php:1841
 msgid "Combined result"
 msgstr "合併的結果"
 
@@ -2897,7 +2897,7 @@ msgstr "DNS名稱"
 msgid "DOWN"
 msgstr "斷線"
 
-#: include/forms.inc.php:1503 include/maintenances.inc.php:35
+#: include/forms.inc.php:1502 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
 #: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
@@ -2987,7 +2987,7 @@ msgstr "資料庫類型"
 msgid "Database user"
 msgstr "資料庫用戶"
 
-#: include/forms.inc.php:1589 include/forms.inc.php:1674 jsrpc.php:137
+#: include/forms.inc.php:1588 include/forms.inc.php:1673 jsrpc.php:137
 msgid "Date"
 msgstr "日期"
 
@@ -3007,12 +3007,12 @@ msgstr "硬體維修過期日期"
 msgid "Date HW purchased"
 msgstr "硬體購買日期"
 
-#: include/forms.inc.php:1589 report3.php:126 report4.php:161 report5.php:45
+#: include/forms.inc.php:1588 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
 msgstr "日"
 
-#: include/forms.inc.php:1617
+#: include/forms.inc.php:1616
 msgid "Day of month"
 msgstr "月中第幾日"
 
@@ -3032,8 +3032,8 @@ msgstr "月中第幾日是 > N"
 msgid "Day of month is NOT N"
 msgstr "月中第幾日不是 N"
 
-#: include/forms.inc.php:1532 include/forms.inc.php:1589
-#: include/forms.inc.php:1613
+#: include/forms.inc.php:1531 include/forms.inc.php:1588
+#: include/forms.inc.php:1612
 msgid "Day of week"
 msgstr "週中第幾日"
 
@@ -3053,7 +3053,7 @@ msgstr "週中第幾日是 > N"
 msgid "Day of week is NOT N"
 msgstr "週中第幾日不是 N"
 
-#: include/forms.inc.php:1695 tr_status.php:207 tr_status.php:209
+#: include/forms.inc.php:1694 tr_status.php:207 tr_status.php:209
 msgid "Days"
 msgstr "日數"
 
@@ -3075,7 +3075,7 @@ msgstr "調試模式已更新"
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1566 include/func.inc.php:115
+#: include/forms.inc.php:1565 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "十二"
@@ -3139,7 +3139,7 @@ msgstr "延遲(秒計)"
 msgid "Delayed by"
 msgstr "延遲因"
 
-#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1936
+#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1935
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:328 tr_logform.php:345
@@ -3216,7 +3216,7 @@ msgstr "刪除網路拓墣圖?"
 msgid "Delete proxy?"
 msgstr "刪除系統代理程式?"
 
-#: include/forms.inc.php:1872
+#: include/forms.inc.php:1871
 msgid "Delete regular expression?"
 msgstr "删除正規表示式?"
 
@@ -3463,8 +3463,8 @@ msgstr "已刪除: 觸發器 \"%1$s\" 於 \"%2$s\"."
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 
-#: include/forms.inc.php:1833 include/forms.inc.php:1914
-#: include/forms.inc.php:1994
+#: include/forms.inc.php:1832 include/forms.inc.php:1913
+#: include/forms.inc.php:1993
 msgid "Delimiter"
 msgstr "分隔符"
 
@@ -3735,7 +3735,6 @@ msgstr "探索物件"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1114 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
 msgstr "探索規則"
@@ -3773,6 +3772,7 @@ msgid "Discovery rule updated"
 msgstr "探索規則已更新"
 
 #: include/html.inc.php:489 include/html.inc.php:493
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -3989,7 +3989,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每個URL必須是唯一的. 請確保僅有一個URL為名."
 
-#: include/forms.inc.php:1907 include/forms.inc.php:1921
+#: include/forms.inc.php:1906 include/forms.inc.php:1920
 #: include/views/administration.users.edit.php:164
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:377
@@ -4295,11 +4295,11 @@ msgstr "事件來源細節"
 msgid "Events"
 msgstr "事件"
 
-#: include/forms.inc.php:1515
+#: include/forms.inc.php:1514
 msgid "Every day(s)"
 msgstr "每日"
 
-#: include/forms.inc.php:1522
+#: include/forms.inc.php:1521
 msgid "Every week(s)"
 msgstr "每週"
 
@@ -4345,7 +4345,7 @@ msgstr "拓展巨集"
 msgid "Expand single problem"
 msgstr "展開單一問題"
 
-#: include/forms.inc.php:1774 include/forms.inc.php:1905
+#: include/forms.inc.php:1773 include/forms.inc.php:1904
 msgid "Expected result"
 msgstr "期望的結果"
 
@@ -4372,8 +4372,8 @@ msgstr "匯出所選的"
 msgid "Export to CSV"
 msgstr "匯出到CSV"
 
-#: include/forms.inc.php:1773 include/forms.inc.php:1904
-#: include/forms.inc.php:1977 include/triggers.inc.php:1646
+#: include/forms.inc.php:1772 include/forms.inc.php:1903
+#: include/forms.inc.php:1976 include/triggers.inc.php:1646
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4400,7 +4400,7 @@ msgstr "表示式不能為空白"
 msgid "Expression constructor"
 msgstr "表示式建構子"
 
-#: include/forms.inc.php:1986
+#: include/forms.inc.php:1985
 msgid "Expression type"
 msgstr "表示式類型"
 
@@ -4423,7 +4423,7 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "F"
 
-#: include/forms.inc.php:1829 include/forms.inc.php:1849
+#: include/forms.inc.php:1828 include/forms.inc.php:1848
 msgid "FALSE"
 msgstr "偽"
 
@@ -4474,7 +4474,7 @@ msgstr "常用的"
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1544 include/func.inc.php:105
+#: include/forms.inc.php:1543 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "二月"
@@ -4551,7 +4551,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
-#: include/forms.inc.php:1595 include/maintenances.inc.php:103
+#: include/forms.inc.php:1594 include/maintenances.inc.php:103
 msgid "First"
 msgstr "首"
 
@@ -4582,7 +4582,7 @@ msgstr "訪客的密碼必須為空"
 msgid "Formula"
 msgstr "公式"
 
-#: include/forms.inc.php:1598 include/maintenances.inc.php:106
+#: include/forms.inc.php:1597 include/maintenances.inc.php:106
 msgid "Fourth"
 msgstr "第四"
 
@@ -4594,7 +4594,7 @@ msgstr "法語 (fr_FR)"
 msgid "Fri"
 msgstr "週五"
 
-#: include/forms.inc.php:1529 include/forms.inc.php:1610
+#: include/forms.inc.php:1528 include/forms.inc.php:1609
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
 msgstr "週五"
@@ -5198,7 +5198,7 @@ msgstr "主機(升冪)"
 msgid "Host IP"
 msgstr "主機IP地址"
 
-#: include/forms.inc.php:1715
+#: include/forms.inc.php:1714
 msgid "Host Inventory"
 msgstr "主機資產紀錄"
 
@@ -5404,7 +5404,7 @@ msgstr "主機已更新"
 msgid "Hourly"
 msgstr "每小時"
 
-#: include/forms.inc.php:1697
+#: include/forms.inc.php:1696
 msgid "Hours"
 msgstr "時"
 
@@ -6741,7 +6741,7 @@ msgstr "Jabber Identifier"
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1539 include/func.inc.php:104
+#: include/forms.inc.php:1538 include/func.inc.php:104
 #: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "一月"
@@ -6754,7 +6754,7 @@ msgstr "日語 (ja_JP)"
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1541 include/func.inc.php:110
+#: include/forms.inc.php:1540 include/func.inc.php:110
 #: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "七月"
@@ -6763,7 +6763,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1564 include/func.inc.php:109
+#: include/forms.inc.php:1563 include/func.inc.php:109
 #: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "六月"
@@ -6885,7 +6885,7 @@ msgstr "標示位置"
 msgid "Language"
 msgstr "語言"
 
-#: include/forms.inc.php:1599 include/maintenances.inc.php:107
+#: include/forms.inc.php:1598 include/maintenances.inc.php:107
 msgid "Last"
 msgstr "末"
 
@@ -7325,7 +7325,7 @@ msgstr "維修已新增"
 msgid "Maintenance deleted"
 msgstr "維修已刪除"
 
-#: include/forms.inc.php:1692
+#: include/forms.inc.php:1691
 msgid "Maintenance period length"
 msgstr "維修期間長度"
 
@@ -7441,7 +7441,7 @@ msgstr "拓墣圖"
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1549 include/func.inc.php:106
+#: include/forms.inc.php:1548 include/func.inc.php:106
 #: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "三月"
@@ -7537,7 +7537,7 @@ msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d cha
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "最大的可見名稱長度是%2$d個字元, \"%3$s\" 是%1$d個字元."
 
-#: include/forms.inc.php:1559 include/func.inc.php:108
+#: include/forms.inc.php:1558 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "五月"
@@ -7718,7 +7718,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1699
+#: include/forms.inc.php:1698
 msgid "Minutes"
 msgstr "分"
 
@@ -7762,7 +7762,7 @@ msgstr "模型"
 msgid "Mon"
 msgstr "一"
 
-#: include/forms.inc.php:1525 include/forms.inc.php:1606
+#: include/forms.inc.php:1524 include/forms.inc.php:1605
 #: include/func.inc.php:123 include/func.inc.php:207
 msgid "Monday"
 msgstr "週一"
@@ -7786,11 +7786,11 @@ msgstr "已監測的主機"
 msgid "Monitoring"
 msgstr "監測中"
 
-#: include/forms.inc.php:1568 report3.php:108 report4.php:143 report5.php:47
+#: include/forms.inc.php:1567 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
 msgstr "月"
 
-#: include/forms.inc.php:1505 include/maintenances.inc.php:39
+#: include/forms.inc.php:1504 include/maintenances.inc.php:39
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
@@ -7850,7 +7850,7 @@ msgstr "NTLM認證"
 #: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
-#: include/forms.inc.php:1768 include/hosts.inc.php:114
+#: include/forms.inc.php:1767 include/hosts.inc.php:114
 #: include/reports.inc.php:382 include/setup.inc.php:318
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
@@ -7939,7 +7939,7 @@ msgstr "從未"
 msgid "Never executed"
 msgstr "從未執行過"
 
-#: include/forms.inc.php:1935 include/views/configuration.action.edit.php:396
+#: include/forms.inc.php:1934 include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:603
 #: include/views/configuration.action.edit.php:903
 #: include/views/configuration.discovery.edit.php:54
@@ -8012,7 +8012,7 @@ msgid "Next check"
 msgstr "下個檢查"
 
 #: events.php:760 include/config.inc.php:568 include/events.inc.php:302
-#: include/events.inc.php:320 include/forms.inc.php:1920
+#: include/events.inc.php:320 include/forms.inc.php:1919
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
@@ -8724,7 +8724,7 @@ msgstr "警報"
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1561 include/func.inc.php:114
+#: include/forms.inc.php:1560 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "十一月"
@@ -8867,7 +8867,7 @@ msgstr "十月"
 msgid "Octal"
 msgstr "八進位"
 
-#: include/forms.inc.php:1556 include/func.inc.php:113
+#: include/forms.inc.php:1555 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "十月"
@@ -8895,7 +8895,7 @@ msgstr "於狀態改變時, 觸發器因此閃爍於"
 msgid "Once"
 msgstr "一次"
 
-#: include/forms.inc.php:1502 include/maintenances.inc.php:33
+#: include/forms.inc.php:1501 include/maintenances.inc.php:33
 msgid "One time only"
 msgstr "一次性"
 
@@ -9437,7 +9437,7 @@ msgstr "百分比線(右)"
 msgid "Period"
 msgstr "期間"
 
-#: include/forms.inc.php:1507
+#: include/forms.inc.php:1506
 #: include/views/configuration.maintenance.edit.php:133
 msgid "Period type"
 msgstr "期間類型"
@@ -10089,7 +10089,7 @@ msgstr "回應時間"
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案 \"%2$s\" 之步驟 \"%1$s\" 的回應時間."
 
-#: include/forms.inc.php:1775 include/forms.inc.php:1857 tr_testexpr.php:135
+#: include/forms.inc.php:1774 include/forms.inc.php:1856 tr_testexpr.php:135
 #: tr_testexpr.php:167
 msgid "Result"
 msgstr "結果"
@@ -10390,13 +10390,13 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "六"
 
-#: include/forms.inc.php:1530 include/forms.inc.php:1611
+#: include/forms.inc.php:1529 include/forms.inc.php:1610
 #: include/func.inc.php:128 include/func.inc.php:212
 msgid "Saturday"
 msgstr "週六"
 
-#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1703
-#: include/forms.inc.php:1861 include/forms.inc.php:2007
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1702
+#: include/forms.inc.php:1860 include/forms.inc.php:2006
 #: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
@@ -10655,7 +10655,7 @@ msgstr "搜尋式樣是空白"
 msgid "Search/Filter elements limit"
 msgstr "搜尋/過濾組件限制"
 
-#: include/forms.inc.php:1596 include/maintenances.inc.php:104
+#: include/forms.inc.php:1595 include/maintenances.inc.php:104
 msgid "Second"
 msgstr "秒"
 
@@ -10818,7 +10818,7 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分開的"
 
-#: include/forms.inc.php:1551 include/func.inc.php:112
+#: include/forms.inc.php:1550 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr "九月"
@@ -11418,7 +11418,7 @@ msgstr ""
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1531 include/forms.inc.php:1612
+#: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:130 include/func.inc.php:206
 msgid "Sunday"
 msgstr "日"
@@ -11484,7 +11484,7 @@ msgstr "總合"
 msgid "TRIGGER COMMENTS"
 msgstr "觸發器評論"
 
-#: include/forms.inc.php:1827 include/forms.inc.php:1846
+#: include/forms.inc.php:1826 include/forms.inc.php:1845
 msgid "TRUE"
 msgstr "真"
 
@@ -11631,7 +11631,7 @@ msgstr "模板\"%1$s\"自主機\"%2$s\"斷連."
 msgid "Tera"
 msgstr "Tera"
 
-#: include/forms.inc.php:1866
+#: include/forms.inc.php:1865
 #: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
@@ -11650,7 +11650,7 @@ msgstr "測試確認"
 msgid "Test data"
 msgstr "測試數據"
 
-#: adm.regexps.php:37 include/forms.inc.php:1769
+#: adm.regexps.php:37 include/forms.inc.php:1768
 msgid "Test string"
 msgstr "測試字串"
 
@@ -11699,7 +11699,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "有內部GUI存取的群組\"%1$d\"."
 
-#: include/forms.inc.php:1597 include/maintenances.inc.php:105
+#: include/forms.inc.php:1596 include/maintenances.inc.php:105
 msgid "Third"
 msgstr "第三的"
 
@@ -11732,7 +11732,7 @@ msgstr "本年"
 msgid "Thu"
 msgstr "四"
 
-#: include/forms.inc.php:1528 include/forms.inc.php:1609
+#: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:126 include/func.inc.php:210
 msgid "Thursday"
 msgstr "週四"
@@ -12078,7 +12078,7 @@ msgstr "嘗試讀取不能存取的屬性\"%s\"."
 msgid "Tue"
 msgstr "二"
 
-#: include/forms.inc.php:1526 include/forms.inc.php:1607
+#: include/forms.inc.php:1525 include/forms.inc.php:1606
 #: include/func.inc.php:124 include/func.inc.php:208
 msgid "Tuesday"
 msgstr "週二"
@@ -12933,7 +12933,7 @@ msgstr "Webcheck必需至少有一個步驟."
 msgid "Wed"
 msgstr "三"
 
-#: include/forms.inc.php:1527 include/forms.inc.php:1608
+#: include/forms.inc.php:1526 include/forms.inc.php:1607
 #: include/func.inc.php:125 include/func.inc.php:209
 msgid "Wednesday"
 msgstr "週三"
@@ -12942,7 +12942,7 @@ msgstr "週三"
 msgid "Week"
 msgstr "週"
 
-#: include/forms.inc.php:1504 include/maintenances.inc.php:37
+#: include/forms.inc.php:1503 include/maintenances.inc.php:37
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
@@ -13194,7 +13194,7 @@ msgstr "每年"
 #: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:305 include/events.inc.php:323
-#: include/forms.inc.php:1920 include/triggers.inc.php:1648
+#: include/forms.inc.php:1919 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "是"
