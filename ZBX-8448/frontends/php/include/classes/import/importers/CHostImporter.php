@@ -71,16 +71,46 @@ class CHostImporter extends CImporter {
 		}
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
+
+			$updateHostTemplates = false;
+			foreach ($hostsToUpdate as $host) {
+				if (isset($templateLinkage[$host['host']]) && $templateLinkage[$host['host']]) {
+					$updateHostTemplates = true;
+					break;
+				}
+			}
+
+			// check existing host-template linkage and try to link only new templates.
+			if ($updateHostTemplates) {
+				$dbHosts = API::Host()->get(array(
+					'output' => array(),
+					'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
+					'selectParentTemplates' => array('templateid'),
+					'preservekeys' => true
+				));
+
+				foreach ($hostsToUpdate as $host) {
+					if (isset($templateLinkage[$host['host']]) && $templateLinkage[$host['host']]) {
+						$dbHost = $dbHosts[$host['hostid']];
+
+						$oldTemplateIds = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
+						$newTemplateIds = zbx_objectValues($templateLinkage[$host['host']], 'templateid');
+
+						$templateIds = array_diff($newTemplateIds, $oldTemplateIds);
+
+						if ($templateIds) {
+							API::Template()->massAdd(array(
+								'hosts' => $host,
+								'templates' => zbx_toObject($templateIds, 'templateid')
+							));
+						}
+					}
+				}
+			}
+
 			foreach ($hostsToUpdate as $host) {
 				$this->referencer->addProcessedHost($host['host']);
 				$processedHostIds[$host['host']] = $host['hostid'];
-
-				if (!empty($templateLinkage[$host['host']])) {
-					API::Template()->massAdd(array(
-						'hosts' => $host,
-						'templates' => $templateLinkage[$host['host']]
-					));
-				}
 			}
 		}
 

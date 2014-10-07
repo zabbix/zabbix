@@ -939,33 +939,51 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['groups']) && !is_null($data['groups'])) {
 			$data['groups'] = zbx_toArray($data['groups']);
 			$templateGroups = API::HostGroup()->get(array(
-				'output' => array('groupid'),
+				'output' => array(),
 				'hostids' => $templateids,
-				'editable' => true
+				'preservekeys' => true
 			));
-			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
 
-			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
+			$oldGroupIds = array_keys($templateGroups);
+			$newGroupIds = zbx_objectValues($data['groups'], 'groupid');
 
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'templates' => $templates,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+			$groupIdsToAdd = array_diff($newGroupIds, $oldGroupIds);
+			$groupIdsToDelete = array_diff($oldGroupIds, $newGroupIds);
+
+			$groupIds = array_keys(array_flip(array_merge($groupIdsToAdd, $groupIdsToDelete)));
+
+			if ($groupIds) {
+				$hostGroupsAllowed = API::HostGroup()->get(array(
+					'output' => array(),
+					'groupids' => $groupIds,
+					'editable' => true,
+					'preservekeys' => true
 				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
-				}
-			}
 
-			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
-			if (!empty($groupidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
+				/*
+				 * If no groups found, they are not allowed to be removed from template nor added.
+				 * Such groups are currently skipped.
+				 */
+				if ($hostGroupsAllowed) {
+					if ($groupIdsToDelete) {
+						$result = $this->massRemove(array(
+							'templateids' => $templateids,
+							'groupids' => $groupIdsToDelete
+						));
+						if (!$result) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
+						}
+					}
+
+					if ($groupIdsToAdd) {
+						$result = $this->massAdd(array(
+							'templates' => $templates,
+							'groups' => zbx_toObject($groupIdsToAdd, 'groupid')
+						));
+						if (!$result) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
+						}
+					}
 				}
 			}
 		}
@@ -983,36 +1001,75 @@ class CTemplate extends CHostGeneral {
 
 		// UPDATE TEMPLATE LINKAGE {{{
 		// firstly need to unlink all things, to correctly check circulars
-
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
 			$templateHosts = API::Host()->get(array(
+				'output' => array(),
 				'templateids' => $templateids,
-				'templated_hosts' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				'templated_hosts' => true,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+				'preservekeys' => true
 			));
-			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
+
+			$oldHostIds = array_keys($templateHosts);
 			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
 
-			$hostsToDel = array_diff($templateHostids, $newHostids);
-			$hostidsToDel = array_diff($hostsToDel, $templateidsClear);
+			$hostIds = array_diff($oldHostIds, $newHostids);
+			// check for situation when unlinking template and linking them back at the same time
+			$hostIds = array_diff($hostIds, $templateidsClear);
 
-			if (!empty($hostidsToDel)) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostidsToDel,
-					'templateids' => $templateids
+			if ($hostIds) {
+				// check permissions to hosts if can they be unlinked
+				$hostsAllowed = API::Host()->get(array(
+					'output' => array(),
+					'hostids' => $hostIds,
+					'editable' => true,
+					'preservekeys' => true
 				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
+
+				// if not hosts found, user has no permissions to unlink hosts from template and hosts should be skipped
+				$hostIdsToDelete = array();
+				if ($hostsAllowed) {
+					$hostIdsToDelete = array_keys($hostsAllowed);
+				}
+
+				// check also if IDs passed belong to templates
+				$templatesAllowed = API::Template()->get(array(
+					'output' => array(),
+					'templateids' => $hostIds,
+					'editable' => true,
+					'preservekeys' => true
+				));
+
+				$templateIdsToDelete = array();
+				if ($templatesAllowed) {
+					$templateIdsToDelete = array_keys($templatesAllowed);
+				}
+
+				$hostIdsToDelete = array_merge($hostIdsToDelete, $templateIdsToDelete);
+
+				if ($hostIdsToDelete) {
+					$result = $this->massRemove(array(
+						'hostids' => $hostIdsToDelete,
+						'templateids' => $templateids
+					));
+					if (!$result) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
+					}
 				}
 			}
 		}
 
 		if (isset($data['templates_link']) && !is_null($data['templates_link'])) {
-			$templateTemplates = API::Template()->get(array('hostids' => $templateids));
-			$templateTemplateids = zbx_objectValues($templateTemplates, 'templateid');
-			$newTemplateids = zbx_objectValues($data['templates_link'], 'templateid');
+			$templateTemplates = API::Template()->get(array(
+				'output' => array(),
+				'hostids' => $templateids,
+				'preservekeys' => true
+			));
 
-			$templatesToDel = array_diff($templateTemplateids, $newTemplateids);
+			$oldTemplateIds = array_keys($templateTemplates);
+			$newTemplateIds = zbx_objectValues($data['templates_link'], 'templateid');
+
+			$templatesToDel = array_diff($oldTemplateIds, $newTemplateIds);
 			$templateidsToDel = array_diff($templatesToDel, $templateidsClear);
 			if (!empty($templateidsToDel)) {
 				$result = $this->massRemove(array(
@@ -1026,8 +1083,8 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
+			$hostsToAdd = array_diff($newHostids, $oldHostIds);
 
-			$hostsToAdd = array_diff($newHostids, $templateHostids);
 			if (!empty($hostsToAdd)) {
 				$result = $this->massAdd(array('templates' => $templates, 'hosts' => $hostsToAdd));
 				if (!$result) {
@@ -1037,7 +1094,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['templates_link']) && !is_null($data['templates_link'])) {
-			$templatesToAdd = array_diff($newTemplateids, $templateTemplateids);
+			$templatesToAdd = array_diff($newTemplateIds, $oldTemplateIds);
 			if (!empty($templatesToAdd)) {
 				$result = $this->massAdd(array('templates' => $templates, 'templates_link' => $templatesToAdd));
 				if (!$result) {

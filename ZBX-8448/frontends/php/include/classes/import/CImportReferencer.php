@@ -588,8 +588,7 @@ class CImportReferencer {
 			$dbGroups = API::HostGroup()->get(array(
 				'filter' => array('name' => $this->groups),
 				'output' => array('groupid', 'name'),
-				'preservekeys' => true,
-				'editable' => true
+				'preservekeys' => true
 			));
 			foreach ($dbGroups as $group) {
 				$this->groupsRefs[$group['name']] = $group['groupid'];
@@ -608,8 +607,7 @@ class CImportReferencer {
 			$dbTemplates = API::Template()->get(array(
 				'filter' => array('host' => $this->templates),
 				'output' => array('hostid', 'host'),
-				'preservekeys' => true,
-				'editable' => true
+				'preservekeys' => true
 			));
 			foreach ($dbTemplates as $template) {
 				$this->templatesRefs[$template['host']] = $template['templateid'];

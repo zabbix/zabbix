@@ -403,8 +403,13 @@ class CHostPrototype extends CHostBase {
 			'messageRegex' => _('Incorrect group prototype ID.')
 		)));
 
-		$groupPrototypeGroupIds = array();
+		$newGroupIds = array();
+		$oldGroupIds = array();
+		$validateGroupIds = array();
+
 		foreach ($hostPrototypes as $hostPrototype) {
+			$dbHostPrototype = $dbHostPrototypes[$hostPrototype['hostid']];
+
 			// host prototype
 			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
 			$this->checkPartialValidator($hostPrototype, $hostPrototypeValidator);
@@ -414,7 +419,7 @@ class CHostPrototype extends CHostBase {
 				foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
 					$this->checkPartialValidator($groupPrototype, $groupLinkValidator);
 
-					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					$newGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 				}
 			}
 
@@ -425,12 +430,29 @@ class CHostPrototype extends CHostBase {
 					$this->checkPartialValidator($groupPrototype, $groupPrototypeValidator);
 				}
 			}
+
+			// groups that host prototype is assigned currently
+			if ($dbHostPrototype['groupLinks']) {
+				foreach ($dbHostPrototype['groupLinks'] as $groupPrototype) {
+					$oldGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+				}
+			}
+
+			/*
+			 * Check if new groups are already assigned to host prototype. If not, those groups should be validated first.
+			 * If validation fails, user may not assign those new host groups to current host prototype. However,
+			 * existing groups that user has no permissions to, will not be removed from host prototype.
+			 */
+			$groupIds = array_diff($newGroupIds, $oldGroupIds);
+			foreach ($groupIds as $groupId) {
+				$validateGroupIds[$groupId] = $groupId;
+			}
 		}
 
-		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
+		$this->checkHostGroupsPermissions($validateGroupIds);
 
 		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
+		$this->checkValidator(array_unique($newGroupIds), new CHostGroupNormalValidator(array(
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
 
@@ -459,7 +481,10 @@ class CHostPrototype extends CHostBase {
 			_('Incorrect host prototype ID.')
 		);
 
-		// fetch updated objects from the DB
+		/*
+		 * Fetch updated objects from the DB. Option 'editable' => true will not affect gathering if linked groups.
+		 * So $dbHostPrototypes['groupLinks'] will hold all host groups host prototype belongs to.
+		 */
 		$dbHostPrototypes = $this->get(array(
 			'output' => array('host', 'name'),
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
@@ -507,6 +532,7 @@ class CHostPrototype extends CHostBase {
 		unset($hostPrototype);
 
 		$hostPrototypes = $this->updateReal($hostPrototypes);
+
 		$this->inherit($hostPrototypes);
 
 		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
@@ -538,76 +564,154 @@ class CHostPrototype extends CHostBase {
 		// update related objects
 		$inventoryCreate = array();
 		$inventoryDeleteIds = array();
+
+		$oldGroupIds = array();
+		$newGroupIds = array();
+
+		$groupIdsToAdd = array();
+		$groupIdsToDelete = array();
+
 		$groupIds = array();
 
 		foreach ($hostPrototypes as $hostPrototype) {
-			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
+			$hostId = $hostPrototype['hostid'];
+			$exHostPrototype = $exHostPrototypes[$hostId];
 
 			$exGroupPrototypes = array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']);
+
 			foreach ($exGroupPrototypes as $exGroupPrototype) {
-				$groupIds[$exGroupPrototype['group_prototypeid']] = $exGroupPrototype['groupid'];
+				$oldGroupIds[$exGroupPrototype['groupid']] = $exGroupPrototype['groupid'];
 			}
-		}
 
-		// get group IDs that user has permissions to
-		$groups = API::HostGroup()->get(array(
-			'output' => array('groupid'),
-			'groupids' => array_keys(array_flip($groupIds)),
-			'editable' => true,
-			'preservekeys' => true
-		));
-
-		$groupIdsToPreserve = array();
-
-		if ($groups) {
-			$groupIdsToPreserve = array_diff($groupIds, array_keys($groups));
-
-			if ($groupIdsToPreserve) {
-				// preserve keys that user has no permissions to remove
-				foreach ($groupIds as $groupPrototypeId => $groupId) {
-					if (isset($groupIdsToPreserve[$groupPrototypeId])) {
-						unset($groupIds[$groupPrototypeId]);
-					}
-				}
+			// due to "merge group links into group prototypes"
+			if (!isset($hostPrototype['groupLinks'])
+					|| isset($hostPrototype['groupLinks']) && $hostPrototype['groupLinks'] === null) {
+				$newGroupPrototypes = $hostPrototype['groupPrototypes'];
 			}
 			else {
-				// preserve all keys if no difference found
-				$groupIds = array();
+				$newGroupPrototypes = array_merge($hostPrototype['groupLinks'], $hostPrototype['groupPrototypes']);
+			}
+
+			foreach ($newGroupPrototypes as $newGroupPrototype) {
+				$newGroupIds[$newGroupPrototype['groupid']] = $newGroupPrototype['groupid'];
+			}
+
+			$groupIdsToAdd[$hostId] = array_diff($newGroupIds, $oldGroupIds);
+			$groupIdsToDelete[$hostId] = array_diff($oldGroupIds, $newGroupIds);
+
+			// gather all unique group IDs that are changed (added new, or should be removed)
+			foreach ($groupIdsToAdd[$hostId] as $groupId) {
+				$groupIds[$groupId] = $groupId;
+			}
+			foreach ($groupIdsToDelete[$hostId] as $groupId) {
+				$groupIds[$groupId] = $groupId;
 			}
 		}
 
-		foreach ($hostPrototypes as $key => $hostPrototype) {
+		// at least one host prototype group assignment is changed, group linkage should be validated and updated
+		if ($groupIds) {
+			$groupIdsToPreserve = array();
+
+			$hostGroupsAllowed = API::HostGroup()->get(array(
+				'output' => array(),
+				'groupids' => $groupIds,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			// get group IDs that user has permissions to
+			if ($hostGroupsAllowed) {
+				// group IDs that user is not allowed to removed
+				$groupIdsToPreserve = array_diff($groupIds, array_keys($hostGroupsAllowed));
+
+				// remove some host groups that user has no permissions to remove
+				if ($groupIdsToPreserve) {
+					foreach ($hostPrototypes as $hostPrototype) {
+						$hostId = $hostPrototype['hostid'];
+						foreach ($groupIdsToPreserve as $groupId) {
+							unset($groupIdsToDelete[$hostId][$groupId]);
+						}
+					}
+				}
+				// else user has permissions to all of these groups and they all can be removedelse
+			}
+			else {
+				// user has no permissions to any these groups remove all groups
+				foreach ($hostPrototypes as $hostPrototype) {
+					unset($groupIdsToDelete[$hostPrototype['hostid']]);
+				}
+			}
+		}
+		// none of host prototype group assignmens are changed and they remain as is
+
+		foreach ($hostPrototypes as &$hostPrototype) {
 			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
 
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
+				$hostId = $hostPrototype['hostid'];
+
 				foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
-					$groupPrototype['hostid'] = $hostPrototype['hostid'];
+					$groupPrototype['hostid'] = $hostId;
 				}
 				unset($groupPrototype);
 
-				$modifiedGroupPrototypes = array();
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					// preserve groups that are not modified
-					if (isset($groupPrototype['group_prototypeid'])) {
-						unset($groupIds[$groupPrototype['group_prototypeid']]);
+				$exGroupPrototypes = zbx_toHash(
+					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
+					'groupid'
+				);
+
+				if ($groupIdsToDelete[$hostId]) {
+					$groupPrototypeIdsToDelete = array();
+					foreach ($groupIdsToDelete[$hostId] as $groupId) {
+						$groupPrototypeId = $exGroupPrototypes[$groupId]['group_prototypeid'];
+						$groupPrototypeIdsToDelete[$groupPrototypeId] = $groupPrototypeId;
 					}
 
-					$modifiedGroupPrototypes[] = $groupPrototype;
+					$this->deleteGroupPrototypes($groupPrototypeIdsToDelete);
 				}
 
-				if ($groupIds) {
-					$this->deleteGroupPrototypes(array_keys($groupIds));
+				if ($groupIdsToAdd[$hostId]) {
+					$groupPrototypesToAdd = array();
+					foreach ($groupIdsToAdd[$hostId] as $groupId) {
+						foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+							if ($groupId == $groupPrototype['groupid']
+									&& !isset($groupPrototype['group_prototypeid'])) {
+								$groupPrototypesToAdd[] = array('hostid' => $hostId, 'groupid' => $groupId);
+							}
+						}
+					}
+
+					$hostPrototype['groupPrototypes'] = DB::save('group_prototype', $groupPrototypesToAdd);
 				}
-				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
+				else {
+					// in case there is nothing to update, for futher inheritance, 'groupPrototypes' requires known
+					// 'hostid', 'groupid' and 'group_prototypeid'
+					foreach ($exGroupPrototypes as $exGroupPrototype) {
+						foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
+							$groupId = $exGroupPrototype['groupid'];
+							$groupPrototype['group_prototypeid'] = $exGroupPrototypes[$groupId]['group_prototypeid'];
+						}
+						unset($groupPrototype);
+					}
+				}
 			}
 
 			// templates
 			if (isset($hostPrototype['templates'])) {
 				$existingTemplateIds = zbx_objectValues($exHostPrototype['templates'], 'templateid');
 				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
-				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostPrototype['hostid']));
-				$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostPrototype['hostid']));
+
+				$templatesToUnlink = array_diff($existingTemplateIds, $newTemplateIds);
+				$templatesToLink = array_diff($newTemplateIds, $existingTemplateIds);
+
+				if ($templatesToUnlink) {
+					$this->unlink($templatesToUnlink, array($hostPrototype['hostid']));
+				}
+
+				if ($templatesToLink) {
+					$this->link($templatesToLink, array($hostPrototype['hostid']));
+				}
 			}
 
 			// inventory
@@ -634,6 +738,7 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 		}
+		unset($hostPrototype);
 
 		// save inventory
 		DB::insert('host_inventory', $inventoryCreate, false);
@@ -1050,7 +1155,40 @@ class CHostPrototype extends CHostBase {
 		return count($ids) == $count;
 	}
 
+	/**
+	 * Link templates to host prototypes.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given target
+	 *
+	 * @param array $templateIds
+	 * @param array $targetIds
+	 *
+	 * @return array
+	 */
 	protected function link(array $templateIds, array $targetIds) {
+		/*
+		 * If user has permissions to edit parent and to link read only templates, so should the child be allowed
+		 * to inherit those properties. First find parent and check if target parent is writable. If no parent is found,
+		 * check the current target writable permissions.
+		 */
+		$parents = DBselect(
+			'SELECT h.templateid'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionInt('hostid', $targetIds)
+		);
+
+		$parentTargetIds = array();
+
+		while ($parent = DBfetch($parents)) {
+			if ($parent && $parent['templateid'] != 0) {
+				$parentTargetIds[$parent['templateid']] = $parent['templateid'];
+			}
+		}
+
+		if ($parentTargetIds) {
+			$targetIds = $parentTargetIds;
+		}
+
 		if (!$this->isWritable($targetIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
