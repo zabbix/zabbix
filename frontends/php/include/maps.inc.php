@@ -197,6 +197,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 					'hostid' => 0,
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
+
+				// always show active trigger link for host group map elements
+				$gotos['showTriggers'] = true;
 				break;
 		}
 

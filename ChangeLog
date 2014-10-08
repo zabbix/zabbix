@@ -30,6 +30,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
