@@ -820,13 +820,14 @@ class CXmlImport18 {
 					$triggerData = $linktrigger['triggerid'];
 
 					$dbTriggers = API::Trigger()->get(array(
+						'output' => array('triggerid', 'expression'),
 						'filter' => array('host' => $triggerData['host'], 'description' => $triggerData['description']),
-						'output' => array('expression'),
 						'expandExpression' => true
 					));
 
 					$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
-						$triggerData['host'].':'.$triggerData['description'], $sysmap['name']);
+						$triggerData['host'].':'.$triggerData['description'], $sysmap['name']
+					);
 
 					if (!$dbTriggers) {
 						throw new Exception($error);
@@ -834,7 +835,7 @@ class CXmlImport18 {
 
 					$dbTriggerId = null;
 					foreach ($dbTriggers as $dbTrigger) {
-						if ($dbTrigger['expression'] == $triggerData['expression']) {
+						if ($dbTrigger['expression'] === $triggerData['expression']) {
 							$dbTriggerId = $dbTrigger['triggerid'];
 							break;
 						}
