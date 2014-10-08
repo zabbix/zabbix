@@ -24,6 +24,13 @@ A......... [ZBX-8660] fix API to disallow deleting of discovered entities (items
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 2.4.1rc2
 
 New features:
