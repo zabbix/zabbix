@@ -355,6 +355,8 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	/* Comments for process memory types were compiled from: */
 	/*    man 5 proc */
+	/*    https://www.kernel.org/doc/Documentation/filesystems/proc.txt */
+	/*    Himanshu Arora, Linux Processes explained - Part II, http://mylinuxbook.com/linux-processes-part2/ */
 
 	if (NULL == mem_type || '\0' == *mem_type || 0 == strcmp(mem_type, "vmsize") || 0 == strcmp(mem_type, "vsize"))
 	{
