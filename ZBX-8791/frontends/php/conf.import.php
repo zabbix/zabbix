@@ -132,7 +132,6 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 
 		case 'map':
 			$data['rules']['maps'] = array('updateExisting' => true, 'createMissing' => true);
-			$data['rules']['images'] = array('createMissing' => true);
 			break;
 
 		case 'screen':
