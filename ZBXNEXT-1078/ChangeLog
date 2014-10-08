@@ -24,6 +24,20 @@ A......... [ZBX-8660] fix API to disallow deleting of discovered entities (items
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.2rc1
+
+New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
+
+Bug fixes:
+..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
+..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
+..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
+.......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
+A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.4.1rc2
 
 New features:
@@ -447,6 +461,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
