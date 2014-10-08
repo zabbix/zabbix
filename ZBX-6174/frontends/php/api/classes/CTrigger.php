@@ -2066,8 +2066,8 @@ class CTrigger extends CTriggerGeneral {
 				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
 					'SELECT d.triggerid_down,d.triggerid_up,t.value as up_trigger_value'.
-						' FROM trigger_depends d,triggers t'.
-						' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds).
+					' FROM trigger_depends d,triggers t'.
+					' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds).
 						' AND t.triggerid = d.triggerid_up'
 				);
 
@@ -2100,15 +2100,15 @@ class CTrigger extends CTriggerGeneral {
 			// Fetch trigger IDs for triggers that are disabled, have disabled items or disabled item hosts.
 			$dbResult = DBSelect(
 				'SELECT t.triggerid'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid=f.triggerid'.
+				' FROM triggers t,functions f,items i,hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
 					' AND ('.
 						'i.status='.ITEM_STATUS_DISABLED.
 						' OR h.status='.HOST_STATUS_NOT_MONITORED.
 						' OR t.status='.TRIGGER_STATUS_DISABLED.
-					' )'.
+					')'.
 					' AND '.dbConditionInt('t.triggerid', $allUpTriggerIds)
 			);
 			while ($row = DBfetch($dbResult)) {
@@ -2196,9 +2196,9 @@ class CTrigger extends CTriggerGeneral {
 					' AND e.acknowledged=0'
 			), 'objectid');
 
-			foreach ($triggers as $resultTriggerId => $trigger) {
-				if (!isset($correctTriggerIds[$resultTriggerId])) {
-					unset($triggers[$resultTriggerId]);
+			foreach ($triggers as $triggerId => $trigger) {
+				if (!isset($correctTriggerIds[$triggerId])) {
+					unset($triggers[$triggerId]);
 				}
 			}
 		}
