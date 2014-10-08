@@ -539,13 +539,13 @@ class CGraph extends CGraphGeneral {
 
 		if (!$nopermissions) {
 			foreach ($graphids as $graphid) {
-				$delGraph = $delGraphs[$graphid];
-
-				if (!isset($delGraph)) {
+				if (!isset($delGraphs[$graphid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 
-				if (!empty($delGraph['templateid'])) {
+				$delGraph = $delGraphs[$graphid];
+
+				if ($delGraph['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs.'));
 				}
 
