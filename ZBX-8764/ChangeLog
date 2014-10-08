@@ -1,3 +1,17 @@
+Changes for 2.4.2rc1
+
+New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
+
+Bug fixes:
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1
+
+2.4.1rc2 was released as 2.4.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.1rc2
 
 New features:
@@ -421,6 +435,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
@@ -1522,6 +1537,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
