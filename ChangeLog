@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
 ...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)

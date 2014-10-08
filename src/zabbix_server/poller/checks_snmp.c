@@ -1012,6 +1012,8 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
+	oid			parsed_oids[MAX_SNMP_ITEMS][MAX_OID_LEN];
+	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
 
@@ -1026,16 +1028,15 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 	for (i = 0; i < num; i++)
 	{
-		oid	anOID[MAX_OID_LEN];
-		size_t	anOID_len = MAX_OID_LEN;
-
 		if (SUCCEED != errcodes[i])
 			continue;
 
 		if (NULL != query_and_ignore_type && 0 == query_and_ignore_type[i])
 			continue;
 
-		if (NULL == snmp_parse_oid(oids[i], anOID, &anOID_len))
+		parsed_oid_lens[i] = MAX_OID_LEN;
+
+		if (NULL == snmp_parse_oid(oids[i], parsed_oids[i], &parsed_oid_lens[i]))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".",
 					oids[i]));
@@ -1043,7 +1044,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 			continue;
 		}
 
-		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))
+		if (NULL == snmp_add_null_var(pdu, parsed_oids[i], parsed_oid_lens[i]))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 			errcodes[i] = CONFIG_ERROR;
@@ -1066,12 +1067,66 @@ retry:
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
-		if (*max_succeed < mapping_num)
-			*max_succeed = mapping_num;
+		int	succeed = 1;
 
-		for (i = 0, var = response->variables; NULL != var; i++, var = var->next_variable)
+		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
+			/* check that response variable binding matches the request variable binding */
+
+			if (i == mapping_num)
+			{
+				if (NULL != var)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+							" too many variable bindings", items[0].host.host);
+					succeed = 0;
+				}
+
+				break;
+			}
+
+			if (NULL == var)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
+						" all of the requested variable bindings", items[0].host.host);
+
+				do
+				{
+					j = mapping[i++];
+
+					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
+							" cannot find variable binding for this OID."));
+					errcodes[j] = NOTSUPPORTED;
+				}
+				while (i < mapping_num);
+
+				succeed = 0;
+				break;
+			}
+
 			j = mapping[i];
+
+			if (parsed_oid_lens[j] != var->name_length ||
+					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
+						" variable bindings in the requested order", items[0].host.host);
+
+				do
+				{
+					j = mapping[i++];
+
+					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
+							" variable binding order does not match the request."));
+					errcodes[j] = NOTSUPPORTED;
+				}
+				while (i < mapping_num);
+
+				succeed = 0;
+				break;
+			}
+
+			/* process received data */
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
 			{
@@ -1082,6 +1137,17 @@ retry:
 				errcodes[j] = zbx_snmp_set_result(var, items[j].value_type, items[j].data_type,
 						&results[j]);
 			}
+		}
+
+		if (1 == succeed)
+		{
+			if (*max_succeed < mapping_num)
+				*max_succeed = mapping_num;
+		}
+		else if (1 < mapping_num)
+		{
+			if (*min_fail > mapping_num)
+				*min_fail = mapping_num;
 		}
 	}
 	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex &&
@@ -1094,6 +1160,19 @@ retry:
 		/* get this error with SNMPv1, we fix the PDU by removing the bad variable and retry the request. */
 
 		i = response->errindex - 1;
+
+		if (0 > i || i >= mapping_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+					" an out of bounds error index", items[0].host.host);
+
+			zbx_snprintf(error, max_error_len, "Invalid SNMP response: error index out of bounds (%ld).",
+					response->errindex);
+
+			ret = NOTSUPPORTED;
+			goto exit;
+		}
+
 		j = mapping[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() errindex:%ld oid:'%s'", __function_name,
