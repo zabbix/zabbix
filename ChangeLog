@@ -4,9 +4,12 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+A......... [ZBX-8660] fix API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
+...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
+..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
-..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
 ...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
 ...G...PS. [ZBX-8763] fixed log message printing to syslog and undefined type log if debug level 5 is set (igors)
@@ -21,18 +24,35 @@ Bug fixes:
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
-Changes for 2.4.1rc1
+Changes for 2.4.1rc2
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, German and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-8847] fixed mass actions in lists only affecting the selected elements on the current page (Pavels)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1rc1
 
 Bug fixes:
 ..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
+..F....... [ZBX-8665] fixed incorrect display of period in graph filter time bar, dragging the scrollbar beyond year 1970 and calendar months to run in loop for years 1970 and 2038 (Ivo)
+..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
+.......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
+...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
+..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
+..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
+........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
 ..F....... [ZBX-8753] fixed mass update to change host inventory (Sasha)
 ....I..... [ZBX-8744] fixed database upgrade procedure stopping when upgrade step was failed (Sasha)
 ........S. [ZBX-8719] optimised value cache requests to better utilise database indexes (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.0
@@ -127,7 +147,7 @@ A......... [ZBX-8627] fixed problem with some of code not working on PHP 5.3 (Kr
 ...G...PS. [ZBX-8599] fixed incorrect error message in Telnet based checks (Arturs)
 ....I..PS. [ZBX-8389] fixed compilation error due to undeclared CURLOPT_KEYPASSWD with versions of libcurl up to 7.16.4 (asaveljevs, dimir)
 A.F....... [ZBX-8582] added use of escaping to variables in SQL queries to prevent possible injections in places where it was missing; thanks to Leann for the report (Krists)
-........S. [ZBX-8444] database queries for enabled items, triggers and hosts replaced with queries from configuration cache to improve performance for processing sleeping escalations (igors)
+........S. [ZBX-8444] improved sleeping escalation processing by using configuration cache to get enabled items, triggers and hosts (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 ........S. [ZBX-8608] fixed clearing of discovered services with using CIDR notation in ip lists (Sasha)
 ........S. [ZBX-8415] fixed possible server crash on LLD host or host group update (dimir, Sasha)
@@ -423,9 +443,19 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.7rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (Taiwan) and Polish translations; thanks to Zabbix translators (Richlv)
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
+A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
+..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
+...G...... [ZBX-8822] fixed error message being set for vm.memory.size[] items on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
+..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
+........S. [ZBX-8514] fixed bug where server would turn a passive proxy into a host if the proxy machine is running an agent that is discovered via network discovery (Juris)
+..F....... [ZBX-8773] fixed inventory mode resetting when adding template to a host (Ivo)
+........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ........S. [ZBX-8719] optimized value cache database requests (wiper)
 ..F....... [ZBX-8659] fixed graphs in screens not respecting "Show legend" setting when in dynamic mode (Krists)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
@@ -438,6 +468,7 @@ A.F....... [ZBX-8650] fixed undefined index in user.get method when using 'searc
 ........S. [ZBX-8414] fixed value cache statistics update when database contains only part of requested data (wiper)
 ........S. [ZBX-8414] fixed value cache single value request returning FAIL for not found items in low memory mode (wiper)
 ..F....... [ZBX-8616] fixed link to host items in Inventory->Hosts host view (Krists)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.6
@@ -459,7 +490,7 @@ Bug fixes:
 ....IJ.... [ZBX-4800] replaced JSON.org library with Android JSON library; thanks to Volker Fröhlich for legal research (asaveljevs)
 .........T [ZBX-4800] fixed typo in item name in "Template JMX Generic": "mpTenured" -> "mp Tenured" (asaveljevs)
 .......PS. [ZBX-8488] fixed items being shown in queue with a delay of more than 44 years (asaveljevs)
-........S. [ZBX-8444] increased the interval for checking sleeping escalations to improve performance (igors)
+........S. [ZBX-8444] changed the interval for checking sleeping escalations to improve performance (igors)
 ..F....PS. [ZBX-8608] added support of IP masks for action conditions (Sasha)
 A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not updating properly when linking template to host (Ivo)
 ........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
@@ -806,7 +837,7 @@ A......... [ZBX-7483] fixed user group delete validation (Eduard)
 A.F....... [ZBX-6348] fixed possibility to create host groups and update all other existing objects with name containing only zeros (Ivo)
 .......PS. [ZBX-7288] improved error logging for server-proxy communication (Andris)
 A.F....... [ZBX-7407] fixed being able to change event source for existing actions (Ivo)
-...G...PS. [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
+...G...... [ZBX-7392] fixed memory leaks in gnuregex.c (igors)
 ........S. [ZBX-7397] reduced value cache memory usage (wiper)
 ........S. [ZBX-7516] fixed typo in SQL query: changed "impi_disable_until" to "ipmi_disable_until" (asaveljevs)
 A......... [ZBX-7509] changed "value_flag" to proper name "value_flags" in triggers API (Ivo)
@@ -1514,11 +1545,17 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.14rc1
 
 New features:
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
+........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.13
@@ -3102,6 +3139,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.22rc1
 
+........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
+........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
+...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 Changes for 1.8.21
 

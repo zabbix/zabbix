@@ -33,6 +33,11 @@ Curl.prototype = {
 	query:		'',
 	args:		null,
 
+	/**
+	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
+	 *
+	 * @param url
+	 */
 	initialize: function(url) {
 		url = url || location.href;
 
@@ -157,7 +162,7 @@ Curl.prototype = {
 			if (keyval.length > 1) {
 				try {
 					var tmp = keyval[1].replace(/\+/g, '%20');
-					this.args[keyval[0]] = decodeURIComponent(tmp);
+					this.args[decodeURIComponent(keyval[0])] = decodeURIComponent(tmp);
 				}
 				catch(exc) {
 					this.args[keyval[0]] = keyval[1];

@@ -438,41 +438,31 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Check item data and set flags field.
+	 * Validates items to be created.
+	 *
+	 * @throws APIException if validation fails
 	 *
 	 * @param array $items
-	 * @param bool  $update
 	 *
 	 * @return void
 	 */
-	protected function checkInput(array &$items, $update = false) {
-		parent::checkInput($items, $update);
-		self::validateInventoryLinks($items, $update);
+	protected function validateCreate(array $items) {
+		parent::checkInput($items, false);
+		self::validateInventoryLinks($items, false);
+	}
 
-		// set proper flags to divide normal and discovered items in future processing
-		if ($update) {
-			$dbItems = $this->get(array(
-				'itemids' => zbx_objectValues($items, 'itemid'),
-				'output' => array('itemid', 'flags'),
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($items as &$item) {
-				$item['flags'] = $dbItems[$item['itemid']]['flags'];
-			}
-			unset($item);
-		}
-		else {
-			foreach ($items as &$item) {
-				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+	/**
+	 * Validates item update data.
 
-				// set default formula value
-				if (!isset($item['formula'])) {
-					$item['formula'] = '1';
-				}
-			}
-			unset($item);
-		}
+	 * @throws APIException if validation fails
+	 *
+	 * @param array $items
+	 *
+	 * @return void
+	 */
+	protected function validateUpdate(array $items) {
+		parent::checkInput($items, true);
+		self::validateInventoryLinks($items, true);
 	}
 
 	/**
@@ -485,7 +475,18 @@ class CItem extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 
-		$this->checkInput($items);
+		$this->validateCreate($items);
+
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+
+			// set default formula value
+			if (!isset($item['formula'])) {
+				$item['formula'] = '1';
+			}
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -525,8 +526,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -577,8 +578,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -598,7 +599,20 @@ class CItem extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$this->checkInput($items, true);
+		$dbItems = $this->get(array(
+			'output' => array('itemid', 'flags'),
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		$this->validateUpdate($items);
+
+		foreach ($items as &$item) {
+			$item['flags'] = $dbItems[$item['itemid']]['flags'];
+		}
+		unset($item);
+
 		$this->updateReal($items);
 		$this->inherit($items);
 
@@ -609,11 +623,11 @@ class CItem extends CItemGeneral {
 	 * Delete items.
 	 *
 	 * @param array $itemIds
-	 * @param bool  $noPermissions
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemIds, $noPermissions = false) {
+	public function delete(array $itemIds, $nopermissions = false) {
 		if (!$itemIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -621,7 +635,7 @@ class CItem extends CItemGeneral {
 		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get(array(
-			'output' => array('name', 'templateid'),
+			'output' => array('name', 'templateid', 'flags'),
 			'selectHosts' => array('name'),
 			'itemids' => $itemIds,
 			'editable' => true,
@@ -629,13 +643,21 @@ class CItem extends CItemGeneral {
 		));
 
 		// TODO: remove $nopermissions hack
-		if (!$noPermissions) {
+		if (!$nopermissions) {
 			foreach ($itemIds as $itemId) {
 				if (!isset($delItems[$itemId])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delItems[$itemId]['templateid'] != 0) {
+				$delItem = $delItems[$itemId];
+
+				if ($delItem['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
+				}
+
+				if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot delete discovered item "%1$s".', $delItem['name']
+					));
 				}
 			}
 		}
@@ -748,10 +770,10 @@ class CItem extends CItemGeneral {
 		}
 
 		$items = $this->get(array(
+			'output' => $selectFields,
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => array('applicationid'),
-			'output' => $selectFields,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 

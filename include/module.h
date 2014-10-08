@@ -27,6 +27,8 @@
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
+#define get_rkey(request)		(request)->key
+#define get_rparams_num(request)	(request)->nparam
 #define get_rparam(request, num)	((request)->nparam > num ? (request)->params[num] : NULL)
 
 /* flags for command */
