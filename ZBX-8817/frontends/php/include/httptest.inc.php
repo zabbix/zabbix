@@ -76,7 +76,7 @@ function delete_history_by_httptestid($httptestid) {
 		'SELECT DISTINCT i.itemid'.
 		' FROM items i,httptest ht,httptestitem hti,httpstep hs,httpstepitem hsi'.
 		' WHERE ((i.itemid=hti.itemid AND hti.httptestid=ht.httptestid)'.
-			' OR (i.itemid=hsi.itemid AND hsi.httpstepid=hs.httpstepid))'.
+				' OR (i.itemid=hsi.itemid AND hsi.httpstepid=hs.httpstepid))'.
 			' AND ht.httptestid='.zbx_dbstr($httptestid)
 	);
 	while ($item_data = DBfetch($db_items)) {

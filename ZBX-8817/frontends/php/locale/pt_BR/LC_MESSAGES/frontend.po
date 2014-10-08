@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-24 23:09+0300\n"
-"PO-Revision-Date: 2014-08-16 19:09+0300\n"
+"POT-Creation-Date: 2014-10-03 05:43+0300\n"
+"PO-Revision-Date: 2014-10-02 19:46+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408208996.0\n"
+"X-POOTLE-MTIME: 1412272001.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -55,8 +55,8 @@ msgstr "%1$s (ano %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ITEM"
+msgstr[1] "%1$s ITENS"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -471,7 +471,7 @@ msgstr "Ativo até"
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.httpconf.edit.php:278
-#: include/views/configuration.httpconf.edit.php:322
+#: include/views/configuration.httpconf.edit.php:329
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
@@ -756,7 +756,7 @@ msgstr "Abordagem"
 msgid "Apr"
 msgstr "Abr"
 
-#: include/forms.inc.php:1684 include/func.inc.php:120
+#: include/forms.inc.php:1682 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
 msgid "April"
 msgstr "Abril"
@@ -817,7 +817,7 @@ msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] "Às %1$s:%2$s de cada dia"
 msgstr[1] "Às %1$s:%2$s a cada %3$s dias"
 
-#: include/forms.inc.php:1765
+#: include/forms.inc.php:1763
 msgid "At (hour:minute)"
 msgstr "Às (horas:minutos)"
 
@@ -859,7 +859,7 @@ msgstr "Log de auditoria"
 msgid "Aug"
 msgstr "Ago"
 
-#: include/forms.inc.php:1676 include/func.inc.php:124
+#: include/forms.inc.php:1674 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:120
 msgid "August"
 msgstr "Agosto"
@@ -1264,7 +1264,7 @@ msgstr "Carga da(s) CPU(s). Carga de processamento. A cpu e o modo são opcionai
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Utilização da(s) CPU(s). Carga percentual do processador. O parâmetros <cpu>, <type> e <mode> são opcionais. Se <cpu> estiver ausente, serão consideradas todas. Se o <type> estiver ausente, será usado tipo usuário. Se o <modo> estiver ausente, avg1 é utilizado."
+msgstr "Utilização da(s) CPU(s). Carga percentual do processador. O parâmetros <cpu>, <type> e <mode> são opcionais. Se <cpu> estiver ausente, serão consideradas todas. Se o <type> estiver ausente, será usado tipo usuário. Se o <modo> estiver ausente, <avg1> é utilizado."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -2069,22 +2069,22 @@ msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como 
 #: include/classes/import/CConfigurationImport.php:1172
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo gráfico \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pela trigger \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de trigger \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -2805,7 +2805,7 @@ msgstr "Clássico"
 msgid "Clear"
 msgstr "Limpar"
 
-#: include/views/configuration.httpconf.edit.php:312
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:447
 msgid "Clear history and trends"
 msgstr "Limpar histórico e médias"
@@ -2835,7 +2835,7 @@ msgstr "Relógio"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:309
+#: include/views/configuration.httpconf.edit.php:320
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -3186,7 +3186,8 @@ msgstr ""
 "A conexão com o servidor Zabbix \"%s\" foi recusada. Possíveis causas:\n"
 "1. IP/DNS incorreto no arquivo \"zabbix.conf.php\";\n"
 "2. Definição de segurança (por exemplo SELinux) está bloqueando a conexão;\n"
-"3. Firewall bloqueando conexão TCP.\n"
+"3. Servidor Zabbix não está em execução\n"
+"4. Firewall bloqueando conexão TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:278
 #, c-format
@@ -3337,7 +3338,7 @@ msgstr "Criar tipo de mídia"
 
 #: include/views/conf.import.php:24
 msgid "Create new"
-msgstr ""
+msgstr "Criar novo"
 
 #: include/views/administration.proxy.list.php:27
 msgid "Create proxy"
@@ -3584,7 +3585,7 @@ msgstr "Nome DNS"
 msgid "DOWN"
 msgstr "DOWN"
 
-#: include/forms.inc.php:1633 include/maintenances.inc.php:33
+#: include/forms.inc.php:1631 include/maintenances.inc.php:33
 #: include/reports.inc.php:62 include/reports.inc.php:386
 #: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
@@ -3692,7 +3693,7 @@ msgstr "Tipo de banco de dados"
 msgid "Database user"
 msgstr "Usuário do banco de dados"
 
-#: include/forms.inc.php:1700 include/forms.inc.php:1761 jsrpc.php:136
+#: include/forms.inc.php:1698 include/forms.inc.php:1759 jsrpc.php:136
 msgid "Date"
 msgstr "Data"
 
@@ -3712,11 +3713,11 @@ msgstr "Data de fim da garantia do HW"
 msgid "Date HW purchased"
 msgstr "Data de aquisição do HW"
 
-#: include/forms.inc.php:1702 report3.php:124 report4.php:159 report5.php:44
+#: include/forms.inc.php:1700 report3.php:124 report4.php:159 report5.php:44
 msgid "Day"
 msgstr "Dia"
 
-#: include/forms.inc.php:1734
+#: include/forms.inc.php:1732
 msgid "Day of month"
 msgstr "Dia do mês"
 
@@ -3736,8 +3737,8 @@ msgstr "O dia do mês é > N"
 msgid "Day of month is NOT N"
 msgstr "O dia do mês é NÃO É N"
 
-#: include/forms.inc.php:1662 include/forms.inc.php:1705
-#: include/forms.inc.php:1730
+#: include/forms.inc.php:1660 include/forms.inc.php:1703
+#: include/forms.inc.php:1728
 msgid "Day of week"
 msgstr "Dia da semana"
 
@@ -3757,7 +3758,7 @@ msgstr "Dia da semana é > N"
 msgid "Day of week is NOT N"
 msgstr "Dia da semana é NÃO É N"
 
-#: include/forms.inc.php:1778
+#: include/forms.inc.php:1776
 msgid "Days"
 msgstr "Dias"
 
@@ -3779,7 +3780,7 @@ msgstr "Modo de depuração atualizado"
 msgid "Dec"
 msgstr "Dez"
 
-#: include/forms.inc.php:1696 include/func.inc.php:128
+#: include/forms.inc.php:1694 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:124
 msgid "December"
 msgstr "Dezembro"
@@ -3854,7 +3855,7 @@ msgstr "Remover"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Excluir todos os elementos que não estão presentes no arquivo XML?"
 
 #: include/views/configuration.template.edit.php:486
 msgid "Delete and clear"
@@ -3928,7 +3929,7 @@ msgstr "Remover período de manutenção?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "Excluir os ausentes"
 
 #: include/views/configuration.sysmap.edit.php:193
 msgid "Delete network map?"
@@ -4619,11 +4620,11 @@ msgstr "Mostrar as triggers OK para"
 
 #: latest.php:892
 msgid "Display graph"
-msgstr ""
+msgstr "Exibir gráfico"
 
 #: latest.php:891
 msgid "Display stacked graph"
-msgstr ""
+msgstr "Exibir pilha de gráficos"
 
 #: include/func.inc.php:1568
 msgid "Displaying"
@@ -5201,11 +5202,11 @@ msgstr "Eventos"
 msgid "Events and alerts"
 msgstr "Eventos e alertas"
 
-#: include/forms.inc.php:1645
+#: include/forms.inc.php:1643
 msgid "Every day(s)"
 msgstr "A cada dia(s)"
 
-#: include/forms.inc.php:1652
+#: include/forms.inc.php:1650
 msgid "Every week(s)"
 msgstr "A cada semana(s)"
 
@@ -5229,7 +5230,7 @@ msgstr "Erro de execução de SQL: [%1$s] em [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Executar a consulta WMI e retornar o primeiro objeto selecionado."
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
@@ -5299,7 +5300,7 @@ msgid "Expression"
 msgstr "Expressão"
 
 #: include/forms.inc.php:1469 include/forms.inc.php:1474
-#: include/forms.inc.php:1483
+#: include/forms.inc.php:1482
 msgid "Expression Syntax Error."
 msgstr "Erro de sintaxe na expressão."
 
@@ -5398,7 +5399,7 @@ msgstr "Favoritos"
 msgid "Feb"
 msgstr "Fev"
 
-#: include/forms.inc.php:1674 include/func.inc.php:118
+#: include/forms.inc.php:1672 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:114
 msgid "February"
 msgstr "Fevereiro"
@@ -5542,7 +5543,7 @@ msgstr "Fim"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandês (fi_FI)"
 
-#: include/forms.inc.php:1712 include/maintenances.inc.php:111
+#: include/forms.inc.php:1710 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Primeiro"
 
@@ -5578,7 +5579,7 @@ msgstr "Para convidado, senha deve ser vazia"
 msgid "Formula"
 msgstr "Fórmula"
 
-#: include/forms.inc.php:1715 include/maintenances.inc.php:114
+#: include/forms.inc.php:1713 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Quarto"
 
@@ -5590,7 +5591,7 @@ msgstr "Francês (fr_FR)"
 msgid "Fri"
 msgstr "Sex"
 
-#: include/forms.inc.php:1659 include/forms.inc.php:1727
+#: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "Sexta-feira"
@@ -5790,7 +5791,7 @@ msgstr "O gráfico \"%1$s\" já existe em \"%2$s\" (com itens diferentes)."
 
 #: include/classes/api/services/CGraph.php:410
 #: include/classes/api/services/CGraphPrototype.php:420
-#: include/graphs.inc.php:345
+#: include/graphs.inc.php:356
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "O gráfico \"%1$s\" já existe em \"%2$s\"."
@@ -5884,7 +5885,7 @@ msgstr "Protótipo de gráfico excluído"
 
 #: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "O protótipo de gráfico não foi encontrado."
 
 #: graphs.php:230
 msgid "Graph prototype updated"
@@ -6209,7 +6210,7 @@ msgstr "Histórico"
 msgid "History cleared"
 msgstr "Histórico zerado"
 
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:310
 #: include/views/configuration.item.edit.php:448
 msgid "History clearing can take a long time. Continue?"
 msgstr "Zerar o histórico pode levar um tempo bem longo. Continuar?"
@@ -6635,7 +6636,7 @@ msgstr "Hosts atualizados"
 msgid "Hourly"
 msgstr "Por hora"
 
-#: include/forms.inc.php:1780
+#: include/forms.inc.php:1778
 msgid "Hours"
 msgstr "Horas"
 
@@ -7381,7 +7382,7 @@ msgstr "Foi informado o ID de gráfico \"%1$s\" e ele é inválido para o elemen
 #: include/classes/api/services/CScreenItem.php:661
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de protótipo de gráfico \"%1$s\" e ele é inválido para o elemento da tela."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7467,7 +7468,7 @@ msgstr "Foi informada uma chave de item inválida \"%1$s\" para a expressão da 
 #: include/classes/api/services/CScreenItem.php:698
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de protótipo de item \"%1$s\" e ele é inválido para o elemento da tela."
 
 #: include/classes/validators/CFunctionValidator.php:254
 #, c-format
@@ -7484,7 +7485,7 @@ msgstr "Lista de itens inválida."
 
 #: maintenance.php:330
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038."
+msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038"
 
 #: maintenance.php:358
 msgid "Incorrect maintenance date"
@@ -7531,7 +7532,7 @@ msgstr "Foi informado um comprimento inválido para o mapa \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:590
 msgid "Incorrect max columns provided for screen element."
-msgstr ""
+msgstr "O máximo de colunas informado é inválido para o elemento da tela."
 
 #: include/classes/api/services/CScript.php:563
 #, c-format
@@ -7749,11 +7750,11 @@ msgstr "Foi informada uma função de trigger inválida \"%1$s\" na expressão."
 #: include/classes/api/services/CTriggerPrototype.php:976
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr ""
+msgstr "O protótipo de trigger possui expressão inválida. O host \"%1$s\" não existe ou você não possui acesso a este host."
 
 #: include/classes/api/services/CTriggerPrototype.php:987
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "O protótipo de trigger possui expressão inválida. A expressão não pode possuir referencia a host e template simultaneamente."
 
 #: include/func.inc.php:1004
 msgid "Incorrect type of asort_by_key."
@@ -7904,7 +7905,7 @@ msgstr "A interface com o IP \"%1$s\" não pode possuir nome de DNS nulo enquant
 #: include/classes/api/services/CHostInterface.php:315
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr "A interface com IP \"%s$s\" não pode possuir nome de DNS nulo."
+msgstr "A interface com IP \"%1$s\" não pode possuir nome de DNS nulo."
 
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
@@ -8271,7 +8272,7 @@ msgstr "O item usa uma interface de tipo inválido."
 
 #: chart.php:89
 msgid "Item values"
-msgstr ""
+msgstr "Valores do item"
 
 #: include/classes/api/services/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -8396,7 +8397,7 @@ msgstr "Identificador Jabber"
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1669 include/func.inc.php:117
+#: include/forms.inc.php:1667 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:113
 msgid "January"
 msgstr "Janeiro"
@@ -8409,7 +8410,7 @@ msgstr "Japonês (ja_JP)"
 msgid "Jul"
 msgstr "Jul"
 
-#: include/forms.inc.php:1671 include/func.inc.php:123
+#: include/forms.inc.php:1669 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:119
 msgid "July"
 msgstr "Julho"
@@ -8418,7 +8419,7 @@ msgstr "Julho"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/forms.inc.php:1694 include/func.inc.php:122
+#: include/forms.inc.php:1692 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:118
 msgid "June"
 msgstr "Junho"
@@ -8525,7 +8526,7 @@ msgstr "Localização do texto"
 msgid "Language"
 msgstr "Língua"
 
-#: include/forms.inc.php:1716 include/maintenances.inc.php:115
+#: include/forms.inc.php:1714 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Última"
 
@@ -8991,7 +8992,7 @@ msgstr "Manutenção excluída"
 msgid "Maintenance period"
 msgstr "Período de manutenção"
 
-#: include/forms.inc.php:1775
+#: include/forms.inc.php:1773
 msgid "Maintenance period length"
 msgstr "Duração do período de manutenção"
 
@@ -9063,7 +9064,7 @@ msgstr "O mapa \"%s\" foi atualizado."
 
 #: sysmap.php:85
 msgid "Map is updated! Return?"
-msgstr ""
+msgstr "O mapa foi atualizado! Retornar para a lista de mapas?"
 
 #: include/views/configuration.sysmap.edit.php:99
 msgid "Map label type"
@@ -9071,7 +9072,7 @@ msgstr "Tipo de rótulo no mapa"
 
 #: sysmap.php:88
 msgid "Map update failed."
-msgstr ""
+msgstr "A atualização do mapa falhou."
 
 #: include/classes/api/services/CMap.php:513
 #, c-format
@@ -9103,7 +9104,7 @@ msgstr "Mapas"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1679 include/func.inc.php:119
+#: include/forms.inc.php:1677 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:115
 msgid "March"
 msgstr "Março"
@@ -9138,7 +9139,7 @@ msgstr "Atualização em massa de elementos"
 #: include/views/configuration.screen.constructor.edit.php:287
 #: screenedit.php:71
 msgid "Max columns"
-msgstr ""
+msgstr "Máximo de colunas"
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
@@ -9174,7 +9175,7 @@ msgstr "Quantidade MÁXIMA de arquivos abertos suportada pelo SO."
 msgid "Maximum number of processes supported by OS."
 msgstr "Quantidade MÁXIMA de processos suportada pelo SO."
 
-#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:404
+#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:415
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -9197,7 +9198,7 @@ msgstr "O valor máximo para um período T é > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "O valor máximo para um período T é NÃO É N"
 
-#: include/forms.inc.php:1689 include/func.inc.php:121
+#: include/forms.inc.php:1687 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:117
 msgid "May"
 msgstr "Maio"
@@ -9365,7 +9366,7 @@ msgstr "O tamanho mínimo requerido para o POST PHP é %s (opção de configura�
 msgid "Minimum severity"
 msgstr "Severidade mínima"
 
-#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:397
+#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:408
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -9393,7 +9394,7 @@ msgstr "Valor mínimo em um período T é > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Valor mínimo em um período T é NÃO É N"
 
-#: include/forms.inc.php:1782
+#: include/forms.inc.php:1780
 msgid "Minutes"
 msgstr "Minutos"
 
@@ -9440,7 +9441,7 @@ msgstr "Estão faltando itens no gráfico \"%1$s\"."
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr "Estão faltando itens no protótipo de gráfico \"%1$s\"."
 
-#: include/graphs.inc.php:312
+#: include/graphs.inc.php:323
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Está faltando a chave \"%1$s\" para o host \"%2$s\"."
@@ -9461,7 +9462,7 @@ msgstr "Modelo"
 msgid "Mon"
 msgstr "Seg"
 
-#: include/forms.inc.php:1655 include/forms.inc.php:1723
+#: include/forms.inc.php:1653 include/forms.inc.php:1721
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "Segunda-feira"
@@ -9492,11 +9493,11 @@ msgstr "Monitoramento de log com rotação. fileformat - [caminho][expressão re
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr "Monitoramento de log. pattern - expressão regular"
 
-#: include/forms.inc.php:1698 report3.php:106 report4.php:146 report5.php:46
+#: include/forms.inc.php:1696 report3.php:106 report4.php:146 report5.php:46
 msgid "Month"
 msgstr "Mês"
 
-#: include/forms.inc.php:1635 include/maintenances.inc.php:37
+#: include/forms.inc.php:1633 include/maintenances.inc.php:37
 #: include/reports.inc.php:64 include/reports.inc.php:388
 #: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
@@ -10003,14 +10004,14 @@ msgstr "Não foram definidos intervalos flexíveis."
 msgid "No graph ID provided for screen element."
 msgstr "Não foi informado um ID de gráfico para um elemento da tela."
 
-#: include/graphs.inc.php:274
+#: include/graphs.inc.php:285
 #, c-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Não foi localizado um gráfico com o graphid \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:501
 msgid "No graph prototype ID provided for screen element."
-msgstr ""
+msgstr "Não foi informado o ID do protótipo de gráfico para o elemento da tela."
 
 #: include/views/configuration.graph.list.php:73 popup.php:1290
 msgid "No graph prototypes found."
@@ -10143,7 +10144,7 @@ msgstr "Nenhuma chave de item encontrada."
 
 #: include/classes/api/services/CScreenItem.php:511
 msgid "No item prototype ID provided for screen element."
-msgstr ""
+msgstr "Não foi informado o ID do protótipo de item para o elemento da tela."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:1085
 msgid "No item prototypes found."
@@ -10516,11 +10517,11 @@ msgstr "Visão normal"
 #: include/actions.inc.php:232
 #: include/views/configuration.action.edit.php:1040
 msgid "Not Ack"
-msgstr "Não reconhecer"
+msgstr "Não reconhecido"
 
 #: include/forms.inc.php:601 include/forms.inc.php:782
 msgid "Not Templated items"
-msgstr "Itens fora do emplate"
+msgstr "Itens fora do template"
 
 #: include/classes/api/services/CTrigger.php:1452
 #, c-format
@@ -10587,7 +10588,7 @@ msgstr "Notificações"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1691 include/func.inc.php:127
+#: include/forms.inc.php:1689 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:123
 msgid "November"
 msgstr "Novembro"
@@ -10823,7 +10824,7 @@ msgstr "Out"
 msgid "Octal"
 msgstr "Octal"
 
-#: include/forms.inc.php:1686 include/func.inc.php:126
+#: include/forms.inc.php:1684 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:122
 msgid "October"
 msgstr "Outubro"
@@ -10858,7 +10859,7 @@ msgstr "Uma vez"
 msgid "One of the objects is left without a host group."
 msgstr "Um dos objetos está sem um grupo de hosts."
 
-#: include/forms.inc.php:1632 include/maintenances.inc.php:31
+#: include/forms.inc.php:1630 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Apenas uma vez"
 
@@ -11439,7 +11440,7 @@ msgstr "Executa uma consulta DNS. Caso seja bem sucedida retorna uma sequência 
 msgid "Period"
 msgstr "Período"
 
-#: include/forms.inc.php:1637
+#: include/forms.inc.php:1635
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Tipo de período"
@@ -12478,7 +12479,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Sab"
 
-#: include/forms.inc.php:1660 include/forms.inc.php:1728
+#: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "Sábado"
@@ -12678,7 +12679,7 @@ msgstr "Padrão de busca está vazio"
 msgid "Search/Filter elements limit"
 msgstr "Limite de Busca/Filtragem de elementos"
 
-#: include/forms.inc.php:1713 include/maintenances.inc.php:112
+#: include/forms.inc.php:1711 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Segundo"
 
@@ -12845,7 +12846,7 @@ msgstr "Set"
 msgid "Separated"
 msgstr "Separados"
 
-#: include/forms.inc.php:1681 include/func.inc.php:125
+#: include/forms.inc.php:1679 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:121
 msgid "September"
 msgstr "Setembro"
@@ -13097,7 +13098,7 @@ msgstr "Gráfico simples"
 
 #: include/screens.inc.php:46
 msgid "Simple graph prototype"
-msgstr ""
+msgstr "Protótipo simples de gráfico"
 
 #: include/hosts.inc.php:370
 msgid "Site ZIP / postal"
@@ -13145,7 +13146,7 @@ msgstr "Tamanho de um arquivo. Tamanho em bytes. O arquivo deve possuir permiss�
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "O tamanho da resposta recebida do servidor Zabbix \"%1$s\" excedeu o tamanho permitido de %2$s bytes. Este valor pode ser modificado modificando a constante ZBX_SOCKET_BYTES_LIMIT em include/defines.inc.php."
 
-#: include/graphs.inc.php:360
+#: include/graphs.inc.php:371
 #, c-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Foi ignorada a cópia do gráfico \"%1$s\" para o host \"%2$s\"."
@@ -13280,11 +13281,11 @@ msgstr "O script informado não existe ou você não possui privilégios para ex
 
 #: include/views/configuration.item.list.php:59
 msgid "Specify some filter condition to see the items."
-msgstr ""
+msgstr "Especifique alguma condição de filtro para visualizar os itens."
 
 #: latest.php:442
 msgid "Specify some filter condition to see the values."
-msgstr ""
+msgstr "Especifique alguma condição de filtro para visualizar os valores."
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -13477,7 +13478,7 @@ msgstr "Total dos valores de um período T é NÃO É N"
 msgid "Sun"
 msgstr "Dom"
 
-#: include/forms.inc.php:1661 include/forms.inc.php:1729
+#: include/forms.inc.php:1659 include/forms.inc.php:1727
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "Domingo"
@@ -13845,7 +13846,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Existe \"%1$d\" grupo com acesso interno à interface web."
 msgstr[1] "Existem \"%1$d\" grupos com acesso interno à interface web."
 
-#: include/forms.inc.php:1714 include/maintenances.inc.php:113
+#: include/forms.inc.php:1712 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Terceiro"
 
@@ -13878,7 +13879,7 @@ msgstr "Este ano"
 msgid "Thu"
 msgstr "Qui"
 
-#: include/forms.inc.php:1658 include/forms.inc.php:1726
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "Quinta-feira"
@@ -14327,7 +14328,7 @@ msgstr "Tentativa de leitura de propriedade inacessível \"%s\"."
 msgid "Tue"
 msgstr "Ter"
 
-#: include/forms.inc.php:1656 include/forms.inc.php:1724
+#: include/forms.inc.php:1654 include/forms.inc.php:1722
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "Terça-feira"
@@ -14756,7 +14757,7 @@ msgstr "Ligado"
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:307
+#: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
 #: include/views/configuration.item.massupdate.php:571
@@ -14777,11 +14778,11 @@ msgstr "Ligado"
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:177
 #: popup_media.php:137 popup_period.php:145 tr_logform.php:347
 msgid "Update"
-msgstr "Atualiza"
+msgstr "Atualizar"
 
 #: acknow.php:229
 msgid "Update and return"
-msgstr ""
+msgstr "Atualizar e retornar"
 
 #: include/views/conf.import.php:24
 msgid "Update existing"
@@ -15553,7 +15554,7 @@ msgstr "Cenários web"
 msgid "Wed"
 msgstr "Qua"
 
-#: include/forms.inc.php:1657 include/forms.inc.php:1725
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "Quarta-feira"
@@ -15562,7 +15563,7 @@ msgstr "Quarta-feira"
 msgid "Week"
 msgstr "Semana"
 
-#: include/forms.inc.php:1634 include/maintenances.inc.php:35
+#: include/forms.inc.php:1632 include/maintenances.inc.php:35
 #: include/reports.inc.php:63 include/reports.inc.php:387
 #: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
