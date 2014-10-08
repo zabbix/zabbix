@@ -680,7 +680,7 @@ function DBid2nodeid($id_name) {
 }
 
 function id2nodeid($id) {
-	return (int) bcdiv("$id", ZBX_DM_MAX_HISTORY_IDS);
+	return ZBX_DISTRIBUTED ? (int) bcdiv("$id", ZBX_DM_MAX_HISTORY_IDS) : 0;
 }
 
 /**
