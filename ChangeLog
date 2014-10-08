@@ -30,6 +30,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 
 --------------------------------------------------------------------------------
