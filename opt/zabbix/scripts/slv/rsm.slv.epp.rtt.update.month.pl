@@ -9,6 +9,9 @@ use warnings;
 use RSM;
 use RSMSLV;
 
+use constant MIN_UPDATE_ERROR => -208; # minimal UPDATE TIME error
+use constant MAX_UPDATE_ERROR => -206; # maximal UPDATE TIME error
+
 my $cfg_key_in = 'rsm.epp.rtt[{$RSM.TLD},update]';
 my $cfg_key_out = 'rsm.slv.epp.rtt.update.month';
 
