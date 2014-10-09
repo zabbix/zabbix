@@ -185,7 +185,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
-	int			saved_nscount, saved_retrans, saved_retry;
+	int			saved_nscount, saved_retrans, saved_retry, saved_options;
 	struct sockaddr_in	saved_ns;
 #endif
 	typedef struct
@@ -473,6 +473,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
+	saved_options = _res.options;
 	if (0 != use_tcp)
 		_res.options |= RES_USEVC;
 
@@ -501,6 +502,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	res = res_send(buf, res, answer.buffer, sizeof(answer.buffer));
 
+	_res.options = saved_options;
 	_res.retrans = saved_retrans;
 	_res.retry = saved_retry;
 
