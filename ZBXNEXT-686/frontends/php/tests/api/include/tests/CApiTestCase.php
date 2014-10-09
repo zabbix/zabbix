@@ -160,7 +160,7 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	protected function assertError($definition, CApiResponse $response) {
 		if (!$response->isError()) {
 			throw new Exception(
-				sprintf('Cannot use "assertError" for a successfull request.')
+				sprintf('Failed asserting that the request has failed with an error.')
 			);
 		}
 		$this->assertArraySchema($definition, $response->getError());
@@ -177,7 +177,7 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	protected function assertResult($definition, CApiResponse $response) {
 		if ($response->isError()) {
 			throw new Exception(
-				sprintf('Cannot use "assertResult" for a failed request.')
+				sprintf('Failed asserting that the request has been executed correctly.')
 			);
 		}
 		$this->assertArraySchema($definition, $response->getResult());
