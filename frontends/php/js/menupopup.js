@@ -329,7 +329,7 @@ function getMenuPopupMap(options) {
 
 		// latest
 		if (typeof options.gotos.latestData !== 'undefined') {
-			var url = new Curl('latest.php?filter_set=1');
+			var url = new Curl('latest.php');
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
 				url.setArgument(name, value);
