@@ -71,18 +71,45 @@ function httptest_status2style($status) {
 	}
 }
 
-function delete_history_by_httptestid($httptestid) {
-	$db_items = DBselect(
-		'SELECT DISTINCT i.itemid'.
-		' FROM items i,httptest ht,httptestitem hti,httpstep hs,httpstepitem hsi'.
-		' WHERE ((i.itemid=hti.itemid AND hti.httptestid=ht.httptestid)'.
-				' OR (i.itemid=hsi.itemid AND hsi.httpstepid=hs.httpstepid))'.
-			' AND ht.httptestid='.zbx_dbstr($httptestid)
+/**
+ * Delete web scenario item and web scenario step item history and trends by given web scenario ID.
+ *
+ * @param string $httpTestId
+ *
+ * @return bool
+ */
+function deleteHistoryByHttpTestId($httpTestId) {
+	$itemIds = array();
+
+	// find web scenario items
+	$dbItems = DBselect(
+		'SELECT hti.itemid'.
+		' FROM httptestitem hti'.
+		' WHERE hti.httptestid='.zbx_dbstr($httpTestId)
 	);
-	while ($item_data = DBfetch($db_items)) {
-		if (!delete_history_by_itemid($item_data['itemid'])) {
-			return false;
-		}
+
+	while ($itemData = DBfetch($dbItems)) {
+		$itemIds[$itemData['itemid']] = $itemData['itemid'];
+	}
+
+	// find web scenario step items
+	$dbItems = DBselect(
+		'SELECT hsi.itemid'.
+		' FROM httpstep hs'.
+		' LEFT JOIN httpstepitem hsi ON hs.httpstepid=hsi.httpstepid'.
+		' WHERE hs.httptestid='.zbx_dbstr($httpTestId)
+	);
+
+	while ($itemData = DBfetch($dbItems)) {
+		$itemIds[$itemData['itemid']] = $itemData['itemid'];
+	}
+
+	if (!$itemIds) {
+		return false;
+	}
+
+	if (!deleteHistoryByItemIds($itemIds)) {
+		return false;
 	}
 
 	return true;

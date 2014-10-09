@@ -163,21 +163,24 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 
 	DBstart();
 
-	$httptestId = getRequest('httptestid');
+	$httpTestId = getRequest('httptestid');
 
-	$httpTest = get_httptest_by_httptestid($httptestId);
+	$httpTest = get_httptest_by_httptestid($httpTestId);
 	if ($httpTest) {
-		$result = delete_history_by_httptestid($httptestId);
+		$result = deleteHistoryByHttpTestId($httpTestId);
 		if ($result) {
 
-			$result = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+			$result = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httpTestId));
 
 			$host = DBfetch(DBselect(
-				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
+				'SELECT h.host'.
+				' FROM hosts h,httptest ht'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND ht.httptestid='.zbx_dbstr($httpTestId)
 			));
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-				'Scenario ['.$httpTest['name'].'] ['.$httptestId.'] Host ['.$host['host'].'] history cleared'
+				'Scenario ['.$httpTest['name'].'] ['.$httpTestId.'] Host ['.$host['host'].'] history cleared'
 			);
 		}
 	}
@@ -386,7 +389,7 @@ elseif (hasRequest('action') && getRequest('action') == 'httptest.massclearhisto
 			continue;
 		}
 
-		$result &= delete_history_by_httptestid($id);
+		$result &= deleteHistoryByHttpTestId($id);
 		if ($result) {
 			$result &= DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($id));
 

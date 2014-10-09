@@ -828,17 +828,16 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 }
 
 /**
- * Clear items history and trends.
+ * Clear item history and trends by provided item IDs.
  *
- * @param $itemIds
+ * @param array $itemIds	IDs of items for which history should be cleared
  *
  * @return bool
  */
-function delete_history_by_itemid($itemIds) {
-	zbx_value2array($itemIds);
-	$result = delete_trends_by_itemid($itemIds);
+function deleteHistoryByItemIds(array $itemIds) {
+	$result = deleteTrendsByItemIds($itemIds);
 	if (!$result) {
-		return $result;
+		return false;
 	}
 
 	$result &= DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
@@ -851,14 +850,13 @@ function delete_history_by_itemid($itemIds) {
 }
 
 /**
- * Clear trends history for provided item ids.
+ * Clear trends history for provided item IDs.
  *
- * @param mixed $itemIds IDs of items for which history should be cleared
+ * @param array $itemIds	IDs of items for which trends should be cleared
  *
  * @return bool
  */
-function delete_trends_by_itemid($itemIds) {
-	zbx_value2array($itemIds);
+function deleteTrendsByItemIds(array $itemIds) {
 	$r1 = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
 	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds));
 
