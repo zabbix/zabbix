@@ -1021,7 +1021,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
 	{
-		strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+		zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
 		ret = CONFIG_ERROR;
 		goto out;
 	}
@@ -1067,8 +1067,6 @@ retry:
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
-		int	succeed = 1;
-
 		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
 			/* check that response variable binding matches the request variable binding */
@@ -1079,7 +1077,11 @@ retry:
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
 							" too many variable bindings", items[0].host.host);
-					succeed = 0;
+
+					zbx_strlcpy(error, "Invalid SNMP response: too many variable bindings.",
+							max_error_len);
+
+					ret = NOTSUPPORTED;
 				}
 
 				break;
@@ -1090,17 +1092,9 @@ retry:
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
 						" all of the requested variable bindings", items[0].host.host);
 
-				do
-				{
-					j = mapping[i++];
+				zbx_strlcpy(error, "Invalid SNMP response: too few variable bindings.", max_error_len);
 
-					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
-							" cannot find variable binding for this OID."));
-					errcodes[j] = NOTSUPPORTED;
-				}
-				while (i < mapping_num);
-
-				succeed = 0;
+				ret = NOTSUPPORTED;
 				break;
 			}
 
@@ -1112,17 +1106,10 @@ retry:
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
 						" variable bindings in the requested order", items[0].host.host);
 
-				do
-				{
-					j = mapping[i++];
+				zbx_strlcpy(error, "Invalid SNMP response: variable bindings out of order.",
+						max_error_len);
 
-					SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "Invalid SNMP response:"
-							" variable binding order does not match the request."));
-					errcodes[j] = NOTSUPPORTED;
-				}
-				while (i < mapping_num);
-
-				succeed = 0;
+				ret = NOTSUPPORTED;
 				break;
 			}
 
@@ -1139,7 +1126,7 @@ retry:
 			}
 		}
 
-		if (1 == succeed)
+		if (SUCCEED == ret)
 		{
 			if (*max_succeed < mapping_num)
 				*max_succeed = mapping_num;
@@ -1198,7 +1185,7 @@ retry:
 			}
 			else
 			{
-				strlcpy(error, "snmp_fix_pdu(): cannot fix PDU object.", max_error_len);
+				zbx_strlcpy(error, "snmp_fix_pdu(): cannot fix PDU object.", max_error_len);
 				ret = NOTSUPPORTED;
 			}
 		}
@@ -1511,7 +1498,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				/* consider a network error as relating to all items passed to */
 				/* this function, including those we did not just try to walk for */
 
-				strlcpy(error, result.msg, max_error_len);
+				zbx_strlcpy(error, result.msg, max_error_len);
 				ret = NETWORK_ERROR;
 
 				free_result(&result);
