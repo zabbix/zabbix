@@ -356,8 +356,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			milliseconds = current_time.millitm;
 #else
 			gettimeofday(&current_time,NULL);
-			localtime_r(&current_time.tv_sec, &tm_local);
-			tm = &tm_local;
+			tm = localtime_r(&current_time.tv_sec, &tm_local);
 			milliseconds = current_time.tv_usec / 1000;
 #endif
 			fprintf(log_file,
