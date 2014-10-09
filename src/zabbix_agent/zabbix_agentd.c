@@ -984,8 +984,7 @@ void	zbx_free_service_resources(void)
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
-#endif
-#ifndef _WINDOWS
+#else
 	unload_modules();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
