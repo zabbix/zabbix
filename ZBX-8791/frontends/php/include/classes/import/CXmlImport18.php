@@ -630,7 +630,7 @@ class CXmlImport18 {
 
 					// image will be decoded in class.image.php
 					$image['image'] = $image['encodedImage'];
-					unset($image['encodedImage']);
+					unset($image['encodedImage'], $image['imagetype']);
 
 					$images_to_update[] = $image;
 				}
@@ -643,18 +643,12 @@ class CXmlImport18 {
 				}
 			}
 
-			if (!empty($images_to_add)) {
-				$result = API::Image()->create($images_to_add);
-				if (!$result) {
-					throw new Exception(_('Cannot add image.'));
-				}
+			if ($images_to_add) {
+				API::Image()->create($images_to_add);
 			}
 
-			if (!empty($images_to_update)) {
-				$result = API::Image()->update($images_to_update);
-				if (!$result) {
-					throw new Exception(_('Cannot update image.'));
-				}
+			if ($images_to_update) {
+				API::Image()->update($images_to_update);
 			}
 		}
 
