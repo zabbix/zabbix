@@ -510,22 +510,29 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 
 	$itemId = getRequest('itemid');
 
-	DBstart();
+	$items = API::Item()->get(array(
+		'output' => array('key_'),
+		'itemids' => array($itemId),
+		'selectHosts' => array('name'),
+		'editable' => true
+	));
 
-	$item = get_item_by_itemid($itemId);
+	if ($items) {
+		DBstart();
 
-	if ($item) {
 		$result = deleteHistoryByItemIds(array($itemId));
-	}
 
-	if ($result) {
-		$host = get_host_by_hostid(getRequest('hostid'));
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
-			_('Host').' ['.$host['name'].'] '._('History cleared')
-		);
-	}
+		if ($result) {
+			$item = reset($items);
+			$host = reset($item['hosts']);
 
-	$result = DBend($result);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
+				_('Host').' ['.$host['name'].'] '._('History cleared')
+			);
+		}
+
+		$result = DBend($result);
+	}
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
@@ -757,27 +764,42 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
-	DBstart();
+elseif (hasRequest('action')
+		&& getRequest('action') === 'item.massclearhistory'
+		&& hasRequest('group_itemid')
+		&& is_array(getRequest('group_itemid'))) {
+	$result = false;
 
-	$result = deleteHistoryByItemIds(getRequest('group_itemid'));
+	$itemIds = getRequest('group_itemid');
 
-	if ($result) {
-		foreach (getRequest('group_itemid') as $id) {
-			if (!$item = get_item_by_itemid($id)) {
-				continue;
+	$items = API::Item()->get(array(
+		'output' => array('itemid', 'key_'),
+		'itemids' => $itemIds,
+		'selectHosts' => array('name'),
+		'editable' => true
+	));
+
+	if ($items) {
+		DBstart();
+
+		$result = deleteHistoryByItemIds($itemIds);
+
+		if ($result) {
+			foreach ($items as $item) {
+				$host = reset($item['hosts']);
+
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+					_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+						_('History cleared')
+				);
 			}
-			$host = get_host_by_hostid($item['hostid']);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				_('Item').' ['.$item['key_'].'] ['.$id.'] '._('Host').' ['.$host['host'].'] '._('History cleared')
-			);
 		}
-	}
 
-	$result = DBend($result);
+		$result = DBend($result);
 
-	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 	}
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
