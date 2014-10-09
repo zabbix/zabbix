@@ -296,14 +296,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
 
-	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
-
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 		ret = ZBX_DB_FAIL;
 	}
+
+	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
