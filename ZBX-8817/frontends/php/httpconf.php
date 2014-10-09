@@ -175,7 +175,7 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 			$host = DBfetch(DBselect(
 				'SELECT h.host'.
 				' FROM hosts h,httptest ht'.
-				' WHERE ht.hostid=h.hostid'.
+				' WHERE h.hostid=ht.hostid'.
 					' AND ht.httptestid='.zbx_dbstr($httpTestId)
 			));
 

@@ -85,31 +85,20 @@ function deleteHistoryByHttpTestId($httpTestId) {
 	$dbItems = DBselect(
 		'SELECT hti.itemid'.
 		' FROM httptestitem hti'.
-		' WHERE hti.httptestid='.zbx_dbstr($httpTestId)
-	);
-
-	while ($itemData = DBfetch($dbItems)) {
-		$itemIds[$itemData['itemid']] = $itemData['itemid'];
-	}
-
-	// find web scenario step items
-	$dbItems = DBselect(
+		' WHERE hti.httptestid='.zbx_dbstr($httpTestId).
+		' UNION ALL '.
 		'SELECT hsi.itemid'.
-		' FROM httpstep hs'.
-		' LEFT JOIN httpstepitem hsi ON hs.httpstepid=hsi.httpstepid'.
-		' WHERE hs.httptestid='.zbx_dbstr($httpTestId)
+		' FROM httpstep hs,httpstepitem hsi'.
+		' WHERE hs.httpstepid=hsi.httpstepid'.
+			' AND hs.httptestid='.zbx_dbstr($httpTestId)
 	);
 
 	while ($itemData = DBfetch($dbItems)) {
-		$itemIds[$itemData['itemid']] = $itemData['itemid'];
+		$itemIds[] = $itemData['itemid'];
 	}
 
-	if (!$itemIds) {
-		return false;
-	}
-
-	if (!deleteHistoryByItemIds($itemIds)) {
-		return false;
+	if ($itemIds) {
+		return deleteHistoryByItemIds($itemIds);
 	}
 
 	return true;
