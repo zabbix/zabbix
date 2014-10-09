@@ -72,29 +72,28 @@ function httptest_status2style($status) {
 }
 
 /**
- * Delete web scenario item and web scenario step item history and trends by given web scenario ID.
+ * Delete web scenario item and web scenario step item history and trends by given web scenario IDs.
  *
- * @param string $httpTestId
+ * @param array $httpTestIds
  *
  * @return bool
  */
-function deleteHistoryByHttpTestId($httpTestId) {
+function deleteHistoryByHttpTestIds(array $httpTestIds) {
 	$itemIds = array();
 
-	// find web scenario items
 	$dbItems = DBselect(
 		'SELECT hti.itemid'.
 		' FROM httptestitem hti'.
-		' WHERE hti.httptestid='.zbx_dbstr($httpTestId).
+		' WHERE '.dbConditionInt('httptestid', $httpTestIds).
 		' UNION ALL '.
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND hs.httptestid='.zbx_dbstr($httpTestId)
+			' AND '.dbConditionInt('httptestid', $httpTestIds)
 	);
 
-	while ($itemData = DBfetch($dbItems)) {
-		$itemIds[] = $itemData['itemid'];
+	while ($dbItem = DBfetch($dbItems)) {
+		$itemIds[] = $dbItem['itemid'];
 	}
 
 	if ($itemIds) {
