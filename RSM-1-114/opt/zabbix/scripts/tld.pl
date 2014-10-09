@@ -122,7 +122,7 @@ pfail("Password for Zabbix API is not specified. Please check configuration file
 
 my $result = zbx_connect($config->{'zapi'}->{'url'}, $config->{'zapi'}->{'user'}, $config->{'zapi'}->{'password'});
 
-if ( $result ne true ) {
+if ($result ne true) {
     pfail("Could not connect to Zabbix API. ".$result->{'data'});
 }
 
@@ -993,9 +993,7 @@ sub create_main_template {
                 	    'priority' => '2',
                 };
 
-	        my $triggerid = create_trigger($options);
-
-		
+	        create_trigger($options);
     	    }
         }
 
@@ -1014,7 +1012,7 @@ sub create_main_template {
                             'priority' => '2',
                 };
 
-                my $triggerid = create_trigger($options);
+                create_trigger($options);
 	    }
         }
     }
@@ -1137,15 +1135,15 @@ sub create_slv_items {
         $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > '.$threshold.'%',
                          'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}='.$threshold.'|'.
                                         '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>'.$threshold,
-                        'priority' =>  $priority,
+                        'priority' => $priority,
                 };
 
-        my $triggerid = create_trigger($options);
+        my $result = create_trigger($options);
 
-	$triggerid = $triggerid->{'triggerids'}[0];
+	my $triggerid = $result->{'triggerids'}[0];
 
         if (defined($depend_down)) {
-            my $result = add_dependency($triggerid, $depend_down);
+            add_dependency($triggerid, $depend_down);
         }
 
         $depend_down = $triggerid;
@@ -1180,15 +1178,15 @@ sub create_slv_items {
             $options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] >'.$threshold.'%',
                          'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>'.$threshold.'|'.
 					    '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}='.$threshold,
-                        'priority' =>  $priority,
+                        'priority' => $priority,
                 };
 
-	    my $triggerid = create_trigger($options);
+	    my $result = create_trigger($options);
 
-    	    $triggerid = $triggerid->{'triggerids'}[0];
+    	    my $triggerid = $result->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = add_dependency($triggerid, $depend_down);
+    	        add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;
@@ -1229,12 +1227,12 @@ sub create_slv_items {
                         'priority' => $priority,
                 };
 
-	    my $triggerid = create_trigger($options);
+	    my $result = create_trigger($options);
 
-    	    $triggerid = $triggerid->{'triggerids'}[0];
+    	    my $triggerid = $result->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = add_dependency($triggerid, $depend_down);
+    	        add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;
@@ -1279,15 +1277,15 @@ sub create_slv_items {
             $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
                          'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
 					    '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
-                        'priority' =>  $priority,
+                        'priority' => $priority,
                 };
 
-	    my $triggerid = create_trigger($options);
+	    my $result = create_trigger($options);
 
-    	    $triggerid = $triggerid->{'triggerids'}[0];
+    	    my $triggerid = $result->{'triggerids'}[0];
 
 	    if (defined($depend_down)) {
-    	        my $result = add_dependency($triggerid, $depend_down);
+    	        add_dependency($triggerid, $depend_down);
     	    }
 
     	    $depend_down = $triggerid;

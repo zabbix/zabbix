@@ -8,6 +8,7 @@ use Pod::Usage;
 use Exporter qw(import);
 use Zabbix;
 use Sender;
+use Alerts;
 use File::Pid;
 use POSIX qw(floor);
 use Data::Dumper;
@@ -24,8 +25,6 @@ use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
 use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 use constant MIN_LOGIN_ERROR => -205;
 use constant MAX_LOGIN_ERROR => -203;
-use constant MIN_UPDATE_ERROR => -208; # minimal UPDATE TIME error
-use constant MAX_UPDATE_ERROR => -206; # maximal UPDATE TIME error
 use constant MIN_INFO_ERROR => -211;
 use constant MAX_INFO_ERROR => -209;
 
@@ -71,6 +70,9 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 
 # configuration, set in set_slv_config()
 my $config = undef;
+
+# whether additional alerts through Redis are enabled, disable in config passed with set_slv_config()
+my $alerts_enabled = 1;
 
 # make sure only one copy of script runs (unless in test mode)
 my $pidfile;
@@ -656,6 +658,8 @@ sub db_select
 sub set_slv_config
 {
     $config = shift;
+
+    $alerts_enabled = undef if ($config and $config->{'redis'} and $config->{'redis'}->{'enabled'} and $config->{'redis'}->{'enabled'} eq "0");
 }
 
 # Get bounds of the previous rdds test period shifted AVAIL_SHIFT_BACK seconds back.
@@ -1304,6 +1308,7 @@ sub process_slv_avail
     if ($probes_count < $cfg_minonline)
     {
 	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
+	add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes online, $probes_count while $cfg_minonline required)") if ($alerts_enabled);
 	return;
     }
 
@@ -1327,6 +1332,7 @@ sub process_slv_avail
     if ($probes_with_results < $cfg_minonline)
     {
 	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+	add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if ($alerts_enabled);
 	return;
     }
 
@@ -1415,10 +1421,12 @@ sub process_slv_ns_avail
 	if ($online_probes_count < $cfg_minonline)
 	{
 	    push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes online, $online_probes_count while $cfg_minonline required)");
+	    add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes online, $online_probes_count while $cfg_minonline required)") if ($alerts_enabled);
 	}
 	elsif ($probes_with_results < $cfg_minonline)
 	{
 	    push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+	    add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if ($alerts_enabled);
 	}
 	else
 	{
