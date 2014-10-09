@@ -597,7 +597,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	else if (ASN_INTEGER == var->type)
 #endif
 	{
-		char	buffer[16];
+		char	buffer[12];
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
 
