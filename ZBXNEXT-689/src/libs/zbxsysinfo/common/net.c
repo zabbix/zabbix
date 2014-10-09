@@ -181,7 +181,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	size_t			offset = 0;
-	int			res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL, use_tcp = 0;
+	int			res, type, retrans, retry, use_tcp, i, ret = SYSINFO_RET_FAIL;
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
@@ -312,15 +312,16 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL != (param = get_rparam(request, 5)))
+	param = get_rparam(request, 5);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "udp"))
+		use_tcp = 0;
+	else if (0 == strcmp(param, "tcp"))
+		use_tcp = 1;
+	else
 	{
-		if (0 == strcmp(param, "tcp"))
-			use_tcp = 1;
-		else if ('\0' != *param && 0 != strcmp(param, "udp"))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 #ifdef _WINDOWS
