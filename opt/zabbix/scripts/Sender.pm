@@ -135,8 +135,12 @@ sub send_arrref {
     my $self = shift;
     my $data_ref = shift;
 
+    my $start = time();
+
     my $status = 0;
-    foreach my $i ( 1 .. $self->retries() ) {
+    my $attempt;
+    foreach ( 1 .. $self->retries() ) {
+	$attempt = $_;
         if ( $self->_send( $data_ref ) ) {
             $status = 1;
             last;
@@ -144,6 +148,9 @@ sub send_arrref {
     }
 
     return 1 if ($status == 1);
+
+    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempt attempts)");
+
     return;
 }
 
@@ -152,7 +159,7 @@ sub sender_err {
 }
 
 sub _send {
-    my $self  = shift;
+    my $self = shift;
     my $data_ref = shift;
 
     if ( time() - $self->_last_sent() < $self->interval() ) {
@@ -180,7 +187,7 @@ sub _send {
     }
     $self->_disconnect() unless $self->keepalive();
 
-    return $status if ($status);
+    return $status if ($status == 1);
     return;
 }
 
