@@ -2,10 +2,10 @@
 
 fixtures:
   emptyHost:
-    groupid: @fixtures.base.result.groupid@
+    groupid: '@fixtures.base.result.groupid@'
 
   templateWithApplication:
-    groupid: @fixtures.base.result.groupid@
+    groupid: '@fixtures.base.result.groupid@'
 
   httpTest:
     type: api
@@ -13,7 +13,7 @@ fixtures:
       method: httptest.create
       params:
         name: "Web scenario"
-        applicationid: @fixtures.templateWithApplication.result.applicationid@
+        applicationid: "@fixtures.templateWithApplication.result.applicationid@"
         nextcheck: 0
         delay: 100
         status: 0
@@ -22,7 +22,7 @@ fixtures:
         authentication: 1
         http_user: "user"
         http_password: "password"
-        hostid: @fixtures.templateWithApplication.result.templateid@
+        hostid: '@fixtures.templateWithApplication.result.templateid@'
         http_proxy: "root@proxy"
         retries: 3
         ssl_cert_file: "certificate"
@@ -34,7 +34,7 @@ fixtures:
         steps:
           -
             name: "Step 1"
-            no: 1
+            'no': 1
             url: "http://zabbix.com"
             timeout: 30
             posts: "post=1"
@@ -46,7 +46,7 @@ fixtures:
             headers: "Accept: text/plain"
           -
             name: "Step 2"
-            no: 2
+            'no': 2
             url: "http://google.com"
             timeout: 40
             posts: ""
@@ -63,8 +63,8 @@ steps:
     request:
       method: host.update
       params:
-        hostid: @fixtures.emptyHost.result.hostid@
-        templates: { templateid: @fixtures.templateWithApplication.result.templateid@ }
+        hostid: '@fixtures.emptyHost.result.hostid@'
+        templates: { templateid: '@fixtures.templateWithApplication.result.templateid@' }
         # TODO: the inventory parameter has been added to avoid ZBX-8779
         inventory: {}
 
@@ -78,7 +78,7 @@ steps:
       params:
         output: extend
         selectSteps: extend
-        hostids: @fixtures.emptyHost.result.hostid@
+        hostids: '@fixtures.emptyHost.result.hostid@'
 
     assertResult:
       -
@@ -93,7 +93,7 @@ steps:
         authentication: 1
         http_user: "user"
         http_password: "password"
-        hostid: @fixtures.emptyHost.result.hostid@
+        hostid: '@fixtures.emptyHost.result.hostid@'
         http_proxy: "root@proxy"
         retries: 3
         ssl_cert_file: "certificate"
@@ -102,13 +102,13 @@ steps:
         verify_peer: 1
         verify_host: 1
         headers: "Accept: text/html"
-        templateid: @fixtures.httpTest.result.httptestids[0]@
+        templateid: '@fixtures.httpTest.result.httptestids[0]@'
         steps:
           -
             httpstepid: { _assert: { id: ~ } }
             httptestid: { _assert: { id: ~ } }
             name: "Step 1"
-            no: 1
+            'no': 1
             url: "http://zabbix.com"
             timeout: 30
             posts: "post=1"
@@ -122,7 +122,7 @@ steps:
             httpstepid: { _assert: { id: ~ } }
             httptestid: { _assert: { id: ~ } }
             name: "Step 2"
-            no: 2
+            'no': 2
             url: "http://google.com"
             timeout: 40
             posts: ""
@@ -139,12 +139,12 @@ steps:
       method: application.get
       params:
         output: [name, hostid]
-        applicationids: @steps.step2.response.result[0].applicationid@
+        applicationids: '@steps.step2.response.result[0].applicationid@'
 
     assertRestult:
       -
-        applicationid: @steps.step2.response.result[0].applicationid@
+        applicationid: '@steps.step2.response.result[0].applicationid@'
         name: App
-        hostid: @fixtures.emptyHost.result.hostid@
+        hostid: '@fixtures.emptyHost.result.hostid@'
 
-  # TODO: check that web items have been created on the host
+#  TODO: check that web items have been created on the host

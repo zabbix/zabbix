@@ -2,10 +2,10 @@
 
 fixtures:
   hostWithItem:
-    groupid: @fixtures.base.result.groupid@
+    groupid: '@fixtures.base.result.groupid@'
 
   templateWithItem:
-    groupid: @fixtures.base.result.groupid@
+    groupid: '@fixtures.base.result.groupid@'
 
   # link the template to the host
   linkTemplate:
@@ -13,13 +13,13 @@ fixtures:
     params:
       method: host.update
       params:
-        hostid: @fixtures.hostWithItem.result.hostid@
-        templates: { templateid: @fixtures.templateWithItem.result.templateid@ }
+        hostid: '@fixtures.hostWithItem.result.hostid@'
+        templates: { templateid: '@fixtures.templateWithItem.result.templateid@' }
         # TODO: the inventory parameter has been added to avoid ZBX-8779
         inventory: {}
         interfaces:
           -
-            interfaceid: @fixtures.hostWithItem.result.interfaceid@
+            interfaceid: '@fixtures.hostWithItem.result.interfaceid@'
             main: 0
             type: 1
             useip: 1
@@ -44,7 +44,7 @@ fixtures:
       params:
         output: ["hostid"]
         selectInterfaces: ["interfaceid"]
-        hostids: @fixtures.hostWithItem.result.hostid@
+        hostids: '@fixtures.hostWithItem.result.hostid@'
 
 steps:
 
@@ -53,11 +53,11 @@ steps:
     request:
       method: host.update
       params:
-        hostid: @fixtures.hostWithItem.result.hostid@
-        templates_clear: [{ templateid: @fixtures.templateWithItem.result.templateid@] }]
+        hostid: '@fixtures.hostWithItem.result.hostid@'
+        templates_clear: [{ templateid: '@fixtures.templateWithItem.result.templateid@' }]
         interfaces:
           -
-            interfaceid: @fixtures.interfaces.result[0].interfaces[1].interfaceid@
+            interfaceid: '@fixtures.interfaces.result[0].interfaces[1].interfaceid@'
             main: 1
             type: 1
             useip: 1
@@ -67,7 +67,7 @@ steps:
             bulk: 1
 
     assertResult:
-      hostids: [@fixtures.hostWithItem.result.hostid@]
+      hostids: ['@fixtures.hostWithItem.result.hostid@']
 
   # make sure step2 has been executed correctly
   step2:
@@ -82,7 +82,7 @@ steps:
 
     assertResult:
       -
-        hostid: @fixtures.hostWithItem.result.hostid@
+        hostid: '@fixtures.hostWithItem.result.hostid@'
         parentTemplates: []
         items: []
-        interfaces: [{ interfaceid: @fixtures.interfaces.result[0].interfaces[1].interfaceid@ }]
+        interfaces: [{ interfaceid: '@fixtures.interfaces.result[0].interfaces[1].interfaceid@' }]

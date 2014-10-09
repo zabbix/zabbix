@@ -1,6 +1,5 @@
 <?php
 
-use Symfony\Component\Yaml\Yaml;
 
 class CFileApiTestCase extends CApiTestCase {
 
@@ -22,7 +21,7 @@ class CFileApiTestCase extends CApiTestCase {
 			throw new Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
 		}
 
-		return Yaml::parse(file_get_contents($path));
+		return yaml_parse_file($path);
 	}
 
 	protected function runTestFile($file) {

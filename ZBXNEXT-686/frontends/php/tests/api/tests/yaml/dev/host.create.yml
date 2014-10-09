@@ -16,7 +16,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.base.result.groupid@
+            groupid: '@fixtures.base.result.groupid@'
 
     assertResult:
       hostids:
@@ -33,9 +33,9 @@ steps:
 
     assertResult:
       -
-        hostid: @steps.step1.response.result.hostids[0]@
-        host: @steps.step1.request.params.host@
-        name: @steps.step1.request.params.host@
+        hostid: '@steps.step1.response.result.hostids[0]@'
+        host: '@steps.step1.request.params.host@'
+        name: '@steps.step1.request.params.host@'
         proxy_hostid: "0"
         status: "0"
         disable_until: "0"
@@ -68,7 +68,7 @@ steps:
         description: ""
         groups:
           -
-            groupid: @steps.step1.request.params.groups[0].groupid@
+            groupid: '@steps.step1.request.params.groups[0].groupid@'
         interfaces:
           -
-            ip: @steps.step1.request.params.interfaces[0].ip@
+            ip: '@steps.step1.request.params.interfaces[0].ip@'

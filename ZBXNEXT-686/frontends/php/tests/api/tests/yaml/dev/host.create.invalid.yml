@@ -15,7 +15,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.base.result.groupid@
+            groupid: '@fixtures.base.result.groupid@'
 
     assertError:
       message: "Invalid params."

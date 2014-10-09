@@ -2,10 +2,10 @@ params:
   groupid: ~
 
 return:
-  hostid: @fixtures.host.result.hostids[0]@
-  itemid: @fixtures.discoveredItem.result[0]@
-  graphid: @fixtures.discoveredItem.result[0]@
-  triggerid: @fixtures.discoveredItem.result[0]@
+  hostid: '@fixtures.host.result.hostids[0]@'
+  itemid: '@fixtures.discoveredItem.result[0]@'
+  graphid: '@fixtures.discoveredItem.result[0]@'
+  triggerid: '@fixtures.discoveredItem.result[0]@'
 
 fixtures:
   # create host
@@ -24,7 +24,7 @@ fixtures:
             dns: ""
             port: 10050
             bulk: 1
-        groups: [{ groupid: @params.groupid@ }]
+        groups: [{ groupid: '@params.groupid@' }]
 
   interface:
     type: api
@@ -33,7 +33,7 @@ fixtures:
       params:
         output: ["hostid"]
         selectInterfaces: ["interfaceid"]
-        hostids: @fixtures.host.result.hostids[0]@
+        hostids: '@fixtures.host.result.hostids[0]@'
 
   # discovery rule
   rule:
@@ -43,9 +43,9 @@ fixtures:
       params:
         name: LLD rule
         key_: lld
-        hostid: @fixtures.host.result.hostids[0]@
+        hostid: '@fixtures.host.result.hostids[0]@'
         type: 0
-        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        interfaceid: '@fixtures.interface.result[0].interfaces[0].interfaceid@'
         delay: 30
 
   # item prototype
@@ -56,11 +56,11 @@ fixtures:
       params:
         name: item prototype
         key_: llditem[{#MACRO}]
-        hostid: @fixtures.host.result.hostids[0]@
-        ruleid: @fixtures.rule.result.itemids[0]@
+        hostid: '@fixtures.host.result.hostids[0]@'
+        ruleid: '@fixtures.rule.result.itemids[0]@'
         type: 0
         value_type: 3
-        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        interfaceid: '@fixtures.interface.result[0].interfaces[0].interfaceid@'
         delay: 30
 
   # trigger prototype
@@ -83,7 +83,7 @@ fixtures:
         height: 200
         gitems:
           -
-            itemid: @fixtures.itemPrototype.result.itemids[0]@
+            itemid: '@fixtures.itemPrototype.result.itemids[0]@'
             color: 00AA00
 
   # discovered item
@@ -96,7 +96,7 @@ fixtures:
           type: 0
           snmp_community: ""
           snmp_oid: ""
-          hostid: @fixtures.host.result.hostids[0]@
+          hostid: '@fixtures.host.result.hostids[0]@'
           name: item prototype
           key_: llditem[test]
           delay: 30
@@ -136,7 +136,7 @@ fixtures:
           state: 0
           snmpv3_contextname: ""
           evaltype: 0
-          interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+          interfaceid: '@fixtures.interface.result[0].interfaces[0].interfaceid@'
 
   itemDiscovery:
     type: data
@@ -144,8 +144,8 @@ fixtures:
       table: item_discovery
       values:
         -
-          itemid: @fixtures.discoveredItem.result[0]@
-          parent_itemid: @fixtures.itemPrototype.result.itemids[0]@
+          itemid: '@fixtures.discoveredItem.result[0]@'
+          parent_itemid: '@fixtures.itemPrototype.result.itemids[0]@'
           key_: ""
           lastcheck: 0
           ts_delete:  0
@@ -177,8 +177,8 @@ fixtures:
       table: functions
       values:
         -
-          itemid: @fixtures.discoveredItem.result[0]@
-          triggerid: @fixtures.discoveredTrigger.result[0]@
+          itemid: '@fixtures.discoveredItem.result[0]@'
+          triggerid: '@fixtures.discoveredTrigger.result[0]@'
           function: last
           parameter: 0
 
@@ -189,7 +189,7 @@ fixtures:
       values:
         expression: "{@fixtures.function.result[0]@}<20"
       where:
-        triggerid: @fixtures.discoveredTrigger.result[0]@
+        triggerid: '@fixtures.discoveredTrigger.result[0]@'
 
   triggerDiscovery:
     type: data
@@ -198,8 +198,8 @@ fixtures:
       generateIds: false
       values:
         -
-          triggerid: @fixtures.discoveredTrigger.result[0]@
-          parent_triggerid: @fixtures.triggerPrototype.result.triggerids[0]@
+          triggerid: '@fixtures.discoveredTrigger.result[0]@'
+          parent_triggerid: '@fixtures.triggerPrototype.result.triggerids[0]@'
 
   # graph prototype
   discoveredGraph:
@@ -230,8 +230,8 @@ fixtures:
       table: graphs_items
       values:
         -
-          graphid: @fixtures.discoveredGraph.result[0]@
-          itemid: @fixtures.discoveredItem.result[0]@
+          graphid: '@fixtures.discoveredGraph.result[0]@'
+          itemid: '@fixtures.discoveredItem.result[0]@'
           drawtype: 1
           sortorder: 0
           color: 00AA00
@@ -246,5 +246,5 @@ fixtures:
       generateIds: false
       values:
         -
-          graphid: @fixtures.discoveredGraph.result[0]@
-          parent_graphid: @fixtures.graphPrototype.result.graphids[0]@
+          graphid: '@fixtures.discoveredGraph.result[0]@'
+          parent_graphid: '@fixtures.graphPrototype.result.graphids[0]@'

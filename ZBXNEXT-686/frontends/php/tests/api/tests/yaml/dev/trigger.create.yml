@@ -1,6 +1,6 @@
 fixtures:
   hostWithItem:
-    groupid: @fixtures.base.result.groupid@
+    groupid: '@fixtures.base.result.groupid@'
 
 steps:
 
@@ -21,16 +21,16 @@ steps:
       params:
         selectFunctions: extend
         selectHosts: [host]
-        triggerids: @steps.step1.response.result.triggerids[0]@
+        triggerids: '@steps.step1.response.result.triggerids[0]@'
 
     assertResult:
       -
-        triggerid: @steps.step1.response.result.triggerids[0]@
+        triggerid: '@steps.step1.response.result.triggerids[0]@'
 
         # since we don't know the ID of the function, validate the expression using a regex
         expression: { _assert: { string: { regex: "/^{[0-9]+}<1024$/" } } }
 
-        description: @steps.step1.request.params.description@
+        description: '@steps.step1.request.params.description@'
         url: ""
         status: 0
         value: 0
@@ -48,7 +48,7 @@ steps:
             functionid: { _assert: { id: ~ } }
             itemid: { _assert: { id: ~ } }
 
-            triggerid: @steps.step1.response.result.triggerids[0]@
+            triggerid: '@steps.step1.response.result.triggerids[0]@'
             function: "last"
             parameter: ""
 
@@ -69,6 +69,6 @@ steps:
 
     assertResult:
       -
-        triggerid: @steps.step1.response.result.triggerids[0]@
-        expression: @steps.step1.request.params.expression@
+        triggerid: '@steps.step1.response.result.triggerids[0]@'
+        expression: '@steps.step1.request.params.expression@'
         description: "Low memory on @fixtures.hostWithItem.result.host@"

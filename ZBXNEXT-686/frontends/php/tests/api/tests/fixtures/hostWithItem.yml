@@ -2,11 +2,11 @@ params:
   groupid: ~
 
 return:
-  hostid: @fixtures.host.result.hostids[0]@
-  interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
-  itemid: @fixtures.item.result.itemids[0]@
-  host: @fixtures.host.params.params.host@
-  itemKey: @fixtures.item.params.params.key_@
+  hostid: '@fixtures.host.result.hostids[0]@'
+  interfaceid: '@fixtures.interface.result[0].interfaces[0].interfaceid@'
+  itemid: '@fixtures.item.result.itemids[0]@'
+  host: '@fixtures.host.params.params.host@'
+  itemKey: '@fixtures.item.params.params.key_@'
 
 fixtures:
   host:
@@ -24,7 +24,7 @@ fixtures:
             dns: ""
             port: 10050
             bulk: 1
-        groups: [{ groupid: @params.groupid@ }]
+        groups: [{ groupid: '@params.groupid@' }]
 
   # fetch the interface to create an item with it
   interface:
@@ -34,7 +34,7 @@ fixtures:
       params:
         output: ["hostid"]
         selectInterfaces: ["interfaceid"]
-        hostids: @fixtures.host.result.hostids[0]@
+        hostids: '@fixtures.host.result.hostids[0]@'
 
   item:
     type: api
@@ -43,8 +43,8 @@ fixtures:
       params:
         name: "Available memory"
         key_: "vm.memory.size[available]"
-        hostid: @fixtures.host.result.hostids[0]@
+        hostid: '@fixtures.host.result.hostids[0]@'
         type: 0
         value_type: 3
-        interfaceid: @fixtures.interface.result[0].interfaces[0].interfaceid@
+        interfaceid: '@fixtures.interface.result[0].interfaces[0].interfaceid@'
         delay: 30

@@ -21,7 +21,7 @@ steps:
         groups:
           -
             # macros can be used to reference values returned by fixtures
-            groupid: @fixtures.base.result.groupid@
+            groupid: '@fixtures.base.result.groupid@'
 
     # validate the received result
     assertResult:
@@ -42,8 +42,8 @@ steps:
       -
         # macros can be used in the response as well
         # this will match the value of "hostid" to the ID returned by host.create in step1
-        hostid: @steps.step1.response.result.hostids[0]@
-        host: @steps.step1.request.params.host@
+        hostid: '@steps.step1.response.result.hostids[0]@'
+        host: '@steps.step1.request.params.host@'
         # a simple match
         status: "0"
 
@@ -52,7 +52,7 @@ steps:
     request:
       method: host.create
       params:
-        host: @steps.step1.request.params.host@
+        host: '@steps.step1.request.params.host@'
         interfaces:
           -
             type: 1
@@ -63,7 +63,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.base.result.groupid@
+            groupid: '@fixtures.base.result.groupid@'
 
     # in this step we expect an error
     assertError:
@@ -88,7 +88,7 @@ steps:
             port: "10050"
         groups:
           -
-            groupid: @fixtures.base.result.groupid@
+            groupid: '@fixtures.base.result.groupid@'
 
     assertResult:
       hostids:
@@ -119,4 +119,4 @@ steps:
         code: -32602
         message: "Invalid params."
         data: "Not authorised."
-      id: @steps.step5.request.id@
+      id: '@steps.step5.request.id@'

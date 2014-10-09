@@ -2,7 +2,7 @@ params:
   groupid: ~
 
 return:
-  templateid: @fixtures.template.result.templateids[0]@
+  templateid: '@fixtures.template.result.templateids[0]@'
 
 fixtures:
   template:
@@ -11,7 +11,7 @@ fixtures:
       method: template.create
       params:
         host: "Template"
-        groups: [{ groupid: @params.groupid@ }]
+        groups: [{ groupid: '@params.groupid@' }]
 
   item:
     type: api
@@ -20,7 +20,7 @@ fixtures:
       params:
         name: "Available memory"
         key_: "vm.memory.size[available]"
-        hostid: @fixtures.template.result.templateids[0]@
+        hostid: '@fixtures.template.result.templateids[0]@'
         type: 0
         delay: 30
         value_type: 3

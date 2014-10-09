@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Yaml\Yaml;
-
 class CIncludeFixture extends CFixture {
 
 	/**
@@ -25,7 +23,7 @@ class CIncludeFixture extends CFixture {
 			throw new Exception(sprintf('Can not find fixture file "%s" (expected location "%s")', $file, $path));
 		}
 
-		$fixtureFile = Yaml::parse(file_get_contents($path));
+		$fixtureFile = yaml_parse_file($path);
 
 		$fixtures = $this->fixtureLoader->load($fixtureFile['fixtures'], $params['params']);
 
