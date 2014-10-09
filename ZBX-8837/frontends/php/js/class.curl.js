@@ -33,11 +33,6 @@ Curl.prototype = {
 	query:		'',
 	args:		null,
 
-	/**
-	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
-	 *
-	 * @param url
-	 */
 	initialize: function(url) {
 		url = url || location.href;
 
@@ -145,7 +140,17 @@ Curl.prototype = {
 	},
 
 	formatQuery: function() {
-		this.query = jQuery.param(this.args);
+		if (this.args.lenght < 1) {
+			return;
+		}
+
+		var query = [];
+		for (var key in this.args) {
+			if (typeof(this.args[key]) != 'undefined' && !is_null(this.args[key])) {
+				query.push(key + '=' + encodeURIComponent(this.args[key]));
+			}
+		}
+		this.query = query.join('&');
 	},
 
 	formatArguments: function() {
@@ -162,7 +167,7 @@ Curl.prototype = {
 			if (keyval.length > 1) {
 				try {
 					var tmp = keyval[1].replace(/\+/g, '%20');
-					this.args[decodeURIComponent(keyval[0])] = decodeURIComponent(tmp);
+					this.args[keyval[0]] = decodeURIComponent(tmp);
 				}
 				catch(exc) {
 					this.args[keyval[0]] = keyval[1];

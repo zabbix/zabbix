@@ -26,11 +26,6 @@ class CUrl {
 	protected $query;
 	protected $arguments = array();
 
-	/**
-	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
-	 *
-	 * @param string|null $url
-	 */
 	public function __construct($url = null) {
 		if (empty($url)) {
 			$this->formatGetArguments();
@@ -91,7 +86,7 @@ class CUrl {
 
 				if (strpos($arg, '=') !== false) {
 					list($name, $value) = explode('=', $arg);
-					$this->arguments[urldecode($name)] = urldecode($value);
+					$this->arguments[$name] = isset($value) ? urldecode($value) : '';
 				}
 				else {
 					$this->arguments[$arg] = '';

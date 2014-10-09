@@ -548,8 +548,8 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$triggers = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
+			'output' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($triggers as $trigger) {
@@ -577,29 +577,24 @@ class CTrigger extends CTriggerGeneral {
 			$triggerDbFields = array('triggerid' => null);
 
 			$dbTriggers = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true
 			));
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('triggerid', 'status'),
-				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered trigger.')
 			));
 			foreach ($triggers as $trigger) {
-				$triggerId = $trigger['triggerid'];
 				// check permissions
-				if (!isset($dbTriggers[$triggerId])) {
+				if (!isset($dbTriggers[$trigger['triggerid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
-				$dbTrigger = $dbTriggers[$triggerId];
-
-				$triggerName = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
-				$updateDiscoveredValidator->setObjectName($triggerName);
 
 				// discovered fields, except status, cannot be updated
-				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTrigger);
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTriggers[$trigger['triggerid']]);
 			}
 
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
@@ -657,9 +652,13 @@ class CTrigger extends CTriggerGeneral {
 				$expressionHosts = $expressionData->getHosts();
 
 				$hosts = API::Host()->get(array(
-					'output' => array('hostid', 'host', 'status'),
 					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
+					'output' => array(
+						'hostid',
+						'host',
+						'status'
+					),
 					'templated_hosts' => true,
 					'preservekeys' => true
 				));
@@ -802,8 +801,8 @@ class CTrigger extends CTriggerGeneral {
 
 		// select all triggers which are deleted (including children)
 		$delTriggers = $this->get(array(
-			'output' => array('triggerid', 'description', 'expression'),
 			'triggerids' => $triggerIds,
+			'output' => array('triggerid', 'description', 'expression'),
 			'nopermissions' => true,
 			'selectHosts' => array('name')
 		));
@@ -839,21 +838,6 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if (!$nopermissions) {
-			$dbTriggers = $this->get(array(
-				'output' => array('triggerid', 'flags', 'description'),
-				'triggerids' => $triggerIds,
-				'editable' => true,
-				'filter' => array('flags' => null)
-			));
-
-			foreach ($dbTriggers as $dbTrigger) {
-				if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered trigger "%s"!', $dbTrigger['description'])
-					);
-				}
-			}
-
 			$this->checkPermissions($triggerIds);
 			$this->checkNotInherited($triggerIds);
 		}
@@ -1131,8 +1115,8 @@ class CTrigger extends CTriggerGeneral {
 		$triggerIds = zbx_objectValues($triggers, 'triggerid');
 
 		$dbTriggers = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
 			'triggerids' => $triggerIds,
+			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'selectDependencies' => array('triggerid'),
 			'preservekeys' => true,
@@ -1279,11 +1263,11 @@ class CTrigger extends CTriggerGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$triggers = $this->get(array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => true,
 			'output' => array(
 				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			),
-			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			)
 		));
 
 		foreach ($triggers as $trigger) {
@@ -1311,19 +1295,19 @@ class CTrigger extends CTriggerGeneral {
 		$hostIds = zbx_toArray($data['hostids']);
 
 		$parentTriggers = $this->get(array(
-			'output' => array('triggerid'),
 			'hostids' => $templateIds,
 			'preservekeys' => true,
+			'output' => array('triggerid'),
 			'selectDependencies' => array('triggerid')
 		));
 
 		if ($parentTriggers) {
 			$childTriggers = $this->get(array(
-				'output' => array('triggerid', 'templateid'),
 				'hostids' => ($hostIds) ? $hostIds : null,
 				'filter' => array('templateid' => array_keys($parentTriggers)),
 				'nopermissions' => true,
 				'preservekeys' => true,
+				'output' => array('triggerid', 'templateid'),
 				'selectHosts' => array('hostid')
 			));
 
@@ -1380,8 +1364,8 @@ class CTrigger extends CTriggerGeneral {
 			// forbid dependencies from hosts to templates
 			if (!$triggerTemplates) {
 				$triggerDependencyTemplates = API::Template()->get(array(
-					'output' => array('templateid'),
 					'triggerids' => $trigger['dependencies'],
+					'output' => array('templateid'),
 					'nopermissions' => true,
 					'limit' => 1
 				));
@@ -1428,8 +1412,8 @@ class CTrigger extends CTriggerGeneral {
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
 				'triggerids' => $trigger['dependencies'],
+				'output' => array('templateid'),
 				'nopermissions' => true,
 			));
 			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
@@ -1865,7 +1849,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Checks if all of the given triggers are available for writing.
 	 *
-	 * @throws APIException     if a trigger is not writable or does not exist or is not normal
+	 * @throws APIException     if a trigger is not writable or does not exist
 	 *
 	 * @param array $triggerIds
 	 */
