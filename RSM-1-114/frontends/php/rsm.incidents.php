@@ -71,39 +71,72 @@ if (isset($_REQUEST['mark_incident']) && CWebUser::getType() >= USER_TYPE_ZABBIX
 		)
 	));
 
-	if ($_REQUEST['mark_incident'] == INCIDENT_ACTIVE) {
-		$incidentType = _('Active');
-		$changeIncidentType = 0;
+	if (!$event) {
+		access_deny();
 	}
-	elseif ($_REQUEST['mark_incident'] == INCIDENT_RESOLVED) {
+
+	$event = reset($event);
+
+	if (get_request('mark_incident') == INCIDENT_ACTIVE) {
+		$incidentType = _('Active');
+		$changeIncidentType = INCIDENT_FLAG_NORMAL;
+	}
+	elseif (get_request('mark_incident') == INCIDENT_RESOLVED) {
 		$incidentType = _('Resolved');
-		$changeIncidentType = 0;
+		$changeIncidentType = INCIDENT_FLAG_NORMAL;
 	}
 	else {
 		$incidentType = _('False positive');
-		$changeIncidentType = 1;
+		$changeIncidentType = INCIDENT_FLAG_FALSE_POSITIVE;
 	}
 
-	if ($event) {
-		$event = reset($event);
-		if ($event['false_positive'] != $changeIncidentType) {
-			DBstart();
-			$res = DBexecute(
-				'UPDATE events SET false_positive='.zbx_dbstr($changeIncidentType).' WHERE eventid='.$event['eventid']
-			);
-			show_messages(DBend($res), _('Status updated'), _('Cannot update status'));
+	if ($event['false_positive'] != $changeIncidentType) {
+		// get next ok event
+		$nextOkEvent = DBfetch(DBselect(
+			'SELECT e.clock'.
+			' FROM events e'.
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.clock>='.$event['clock'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.source='.EVENT_SOURCE_TRIGGERS.
+				' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+			' ORDER BY e.clock,e.ns',
+			1
+		));
 
-			if ($res) {
-				add_audit(
-					AUDIT_ACTION_UPDATE,
-					AUDIT_RESOURCE_INCIDENT,
-					' Incident ['.$event['eventid'].'] '.$incidentType
-				);
+		if ($nextOkEvent) {
+			$markedEvents = DBselect(
+				'SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid='.$event['objectid'].
+					' AND e.clock>='.$event['clock'].
+					' AND e.clock<='.$nextOkEvent['clock'].
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
+					' AND e.value='.TRIGGER_VALUE_TRUE
+			);
+
+			while($markedEvent = DBfetch($markedEvents)){
+				$eventIds[] = $markedEvent['eventid'];
 			}
 		}
-	}
-	else {
-		access_deny();
+		else {
+			$eventIds = array($event['eventid']);
+		}
+
+		DBstart();
+		$res = DBexecute('UPDATE events SET false_positive='.zbx_dbstr($changeIncidentType).' WHERE '.
+			dbConditionInt('eventid', $eventIds)
+		);
+		show_messages(DBend($res), _('Status updated'), _('Cannot update status'));
+
+		if ($res) {
+			add_audit(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_INCIDENT,
+				' Incident ['.$event['eventid'].'] '.$incidentType
+			);
+		}
 	}
 }
 

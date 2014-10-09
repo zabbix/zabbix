@@ -940,6 +940,10 @@ define('INCIDENT_ACTIVE',			0);
 define('INCIDENT_RESOLVED',			1);
 define('INCIDENT_FALSE_POSITIVE',	2);
 
+// false positive
+define('INCIDENT_FLAG_NORMAL',			0);
+define('INCIDENT_FLAG_FALSE_POSITIVE',	1);
+
 // SLA monitoring incident status
 define('DNS_NO_REPLY_ERROR_CODE',	-200);
 define('DNSSEC_FAIL_ERROR_CODE',	-204);
