@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 05:40+0300\n"
+"POT-Creation-Date: 2014-10-11 02:15+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -468,7 +468,7 @@ msgstr "作用中直到"
 #: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
 #: include/views/configuration.maintenance.edit.php:203
-#: include/views/configuration.screen.constructor.edit.php:753
+#: include/views/configuration.screen.constructor.edit.php:749
 #: include/views/configuration.screen.edit.php:64
 #: include/views/configuration.services.edit.php:120
 #: include/views/configuration.services.edit.php:268
@@ -682,7 +682,7 @@ msgstr "包括任何字元字串"
 #: include/views/configuration.httpconf.edit.php:64
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.httpconf.list.php:70
-#: include/views/configuration.screen.constructor.edit.php:502
+#: include/views/configuration.screen.constructor.edit.php:501
 #: include/views/inventory.host.view.php:240
 #: include/views/js/configuration.sysmaps.js.php:118 latest.php:404
 msgid "Application"
@@ -818,7 +818,7 @@ msgstr "應該選擇至少一個主機或群組."
 msgid "At least one maintenance period must be created."
 msgstr "必須創建至少一個維修期間."
 
-#: include/classes/setup/CFrontendSetup.php:228
+#: include/classes/setup/CFrontendSetup.php:233
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 msgstr ""
 
@@ -1043,7 +1043,7 @@ msgstr "粗線"
 msgid "Boolean"
 msgstr "二元邏輯"
 
-#: include/views/configuration.screen.constructor.edit.php:714
+#: include/views/configuration.screen.constructor.edit.php:710
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:83
 #: include/views/js/configuration.sysmaps.js.php:247
@@ -1054,7 +1054,7 @@ msgstr "底部"
 msgid "Brighten"
 msgstr "轉亮"
 
-#: include/locales.inc.php:56
+#: include/locales.inc.php:54
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
@@ -2251,7 +2251,7 @@ msgstr ""
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
 msgstr "無法設置 \"templateid\"給應用集\"%1$s\"."
 
-#: include/classes/api/services/CScreen.php:365
+#: include/classes/api/services/CScreen.php:372
 #, c-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
@@ -2265,6 +2265,11 @@ msgstr "無法設置 \"templateid\"給觸發器原型\"%1$s\"."
 #: include/classes/api/services/CHost.php:572
 #: include/classes/api/services/CHost.php:1017
 msgid "Cannot set inventory fields for disabled inventory."
+msgstr ""
+
+#: include/classes/api/services/CScreenItem.php:570
+#: include/classes/api/services/CScreenItem.php:596
+msgid "Cannot set resource ID for screen element."
 msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:269
@@ -2372,7 +2377,7 @@ msgstr "無法更新\"templateid\"給圖形\"%1$s\"."
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CScreen.php:440
+#: include/classes/api/services/CScreen.php:447
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "無法更新\"templateid\"給篩選\"%1$s\"."
@@ -2522,7 +2527,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "無法更新正規表示式"
 
-#: screenconf.php:134 screenedit.php:228 screenedit.php:245
+#: screenconf.php:134 screenedit.php:231 screenedit.php:248
 msgid "Cannot update screen"
 msgstr "無法更新篩選"
 
@@ -2605,7 +2610,7 @@ msgstr ""
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:698
+#: include/views/configuration.screen.constructor.edit.php:694
 msgid "Center"
 msgstr "中"
 
@@ -2725,11 +2730,11 @@ msgstr ""
 msgid "Checks should be unique."
 msgstr "檢查必需是唯一的"
 
-#: include/locales.inc.php:57
+#: include/locales.inc.php:55
 msgid "Chinese (zh_CN)"
 msgstr "中文 (zh_CN)"
 
-#: include/locales.inc.php:58
+#: include/locales.inc.php:56
 msgid "Chinese (zh_TW)"
 msgstr "中文 (zh_TW)"
 
@@ -2839,15 +2844,15 @@ msgstr ""
 msgid "Colour (OK)"
 msgstr "顏色 (OK)"
 
-#: screenedit.php:287
+#: screenedit.php:290
 msgid "Column added"
 msgstr ""
 
-#: screenedit.php:362
+#: screenedit.php:365
 msgid "Column deleted"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:719
+#: include/views/configuration.screen.constructor.edit.php:715
 #: screenedit.php:73
 msgid "Column span"
 msgstr "列跨幅"
@@ -3489,7 +3494,7 @@ msgstr "自訂尺寸"
 msgid "Custom slides"
 msgstr "自訂簡報片"
 
-#: include/locales.inc.php:59
+#: include/locales.inc.php:57
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
@@ -3512,8 +3517,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "方案細節"
 
-#: include/maps.inc.php:462 include/maps.inc.php:544 include/maps.inc.php:632
-#: include/maps.inc.php:722
+#: include/maps.inc.php:465 include/maps.inc.php:547 include/maps.inc.php:635
+#: include/maps.inc.php:725
 msgid "DISABLED"
 msgstr "關閉"
 
@@ -4136,7 +4141,7 @@ msgstr "已刪除: 主機 \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:733
+#: include/classes/api/services/CItem.php:734
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 項目 \"%1$s\" 於 \"%2$s\"."
@@ -4722,11 +4727,11 @@ msgstr "持續時間"
 msgid "Duration (sec)"
 msgstr "持續時間(秒)"
 
-#: include/locales.inc.php:60
+#: include/locales.inc.php:58
 msgid "Dutch (nl_NL)"
 msgstr "荷蘭(nl_NL)"
 
-#: include/views/configuration.screen.constructor.edit.php:732
+#: include/views/configuration.screen.constructor.edit.php:728
 msgid "Dynamic item"
 msgstr "動態監控項"
 
@@ -4921,7 +4926,7 @@ msgstr "空參數"
 msgid "Empty response received from Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CScreen.php:471
+#: include/classes/api/services/CScreen.php:478
 msgid "Empty screen ID for screen."
 msgstr ""
 
@@ -5071,11 +5076,11 @@ msgstr ""
 msgid "Enabled"
 msgstr "已啟用"
 
-#: include/locales.inc.php:54
+#: include/locales.inc.php:52
 msgid "English (en_GB)"
 msgstr "英語 (en_GB)"
 
-#: include/locales.inc.php:55
+#: include/locales.inc.php:53
 msgid "English (en_US)"
 msgstr "英語(en_US)"
 
@@ -5495,7 +5500,7 @@ msgstr ""
 msgid "Finish"
 msgstr "完成"
 
-#: include/locales.inc.php:61
+#: include/locales.inc.php:59
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
@@ -5539,7 +5544,7 @@ msgstr "公式"
 msgid "Fourth"
 msgstr "第四"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:60
 msgid "French (fr_FR)"
 msgstr "法語 (fr_FR)"
 
@@ -5633,7 +5638,7 @@ msgstr "一般"
 msgid "Generated in %s sec"
 msgstr "產生於%s秒"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:61
 msgid "German (de_DE)"
 msgstr "德語 (de_DE)"
 
@@ -5911,7 +5916,7 @@ msgstr "圖形已複製"
 msgid "Graphs deleted"
 msgstr "圖形已删除"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:62
 msgid "Greek (el_GR)"
 msgstr "希臘(el_GR)"
 
@@ -5933,8 +5938,8 @@ msgstr "網格"
 #: include/views/configuration.httpconf.list.php:43
 #: include/views/configuration.maintenance.list.php:32
 #: include/views/configuration.screen.constructor.edit.php:387
-#: include/views/configuration.screen.constructor.edit.php:489
-#: include/views/configuration.screen.constructor.edit.php:562
+#: include/views/configuration.screen.constructor.edit.php:488
+#: include/views/configuration.screen.constructor.edit.php:561
 #: include/views/configuration.triggers.list.php:74
 #: include/views/inventory.host.list.php:25
 #: include/views/inventory.host.list.php:75
@@ -6094,7 +6099,7 @@ msgstr ""
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:56
 #: include/views/configuration.graph.list.php:79
-#: include/views/configuration.screen.constructor.edit.php:677
+#: include/views/configuration.screen.constructor.edit.php:673
 #: include/views/configuration.sysmap.edit.php:43
 #: include/views/configuration.sysmap.list.php:45
 #: include/views/js/configuration.sysmaps.js.php:54 screenedit.php:69
@@ -6193,11 +6198,11 @@ msgstr ""
 msgid "History storage period (in days)"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:641
+#: include/views/configuration.screen.constructor.edit.php:637
 msgid "Horizontal"
 msgstr "横向"
 
-#: include/views/configuration.screen.constructor.edit.php:702
+#: include/views/configuration.screen.constructor.edit.php:698
 msgid "Horizontal align"
 msgstr "横向對齊"
 
@@ -6499,7 +6504,7 @@ msgstr "主機狀態"
 msgid "Host subnet mask"
 msgstr "主機子網路遮罩"
 
-#: include/views/configuration.screen.constructor.edit.php:605
+#: include/views/configuration.screen.constructor.edit.php:602
 msgid "Host time"
 msgstr "主機時間"
 
@@ -6573,7 +6578,7 @@ msgstr "維修中主機"
 msgid "Hosts info"
 msgstr "主機資訊"
 
-#: include/views/configuration.screen.constructor.edit.php:654
+#: include/views/configuration.screen.constructor.edit.php:650
 #: include/views/monitoring.overview.items.php:58
 #: include/views/monitoring.overview.triggers.php:80
 msgid "Hosts location"
@@ -6600,7 +6605,7 @@ msgstr "時"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:63
 msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
@@ -6871,7 +6876,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "假如您認為這個訊息是錯的, 請諮詢您的管理者關於如何取得需要的許可權."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:744
+#: include/maps.inc.php:747
 #: include/views/administration.general.image.edit.php:39
 #: include/views/administration.general.image.edit.php:42
 #: include/views/js/configuration.sysmaps.js.php:21 jsLoader.php:145
@@ -6954,7 +6959,7 @@ msgstr "已成功匯入"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "不可能以不存在的資產紀錄欄位\"%s\"來過濾."
 
-#: screenedit.php:330 screenedit.php:370
+#: screenedit.php:333 screenedit.php:373
 msgid "Impossible to remove last row and column."
 msgstr "不可能移除最後的行和列."
 
@@ -7326,12 +7331,12 @@ msgstr ""
 msgid "Incorrect function is used"
 msgstr "使用了不正確的方程式"
 
-#: include/classes/api/services/CScreenItem.php:643
+#: include/classes/api/services/CScreenItem.php:695
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:661
+#: include/classes/api/services/CScreenItem.php:713
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
 msgstr ""
@@ -7346,12 +7351,12 @@ msgstr ""
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:625
+#: include/classes/api/services/CScreenItem.php:677
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:607
+#: include/classes/api/services/CScreenItem.php:659
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
 msgstr ""
@@ -7378,7 +7383,7 @@ msgid "Incorrect image index."
 msgstr "不正確的圖片索引"
 
 #: include/classes/api/services/CImage.php:538
-#: include/classes/api/services/CScreen.php:358
+#: include/classes/api/services/CScreen.php:365
 #: include/classes/api/services/CTemplateScreen.php:544
 msgid "Incorrect input parameters."
 msgstr ""
@@ -7403,7 +7408,7 @@ msgstr "給予了不正確的介面埠參數\"%s\"."
 msgid "Incorrect inventory field \"%s\"."
 msgstr "不正確的資產紀錄欄位\"%s\"."
 
-#: include/classes/api/services/CScreenItem.php:680
+#: include/classes/api/services/CScreenItem.php:732
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
 msgstr ""
@@ -7417,7 +7422,7 @@ msgstr "不正確的項目予軸值."
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "提供不正確的項目鍵值\"%1$s\"給\"%2$s\"上的觸發器表示式."
 
-#: include/classes/api/services/CScreenItem.php:698
+#: include/classes/api/services/CScreenItem.php:750
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr ""
@@ -7467,7 +7472,7 @@ msgstr "不正確的維修期間(至少要5分鐘)"
 msgid "Incorrect maintenance week period"
 msgstr "不正確的維修週期間"
 
-#: include/classes/api/services/CScreenItem.php:716
+#: include/classes/api/services/CScreenItem.php:768
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
 msgstr ""
@@ -7482,7 +7487,7 @@ msgstr "予拓墣圖\"%s\"不正確的拓墣圖高度."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "予拓墣圖\"%s\"不正確的拓墣圖寬度."
 
-#: include/classes/api/services/CScreenItem.php:590
+#: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
 msgstr ""
 
@@ -7571,7 +7576,7 @@ msgstr "不正確的系統代理程式ID(proxyid)"
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:456
+#: include/classes/api/services/CScreenItem.php:489
 msgid "Incorrect resource type provided for screen item."
 msgstr "提供了不正確的資源類型給篩選項目."
 
@@ -7584,12 +7589,12 @@ msgstr ""
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:747
+#: include/classes/api/services/CScreenItem.php:799
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
 msgstr ""
 
-#: include/classes/api/services/CScreen.php:472
+#: include/classes/api/services/CScreen.php:479
 msgid "Incorrect screen ID."
 msgstr ""
 
@@ -7636,6 +7641,10 @@ msgstr "予服務\"%1$s\"不正確的狀態."
 #: include/classes/api/services/CDRule.php:225
 msgid "Incorrect status."
 msgstr "不正確的狀態."
+
+#: include/classes/api/services/CScreenItem.php:643
+msgid "Incorrect style provided for screen element."
+msgstr ""
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7730,7 +7739,7 @@ msgstr "不正確的用戶群組."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:571
+#: include/classes/api/services/CScreenItem.php:618
 #: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
@@ -7790,7 +7799,7 @@ msgstr "圖形\"%1$s\"的不正確y max項目."
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y min項目."
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:64
 msgid "Indonesian (id_ID)"
 msgstr "印尼語 (id_ID)"
 
@@ -7967,8 +7976,8 @@ msgid "Invalid maintenance period"
 msgstr ""
 
 #: include/classes/api/services/CScreenItem.php:149
-#: include/classes/api/services/CScreenItem.php:242
-#: include/classes/api/services/CScreenItem.php:303
+#: include/classes/api/services/CScreenItem.php:264
+#: include/classes/api/services/CScreenItem.php:328
 #: include/classes/api/services/CScript.php:429
 #: include/classes/api/services/CService.php:206
 #: include/classes/api/services/CService.php:381
@@ -8057,7 +8066,7 @@ msgstr "不可能於HTTP認證中登出."
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:65
 msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
@@ -8085,7 +8094,7 @@ msgstr "鍵值為 \"%1$s\"的項目已存在於 \"%2$s\", 繼承自其他模板.
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:909
+#: include/classes/api/services/CItem.php:910
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號碼\"%2$d\". 選擇為: 從0(不填入)到%3$d."
@@ -8345,7 +8354,7 @@ msgstr "一月"
 msgid "January"
 msgstr "一月"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:67
 msgid "Japanese (ja_JP)"
 msgstr "日語 (ja_JP)"
 
@@ -8405,7 +8414,7 @@ msgstr "關鍵字"
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:66
 msgid "Korean (ko_KR)"
 msgstr "韓語 (ko_KR)"
 
@@ -8564,13 +8573,13 @@ msgstr "最新報警"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:68
 msgid "Latvian (lv_LV)"
 msgstr "拉脱維亞語(lv_LV)"
 
 #: include/reports.inc.php:100
-#: include/views/configuration.screen.constructor.edit.php:650
-#: include/views/configuration.screen.constructor.edit.php:696
+#: include/views/configuration.screen.constructor.edit.php:646
+#: include/views/configuration.screen.constructor.edit.php:692
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
@@ -8677,7 +8686,7 @@ msgstr "清單是空的"
 msgid "List of network interfaces. Text value."
 msgstr ""
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:69
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -8687,7 +8696,7 @@ msgid "Loading..."
 msgstr "載入中..."
 
 #: include/classes/screens/CScreenHistory.php:147
-#: include/views/configuration.screen.constructor.edit.php:603
+#: include/views/configuration.screen.constructor.edit.php:600
 msgid "Local time"
 msgstr "當地時間"
 
@@ -8818,7 +8827,7 @@ msgstr "Mac位址A"
 msgid "MAC address B"
 msgstr "Mac位址B"
 
-#: include/maps.inc.php:536
+#: include/maps.inc.php:539
 msgid "MAINTENANCE"
 msgstr "維修"
 
@@ -8893,7 +8902,7 @@ msgstr "巨集"
 msgid "Macros updated"
 msgstr "巨集已更新"
 
-#: include/audit.inc.php:47 include/maps.inc.php:621 include/maps.inc.php:711
+#: include/audit.inc.php:47 include/maps.inc.php:624 include/maps.inc.php:714
 #: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:150
@@ -9259,7 +9268,7 @@ msgid "Method not found."
 msgstr "未發現方法."
 
 #: include/reports.inc.php:434
-#: include/views/configuration.screen.constructor.edit.php:712
+#: include/views/configuration.screen.constructor.edit.php:708
 msgid "Middle"
 msgstr "居中"
 
@@ -9268,32 +9277,32 @@ msgstr "居中"
 msgid "Minimize"
 msgstr "最小化"
 
-#: include/classes/setup/CFrontendSetup.php:120
+#: include/classes/setup/CFrontendSetup.php:125
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:154
+#: include/classes/setup/CFrontendSetup.php:159
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:102
+#: include/classes/setup/CFrontendSetup.php:107
 #, c-format
 msgid "Minimum required PHP version is %s."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:171
+#: include/classes/setup/CFrontendSetup.php:176
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:188
+#: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:137
+#: include/classes/setup/CFrontendSetup.php:142
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
 msgstr ""
@@ -9705,7 +9714,7 @@ msgstr ""
 msgid "No \"%1$s\" given for host prototype."
 msgstr ""
 
-#: include/classes/api/services/CScreen.php:470
+#: include/classes/api/services/CScreen.php:477
 #, c-format
 msgid "No \"%1$s\" given for screen."
 msgstr ""
@@ -9782,7 +9791,7 @@ msgstr ""
 msgid "No SNMP interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:557
+#: include/classes/api/services/CScreenItem.php:604
 msgid "No URL provided for screen element."
 msgstr "沒有提供URL給篩選組件"
 
@@ -9935,7 +9944,7 @@ msgstr "沒有檔案上載."
 msgid "No flexible intervals defined."
 msgstr "並無定義的的彈性區間"
 
-#: include/classes/api/services/CScreenItem.php:492
+#: include/classes/api/services/CScreenItem.php:525
 msgid "No graph ID provided for screen element."
 msgstr "沒有提供圖形ID給篩選組件."
 
@@ -9944,7 +9953,7 @@ msgstr "沒有提供圖形ID給篩選組件."
 msgid "No graph item with graphid \"%s\"."
 msgstr "沒有圖形ID\"%s\"的圖形項目."
 
-#: include/classes/api/services/CScreenItem.php:501
+#: include/classes/api/services/CScreenItem.php:534
 msgid "No graph prototype ID provided for screen element."
 msgstr ""
 
@@ -9993,7 +10002,7 @@ msgstr "沒有所知的巨集\"%1$s\"的主機."
 msgid "No host group ID for group prototype."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:474
+#: include/classes/api/services/CScreenItem.php:507
 msgid "No host group ID provided for screen element."
 msgstr "沒有提供主機群組給篩選組件"
 
@@ -10066,8 +10075,8 @@ msgstr ""
 msgid "No interfaces for host \"%s\"."
 msgstr "沒有主機\"%s\"的介面."
 
-#: include/classes/api/services/CScreenItem.php:521
-#: include/classes/api/services/CScreenItem.php:530
+#: include/classes/api/services/CScreenItem.php:554
+#: include/classes/api/services/CScreenItem.php:564
 msgid "No item ID provided for screen element."
 msgstr "沒有提供項目給篩選組件."
 
@@ -10075,7 +10084,7 @@ msgstr "沒有提供項目給篩選組件."
 msgid "No item keys found."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:511
+#: include/classes/api/services/CScreenItem.php:544
 msgid "No item prototype ID provided for screen element."
 msgstr ""
 
@@ -10114,7 +10123,7 @@ msgstr ""
 msgid "No maintenance periods found."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:539
+#: include/classes/api/services/CScreenItem.php:577
 msgid "No map ID provided for screen element."
 msgstr "沒有提供拓墣圖ID給篩選組件."
 
@@ -10262,10 +10271,10 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CProxy.php:202
 #: include/classes/api/services/CProxy.php:275
 #: include/classes/api/services/CProxy.php:536
-#: include/classes/api/services/CScreenItem.php:362
-#: include/classes/api/services/CScreenItem.php:452
-#: include/classes/api/services/CScreen.php:428
-#: include/classes/api/services/CScreen.php:603
+#: include/classes/api/services/CScreenItem.php:387
+#: include/classes/api/services/CScreenItem.php:485
+#: include/classes/api/services/CScreen.php:435
+#: include/classes/api/services/CScreen.php:610
 #: include/classes/api/services/CService.php:1051
 #: include/classes/api/services/CService.php:1066
 #: include/classes/api/services/CTemplateScreen.php:568
@@ -10322,7 +10331,7 @@ msgstr "沒有動作操作訊息的收受者."
 msgid "No regular expressions found."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:547
+#: include/classes/api/services/CScreenItem.php:585
 msgid "No screen ID provided for screen element."
 msgstr "沒有提供篩選ID給篩選組件."
 
@@ -10699,8 +10708,8 @@ msgstr "OEM"
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
 #: include/classes/setup/CSetupWizard.php:516
-#: include/classes/tree/CServiceTree.php:45 include/maps.inc.php:470
-#: include/maps.inc.php:552 include/maps.inc.php:642 include/maps.inc.php:732
+#: include/classes/tree/CServiceTree.php:45 include/maps.inc.php:473
+#: include/maps.inc.php:555 include/maps.inc.php:645 include/maps.inc.php:735
 #: include/triggers.inc.php:154
 #: include/views/monitoring.overview.triggers.php:38
 msgid "OK"
@@ -11072,155 +11081,163 @@ msgstr "P"
 msgid "PERSONAL DASHBOARD"
 msgstr "個人儀表板"
 
-#: include/classes/setup/CFrontendSetup.php:286
+#: include/classes/setup/CFrontendSetup.php:350
+msgid "PHP always_populate_raw_post_data"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:354
+msgid "PHP always_populate_raw_post_data must be set to -1."
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:290
+#: include/classes/setup/CFrontendSetup.php:295
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:521
+#: include/classes/setup/CFrontendSetup.php:547
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:525
+#: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:224
+#: include/classes/setup/CFrontendSetup.php:229
 msgid "PHP databases support"
 msgstr "PHP支持的資料庫"
 
-#: include/classes/setup/CFrontendSetup.php:366
+#: include/classes/setup/CFrontendSetup.php:392
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:437
+#: include/classes/setup/CFrontendSetup.php:463
 msgid "PHP gd FreeType support"
 msgstr "支援PHP gd FreeType"
 
-#: include/classes/setup/CFrontendSetup.php:441
+#: include/classes/setup/CFrontendSetup.php:467
 msgid "PHP gd FreeType support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:418
+#: include/classes/setup/CFrontendSetup.php:444
 msgid "PHP gd JPEG image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:414
+#: include/classes/setup/CFrontendSetup.php:440
 msgid "PHP gd JPEG support"
 msgstr "支援PHP gd JPEG"
 
-#: include/classes/setup/CFrontendSetup.php:393
+#: include/classes/setup/CFrontendSetup.php:419
 msgid "PHP gd PNG image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:389
+#: include/classes/setup/CFrontendSetup.php:415
 msgid "PHP gd PNG support"
 msgstr "支援PHP gd PNG"
 
-#: include/classes/setup/CFrontendSetup.php:370
+#: include/classes/setup/CFrontendSetup.php:396
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:572
+#: include/classes/setup/CFrontendSetup.php:598
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:576
+#: include/classes/setup/CFrontendSetup.php:602
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:486
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:490
 msgid "PHP libxml extension missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:303
+#: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:307
+#: include/classes/setup/CFrontendSetup.php:312
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:324
+#: include/classes/setup/CFrontendSetup.php:329
 msgid "PHP mbstring.func_overload"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:167
+#: include/classes/setup/CFrontendSetup.php:172
 msgid "PHP option max_execution_time"
 msgstr "PHP選項max_execution_time"
 
-#: include/classes/setup/CFrontendSetup.php:184
+#: include/classes/setup/CFrontendSetup.php:189
 msgid "PHP option max_input_time"
 msgstr "PHP選項max_input_time"
 
-#: include/classes/setup/CFrontendSetup.php:116
+#: include/classes/setup/CFrontendSetup.php:121
 msgid "PHP option memory_limit"
 msgstr "PHP選項memory_limit"
 
-#: include/classes/setup/CFrontendSetup.php:133
+#: include/classes/setup/CFrontendSetup.php:138
 msgid "PHP option post_max_size"
 msgstr "PHP選項post_max_size"
 
-#: include/classes/setup/CFrontendSetup.php:150
+#: include/classes/setup/CFrontendSetup.php:155
 msgid "PHP option upload_max_filesize"
 msgstr "PHP選項upload_max_filesize"
 
-#: include/classes/setup/CFrontendSetup.php:538
+#: include/classes/setup/CFrontendSetup.php:564
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:555
+#: include/classes/setup/CFrontendSetup.php:581
 msgid "PHP session auto start"
 msgstr "PHP連線期自動啟動"
 
-#: include/classes/setup/CFrontendSetup.php:559
+#: include/classes/setup/CFrontendSetup.php:585
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:542
+#: include/classes/setup/CFrontendSetup.php:568
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:341
+#: include/classes/setup/CFrontendSetup.php:367
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:345
+#: include/classes/setup/CFrontendSetup.php:371
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:333
 msgid "PHP string function overloading must be disabled."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:201
+#: include/classes/setup/CFrontendSetup.php:206
 msgid "PHP time zone"
 msgstr "PHP時區"
 
-#: include/classes/setup/CFrontendSetup.php:98
+#: include/classes/setup/CFrontendSetup.php:103
 msgid "PHP version"
 msgstr "PHP版本"
 
-#: include/classes/setup/CFrontendSetup.php:494
+#: include/classes/setup/CFrontendSetup.php:520
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:498
+#: include/classes/setup/CFrontendSetup.php:524
 msgid "PHP xmlreader extension missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:477
+#: include/classes/setup/CFrontendSetup.php:503
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:481
+#: include/classes/setup/CFrontendSetup.php:507
 msgid "PHP xmlwriter extension missing."
 msgstr ""
 
@@ -11229,7 +11246,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:454 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:457 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11254,8 +11271,8 @@ msgstr "Palette #%1$s"
 #: include/views/configuration.screen.constructor.edit.php:282
 #: include/views/configuration.screen.constructor.edit.php:308
 #: include/views/configuration.screen.constructor.edit.php:360
-#: include/views/configuration.screen.constructor.edit.php:533
-#: include/views/configuration.screen.constructor.edit.php:622
+#: include/views/configuration.screen.constructor.edit.php:532
+#: include/views/configuration.screen.constructor.edit.php:621
 #: popup_bitem.php:42 popup_bitem.php:151
 msgid "Parameter"
 msgstr "参數"
@@ -11390,7 +11407,7 @@ msgstr "許可權"
 msgid "Permissions can be assigned for user groups only."
 msgstr "許可權只能被指派予用戶群組"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:70
 msgid "Persian (fa_IR)"
 msgstr "波斯語 (fa_IR)"
 
@@ -11431,7 +11448,7 @@ msgstr "請輸入確認文字."
 msgid "Please select two elements"
 msgstr "請選擇兩組件"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:71
 msgid "Polish (pl_PL)"
 msgstr "波蘭(pl_PL)"
 
@@ -11467,11 +11484,11 @@ msgstr "主機介面的埠不能是空白."
 msgid "Port range"
 msgstr "埠範圍"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:72
 msgid "Portuguese (pt_BR)"
 msgstr "波蘭語 (pt_BR)"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -11577,7 +11594,7 @@ msgstr "優先權層級"
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
-#: include/maps.inc.php:508 include/maps.inc.php:591 include/maps.inc.php:682
+#: include/maps.inc.php:511 include/maps.inc.php:594 include/maps.inc.php:685
 #: include/views/common.filter.trigger.php:40
 #: include/views/js/configuration.sysmaps.js.php:143
 msgid "Problem"
@@ -11604,8 +11621,8 @@ msgstr "問題, 如果所有的下層都有問題"
 msgid "Problem, if at least one child has a problem"
 msgstr "問題, 如果至少一個下層有一個問題"
 
-#: chart4.php:163 include/maps.inc.php:502 include/maps.inc.php:585
-#: include/maps.inc.php:676 report2.php:395 report3.php:83
+#: chart4.php:163 include/maps.inc.php:505 include/maps.inc.php:588
+#: include/maps.inc.php:679 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "問題"
 
@@ -12128,7 +12145,7 @@ msgid "Returns percentage of lost ICMP ping packets."
 msgstr ""
 
 #: include/reports.inc.php:100
-#: include/views/configuration.screen.constructor.edit.php:700
+#: include/views/configuration.screen.constructor.edit.php:696
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:85
@@ -12136,19 +12153,19 @@ msgstr ""
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:74
 msgid "Romanian (ro_RO)"
 msgstr ""
 
-#: screenedit.php:264
+#: screenedit.php:267
 msgid "Row added"
 msgstr ""
 
-#: screenedit.php:322
+#: screenedit.php:325
 msgid "Row deleted"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:720
+#: include/views/configuration.screen.constructor.edit.php:716
 #: screenedit.php:74
 msgid "Row span"
 msgstr "行寬度"
@@ -12210,7 +12227,7 @@ msgstr "於主機上執行遠程命令"
 msgid "Run specified command on the host."
 msgstr ""
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:75
 msgid "Russian (ru_RU)"
 msgstr "俄語 (ru_RU)"
 
@@ -12458,34 +12475,34 @@ msgstr "篩選 \"%1$s\" 已新增."
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
 
-#: include/classes/api/services/CScreen.php:379
-#: include/classes/api/services/CScreen.php:452
+#: include/classes/api/services/CScreen.php:386
+#: include/classes/api/services/CScreen.php:459
 #, c-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "篩選\"%1$s\"已存在."
 
-#: include/classes/api/services/CScreenItem.php:893
-#: include/classes/api/services/CScreenItem.php:917
+#: include/classes/api/services/CScreenItem.php:945
+#: include/classes/api/services/CScreenItem.php:969
 #, c-format
 msgid "Screen \"%1$s\" cell X - %2$s Y - %3$s is already taken."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:793
+#: include/classes/api/services/CScreenItem.php:845
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:842
+#: include/classes/api/services/CScreenItem.php:894
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:779
+#: include/classes/api/services/CScreenItem.php:831
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:829
+#: include/classes/api/services/CScreenItem.php:881
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
@@ -12504,7 +12521,7 @@ msgstr "篩選\"%1$s\"已更新."
 msgid "Screen added"
 msgstr "篩選已新增"
 
-#: include/views/configuration.screen.constructor.edit.php:738
+#: include/views/configuration.screen.constructor.edit.php:734
 msgid "Screen cell configuration"
 msgstr "篩選格位組態"
 
@@ -12512,11 +12529,11 @@ msgstr "篩選格位組態"
 msgid "Screen deleted"
 msgstr "篩選已删除"
 
-#: screenedit.php:329 screenedit.php:369
+#: screenedit.php:332 screenedit.php:372
 msgid "Screen should contain at least one row and column."
 msgstr "篩選應包含至少一個行和列."
 
-#: screenconf.php:133 screenedit.php:228 screenedit.php:245
+#: screenconf.php:133 screenedit.php:231 screenedit.php:248
 msgid "Screen updated"
 msgstr "篩選已更新"
 
@@ -12682,9 +12699,9 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:310
 #: include/views/configuration.screen.constructor.edit.php:342
 #: include/views/configuration.screen.constructor.edit.php:351
-#: include/views/configuration.screen.constructor.edit.php:535
-#: include/views/configuration.screen.constructor.edit.php:610
-#: include/views/configuration.screen.constructor.edit.php:617
+#: include/views/configuration.screen.constructor.edit.php:534
+#: include/views/configuration.screen.constructor.edit.php:609
+#: include/views/configuration.screen.constructor.edit.php:616
 #: include/views/configuration.services.child.list.php:63
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
@@ -12796,7 +12813,7 @@ msgstr "伺服器"
 msgid "Server info"
 msgstr "伺服器資訊"
 
-#: include/views/configuration.screen.constructor.edit.php:604
+#: include/views/configuration.screen.constructor.edit.php:601
 msgid "Server time"
 msgstr "伺服器時間"
 
@@ -12960,7 +12977,7 @@ msgstr "展示圖標"
 #: include/views/configuration.screen.constructor.edit.php:364
 #: include/views/configuration.screen.constructor.edit.php:431
 #: include/views/configuration.screen.constructor.edit.php:446
-#: include/views/configuration.screen.constructor.edit.php:467
+#: include/views/configuration.screen.constructor.edit.php:466
 #: screenedit.php:75
 msgid "Show lines"
 msgstr "展示線條"
@@ -13120,7 +13137,7 @@ msgstr "簡報片展示"
 msgid "Slides"
 msgstr "簡報片"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:76
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -13195,7 +13212,7 @@ msgstr "依欄位\"%1$s\"排序是不允許的."
 msgid "Source"
 msgstr "來源 "
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:77
 msgid "Spanish (es_ES)"
 msgstr "西班牙語 (es_ES)"
 
@@ -13353,7 +13370,7 @@ msgstr "儲存值"
 msgid "Straight"
 msgstr "Straight"
 
-#: include/views/configuration.screen.constructor.edit.php:645
+#: include/views/configuration.screen.constructor.edit.php:641
 msgid "Style"
 msgstr "風格"
 
@@ -13431,7 +13448,7 @@ msgstr ""
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:78
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -13690,12 +13707,12 @@ msgstr "文字"
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:941
+#: include/classes/api/services/CScreenItem.php:993
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr ""
 
-#: include/classes/api/services/CScreenItem.php:953
+#: include/classes/api/services/CScreenItem.php:1005
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr ""
@@ -13857,11 +13874,11 @@ msgstr "時間期間"
 msgid "Time shift"
 msgstr "排班"
 
-#: include/views/configuration.screen.constructor.edit.php:606
+#: include/views/configuration.screen.constructor.edit.php:603
 msgid "Time type"
 msgstr "時間類型"
 
-#: include/classes/setup/CFrontendSetup.php:205
+#: include/classes/setup/CFrontendSetup.php:210
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr ""
 
@@ -13908,8 +13925,8 @@ msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有�
 msgid "Today"
 msgstr "今天"
 
-#: include/views/configuration.screen.constructor.edit.php:652
-#: include/views/configuration.screen.constructor.edit.php:710
+#: include/views/configuration.screen.constructor.edit.php:648
+#: include/views/configuration.screen.constructor.edit.php:706
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
 #: include/views/js/configuration.sysmaps.js.php:250
@@ -14249,7 +14266,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:79
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14257,7 +14274,7 @@ msgstr ""
 msgid "Two elements should be selected"
 msgstr "兩個組件必需被選擇"
 
-#: include/classes/api/services/CItem.php:970
+#: include/classes/api/services/CItem.php:971
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "兩個項目 (\"%1$s\"和\"%2$s\")不能填入一個主機資產紀錄欄位\"%3$s\", 這會造成衝突."
@@ -14347,7 +14364,7 @@ msgstr "上線"
 #: include/screens.inc.php:44
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.httpconf.popup.php:87
-#: include/views/configuration.screen.constructor.edit.php:661
+#: include/views/configuration.screen.constructor.edit.php:657
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/configuration.sysmaps.js.php:184 jsLoader.php:221
@@ -14402,7 +14419,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用戶基本資料"
 
-#: include/locales.inc.php:82
+#: include/locales.inc.php:80
 msgid "Ukrainian (uk_UA)"
 msgstr "烏克蘭語 (uk_UA)"
 
@@ -14414,7 +14431,7 @@ msgstr "不能選擇組態."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:519 include/maps.inc.php:602 include/maps.inc.php:693
+#: include/maps.inc.php:522 include/maps.inc.php:605 include/maps.inc.php:696
 msgid "Unacknowledged"
 msgstr "未知悉的"
 
@@ -14678,7 +14695,7 @@ msgstr "上"
 #: include/views/configuration.item.massupdate.php:571
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
-#: include/views/configuration.screen.constructor.edit.php:744
+#: include/views/configuration.screen.constructor.edit.php:740
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.services.edit.php:298
 #: include/views/configuration.slideconf.edit.php:108
@@ -15326,15 +15343,15 @@ msgstr ""
 msgid "Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1"
 msgstr ""
 
-#: include/views/configuration.screen.constructor.edit.php:643
+#: include/views/configuration.screen.constructor.edit.php:639
 msgid "Vertical"
 msgstr "垂直的"
 
-#: include/views/configuration.screen.constructor.edit.php:717
+#: include/views/configuration.screen.constructor.edit.php:713
 msgid "Vertical align"
 msgstr "縱向對齊"
 
-#: include/locales.inc.php:83
+#: include/locales.inc.php:81
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
@@ -15486,7 +15503,7 @@ msgstr "當作用中時"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:78
-#: include/views/configuration.screen.constructor.edit.php:676
+#: include/views/configuration.screen.constructor.edit.php:672
 #: include/views/configuration.sysmap.edit.php:42
 #: include/views/configuration.sysmap.list.php:44
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:68
@@ -16268,38 +16285,41 @@ msgstr "現在"
 msgid "of"
 msgstr "其"
 
-#: include/classes/setup/CFrontendSetup.php:225
-#: include/classes/setup/CFrontendSetup.php:287
-#: include/classes/setup/CFrontendSetup.php:304
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:326
-#: include/classes/setup/CFrontendSetup.php:342
-#: include/classes/setup/CFrontendSetup.php:390
-#: include/classes/setup/CFrontendSetup.php:415
-#: include/classes/setup/CFrontendSetup.php:438
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:495
-#: include/classes/setup/CFrontendSetup.php:522
-#: include/classes/setup/CFrontendSetup.php:539
-#: include/classes/setup/CFrontendSetup.php:556
-#: include/classes/setup/CFrontendSetup.php:557
-#: include/classes/setup/CFrontendSetup.php:573
+#: include/classes/setup/CFrontendSetup.php:230
+#: include/classes/setup/CFrontendSetup.php:292
+#: include/classes/setup/CFrontendSetup.php:309
+#: include/classes/setup/CFrontendSetup.php:330
+#: include/classes/setup/CFrontendSetup.php:331
+#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:352
+#: include/classes/setup/CFrontendSetup.php:368
+#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:441
+#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:504
+#: include/classes/setup/CFrontendSetup.php:521
+#: include/classes/setup/CFrontendSetup.php:548
+#: include/classes/setup/CFrontendSetup.php:565
+#: include/classes/setup/CFrontendSetup.php:582
+#: include/classes/setup/CFrontendSetup.php:583
+#: include/classes/setup/CFrontendSetup.php:599
 msgid "off"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:287
-#: include/classes/setup/CFrontendSetup.php:304
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:342
-#: include/classes/setup/CFrontendSetup.php:390
-#: include/classes/setup/CFrontendSetup.php:415
-#: include/classes/setup/CFrontendSetup.php:438
-#: include/classes/setup/CFrontendSetup.php:478
-#: include/classes/setup/CFrontendSetup.php:495
-#: include/classes/setup/CFrontendSetup.php:522
-#: include/classes/setup/CFrontendSetup.php:539
-#: include/classes/setup/CFrontendSetup.php:556
-#: include/classes/setup/CFrontendSetup.php:573
+#: include/classes/setup/CFrontendSetup.php:292
+#: include/classes/setup/CFrontendSetup.php:309
+#: include/classes/setup/CFrontendSetup.php:330
+#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:368
+#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:441
+#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:504
+#: include/classes/setup/CFrontendSetup.php:521
+#: include/classes/setup/CFrontendSetup.php:548
+#: include/classes/setup/CFrontendSetup.php:565
+#: include/classes/setup/CFrontendSetup.php:582
+#: include/classes/setup/CFrontendSetup.php:599
 #: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr "於"
@@ -16387,9 +16407,9 @@ msgstr ""
 msgid "unexpected end of key"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:202
-#: include/classes/setup/CFrontendSetup.php:361
-#: include/classes/setup/CFrontendSetup.php:455
+#: include/classes/setup/CFrontendSetup.php:207
+#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:481
 msgid "unknown"
 msgstr "未知的"
 
