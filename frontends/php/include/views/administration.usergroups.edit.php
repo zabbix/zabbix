@@ -26,6 +26,7 @@ $userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 $userGroupForm = new CForm();
 $userGroupForm->setName('userGroupsForm');
 $userGroupForm->addVar('form', $this->data['form']);
+$userGroupForm->registerSerializedField('group_rights');
 $userGroupForm->addVar('group_rights', $this->data['group_rights']);
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addVar('usrgrpid', $this->data['usrgrpid']);
@@ -80,6 +81,7 @@ $permissionsFormList = new CFormList('permissionsFormList');
 $permissionsTable = new CTable(null, 'right_table');
 $permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
+$userGroupForm->registerSerializedField('right_to_del');
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
 $lstRead = new CListBox('right_to_del[read_only][]', null, 20);
 $lstDeny = new CListBox('right_to_del[deny][]', null, 20);
@@ -133,7 +135,7 @@ $userGroupForm->addItem($userGroupTab);
 // append buttons to form
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addItem(makeFormFooter(
-		new CSubmit('update', _('Update')),
+			new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid').url_param('config')),
 			new CButtonCancel(url_param('config'))

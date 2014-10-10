@@ -152,4 +152,10 @@ jQuery(function($) {
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
+
+	$('form[data-serialized-fields]').each(function(){
+		$(this).serializeFieldsOnSubmit({
+			fields: $(this).data('serialized-fields')
+		});
+	})
 });
