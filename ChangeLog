@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+.......PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
@@ -33,6 +34,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 ........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
 ..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
