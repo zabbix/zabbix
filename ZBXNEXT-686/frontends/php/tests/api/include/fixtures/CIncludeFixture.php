@@ -17,6 +17,8 @@ class CIncludeFixture extends CFixture {
 		}
 
 		$file = $params['file'];
+
+		// TODO: pass the path as a parameter
 		$path = __DIR__ . '/../../tests/fixtures/'.$file.'.yml';
 
 		if (!is_readable($path)) {

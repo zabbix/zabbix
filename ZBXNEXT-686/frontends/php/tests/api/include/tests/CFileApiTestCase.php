@@ -14,18 +14,17 @@ class CFileApiTestCase extends CApiTestCase {
 		self::$macroResolver = new CArrayMacroResolver();
 	}
 
-	protected function parseTestFile($name) {
-		$path = ZABBIX_NEW_TEST_DIR . '/tests/yaml/'.$name.'.yml';
-
-		if (!is_readable($path)) {
-			throw new Exception(sprintf('Test file "%s" not readable, expected location "%s"', $name, $path));
-		}
-
-		return yaml_parse_file($path);
+	/**
+	 * Return the path to the test file directory.
+	 *
+	 * @return string
+	 */
+	protected function getTestFileDir() {
+		return ZABBIX_NEW_TEST_DIR.'/tests/yaml';
 	}
 
-	protected function runTestFile($file) {
-		$test = $this->parseTestFile($file);
+	protected function runTestFile($path) {
+		$test = $this->parseTestFile($path);
 
 		$fixtures = (isset($test['fixtures'])) ? $test['fixtures'] : array();
 
@@ -46,6 +45,10 @@ class CFileApiTestCase extends CApiTestCase {
 
 		$this->login('Admin', 'zabbix');
 		$this->runSteps($test['steps'], $fixtures);
+	}
+
+	protected function parseTestFile($path) {
+		return yaml_parse_file($this->getTestFileDir().'/'.$path);
 	}
 
 	/**
@@ -130,5 +133,37 @@ class CFileApiTestCase extends CApiTestCase {
 			'params' => null,
 			'auth' => $auth
 		), $requestDefinition);
+	}
+
+	/**
+	 * Returns the data for a test file provider containing the path to the test file.
+	 *
+	 * @return array
+	 */
+	protected function provideTestFiles() {
+		$dir = $this->getTestFileDir();
+
+		$rs = array();
+		foreach ($this->getTestFileIterator($dir) as $file) {
+			/* @var SplFileInfo $file */
+			$subPath = ltrim(str_replace($dir, '', $file->getPathname()), '/');
+
+			$rs[$subPath] = array($subPath);
+		}
+
+		return $rs;
+	}
+
+	/**
+	 * Returns an iterator over test files.
+	 *
+	 * @param string $dir	directory to look for the files in
+	 *
+	 * @return Iterator
+	 */
+	protected function getTestFileIterator($dir) {
+		$i = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
+
+		return new RegexIterator($i, '/^.+\.yml$/i');
 	}
 }
