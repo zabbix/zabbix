@@ -19,15 +19,26 @@
 **/
 
 
+/**
+ * A class for working with array macros.
+ */
 class CArrayMacroResolver {
 
 	/**
-	 * Expands step variables like "@step1.data@"
+	 * Expands all array macros in $array using the values from $data.
+	 *
+	 * An array macro is a macro in the form of @key.key2@. To expand the macro in the example,
+	 * the method will look for value $data['key']['key2'].
+	 *
+	 * String keys should be defined using dots, but numeric keys using square brackets.
+	 * For example @key.subkey[2]@ is equivalent to $data['key']['subkey'][2].
 	 *
 	 * @param array $array  an array to resolve macros in
 	 * @param array $data   an array to take the data from
 	 *
-	 * @return array
+	 * @return array	the source array with the macros expanded
+	 *
+	 * @throws InvalidArgumentException if a macro cannot be resolved
 	 */
 	public function resolve(array $array, array $data) {
 		array_walk_recursive($array, function (&$value, $index) use ($data) {
@@ -35,7 +46,6 @@ class CArrayMacroResolver {
 				return;
 			}
 
-			// TODO: this should be refactored to single regular expression like (@((([a-z0-9]+)[.[\]]*)+)@)
 			// extract variables
 			preg_match_all("/@(?:[a-z0-9[\\]._]+)@/i", $value, $matches);
 
@@ -46,8 +56,9 @@ class CArrayMacroResolver {
 					if (count($keys) > 0) {
 						try {
 							$newValue = $this->drillIn($data, $keys);
-						} catch (\Exception $e) {
-							throw new \Exception(
+						}
+						catch (InvalidArgumentException $e) {
+							throw new InvalidArgumentException(
 								sprintf('Cannot resolve macro "%1$s": %2$s',
 									$macro,
 									$e->getMessage()
@@ -58,7 +69,7 @@ class CArrayMacroResolver {
 						$value = str_replace($macro, $newValue, $value);
 					}
 					else {
-						throw new \Exception(sprintf('Incorrect macro "%1$s"', $macro));
+						throw new InvalidArgumentException(sprintf('Incorrect macro "%1$s"', $macro));
 					}
 				}
 			}
@@ -70,20 +81,22 @@ class CArrayMacroResolver {
 	/**
 	 * Drill in function - returns item from array $data defined by $keys.
 	 *
-	 * @param $data
-	 * @param $keys
+	 * @param array $data
+	 * @param array $keys
+	 *
 	 * @return mixed
-	 * @throws \Exception
+	 *
+	 * @throws InvalidArgumentException	if a value does not exist
 	 */
-	protected function drillIn(array $data, $keys) {
+	protected function drillIn(array $data, array $keys) {
 		foreach ($keys as $i => $key) {
 			if (!is_array($data)) {
-				throw new \Exception(sprintf(
+				throw new InvalidArgumentException(sprintf(
 					'value of "%1$s" is not an array', $keys[$i - 1]
 				));
 			}
 			elseif(!isset($data[$key])) {
-				throw new \Exception(sprintf(
+				throw new InvalidArgumentException(sprintf(
 					'key "%1$s" is not set', $key
 				));
 			}
