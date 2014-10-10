@@ -46,6 +46,8 @@ abstract class CApiClient {
 	 * @param string		$jsonRpc	JSON RPC version
 	 *
 	 * @return CApiResponse
+	 *
+	 * @throws UnexpectedValueException		if a the value returned by the endpoint is invalid
 	 */
 	abstract public function callMethod($method, $params, $auth = null, $id = null, $jsonRpc = '2.0');
 
