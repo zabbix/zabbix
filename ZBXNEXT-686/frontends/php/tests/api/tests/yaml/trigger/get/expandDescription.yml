@@ -1,0 +1,29 @@
+fixtures:
+  hostWithItem:
+    groupid: '@fixtures.base.result.groupid@'
+
+steps:
+
+  step1:
+    request:
+      method: trigger.create
+      params:
+        description: "Low memory on {HOST.NAME}"
+        expression: "{@fixtures.hostWithItem.result.host@:@fixtures.hostWithItem.result.itemKey@.last()}<1024"
+
+    assertResult:
+      triggerids:
+        - { _assert: { id: ~ } }
+
+  # validate that the description
+  step3:
+    request:
+      method: trigger.get
+      params:
+        output: [description]
+        expandDescription: true
+
+    assertResult:
+      -
+        triggerid: '@steps.step1.response.result.triggerids[0]@'
+        description: "Low memory on @fixtures.hostWithItem.result.host@"

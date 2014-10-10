@@ -8,7 +8,7 @@ steps:
     request:
       method: trigger.create
       params:
-        description: "Low memory on {HOST.NAME}"
+        description: "Low memory on server"
         expression: "{@fixtures.hostWithItem.result.host@:@fixtures.hostWithItem.result.itemKey@.last()}<1024"
 
     assertResult:
@@ -57,18 +57,3 @@ steps:
           -
             hostid: { _assert: { id: ~ } }
             host: Zabbix server
-
-  # validate that the expression and descriptions are expanded correctly
-  step3:
-    request:
-      method: trigger.get
-      params:
-        output: [expression, description]
-        expandDescription: true
-        expandExpression: true
-
-    assertResult:
-      -
-        triggerid: '@steps.step1.response.result.triggerids[0]@'
-        expression: '@steps.step1.request.params.expression@'
-        description: "Low memory on @fixtures.hostWithItem.result.host@"

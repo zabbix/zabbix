@@ -29,7 +29,6 @@ steps:
         hostids: ["@steps.step1.response.result.hostids[0]@"]
         selectGroups: [groupid]
         selectInterfaces: [ip]
-        selectParentTemplate: [templateid]
 
     assertResult:
       -
