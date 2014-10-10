@@ -27,13 +27,13 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		self::$database = new CTestDatabase();
 
-		self::$api = new CIncludeFileApiClient(new CJson());
+		self::$api = new CIncludeFileApiClient(new CJson(), API_TEST_DIR.'/../../api_jsonrpc.php');
 
 		$client = new CLocalApiClient(new CJson());
 		$client->setServiceFactory(new CApiServiceFactory());
 
 		self::$fixtureLoader = new CFixtureLoader(
-			new CFixtureFactory(new CApiWrapper($client)),
+			new CFixtureFactory(API_TEST_DIR.'/fixtures', new CApiWrapper($client)),
 			new CArrayMacroResolver()
 		);
 	}

@@ -7,7 +7,15 @@ class CIncludeFixture extends CFixture {
 	 */
 	protected $fixtureLoader;
 
-	public function __construct(CFixtureLoader $fixtureLoader) {
+	/**
+	 * Directory where the fixture files are located.
+	 *
+	 * @var string
+	 */
+	protected $fileDir;
+
+	public function __construct($fileDir, CFixtureLoader $fixtureLoader) {
+		$this->fileDir = $fileDir;
 		$this->fixtureLoader = $fixtureLoader;
 	}
 
@@ -16,10 +24,7 @@ class CIncludeFixture extends CFixture {
 			$params['params'] = array();
 		}
 
-		$file = $params['file'];
-
-		// TODO: pass the path as a parameter
-		$path = __DIR__ . '/../../tests/fixtures/'.$file.'.yml';
+		$path = $this->fileDir.'/'.$params['file'].'.yml';
 
 		if (!is_readable($path)) {
 			throw new Exception(sprintf('Can not find fixture file "%s" (expected location "%s")', $file, $path));

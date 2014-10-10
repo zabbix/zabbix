@@ -1,7 +1,7 @@
 <?php
 
 // we mostly just need to require autoloader and save test directory
-define('ZABBIX_NEW_TEST_DIR', __DIR__);
+define('API_TEST_DIR', __DIR__);
 
 // register autoloader
 require_once dirname(__FILE__).'/../../include/classes/core/Z.php';

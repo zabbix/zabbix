@@ -20,7 +20,7 @@ class CFileApiTestCase extends CApiTestCase {
 	 * @return string
 	 */
 	protected function getTestFileDir() {
-		return ZABBIX_NEW_TEST_DIR.'/tests/yaml';
+		return API_TEST_DIR.'/tests/yaml';
 	}
 
 	protected function runTestFile($path) {

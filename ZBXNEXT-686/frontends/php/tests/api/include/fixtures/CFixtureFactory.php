@@ -17,7 +17,15 @@ class CFixtureFactory {
 	 */
 	protected $apiWrapper;
 
-	public function __construct(CApiWrapper $apiWrapper) {
+	/**
+	 * Directory where the fixture files are located.
+	 *
+	 * @var string
+	 */
+	protected $fileDir;
+
+	public function __construct($fileDir, CApiWrapper $apiWrapper) {
+		$this->fileDir = $fileDir;
 		$this->apiWrapper = $apiWrapper;
 	}
 
@@ -28,7 +36,7 @@ class CFixtureFactory {
 	public function getFixture($type) {
 		switch ($type) {
 			case self::TYPE_INCLUDE:
-				return new CIncludeFixture($this->fixtureLoader);
+				return new CIncludeFixture($this->fileDir, $this->fixtureLoader);
 
 				break;
 			case self::TYPE_API:

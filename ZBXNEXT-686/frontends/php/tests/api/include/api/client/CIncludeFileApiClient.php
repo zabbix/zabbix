@@ -26,10 +26,10 @@ class CIncludeFileApiClient extends CApiClient {
 
 	protected $endpoint;
 
-	public function __construct(CJson $json, $endpoint = null) {
+	public function __construct(CJson $json, $endpoint) {
 		parent::__construct($json);
 
-		$this->endpoint = ($endpoint !== null) ? $endpoint : __DIR__.'/../../../../../api_jsonrpc.php';
+		$this->endpoint = $endpoint;
 	}
 
 	public function callMethod($method, $params, $auth = null, $id = null, $jsonRpc = '2.0') {
