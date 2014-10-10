@@ -37,7 +37,6 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = array(
 	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'itemid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
-	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
@@ -148,31 +147,18 @@ $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 // permissions
-if (getRequest('parent_discoveryid', false)) {
-	$discovery_rule = API::DiscoveryRule()->get(array(
-		'itemids' => $_REQUEST['parent_discoveryid'],
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true
-	));
-	$discovery_rule = reset($discovery_rule);
-	if (!$discovery_rule) {
-		access_deny();
-	}
-	$_REQUEST['hostid'] = $discovery_rule['hostid'];
-
-	if (isset($_REQUEST['itemid'])) {
-		$itemPrototype = API::ItemPrototype()->get(array(
-			'itemids' => $_REQUEST['itemid'],
-			'output' => array('itemid'),
-			'editable' => true,
-			'preservekeys' => true
-		));
-		if (empty($itemPrototype)) {
-			access_deny();
-		}
-	}
+$discoveryRule = API::DiscoveryRule()->get(array(
+	'output' => array('hostid', 'name'),
+	'itemids' => getRequest('parent_discoveryid'),
+	'editable' => true
+));
+$discoveryRule = reset($discoveryRule);
+if (!$discoveryRule) {
+	access_deny();
 }
-else {
+
+$itemPrototypeId = getRequest('itemid');
+if ($itemPrototypeId && !API::ItemPrototype()->isWritable(array($itemPrototypeId))) {
 	access_deny();
 }
 
@@ -226,7 +212,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (!zbx_empty($_REQUEST['new_application'])) {
 		$new_appid = API::Application()->create(array(
 			'name' => $_REQUEST['new_application'],
-			'hostid' => $_REQUEST['hostid']
+			'hostid' => $discoveryRule['hostid']
 		));
 		if ($new_appid) {
 			$new_appid = reset($new_appid['applicationids']);
@@ -238,7 +224,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'name'			=> getRequest('name'),
 		'description'	=> getRequest('description'),
 		'key_'			=> getRequest('key'),
-		'hostid'		=> getRequest('hostid'),
+		'hostid'		=> $discoveryRule['hostid'],
 		'interfaceid'	=> getRequest('interfaceid'),
 		'delay'			=> getRequest('delay'),
 		'status'		=> getRequest('status', ITEM_STATUS_DISABLED),
@@ -366,6 +352,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
 	$data['is_item_prototype'] = true;
+	$data['config'] = select_config();
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
@@ -379,11 +366,13 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'hostid' => getRequest('hostid'),
-		'discovery_rule' => $discovery_rule,
+		'hostid' => $discoveryRule['hostid'],
+		'discovery_rule' => $discoveryRule,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	);

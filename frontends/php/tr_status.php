@@ -244,7 +244,8 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'hostId' => getRequest('hostid'),
 		'groupId' => getRequest('groupid'),
 		'fullScreen' => getRequest('fullscreen')
-	)
+	),
+	'config' => $config
 ));
 $filterForm = $filterFormView->render();
 
@@ -715,7 +716,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	// severity
-	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value']);
+	$severityColumn = getSeverityCell($trigger['priority'], $config, null, !$trigger['value']);
 	if ($showEventColumn) {
 		$severityColumn->setColSpan(2);
 	}

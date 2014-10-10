@@ -130,6 +130,7 @@ AC_CHECK_HEADERS(linux/netlink.h, [
 #  include <sys/socket.h>
 #endif
 ])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for libraries                      *

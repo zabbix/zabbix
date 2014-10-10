@@ -163,7 +163,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 				$gotos['inventory'] = array('hostid' => $host['hostid']);
 
-				$gotos['latestData'] = array('hostid' => $host['hostid']);
+				$gotos['latestData'] = array('hostids' => array($host['hostid']));
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
@@ -197,6 +197,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 					'hostid' => 0,
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
+
+				// always show active trigger link for host group map elements
+				$gotos['showTriggers'] = true;
 				break;
 		}
 
@@ -1053,8 +1056,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						$i['problem_unack']++;
 					}
 
-					$config = select_config();
-
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 				}
 			}
@@ -1497,6 +1498,8 @@ function drawMapSelements(&$im, $map, $mapInfo) {
 }
 
 function drawMapHighligts(&$im, $map, $mapInfo) {
+	$config = select_config();
+
 	$selements = $map['selements'];
 
 	foreach ($selements as $selementId => $selement) {
@@ -1591,7 +1594,6 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 					imagecolorallocate($im, 120, 120, 120)
 				);
 
-				$config = select_config();
 				if (isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable']) {
 					imagesetthickness($im, 5);
 					imagearc($im,
