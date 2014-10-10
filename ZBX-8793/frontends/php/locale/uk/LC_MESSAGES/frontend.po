@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-10-03 05:40+0300\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -495,7 +495,7 @@ msgstr "Активно до"
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.httpconf.edit.php:278
-#: include/views/configuration.httpconf.edit.php:322
+#: include/views/configuration.httpconf.edit.php:329
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
@@ -782,7 +782,7 @@ msgstr "Наближається"
 msgid "Apr"
 msgstr "Кві"
 
-#: include/forms.inc.php:1684 include/func.inc.php:120
+#: include/forms.inc.php:1682 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
 msgid "April"
 msgstr "Квітень"
@@ -847,7 +847,7 @@ msgstr[1] "О %1$s:%2$s кожний %3$s день"
 msgstr[2] "О %1$s:%2$s кожні %3$s дні"
 msgstr[3] "О %1$s:%2$s кожні %3$s днів"
 
-#: include/forms.inc.php:1765
+#: include/forms.inc.php:1763
 msgid "At (hour:minute)"
 msgstr "В (час:хвилина)"
 
@@ -889,7 +889,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Сер"
 
-#: include/forms.inc.php:1676 include/func.inc.php:124
+#: include/forms.inc.php:1674 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:120
 msgid "August"
 msgstr "Серпень"
@@ -2897,7 +2897,7 @@ msgstr "Класична"
 msgid "Clear"
 msgstr "Очистити"
 
-#: include/views/configuration.httpconf.edit.php:312
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:447
 msgid "Clear history and trends"
 msgstr "Очистити історію та динаміку змін"
@@ -2927,7 +2927,7 @@ msgstr "Годинник"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:309
+#: include/views/configuration.httpconf.edit.php:320
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -2961,7 +2961,7 @@ msgid "Colour"
 msgstr "Колір"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
@@ -3679,7 +3679,7 @@ msgstr "DNS ім'я"
 msgid "DOWN"
 msgstr "НЕДОСТУПНИЙ"
 
-#: include/forms.inc.php:1633 include/maintenances.inc.php:33
+#: include/forms.inc.php:1631 include/maintenances.inc.php:33
 #: include/reports.inc.php:62 include/reports.inc.php:386
 #: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
@@ -3787,7 +3787,7 @@ msgstr "Тип бази даних"
 msgid "Database user"
 msgstr "Користувач бази даних"
 
-#: include/forms.inc.php:1700 include/forms.inc.php:1761 jsrpc.php:136
+#: include/forms.inc.php:1698 include/forms.inc.php:1759 jsrpc.php:136
 msgid "Date"
 msgstr "Дата"
 
@@ -3807,11 +3807,11 @@ msgstr "Дата закінчення гарантії HW"
 msgid "Date HW purchased"
 msgstr "Дата придбання HW"
 
-#: include/forms.inc.php:1702 report3.php:124 report4.php:159 report5.php:44
+#: include/forms.inc.php:1700 report3.php:124 report4.php:159 report5.php:44
 msgid "Day"
 msgstr "День"
 
-#: include/forms.inc.php:1734
+#: include/forms.inc.php:1732
 msgid "Day of month"
 msgstr "День в місяць"
 
@@ -3831,8 +3831,8 @@ msgstr "День місяця > N"
 msgid "Day of month is NOT N"
 msgstr "День місяця НЕ є N"
 
-#: include/forms.inc.php:1662 include/forms.inc.php:1705
-#: include/forms.inc.php:1730
+#: include/forms.inc.php:1660 include/forms.inc.php:1703
+#: include/forms.inc.php:1728
 msgid "Day of week"
 msgstr "День в тиждень"
 
@@ -3852,7 +3852,7 @@ msgstr "День тижня > N"
 msgid "Day of week is NOT N"
 msgstr "День тижня НЕ є N"
 
-#: include/forms.inc.php:1778
+#: include/forms.inc.php:1776
 msgid "Days"
 msgstr "Днів"
 
@@ -3874,7 +3874,7 @@ msgstr "Режим ДЕБАГ оновлено"
 msgid "Dec"
 msgstr "Гру"
 
-#: include/forms.inc.php:1696 include/func.inc.php:128
+#: include/forms.inc.php:1694 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:124
 msgid "December"
 msgstr "Грудень"
@@ -4640,7 +4640,6 @@ msgstr "Об'єкт виявлення"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Правило виявлення"
@@ -4697,6 +4696,7 @@ msgid "Discovery rule updated"
 msgstr "Правило виявлення оновлено"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5301,11 +5301,11 @@ msgstr "Події"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1645
+#: include/forms.inc.php:1643
 msgid "Every day(s)"
 msgstr "Щодня"
 
-#: include/forms.inc.php:1652
+#: include/forms.inc.php:1650
 msgid "Every week(s)"
 msgstr "Щотижня"
 
@@ -5399,7 +5399,7 @@ msgid "Expression"
 msgstr "Вираз"
 
 #: include/forms.inc.php:1469 include/forms.inc.php:1474
-#: include/forms.inc.php:1483
+#: include/forms.inc.php:1482
 msgid "Expression Syntax Error."
 msgstr "Помилка в синтаксисі виразу."
 
@@ -5498,7 +5498,7 @@ msgstr "Обрані"
 msgid "Feb"
 msgstr "Лют"
 
-#: include/forms.inc.php:1674 include/func.inc.php:118
+#: include/forms.inc.php:1672 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:114
 msgid "February"
 msgstr "Лютий"
@@ -5512,7 +5512,7 @@ msgstr "Поле"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
@@ -5537,12 +5537,12 @@ msgstr ""
 msgid "Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
@@ -5642,7 +5642,7 @@ msgstr "Завершити"
 msgid "Finnish (fi_FI)"
 msgstr "Фінська (fi_FI)"
 
-#: include/forms.inc.php:1712 include/maintenances.inc.php:111
+#: include/forms.inc.php:1710 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Перший"
 
@@ -5678,7 +5678,7 @@ msgstr "Для Гостя пароль повинен бути пустим"
 msgid "Formula"
 msgstr "Формула"
 
-#: include/forms.inc.php:1715 include/maintenances.inc.php:114
+#: include/forms.inc.php:1713 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Четвертий"
 
@@ -5690,7 +5690,7 @@ msgstr "Французька (fr_FR)"
 msgid "Fri"
 msgstr "П'ят"
 
-#: include/forms.inc.php:1659 include/forms.inc.php:1727
+#: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "П'ятниця"
@@ -5890,7 +5890,7 @@ msgstr "Графік \"%1$s\" вже існує у \"%2$s\" (елементи д
 
 #: include/classes/api/services/CGraph.php:410
 #: include/classes/api/services/CGraphPrototype.php:420
-#: include/graphs.inc.php:345
+#: include/graphs.inc.php:356
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Графік \"%1$s\" вже існує у \"%2$s\"."
@@ -6312,7 +6312,7 @@ msgstr "Історія"
 msgid "History cleared"
 msgstr "Історію очищено"
 
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:310
 #: include/views/configuration.item.edit.php:448
 msgid "History clearing can take a long time. Continue?"
 msgstr "Очистка журналу може забрати багато часу. Продовжувати?"
@@ -6749,7 +6749,7 @@ msgstr "Вузли мережі оновлено"
 msgid "Hourly"
 msgstr "Щогодини"
 
-#: include/forms.inc.php:1780
+#: include/forms.inc.php:1778
 msgid "Hours"
 msgstr "Годин"
 
@@ -7886,13 +7886,13 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr "Некоректна група користувачів."
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
@@ -7917,7 +7917,7 @@ msgstr "Значення \"%1$s\" є некоректним для поля чи
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -8513,7 +8513,7 @@ msgstr "Ідентифікатор Jabber"
 msgid "Jan"
 msgstr "Січ"
 
-#: include/forms.inc.php:1669 include/func.inc.php:117
+#: include/forms.inc.php:1667 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:113
 msgid "January"
 msgstr "Січень"
@@ -8526,7 +8526,7 @@ msgstr "Японська (ja_JP)"
 msgid "Jul"
 msgstr "Лип"
 
-#: include/forms.inc.php:1671 include/func.inc.php:123
+#: include/forms.inc.php:1669 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:119
 msgid "July"
 msgstr "Липень"
@@ -8535,7 +8535,7 @@ msgstr "Липень"
 msgid "Jun"
 msgstr "Чер"
 
-#: include/forms.inc.php:1694 include/func.inc.php:122
+#: include/forms.inc.php:1692 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:118
 msgid "June"
 msgstr "Червень"
@@ -8639,7 +8639,7 @@ msgstr "Розміщення ярлика"
 msgid "Language"
 msgstr "Мова"
 
-#: include/forms.inc.php:1716 include/maintenances.inc.php:115
+#: include/forms.inc.php:1714 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Останній"
 
@@ -9105,7 +9105,7 @@ msgstr "Сервіс видалено"
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1775
+#: include/forms.inc.php:1773
 msgid "Maintenance period length"
 msgstr "Тривалість періоду сервісу"
 
@@ -9217,7 +9217,7 @@ msgstr "Карти мереж"
 msgid "Mar"
 msgstr "Бер"
 
-#: include/forms.inc.php:1679 include/func.inc.php:119
+#: include/forms.inc.php:1677 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:115
 msgid "March"
 msgstr "Березень"
@@ -9288,7 +9288,7 @@ msgstr ""
 msgid "Maximum number of processes supported by OS."
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:404
+#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:415
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -9313,7 +9313,7 @@ msgstr "Максимальне значення за період T є > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "Максимальне значення за період T НЕ є N"
 
-#: include/forms.inc.php:1689 include/func.inc.php:121
+#: include/forms.inc.php:1687 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:117
 msgid "May"
 msgstr "Тра"
@@ -9487,7 +9487,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:397
+#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:408
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -9517,7 +9517,7 @@ msgstr "Мінімальне значення за період T є > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Мінімальне значення за період T НЕ є N"
 
-#: include/forms.inc.php:1782
+#: include/forms.inc.php:1780
 msgid "Minutes"
 msgstr "Хвилин"
 
@@ -9564,7 +9564,7 @@ msgstr "Відсутні елементи даних для графіку \"%1$
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr ""
 
-#: include/graphs.inc.php:312
+#: include/graphs.inc.php:323
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Відсутній ключ \"%1$s\" для вузла мережі \"%2$s\"."
@@ -9585,7 +9585,7 @@ msgstr "Модель"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:1655 include/forms.inc.php:1723
+#: include/forms.inc.php:1653 include/forms.inc.php:1721
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "Понеділок"
@@ -9616,11 +9616,11 @@ msgstr ""
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1698 report3.php:106 report4.php:146 report5.php:46
+#: include/forms.inc.php:1696 report3.php:106 report4.php:146 report5.php:46
 msgid "Month"
 msgstr "Місяць"
 
-#: include/forms.inc.php:1635 include/maintenances.inc.php:37
+#: include/forms.inc.php:1633 include/maintenances.inc.php:37
 #: include/reports.inc.php:64 include/reports.inc.php:388
 #: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
@@ -10127,7 +10127,7 @@ msgstr "Змінних інтервалів не визначено."
 msgid "No graph ID provided for screen element."
 msgstr "Для елемента комплексного екрану не вказано ID графіка."
 
-#: include/graphs.inc.php:274
+#: include/graphs.inc.php:285
 #, c-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Немає елемента графіку з graphid \"%s\"."
@@ -10707,7 +10707,7 @@ msgstr "Повідомлення"
 msgid "Nov"
 msgstr "Лис"
 
-#: include/forms.inc.php:1691 include/func.inc.php:127
+#: include/forms.inc.php:1689 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:123
 msgid "November"
 msgstr "Листопад"
@@ -10943,7 +10943,7 @@ msgstr "Жов"
 msgid "Octal"
 msgstr "Вісімковий"
 
-#: include/forms.inc.php:1686 include/func.inc.php:126
+#: include/forms.inc.php:1684 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:122
 msgid "October"
 msgstr "Жовтень"
@@ -10978,7 +10978,7 @@ msgstr "Один раз"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1632 include/maintenances.inc.php:31
+#: include/forms.inc.php:1630 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Одноразово"
 
@@ -11081,7 +11081,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Операція \"%s\" вже існує."
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операцію не може бути виконано через несанкціонований запит."
 
@@ -11423,7 +11423,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr "Сторінка отримала некоректні дані"
 
@@ -11559,7 +11559,7 @@ msgstr ""
 msgid "Period"
 msgstr "Період"
 
-#: include/forms.inc.php:1637
+#: include/forms.inc.php:1635
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Тип періоду"
@@ -12600,7 +12600,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Суб"
 
-#: include/forms.inc.php:1660 include/forms.inc.php:1728
+#: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "Субота"
@@ -12798,7 +12798,7 @@ msgstr "Шаблон пошуку пустий"
 msgid "Search/Filter elements limit"
 msgstr "Ліміт елементів в пошуку/фільтрі"
 
-#: include/forms.inc.php:1713 include/maintenances.inc.php:112
+#: include/forms.inc.php:1711 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Другий"
 
@@ -12965,7 +12965,7 @@ msgstr "Вер"
 msgid "Separated"
 msgstr "Непідтверджені окремо"
 
-#: include/forms.inc.php:1681 include/func.inc.php:125
+#: include/forms.inc.php:1679 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:121
 msgid "September"
 msgstr "Вересень"
@@ -13267,7 +13267,7 @@ msgstr ""
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr ""
 
-#: include/graphs.inc.php:360
+#: include/graphs.inc.php:371
 #, c-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Пропущено копіювання графіку \"%1$s\" у вузол мережі \"%2$s\"."
@@ -13599,7 +13599,7 @@ msgstr "Сума значень за період T НЕ є N"
 msgid "Sun"
 msgstr "Нед"
 
-#: include/forms.inc.php:1661 include/forms.inc.php:1729
+#: include/forms.inc.php:1659 include/forms.inc.php:1727
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "Неділя"
@@ -13972,7 +13972,7 @@ msgstr[1] "Існує \"%1$d\" група з Внутрішнім доступо
 msgstr[2] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
 msgstr[3] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
 
-#: include/forms.inc.php:1714 include/maintenances.inc.php:113
+#: include/forms.inc.php:1712 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Третій"
 
@@ -14005,7 +14005,7 @@ msgstr "Цей рік"
 msgid "Thu"
 msgstr "Чет"
 
-#: include/forms.inc.php:1658 include/forms.inc.php:1726
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "Четвер"
@@ -14462,7 +14462,7 @@ msgstr "Спроба читання недоступної властивост�
 msgid "Tue"
 msgstr "Вів"
 
-#: include/forms.inc.php:1656 include/forms.inc.php:1724
+#: include/forms.inc.php:1654 include/forms.inc.php:1722
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "Вівторок"
@@ -14890,7 +14890,7 @@ msgstr "Доступний"
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:307
+#: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
 #: include/views/configuration.item.massupdate.php:571
@@ -15438,6 +15438,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина 2048 символів."
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15694,7 +15695,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Сер"
 
-#: include/forms.inc.php:1657 include/forms.inc.php:1725
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "Середа"
@@ -15703,7 +15704,7 @@ msgstr "Середа"
 msgid "Week"
 msgstr "Тиждень"
 
-#: include/forms.inc.php:1634 include/maintenances.inc.php:35
+#: include/forms.inc.php:1632 include/maintenances.inc.php:35
 #: include/reports.inc.php:63 include/reports.inc.php:387
 #: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
@@ -16082,7 +16083,7 @@ msgstr "Zabbix агент (активний)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегований"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix отримав некоректний запит."
 

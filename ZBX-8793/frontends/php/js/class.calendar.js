@@ -170,14 +170,15 @@ calendar.prototype = {
 				var val = null;
 				var result = false;
 
-				if (this.timeobjects[0].tagName.toLowerCase() == 'input') {
+				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
 					val = this.timeobjects[0].value;
 				}
 				else {
 					val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
 				}
 
-				if (jQuery(this.timeobjects[0]).attr('data-timestamp') > 0) {
+				// allow unix timestamp 0 (year 1970)
+				if (jQuery(this.timeobjects[0]).attr('data-timestamp') >= 0) {
 					this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
 				}
 				else {
@@ -203,7 +204,7 @@ calendar.prototype = {
 					}
 				}
 
-				if(!result) {
+				if (!result) {
 					return false;
 				}
 				break;
@@ -395,9 +396,16 @@ calendar.prototype = {
 
 	monthup: function() {
 		this.month++;
+
 		if (this.month > 11) {
-			this.month = 0;
-			this.yearup();
+			// prevent months from running in loop in year 2038
+			if (this.year < 2038) {
+				this.month = 0;
+				this.yearup();
+			}
+			else {
+				this.month = 11;
+			}
 		}
 		else {
 			this.syncCDT();
@@ -407,9 +415,16 @@ calendar.prototype = {
 
 	monthdown: function() {
 		this.month--;
+
 		if (this.month < 0) {
-			this.month = 11;
-			this.yeardown();
+			// prevent months from running in loop in year 1970
+			if (this.year > 1970) {
+				this.month = 11;
+				this.yeardown();
+			}
+			else {
+				this.month = 0;
+			}
 		}
 		else {
 			this.syncCDT();

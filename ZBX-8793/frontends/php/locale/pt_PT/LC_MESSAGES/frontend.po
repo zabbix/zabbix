@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 15:57+0300\n"
+"POT-Creation-Date: 2014-10-03 05:40+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -470,7 +470,7 @@ msgstr "Activo até"
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.httpconf.edit.php:278
-#: include/views/configuration.httpconf.edit.php:322
+#: include/views/configuration.httpconf.edit.php:329
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
@@ -755,7 +755,7 @@ msgstr "Aproximando"
 msgid "Apr"
 msgstr "Abr"
 
-#: include/forms.inc.php:1684 include/func.inc.php:120
+#: include/forms.inc.php:1682 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
 msgid "April"
 msgstr "Abril"
@@ -816,7 +816,7 @@ msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1765
+#: include/forms.inc.php:1763
 msgid "At (hour:minute)"
 msgstr "Às (horas:minutos)"
 
@@ -858,7 +858,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Ago"
 
-#: include/forms.inc.php:1676 include/func.inc.php:124
+#: include/forms.inc.php:1674 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:120
 msgid "August"
 msgstr "Agosto"
@@ -2807,7 +2807,7 @@ msgstr "Clássico"
 msgid "Clear"
 msgstr "Limpar"
 
-#: include/views/configuration.httpconf.edit.php:312
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:447
 msgid "Clear history and trends"
 msgstr "Limpar histórico e tendências"
@@ -2837,7 +2837,7 @@ msgstr "Relógio"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:309
+#: include/views/configuration.httpconf.edit.php:320
 #: include/views/configuration.item.edit.php:468
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -2871,7 +2871,7 @@ msgid "Colour"
 msgstr "Cor"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:375 jsLoader.php:158
+#: include/validate.inc.php:386 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
@@ -3587,7 +3587,7 @@ msgstr "Nome DNS"
 msgid "DOWN"
 msgstr "ABAIXO"
 
-#: include/forms.inc.php:1633 include/maintenances.inc.php:33
+#: include/forms.inc.php:1631 include/maintenances.inc.php:33
 #: include/reports.inc.php:62 include/reports.inc.php:386
 #: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
@@ -3695,7 +3695,7 @@ msgstr "Tipo de base de dados"
 msgid "Database user"
 msgstr "Utilizador da base de dados"
 
-#: include/forms.inc.php:1700 include/forms.inc.php:1761 jsrpc.php:136
+#: include/forms.inc.php:1698 include/forms.inc.php:1759 jsrpc.php:136
 msgid "Date"
 msgstr "Data"
 
@@ -3715,11 +3715,11 @@ msgstr "Período de manutenção do HW expira"
 msgid "Date HW purchased"
 msgstr "Data de aquisição do HW"
 
-#: include/forms.inc.php:1702 report3.php:124 report4.php:159 report5.php:44
+#: include/forms.inc.php:1700 report3.php:124 report4.php:159 report5.php:44
 msgid "Day"
 msgstr "Dia"
 
-#: include/forms.inc.php:1734
+#: include/forms.inc.php:1732
 msgid "Day of month"
 msgstr "Dia do mês"
 
@@ -3739,8 +3739,8 @@ msgstr "O dia do mês é > N"
 msgid "Day of month is NOT N"
 msgstr "O dia do mês é != N"
 
-#: include/forms.inc.php:1662 include/forms.inc.php:1705
-#: include/forms.inc.php:1730
+#: include/forms.inc.php:1660 include/forms.inc.php:1703
+#: include/forms.inc.php:1728
 msgid "Day of week"
 msgstr "Dia da semana"
 
@@ -3760,7 +3760,7 @@ msgstr "O dia da semana é > N"
 msgid "Day of week is NOT N"
 msgstr "O dia da semana é != N"
 
-#: include/forms.inc.php:1778
+#: include/forms.inc.php:1776
 msgid "Days"
 msgstr "Dias"
 
@@ -3782,7 +3782,7 @@ msgstr "Actualizado o debug mode"
 msgid "Dec"
 msgstr "Dez"
 
-#: include/forms.inc.php:1696 include/func.inc.php:128
+#: include/forms.inc.php:1694 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:124
 msgid "December"
 msgstr "Dezembro"
@@ -4546,7 +4546,6 @@ msgstr "Objecto de descoberta"
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/blocks.inc.php:1256 include/forms.inc.php:1090
 #: include/views/configuration.discovery.edit.php:80
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Regra de descoberta"
@@ -4599,6 +4598,7 @@ msgid "Discovery rule updated"
 msgstr "Regra de descoberta actualizada"
 
 #: include/html.inc.php:472 include/html.inc.php:476
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:553
 #: include/views/configuration.template.edit.php:286
@@ -5203,11 +5203,11 @@ msgstr "Eventos"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1645
+#: include/forms.inc.php:1643
 msgid "Every day(s)"
 msgstr "Diariamente"
 
-#: include/forms.inc.php:1652
+#: include/forms.inc.php:1650
 msgid "Every week(s)"
 msgstr "Semanalmente"
 
@@ -5301,7 +5301,7 @@ msgid "Expression"
 msgstr "Expressão"
 
 #: include/forms.inc.php:1469 include/forms.inc.php:1474
-#: include/forms.inc.php:1483
+#: include/forms.inc.php:1482
 msgid "Expression Syntax Error."
 msgstr "Erro de sintaxe na expressão."
 
@@ -5400,7 +5400,7 @@ msgstr "Favoritos"
 msgid "Feb"
 msgstr "Fev"
 
-#: include/forms.inc.php:1674 include/func.inc.php:118
+#: include/forms.inc.php:1672 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:114
 msgid "February"
 msgstr "Fevereiro"
@@ -5414,7 +5414,7 @@ msgstr "Campo"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: include/validate.inc.php:432
+#: include/validate.inc.php:443
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
@@ -5439,12 +5439,12 @@ msgstr ""
 msgid "Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:365
+#: include/validate.inc.php:376
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:444
+#: include/validate.inc.php:455
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
@@ -5544,7 +5544,7 @@ msgstr "Terminar"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandês (fi_FI)"
 
-#: include/forms.inc.php:1712 include/maintenances.inc.php:111
+#: include/forms.inc.php:1710 include/maintenances.inc.php:111
 msgid "First"
 msgstr "Primeiro"
 
@@ -5580,7 +5580,7 @@ msgstr "Para guest, a palavra-passe deverá ser vazia"
 msgid "Formula"
 msgstr "Fórmula"
 
-#: include/forms.inc.php:1715 include/maintenances.inc.php:114
+#: include/forms.inc.php:1713 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Quarto"
 
@@ -5592,7 +5592,7 @@ msgstr "Francês (fr_FR)"
 msgid "Fri"
 msgstr "Sex"
 
-#: include/forms.inc.php:1659 include/forms.inc.php:1727
+#: include/forms.inc.php:1657 include/forms.inc.php:1725
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "Sexta-feira"
@@ -5792,7 +5792,7 @@ msgstr "O gráfico \"%1$s\" já existe em \"%2$s\" (os itens não são idêntico
 
 #: include/classes/api/services/CGraph.php:410
 #: include/classes/api/services/CGraphPrototype.php:420
-#: include/graphs.inc.php:345
+#: include/graphs.inc.php:356
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "O gráfico \"%1$s\" já existe em \"%2$s\"."
@@ -6212,7 +6212,7 @@ msgstr "Histórico"
 msgid "History cleared"
 msgstr "Histórico eliminado"
 
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:310
 #: include/views/configuration.item.edit.php:448
 msgid "History clearing can take a long time. Continue?"
 msgstr "Eliminar o histórico pode demorar bastante tempo. Continuar?"
@@ -6638,7 +6638,7 @@ msgstr "Hosts actualizados"
 msgid "Hourly"
 msgstr "Por hora"
 
-#: include/forms.inc.php:1780
+#: include/forms.inc.php:1778
 msgid "Hours"
 msgstr "Horas"
 
@@ -7775,13 +7775,13 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr "Grupo de utilizadores inválido."
 
-#: include/validate.inc.php:483
+#: include/validate.inc.php:494
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
 #: include/classes/api/services/CScreenItem.php:571
-#: include/validate.inc.php:479
+#: include/validate.inc.php:490
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
@@ -7806,7 +7806,7 @@ msgstr "O valor \"%1$s\" é inválido para o campo unsigned int \"%2$s\"."
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:474
+#: include/validate.inc.php:485
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -8394,7 +8394,7 @@ msgstr "Identificador Jabber"
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1669 include/func.inc.php:117
+#: include/forms.inc.php:1667 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:113
 msgid "January"
 msgstr "Janeiro"
@@ -8407,7 +8407,7 @@ msgstr "Japonês (ja_JP)"
 msgid "Jul"
 msgstr "Jul"
 
-#: include/forms.inc.php:1671 include/func.inc.php:123
+#: include/forms.inc.php:1669 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:119
 msgid "July"
 msgstr "Julho"
@@ -8416,7 +8416,7 @@ msgstr "Julho"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/forms.inc.php:1694 include/func.inc.php:122
+#: include/forms.inc.php:1692 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:118
 msgid "June"
 msgstr "Junho"
@@ -8520,7 +8520,7 @@ msgstr "Localização da etiqueta"
 msgid "Language"
 msgstr "Língua"
 
-#: include/forms.inc.php:1716 include/maintenances.inc.php:115
+#: include/forms.inc.php:1714 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Último"
 
@@ -8984,7 +8984,7 @@ msgstr "Manutenção eliminada"
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1775
+#: include/forms.inc.php:1773
 msgid "Maintenance period length"
 msgstr "Duração do período de manutenção"
 
@@ -9096,7 +9096,7 @@ msgstr "Mapas"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1679 include/func.inc.php:119
+#: include/forms.inc.php:1677 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:115
 msgid "March"
 msgstr "Março"
@@ -9167,7 +9167,7 @@ msgstr ""
 msgid "Maximum number of processes supported by OS."
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:404
+#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:415
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -9190,7 +9190,7 @@ msgstr "O valor máximo para o período T é > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "O valor máximo para o período T é != N"
 
-#: include/forms.inc.php:1689 include/func.inc.php:121
+#: include/forms.inc.php:1687 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:117
 msgid "May"
 msgstr "Mai"
@@ -9360,7 +9360,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:397
+#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:408
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -9388,7 +9388,7 @@ msgstr "O valor mínimo para o período T é > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "O valor mínimo para o período T é != N"
 
-#: include/forms.inc.php:1782
+#: include/forms.inc.php:1780
 msgid "Minutes"
 msgstr "Minutos"
 
@@ -9435,7 +9435,7 @@ msgstr "Alguns itens estão em falta para o gráfico \"%1$s\"."
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr ""
 
-#: include/graphs.inc.php:312
+#: include/graphs.inc.php:323
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "A chave \"%1$s\" está em falta para o host \"%2$s\"."
@@ -9456,7 +9456,7 @@ msgstr "Modelo"
 msgid "Mon"
 msgstr "Seg"
 
-#: include/forms.inc.php:1655 include/forms.inc.php:1723
+#: include/forms.inc.php:1653 include/forms.inc.php:1721
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "Segunda-feira"
@@ -9487,11 +9487,11 @@ msgstr ""
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1698 report3.php:106 report4.php:146 report5.php:46
+#: include/forms.inc.php:1696 report3.php:106 report4.php:146 report5.php:46
 msgid "Month"
 msgstr "Mês"
 
-#: include/forms.inc.php:1635 include/maintenances.inc.php:37
+#: include/forms.inc.php:1633 include/maintenances.inc.php:37
 #: include/reports.inc.php:64 include/reports.inc.php:388
 #: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
@@ -9998,7 +9998,7 @@ msgstr "Não foram definidos intervalos flexíveis."
 msgid "No graph ID provided for screen element."
 msgstr "Não foi fornecido o ID do gráfico para o elemento no ecrã."
 
-#: include/graphs.inc.php:274
+#: include/graphs.inc.php:285
 #, c-format
 msgid "No graph item with graphid \"%s\"."
 msgstr "Não existe nenhum gráfico com graphid \"%s\"."
@@ -10578,7 +10578,7 @@ msgstr "Notificações"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1691 include/func.inc.php:127
+#: include/forms.inc.php:1689 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:123
 msgid "November"
 msgstr "Novembro"
@@ -10814,7 +10814,7 @@ msgstr "Out"
 msgid "Octal"
 msgstr "Octal"
 
-#: include/forms.inc.php:1686 include/func.inc.php:126
+#: include/forms.inc.php:1684 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:122
 msgid "October"
 msgstr "Outubro"
@@ -10849,7 +10849,7 @@ msgstr "Uma vez"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1632 include/maintenances.inc.php:31
+#: include/forms.inc.php:1630 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Apenas uma vez"
 
@@ -10952,7 +10952,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "A operação \"%s\" já existe."
 
-#: include/validate.inc.php:456
+#: include/validate.inc.php:467
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Não foi possível realizar a operação devido a um pedido não autorizado."
 
@@ -11294,7 +11294,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEMA"
 
-#: include/validate.inc.php:544
+#: include/validate.inc.php:555
 msgid "Page received incorrect data"
 msgstr "A página recebeu dados incorrectos"
 
@@ -11430,7 +11430,7 @@ msgstr ""
 msgid "Period"
 msgstr "Período"
 
-#: include/forms.inc.php:1637
+#: include/forms.inc.php:1635
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Tipo de período"
@@ -12469,7 +12469,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Sáb"
 
-#: include/forms.inc.php:1660 include/forms.inc.php:1728
+#: include/forms.inc.php:1658 include/forms.inc.php:1726
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "Sábado"
@@ -12667,7 +12667,7 @@ msgstr "O padrão de pesquisa está vazio"
 msgid "Search/Filter elements limit"
 msgstr "Limite de elementos de Pesquisa/Filtragem"
 
-#: include/forms.inc.php:1713 include/maintenances.inc.php:112
+#: include/forms.inc.php:1711 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "Segundo"
 
@@ -12834,7 +12834,7 @@ msgstr "Set"
 msgid "Separated"
 msgstr "Separado"
 
-#: include/forms.inc.php:1681 include/func.inc.php:125
+#: include/forms.inc.php:1679 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:121
 msgid "September"
 msgstr "Setembro"
@@ -13132,7 +13132,7 @@ msgstr ""
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr ""
 
-#: include/graphs.inc.php:360
+#: include/graphs.inc.php:371
 #, c-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Ignorada a cópia do gráfico \"%1$s\" para o host \"%2$s\"."
@@ -13464,7 +13464,7 @@ msgstr "O somatório de valores de um período T é != N"
 msgid "Sun"
 msgstr "Dom"
 
-#: include/forms.inc.php:1661 include/forms.inc.php:1729
+#: include/forms.inc.php:1659 include/forms.inc.php:1727
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "Domingo"
@@ -13831,7 +13831,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Existe um grupo \"%1$d\" com acesso ao GUI Interno."
 msgstr[1] "Existem grupos \"%1$d\" com acesso ao GUI Interno."
 
-#: include/forms.inc.php:1714 include/maintenances.inc.php:113
+#: include/forms.inc.php:1712 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Terceira"
 
@@ -13864,7 +13864,7 @@ msgstr "Este ano"
 msgid "Thu"
 msgstr "Qui"
 
-#: include/forms.inc.php:1658 include/forms.inc.php:1726
+#: include/forms.inc.php:1656 include/forms.inc.php:1724
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "Quinta-feira"
@@ -14313,7 +14313,7 @@ msgstr "Tentativa de leitura de uma propriedade inacessível \"%s\"."
 msgid "Tue"
 msgstr "Ter"
 
-#: include/forms.inc.php:1656 include/forms.inc.php:1724
+#: include/forms.inc.php:1654 include/forms.inc.php:1722
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "Terça-feira"
@@ -14741,7 +14741,7 @@ msgstr "Em cima"
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:307
+#: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
 #: include/views/configuration.item.massupdate.php:571
@@ -15285,6 +15285,7 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres."
 
 #: include/validate.inc.php:325 include/validate.inc.php:349
+#: include/validate.inc.php:364
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
@@ -15537,7 +15538,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Qua"
 
-#: include/forms.inc.php:1657 include/forms.inc.php:1725
+#: include/forms.inc.php:1655 include/forms.inc.php:1723
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "Quarta-feira"
@@ -15546,7 +15547,7 @@ msgstr "Quarta-feira"
 msgid "Week"
 msgstr "Semana"
 
-#: include/forms.inc.php:1634 include/maintenances.inc.php:35
+#: include/forms.inc.php:1632 include/maintenances.inc.php:35
 #: include/reports.inc.php:63 include/reports.inc.php:387
 #: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
@@ -15925,7 +15926,7 @@ msgstr "Agente Zabbix (activo)"
 msgid "Zabbix aggregate"
 msgstr "Agregado Zabbix"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:505
 msgid "Zabbix has received an incorrect request."
 msgstr "O Zabbix recebeu um pedido incorrecto."
 
