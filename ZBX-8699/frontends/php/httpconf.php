@@ -109,6 +109,15 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		access_deny();
 	}
 }
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
+	access_deny();
+}
+
+$groupId = getRequest('groupid');
+if ($groupId && !API::HostGroup()->get(array('groupids' => $groupId))) {
+	access_deny();
+}
 
 /*
  * Actions
@@ -427,7 +436,8 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'templates' => array()
+		'templates' => array(),
+		'is_template' => false
 	);
 
 	if (isset($data['httptestid'])) {
@@ -435,7 +445,7 @@ if (isset($_REQUEST['form'])) {
 		$httpTestId = $data['httptestid'];
 		while ($httpTestId) {
 			$dbTest = DBfetch(DBselect(
-				'SELECT h.hostid,h.name,ht.httptestid,ht.templateid'.
+				'SELECT h.hostid,h.name,h.status,ht.httptestid,ht.templateid'.
 					' FROM hosts h,httptest ht'.
 					' WHERE ht.hostid=h.hostid'.
 					' AND ht.httptestid='.zbx_dbstr($httpTestId)
@@ -452,6 +462,7 @@ if (isset($_REQUEST['form'])) {
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
+				$data['is_template'] = $dbTest['status'] == HOST_STATUS_TEMPLATE;
 			}
 		}
 		$data['templates'] = array_reverse($data['templates']);
@@ -570,6 +581,8 @@ else {
 	}
 
 	if ($data['pageFilter']->hostsSelected) {
+		$config = select_config();
+
 		$options = array(
 			'editable' => true,
 			'output' => array('httptestid'),

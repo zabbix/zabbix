@@ -44,6 +44,9 @@ class CScreenEvents extends CScreenBase {
 		));
 
 		$events = getLastEvents($options);
+
+		$config = select_config();
+
 		foreach ($events as $event) {
 			$trigger = $event['trigger'];
 			$host = $event['host'];
@@ -61,7 +64,7 @@ class CScreenEvents extends CScreenBase {
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,
-				getSeverityCell($trigger['priority'])
+				getSeverityCell($trigger['priority'], $config)
 			));
 		}
 

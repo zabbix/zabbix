@@ -313,7 +313,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
-	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pQueryResults, NULL);
+	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE, NULL, &pQueryResults, NULL);
 	zbx_free(wzone);
 
 	if (1 == short_answer)
