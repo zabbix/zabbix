@@ -1,12 +1,25 @@
 <?php
 
+/**
+ * A utility class for working with the test database.
+ */
 class CTestDatabase {
 
-	public function clear() {
+	/**
+	 * Truncates all of the tables except for "DB" version.
+	 *
+	 * @param array $skipTables		tables to skip
+	 *
+	 * @throws Exception	if a db error occurs
+	 */
+	public function clear(array $skipTables = array()) {
 		DBstart();
 
-		// TODO: clear the database in the correct order
 		foreach ($this->getTablesToClear() as $tableName) {
+			if (in_array($tableName, $skipTables)) {
+				continue;
+			}
+
 			$rs = DBexecute('DELETE FROM '.$tableName);
 			if (!$rs) {
 				DBend(false);
@@ -20,39 +33,81 @@ class CTestDatabase {
 		DBend();
 	}
 
+	/**
+	 * Returns tables in the order they can be truncated taking into account the foreign key relations.
+	 *
+	 * @return array
+	 */
 	protected function getTablesToClear() {
-		$bumpTables = array(
-			'usrgrp',
-			'scripts',
-			'opgroup',
-			'opmessage_grp',
-			'optemplate',
-			'items',
-			'graphs',
-			'httptest',
-			'config',
-			'trigger_discovery',
-			'graph_discovery',
-			'item_discovery',
-			'host_discovery',
-		);
+		$schema = DB::getSchema();
 
-		// TODO: implement a better ordering algorithm
 		$tables = array();
-		foreach (DB::getSchema() as $tableName => $tableData) {
-			if (in_array($tableName, $bumpTables) || $tableName == 'dbversion') {
-				continue;
+		foreach ($this->getTopTables($schema) as $topTable) {
+			$this->addChildTables($schema, $topTable, $tables);
+		}
+
+		return array_reverse($tables);
+	}
+
+	/**
+	 * Get a list of tables that don't reference other tables.
+	 *
+	 * @param array $schema
+	 *
+	 * @return array
+	 */
+	protected function getTopTables(array $schema) {
+		$rs = array();
+		foreach ($schema as $name => $table) {
+			foreach ($table['fields'] as $field) {
+				if (isset($field['ref_table']) && ($field['ref_table'] !== $name)) {
+					continue 2;
+				}
 			}
 
-			$tables[] = $tableName;
+			$rs[] = $name;
 		}
 
-		// clear the items table first to avoid integrity check errors
-		foreach ($bumpTables as $table) {
-			array_unshift($tables, $table);
+		return $rs;
+	}
+
+	/**
+	 * Add table that are related to the start table to the $tables array.
+	 *
+	 * @param array 	$schema
+	 * @param string	$startTableName
+	 * @param array 	$tables
+	 */
+	protected function addChildTables(array $schema, $startTableName, array &$tables) {
+		if (in_array($startTableName, $tables)) {
+			return;
 		}
 
-		return $tables;
+		$startTable = $schema[$startTableName];
+
+		// handle tables that the top table refers to
+		foreach ($startTable['fields'] as $field) {
+			if (isset($field['ref_table'])) {
+				if ($field['ref_table'] != $startTableName) {
+					$this->addChildTables($schema, $field['ref_table'], $tables);
+				}
+			}
+		}
+
+		if (!in_array($startTableName, $tables)) {
+			$tables[] = $startTableName;
+		}
+
+		// handle tables that refer to the top table
+		foreach ($schema as $tableName => $table) {
+			foreach ($table['fields'] as $field) {
+				if (isset($field['ref_table'])) {
+					if ($field['ref_table'] == $startTableName && $startTableName != $tableName) {
+						$this->addChildTables($schema, $tableName, $tables);
+					}
+				}
+			}
+		}
 	}
 
 }

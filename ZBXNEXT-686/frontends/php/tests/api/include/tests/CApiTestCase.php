@@ -73,7 +73,7 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function clearDatabase() {
-		self::$database->clear();
+		self::$database->clear(array('dbversion'));
 	}
 
 	protected function loadFixtures(array $fixtures) {
