@@ -213,8 +213,13 @@ foreach ($this->data['tests'] as $test) {
 	if (isset($test['startEvent']) && $test['startEvent']) {
 		$startEndIncident = _('Start time');
 	}
-	elseif (isset($test['endEvent']) && $test['endEvent']) {
-		$startEndIncident = _('Resolved');
+	elseif (isset($test['endEvent']) && $test['endEvent'] != TRIGGER_VALUE_TRUE) {
+		if ($test['endEvent'] == TRIGGER_VALUE_FALSE) {
+			$startEndIncident = _('Resolved');
+		}
+		else {
+			$startEndIncident = _('Resolved (no data)');
+		}
 	}
 	else {
 		$startEndIncident = SPACE;
@@ -244,6 +249,11 @@ if ($this->data['incidentType'] == INCIDENT_ACTIVE) {
 }
 elseif ($this->data['incidentType'] == INCIDENT_RESOLVED) {
 	$incidentType = _('Resolved');
+	$changeIncidentType = INCIDENT_FALSE_POSITIVE;
+	$changeIncidentTypeName = _('Mark incident as false positive');
+}
+elseif ($this->data['incidentType'] == INCIDENT_RESOLVED_NO_DATA) {
+	$incidentType = _('Resolved (no data)');
 	$changeIncidentType = INCIDENT_FALSE_POSITIVE;
 	$changeIncidentTypeName = _('Mark incident as false positive');
 }
