@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-11 02:15+0300\n"
-"PO-Revision-Date: 2014-10-02 19:46+0300\n"
+"POT-Creation-Date: 2014-10-11 02:26+0300\n"
+"PO-Revision-Date: 2014-10-10 18:49+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412272001.0\n"
+"X-POOTLE-MTIME: 1412959740.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -4992,7 +4992,7 @@ msgstr "Ativar"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr "Ativar configuração"
+msgstr "Ativar confirmação"
 
 #: include/views/administration.usergroups.list.php:140
 msgid "Enable debug mode"
@@ -8851,7 +8851,7 @@ msgstr "O nome de login ou a senha está incorreto."
 #: auditlogs.php:136 include/page_header.php:222 include/page_header.php:226
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
-msgstr "Logout"
+msgstr "Desconectar"
 
 #: include/discovery.inc.php:156
 msgid "Lost"
