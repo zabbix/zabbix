@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
 A......... [ZBX-8660] fix API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
