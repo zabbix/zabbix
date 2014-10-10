@@ -614,41 +614,41 @@ class CXmlImport18 {
 		}
 
 		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])) {
-			$images = $importMaps['zabbix_export']['images'];
-			$images_to_add = array();
-			$images_to_update = array();
-			foreach ($images as $image) {
-				$dbImage = API::Image()->get(array(
-					'output' => array('imageid'),
-					'filter' => array('name' => $image['name']),
-					'limit' => 1
-				));
+			$allImages = $importMaps['zabbix_export']['images'];
 
-				if ($dbImage && $rules['images']['updateExisting']) {
-					$dbImage = reset($dbImage);
-					$image['imageid'] = $dbImage['imageid'];
+			$allImages = zbx_toHash($allImages, 'name');
 
-					// image will be decoded in class.image.php
+			$dbImages = API::Image()->get(array(
+				'output' => array('imageid', 'name'),
+				'filter' => array('name' => zbx_objectValues($allImages, 'name')),
+			));
+			$dbImages = zbx_toHash($dbImages, 'name');
+
+			$imagesToCreate = array();
+			$imagesToUpdate = array();
+
+			foreach ($allImages as $imageName => $image) {
+				if (isset($dbImages[$imageName])) {
+					$image['imageid'] = $dbImages[$imageName]['imageid'];
 					$image['image'] = $image['encodedImage'];
-					unset($image['encodedImage'], $image['imagetype']);
 
-					$images_to_update[] = $image;
+					unset($image['encodedImage'], $image['imagetype']);
+					$imagesToUpdate[] = $image;
 				}
-				elseif (!$dbImage && $rules['images']['createMissing']) {
-					// No need to decode_base64
+				else {
 					$image['image'] = $image['encodedImage'];
 
 					unset($image['encodedImage']);
-					$images_to_add[] = $image;
+					$imagesToCreate[] = $image;
 				}
 			}
 
-			if ($images_to_add) {
-				API::Image()->create($images_to_add);
+			if ($rules['images']['createMissing'] && $imagesToCreate) {
+				API::Image()->create($imagesToCreate);
 			}
 
-			if ($images_to_update) {
-				API::Image()->update($images_to_update);
+			if ($rules['images']['updateExisting'] && $imagesToUpdate) {
+				API::Image()->update($imagesToUpdate);
 			}
 		}
 

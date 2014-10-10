@@ -1333,11 +1333,11 @@ class CConfigurationImport {
 
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBfetchArrayAssoc(DBselect(
-			'SELECT i.imageid,i.name'.
-			' FROM images i'.
-			' WHERE '.dbConditionString('i.name', array_keys($allImages))
-		), 'name');
+		$dbImages = API::Image()->get(array(
+			'output' => array('imageid', 'name'),
+			'filter' => array('name' => array_keys($allImages))
+		));
+		$dbImages = zbx_toHash($dbImages, 'name');
 
 		$imagesToUpdate = array();
 		$imagesToCreate = array();
