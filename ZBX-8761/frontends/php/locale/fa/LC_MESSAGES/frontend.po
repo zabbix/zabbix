@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-24 23:55+0300\n"
+"POT-Creation-Date: 2014-10-03 06:07+0300\n"
 "PO-Revision-Date: 2014-04-13 14:12+0300\n"
 "Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -459,7 +459,7 @@ msgstr "فعال تا"
 #: include/views/configuration.host.prototype.edit.php:258
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.httpconf.edit.php:278
-#: include/views/configuration.httpconf.edit.php:322
+#: include/views/configuration.httpconf.edit.php:329
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:476
@@ -743,7 +743,7 @@ msgstr ""
 msgid "Apr"
 msgstr "آوریل"
 
-#: include/forms.inc.php:1697 include/func.inc.php:120
+#: include/forms.inc.php:1695 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
 msgid "April"
 msgstr "آوریل"
@@ -802,7 +802,7 @@ msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 
-#: include/forms.inc.php:1778
+#: include/forms.inc.php:1776
 msgid "At (hour:minute)"
 msgstr "در (ساعت:دقیقه)"
 
@@ -844,7 +844,7 @@ msgstr ""
 msgid "Aug"
 msgstr "اوت"
 
-#: include/forms.inc.php:1689 include/func.inc.php:124
+#: include/forms.inc.php:1687 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:120
 msgid "August"
 msgstr "اوت"
@@ -2764,7 +2764,7 @@ msgstr ""
 msgid "Clear"
 msgstr "پاک کردن"
 
-#: include/views/configuration.httpconf.edit.php:312
+#: include/views/configuration.httpconf.edit.php:309
 #: include/views/configuration.item.edit.php:446
 msgid "Clear history and trends"
 msgstr "پاک کردن تاریخچه و روند ها"
@@ -2794,7 +2794,7 @@ msgstr "ساعت"
 #: include/views/configuration.host.edit.php:888
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
-#: include/views/configuration.httpconf.edit.php:309
+#: include/views/configuration.httpconf.edit.php:320
 #: include/views/configuration.item.edit.php:467
 #: include/views/configuration.maintenance.edit.php:195
 #: include/views/configuration.screen.edit.php:56
@@ -3532,7 +3532,7 @@ msgstr ""
 msgid "DOWN"
 msgstr "پایین"
 
-#: include/forms.inc.php:1646 include/maintenances.inc.php:33
+#: include/forms.inc.php:1644 include/maintenances.inc.php:33
 #: include/reports.inc.php:62 include/reports.inc.php:386
 #: include/reports.inc.php:394 report3.php:58 report4.php:104
 msgid "Daily"
@@ -3640,7 +3640,7 @@ msgstr "نوع پایگاه داده"
 msgid "Database user"
 msgstr "کاربر پایگاه داده"
 
-#: include/forms.inc.php:1713 include/forms.inc.php:1774 jsrpc.php:136
+#: include/forms.inc.php:1711 include/forms.inc.php:1772 jsrpc.php:136
 msgid "Date"
 msgstr "تاریخ"
 
@@ -3660,11 +3660,11 @@ msgstr "تاریخ منقضی شدن تعمیر سخت افزار"
 msgid "Date HW purchased"
 msgstr "تاریخ خرید سخت افزار"
 
-#: include/forms.inc.php:1715 report3.php:124 report4.php:159 report5.php:44
+#: include/forms.inc.php:1713 report3.php:124 report4.php:159 report5.php:44
 msgid "Day"
 msgstr "روز"
 
-#: include/forms.inc.php:1747
+#: include/forms.inc.php:1745
 msgid "Day of month"
 msgstr "روز از ماه"
 
@@ -3684,8 +3684,8 @@ msgstr ""
 msgid "Day of month is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1675 include/forms.inc.php:1718
-#: include/forms.inc.php:1743
+#: include/forms.inc.php:1673 include/forms.inc.php:1716
+#: include/forms.inc.php:1741
 msgid "Day of week"
 msgstr "روز از هفته"
 
@@ -3705,7 +3705,7 @@ msgstr ""
 msgid "Day of week is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1791
+#: include/forms.inc.php:1789
 msgid "Days"
 msgstr "روز"
 
@@ -3727,7 +3727,7 @@ msgstr "حالت رفع خطا بروز شد"
 msgid "Dec"
 msgstr ""
 
-#: include/forms.inc.php:1709 include/func.inc.php:128
+#: include/forms.inc.php:1707 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:124
 msgid "December"
 msgstr "دسامبر"
@@ -5148,11 +5148,11 @@ msgstr "وقایع"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1658
+#: include/forms.inc.php:1656
 msgid "Every day(s)"
 msgstr "هر روز"
 
-#: include/forms.inc.php:1665
+#: include/forms.inc.php:1663
 msgid "Every week(s)"
 msgstr "هر هفته"
 
@@ -5247,7 +5247,7 @@ msgid "Expression"
 msgstr "عبارت"
 
 #: include/forms.inc.php:1482 include/forms.inc.php:1487
-#: include/forms.inc.php:1496
+#: include/forms.inc.php:1495
 msgid "Expression Syntax Error."
 msgstr "خطای نحوی عبارت"
 
@@ -5346,7 +5346,7 @@ msgstr "مورد علاقه ها"
 msgid "Feb"
 msgstr ""
 
-#: include/forms.inc.php:1687 include/func.inc.php:118
+#: include/forms.inc.php:1685 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:114
 msgid "February"
 msgstr "فوریه"
@@ -5490,7 +5490,7 @@ msgstr "پایان"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1725 include/maintenances.inc.php:111
+#: include/forms.inc.php:1723 include/maintenances.inc.php:111
 msgid "First"
 msgstr "ابتدا"
 
@@ -5526,7 +5526,7 @@ msgstr "برای میهمان ، کلمه عبور باید خالی باشد"
 msgid "Formula"
 msgstr ""
 
-#: include/forms.inc.php:1728 include/maintenances.inc.php:114
+#: include/forms.inc.php:1726 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "چهارم"
 
@@ -5538,7 +5538,7 @@ msgstr ""
 msgid "Fri"
 msgstr ""
 
-#: include/forms.inc.php:1672 include/forms.inc.php:1740
+#: include/forms.inc.php:1670 include/forms.inc.php:1738
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "جمعه"
@@ -5740,7 +5740,7 @@ msgstr ""
 
 #: include/classes/api/services/CGraph.php:410
 #: include/classes/api/services/CGraphPrototype.php:420
-#: include/graphs.inc.php:345
+#: include/graphs.inc.php:356
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -6154,7 +6154,7 @@ msgstr "تاریخچه"
 msgid "History cleared"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:313
+#: include/views/configuration.httpconf.edit.php:310
 #: include/views/configuration.item.edit.php:447
 msgid "History clearing can take a long time. Continue?"
 msgstr ""
@@ -6576,7 +6576,7 @@ msgstr ""
 msgid "Hourly"
 msgstr "ساعتی"
 
-#: include/forms.inc.php:1793
+#: include/forms.inc.php:1791
 msgid "Hours"
 msgstr "ساعت"
 
@@ -8332,7 +8332,7 @@ msgstr "شناسه Jabber"
 msgid "Jan"
 msgstr ""
 
-#: include/forms.inc.php:1682 include/func.inc.php:117
+#: include/forms.inc.php:1680 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:113
 msgid "January"
 msgstr ""
@@ -8345,7 +8345,7 @@ msgstr ""
 msgid "Jul"
 msgstr ""
 
-#: include/forms.inc.php:1684 include/func.inc.php:123
+#: include/forms.inc.php:1682 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:119
 msgid "July"
 msgstr ""
@@ -8354,7 +8354,7 @@ msgstr ""
 msgid "Jun"
 msgstr ""
 
-#: include/forms.inc.php:1707 include/func.inc.php:122
+#: include/forms.inc.php:1705 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:118
 msgid "June"
 msgstr ""
@@ -8458,7 +8458,7 @@ msgstr "محل برچسب"
 msgid "Language"
 msgstr "زبان"
 
-#: include/forms.inc.php:1729 include/maintenances.inc.php:115
+#: include/forms.inc.php:1727 include/maintenances.inc.php:115
 msgid "Last"
 msgstr "آخرین"
 
@@ -8921,7 +8921,7 @@ msgstr ""
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1788
+#: include/forms.inc.php:1786
 msgid "Maintenance period length"
 msgstr "طول دوره نگه داری"
 
@@ -9034,7 +9034,7 @@ msgstr "نقشه‌ها"
 msgid "Mar"
 msgstr ""
 
-#: include/forms.inc.php:1692 include/func.inc.php:119
+#: include/forms.inc.php:1690 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:115
 msgid "March"
 msgstr ""
@@ -9106,7 +9106,7 @@ msgstr ""
 msgid "Maximum number of processes supported by OS."
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:404
+#: include/classes/screens/CScreenBase.php:348 include/graphs.inc.php:415
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -9128,7 +9128,7 @@ msgstr ""
 msgid "Maximum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1702 include/func.inc.php:121
+#: include/forms.inc.php:1700 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:117
 msgid "May"
 msgstr ""
@@ -9293,7 +9293,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr ""
 
-#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:397
+#: include/classes/screens/CScreenBase.php:343 include/graphs.inc.php:408
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
@@ -9320,7 +9320,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1795
+#: include/forms.inc.php:1793
 msgid "Minutes"
 msgstr "دقیقه"
 
@@ -9367,7 +9367,7 @@ msgstr ""
 msgid "Missing items for graph prototype \"%1$s\"."
 msgstr ""
 
-#: include/graphs.inc.php:312
+#: include/graphs.inc.php:323
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr ""
@@ -9388,7 +9388,7 @@ msgstr "مدل"
 msgid "Mon"
 msgstr "دوشنبه"
 
-#: include/forms.inc.php:1668 include/forms.inc.php:1736
+#: include/forms.inc.php:1666 include/forms.inc.php:1734
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "دوشنبه"
@@ -9419,11 +9419,11 @@ msgstr ""
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1711 report3.php:106 report4.php:146 report5.php:46
+#: include/forms.inc.php:1709 report3.php:106 report4.php:146 report5.php:46
 msgid "Month"
 msgstr "ماه"
 
-#: include/forms.inc.php:1648 include/maintenances.inc.php:37
+#: include/forms.inc.php:1646 include/maintenances.inc.php:37
 #: include/reports.inc.php:64 include/reports.inc.php:388
 #: include/reports.inc.php:396 report3.php:60 report4.php:106
 msgid "Monthly"
@@ -9931,7 +9931,7 @@ msgstr ""
 msgid "No graph ID provided for screen element."
 msgstr ""
 
-#: include/graphs.inc.php:274
+#: include/graphs.inc.php:285
 #, c-format
 msgid "No graph item with graphid \"%s\"."
 msgstr ""
@@ -10515,7 +10515,7 @@ msgstr "اخطارها"
 msgid "Nov"
 msgstr ""
 
-#: include/forms.inc.php:1704 include/func.inc.php:127
+#: include/forms.inc.php:1702 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:123
 msgid "November"
 msgstr "نوامبر"
@@ -10751,7 +10751,7 @@ msgstr ""
 msgid "Octal"
 msgstr "هشت هشتی"
 
-#: include/forms.inc.php:1699 include/func.inc.php:126
+#: include/forms.inc.php:1697 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:122
 msgid "October"
 msgstr "اکتبر"
@@ -10786,7 +10786,7 @@ msgstr "یکبار"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1645 include/maintenances.inc.php:31
+#: include/forms.inc.php:1643 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "فقط یکبار"
 
@@ -11360,7 +11360,7 @@ msgstr ""
 msgid "Period"
 msgstr "دوره"
 
-#: include/forms.inc.php:1650
+#: include/forms.inc.php:1648
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "نوع دوره"
@@ -12398,7 +12398,7 @@ msgstr ""
 msgid "Sat"
 msgstr "شنبه"
 
-#: include/forms.inc.php:1673 include/forms.inc.php:1741
+#: include/forms.inc.php:1671 include/forms.inc.php:1739
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "شنبه"
@@ -12597,7 +12597,7 @@ msgstr ""
 msgid "Search/Filter elements limit"
 msgstr "محدودسازی مشخصه های جستجو/فیلتر"
 
-#: include/forms.inc.php:1726 include/maintenances.inc.php:112
+#: include/forms.inc.php:1724 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "ثانیه"
 
@@ -12764,7 +12764,7 @@ msgstr ""
 msgid "Separated"
 msgstr "جداشده"
 
-#: include/forms.inc.php:1694 include/func.inc.php:125
+#: include/forms.inc.php:1692 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:121
 msgid "September"
 msgstr "سپتامبر"
@@ -13061,7 +13061,7 @@ msgstr ""
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr ""
 
-#: include/graphs.inc.php:360
+#: include/graphs.inc.php:371
 #, c-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr ""
@@ -13394,7 +13394,7 @@ msgstr ""
 msgid "Sun"
 msgstr "یکشنبه"
 
-#: include/forms.inc.php:1674 include/forms.inc.php:1742
+#: include/forms.inc.php:1672 include/forms.inc.php:1740
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "یکشنبه"
@@ -13758,7 +13758,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] ""
 
-#: include/forms.inc.php:1727 include/maintenances.inc.php:113
+#: include/forms.inc.php:1725 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "سوم"
 
@@ -13791,7 +13791,7 @@ msgstr "امسال"
 msgid "Thu"
 msgstr "پنجشنبه"
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1739
+#: include/forms.inc.php:1669 include/forms.inc.php:1737
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "پنجشنبه"
@@ -14236,7 +14236,7 @@ msgstr ""
 msgid "Tue"
 msgstr "سه شنبه"
 
-#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/forms.inc.php:1667 include/forms.inc.php:1735
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "سه شنبه"
@@ -14661,7 +14661,7 @@ msgstr ""
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
-#: include/views/configuration.httpconf.edit.php:307
+#: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:465
 #: include/views/configuration.item.massupdate.php:571
@@ -15454,7 +15454,7 @@ msgstr ""
 msgid "Wed"
 msgstr "چهارشنبه"
 
-#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/forms.inc.php:1668 include/forms.inc.php:1736
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "چهارشنبه"
@@ -15463,7 +15463,7 @@ msgstr "چهارشنبه"
 msgid "Week"
 msgstr "هفته"
 
-#: include/forms.inc.php:1647 include/maintenances.inc.php:35
+#: include/forms.inc.php:1645 include/maintenances.inc.php:35
 #: include/reports.inc.php:63 include/reports.inc.php:387
 #: include/reports.inc.php:395 report3.php:59 report4.php:105
 msgid "Weekly"
