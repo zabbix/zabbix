@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 ........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
 ..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
