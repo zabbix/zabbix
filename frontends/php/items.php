@@ -507,7 +507,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	$visible = get_request('visible', array());
-	if (isset($visible['delay_flex_visible'])) {
+	if (isset($visible['delay_flex'])) {
 		$delay_flex = get_request('delay_flex');
 		if (!is_null($delay_flex)) {
 			$db_delay_flex = '';
