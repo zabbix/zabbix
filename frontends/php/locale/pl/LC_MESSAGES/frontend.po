@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-10-03 01:11+0300\n"
-"PO-Revision-Date: 2014-09-26 21:55+0300\n"
+"PO-Revision-Date: 2014-10-03 12:02+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1411761318.0\n"
+"X-POOTLE-MTIME: 1412330578.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -13497,12 +13497,12 @@ msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix. Aktualna w
 #: include/views/configuration.hostgroups.list.php:137
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: include/html.inc.php:596
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć hosta i zostanie on wykasowany z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć hosta i zostanie on wykasowany za %1$s (%2$s o %3$s)."
 
 #: api/classes/CImage.php:492
 #, c-format
@@ -13523,7 +13523,7 @@ msgstr[2] "Obraz został użyty w mapach %1$s."
 #: include/views/configuration.item.list.php:127
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć pozycji i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć pozycji i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: queue.php:78
 msgid "The queue is empty."
