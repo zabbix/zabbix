@@ -2044,7 +2044,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// unset triggers which are dependant on at least one problem trigger upstream into dependency tree
 		if ($options['skipDependent'] !== null) {
-
 			// Result trigger IDs of all triggers in results.
 			$resultTriggerIds = zbx_objectValues($triggers, 'triggerid');
 
@@ -2065,10 +2064,10 @@ class CTrigger extends CTriggerGeneral {
 			do {
 				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
-					'SELECT d.triggerid_down,d.triggerid_up,t.value as up_trigger_value'.
+					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
 					' FROM trigger_depends d,triggers t'.
-					' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds).
-						' AND t.triggerid = d.triggerid_up'
+					' WHERE d.triggerid_up=t.triggerid'.
+						' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.
@@ -2090,7 +2089,7 @@ class CTrigger extends CTriggerGeneral {
 					$allUpTriggerIds[] = $upTriggerId;
 
 					// Remember value of this "up" trigger.
-					$upTriggerValues[$upTriggerId] = $dependency['up_trigger_value'];
+					$upTriggerValues[$upTriggerId] = $dependency['value'];
 
 					// Add ID of this "up" trigger to the list of trigger IDs which should be mapped.
 					$triggerIds[] = $upTriggerId;
@@ -2118,18 +2117,14 @@ class CTrigger extends CTriggerGeneral {
 
 			// Now process all mapped dependencies and unset any disabled "up" triggers so they do not participate in
 			// decisions regarding nesting resolution in next step.
-			foreach ($downToUpTriggerIds as $downTriggerId => &$upTriggerIds) {
+			foreach ($downToUpTriggerIds as $downTriggerId => $upTriggerIds) {
 				$upTriggerIdsToUnset = array();
 				foreach ($upTriggerIds as $upTriggerId) {
 					if (isset($disabledTriggerIds[$upTriggerId])) {
-						$upTriggerIdsToUnset[] = $upTriggerId;
+						unset($downToUpTriggerIds[$downTriggerId][$upTriggerId]);
 					}
 				}
-				foreach ($upTriggerIdsToUnset as $upTriggerId) {
-					unset($upTriggerIds[$upTriggerId]);
-				}
 			}
-			unset($upTriggerIds);
 
 			// Resolve dependencies for all result set triggers.
 			foreach ($resultTriggerIds as $resultTriggerId) {
@@ -2165,6 +2160,7 @@ class CTrigger extends CTriggerGeneral {
 						unset($triggers[$resultTriggerId]);
 					}
 				}
+
 				// Check if result trigger is disabled and if so, remove from results.
 				if (isset($disabledTriggerIds[$resultTriggerId])) {
 					unset($triggers[$resultTriggerId]);
