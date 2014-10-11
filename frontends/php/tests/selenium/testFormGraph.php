@@ -615,7 +615,7 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
-		$sqlGraphs = "select * from graphs";
+		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
