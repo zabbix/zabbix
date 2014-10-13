@@ -978,21 +978,19 @@ void	zbx_free_service_resources(void)
 		zbx_free(threads);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-#ifndef _WINDOWS
-	unload_modules();
-#endif
-	zabbix_close_log();
-
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
+#else
+	unload_modules();
 #endif
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
 }
 
 void	zbx_on_exit(void)
