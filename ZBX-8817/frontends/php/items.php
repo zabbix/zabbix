@@ -764,10 +764,8 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action')
-		&& getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid')
-		&& is_array(getRequest('group_itemid'))) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
+		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
 	$result = false;
 
 	$itemIds = getRequest('group_itemid');
