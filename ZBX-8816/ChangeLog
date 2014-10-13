@@ -1,8 +1,44 @@
-Changes for 2.4.1rc1
+Changes for 2.4.2rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thanks to Zabbix translators (Richlv)
+...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
+.......PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
+........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
+..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
+..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
+..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
+.......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
+A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
+........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1
+
+2.4.1rc2 was released as 2.4.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1rc2
+
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, German and Slovak translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-8847] fixed mass actions in lists only affecting the selected elements on the current page (Pavels)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.1rc1
+
+Bug fixes:
+..F....... [ZBX-8784] fixed link to the latest data page from the map pop up menu (Pavels)
+..F....... [ZBX-8665] fixed incorrect display of period in graph filter time bar, dragging the scrollbar beyond year 1970 and calendar months to run in loop for years 1970 and 2038 (Ivo)
+..F....... [ZBX-8802] fixed missing sub-menu icon in global script menu (Krists)
+.......PS. [ZBX-8825] fixed character "#" being replaced with "<>" in low-level discovery macros during database upgrade (asaveljevs)
+...G...... [ZBX-8822] fixed vm.memory.size[] items being unsupported on FreeBSD (asaveljevs)
+..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
 ..F....... [ZBX-8727] fixed item multiplier value validation to support scientific notation correctly (Krists)
@@ -1504,7 +1540,6 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 .......... [ZBX-8679] removed outdated and unused images (Richlv)
 ..F....... [ZBX-8700] fixed possible SQL error in details of web scenario (Oleg)

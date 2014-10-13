@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[2.4.1rc1])
+AC_INIT([Zabbix],[2.4.2rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -840,6 +840,7 @@ int main()
 ],
 AC_DEFINE(HAVE_LONG_LONG_QU, 1 ,[Define to 1 if format '%qu' exists.])
 AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no),
 AC_MSG_RESULT(no))
 
 dnl option -rdynamic is needed for readable backtraces
