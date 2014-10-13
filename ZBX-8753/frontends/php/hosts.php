@@ -736,10 +736,7 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 	order_result($data['proxies'], 'host');
 
 	// get inventories
-	if ($data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-		$data['inventories'] = getHostInventories();
-		$data['inventories'] = zbx_toHash($data['inventories'], 'db_field');
-	}
+	$data['inventories'] = zbx_toHash(getHostInventories(), 'db_field');
 
 	// get templates data
 	$data['linkedTemplates'] = null;
