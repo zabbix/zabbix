@@ -836,7 +836,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
-			)
+			),
+			'selectHosts' => array('status')
 		));
 		$item = reset($item);
 	}
