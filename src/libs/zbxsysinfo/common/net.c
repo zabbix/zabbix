@@ -473,10 +473,6 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
-	saved_options = _res.options;
-	if (0 != use_tcp)
-		_res.options |= RES_USEVC;
-
 	if (NULL != ip && '\0' != *ip)
 	{
 		if (0 == inet_aton(ip, &inaddr))
@@ -494,8 +490,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		_res.nscount = 1;
 	}
 
+	saved_options = _res.options;
 	saved_retrans = _res.retrans;
 	saved_retry = _res.retry;
+
+	if (0 != use_tcp)
+		_res.options |= RES_USEVC;
 
 	_res.retrans = retrans;
 	_res.retry = retry;
