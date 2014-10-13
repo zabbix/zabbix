@@ -228,9 +228,9 @@ void	unload_modules()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* there is no registered modules */
+	/* there are no registered modules */
 	if (NULL == modules)
-		return;
+		goto out;
 
 	for (module = modules; NULL != *module; module++)
 	{
@@ -250,6 +250,6 @@ void	unload_modules()
 	}
 
 	zbx_free(modules);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
