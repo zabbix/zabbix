@@ -21,8 +21,6 @@
 
 class CForm extends CTag {
 
-	protected $serializedFields = array();
-
 	public function __construct($method = 'post', $action = null, $enctype = null) {
 		parent::__construct('form', 'yes');
 		$this->setMethod($method);
@@ -51,29 +49,17 @@ class CForm extends CTag {
 
 	public function setEnctype($value = null) {
 		if (is_null($value)) {
-			$this->removeAttribute('enctype');
+			return $this->removeAttribute('enctype');
 		}
 		elseif (!is_string($value)) {
-			$this->error('Incorrect value for SetEnctype "'.$value.'".');
+			return $this->error('Incorrect value for SetEnctype "'.$value.'".');
 		}
-		$this->setAttribute('enctype', $value);
+		return $this->setAttribute('enctype', $value);
 	}
 
 	public function addVar($name, $value, $id = null) {
 		if (!is_null($value)) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
-	}
-
-	public function registerSerializedField($name) {
-		$this->serializedFields[$name] = $name;
-	}
-
-	public function startToString() {
-		if ($this->serializedFields) {
-			$this->setAttribute('data-serialized-fields', array_values($this->serializedFields));
-		}
-
-		return parent::startToString();
 	}
 }
