@@ -481,7 +481,7 @@ class testFormGraph extends CWebTest {
 					$this->assertVisible('yaxismin');
 					$this->assertAttribute("//input[@id='yaxismin']/@maxlength", '255');
 					$this->assertAttribute("//input[@id='yaxismin']/@size", '7');
-					$this->assertAttribute("//input[@id='yaxismin']/@value", '0.00');
+					$this->assertAttribute("//input[@id='yaxismin']/@value", '0.0000');
 
 					$this->assertElementNotPresent('ymin_name');
 					$this->assertElementNotPresent('yaxis_min');
@@ -511,7 +511,7 @@ class testFormGraph extends CWebTest {
 					$this->assertVisible('yaxismax');
 					$this->assertAttribute("//input[@id='yaxismax']/@maxlength", '255');
 					$this->assertAttribute("//input[@id='yaxismax']/@size", '7');
-					$this->assertAttribute("//input[@id='yaxismax']/@value", '100.00');
+					$this->assertAttribute("//input[@id='yaxismax']/@value", '100.0000');
 
 					$this->assertElementNotPresent('ymax_name');
 					$this->assertElementNotPresent('yaxis_max');
@@ -615,7 +615,7 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
-		$sqlGraphs = "select * from graphs";
+		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
@@ -796,10 +796,10 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "0" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Incorrect value "0" for "Height (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not decimal number.',
-						'Field "yaxismin" is not decimal number.'
+						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
+						'Value "name" of "yaxismin" has incorrect decimal format.',
+						'Value "name" of "yaxismax" has incorrect decimal format.'
 					)
 				)
 			),
@@ -817,8 +817,8 @@ class testFormGraph extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "65536" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Incorrect value "-22" for "Height (min:20, max:65535)" field: must be between 20 and 65535.'
+						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'
 					)
 				)
 			),
