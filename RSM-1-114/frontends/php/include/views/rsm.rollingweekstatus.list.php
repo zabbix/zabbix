@@ -112,7 +112,6 @@ if (isset($this->data['tld'])) {
 	$from = date('YmdHis', $serverTime - $this->data['rollWeekSeconds']);
 	$till = date('YmdHis', $serverTime);
 	foreach ($this->data['tld'] as $key => $tld) {
-
 		// DNS
 		if (isset($tld[RSM_DNS])) {
 			if ($tld[RSM_DNS]['trigger']) {

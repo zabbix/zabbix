@@ -360,27 +360,36 @@ if ($tlds) {
 				$problem = array();
 				switch ($items[$trItem]['key_']) {
 					case RSM_SLV_DNS_AVAIL:
-						$data['tld'][$items[$trItem]['hostid']][RSM_DNS]['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']][RSM_DNS]['incident'] = getLastEvent(
 							$trigger['triggerid']
 						);
+						if ($data['tld'][$items[$trItem]['hostid']][RSM_DNS]['incident']) {
+							$data['tld'][$items[$trItem]['hostid']][RSM_DNS]['trigger'] = true;
+						}
 						break;
 					case RSM_SLV_DNSSEC_AVAIL:
-						$data['tld'][$items[$trItem]['hostid']][RSM_DNSSEC]['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']][RSM_DNSSEC]['incident'] = getLastEvent(
 							$trigger['triggerid']
 						);
+						if ($data['tld'][$items[$trItem]['hostid']][RSM_DNSSEC]['incident']) {
+							$data['tld'][$items[$trItem]['hostid']][RSM_DNSSEC]['trigger'] = true;
+						}
 						break;
 					case RSM_SLV_RDDS_AVAIL:
-						$data['tld'][$items[$trItem]['hostid']][RSM_RDDS]['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']][RSM_RDDS]['incident'] = getLastEvent(
-							$trigger['triggerid']);
+							$trigger['triggerid']
+						);
+						if ($data['tld'][$items[$trItem]['hostid']][RSM_RDDS]['incident']) {
+							$data['tld'][$items[$trItem]['hostid']][RSM_RDDS]['trigger'] = true;
+						}
 						break;
 					case RSM_SLV_EPP_AVAIL:
-						$data['tld'][$items[$trItem]['hostid']][RSM_EPP]['trigger'] = true;
 						$data['tld'][$items[$trItem]['hostid']][RSM_EPP]['incident'] = getLastEvent(
 							$trigger['triggerid']
 						);
+						if ($data['tld'][$items[$trItem]['hostid']][RSM_EPP]['incident']) {
+							$data['tld'][$items[$trItem]['hostid']][RSM_EPP]['trigger'] = true;
+						}
 						break;
 				}
 			}
