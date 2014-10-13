@@ -7,7 +7,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thank
 Bug fixes:
 ..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
 ...G...PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
-........S. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
+.......PS. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
 ..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
 ..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
