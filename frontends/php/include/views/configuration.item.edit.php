@@ -315,7 +315,7 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && ($host['status'] != HOST_STATUS_TEMPLATE)) {
+if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && $host['status'] != HOST_STATUS_TEMPLATE) {
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -331,7 +331,7 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && ($host['status'] != HOST_STATUS_TEMPLATE)) {
+if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && $host['status'] != HOST_STATUS_TEMPLATE) {
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -442,7 +442,7 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
-	if (($host['status'] != HOST_STATUS_TEMPLATE) && ($this->data['parent_discoveryid'] == 0)) {
+	if ($host['status'] != HOST_STATUS_TEMPLATE && $this->data['parent_discoveryid'] == 0) {
 		$buttonDelHistory = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
