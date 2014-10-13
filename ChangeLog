@@ -12,7 +12,6 @@ Bug fixes:
 ..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
 ..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
 ....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
-..F....... [ZBX-8860] fixed flexible interval updating with mass update (Krists)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
@@ -447,6 +446,7 @@ A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations;
 
 Bug fixes:
 ..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
+....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
