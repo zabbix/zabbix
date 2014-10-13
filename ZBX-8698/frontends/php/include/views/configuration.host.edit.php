@@ -697,7 +697,7 @@ if (!$isDiscovered) {
 			array(
 				$templateLink,
 				array(
-					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu first'),
+					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu_with_right_margin'),
 					isset($originalTemplates[$template['templateid']]) && !$cloneOrFullClone
 						? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
 						: null
