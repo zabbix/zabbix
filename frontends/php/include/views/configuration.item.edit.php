@@ -441,7 +441,7 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
-	if (!$this->data['is_template'] && ($this->data['parent_discoveryid'] == 0)) {
+	if (!$this->data['is_template'] && $this->data['parent_discoveryid'] == 0) {
 		$buttonDelHistory = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
