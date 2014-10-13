@@ -409,12 +409,12 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		months = 0;
 
 	if (isExtend) {
-		years = parseInt(timestamp / 31536000);
-		months = parseInt((timestamp - years * 31536000) / 2592000);
+		years = Math.floor(timestamp / 31536000);
+		months = Math.floor((timestamp - years * 31536000) / 2592000);
 	}
 
-	var days = parseInt((timestamp - years * 31536000 - months * 2592000) / 86400),
-		hours = parseInt((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
+	var days = Math.floor((timestamp - years * 31536000 - months * 2592000) / 86400),
+		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
 
 	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
 	if (months == 12) {

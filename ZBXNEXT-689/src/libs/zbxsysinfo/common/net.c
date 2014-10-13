@@ -326,7 +326,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 
 #ifdef _WINDOWS
-	options = DNS_QUERY_STANDARD;
+	options = DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE;
 	if (0 != use_tcp)
 		options |= DNS_QUERY_USE_TCP_ONLY;
 
