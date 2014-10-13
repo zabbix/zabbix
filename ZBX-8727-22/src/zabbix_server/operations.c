@@ -53,32 +53,36 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 	{
 		case EVENT_OBJECT_DHOST:
 			sql = zbx_dsprintf(sql,
-				"select h.hostid"
+				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
 					" and ds.dhostid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		case EVENT_OBJECT_DSERVICE:
 			sql = zbx_dsprintf(sql,
-				"select h.hostid"
+				"select h.hostid,h.status"
 				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
 				" where h.hostid=i.hostid"
 					" and i.ip=ds.ip"
 					" and ds.dcheckid=dc.dcheckid"
 					" and dc.druleid=dr.druleid"
+					" and h.status in (%d,%d)"
 					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
 					" and i.useip=1"
-					" and ds.dserviceid =" ZBX_FS_UI64
+					" and ds.dserviceid=" ZBX_FS_UI64
 					ZBX_SQL_NODE
 				" order by i.hostid",
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				event->objectid, DBand_node_local("i.interfaceid"));
 			break;
 		default:
@@ -138,7 +142,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (FAIL == (i = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_uint64_search(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -156,6 +160,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+
+		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		for (i = 0; i < groupids->values_num; i++)
 		{
@@ -265,10 +271,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
+							" and h.status in (%d,%d)"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 							ZBX_SQL_NODE
 						" order by h.hostid",
+						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 						DBsql_id_cmp(proxy_hostid),
 						dhostid,
 						DBand_node_local("h.hostid"));
