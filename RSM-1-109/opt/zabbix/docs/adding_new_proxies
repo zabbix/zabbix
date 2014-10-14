@@ -1,0 +1,19 @@
+Adding new probes to Zabbix installation
+
+1. Install new probe server using "proxy_install" documentation.
+
+2. Do not forget to add Zabbix proxy port (10051 TCP) to allow incoming packets from Zabbix server.
+
+3. Do not forget to add Zabbix agent port (10050 TCP) to allow communication from Zabbix server to Zabbix agent.
+
+4. Go to Zabbix frontend. Go to Administration->DM page and select "Proxies" in the dropbox menu right top corner.
+
+5. Click "Create proxy" button.
+
+6. Fill "Proxy name" field with name of new proxy.
+
+7. Proxy mode must be "Passive".
+
+8. Fill "Interface" section with IP, DNS and port settings. Connection to proxy using IP is preffered than using DNS.
+
+9. CLick "Save". Proxy is added.
