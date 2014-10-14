@@ -34,6 +34,7 @@ class CTweenBox {
 		$this->rbox = new CListBox($this->id_r, null, $size);
 		$this->lbox->setAttribute('style', 'width: 280px;');
 		$this->rbox->setAttribute('style', 'width: 280px;');
+		$this->form->addVar($this->varname, CJs::encodeJson($this->value));
 	}
 
 	public function setName($name = null) {
@@ -61,7 +62,6 @@ class CTweenBox {
 				|| (is_int($selected) && $selected != 0)
 				|| (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected == 'on'))) {
 			$this->lbox->addItem($value, $caption, null, $enabled);
-			$this->form->addVar($this->varname.'['.$value.']', $value);
 		}
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);

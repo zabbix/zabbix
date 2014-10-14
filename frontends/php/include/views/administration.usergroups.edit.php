@@ -26,7 +26,7 @@ $userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 $userGroupForm = new CForm();
 $userGroupForm->setName('userGroupsForm');
 $userGroupForm->addVar('form', $this->data['form']);
-$userGroupForm->addVar('group_rights', $this->data['group_rights']);
+$userGroupForm->addVar('group_rights', CJs::encodeJson($this->data['group_rights']));
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addVar('usrgrpid', $this->data['usrgrpid']);
 }
@@ -80,25 +80,36 @@ $permissionsFormList = new CFormList('permissionsFormList');
 $permissionsTable = new CTable(null, 'right_table');
 $permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
-$lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
-$lstRead = new CListBox('right_to_del[read_only][]', null, 20);
-$lstDeny = new CListBox('right_to_del[deny][]', null, 20);
+$rightToDelReadWriteVar = new CVar('right_to_del_read_write', CJs::encodeJson(array()));
+$lstReadWrite = new CListBox(null, null, 20);
+$lstReadWrite->serializeToVar($rightToDelReadWriteVar);
+$userGroupForm->addItem($rightToDelReadWriteVar);
+
+$rightToDelReadOnlyVar = new CVar('right_to_del_read_only', CJs::encodeJson(array()));
+$lstReadOnly = new CListBox(null, null, 20);
+$lstReadOnly->serializeToVar($rightToDelReadOnlyVar);
+$userGroupForm->addItem($rightToDelReadOnlyVar);
+
+$rightToDelDenyVar = new CVar('right_to_del_deny', CJs::encodeJson(array()));
+$lstDeny = new CListBox(null, null, 20);
+$lstDeny->serializeToVar($rightToDelDenyVar);
+$userGroupForm->addItem($rightToDelDenyVar);
 
 foreach ($this->data['group_rights'] as $id => $rights) {
 	if ($rights['permission'] == PERM_DENY) {
 		$lstDeny->addItem($id, $rights['name']);
 	}
 	elseif ($rights['permission'] == PERM_READ) {
-		$lstRead->addItem($id, $rights['name']);
+		$lstReadOnly->addItem($id, $rights['name']);
 	}
 	elseif ($rights['permission'] == PERM_READ_WRITE) {
-		$lstWrite->addItem($id, $rights['name']);
+		$lstReadWrite->addItem($id, $rights['name']);
 	}
 }
 
 $permissionsTable->addRow(array(
-	new CCol($lstWrite, 'read_write'),
-	new CCol($lstRead, 'read_only'),
+	new CCol($lstReadWrite, 'read_write'),
+	new CCol($lstReadOnly, 'read_only'),
 	new CCol($lstDeny, 'deny')
 ));
 $permissionsTable->addRow(array(

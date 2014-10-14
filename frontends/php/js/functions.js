@@ -309,29 +309,45 @@ function getNextColor(paletteType) {
  *
  * @return true
  */
-function moveListBoxSelectedItem(formname, objname, from, to, action) {
-	to = jQuery('#' + to);
+function moveListBoxSelectedItem(formname, objname, source, target, action) {
+	target = jQuery('#' + target);
 
-	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
-		var notApp = true;
-		to.find('option').each(function(j, toel) {
-			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
-				jQuery(toel).before(fromel);
-				notApp = false;
+	jQuery('#' + source).find('option:selected').each(function(i, selectedElement) {
+		var notAppended = true;
+		target.find('option').each(function(j, elementInTarget) {
+			if (elementInTarget.innerHTML.toLowerCase() > selectedElement.innerHTML.toLowerCase()) {
+				jQuery(elementInTarget).before(selectedElement);
+				notAppended = false;
 				return false;
 			}
 		});
-		if (notApp) {
-			to.append(fromel);
+		if (notAppended) {
+			target.append(selectedElement);
 		}
-		fromel = jQuery(fromel);
+		selectedElement = jQuery(selectedElement);
+
+		// Fetch "variable" input element into which JSON'ed values of chosen items are stored.
+		var variableInput = jQuery("input[name=" + objname + "]", document.forms[formname]);
+
+		// Ensure we have an object
+		var value = JSON.parse(variableInput.val());
+		if (value instanceof Array) {
+			value = {};
+		}
+
+		// Fetch value (presumably some ID) from selected option.
+		var selectedValue = selectedElement.val();
+
+		// Add or remove item from value-object.
 		if (action.toLowerCase() == 'add') {
-			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
-				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' type='hidden'>");
+			value[selectedValue] = selectedValue;
 		}
 		else if (action.toLowerCase() == 'rmv') {
-			jQuery('#' + objname + '_' + fromel.val()).remove();
+			delete value[selectedValue];
 		}
+
+		// JSONize and store value back to "variable" input element.
+		variableInput.val(Object.toJSON(value));
 	});
 
 	return true;
