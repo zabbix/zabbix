@@ -27,7 +27,10 @@ class CComboItem extends CTag {
 		$this->setAttribute('value', $value);
 		$this->addItem($caption);
 		$this->setSelected($selected);
-		$this->setEnabled($enabled);
+
+		if ($enabled !== null) {
+			$this->setEnabled($enabled);
+		}
 	}
 
 	public function setValue($value) {
