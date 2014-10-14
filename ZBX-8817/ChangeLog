@@ -1,12 +1,18 @@
 Changes for 2.4.2rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thanks to Zabbix translators (Richlv)
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+A......... [ZBX-6174] fix "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
+..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
+...G...PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
+.......PS. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
 ..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
 ..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
+....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
@@ -440,6 +446,10 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6174] fix "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
+..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
+....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
+..F....... [ZBX-8860] fixed flexible interval updating with mass update (Krists)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8797] fixed erroneous phantom node ID detection from request parameter when using node-based system converted to nodeless (Krists)
@@ -1543,6 +1553,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6174] fix "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
