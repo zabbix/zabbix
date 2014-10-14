@@ -68,3 +68,30 @@ function getTotalTestsCount($itemId, $startTime, $endTime, $incidentStartTime = 
 
 	return $getTotalTestsCount['count'];
 }
+
+/**
+ * Return incident status.
+ *
+ * @param int 		$falsePositive
+ * @param int 		$status
+ *
+ * @return string
+ */
+function getIncidentStatus($falsePositive, $status) {
+	if ($falsePositive) {
+		$incidentStatus = _('False positive');
+	}
+	else {
+		if ($status == TRIGGER_VALUE_TRUE) {
+			$incidentStatus = _('Active');
+		}
+		elseif ($status == TRIGGER_VALUE_FALSE) {
+			$incidentStatus = _('Resolved');
+		}
+		else {
+			$incidentStatus = _('Resolved (no data)');
+		}
+	}
+
+	return $incidentStatus;
+}

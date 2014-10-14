@@ -406,9 +406,9 @@ if ($host || $data['filter_search']) {
 					if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 						// get event end time
 						$addEvent = DBfetch(DBselect(
-							'SELECT e.clock, e.objectid'.
+							'SELECT e.clock,e.objectid,e.value'.
 							' FROM events e'.
-							' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+							' WHERE e.objectid='.$incidents[$i]['objectid'].
 								' AND e.clock>='.$filterTimeTill.
 								' AND e.object='.EVENT_OBJECT_TRIGGER.
 								' AND e.source='.EVENT_SOURCE_TRIGGERS.
@@ -419,7 +419,7 @@ if ($host || $data['filter_search']) {
 
 						if ($addEvent) {
 							$newData[$i] = array(
-								'status' => TRIGGER_VALUE_FALSE,
+								'status' => $addEvent['value'],
 								'endTime' => $addEvent['clock']
 							);
 
@@ -524,7 +524,7 @@ if ($host || $data['filter_search']) {
 				else {
 					if (isset($incidents[$i])) {
 						$incidents[$i] = array(
-							'status' => TRIGGER_VALUE_FALSE,
+							'status' => $event['value'],
 							'endTime' => $event['clock']
 						);
 					}
@@ -566,7 +566,7 @@ if ($host || $data['filter_search']) {
 							$incidents[$i] = array(
 								'objectid' => $event['objectid'],
 								'eventid' => $addEvent['eventid'],
-								'status' => TRIGGER_VALUE_FALSE,
+								'status' => $event['value'],
 								'startTime' => $addEvent['clock'],
 								'endTime' => $event['clock'],
 								'false_positive' => $event['false_positive'],
@@ -676,9 +676,9 @@ if ($host || $data['filter_search']) {
 			if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 				// get event end time
 				$addEvent = DBfetch(DBselect(
-					'SELECT e.clock, e.objectid'.
+					'SELECT e.clock,e.objectid,e.value'.
 					' FROM events e'.
-					' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+					' WHERE e.objectid='.$incidents[$i]['objectid'].
 						' AND e.clock>='.$filterTimeTill.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.source='.EVENT_SOURCE_TRIGGERS.
@@ -689,7 +689,7 @@ if ($host || $data['filter_search']) {
 
 				if ($addEvent) {
 					$newData[$i] = array(
-						'status' => TRIGGER_VALUE_FALSE,
+						'status' => $addEvent['value'],
 						'endTime' => $addEvent['clock']
 					);
 
