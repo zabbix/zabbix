@@ -123,40 +123,19 @@ if (isset($_REQUEST['new_httpstep'])) {
 }
 
 if (hasRequest('delete') && hasRequest('httptestid')) {
-	$result = false;
+	DBstart();
 
-	$httpTestId = getRequest('httptestid');
+	$result = API::HttpTest()->delete(array(getRequest('httptestid')));
 
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('name'),
-		'httptestids' => array($httpTestId),
-		'selectHosts' => array('name'),
-		'editable' => true
-	));
+	$result = DBend($result);
 
-	if ($httpTests) {
-		DBstart();
-
-		$result = API::HttpTest()->delete(array($httpTestId));
-
-		if ($result) {
-			$httpTest = reset($httpTests);
-			$host = reset($httpTest['hosts']);
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-				_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTestId.'] '._('Host').' ['.$host['name'].']'
-			);
-		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
-		}
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
 	}
-	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
+
+	unset($_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid']);
@@ -326,7 +305,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			_('Web scenario').' ['.getRequest('name').'] ['.$httpTestId.'] '._('Host').' ['.$host['name'].']'
 		);
 
-		unset($_REQUEST['httptestid'], $_REQUEST['form']);
+		unset($_REQUEST['form']);
 		show_messages(true, $messageTrue);
 		DBend(true);
 	}
@@ -352,8 +331,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httpte
 
 	$httpTests = API::HttpTest()->get(array(
 		'output' => array('httptestid', 'name', 'status'),
-		'httptestids' => $httpTestIds,
 		'selectHosts' => array('name'),
+		'httptestids' => $httpTestIds,
 		'editable' => true
 	));
 
