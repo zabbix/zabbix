@@ -7,7 +7,7 @@ New features:
 Bug fixes:
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
-A......... [ZBX-8660] fix API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
+A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
 ...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
 ..F....... [ZBX-8816] removed "clear history & trends" button from template web scenarios (arvids)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
@@ -33,6 +33,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
 ...G...PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 .......PS. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
@@ -468,6 +469,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (Taiwan), Italian and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6174] fix "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
 ....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
 ..F....... [ZBX-8860] fixed flexible interval updating with mass update (Krists)
@@ -1574,6 +1576,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
