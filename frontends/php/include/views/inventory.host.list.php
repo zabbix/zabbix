@@ -50,7 +50,8 @@ $filterTable->addRow(array(
 ), 'host-inventories');
 
 $filter = new CSubmit('filter_set', _('Filter'));
-$filter->useJQueryStyle('main');
+$filter->main();
+$filter->useJQueryStyle();
 
 $reset = new CSubmit('filter_rst', _('Reset'));
 $reset->useJQueryStyle();

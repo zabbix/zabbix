@@ -621,7 +621,8 @@ function getItemFilterForm(&$items) {
 	), 'item-list-row');
 
 	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$filter->useJQueryStyle('main');
+	$filter->main();
+	$filter->useJQueryStyle();
 
 	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$reset->useJQueryStyle();
