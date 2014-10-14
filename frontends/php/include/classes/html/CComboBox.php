@@ -90,6 +90,15 @@ class CComboBox extends CTag {
 			parent::addItem($citem);
 		}
 	}
+
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
+		}
+	}
 }
 
 class COptGroup extends CTag {
