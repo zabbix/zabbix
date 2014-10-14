@@ -723,14 +723,16 @@ elseif (isset($_REQUEST['form'])) {
 
 		$dbHosts = API::Host()->get(array(
 			'hostids' => $hostId,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectGroups' => array('groupid', 'name'),
 			'selectParentTemplates' => array('templateid', 'name'),
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectInventory' => true,
 			'selectDiscoveryRule' => array('name', 'itemid'),
 			'output' => API_OUTPUT_EXTEND
 		));
+
 		$dbHost = reset($dbHosts);
+		order_result($dbHost['groups'], 'name');
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $hostId,

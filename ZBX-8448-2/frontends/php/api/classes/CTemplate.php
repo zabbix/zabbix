@@ -979,22 +979,44 @@ class CTemplate extends CHostGeneral {
 
 		// UPDATE TEMPLATE LINKAGE {{{
 		// firstly need to unlink all things, to correctly check circulars
-
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
 			$templateHosts = API::Host()->get(array(
+				'output' => array('hostid'),
 				'templateids' => $templateids,
-				'templated_hosts' => 1,
+				'templated_hosts' => true,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
 			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
 
 			$hostsToDel = array_diff($templateHostids, $newHostids);
-			$hostidsToDel = array_diff($hostsToDel, $templateidsClear);
+			$hostIdsToDel = array_diff($hostsToDel, $templateidsClear);
+			$hostIdsToAdd = array_diff($newHostids, $templateHostids);
+
+			// gather both host and template IDs and validate write permissions
+			$hostIds = array_merge($hostIdsToAdd, $hostIdsToDel);
+
+			if ($hostIds) {
+				$templatesHostsAllowed = API::Host()->get(array(
+					'output' => array('hostid'),
+					'templated_hosts' => true,
+					'editable' => true,
+					'preservekeys' => true,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
+
+				foreach ($hostIds as $hostid) {
+					if (!isset($templatesHostsAllowed[$hostid])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
+			}
 
 			if (!empty($hostidsToDel)) {
 				$result = $this->massRemove(array(
-					'hostids' => $hostidsToDel,
+					'hostids' => $hostIdsToDel,
 					'templateids' => $templateids
 				));
 				if (!$result) {

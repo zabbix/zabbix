@@ -624,35 +624,81 @@ class CHost extends CHostGeneral {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 
-		// permissions
-		$groupids = array();
-		foreach ($hosts as $host) {
-			if (!isset($host['groups'])) {
-				continue;
-			}
-			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
-		}
+		$hostDbfields = $update ? array('hostid' => null) : array('host' => null);
 
 		if ($update) {
-			$hostDBfields = array('hostid' => null);
 			$dbHosts = $this->get(array(
 				'output' => array('hostid', 'host', 'flags'),
+				'selectGroups' => array('groupid'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
 		}
-		else {
-			$hostDBfields = array('host' => null);
+
+		$newGroupIds = array();
+		$oldGroupIds = array();
+		$validateGroupIds = array();
+
+		foreach ($hosts as $host) {
+			// validate mandatory fields
+			if (!check_db_fields($hostDbfields, $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : '')
+				);
+			}
+
+			if ($update) {
+				$hostId = $host['hostid'];
+
+				// validate host permissions
+				if (!isset($dbHosts[$hostId])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+
+				$dbHost = $dbHosts[$hostId];
+
+				// gather new groups assigned to current host
+				if (isset($host['groups'])) {
+					foreach ($host['groups'] as $group) {
+						$newGroupIds[$group['groupid']] = $group['groupid'];
+					}
+				}
+				elseif (!is_array($host['groups']) || !$host['groups']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $dbHost['host']));
+				}
+
+				// gather current groups assigned to host
+				foreach ($dbHost['groups'] as $group) {
+					$oldGroupIds[$group['groupid']] = $group['groupid'];
+				}
+			}
+			else {
+				if (!isset($host['groups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
+				}
+
+				foreach ($host['groups'] as $group) {
+					$newGroupIds[$group['groupid']] = $group['groupid'];
+				}
+			}
 		}
 
-		if (!empty($groupids)) {
-			$dbGroups = API::HostGroup()->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $groupids,
-				'editable' => true,
-				'preservekeys' => true
-			));
+		if ($update) {
+			// validate groups that are added
+			$validateGroupIds = array_diff($newGroupIds, $oldGroupIds);
+
+			// validate groups that are removed
+			$validateGroupIds += array_diff($oldGroupIds, $newGroupIds);
+		}
+		else {
+			$validateGroupIds = $newGroupIds;
+		}
+
+		if ($validateGroupIds && !API::HostGroup()->isWritable($validateGroupIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$inventoryFields = getHostInventories();
@@ -660,13 +706,7 @@ class CHost extends CHostGeneral {
 
 		$hostNames = array();
 		foreach ($hosts as &$host) {
-			if (!check_db_fields($hostDBfields, $host)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
-			}
-
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
-
 				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 				}
@@ -683,11 +723,8 @@ class CHost extends CHostGeneral {
 				'allowed' => array('hostid', 'status', 'inventory'),
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
-			if ($update) {
-				if (!isset($dbHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
 
+			if ($update) {
 				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
@@ -697,24 +734,8 @@ class CHost extends CHostGeneral {
 					$host['name'] = $host['host'];
 				}
 
-				if (!isset($host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
-				}
-
 				if (!isset($host['interfaces'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
-				}
-			}
-
-			if (isset($host['groups'])) {
-				if (!is_array($host['groups']) || empty($host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
-				}
-
-				foreach ($host['groups'] as $group) {
-					if (!isset($dbGroups[$group['groupid']])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-					}
 				}
 			}
 

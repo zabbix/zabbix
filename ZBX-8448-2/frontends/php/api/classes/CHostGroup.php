@@ -765,46 +765,38 @@ class CHostGroup extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massAdd(array $data) {
-		$groups = zbx_toArray($data['groups']);
-		$groupids = zbx_objectValues($groups, 'groupid');
+		$this->validatePermissions($data);
 
-		$updGroups = $this->get(array(
-			'groupids' => $groupids,
-			'editable' => true,
-			'preservekeys' => true
-		));
-		foreach ($groups as $group) {
-			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
+		$groups = zbx_toArray($data['groups']);
+		$groupIds = zbx_objectValues($groups, 'groupid');
 
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-		$objectids = array_merge($hostids, $templateids);
+		$hostIds = ($hosts === null) ? array() : zbx_objectValues($hosts, 'hostid');
 
-		// check if any of the hosts are discovered
-		$this->checkValidator($hostids, new CHostNormalValidator(array(
-			'message' => _('Cannot update groups for discovered host "%1$s".')
-		)));
+		if ($hostIds) {
+			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+				'message' => _('Cannot update groups for discovered host "%1$s".')
+			)));
+		}
+
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+		$templateIds = ($templates === null) ? array() : zbx_objectValues($templates, 'templateid');
+
+		$objectids = array_merge($hostIds, $templateIds);
 
 		$linked = array();
 		$linkedDb = DBselect(
 			'SELECT hg.hostid,hg.groupid'.
 			' FROM hosts_groups hg'.
 			' WHERE '.dbConditionInt('hg.hostid', $objectids).
-				' AND '.dbConditionInt('hg.groupid', $groupids)
+				' AND '.dbConditionInt('hg.groupid', $groupIds)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['groupid']][$pair['hostid']] = 1;
 		}
 
 		$insert = array();
-		foreach ($groupids as $groupid) {
+		foreach ($groupIds as $groupid) {
 			foreach ($objectids as $hostid) {
 				if (isset($linked[$groupid][$hostid])) {
 					continue;
@@ -812,8 +804,9 @@ class CHostGroup extends CZBXAPI {
 				$insert[] = array('hostid' => $hostid, 'groupid' => $groupid);
 			}
 		}
+
 		DB::insert('hosts_groups', $insert);
-		return array('groupids' => $groupids);
+		return array('groupids' => $groupIds);
 	}
 
 	/**
@@ -876,35 +869,16 @@ class CHostGroup extends CZBXAPI {
 	 * @return array
 	 */
 	public function massUpdate(array $data) {
+		$this->validatePermissions($data);
+
 		$groupIds = array_unique(zbx_objectValues(zbx_toArray($data['groups']), 'groupid'));
 		$hostIds = array_unique(zbx_objectValues(isset($data['hosts']) ? zbx_toArray($data['hosts']) : null, 'hostid'));
 		$templateIds = array_unique(zbx_objectValues(isset($data['templates']) ? zbx_toArray($data['templates']) : null, 'templateid'));
 
 		$workHostIds = array();
 
-		// validate permission
-		$allowedGroups = $this->get(array(
-			'groupids' => $groupIds,
-			'editable' => true,
-			'preservekeys' => true
-		));
-		foreach ($groupIds as $groupId) {
-			if (!isset($allowedGroups[$groupId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-
 		// validate allowed hosts
 		if (!empty($hostIds)) {
-			if (!API::Host()->isWritable($hostIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			// check if any of the hosts are discovered
 			$this->checkValidator($hostIds, new CHostNormalValidator(array(
 				'message' => _('Cannot update groups for discovered host "%1$s".')
 			)));
@@ -914,18 +888,7 @@ class CHostGroup extends CZBXAPI {
 
 		// validate allowed templates
 		if (!empty($templateIds)) {
-			$allowedTemplates = API::Template()->get(array(
-				'templateids' => $templateIds,
-				'editable' => true,
-				'preservekeys' => true
-			));
 			foreach ($templateIds as $templateId) {
-				if (!isset($allowedTemplates[$templateId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-
 				$workHostIds[$templateId] = $templateId;
 			}
 		}
@@ -994,6 +957,94 @@ class CHostGroup extends CZBXAPI {
 		DB::replace('hosts_groups', $oldRecords, array_merge($replaceRecords, $newRecords));
 
 		return array('groupids' => $groupIds);
+	}
+
+	/**
+	 * Validate write access to hosts, templates and host groups.
+	 *
+	 * @param array $data
+	 * @param array $data['groups']
+	 * @param array $data['hosts']
+	 * @param array $data['templates']
+	 *
+	 * @throws APIException				if user has no write permissions to one of the objects
+	 *
+	 * @return void
+	 */
+	protected function validatePermissions(array $data) {
+		$groups = zbx_toArray($data['groups']);
+		$newGroupIds = zbx_objectValues($groups, 'groupid');
+		$oldGroupIds = array();
+		$validateGroupIds = array();
+
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+		$hostIds = ($hosts === null) ? array() : zbx_objectValues($hosts, 'hostid');
+
+		if ($hosts) {
+			$dbHosts = API::Host()->get(array(
+				'output' => array('hostid'),
+				'selectGroups' => array('groupid'),
+				'hostids' => $hostIds,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			foreach ($hosts as $host) {
+				$hostId = $host['hostid'];
+				if (!isset($dbHosts[$hostId])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+				$dbHost = $dbHosts[$hostId];
+				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
+
+				// validate groups that are added for current host
+				$validateGroupIds = array_merge($validateGroupIds, array_diff($newGroupIds, $oldGroupIds));
+
+				// validate groups that are removed from current host
+				$validateGroupIds = array_merge($validateGroupIds, array_diff($oldGroupIds, $newGroupIds));
+			}
+		}
+
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+		$templateIds = ($templates === null) ? array() : zbx_objectValues($templates, 'templateid');
+
+		if ($templates) {
+			$dbTemplates = API::Template()->get(array(
+				'output' => array('hostid'),
+				'selectGroups' => array('groupid'),
+				'templateids' => $templateIds,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			foreach ($templates as $template) {
+				$templateId = $template['templateid'];
+				if (!isset($dbTemplates[$templateId])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+				$dbTemplate = $dbTemplates[$templateId];
+				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
+
+				// validate groups that are added for current host
+				$validateGroupIds = array_merge($validateGroupIds, array_diff($newGroupIds, $oldGroupIds));
+
+				// validate groups that are removed from current template
+				$validateGroupIds = array_merge($validateGroupIds, array_diff($oldGroupIds, $newGroupIds));
+			}
+		}
+
+		$validateGroupIds = array_unique($validateGroupIds);
+
+		// validate all changed groups for all hosts and templates in bulk
+		if ($validateGroupIds && !$this->isWritable($validateGroupIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
+		}
 	}
 
 	/**
