@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-14 20:07+0300\n"
-"PO-Revision-Date: 2014-10-02 19:20+0300\n"
+"POT-Creation-Date: 2014-10-14 20:19+0300\n"
+"PO-Revision-Date: 2014-10-10 18:49+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412270427.0\n"
+"X-POOTLE-MTIME: 1412959745.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -920,7 +920,7 @@ msgstr "Login automático"
 
 #: include/views/administration.users.edit.php:165 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Auto-logout (mín. 90 segundos)"
+msgstr "Desconexão automática (mín. 90 segundos)"
 
 #: include/views/administration.general.housekeeper.edit.php:57
 msgid "Auto-registration data storage period (in days)"
@@ -2224,7 +2224,7 @@ msgstr "Não foi possível entrar."
 
 #: include/classes/api/services/CUser.php:954
 msgid "Cannot logout."
-msgstr "Não foi possível terminar sessão."
+msgstr "Não foi possível desconectar a sessão."
 
 #: include/classes/api/services/CHost.php:971
 msgid "Cannot mass update host name."
@@ -5014,7 +5014,7 @@ msgstr "Ativar"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr "Ativar configuração"
+msgstr "Ativar confirmação"
 
 #: include/views/administration.usergroups.list.php:140
 msgid "Enable debug mode"
@@ -8135,7 +8135,7 @@ msgstr "Não é possível filtrar pela senha de usuário."
 
 #: include/page_header.php:223
 msgid "It is not possible to logout from HTTP authentication."
-msgstr "Não é possível terminar a sessão de autenticação HTTP."
+msgstr "Não é possível desconectar a sessão de autenticação HTTP."
 
 #: include/classes/api/services/CUser.php:150
 msgid "It is not possible to search by user password."
@@ -8879,7 +8879,7 @@ msgstr "O nome de login ou a senha está incorreto."
 #: auditlogs.php:138 include/page_header.php:222 include/page_header.php:226
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
-msgstr "Logout"
+msgstr "Desconectar"
 
 #: include/discovery.inc.php:156
 msgid "Lost"
