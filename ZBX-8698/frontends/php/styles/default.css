@@ -472,6 +472,7 @@ table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 table.filter-center tr td { text-align: center; }
+table.filter .ui-button { margin-right: 3px; }
 
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }

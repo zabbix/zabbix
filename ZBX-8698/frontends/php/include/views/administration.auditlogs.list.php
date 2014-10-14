@@ -66,7 +66,7 @@ $filterButton = new CSubmit('filter_set', _('Filter'));
 $filterButton->useJQueryStyle('main');
 $resetButton = new CSubmit('filter_rst', _('Reset'));
 $resetButton->useJQueryStyle();
-$buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
+$buttonsDiv = new CDiv(array($filterButton, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0;');
 
 $filterTable->addRow(new CCol($buttonsDiv, 'controls', 3));

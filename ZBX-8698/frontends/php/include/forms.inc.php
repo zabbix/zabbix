@@ -632,7 +632,7 @@ function getItemFilterForm(&$items) {
 	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$reset->useJQueryStyle();
 
-	$div_buttons = new CDiv(array($filter, SPACE, $reset));
+	$div_buttons = new CDiv(array($filter, $reset));
 	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
 	$footer = new CCol($div_buttons, 'controls', 8);
