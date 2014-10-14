@@ -866,7 +866,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$populatingItem->addStyle('display: none');
 	}
 
-	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $populatingItem), false, null, 'formrow-inventory');
+	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $populatingItem));
 }
 
 // clearing the float
