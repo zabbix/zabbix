@@ -37,11 +37,11 @@ Bug fixes:
 ...G...PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 .......PS. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
-..F....... [ZBX-8817] fixed clearing of web scenario item history and trends (Ivo)
+A.F....... [ZBX-8817] fixed incorrect clearing of web scenario item history and trends, added missing web scenario audit log translations and renamed "Scenario..." to "Web scenario..." in various front-end places (Ivo)
 ..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
 ....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
-A.F....... [ZBX-8764] add missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
+A.F....... [ZBX-8764] added missing validation for resource ID in screenitem.create and screenitem.update API (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 
 --------------------------------------------------------------------------------
