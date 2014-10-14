@@ -262,12 +262,24 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	wchar_t			thread_id[20], *strings[2];
 #else
 	struct timeval		current_time;
+	sigset_t		mask, orig_mask;
+	struct tm		tm_local;
 #endif
+
+#ifndef _WINDOWS
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+#endif
+
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (LOG_TYPE_FILE == log_type)
 	{
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
@@ -290,7 +302,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 						milliseconds = current_time.millitm;
 #else
 						gettimeofday(&current_time,NULL);
-						tm = localtime(&current_time.tv_sec);
+						tm = localtime_r(&current_time.tv_sec, &tm_local);
 						milliseconds = current_time.tv_usec / 1000;
 #endif
 						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
@@ -344,7 +356,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			milliseconds = current_time.millitm;
 #else
 			gettimeofday(&current_time,NULL);
-			tm = localtime(&current_time.tv_sec);
+			tm = localtime_r(&current_time.tv_sec, &tm_local);
 			milliseconds = current_time.tv_usec / 1000;
 #endif
 			fprintf(log_file,
@@ -369,6 +381,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		zbx_mutex_unlock(&log_file_access);
 
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
+#endif
 		return;
 	}
 
@@ -440,6 +456,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_SYSLOG */
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		switch (level)
@@ -465,6 +485,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		}
 
 		zbx_mutex_unlock(&log_file_access);
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
+#endif
 	}
 }
 
