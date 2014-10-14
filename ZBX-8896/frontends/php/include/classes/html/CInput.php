@@ -56,13 +56,13 @@ class CInput extends CTag {
 		}
 	}
 
-	public function setEnabled($value = 'yes') {
-		if ((is_string($value) && ($value == 'yes' || $value == 'checked' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0) || $value === true) {
+	public function setEnabled($value) {
+		if ($value) {
 			$this->removeAttribute('disabled');
-			return $this;
 		}
-		$this->attr('disabled', 'disabled');
-		return $this;
+		else {
+			$this->attr('disabled', 'disabled');
+		}
 	}
 
 	public function useJQueryStyle($class = '') {

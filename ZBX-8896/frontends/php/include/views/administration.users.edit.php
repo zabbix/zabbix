@@ -351,7 +351,7 @@ if (!$this->data['is_profile']) {
 	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
 
 	if (isset($this->data['userid']) && bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
-		$userTypeComboBox->setEnabled('disabled');
+		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
 		$userForm->addVar('user_type', $this->data['user_type']);
 	}
