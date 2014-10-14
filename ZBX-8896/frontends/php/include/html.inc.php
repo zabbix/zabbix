@@ -494,9 +494,10 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main = null, $others = null) {
+function makeFormFooter(CButton $main = null, $others = null) {
 	if ($main) {
-		$main->useJQueryStyle('main');
+		$main->main();
+		$main->useJQueryStyle();
 	}
 
 	$othersButtons = new CDiv($others);

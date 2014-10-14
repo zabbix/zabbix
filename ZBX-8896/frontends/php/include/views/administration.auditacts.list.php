@@ -47,7 +47,8 @@ $filterTable->addRow(array(array(
 )));
 
 $filterButton = new CSubmit('filter_set', _('Filter'));
-$filterButton->useJQueryStyle('main');
+$filterButton->main();
+$filterButton->useJQueryStyle();
 $resetButton = new CSubmit('filter_rst', _('Reset'));
 $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));

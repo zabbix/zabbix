@@ -64,8 +64,4 @@ class CInput extends CTag {
 			$this->attr('disabled', 'disabled');
 		}
 	}
-
-	public function useJQueryStyle($class = '') {
-		$this->attr('class', 'jqueryinput '.$this->getAttribute('class').' '.$class);
-	}
 }

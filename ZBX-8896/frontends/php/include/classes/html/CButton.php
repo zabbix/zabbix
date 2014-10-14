@@ -33,4 +33,12 @@ class CButton extends CInput {
 		$this->addAction('onclick', $action);
 		return $this;
 	}
+
+	public function useJQueryStyle() {
+		$this->attr('class', 'jqueryinput '.$this->getAttribute('class'));
+	}
+
+	public function main() {
+		$this->addClass('main');
+	}
 }
