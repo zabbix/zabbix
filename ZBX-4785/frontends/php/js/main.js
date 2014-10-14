@@ -1047,3 +1047,21 @@ jQuery(function ($) {
 		});
 	};
 });
+
+jQuery(function($) {
+	$.fn.setJsonOnChange = function (options) {
+		options = $.extend({}, options);
+
+		if (options.targetSelector != null) {
+			options.target = $(options.targetSelector);
+		}
+
+		if (options.target == null) {
+			return;
+		}
+
+		$(this).on('change', function() {
+			options.target.val(Object.toJSON($(this).val()));
+		});
+	}
+});
