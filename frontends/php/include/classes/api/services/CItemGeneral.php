@@ -181,9 +181,13 @@ abstract class CItemGeneral extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 
-				$updateDiscoveredValidator->setObjectName($item['name']);
+				$dbItem = $dbItems[$item['itemid']];
+
+				$itemName = isset($item['name']) ? $item['name'] : $dbItem['name'];
+
 				// discovered fields, except status, cannot be updated
-				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItems[$item['itemid']]);
+				$updateDiscoveredValidator->setObjectName($itemName);
+				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
 			}
 
 			$items = $this->extendObjects($this->tableName(), $items, array('name'));
