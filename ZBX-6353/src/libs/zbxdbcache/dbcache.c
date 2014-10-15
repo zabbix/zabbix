@@ -1905,7 +1905,7 @@ int	DCsync_history(int sync_type)
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
 	int			candidate_num;
-	int			indices[ZBX_SYNC_MAX];
+	int			indices[ZBX_SYNC_MAX], iterations;
 	zbx_uint64_t		itemids[ZBX_SYNC_MAX];
 	zbx_vector_uint64_t	triggerids;
 
@@ -1937,6 +1937,7 @@ int	DCsync_history(int sync_type)
 
 		candidate_num = 0;
 		skipped_clock = 0;
+		iterations = 0;
 
 		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > candidate_num;)
 		{
@@ -1960,6 +1961,11 @@ int	DCsync_history(int sync_type)
 				f += num;
 				continue;
 			}
+
+			/* limit iteration count to improve handling of situation when few items */
+			/* have flooded history cache with several hundred thousands of values   */
+			if (ZBX_SYNC_MAX * 10 <= ++iterations)
+				break;
 
 			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 					cache->history[f].itemid))
