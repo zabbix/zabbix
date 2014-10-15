@@ -1008,8 +1008,6 @@ function rm4favorites(favobj, favid, menu_rowid) {
 }
 
 function changeFlickerState(id) {
-	deselectAll();
-
 	var state = showHide(id);
 
 	switchElementsClass($('flicker_icon_l'), 'dbl_arrow_up', 'dbl_arrow_down');
@@ -1033,8 +1031,6 @@ function changeFlickerState(id) {
 }
 
 function changeHatStateUI(icon, divid) {
-	deselectAll();
-
 	var switchIcon = function() {
 		switchElementsClass(icon, 'arrowup', 'arrowdown');
 	};
@@ -1061,8 +1057,6 @@ function changeHatStateUI(icon, divid) {
 }
 
 function change_hat_state(icon, divid) {
-	deselectAll();
-
 	var switchIcon = function() {
 		switchElementsClass(icon, 'arrowup', 'arrowdown');
 	};
@@ -1120,7 +1114,6 @@ function setRefreshRate(pmasterid, dollid, interval, params) {
 }
 
 function switch_mute(icon) {
-	deselectAll();
 	var sound_state = switchElementsClass(icon, 'iconmute', 'iconsound');
 
 	if (false === sound_state) {

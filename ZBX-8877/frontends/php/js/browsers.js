@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  021130-1301, USA.
 **/
 
 
@@ -25,7 +25,7 @@ var agt = navigator.userAgent.toLowerCase(),
 	IE8 = (agt.indexOf('msie 8.0') != -1),
 	IE9 = (agt.indexOf('msie 9.0') != -1),
 	IE10 = (agt.indexOf('msie 10.0') != -1),
-	IE11 = !!agt.match(/trident.*rv:11\./),
+	IE11 = !!agt.match(/trident\/7\./),
 	IE = (IE6 || IE7 || IE8 || IE9 || IE10 || IE11),
 	CR = (agt.indexOf('chrome') != -1),
 	SF = (agt.indexOf('safari') != -1 && !CR),
