@@ -33,6 +33,22 @@ int	hk_period;
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS	4
 
+#ifdef HAVE_SIGQUEUE
+void	zbx_housekeeper_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
+	{
+		if (0 < zbx_get_sleep_remains())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+			zbx_wakeup();
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: delete_history                                                   *
@@ -178,6 +194,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				HOUSEKEEPER_STARTUP_DELAY);
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
+
+	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
 
 	for (;;)
 	{

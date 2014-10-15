@@ -619,25 +619,6 @@ static void	zbx_load_config(void)
 	zbx_validate_config();
 }
 
-#ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(int flags)
-{
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-			break;
-		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
-			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
-			zbx_wakeup();
-			break;
-		default:
-			break;
-	}
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_free_config                                                  *

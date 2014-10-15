@@ -39,7 +39,7 @@ extern int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		int *local_process_num);
 
 #ifdef HAVE_SIGQUEUE
-extern void	zbx_sigusr_handler(int flags);
+static	void (*zbx_sigusr_handler)(int flags);
 
 /******************************************************************************
  *                                                                            *
@@ -77,11 +77,17 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		default:
-			zbx_sigusr_handler(flags);
+			if (NULL != zbx_sigusr_handler)
+				zbx_sigusr_handler(flags);
 			break;
 	}
 }
 #endif
+
+void zbx_set_sigusr_handler(void (*handler)(int flags))
+{
+	zbx_sigusr_handler = handler;
+}
 
 static void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags)
 {

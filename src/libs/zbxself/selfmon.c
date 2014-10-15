@@ -573,7 +573,7 @@ void	zbx_sleep_loop(int sleeptime)
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
 
-void	zbx_sleep_forever()
+void	zbx_sleep_forever(void)
 {
 	sleep_remains = 1;
 
@@ -586,11 +586,15 @@ void	zbx_sleep_forever()
 	while (0 != sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
 }
 
 void	zbx_wakeup(void)
 {
 	sleep_remains = 0;
+}
+
+int	zbx_get_sleep_remains(void)
+{
+	return sleep_remains;
 }
 #endif
