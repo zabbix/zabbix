@@ -190,10 +190,7 @@ if ($items) {
 		'object' => EVENT_OBJECT_TRIGGER,
 		'selectTriggers' => API_OUTPUT_REFER,
 		'time_from' => zbxDateToTime($data['filter_from']),
-		'time_till' => zbxDateToTime($data['filter_to']),
-		'filter' => array(
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
-		)
+		'time_till' => zbxDateToTime($data['filter_to'])
 	));
 
 	CArrayHelper::sort($events, array('objectid', 'clock'));
@@ -208,23 +205,19 @@ if ($items) {
 		if ($event['value'] == TRIGGER_VALUE_TRUE) {
 			if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 				// get event end time
-				$addEvent = API::Event()->get(array(
-					'output' => API_OUTPUT_EXTEND,
-					'triggerids' => array($incidents[$i]['objectid']),
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'selectTriggers' => API_OUTPUT_REFER,
-					'time_from' => zbxDateToTime($data['filter_to']),
-					'filter' => array(
-						'value' => TRIGGER_VALUE_FALSE,
-						'value_changed' => TRIGGER_VALUE_CHANGED_YES
-					),
-					'limit' => 1,
-					'sortorder' => ZBX_SORT_UP
+				$addEvent = DBfetch(DBselect(
+					'SELECT e.clock'.
+					' FROM events e'.
+					' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+						' AND e.clock>='.zbxDateToTime($data['filter_to']).
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.source='.EVENT_SOURCE_TRIGGERS.
+						' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+					' ORDER BY e.clock,e.ns',
+					1
 				));
 
 				if ($addEvent) {
-					$addEvent = reset($addEvent);
 					$incidentsData[$i]['endTime'] = $addEvent['clock'];
 					$incidentsData[$i]['status'] = TRIGGER_VALUE_FALSE;
 				}
@@ -256,8 +249,7 @@ if ($items) {
 					'selectTriggers' => API_OUTPUT_REFER,
 					'time_till' => $event['clock'] - 1,
 					'filter' => array(
-						'value' => TRIGGER_VALUE_TRUE,
-						'value_changed' => TRIGGER_VALUE_CHANGED_YES
+						'value' => TRIGGER_VALUE_TRUE
 					),
 					'limit' => 1,
 					'sortorder' => ZBX_SORT_DOWN
@@ -289,23 +281,19 @@ if ($items) {
 
 	if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 		// get event end time
-		$addEvent = API::Event()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'triggerids' => $incidents[$i]['objectid'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'selectTriggers' => API_OUTPUT_REFER,
-			'time_from' => zbxDateToTime($data['filter_to']),
-			'filter' => array(
-				'value' => TRIGGER_VALUE_FALSE,
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES
-			),
-			'limit' => 1,
-			'sortorder' => ZBX_SORT_UP
+		$addEvent = DBfetch(DBselect(
+			'SELECT e.clock'.
+			' FROM events e'.
+			' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+				' AND e.clock>='.zbxDateToTime($data['filter_to']).
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.source='.EVENT_SOURCE_TRIGGERS.
+				' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+			' ORDER BY e.clock,e.ns',
+			1
 		));
 
 		if ($addEvent) {
-			$addEvent = reset($addEvent);
 			$newData[$i] = array(
 				'status' => TRIGGER_VALUE_FALSE,
 				'endTime' => $addEvent['clock']
@@ -416,7 +404,7 @@ if ($items) {
 		foreach ($data['tests'] as $key => $test) {
 			if (!$test['updated'] && $incident['startTime'] < $test['clock'] && (!isset($incident['endTime'])
 					|| (isset($incident['endTime']) && $incident['endTime'] > $test['clock']))) {
-				$data['tests'][$key]['incident'] = $incident['false_positive'] ? 2 : 1;
+				$data['tests'][$key]['incident'] = $incident['false_positive'] ? INCIDENT_FALSE_POSITIVE : INCIDENT_RESOLVED;
 				$data['tests'][$key]['updated'] = true;
 			}
 		}

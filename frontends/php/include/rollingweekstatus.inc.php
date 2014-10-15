@@ -26,18 +26,73 @@
  * @return int
  */
 function getLastEvent($problemTrigger) {
-	$problemEvent = DBfetch(DBselect(
-		'SELECT MAX(e.eventid) as eventid'.
+	$result = null;
+
+	$lastProblemEvent = DBfetch(DBselect(
+		'SELECT e.eventid,MAX(e.clock) clock,e.false_positive'.
 		' FROM events e'.
 		' WHERE e.objectid='.$problemTrigger.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 			' AND e.value='.TRIGGER_VALUE_TRUE
 	));
 
-	return $problemEvent ? $problemEvent['eventid'] : null;
+	if ($lastProblemEvent && $lastProblemEvent['false_positive'] == INCIDENT_FLAG_NORMAL) {
+		$result = getPreEvents($problemTrigger, $lastProblemEvent['clock'], $lastProblemEvent['eventid']);
+	}
+
+	return $result;
 }
+
+/**
+ * Get previos open event
+ *
+ * @param int $objectid
+ * @param int $clock
+ * @param int $eventid
+ *
+ * @return int
+ */
+function getPreEvents($objectid, $clock, $eventid) {
+	$result = null;
+
+	$beforeEvents = DBselect(
+		'SELECT e.eventid,e.clock,e.value'.
+		' FROM events e'.
+		' WHERE e.objectid='.$objectid.
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
+			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.clock<='.$clock.
+			' AND e.eventid!='.$eventid.
+		' LIMIT 2'
+	);
+
+	if ($beforeEvents) {
+		$firstElement = true;
+		while ($beforeEvent = DBfetch($beforeEvents)) {
+			if ($firstElement) {
+				if ($beforeEvent['value'] == TRIGGER_VALUE_TRUE) {
+					getPreEvents($objectid, $beforeEvent['clock'], $beforeEvent['eventid']);
+					break;
+				}
+				else {
+					$firstElement = false;
+				}
+			}
+			else {
+				if ($beforeEvent['value'] == TRIGGER_VALUE_TRUE) {
+					$result = $beforeEvent['eventid'];
+				}
+				else {
+					$result = $eventid;
+				}
+			}
+		}
+	}
+
+	return $result;
+}
+
 
 /**
  * Convert SLA service name.
@@ -48,10 +103,10 @@ function getLastEvent($problemTrigger) {
  */
 function convertSlaServiceName($name) {
 	$services = array(
-		'dns' => 0,
-		'dnssec' => 1,
-		'rdds' => 2,
-		'epp' => 3
+		'dns' => RSM_DNS,
+		'dnssec' => RSM_DNSSEC,
+		'rdds' => RSM_RDDS,
+		'epp' => RSM_EPP
 	);
 
 	return $services[$name];

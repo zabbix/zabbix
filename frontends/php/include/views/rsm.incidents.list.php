@@ -222,12 +222,7 @@ if (isset($this->data['tld'])) {
 		$dnsTable->setHeader($headers);
 
 		foreach ($this->data['dns']['events'] as $event) {
-			if ($event['false_positive']) {
-				$incidentStatus = _('False positive');
-			}
-			else {
-				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
-			}
+			$incidentStatus = getIncidentStatus($event['false_positive'], $event['status']);
 
 			$row = array(
 				new CLink(
@@ -303,12 +298,7 @@ if (isset($this->data['tld'])) {
 		$dnssecTable->setHeader($headers);
 
 		foreach ($this->data['dnssec']['events'] as $event) {
-			if ($event['false_positive']) {
-				$incidentStatus = _('False positive');
-			}
-			else {
-				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
-			}
+			$incidentStatus = getIncidentStatus($event['false_positive'], $event['status']);
 
 			$row = array(
 				new CLink(
@@ -384,12 +374,7 @@ if (isset($this->data['tld'])) {
 		$rddsTable->setHeader($headers);
 
 		foreach ($this->data['rdds']['events'] as $event) {
-			if ($event['false_positive']) {
-				$incidentStatus = _('False positive');
-			}
-			else {
-				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
-			}
+			$incidentStatus = getIncidentStatus($event['false_positive'], $event['status']);
 
 			$row = array(
 				new CLink(
@@ -465,12 +450,7 @@ if (isset($this->data['tld'])) {
 		$eppTable->setHeader($headers);
 
 		foreach ($this->data['epp']['events'] as $event) {
-			if ($event['false_positive']) {
-				$incidentStatus = _('False positive');
-			}
-			else {
-				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
-			}
+			$incidentStatus = getIncidentStatus($event['false_positive'], $event['status']);
 
 			$row = array(
 				new CLink(

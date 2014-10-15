@@ -939,6 +939,11 @@ define('RSM_SLV_EPP_AVAIL',		'rsm.slv.epp.avail');
 define('INCIDENT_ACTIVE',			0);
 define('INCIDENT_RESOLVED',			1);
 define('INCIDENT_FALSE_POSITIVE',	2);
+define('INCIDENT_RESOLVED_NO_DATA',	3);
+
+// false positive event status
+define('INCIDENT_FLAG_NORMAL',			0);
+define('INCIDENT_FLAG_FALSE_POSITIVE',	1);
 
 // SLA monitoring incident status
 define('DNS_NO_REPLY_ERROR_CODE',	-200);
