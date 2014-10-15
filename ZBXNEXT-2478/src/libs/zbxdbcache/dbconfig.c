@@ -440,6 +440,7 @@ static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	daemon_type;
 extern int		CONFIG_TIMER_FORKS;
+extern int		CONFIG_SNMP_BULK_REQUESTS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
@@ -537,7 +538,7 @@ static int	is_counted_in_item_queue(unsigned char type, const char *key)
 static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t interfaceid, unsigned char type,
 		const char *key)
 {
-	if (ITEM_TYPE_JMX == type || SUCCEED == is_snmp_type(type))
+	if (ITEM_TYPE_JMX == type || (1 == CONFIG_SNMP_BULK_REQUESTS && SUCCEED == is_snmp_type(type)))
 		return interfaceid;
 
 	if (ITEM_TYPE_SIMPLE == type)
@@ -4458,6 +4459,9 @@ static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, in
 	int			ret = FAIL;
 	ZBX_DC_INTERFACE	*dc_interface;
 
+	if (0 == CONFIG_SNMP_BULK_REQUESTS)
+		goto out;
+
 	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
 	{
 		*max_snmp_succeed = dc_interface->max_snmp_succeed;
@@ -4465,7 +4469,7 @@ static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, in
 
 		ret = SUCCEED;
 	}
-
+out:
 	return ret;
 }
 
@@ -4731,6 +4735,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		DCget_item(&items[num], dc_item);
 		num++;
 
+		/* override max_items value for SNMP items to support bulk operations */
 		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type) &&
 				0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
 		{
