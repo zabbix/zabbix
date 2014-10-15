@@ -1146,7 +1146,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			switch($ymin_type) {
 				case 'Fixed':
-					$this->input_type('yaxismin', $this->yaxismin);
+					$this->input_type('yaxismin', isset($data['yaxismin']) ? $data['yaxismin'] : $this->yaxismin);
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
@@ -1162,7 +1162,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			switch($ymax_type) {
 				case 'Fixed':
-					$this->input_type('yaxismax', $this->yaxismax);
+					$this->input_type('yaxismax', isset($data['yaxismax']) ? $data['yaxismax'] : $this->yaxismax);
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
