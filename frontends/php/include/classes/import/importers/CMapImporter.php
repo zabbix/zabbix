@@ -259,28 +259,26 @@ class CMapImporter extends CImporter {
 
 		if (isset($map['links'])) {
 			foreach ($map['links'] as &$link) {
-				if (empty($link['linktriggers'])) {
+				if (!$link['linktriggers']) {
 					unset($link['linktriggers']);
 					continue;
 				}
 
-				foreach ($link['linktriggers'] as &$linktrigger) {
-					$dbTriggers = API::Trigger()->get(array(
-						'output' => array('triggerid'),
-						'filter' => $linktrigger['trigger']
-					));
-					if (!$dbTriggers) {
+				foreach ($link['linktriggers'] as &$linkTrigger) {
+					$trigger = $linkTrigger['trigger'];
+					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+					if (!$triggerId) {
 						throw new Exception(_s(
 							'Cannot find trigger "%1$s" used in map "%2$s".',
-							$linktrigger['trigger']['description'],
+							$trigger['description'],
 							$map['name']
 						));
 					}
-					$tmp = reset($dbTriggers);
 
-					$linktrigger['triggerid'] = $tmp['triggerid'];
+					$linkTrigger['triggerid'] = $triggerId;
 				}
-				unset($linktrigger);
+				unset($linkTrigger);
 			}
 			unset($link);
 		}
