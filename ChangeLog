@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thank
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+F......... [ZBX-8791] fixed importing sysmaps when host elements are linked and have a trigger assigned to the link (Krists)
 ....I..... [ZBX-8072] fixed bug when long messages were not truncated to 2KB when inserting into alerts table on DB2 databases (wiper)
 A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ..F....... [ZBX-8887] fixed error messages when saving graph with invalid width and height (Sasha)
