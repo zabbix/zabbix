@@ -35,12 +35,12 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_;
+    $tld = $_; # set global variable here
 
     my $lastclock = get_lastclock($tld, $cfg_key_out);
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    process_slv_avail($tld, 'dns', $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
+    process_slv_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
 		      $probe_avail_limit, $probes_ref, \&check_item_values);
 }
 

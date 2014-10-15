@@ -65,7 +65,8 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
-		process_slv_monthly get_results get_item_values check_lastclock get_downtime avail_result_msg
+		process_slv_monthly get_results get_item_values check_lastclock get_downtime get_downtime_prepare
+		get_downtime_execute avail_result_msg
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -539,7 +540,6 @@ sub get_items_by_hostids
     my $complete = shift;
 
     my $hostids = join(',', @$hostids_ref);
-    dbg("hostids: $hostids");
 
     my $rows_ref;
     if ($complete)
@@ -632,6 +632,11 @@ sub db_connect
 			    PrintError  => 0,
 			    HandleError => \&handle_db_error,
 			}) or handle_db_error(DBI->errstr);
+
+    # improve performance of selects, see
+    # http://search.cpan.org/~capttofu/DBD-mysql-4.028/lib/DBD/mysql.pm
+    # for details
+    $dbh->{'mysql_use_result'} = 1;
 }
 
 sub db_select
@@ -640,13 +645,13 @@ sub db_select
 
     dbg("[$query]");
 
-    my $res = $dbh->prepare($query)
+    my $sth = $dbh->prepare($query)
 	or fail("cannot prepare [$query]: ", $dbh->errstr);
 
-    my $rv = $res->execute()
-	or fail("cannot execute [$query]: ", $res->errstr);
+    $sth->execute()
+	or fail("cannot execute [$query]: ", $sth->errstr);
 
-    my $rows_ref = $res->fetchall_arrayref();
+    my $rows_ref = $sth->fetchall_arrayref();
 
     my $rows = scalar(@$rows_ref);
 
@@ -1281,7 +1286,6 @@ sub process_slv_monthly
 sub process_slv_avail
 {
     my $tld = shift;
-    my $service = shift;
     my $cfg_key_in = shift;
     my $cfg_key_out = shift;
     my $from = shift;
@@ -1292,17 +1296,7 @@ sub process_slv_avail
     my $probes_ref = shift;
     my $check_value_ref = shift;
 
-    # first get current month downtime
-    my ($curmon_from) = get_curmon_bounds();
-    my $curmon_till = $from;
-
-    my $itemid = get_itemid($tld, $cfg_key_out);
-    my $downtime = get_downtime($itemid, $curmon_from, $curmon_till, 1); # no incidents check
-
-    push_value($tld, "rsm.slv.$service.downtime", $value_ts, $downtime, "$downtime minutes of downtime from ",
-	       ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");
-
-    # now the availability at a particular minute
+    # calculate the availability at a particular minute
     my $probes_count = scalar(@$probes_ref);
 
     if ($probes_count < $cfg_minonline)
@@ -1560,9 +1554,9 @@ sub get_downtime
     my $itemid = shift;
     my $from = shift;
     my $till = shift;
-    my $no_incidents_check = shift;
+    my $ignore_incidents = shift; # if set check the whole period
 
-    my $incidents = ($no_incidents_check) ? [$from, $till] : __get_incidents($itemid, $from, $till);
+    my $incidents = ($ignore_incidents) ? [$from, $till] : __get_incidents($itemid, $from, $till);
 
     my $count = 0;
 
@@ -1582,7 +1576,7 @@ sub get_downtime
 	    " from history_uint".
 	    " where itemid=$itemid".
 	    	" and clock between $event_from and $event_till".
-	    " order by clock,ns");
+	    " order by clock");
 
 	my $prevclock = 0;
 
@@ -1602,6 +1596,78 @@ sub get_downtime
 		$prevclock = 0;
 	    }
 	}
+    }
+
+    return $downtime / 60; # minutes
+}
+
+sub get_downtime_prepare
+{
+    my $query =
+	"select value,clock".
+	" from history_uint".
+	" where itemid=?".
+	    " and clock between ? and ?".
+	" order by clock";
+
+    my $sth = $dbh->prepare($query)
+        or fail("cannot prepare [$query]: ", $dbh->errstr);
+
+    dbg("[$query]");
+
+    return $sth;
+}
+
+sub get_downtime_execute
+{
+    my $sth = shift;
+    my $itemid = shift;
+    my $from = shift;
+    my $till = shift;
+    my $ignore_incidents = shift; # if set check the whole period
+
+    my $incidents = ($ignore_incidents) ? [$from, $till] : __get_incidents($itemid, $from, $till);
+
+    my $count = 0;
+
+    my $total = scalar(@$incidents);
+    my $i = 0;
+    my $downtime = 0;
+
+    while ($i < $total)
+    {
+	my $event_from = $incidents->[$i++];
+	my $event_till = $incidents->[$i++];
+
+	fail("internal error handling incidents, check function __get_incidents()") if (($event_from < $from) and ($event_till < $from));
+
+	$sth->bind_param(1, $itemid);
+	$sth->bind_param(2, $event_from);
+	$sth->bind_param(3, $event_till);
+
+	$sth->execute()
+	    or fail("cannot execute query: ", $sth->errstr);
+
+	my ($value, $clock);
+	$sth->bind_columns(\$value, \$clock);
+
+	my $prevclock = 0;
+
+	while ($sth->fetch)
+	{
+	    $downtime += $clock - $prevclock if ($prevclock != 0);
+
+	    if ($value == DOWN)
+	    {
+		$prevclock = $clock;
+	    }
+	    else
+	    {
+		$prevclock = 0;
+	    }
+	}
+
+	$sth->finish();
     }
 
     return $downtime / 60; # minutes
@@ -2090,7 +2156,7 @@ sub __get_incidents
     return \@incidents;
 }
 
-# Times when probe "lastaccess" under limit.
+# Times when probe "lastaccess" within $probe_avail_limit.
 sub __get_reachable_times
 {
     my $probe = shift;
