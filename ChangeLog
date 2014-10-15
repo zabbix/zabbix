@@ -81,7 +81,7 @@ Bug fixes:
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
 
 --------------------------------------------------------------------------------
-Cha	nges for 2.4.0
+Changes for 2.4.0
 
 2.4.0rc3 was released as 2.4.0 without any changes
 
