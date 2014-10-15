@@ -372,7 +372,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-		$this->zbxTestTextPresent('Scenario');
+		$this->zbxTestTextPresent('Web scenario');
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent web scenarios');
@@ -599,7 +599,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent('Scenario updated');
+		$this->zbxTestTextPresent('Web scenario updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
@@ -1459,7 +1459,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-		$this->zbxTestTextPresent('Scenario');
+		$this->zbxTestTextPresent('Web scenario');
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
@@ -1551,7 +1551,7 @@ class testFormWeb extends CWebTest {
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
-				$this->zbxTestTextPresent('Scenario added');
+				$this->zbxTestTextPresent('Web scenario added');
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				$this->zbxTestTextPresent(array('Number of steps', 'Update interval', 'Status'));
@@ -1563,7 +1563,7 @@ class testFormWeb extends CWebTest {
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
-				$this->zbxTestTextNotPresent('Scenario added');
+				$this->zbxTestTextNotPresent('Web scenario added');
 				break;
 		}
 

@@ -295,7 +295,7 @@ $httpForm->addItem($httpTab);
 if (!empty($this->data['httptestid'])) {
 	if ($this->data['templated'] == 0) {
 		$btnDelete = new CButtonDelete(
-			_('Delete scenario?'),
+			_('Delete web scenario?'),
 			url_param('form').url_param('httptestid').url_param('hostid')
 		);
 	}
@@ -303,15 +303,22 @@ if (!empty($this->data['httptestid'])) {
 		$btnDelete = null;
 	}
 
+	if ($this->data['host']['status'] != HOST_STATUS_TEMPLATE) {
+		$buttonDelHistory = new CButtonQMessage(
+			'del_history',
+			_('Clear history and trends'),
+			_('History clearing can take a long time. Continue?')
+		);
+	}
+	else {
+		$buttonDelHistory = null;
+	}
+
 	$httpForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonQMessage(
-				'del_history',
-				_('Clear history and trends'),
-				_('History clearing can take a long time. Continue?')
-			),
+			$buttonDelHistory,
 			$btnDelete,
 			new CButtonCancel()
 		)
