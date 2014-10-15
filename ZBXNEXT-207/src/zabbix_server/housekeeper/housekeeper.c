@@ -151,6 +151,22 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{NULL}
 };
 
+#ifdef HAVE_SIGQUEUE
+void	zbx_housekeeper_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
+	{
+		if (0 < zbx_get_sleep_remains())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+			zbx_wakeup();
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: hk_item_update_cache_compare                                     *
@@ -813,6 +829,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				HOUSEKEEPER_STARTUP_DELAY);
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
+
+	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
 
 	for (;;)
 	{
