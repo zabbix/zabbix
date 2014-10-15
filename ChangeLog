@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+.......PS. [ZBX-6163] added session restoring to MySQL connections in case of losing connection to the database (Juris)
 ....I..... [ZBX-8072] fixed bug when long messages were not truncated to 2KB when inserting into alerts table on DB2 databases (wiper)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
