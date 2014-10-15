@@ -4439,6 +4439,9 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 {
 	ZBX_DC_INTERFACE	*dc_interface;
 
+	if (0 == CONFIG_SNMP_BULK_REQUESTS)
+		return;
+
 	LOCK_CACHE;
 
 	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
