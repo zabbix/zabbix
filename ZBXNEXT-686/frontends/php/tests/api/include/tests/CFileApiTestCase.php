@@ -4,6 +4,8 @@
 class CFileApiTestCase extends CApiTestCase {
 
 	/**
+	 * Object for resolving array macros.
+	 *
 	 * @var CArrayMacroResolver
 	 */
 	private static $macroResolver;
@@ -11,6 +13,7 @@ class CFileApiTestCase extends CApiTestCase {
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 
+		// set up macro resolver
 		self::$macroResolver = new CArrayMacroResolver();
 	}
 
@@ -23,6 +26,11 @@ class CFileApiTestCase extends CApiTestCase {
 		return API_TEST_DIR.'/tests/yaml';
 	}
 
+	/**
+	 * Run the test from the file.
+	 *
+	 * @param $path
+	 */
 	protected function runTestFile($path) {
 		$test = $this->parseTestFile($path);
 
@@ -47,6 +55,13 @@ class CFileApiTestCase extends CApiTestCase {
 		$this->runSteps($test['steps'], $fixtures);
 	}
 
+	/**
+	 * Parse the test file and return the contents as an array.
+	 *
+	 * @param string $path
+	 *
+	 * @return array
+	 */
 	protected function parseTestFile($path) {
 		return yaml_parse_file($this->getTestFileDir().'/'.$path);
 	}
@@ -57,12 +72,12 @@ class CFileApiTestCase extends CApiTestCase {
 	 * @param array $steps
 	 * @param array $fixtures
 	 *
-	 * @throws Exception
+	 * @throws InvalidArgumentException	if a step has been defined incorrectly
 	 */
 	protected function runSteps(array $steps, array $fixtures) {
 		foreach ($steps as $stepName => &$definition) {
 			if (!isset($definition['request'])) {
-				throw new Exception(sprintf('Each step should have "request" field, "%s" has not', $stepName));
+				throw new InvalidArgumentException(sprintf('Each step should have "request" field, "%s" has not', $stepName));
 			}
 
 			if (is_array($definition['request']['params'])) {

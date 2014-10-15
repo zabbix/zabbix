@@ -3,11 +3,15 @@
 class CApiTestCase extends PHPUnit_Framework_TestCase {
 
 	/**
+	 * A utility object for working with the test database.
+	 *
 	 * @var CTestDatabase
 	 */
 	private static $database;
 
 	/**
+	 * A client for performing test API requests.
+	 *
 	 * @var CApiClient
 	 */
 	private static $api;
@@ -25,10 +29,13 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	private static $fixtureLoader;
 
 	public static function setUpBeforeClass() {
+		// set up the test database object
 		self::$database = new CTestDatabase();
 
+		// set up the API client
 		self::$api = new CIncludeFileApiClient(new CJson(), API_TEST_DIR.'/../../api_jsonrpc.php');
 
+		// set up the fixture loader
 		$client = new CLocalApiClient(new CJson());
 		$client->setServiceFactory(new CApiServiceFactory());
 
@@ -72,10 +79,22 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 		return $this->auth;
 	}
 
+	/**
+	 * Truncate all tables in the database except for "dbversion".
+	 */
 	protected function clearDatabase() {
 		self::$database->clear(array('dbversion'));
 	}
 
+	/**
+	 * Load the given fixtures.
+	 *
+	 * @param array $fixtures
+	 *
+	 * @return array
+	 *
+	 * @throws Exception rethrows exceptions
+	 */
 	protected function loadFixtures(array $fixtures) {
 		try {
 			$fixtures = self::$fixtureLoader->load($fixtures);
