@@ -484,7 +484,7 @@ static void	zbx_load_config(void)
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
-			PARM_OPT,	1,			24},
+			PARM_OPT,	0,			24},
 		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
 		{"SenderFrequency",		&CONFIG_SENDER_FREQUENCY,		TYPE_INT,
