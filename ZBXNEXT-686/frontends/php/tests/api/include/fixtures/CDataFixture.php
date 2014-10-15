@@ -1,17 +1,26 @@
 <?php
 
 
+/**
+ * A class for loading fixtures using the database.
+ */
 class CDataFixture extends CFixture {
 
+	/**
+	 * Load a fixture that inserts data directly into the database.
+	 *
+	 * Supported parameters:
+	 * - table			- table to insert the data in
+	 * - values			- array of rows to insert
+	 * - generateIds	- whether to automatically generate IDs for the inserted rows; defaults to true
+	 */
 	public function load(array $params) {
-		// TODO: automatically handle cases when IDs shouldn't be incremented
 		$generateIds = isset($params['generateIds']) ? $params['generateIds'] : true;
 
 		try {
 			DBstart();
 
-			// TODO: enable ID generation
-			$ids = \DB::insert($params['table'], $params['values'], $generateIds);
+			$ids = DB::insert($params['table'], $params['values'], $generateIds);
 
 			DBend();
 		}
@@ -20,7 +29,9 @@ class CDataFixture extends CFixture {
 
 			global $ZBX_MESSAGES;
 			$lastMessage = array_pop($ZBX_MESSAGES);
-			throw new Exception($lastMessage['message']);
+
+			// treat all DB errors as invalid argument exceptions
+			throw new InvalidArgumentException($lastMessage['message'], $e->getCode(), $e);
 		}
 
 		return $ids;

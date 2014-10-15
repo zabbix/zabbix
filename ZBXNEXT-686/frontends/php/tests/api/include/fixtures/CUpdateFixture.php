@@ -2,6 +2,12 @@
 
 class CUpdateFixture extends CFixture {
 
+	/**
+	 * Supported parameters:
+	 * - table	- table to update
+	 * - values	- values to update
+	 * - where	- where condition
+	 */
 	public function load(array $params) {
 		try {
 			DB::update($params['table'], array(
@@ -12,7 +18,9 @@ class CUpdateFixture extends CFixture {
 		catch (Exception $e) {
 			global $ZBX_MESSAGES;
 			$lastMessage = array_pop($ZBX_MESSAGES);
-			throw new Exception($lastMessage['message']);
+
+			// treat all DB errors as invalid argument exceptions
+			throw new InvalidArgumentException($lastMessage['message'], $e->getCode(), $e);
 		}
 	}
 

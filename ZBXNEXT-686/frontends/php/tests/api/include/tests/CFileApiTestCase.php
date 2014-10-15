@@ -32,7 +32,7 @@ class CFileApiTestCase extends CApiTestCase {
 		$fixtures = array_merge(
 			array(
 				'base' => array(
-					'type' => CFixtureLoader::TYPE_INCLUDE,
+					'type' => CFixtureFactory::TYPE_INCLUDE,
 					'params' => array(
 						'file' => 'base'
 					)
