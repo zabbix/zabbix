@@ -48,7 +48,7 @@ class CDecimalStringValidator extends CValidator {
 		}
 
 		if (!$isValid) {
-			$this->error($this->messageInvalid, $this->stringify($value));
+			$this->error($this->messageInvalid, $value);
 		}
 
 		return $isValid;

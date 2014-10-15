@@ -1944,49 +1944,130 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyPostSqlFiltering(array $triggers, array $options) {
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
-		// skipDependent
-		if (!is_null($options['skipDependent'])) {
-			$triggerIds = zbx_objectValues($triggers, 'triggerid');
-			$map = array();
+		// unset triggers which are dependant on at least one problem trigger upstream into dependency tree
+		if ($options['skipDependent'] !== null) {
+			// Result trigger IDs of all triggers in results.
+			$resultTriggerIds = zbx_objectValues($triggers, 'triggerid');
 
+			// Will contain IDs of all triggers on which some other trigger depends.
+			$allUpTriggerIds = array();
+
+			// Trigger dependency map.
+			$downToUpTriggerIds = array();
+
+			// Values (state) of each "up" trigger ID is stored in here.
+			$upTriggerValues = array();
+
+			// Will contain IDs of all triggers either disabled directly, or by having disabled item or disabled host.
+			$disabledTriggerIds = array();
+
+			// First loop uses result trigger IDs.
+			$triggerIds = $resultTriggerIds;
 			do {
+				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
 					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
-						' FROM trigger_depends d,triggers t'.
-						' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds).
-						' AND d.triggerid_up=t.triggerid'
+					' FROM trigger_depends d,triggers t'.
+					' WHERE d.triggerid_up=t.triggerid'.
+						' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
 				);
+
+				// Add trigger IDs as keys and empty arrays as values.
+				$downToUpTriggerIds = $downToUpTriggerIds + array_fill_keys($triggerIds, array());
+
 				$triggerIds = array();
-				while ($row = DBfetch($dbResult)) {
-					if (TRIGGER_VALUE_TRUE == $row['value']) {
-						if (isset($map[$row['triggerid_down']])) {
-							foreach ($map[$row['triggerid_down']] as $triggerid => $state) {
-								unset($triggers[$triggerid]);
-							}
-						}
-						else {
-							unset($triggers[$row['triggerid_down']]);
-						}
-					}
-					else {
-						if (isset($map[$row['triggerid_down']])) {
-							if (!isset($map[$row['triggerid_up']])) {
-								$map[$row['triggerid_up']] = array();
-							}
+				while ($dependency = DBfetch($dbResult)) {
+					// Trigger ID for "down" trigger, which has dependencies.
+					$downTriggerId = $dependency['triggerid_down'];
 
-							$map[$row['triggerid_up']] += $map[$row['triggerid_down']];
-						}
-						else {
-							if (!isset($map[$row['triggerid_up']])) {
-								$map[$row['triggerid_up']] = array();
-							}
+					// Trigger ID for "up" trigger, on which the other ("up") trigger depends.
+					$upTriggerId = $dependency['triggerid_up'];
 
-							$map[$row['triggerid_up']][$row['triggerid_down']] = 1;
-						}
-						$triggerIds[] = $row['triggerid_up'];
+					// Add "up" trigger ID to mapping. We also index by $upTrigger because later these arrays
+					// are combined with + and this way indexes and values do not break.
+					$downToUpTriggerIds[$downTriggerId][$upTriggerId] = $upTriggerId;
+
+					// Add ID of this "up" trigger to all known "up" triggers.
+					$allUpTriggerIds[] = $upTriggerId;
+
+					// Remember value of this "up" trigger.
+					$upTriggerValues[$upTriggerId] = $dependency['value'];
+
+					// Add ID of this "up" trigger to the list of trigger IDs which should be mapped.
+					$triggerIds[] = $upTriggerId;
+				}
+			} while ($triggerIds);
+
+			// Fetch trigger IDs for triggers that are disabled, have disabled items or disabled item hosts.
+			$dbResult = DBSelect(
+				'SELECT t.triggerid'.
+				' FROM triggers t,functions f,items i,hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND ('.
+						'i.status='.ITEM_STATUS_DISABLED.
+						' OR h.status='.HOST_STATUS_NOT_MONITORED.
+						' OR t.status='.TRIGGER_STATUS_DISABLED.
+					')'.
+					' AND '.dbConditionInt('t.triggerid', $allUpTriggerIds)
+			);
+			while ($row = DBfetch($dbResult)) {
+				$resultTriggerId = $row['triggerid'];
+				$disabledTriggerIds[$resultTriggerId] = $resultTriggerId;
+			}
+
+			// Now process all mapped dependencies and unset any disabled "up" triggers so they do not participate in
+			// decisions regarding nesting resolution in next step.
+			foreach ($downToUpTriggerIds as $downTriggerId => $upTriggerIds) {
+				$upTriggerIdsToUnset = array();
+				foreach ($upTriggerIds as $upTriggerId) {
+					if (isset($disabledTriggerIds[$upTriggerId])) {
+						unset($downToUpTriggerIds[$downTriggerId][$upTriggerId]);
 					}
 				}
-			} while (!empty($triggerIds));
+			}
+
+			// Resolve dependencies for all result set triggers.
+			foreach ($resultTriggerIds as $resultTriggerId) {
+				// We start with result trigger.
+				$triggerIds = array($resultTriggerId);
+
+				// This also is unrolled recursive function and is repeated until there are no more trigger IDs to
+				// check, add and resolve.
+				do {
+					$nextTriggerIds = array();
+					foreach ($triggerIds as $triggerId) {
+						// Loop through all "up" triggers.
+						foreach ($downToUpTriggerIds[$triggerId] as $upTriggerId) {
+							if ($downToUpTriggerIds[$upTriggerId]) {
+								// If there this "up" trigger has "up" triggers of it's own, merge them and proceed with recursion.
+								$downToUpTriggerIds[$resultTriggerId] += $downToUpTriggerIds[$upTriggerId];
+
+								// Add trigger ID to be processed in next loop iteration.
+								$nextTriggerIds[] = $upTriggerId;
+							}
+						}
+					}
+					$triggerIds = $nextTriggerIds;
+				} while ($triggerIds);
+			}
+
+			// Clean result set.
+			foreach ($resultTriggerIds as $resultTriggerId) {
+				foreach ($downToUpTriggerIds[$resultTriggerId] as $upTriggerId) {
+					// If "up" trigger is in problem state, dependent trigger should not be returned and is removed
+					// from results.
+					if ($upTriggerValues[$upTriggerId] == TRIGGER_VALUE_TRUE) {
+						unset($triggers[$resultTriggerId]);
+					}
+				}
+
+				// Check if result trigger is disabled and if so, remove from results.
+				if (isset($disabledTriggerIds[$resultTriggerId])) {
+					unset($triggers[$resultTriggerId]);
+				}
+			}
 		}
 
 		// withLastEventUnacknowledged
