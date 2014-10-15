@@ -67,44 +67,76 @@ if (isset($_REQUEST['mark_incident']) && CWebUser::getType() >= USER_TYPE_ZABBIX
 		'eventids' => get_request('eventid'),
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array(
-			'value' => TRIGGER_VALUE_TRUE,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			'value' => TRIGGER_VALUE_TRUE
 		)
 	));
 
-	if ($_REQUEST['mark_incident'] == INCIDENT_ACTIVE) {
-		$incidentType = _('Active');
-		$changeIncidentType = 0;
+	if (!$event) {
+		access_deny();
 	}
-	elseif ($_REQUEST['mark_incident'] == INCIDENT_RESOLVED) {
+
+	$event = reset($event);
+
+	if (get_request('mark_incident') == INCIDENT_ACTIVE) {
+		$incidentType = _('Active');
+		$changeIncidentType = INCIDENT_FLAG_NORMAL;
+	}
+	elseif (get_request('mark_incident') == INCIDENT_RESOLVED) {
 		$incidentType = _('Resolved');
-		$changeIncidentType = 0;
+		$changeIncidentType = INCIDENT_FLAG_NORMAL;
 	}
 	else {
 		$incidentType = _('False positive');
-		$changeIncidentType = 1;
+		$changeIncidentType = INCIDENT_FLAG_FALSE_POSITIVE;
 	}
 
-	if ($event) {
-		$event = reset($event);
-		if ($event['false_positive'] != $changeIncidentType) {
-			DBstart();
-			$res = DBexecute(
-				'UPDATE events SET false_positive='.zbx_dbstr($changeIncidentType).' WHERE eventid='.$event['eventid']
-			);
-			show_messages(DBend($res), _('Status updated'), _('Cannot update status'));
+	if ($event['false_positive'] != $changeIncidentType) {
+		// get next ok event
+		$nextOkEvent = DBfetch(DBselect(
+			'SELECT e.clock'.
+			' FROM events e'.
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.clock>='.$event['clock'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.source='.EVENT_SOURCE_TRIGGERS.
+				' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+			' ORDER BY e.clock,e.ns',
+			1
+		));
 
-			if ($res) {
-				add_audit(
-					AUDIT_ACTION_UPDATE,
-					AUDIT_RESOURCE_INCIDENT,
-					' Incident ['.$event['eventid'].'] '.$incidentType
-				);
+		if ($nextOkEvent) {
+			$markedEvents = DBselect(
+				'SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid='.$event['objectid'].
+					' AND e.clock>='.$event['clock'].
+					' AND e.clock<='.$nextOkEvent['clock'].
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
+					' AND e.value='.TRIGGER_VALUE_TRUE
+			);
+
+			while($markedEvent = DBfetch($markedEvents)){
+				$eventIds[] = $markedEvent['eventid'];
 			}
 		}
-	}
-	else {
-		access_deny();
+		else {
+			$eventIds = array($event['eventid']);
+		}
+
+		DBstart();
+		$res = DBexecute('UPDATE events SET false_positive='.zbx_dbstr($changeIncidentType).' WHERE '.
+			dbConditionInt('eventid', $eventIds)
+		);
+		show_messages(DBend($res), _('Status updated'), _('Cannot update status'));
+
+		if ($res) {
+			add_audit(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_INCIDENT,
+				' Incident ['.$event['eventid'].'] '.$incidentType
+			);
+		}
 	}
 }
 
@@ -320,7 +352,6 @@ if ($host || $data['filter_search']) {
 					' FROM events e'.
 					' WHERE e.objectid='.$triggerId.
 						' AND e.clock<'.$filterTimeFrom.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND source='.EVENT_SOURCE_TRIGGERS.
 					' ORDER BY e.clock DESC',
@@ -340,10 +371,7 @@ if ($host || $data['filter_search']) {
 				'object' => EVENT_OBJECT_TRIGGER,
 				'selectTriggers' => API_OUTPUT_REFER,
 				'time_from' => $filterTimeFrom,
-				'time_till' => $filterTimeTill,
-				'filter' => array(
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES
-				)
+				'time_till' => $filterTimeTill
 			));
 
 			if ($newEventIds) {
@@ -360,46 +388,50 @@ if ($host || $data['filter_search']) {
 
 			$i = 0;
 			$incidents = array();
+			$lastEventValue = array();
 
 			// data generation
 			foreach ($events as $event) {
 				$getHistory = false;
 
+				if (isset($lastEventValue[$event['objectid']])
+						&& $lastEventValue[$event['objectid']] == $event['value']) {
+					continue;
+				}
+				else {
+					$lastEventValue[$event['objectid']] = $event['value'];
+				}
+
 				if ($event['value'] == TRIGGER_VALUE_TRUE) {
 					if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 						// get event end time
-						$addEvent = API::Event()->get(array(
-							'output' => API_OUTPUT_EXTEND,
-							'triggerids' => array($incidents[$i]['objectid']),
-							'source' => EVENT_SOURCE_TRIGGERS,
-							'object' => EVENT_OBJECT_TRIGGER,
-							'selectTriggers' => API_OUTPUT_REFER,
-							'time_from' => $filterTimeTill,
-							'filter' => array(
-								'value' => TRIGGER_VALUE_FALSE,
-								'value_changed' => TRIGGER_VALUE_CHANGED_YES
-							),
-							'limit' => 1,
-							'sortorder' => ZBX_SORT_UP
+						$addEvent = DBfetch(DBselect(
+							'SELECT e.clock,e.objectid,e.value'.
+							' FROM events e'.
+							' WHERE e.objectid='.$incidents[$i]['objectid'].
+								' AND e.clock>='.$filterTimeTill.
+								' AND e.object='.EVENT_OBJECT_TRIGGER.
+								' AND e.source='.EVENT_SOURCE_TRIGGERS.
+								' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+							' ORDER BY e.clock,e.ns',
+							1
 						));
-
-						$addEvent = reset($addEvent);
 
 						if ($addEvent) {
 							$newData[$i] = array(
-								'status' => TRIGGER_VALUE_FALSE,
+								'status' => $addEvent['value'],
 								'endTime' => $addEvent['clock']
 							);
 
-							$eventTrigger = reset($addEvent['triggers']);
+							$eventTriggerId = $addEvent['objectid'];
 
-							if (in_array($eventTrigger['triggerid'], $dnsTriggers)) {
+							if (in_array($eventTriggerId, $dnsTriggers)) {
 								unset($data['dns']['events'][$i]['status']);
 								$itemType = 'dns';
 								$itemId = $dnsAvailItem;
 								$data['dns']['events'][$i] = array_merge($data['dns']['events'][$i], $newData[$i]);
 							}
-							elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
+							elseif (in_array($eventTriggerId, $dnssecTriggers)) {
 								unset($data['dnssec']['events'][$i]['status']);
 								$itemType = 'dnssec';
 								$itemId = $dnssecAvailItem;
@@ -408,13 +440,13 @@ if ($host || $data['filter_search']) {
 									$newData[$i]
 								);
 							}
-							elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
+							elseif (in_array($eventTriggerId, $rddsTriggers)) {
 								unset($data['rdds']['events'][$i]['status']);
 								$itemType = 'rdds';
 								$itemId = $rddsAvailItem;
 								$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
 							}
-							elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+							elseif (in_array($eventTriggerId, $eppTriggers)) {
 								unset($data['epp']['events'][$i]['status']);
 								$itemType = 'epp';
 								$itemId = $eppAvailItem;
@@ -478,6 +510,7 @@ if ($host || $data['filter_search']) {
 					}
 
 					$eventTrigger = reset($event['triggers']);
+					$eventTriggerId = $eventTrigger['triggerid'];
 
 					$i++;
 					$incidents[$i] = array(
@@ -491,7 +524,7 @@ if ($host || $data['filter_search']) {
 				else {
 					if (isset($incidents[$i])) {
 						$incidents[$i] = array(
-							'status' => TRIGGER_VALUE_FALSE,
+							'status' => $event['value'],
 							'endTime' => $event['clock']
 						);
 					}
@@ -506,8 +539,7 @@ if ($host || $data['filter_search']) {
 							'selectTriggers' => API_OUTPUT_REFER,
 							'time_till' => $event['clock'] - 1,
 							'filter' => array(
-								'value' => TRIGGER_VALUE_TRUE,
-								'value_changed' => TRIGGER_VALUE_CHANGED_YES
+								'value' => TRIGGER_VALUE_TRUE
 							),
 							'limit' => 1,
 							'sortorder' => ZBX_SORT_DOWN
@@ -516,24 +548,25 @@ if ($host || $data['filter_search']) {
 						if ($addEvent) {
 							$addEvent = reset($addEvent);
 							$eventTrigger = reset($addEvent['triggers']);
+							$eventTriggerId = $eventTrigger['triggerid'];
 
-							if (in_array($eventTrigger['triggerid'], $dnsTriggers)) {
+							if (in_array($eventTriggerId, $dnsTriggers)) {
 								$infoItemId = $dnsAvailItem;
 							}
-							elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
+							elseif (in_array($eventTriggerId, $dnssecTriggers)) {
 								$infoItemId = $dnssecAvailItem;
 							}
-							elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
+							elseif (in_array($eventTriggerId, $rddsTriggers)) {
 								$infoItemId = $rddsAvailItem;
 							}
-							elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+							elseif (in_array($eventTriggerId, $eppTriggers)) {
 								$infoItemId = $eppAvailItem;
 							}
 
 							$incidents[$i] = array(
 								'objectid' => $event['objectid'],
 								'eventid' => $addEvent['eventid'],
-								'status' => TRIGGER_VALUE_FALSE,
+								'status' => $event['value'],
 								'startTime' => $addEvent['clock'],
 								'endTime' => $event['clock'],
 								'false_positive' => $event['false_positive'],
@@ -555,7 +588,7 @@ if ($host || $data['filter_search']) {
 					}
 				}
 
-				if (in_array($eventTrigger['triggerid'], $dnsTriggers)) {
+				if (in_array($eventTriggerId, $dnsTriggers)) {
 					if (isset($data['dns']['events'][$i])) {
 						unset($data['dns']['events'][$i]['status']);
 
@@ -571,7 +604,7 @@ if ($host || $data['filter_search']) {
 						}
 					}
 				}
-				elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
+				elseif (in_array($eventTriggerId, $dnssecTriggers)) {
 					if (isset($data['dnssec']['events'][$i])) {
 						unset($data['dnssec']['events'][$i]['status']);
 
@@ -587,7 +620,7 @@ if ($host || $data['filter_search']) {
 						}
 					}
 				}
-				elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
+				elseif (in_array($eventTriggerId, $rddsTriggers)) {
 					if (isset($data['rdds']['events'][$i]) && $data['rdds']['events'][$i]) {
 						unset($data['rdds']['events'][$i]['status']);
 
@@ -603,7 +636,7 @@ if ($host || $data['filter_search']) {
 						}
 					}
 				}
-				elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+				elseif (in_array($eventTriggerId, $eppTriggers)) {
 					if (isset($data['epp']['events'][$i]) && $data['epp']['events'][$i]) {
 						unset($data['epp']['events'][$i]['status']);
 
@@ -642,37 +675,33 @@ if ($host || $data['filter_search']) {
 
 			if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 				// get event end time
-				$addEvent = API::Event()->get(array(
-					'output' => API_OUTPUT_EXTEND,
-					'triggerids' => array($incidents[$i]['objectid']),
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'selectTriggers' => API_OUTPUT_REFER,
-					'time_from' => $filterTimeTill,
-					'filter' => array(
-						'value' => TRIGGER_VALUE_FALSE,
-						'value_changed' => TRIGGER_VALUE_CHANGED_YES
-					),
-					'limit' => 1,
-					'sortorder' => ZBX_SORT_UP
+				$addEvent = DBfetch(DBselect(
+					'SELECT e.clock,e.objectid,e.value'.
+					' FROM events e'.
+					' WHERE e.objectid='.$incidents[$i]['objectid'].
+						' AND e.clock>='.$filterTimeTill.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.source='.EVENT_SOURCE_TRIGGERS.
+						' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+					' ORDER BY e.clock,e.ns',
+					1
 				));
 
 				if ($addEvent) {
-					$addEvent = reset($addEvent);
 					$newData[$i] = array(
-						'status' => TRIGGER_VALUE_FALSE,
+						'status' => $addEvent['value'],
 						'endTime' => $addEvent['clock']
 					);
 
-					$eventTrigger = reset($addEvent['triggers']);
+					$eventTriggerId = $addEvent['objectid'];
 
-					if (in_array($eventTrigger['triggerid'], $dnsTriggers)) {
+					if (in_array($eventTriggerId, $dnsTriggers)) {
 						unset($data['dns']['events'][$i]['status']);
 						$itemType = 'dns';
 						$itemId = $dnsAvailItem;
 						$data['dns']['events'][$i] = array_merge($data['dns']['events'][$i], $newData[$i]);
 					}
-					elseif (in_array($eventTrigger['triggerid'], $dnssecTriggers)) {
+					elseif (in_array($eventTriggerId, $dnssecTriggers)) {
 						unset($data['dnssec']['events'][$i]['status']);
 						$itemType = 'dnssec';
 						$itemId = $dnssecAvailItem;
@@ -681,13 +710,13 @@ if ($host || $data['filter_search']) {
 							$newData[$i]
 						);
 					}
-					elseif (in_array($eventTrigger['triggerid'], $rddsTriggers)) {
+					elseif (in_array($eventTriggerId, $rddsTriggers)) {
 						unset($data['rdds']['events'][$i]['status']);
 						$itemType = 'rdds';
 						$itemId = $rddsAvailItem;
 						$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $newData[$i]);
 					}
-					elseif (in_array($eventTrigger['triggerid'], $eppTriggers)) {
+					elseif (in_array($eventTriggerId, $eppTriggers)) {
 						unset($data['epp']['events'][$i]['status']);
 						$itemType = 'epp';
 						$itemId = $eppAvailItem;

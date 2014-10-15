@@ -261,24 +261,22 @@ if ($mainEvent) {
 	}
 
 	// get end event
-	$endEvent = API::Event()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'triggerids' => $eventTrigger['triggerid'],
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'time_from' => $mainEvent['clock'],
-		'time_till' => get_request('filter_set') ? zbxDateToTime($data['filter_to']) : null,
-		'filter' => array(
-			'value' => TRIGGER_VALUE_FALSE,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
-		),
-		'limit' => 1,
-		'sortorder' => ZBX_SORT_UP
+	$endEventTimeTill = get_request('filter_set') ? ' AND e.clock<='.zbxDateToTime($data['filter_to']) : null;
+
+	$endEvent = DBfetch(DBselect(
+		'SELECT e.clock,e.value'.
+		' FROM events e'.
+		' WHERE e.objectid='.$eventTrigger['triggerid'].
+			' AND e.clock>='.$mainEvent['clock'].
+			$endEventTimeTill.
+			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
+			' AND '.dbConditionString('e.value', array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_UNKNOWN)).
+		' ORDER BY e.clock,e.ns',
+		1
 	));
 
 	if ($endEvent) {
-		$endEvent = reset($endEvent);
-
 		$endEventToTime = $endEvent['clock'] + ($recoveryCount * $delayTime);
 		if (get_request('filter_set')) {
 			$toTime = ($endEventToTime >= zbxDateToTime($data['filter_to']))
@@ -299,9 +297,16 @@ if ($mainEvent) {
 	if ($mainEvent['false_positive']) {
 		$data['incidentType'] = INCIDENT_FALSE_POSITIVE;
 	}
-	else {
-		$data['incidentType'] = $endEvent ? INCIDENT_RESOLVED : INCIDENT_ACTIVE;
+	elseif ($endEvent && $endEvent['value'] == TRIGGER_VALUE_FALSE) {
+		$data['incidentType'] = INCIDENT_RESOLVED;
 	}
+	elseif ($endEvent && $endEvent['value'] == TRIGGER_VALUE_UNKNOWN) {
+		$data['incidentType'] = INCIDENT_RESOLVED_NO_DATA;
+	}
+	else {
+		$data['incidentType'] = INCIDENT_ACTIVE;
+	}
+
 	$data['active'] = $endEvent ? true : false;
 
 	$failingTests = $data['filter_failing_tests'] ? ' AND h.value=0' : null;
@@ -384,11 +389,11 @@ if ($mainEvent) {
 		}
 
 		if ($endEvent && !$endEventExist && $endEventClock == $newClock) {
-			$data['tests'][$key]['endEvent'] = true;
+			$data['tests'][$key]['endEvent'] = $endEvent['value'];
 			$endEventExist = true;
 		}
 		else {
-			$data['tests'][$key]['endEvent'] = false;
+			$data['tests'][$key]['endEvent'] = TRIGGER_VALUE_TRUE;
 		}
 	}
 
