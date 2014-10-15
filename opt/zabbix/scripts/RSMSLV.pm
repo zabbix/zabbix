@@ -1044,6 +1044,7 @@ sub send_values
     my $sender = Zabbix::Sender->new({
 	'server' => $config->{'slv'}->{'zserver'},
 	'port' => $config->{'slv'}->{'zport'},
+	'timeout' => 10,
 	'retries' => 5 });
 
     fail("cannot connect to Zabbix server") unless (defined($sender));
