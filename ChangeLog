@@ -35,6 +35,7 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-8794] fixed parsing of runtime control options and related error messages (igors)
 ....I..... [ZBX-8885] fixed building of Zabbix daemons with IBM DB2 support on systems with newer gcc compilers (Sasha, wiper)
 ..F....... [ZBX-8791] fixed importing sysmaps when host elements are linked and have a trigger assigned to the link (Krists)
 ....I..... [ZBX-8072] fixed bug when long messages were not truncated to 2KB when inserting into alerts table on DB2 databases (wiper)
