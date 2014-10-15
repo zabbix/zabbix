@@ -73,6 +73,7 @@ void		collect_selfmon_stats(void);
 void		get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 			unsigned char state, double *value);
 void		zbx_sleep_loop(int sleeptime);
+void		zbx_sleep_forever(void);
 void		zbx_wakeup(void);
 #endif
 
