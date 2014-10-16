@@ -1068,7 +1068,6 @@ jQuery(function ($) {
 
 		// Take only form elements.
 		$(this).filter('form').each(function() {
-
 			var form = $(this);
 
 			function keypressHandler(e) {
@@ -1077,9 +1076,9 @@ jQuery(function ($) {
 					return true;
 				}
 
-				// Determine where to look for submit button. If there are anything with "subform" class,
-				// use that as place where to look. Otherwise just use given form.
-				var submitButtonContainer = $(this).closest('.subform');
+				// Determine where to look for submit button. If there are anything with "subform" class
+				// in given form, use that as place where to look. Otherwise just use given form.
+				var submitButtonContainer = $(this).closest('.subform', form);
 				if (submitButtonContainer.length == 0) {
 					submitButtonContainer = form;
 				}
@@ -1098,9 +1097,9 @@ jQuery(function ($) {
 				return false;
 			}
 
-			// Attach to inputs and selects.
-			jQuery('input', $(this)).keypress(keypressHandler);
-			jQuery('select', $(this)).keypress(keypressHandler);
+			// Attach to inputs and selects (both those that exist now and that will be created in this form).
+			form.on('keypress', 'input', keypressHandler)
+				.on('keypress', 'select', keypressHandler);
 		});
 
 		return this;
