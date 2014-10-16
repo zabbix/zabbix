@@ -187,7 +187,7 @@ class CFrontendSetup {
 	public function checkPhpMaxInputTime() {
 		$current = ini_get('max_input_time');
 
-		$currentIsValid = $current === '-1' || $current >= self::MIN_PHP_MAX_INPUT_TIME;
+		$currentIsValid = $current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_INPUT_TIME;
 
 		return array(
 			'name' => _('PHP option max_input_time'),
