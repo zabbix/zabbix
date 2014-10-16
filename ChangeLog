@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8753] fixed host mass update form being canceled when trying to change host inventory type (Pavels)
 .......PS. [ZBX-6163] added session restoring to MySQL connections in case of losing connection to the database (Juris)
 ....I..... [ZBX-8072] fixed bug when long messages were not truncated to 2KB when inserting into alerts table on DB2 databases (wiper)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
@@ -35,7 +36,6 @@ New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
-..F....... [ZBX-8753] fixed host mass update form being canceled when trying to change host inventory type (Pavels)
 ...G...PS. [ZBX-8794] fixed parsing of runtime control options and related error messages (igors)
 ....I..... [ZBX-8885] fixed building of Zabbix daemons with IBM DB2 support on systems with newer gcc compilers (Sasha, wiper)
 ..F....... [ZBX-8791] fixed importing sysmaps when host elements are linked and have a trigger assigned to the link (Krists)
