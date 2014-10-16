@@ -6,7 +6,7 @@
 # specify whether to default to --with-net-snmp or --without-net-snmp.
 # If not supplied, DEFAULT-ACTION is no.
 #
-# This macro #defines HAVE_SNMP and HAVE_NETSNMP if a required header files is
+# This macro #defines HAVE_NETSNMP if required header files are
 # found, and sets @SNMP_LDFLAGS@ and @SNMP_CFLAGS@ to the necessary
 # values.
 #
@@ -115,7 +115,6 @@ session.localname = "";
 		unset _save_netsnmp_libs
 
 		AC_DEFINE(HAVE_NETSNMP, 1, [Define to 1 if Net-SNMP should be enabled.])
-		AC_DEFINE([SNMP_NO_DEBUGGING], [], [Disabling debugging messages from Net-SNMP library])
 
 		found_netsnmp="yes"
 	else
