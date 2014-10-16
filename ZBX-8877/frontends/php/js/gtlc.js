@@ -1096,16 +1096,6 @@ var CScrollBar = Class.create(CDebug, {
 		};
 	},
 
-	deselectall: function() {
-		if (IE) {
-			document.selection.empty();
-		}
-		else {
-			var sel = window.getSelection();
-			sel.removeAllRanges();
-		}
-	},
-
 	//----------------------------------------------------------------
 	//-------- SCROLL CREATION ---------------------------------------
 	//----------------------------------------------------------------
