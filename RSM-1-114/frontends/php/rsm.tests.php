@@ -208,7 +208,7 @@ if ($items) {
 				$addEvent = DBfetch(DBselect(
 					'SELECT e.clock'.
 					' FROM events e'.
-					' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+					' WHERE '.dbConditionInt('e.objectid', $incidents[$i]['objectid']).
 						' AND e.clock>='.zbxDateToTime($data['filter_to']).
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.source='.EVENT_SOURCE_TRIGGERS.
@@ -284,7 +284,7 @@ if ($items) {
 		$addEvent = DBfetch(DBselect(
 			'SELECT e.clock'.
 			' FROM events e'.
-			' WHERE '.dbConditionInt(e.objectid, $incidents[$i]['objectid']).
+			' WHERE '.dbConditionInt('e.objectid', $incidents[$i]['objectid']).
 				' AND e.clock>='.zbxDateToTime($data['filter_to']).
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND e.source='.EVENT_SOURCE_TRIGGERS.
