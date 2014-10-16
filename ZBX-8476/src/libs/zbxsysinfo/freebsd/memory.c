@@ -195,7 +195,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -210,29 +210,29 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		VM_MEMORY_TOTAL(result);
+		ret = VM_MEMORY_TOTAL(result);
 	else if (0 == strcmp(mode, "active"))
-		VM_MEMORY_ACTIVE(result);
+		ret = VM_MEMORY_ACTIVE(result);
 	else if (0 == strcmp(mode, "inactive"))
-		VM_MEMORY_INACTIVE(result);
+		ret = VM_MEMORY_INACTIVE(result);
 	else if (0 == strcmp(mode, "wired"))
-		VM_MEMORY_WIRED(result);
+		ret = VM_MEMORY_WIRED(result);
 	else if (0 == strcmp(mode, "cached"))
-		VM_MEMORY_CACHED(result);
+		ret = VM_MEMORY_CACHED(result);
 	else if (0 == strcmp(mode, "free"))
-		VM_MEMORY_FREE(result);
+		ret = VM_MEMORY_FREE(result);
 	else if (0 == strcmp(mode, "used"))
-		VM_MEMORY_USED(result);
+		ret = VM_MEMORY_USED(result);
 	else if (0 == strcmp(mode, "pused"))
-		VM_MEMORY_PUSED(result);
+		ret = VM_MEMORY_PUSED(result);
 	else if (0 == strcmp(mode, "available"))
-		VM_MEMORY_AVAILABLE(result);
+		ret = VM_MEMORY_AVAILABLE(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		VM_MEMORY_PAVAILABLE(result);
+		ret = VM_MEMORY_PAVAILABLE(result);
 	else if (0 == strcmp(mode, "buffers"))
-		VM_MEMORY_BUFFERS(result);
+		ret = VM_MEMORY_BUFFERS(result);
 	else if (0 == strcmp(mode, "shared"))
-		VM_MEMORY_SHARED(result);
+		ret = VM_MEMORY_SHARED(result);
 	else
 		ret = SYSINFO_RET_FAIL;
 

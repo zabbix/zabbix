@@ -549,7 +549,7 @@ void	compress_signs(char *str)
 			{
 				prev = str[i - 1];
 
-				if (0 == isdigit(prev) && '.' != prev)
+				if (0 == isdigit(prev) && '.' != prev && NULL == strchr("KMGTsmhdw", prev))
 				{
 					for (j = i; '\0' != str[j]; j++)
 						str[j] = str[j + 1];
@@ -567,7 +567,7 @@ void	compress_signs(char *str)
 			{
 				prev = str[i - 1];
 
-				if (0 == isdigit(prev) && '.' != prev)
+				if (0 == isdigit(prev) && '.' != prev && NULL == strchr("KMGTsmhdw", prev))
 				{
 					str[i] = 'N';
 				}
