@@ -1073,7 +1073,7 @@ jQuery(function ($) {
 
 			function keypressHandler(e) {
 				// Ignore everything that is not "Enter" key.
-				if ((e.which && e.which != 13) && (e.keyCode && e.keyCode != 13)) {
+				if ((e.which && e.which != 13) || (e.keyCode && e.keyCode != 13)) {
 					return true;
 				}
 
