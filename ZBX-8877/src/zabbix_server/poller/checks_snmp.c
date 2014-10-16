@@ -33,6 +33,8 @@ typedef struct
 }
 zbx_snmp_index_t;
 
+extern int	CONFIG_SNMP_BULK_REQUESTS;
+
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;
 
@@ -794,7 +796,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
-	bulk = (ITEM_TYPE_SNMPv1 == item->type ? 0 : 1);	/* GetBulkRequest-PDU available since SNMPv2 */
+	/* GetBulkRequest-PDU available since SNMPv2 */
+	bulk = (ITEM_TYPE_SNMPv1 == item->type ? 0 : CONFIG_SNMP_BULK_REQUESTS);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' bulk:%d mode:%d", __function_name, OID, bulk, (int)mode);
 
