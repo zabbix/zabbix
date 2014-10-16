@@ -103,7 +103,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 struct snmp_session session;
 session.localname = "";
 		],
-		AC_DEFINE(HAVE_SNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
+		AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
