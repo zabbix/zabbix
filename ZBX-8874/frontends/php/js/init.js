@@ -152,4 +152,6 @@ jQuery(function($) {
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
+
+	jQuery('form').enterSubmit({ submitButtonSelector: 'input[type=submit].main'});
 });
