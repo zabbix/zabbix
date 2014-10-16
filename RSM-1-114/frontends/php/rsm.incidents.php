@@ -392,6 +392,7 @@ if ($host || $data['filter_search']) {
 
 			// data generation
 			foreach ($events as $event) {
+				$eventTriggerId = null;
 				$getHistory = false;
 
 				if (isset($lastEventValue[$event['objectid']])
@@ -523,10 +524,8 @@ if ($host || $data['filter_search']) {
 				}
 				else {
 					if (isset($incidents[$i])) {
-						$incidents[$i] = array(
-							'status' => $event['value'],
-							'endTime' => $event['clock']
-						);
+						$incidents[$i]['status'] = $event['value'];
+						$incidents[$i]['endTime'] = $event['clock'];
 					}
 					else {
 						$i++;
@@ -588,88 +587,90 @@ if ($host || $data['filter_search']) {
 					}
 				}
 
-				if (in_array($eventTriggerId, $dnsTriggers)) {
-					if (isset($data['dns']['events'][$i])) {
-						unset($data['dns']['events'][$i]['status']);
+				if ($eventTriggerId) {
+					if (in_array($eventTriggerId, $dnsTriggers)) {
+						if (isset($data['dns']['events'][$i])) {
+							unset($data['dns']['events'][$i]['status']);
 
-						$itemType = 'dns';
-						$itemId = $dnsAvailItem;
-						$getHistory = true;
+							$itemType = 'dns';
+							$itemId = $dnsAvailItem;
+							$getHistory = true;
 
-						$data['dns']['events'][$i] = array_merge($data['dns']['events'][$i], $incidents[$i]);
-					}
-					else {
-						if (isset($incidents[$i])) {
-							$data['dns']['events'][$i] = $incidents[$i];
+							$data['dns']['events'][$i] = array_merge($data['dns']['events'][$i], $incidents[$i]);
+						}
+						else {
+							if (isset($incidents[$i])) {
+								$data['dns']['events'][$i] = $incidents[$i];
+							}
 						}
 					}
-				}
-				elseif (in_array($eventTriggerId, $dnssecTriggers)) {
-					if (isset($data['dnssec']['events'][$i])) {
-						unset($data['dnssec']['events'][$i]['status']);
+					elseif (in_array($eventTriggerId, $dnssecTriggers)) {
+						if (isset($data['dnssec']['events'][$i])) {
+							unset($data['dnssec']['events'][$i]['status']);
 
-						$itemType = 'dnssec';
-						$itemId = $dnssecAvailItem;
-						$getHistory = true;
+							$itemType = 'dnssec';
+							$itemId = $dnssecAvailItem;
+							$getHistory = true;
 
-						$data['dnssec']['events'][$i] = array_merge($data['dnssec']['events'][$i], $incidents[$i]);
-					}
-					else {
-						if (isset($incidents[$i])) {
-							$data['dnssec']['events'][$i] = $incidents[$i];
+							$data['dnssec']['events'][$i] = array_merge($data['dnssec']['events'][$i], $incidents[$i]);
+						}
+						else {
+							if (isset($incidents[$i])) {
+								$data['dnssec']['events'][$i] = $incidents[$i];
+							}
 						}
 					}
-				}
-				elseif (in_array($eventTriggerId, $rddsTriggers)) {
-					if (isset($data['rdds']['events'][$i]) && $data['rdds']['events'][$i]) {
-						unset($data['rdds']['events'][$i]['status']);
+					elseif (in_array($eventTriggerId, $rddsTriggers)) {
+						if (isset($data['rdds']['events'][$i]) && $data['rdds']['events'][$i]) {
+							unset($data['rdds']['events'][$i]['status']);
 
-						$itemType = 'rdds';
-						$itemId = $rddsAvailItem;
-						$getHistory = true;
+							$itemType = 'rdds';
+							$itemId = $rddsAvailItem;
+							$getHistory = true;
 
-						$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $incidents[$i]);
-					}
-					else {
-						if (isset($incidents[$i])) {
-							$data['rdds']['events'][$i] = $incidents[$i];
+							$data['rdds']['events'][$i] = array_merge($data['rdds']['events'][$i], $incidents[$i]);
+						}
+						else {
+							if (isset($incidents[$i])) {
+								$data['rdds']['events'][$i] = $incidents[$i];
+							}
 						}
 					}
-				}
-				elseif (in_array($eventTriggerId, $eppTriggers)) {
-					if (isset($data['epp']['events'][$i]) && $data['epp']['events'][$i]) {
-						unset($data['epp']['events'][$i]['status']);
+					elseif (in_array($eventTriggerId, $eppTriggers)) {
+						if (isset($data['epp']['events'][$i]) && $data['epp']['events'][$i]) {
+							unset($data['epp']['events'][$i]['status']);
 
-						$itemType = 'epp';
-						$itemId = $eppAvailItem;
-						$getHistory = true;
+							$itemType = 'epp';
+							$itemId = $eppAvailItem;
+							$getHistory = true;
 
-						$data['epp']['events'][$i] = array_merge($data['epp']['events'][$i], $incidents[$i]);
-					}
-					else {
-						if (isset($incidents[$i])) {
-							$data['epp']['events'][$i] = $incidents[$i];
+							$data['epp']['events'][$i] = array_merge($data['epp']['events'][$i], $incidents[$i]);
+						}
+						else {
+							if (isset($incidents[$i])) {
+								$data['epp']['events'][$i] = $incidents[$i];
+							}
 						}
 					}
-				}
 
-				if ($getHistory) {
-					$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
-						$itemId,
-						$filterTimeFrom,
-						$filterTimeTill,
-						$data[$itemType]['events'][$i]['startTime'],
-						$data[$itemType]['events'][$i]['endTime']
-					);
+					if ($getHistory) {
+						$data[$itemType]['events'][$i]['incidentTotalTests'] = getTotalTestsCount(
+							$itemId,
+							$filterTimeFrom,
+							$filterTimeTill,
+							$data[$itemType]['events'][$i]['startTime'],
+							$data[$itemType]['events'][$i]['endTime']
+						);
 
-					$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
-						$itemId,
-						$filterTimeTill,
-						$data[$itemType]['events'][$i]['startTime'],
-						$data[$itemType]['events'][$i]['endTime']
-					);
+						$data[$itemType]['events'][$i]['incidentFailedTests'] = getFailedTestsCount(
+							$itemId,
+							$filterTimeTill,
+							$data[$itemType]['events'][$i]['startTime'],
+							$data[$itemType]['events'][$i]['endTime']
+						);
 
-					unset($getHistory);
+						unset($getHistory);
+					}
 				}
 			}
 
