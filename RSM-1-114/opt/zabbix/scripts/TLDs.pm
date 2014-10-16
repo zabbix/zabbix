@@ -710,8 +710,11 @@ sub create_cron_items($) {
 	next unless ($slv_file =~ /^rsm\.slv\..*\.pl$/);
 
 	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
-	    # check monthly data once a day
+	    # monthly data once a day
 	    system("echo '0 0 * * * root $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
+	} elsif ($slv_file =~ /\.slv\.dns\.downtime\.pl$/) {
+	    # DNS downtime every minute
+	    system("echo '* * * * * root $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	} elsif ($slv_file =~ /\.slv\..*\.avail\.pl$/) {
 	    # separate rollweek and avail by some delay
 	    system("echo '* * * * * root sleep $avail_shift; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
