@@ -212,6 +212,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	int		ret = ZBX_DB_OK;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
+#elif defined(HAVE_MYSQL)
+	my_bool		mysql_reconnect = 1;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -299,6 +301,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 		ret = ZBX_DB_FAIL;
 	}
+
+	/* The RECONNECT option setting is placed here, AFTER the connection	*/
+	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
+	/* reset the options value to the default, regardless of what it was	*/
+	/* set to prior to the connection. MySQL allows changing connection	*/
+	/* options on an open connection, so setting it here is safe.		*/
+
+	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{

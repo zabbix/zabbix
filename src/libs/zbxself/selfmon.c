@@ -564,16 +564,11 @@ void	zbx_sleep_loop(int sleeptime)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-	if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
+	do
 	{
-		do
-		{
-			sleep(1);
-		}
-		while (0 < --sleep_remains);
+		sleep(1);
 	}
-	else
-		sleep(sleeptime);
+	while (0 < --sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
