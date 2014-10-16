@@ -198,6 +198,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
+int	CONFIG_SNMP_BULK_REQUESTS	= 1;
+
 /* mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
@@ -468,6 +470,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"EnableSNMPBulkRequests",	&CONFIG_SNMP_BULK_REQUESTS,		TYPE_INT,
+			PARM_OPT,	0,			1},
 		{NULL}
 	};
 
