@@ -19,7 +19,6 @@
 
 
 var agt = navigator.userAgent.toLowerCase(),
-	OP = !!(agt.indexOf('opera') != -1 && window.opera),
 	IE6 = (agt.indexOf('msie 6.0') != -1),
 	IE7 = (agt.indexOf('msie 7.0') != -1),
 	IE8 = (agt.indexOf('msie 8.0') != -1),
