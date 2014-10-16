@@ -115,7 +115,6 @@ session.localname = "";
 		unset _save_netsnmp_libs
 
 		AC_DEFINE(HAVE_NETSNMP, 1, [Define to 1 if Net-SNMP should be enabled.])
-		AC_DEFINE(HAVE_SNMP, 1, [Define to 1 if SNMP should be enabled.])
 		AC_DEFINE([SNMP_NO_DEBUGGING], [], [Disabling debugging messages from Net-SNMP library])
 
 		found_netsnmp="yes"

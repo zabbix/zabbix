@@ -624,7 +624,7 @@ static int	get_values(unsigned char poller_type)
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num);
 #else

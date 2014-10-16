@@ -21,7 +21,7 @@
 #include "comms.h"
 #include "zbxjson.h"
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 
 typedef struct
 {
@@ -1687,4 +1687,4 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
