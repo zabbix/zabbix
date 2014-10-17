@@ -163,12 +163,22 @@ class CFrontendSetup {
 	/**
 	 * Checks for minimum PHP max execution time.
 	 *
+	 * Value of "max_execution_time" is used to set up OS level timer that fires signal after specified number of
+	 * seconds has passed. Handler of this signal interrupts execution. On *nix platforms this is done with call
+	 * to "setitimer()" (http://linux.die.net/man/2/setitimer) and in this case integer value of "max_input_time"
+	 * is used to specify how many seconds timer has to wait before sending signal:
+	 * - Value "0" is valid because in this case timer is removed and will not fire and stop execution.
+	 * - Value "-1" is valid because this signed integer and is used as value for "it_value.tv_sec" for "new_value"
+	 *   argument in call to "setitimer()". As negative values for "tv_sec" are not allowed the call will fail. Errors
+	 *   are not checked and timer is not set.
+	 * - Any value bigger than "0" is valid and sets up timer to fire after specified number of seconds.
+	 *
 	 * @return array
 	 */
 	public function checkPhpMaxExecutionTime() {
 		$current = ini_get('max_execution_time');
 
-		$currentIsValid = $current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_EXECUTION_TIME;
+		$currentIsValid = ($current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_EXECUTION_TIME);
 
 		return array(
 			'name' => _('PHP option max_execution_time'),
@@ -182,12 +192,14 @@ class CFrontendSetup {
 	/**
 	 * Checks for minimum PHP max input time.
 	 *
+	 * @see checkPhpMaxExecutionTime()
+	 *
 	 * @return array
 	 */
 	public function checkPhpMaxInputTime() {
 		$current = ini_get('max_input_time');
 
-		$currentIsValid = $current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_INPUT_TIME;
+		$currentIsValid = ($current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_INPUT_TIME);
 
 		return array(
 			'name' => _('PHP option max_input_time'),
