@@ -629,8 +629,11 @@ int	zbx_db_begin(void)
 	txn_level++;
 
 #if defined(HAVE_IBM_DB2)
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+		(SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
@@ -679,8 +682,11 @@ int	zbx_db_commit(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+		(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
@@ -730,8 +736,11 @@ int	zbx_db_rollback(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+		(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
@@ -789,7 +798,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
 			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
 	{
-		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
+		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0,
+				OCI_ATTR_ROW_COUNT, oracle.errhp);
 	}
 
 	oci_ids_num = 0;
@@ -1885,7 +1895,8 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, char *sql)
 	SQLINTEGER	sqlcode;
 	SQLSMALLINT	length, i = 1;
 
-	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
+	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate,
+		&sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
 	{
 		if (NULL == sql)
 			zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
