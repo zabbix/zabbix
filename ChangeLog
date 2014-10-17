@@ -44,7 +44,7 @@ A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to co
 ...G...PS. [ZBX-8699] fixed zbx_sleep_loop() to handle correctly signal arrival (igors)
 .......PS. [ZBX-8793] fixed processing of snmp value to represent it as integer (igors)
 ..F....... [ZBX-8726] fixed warning messages shown by deprecated PHP 5.6 options "mbstring.internal_encoding" and "always_populate_raw_post_data" (Ivo)
-A.F....... [ZBX-8817] fixed incorrect clearing of web scenario item history and trends, added missing web scenario audit log translations and renamed "Scenario..." to "Web scenario..." in various front-end places (Ivo)
+A.F....... [ZBX-8817] fixed incorrect clearing of web scenario item history and trends (Ivo)
 ..F....... [ZBX-8830] fixed map pop-up menu "Triggers" link being always disabled for host group map elements (Ivo)
 ....I..... [ZBX-5561] fixed configuration failure during cross compilation; thanks to Christof Lauber for the patch (igors)
 .......PS. [ZBX-8621] added validation of received SNMP responses and warnings in case SNMP responses are bad (asaveljevs)
