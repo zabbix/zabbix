@@ -101,11 +101,11 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "pr_size"))
 	{
-		p_value = &psinfo.pr_size;	/* for size of process image in Kbytes */
+		p_value = &psinfo.pr_size;	/* size of process image in Kbytes */
 	}
 	else if (0 == strcmp(memtype, "pr_rssize"))
 	{
-		p_value = &psinfo.pr_rssize;	/* for resident set size in Kbytes */
+		p_value = &psinfo.pr_rssize;	/* resident set size in Kbytes */
 	}
 	else if (0 == strcmp(memtype, "pr_pctmem"))
 	{
@@ -199,7 +199,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : (double)pct_size / (double)proccount);
+			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
