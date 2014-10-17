@@ -87,6 +87,8 @@ typedef struct
 	char			*name_orig;
 	char			*key;
 	char			*key_orig;
+	char			*units;
+	char			*units_orig;
 	char			*params;
 	char			*params_orig;
 	char			*snmp_oid;
@@ -107,6 +109,8 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_free(item->name_orig);
 	zbx_free(item->key);
 	zbx_free(item->key_orig);
+	zbx_free(item->units);
+	zbx_free(item->units_orig);
 	zbx_free(item->params);
 	zbx_free(item->params_orig);
 	zbx_free(item->snmp_oid);
@@ -129,10 +133,10 @@ static void	lld_item_free(zbx_lld_item_t *item)
  ******************************************************************************/
 static void	lld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
-		const char *delay_flex, int history, int trends, const char *trapper_hosts, const char *units,
-		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
-		zbx_uint64_t valuemapid, const char *ipmi_sensor, const char *snmp_community, const char *port,
-		const char *snmpv3_securityname, unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol,
+		const char *delay_flex, int history, int trends, const char *trapper_hosts, unsigned char multiplier,
+		unsigned char delta, const char *formula, const char *logtimefmt, zbx_uint64_t valuemapid,
+		const char *ipmi_sensor, const char *snmp_community, const char *port, const char *snmpv3_securityname,
+		unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol,
 		const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, const char *snmpv3_privpassphrase,
 		unsigned char authtype, const char *username, const char *password, const char *publickey,
 		const char *privatekey, const char *description, zbx_uint64_t interfaceid,
@@ -199,8 +203,8 @@ static void	lld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		if (0 != strcmp(row[13], trapper_hosts))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS;
 
-		if (0 != strcmp(row[14], units))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_UNITS;
+		item->units = zbx_strdup(NULL, row[14]);
+		item->units_orig = NULL;
 
 		if ((unsigned char)atoi(row[15]) != multiplier)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER;
@@ -393,6 +397,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
 		lld_validate_item_field(item, &item->key, &item->key_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_KEY_LEN, error);
+		lld_validate_item_field(item, &item->units, &item->units_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_UNITS, ITEM_UNITS_LEN, error);
 		lld_validate_item_field(item, &item->params, &item->params_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ITEM_PARAM_LEN, error);
 		lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
@@ -522,8 +528,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 }
 
 static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		struct zbx_json_parse *jp_row)
+		const char *units_proto, const char *params_proto, const char *snmp_oid_proto,
+		const char *description_proto, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_make_item";
 
@@ -565,6 +571,11 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 		item->key_orig = NULL;
 		substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
+		item->units = zbx_strdup(NULL, units_proto);
+		item->units_orig = NULL;
+		substitute_discovery_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(item->units, ZBX_WHITESPACE);
+
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
 		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -604,6 +615,17 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 			item->key = zbx_strdup(NULL, key_proto);
 			substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
+		}
+
+		buffer = zbx_strdup(buffer, units_proto);
+		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(buffer, ZBX_WHITESPACE);
+		if (0 != strcmp(item->units, buffer))
+		{
+			item->units_orig = item->units;
+			item->units = buffer;
+			buffer = NULL;
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_UNITS;
 		}
 
 		buffer = zbx_strdup(buffer, params_proto);
@@ -650,8 +672,8 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 }
 
 static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		const char *params_proto, const char *snmp_oid_proto, const char *description_proto,
-		zbx_vector_ptr_t *lld_rows)
+		const char *units_proto, const char *params_proto, const char *snmp_oid_proto,
+		const char *description_proto, zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -659,8 +681,8 @@ static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, cons
 	{
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
-				&lld_row->jp_row);
+		lld_item_make(items, name_proto, key_proto, units_proto, params_proto, snmp_oid_proto,
+				description_proto, &lld_row->jp_row);
 	}
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -778,13 +800,13 @@ static void	lld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *
 static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *key_proto, unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
 		const char *delay_flex, int history, int trends, unsigned char status, const char *trapper_hosts,
-		const char *units, unsigned char multiplier, unsigned char delta, const char *formula,
-		const char *logtimefmt, zbx_uint64_t valuemapid, const char *ipmi_sensor, const char *snmp_community,
-		const char *port, const char *snmpv3_securityname, unsigned char snmpv3_securitylevel,
-		unsigned char snmpv3_authprotocol, const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol,
-		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
-		const char *publickey, const char *privatekey, zbx_uint64_t interfaceid,
-		zbx_vector_uint64_t *del_itemappids, const char *snmpv3_contextname)
+		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
+		zbx_uint64_t valuemapid, const char *ipmi_sensor, const char *snmp_community, const char *port,
+		const char *snmpv3_securityname, unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol,
+		const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, const char *snmpv3_privpassphrase,
+		unsigned char authtype, const char *username, const char *password, const char *publickey,
+		const char *privatekey, zbx_uint64_t interfaceid, zbx_vector_uint64_t *del_itemappids,
+		const char *snmpv3_contextname)
 {
 	const char	*__function_name = "lld_items_save";
 
@@ -792,13 +814,13 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	zbx_lld_item_t	*item;
 	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0, flags = ZBX_FLAG_LLD_ITEM_UNSET;
 	char		*sql = NULL,
-			*key_proto_esc = NULL, *delay_flex_esc = NULL, *trapper_hosts_esc = NULL, *units_esc = NULL,
+			*key_proto_esc = NULL, *delay_flex_esc = NULL, *trapper_hosts_esc = NULL,
 			*formula_esc = NULL, *logtimefmt_esc = NULL, *ipmi_sensor_esc = NULL,
 			*snmp_community_esc = NULL, *port_esc = NULL, *snmpv3_securityname_esc = NULL,
 			*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL, *username_esc = NULL,
 			*password_esc = NULL, *publickey_esc = NULL, *privatekey_esc = NULL,
 			*snmpv3_contextname_esc = NULL,
-			*name_esc, *key_esc, *params_esc, *snmp_oid_esc, *description_esc;
+			*name_esc, *key_esc, *units_esc, *params_esc, *snmp_oid_esc, *description_esc;
 	size_t		sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_db_insert_t	db_insert, db_insert_idiscovery, db_insert_iapps;
 
@@ -867,8 +889,6 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		delay_flex_esc = DBdyn_escape_string(delay_flex);
 	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS))
 		trapper_hosts_esc = DBdyn_escape_string(trapper_hosts);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
-		units_esc = DBdyn_escape_string(units);
 	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
 		formula_esc = DBdyn_escape_string(formula);
 	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT))
@@ -909,7 +929,7 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 			zbx_db_insert_add_values(&db_insert, item->itemid, item->name, item->key, hostid, (int)type,
 					(int)value_type, (int)data_type, delay, delay_flex, history, trends,
-					(int)status, trapper_hosts, units, (int)multiplier, (int)delta, formula,
+					(int)status, trapper_hosts, item->units, (int)multiplier, (int)delta, formula,
 					logtimefmt, valuemapid, item->params, ipmi_sensor, snmp_community,
 					item->snmp_oid, port, snmpv3_securityname, (int)snmpv3_securitylevel,
 					(int)snmpv3_authprotocol, snmpv3_authpassphrase, (int)snmpv3_privprotocol,
@@ -988,8 +1008,10 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
 				{
+					units_esc = DBdyn_escape_string(item->units);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sunits='%s'",
 							d, units_esc);
+					zbx_free(units_esc);
 					d = ",";
 				}
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER))
@@ -1177,7 +1199,6 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	zbx_free(ipmi_sensor_esc);
 	zbx_free(logtimefmt_esc);
 	zbx_free(formula_esc);
-	zbx_free(units_esc);
 	zbx_free(trapper_hosts_esc);
 	zbx_free(delay_flex_esc);
 	zbx_free(key_proto_esc);
@@ -1404,8 +1425,8 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	parent_itemid, valuemapid, interfaceid;
-		const char	*name_proto, *key_proto, *params_proto, *snmp_oid_proto, *delay_flex, *trapper_hosts,
-				*units, *formula, *logtimefmt, *ipmi_sensor, *snmp_community, *port,
+		const char	*name_proto, *key_proto, *units_proto, *params_proto, *snmp_oid_proto, *delay_flex,
+				*trapper_hosts, *formula, *logtimefmt, *ipmi_sensor, *snmp_community, *port,
 				*snmpv3_securityname, *snmpv3_authpassphrase, *snmpv3_privpassphrase, *username,
 				*password, *publickey, *privatekey, *description_proto, *snmpv3_contextname;
 		unsigned char	type, value_type, data_type, status, multiplier, delta, snmpv3_securitylevel,
@@ -1424,7 +1445,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 		trends = atoi(row[9]);
 		ZBX_STR2UCHAR(status, row[10]);
 		trapper_hosts = row[11];
-		units = row[12];
+		units_proto = row[12];
 		ZBX_STR2UCHAR(multiplier, row[13]);
 		ZBX_STR2UCHAR(delta, row[14]);
 		formula = row[15];
@@ -1451,20 +1472,20 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 		snmpv3_contextname = row[36];
 
 		lld_items_get(parent_itemid, &items, type, value_type, data_type, delay, delay_flex, history, trends,
-				trapper_hosts, units, multiplier, delta, formula, logtimefmt, valuemapid, ipmi_sensor,
+				trapper_hosts, multiplier, delta, formula, logtimefmt, valuemapid, ipmi_sensor,
 				snmp_community, port, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authprotocol,
 				snmpv3_authpassphrase, snmpv3_privprotocol, snmpv3_privpassphrase, authtype, username,
 				password, publickey, privatekey, description_proto, interfaceid, snmpv3_contextname);
 
-		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,
-				lld_rows);
+		lld_items_make(&items, name_proto, key_proto, units_proto, params_proto, snmp_oid_proto,
+				description_proto, lld_rows);
 
 		lld_items_validate(hostid, &items, error);
 
 		lld_applications_make(parent_itemid, &items, &del_itemappids);
 
 		lld_items_save(hostid, parent_itemid, &items, key_proto, type, value_type, data_type, delay,
-				delay_flex, history, trends, status, trapper_hosts, units, multiplier, delta, formula,
+				delay_flex, history, trends, status, trapper_hosts, multiplier, delta, formula,
 				logtimefmt, valuemapid, ipmi_sensor, snmp_community, port, snmpv3_securityname,
 				snmpv3_securitylevel, snmpv3_authprotocol, snmpv3_authpassphrase, snmpv3_privprotocol,
 				snmpv3_privpassphrase, authtype, username, password, publickey, privatekey, interfaceid,
