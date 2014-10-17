@@ -55,7 +55,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 			esac
 		done
 
-		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs`"
+		_full_libnetsnmp_libs="`$_libnetsnmp_config --netsnmp-libs`"
 		for i in $_full_libnetsnmp_libs; do
 			case $i in
 				-L*)
@@ -68,6 +68,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		done
 
 		if test "x$enable_static" = "xyes"; then
+			_full_libnetsnmp_libs="`$_libnetsnmp_config --libs`"
 			for i in $_full_libnetsnmp_libs; do
 				case $i in
 					-lnetsnmp)
