@@ -5035,18 +5035,11 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (0 == dc_item->nextcheck)
-		{
-			/* A "nextcheck" of 0 can mean two things: either the item's host is disabled */
-			/* or it is an item that we do not calculate "nextcheck" for (e.g., a logrt[] */
-			/* item). So we look up the host here to distinguish between these two cases. */
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
 
-			if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-				continue;
-
-			if (HOST_STATUS_MONITORED != dc_host->status)
-				continue;
-		}
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
 
 		dc_item->state = states[i];
 		dc_item->lastclock = lastclocks[i];
@@ -5056,9 +5049,6 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 			dc_item->mtime = mtimes[i];
 
 		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
-			continue;
-
-		if (0 != dc_item->nextcheck && NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
 		switch (errcodes[i])
