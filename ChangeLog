@@ -7,7 +7,6 @@ New features:
 Bug fixes:
 ..F....... [ZBX-8753] fixed host mass update form being canceled when trying to change host inventory type (Pavels)
 .......PS. [ZBX-6163] added session restoring to MySQL connections in case of losing connection to the database (Juris)
-....I..... [ZBX-8072] fixed bug when long messages were not truncated to 2KB when inserting into alerts table on DB2 databases (wiper)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
 A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
