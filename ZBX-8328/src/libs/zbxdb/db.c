@@ -1179,6 +1179,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #if defined(HAVE_IBM_DB2)
 	int		i;
 	SQLRETURN	ret = SQL_SUCCESS;
+	SQLINTEGER	col_type;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		prefetch_rows = 200, counter;
@@ -1233,6 +1234,25 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 				SQL_DESC_DISPLAY_SIZE, NULL, 0, NULL, &result->values_len[i])))
 		{
 			goto error;
+		}
+
+		/* get the column type */
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1),
+				SQL_DESC_TYPE, NULL, 0, NULL, &col_type)))
+		{
+			goto error;
+		}
+
+		switch (col_type)
+		{
+			case SQL_GRAPHIC:
+			case SQL_VARGRAPHIC:
+			case SQL_DBCLOB:
+				/* Graphic string is a sequence of double-byte characters and its */
+				/* display size is 2x of the column size. However because utf-8   */
+				/* characters can take up to 4 bytes we must increase it to       */
+				/* cover the worst case scenario.                                 */
+				result->values_len[i] *= 2;
 		}
 
 		result->values_len[i] += 1; /* '\0'; */
