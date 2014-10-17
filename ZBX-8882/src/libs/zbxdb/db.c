@@ -286,8 +286,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* output error information */
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv, NULL);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, NULL);
 
 	}
 #elif defined(HAVE_MYSQL)
@@ -634,7 +634,7 @@ int	zbx_db_begin(void)
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, NULL);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -684,7 +684,7 @@ int	zbx_db_commit(void)
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, NULL);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -735,7 +735,7 @@ int	zbx_db_rollback(void)
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, NULL);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1003,8 +1003,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt, sql);
 
 		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
@@ -1226,8 +1226,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 error:
 	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt, sql);
 
 		IBM_DB2free_result(result);
 
@@ -1878,7 +1878,7 @@ int	zbx_ibm_db2_success_ext(SQLRETURN ret)
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
 }
 
-void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, char *sql)
 {
 	SQLCHAR		message[SQL_MAX_MESSAGE_LENGTH + 1];
 	SQLCHAR		sqlstate[SQL_SQLSTATE_SIZE + 1];
@@ -1887,7 +1887,11 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
 
 	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
+		if (NULL == sql)
+			zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
+		else
+			zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s] [%s]",
+					(int)sqlcode, sqlstate, message, sql);
 	}
 }
 #elif defined(HAVE_ORACLE)
