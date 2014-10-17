@@ -35,6 +35,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thank
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8916] fixed "lastlogsize" not being updated in the configuration cache when values are received from the agent (asaveljevs, Sasha)
 ..F....... [ZBX-8877] fixed filters not hiding/showing for IE11 (Krists)
 ...G...PS. [ZBX-8794] fixed parsing of runtime control options and related error messages (igors)
 ....I..... [ZBX-8885] fixed building of Zabbix daemons with IBM DB2 support on systems with newer gcc compilers (Sasha, wiper)
@@ -477,6 +478,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.7rc2
 
 Bug fixes:
+.......PS. [ZBX-8916] fixed "lastlogsize" not being updated in the configuration cache when values are received from the agent (asaveljevs, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.7rc1
