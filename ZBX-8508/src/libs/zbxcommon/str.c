@@ -251,7 +251,13 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	if (*offset + n >= *alloc_len)
+	if (NULL == *str)
+	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
 	{
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
@@ -519,7 +525,7 @@ void	compress_signs(char *str)
 		}
 	}
 
-	/* Remove '-', '+' where needed, Convert -123 to +D123 */
+	/* Remove '-', '+' where needed, Convert -123 to +N123 */
 	for(i=0;str[i]!='\0';i++)
 	{
 		cur=str[i];
@@ -534,7 +540,7 @@ void	compress_signs(char *str)
 			else
 			{
 				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				if(!isdigit(prev) && prev!='.' && strchr("KMGTsmhdw",prev)==NULL)
 				{
 					for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
 				}
@@ -550,7 +556,7 @@ void	compress_signs(char *str)
 			else
 			{
 				prev=str[i-1];
-				if(!isdigit(prev) && prev!='.')
+				if(!isdigit(prev) && prev!='.' && strchr("KMGTsmhdw",prev)==NULL)
 				{
 					str[i]='N';
 				}

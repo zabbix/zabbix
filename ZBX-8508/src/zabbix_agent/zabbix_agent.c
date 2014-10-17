@@ -203,7 +203,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
 			if (ZBX_TASK_TEST_METRIC == task)
-				test_parameter(TEST_METRIC, PROCESS_TEST);
+				test_parameter(TEST_METRIC);
 			else
 				test_parameters();
 			zabbix_close_log();

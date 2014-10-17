@@ -41,6 +41,44 @@
 
 static ZBX_METRIC	*commands = NULL;
 
+/*
+ * return value: 0 - error;
+ *               1 - command without parameters;
+ *               2 - command with parameters
+ */
+static int	parse_command_dyn(const char *command, char **cmd, size_t *cmd_alloc, char **param, size_t *param_alloc)
+{
+	const char	*pl, *pr;
+	size_t		cmd_offset = 0, param_offset = 0;
+
+	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
+		;
+
+	if (pl == command)
+		return 0;
+
+	zbx_strncpy_alloc(cmd, cmd_alloc, &cmd_offset, command, pl - command);
+
+	if ('\0' == *pl)	/* no parameters specified */
+	{
+		zbx_strncpy_alloc(param, param_alloc, &param_offset, "", 0);
+		return 1;
+	}
+
+	if ('[' != *pl)		/* unsupported character */
+		return 0;
+
+	for (pr = ++pl; '\0' != *pr; pr++)
+		;
+
+	if (']' != *--pr)
+		return 0;
+
+	zbx_strncpy_alloc(param, param_alloc, &param_offset, pl, pr - pl);
+
+	return 2;
+}
+
 void	add_metric(ZBX_METRIC *new)
 {
 	int	i = 0;
@@ -229,28 +267,39 @@ int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *para
 	return 2;
 }
 
-void	test_parameter(const char *key, unsigned flags)
+void	test_parameter(const char *key)
 {
+#define	ZBX_COL_WIDTH	45
+
 	AGENT_RESULT	result;
+	int		n;
+
+	n = printf("%s", key);
+
+	if (0 < n && ZBX_COL_WIDTH > n)
+		printf("%-*s", ZBX_COL_WIDTH - n, " ");
 
 	init_result(&result);
 
-	process(key, flags, &result);
+	if (SUCCEED == process(key, 0, &result))
+	{
+		if (ISSET_UI64(&result))
+			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
-	if (ISSET_UI64(&result))
-		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+		if (ISSET_DBL(&result))
+			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 
-	if (ISSET_DBL(&result))
-		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
+		if (ISSET_STR(&result))
+			printf(" [s|%s]", result.str);
 
-	if (ISSET_STR(&result))
-		printf(" [s|%s]", result.str);
+		if (ISSET_TEXT(&result))
+			printf(" [t|%s]", result.text);
 
-	if (ISSET_TEXT(&result))
-		printf(" [t|%s]", result.text);
-
-	if (ISSET_MSG(&result))
-		printf(" [m|%s]", result.msg);
+		if (ISSET_MSG(&result))
+			printf(" [m|%s]", result.msg);
+	}
+	else
+		printf(" [m|" ZBX_NOTSUPPORTED "]");
 
 	free_result(&result);
 
@@ -262,9 +311,29 @@ void	test_parameter(const char *key, unsigned flags)
 void	test_parameters()
 {
 	int	i;
+	char	*key = NULL;
+	size_t	key_alloc = 0;
 
 	for (i = 0; NULL != commands[i].key; i++)
-		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
+	{
+		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
+		{
+			size_t	key_offset = 0;
+
+			zbx_strcpy_alloc(&key, &key_alloc, &key_offset, commands[i].key);
+
+			if (0 != (commands[i].flags & CF_USEUPARAM) && NULL != commands[i].test_param)
+			{
+				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, '[');
+				zbx_strcpy_alloc(&key, &key_alloc, &key_offset, commands[i].test_param);
+				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, ']');
+			}
+
+			test_parameter(key);
+		}
+	}
+
+	zbx_free(key);
 }
 
 static int	zbx_check_user_parameter(const char *param, char *error, int max_error_len)
@@ -304,65 +373,51 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 	return SUCCEED;
 }
 
-static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
+static int	replace_param(const char *cmd, const char *param, char **out, size_t *out_alloc, char *error,
+		int max_error_len)
 {
-	int	ret = SUCCEED;
-	char	buf[MAX_STRING_LEN];
-	char	command[MAX_STRING_LEN];
-	char	*pl, *pr;
+	const char	*pl = cmd, *pr;
+	size_t		out_offset = 0;
+	char		*tmp;
+	int		ret = SUCCEED;
 
-	assert(out);
-
-	out[0] = '\0';
-
-	if (NULL == cmd && NULL == param)
-		return ret;
-
-	strscpy(command, cmd);
-
-	pl = command;
-
-	while (NULL != (pr = strchr(pl, '$')) && outlen > 0)
+	while (NULL != (pr = strchr(pl, '$')))
 	{
-		pr[0] = '\0';
-		zbx_strlcat(out, pl, outlen);
-		outlen -= MIN((int)strlen(pl), (int)outlen);
-		pr[0] = '$';
+		zbx_strncpy_alloc(out, out_alloc, &out_offset, pl, pr - pl);
 
-		if ('0' <= pr[1] && pr[1] <= '9')
+		pr++;
+
+		if ('0' == *pr)
 		{
-			buf[0] = '\0';
-
-			if ('0' == pr[1])
-			{
-				strscpy(buf, command);
-			}
-			else
-			{
-				get_param(param, (int)(pr[1] - '0'), buf, sizeof(buf));
-
-				if (SUCCEED != (ret = zbx_check_user_parameter(buf, error, max_error_len)))
-					break;
-			}
-
-			zbx_strlcat(out, buf, outlen);
-			outlen -= MIN((int)strlen(buf), (int)outlen);
-
-			pl = pr + 2;
-			continue;
+			zbx_strcpy_alloc(out, out_alloc, &out_offset, cmd);
 		}
-		else if ('$' == pr[1])
+		else if ('1' <= *pr && *pr <= '9')
 		{
-			pr++;	/* remove second '$' symbol */
+			if (NULL != (tmp = get_param_dyn(param, (int)(*pr - '0'))))
+			{
+				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, error, max_error_len)))
+				{
+					zbx_free(tmp);
+					break;
+				}
+
+				zbx_strcpy_alloc(out, out_alloc, &out_offset, tmp);
+
+				zbx_free(tmp);
+			}
+		}
+		else
+		{
+			if ('$' != *pr)
+				zbx_chrcpy_alloc(out, out_alloc, &out_offset, '$');
+			zbx_chrcpy_alloc(out, out_alloc, &out_offset, *pr);
 		}
 
 		pl = pr + 1;
-		zbx_strlcat(out, "$", outlen);
-		outlen -= 1;
 	}
 
-	zbx_strlcat(out, pl, outlen);
-	outlen -= MIN((int)strlen(pl), (int)outlen);
+	if (SUCCEED == ret)
+		zbx_strcpy_alloc(out, out_alloc, &out_offset, pl);
 
 	return ret;
 }
@@ -370,19 +425,18 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		rc, ret = NOTSUPPORTED;
-	char		usr_cmd[MAX_STRING_LEN];
-	char		usr_param[MAX_STRING_LEN];
-	char		usr_command[MAX_STRING_LEN];
-	char		param[MAX_STRING_LEN], error[MAX_STRING_LEN];
-
+	static char	*usr_command = NULL, *usr_cmd = NULL, *usr_param = NULL, *param = NULL;
+	static size_t	usr_command_alloc = 0, usr_cmd_alloc = 0, usr_param_alloc = 0, param_alloc = 0;
+	size_t		param_offset = 0;
+	char		error[MAX_STRING_LEN];
 	ZBX_METRIC	*command = NULL;
 
 	assert(result);
 	init_result(result);
 
-	alias_expand(in_command, usr_command, sizeof(usr_command));
+	alias_expand_dyn(in_command, &usr_command, &usr_command_alloc);
 
-	if (0 == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (0 == (rc = parse_command_dyn(usr_command, &usr_cmd, &usr_cmd_alloc, &usr_param, &usr_param_alloc)))
 		goto notsupported;
 
 	for (command = commands; NULL != command->key; command++)
@@ -391,65 +445,42 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			break;
 	}
 
-	if (NULL != command->key)
+	if (NULL == command->key)
+		goto notsupported;
+
+	if (0 == (command->flags & CF_USEUPARAM) && 2 == rc)
+		goto notsupported;
+
+	*error = '\0';
+
+	if (NULL != command->main_param)
 	{
 		if (0 != (command->flags & CF_USEUPARAM))
 		{
-			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
-				strscpy(usr_param, command->test_param);
-		}
-		else if (2 == rc)
-			goto notsupported;
-
-		*param = '\0';
-		*error = '\0';
-
-		if (NULL != command->main_param)
-		{
-			if (0 != (command->flags & CF_USEUPARAM))
+			if (FAIL == replace_param(command->main_param, usr_param, &param, &param_alloc,
+					error, sizeof(error)))
 			{
-				if (FAIL == replace_param(command->main_param, usr_param,
-						param, sizeof(param), error, sizeof(error)))
-				{
-					if ('\0' != *error)
-						zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
-					goto notsupported;
-				}
+				if ('\0' != *error)
+					zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
+				goto notsupported;
 			}
-			else
-				strscpy(param, command->main_param);
 		}
 		else
-			strscpy(param, usr_param);
-
-		if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
-		{
-			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-			goto notsupported;
-		}
+			zbx_strcpy_alloc(&param, &param_alloc, &param_offset, command->main_param);
 	}
 	else
+		zbx_strcpy_alloc(&param, &param_alloc, &param_offset, usr_param);
+
+	if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+	{
+		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 		goto notsupported;
+	}
 
 	ret = SUCCEED;
 
 notsupported:
-
-	if (0 != (flags & PROCESS_TEST))
-	{
-#define	COL_WIDTH	45
-
-		int	n1, n2 = 0;
-
-		n1 = printf("%s", usr_cmd);
-
-		if (0 < n1 && '\0' != *param)
-			n2 = printf("[%s]", param);
-
-		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
-			printf("%-*s", COL_WIDTH - n1 - n2, " ");
-	}
 
 	if (NOTSUPPORTED == ret)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
