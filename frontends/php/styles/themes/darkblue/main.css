@@ -512,7 +512,7 @@ select[disabled] option { background: #2b495e; }
 }
 
 .select { margin: 1px 4px 1px 1px; }
-.button{  border-color: #77B7DA; background: #022744; color: #77B7DA; }
+.button-plain {  border-color: #77B7DA; background: #022744; color: #77B7DA; }
 .button:hover { border-color: #022744; color: #022744; background: #77B7DA; text-decoration: none; }
 
 .link_menu { border: 0; background: none; color: #77B7DA; border-bottom: 1px dotted #77B7DA; }

@@ -25,27 +25,27 @@ class CButtonTest extends CTagTest {
 		return array(
 			array(
 				array(),
-				'<input class="input button shadow ui-corner-all" type="button" id="button" name="button" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" />'
 			),
 			array(
 				array('my-button'),
-				'<input class="input button shadow ui-corner-all" type="button" id="my-button" name="my-button" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="button" id="my-button" name="my-button" value="" />'
 			),
 			array(
 				array('button[value]'),
-				'<input class="input button shadow ui-corner-all" type="button" id="button_value" name="button[value]" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button_value" name="button[value]" value="" />'
 			),
 			array(
 				array('button', 'caption'),
-				'<input class="input button shadow ui-corner-all" type="button" id="button" name="button" value="caption" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="caption" />'
 			),
 			array(
 				array('button', 'caption', 'callback()'),
-				'<input class="input button shadow ui-corner-all" type="button" id="button" name="button" value="caption" onclick="callback()" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="caption" onclick="callback()" />'
 			),
 			array(
 				array('button', 'caption', null, 'my-class'),
-				'<input class="input my-class" type="button" id="button" name="button" value="caption" />'
+				'<input class="input button my-class" type="button" id="button" name="button" value="caption" />'
 			),
 		);
 	}
@@ -54,7 +54,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setReadonly(true);
 		$this->assertEquals(
-			'<input class="input button shadow ui-corner-all" type="button" id="button" name="button" value="" readonly="readonly" />',
+			'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" readonly="readonly" />',
 			(string) $button
 		);
 	}
@@ -63,7 +63,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setEnabled(false);
 		$this->assertEquals(
-			'<input class="input button shadow ui-corner-all" type="button" id="button" name="button" value="" disabled="disabled" />',
+			'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" disabled="disabled" />',
 			(string) $button
 		);
 	}
@@ -81,7 +81,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->main();
 		$this->assertEquals(
-			'<input class="input button shadow ui-corner-all main" type="button" id="button" name="button" value="" />',
+			'<input class="input button button-plain shadow ui-corner-all main" type="button" id="button" name="button" value="" />',
 			(string) $button
 		);
 	}
@@ -93,7 +93,7 @@ class CButtonTest extends CTagTest {
 	 * @param $class
 	 * @return CButton
 	 */
-	protected function createTag($name = 'button', $caption = '', $action = null, $class = null) {
+	protected function createTag($name = 'button', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
 		return new CButton($name, $caption, $action, $class);
 	}
 }
