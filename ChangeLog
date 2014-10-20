@@ -5,7 +5,6 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-..F....... [ZBX-8753] fixed host mass update form being canceled when trying to change host inventory type (Pavels)
 .......PS. [ZBX-6163] added session restoring to MySQL connections in case of losing connection to the database (Juris)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
 ...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
