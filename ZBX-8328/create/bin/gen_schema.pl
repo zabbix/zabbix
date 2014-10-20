@@ -91,18 +91,18 @@ my %ibm_db2 = (
 	"after"		=>	"",
 	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
-	"t_char"	=>	"vargraphic",
-	"t_text"	=>	"dbclob(2048)",
+	"t_char"	=>	"varchar",
+	"t_text"	=>	"varchar(2048)",
 	"t_double"	=>	"decfloat(16)",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"integer",
-	"t_longtext"	=>	"dbclob(2048)",
+	"t_longtext"	=>	"varchar(2048)",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint",
-	"t_shorttext"	=>	"dbclob(2048)",
+	"t_shorttext"	=>	"varchar(2048)",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"vargraphic"
+	"t_varchar"	=>	"varchar"
 );
 
 my %mysql = (
