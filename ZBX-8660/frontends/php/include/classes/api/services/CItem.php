@@ -573,7 +573,7 @@ class CItem extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$dbItems = $this->get(array(
-			'output' => array('itemid', 'hostid', 'flags'),
+			'output' => array('itemid', 'flags'),
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
