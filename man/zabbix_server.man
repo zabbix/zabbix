@@ -10,7 +10,7 @@ zabbix_server \- Zabbix server daemon
 .RB [ \-c
 .IR config\-file ]
 .B \-R
-.I runtime-option
+.I runtime\-option
 .br
 .B zabbix_server \-h
 .br
@@ -22,8 +22,8 @@ is the core daemon of Zabbix software.
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
-.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime-option\fR"
-Perform administrative functions according to \fIruntime-option\fR.
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
+Perform administrative functions according to \fIruntime\-option\fR.
 .SS
 .RS 4
 Runtime control options
@@ -55,12 +55,12 @@ Process identifier
 .RE
 .RS 4
 .TP 4
-.I process-type
+.I process\-type
 All processes of specified type (e.g., poller)
 .RE
 .RS 4
 .TP 4
-.I process-type,N
+.I process\-type,N
 Process type and number (e.g., poller,3)
 .RE
 .RE

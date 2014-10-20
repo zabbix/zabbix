@@ -1417,25 +1417,11 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => '',
-					'formulaValue' => '',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
 					'formula' => ' ',
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
@@ -1445,53 +1431,11 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => 'form ula',
-					'formulaValue' => 'form ula',
+					'formula' => ' value ',
+					'formulaValue' => 'value',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' a1b2 c3 ',
-					'formulaValue' => 'a1b2 c3',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' 32 1 abc',
-					'formulaValue' => '32 1 abc',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => '32 1 abc',
-					'formulaValue' => '32 1 abc',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "value" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
@@ -1505,7 +1449,7 @@ class testFormItemPrototype extends CWebTest {
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "321abc" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
