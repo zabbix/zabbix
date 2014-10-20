@@ -103,7 +103,7 @@ $fields = array(
 	'multiplier' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'delta' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
 		'(isset({add}) || isset({update})) && isset({value_type}) && '.IN('0,3','value_type').'(isset({data_type}) && ({data_type} != '.ITEM_DATA_TYPE_BOOLEAN.'))'),
-	'formula' =>				array(T_ZBX_DBL, O_OPT, null,	NOT_ZERO,
+	'formula' =>				array(T_ZBX_DBL_STR, O_OPT, null,	NOT_ZERO,
 		'(isset({add}) || isset({update})) && isset({multiplier}) && ({multiplier} == 1) && '.IN('0,3','value_type'), _('Custom multiplier')),
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && (isset({value_type}) && ({value_type} == 2))'),
