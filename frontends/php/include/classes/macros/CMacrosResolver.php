@@ -609,7 +609,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array	list of strings with macros replaced with corresponding values
 	 */
-	private function resolveGraphsFunctionalItemMacros($strList, $itemsList) {
+	private function resolveGraphsFunctionalItemMacros(array $strList, array $itemsList) {
 		// retrieve all string macros and all host-key pairs
 		$hostKeyPairs = array();
 		$matchesList = array();
@@ -637,7 +637,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			$matchesList[$str] = $matches;
+			$matchesList[] = $matches;
 			$items = next($itemsList);
 		}
 
@@ -679,11 +679,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$matches = reset($matchesList);
 
 		foreach ($strList as &$str) {
-			// If string was not matched with functional item macro, skip it.
-			if (!isset($matchesList[$str])) {
-				continue;
-			}
-
 			// iterate array backwards!
 			$i = count($matches['macros']);
 
