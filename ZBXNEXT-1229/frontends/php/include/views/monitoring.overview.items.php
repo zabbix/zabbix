@@ -33,8 +33,8 @@ $overviewWidget->addHeader(_('Overview'), $headerForm);
 
 // hint table
 $hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
-for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
@@ -85,8 +85,7 @@ $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRang
 $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
 
 // data table
-$config = select_config();
-if ($config['dropdown_first_entry']) {
+if ($this->data['config']['dropdown_first_entry']) {
 	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
 		$this->data['view_style']
 	);

@@ -213,30 +213,32 @@ char	*opt = NULL;
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num)
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
 	int	server_count = 0;
 
-	if (0 == server_num)
+	if (0 == local_server_num)
 	{
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*process_num = server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_COLLECTOR;
+		*local_process_num = local_server_num - server_count + CONFIG_COLLECTOR_FORKS;
 	}
-	else if (server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_PASSIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*process_num = server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_LISTENER;
+		*local_process_num = local_server_num - server_count + CONFIG_PASSIVE_FORKS;
 
 	}
-	else if (server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_ACTIVE_FORKS))
 	{
-		*process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*process_num = server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
+		*local_process_num = local_server_num - server_count + CONFIG_ACTIVE_FORKS;
 	}
 	else
 		return FAIL;
@@ -268,32 +270,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				opt_r++;
-				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
-							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-
-				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
-							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					zbx_error("invalid runtime control option: %s", zbx_optarg);
+				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
 					exit(EXIT_FAILURE);
-				}
+
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 #endif
@@ -976,21 +955,19 @@ void	zbx_free_service_resources(void)
 		zbx_free(threads);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-#ifndef _WINDOWS
-	unload_modules();
-#endif
-	zabbix_close_log();
-
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
+#else
+	unload_modules();
 #endif
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
 }
 
 void	zbx_on_exit(void)

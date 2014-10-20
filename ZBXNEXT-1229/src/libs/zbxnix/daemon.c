@@ -35,7 +35,8 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern int	get_process_info_by_thread(int server_num, unsigned char *process_type, int *process_num);
+extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num);
 
 #ifdef HAVE_SIGQUEUE
 extern void	zbx_sigusr_handler(int flags);

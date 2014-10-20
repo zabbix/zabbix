@@ -130,6 +130,7 @@ AC_CHECK_HEADERS(linux/netlink.h, [
 #  include <sys/socket.h>
 #endif
 ])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for libraries                      *
@@ -848,6 +849,7 @@ int main()
 ],
 AC_DEFINE(HAVE_LONG_LONG_QU, 1 ,[Define to 1 if format '%qu' exists.])
 AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no),
 AC_MSG_RESULT(no))
 
 dnl option -rdynamic is needed for readable backtraces

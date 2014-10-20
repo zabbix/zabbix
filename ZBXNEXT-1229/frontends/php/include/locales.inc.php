@@ -25,21 +25,19 @@ function init_mbstrings() {
 
 	if (version_compare(PHP_VERSION, '5.6', '<')) {
 		ini_set('mbstring.internal_encoding', 'UTF-8');
-		$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
-	} else {
-		// it may be necessary to check / set php.internal encoding too after 5.6 is released, see ZBX-8278
+		$res &= (ini_get('mbstring.internal_encoding') === 'UTF-8');
+	}
+	else {
 		ini_set('default_charset', 'UTF-8');
-		$res &= (ini_get('default_charset') == 'UTF-8');
+		$res &= (ini_get('default_charset') === 'UTF-8');
 	}
 
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
 
-
 	return $res;
 }
 
-/**
 /**
  * Returns a list of all used locales.
  *
@@ -59,7 +57,7 @@ function getLocales() {
 		'cs_CZ' => array('name' => _('Czech (cs_CZ)'),		'display' => false),
 		'nl_NL' => array('name' => _('Dutch (nl_NL)'),		'display' => false),
 		'fi_FI' => array('name' => _('Finnish (fi_FI)'),	'display' => false),
-		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => true),
+		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => false),
 		'de_DE' => array('name' => _('German (de_DE)'),		'display' => false),
 		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => false),
 		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
