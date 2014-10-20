@@ -44,7 +44,7 @@ div.preloader {
 	color: #000000;
 }
 
-.input[disabled], .input[disabled]:hover,
+.input[disabled], .input[disabled]:hover, .input[disabled]:focus,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #d0d0d0;
 	background: #eeeeee;
