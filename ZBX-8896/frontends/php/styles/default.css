@@ -164,9 +164,6 @@ input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor:
 input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
 input[type="submit"].input[disabled].formlist { cursor: default; background: #fff; border-color: #aca899; }
-input.jqueryinput,
-.jqueryinputset input[type="button"],
-.jqueryinputset input[type="submit"] { height: auto; }
 .text, .multiselect { padding-left: 2px; padding-right: 2px }
 input.macro { text-transform: uppercase; }
 textarea.textarea_standard,
@@ -186,6 +183,7 @@ textarea.textarea_big { height: auto; }
 	margin: 1px 2px 1px 1px;
 }
 .button:hover { border-color: black; cursor: pointer; }
+.ui-button { padding: .3em 1em; }
 
 /* button displayed as link */
 .link_menu {
