@@ -64,11 +64,17 @@ zbx_db_version_t;
 #	define ZBX_TYPE_ID_STR		"number(20)"
 #endif
 
-#ifdef HAVE_ORACLE
+#if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_INT_STR		"number(10)"
-#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
 #else
 #	define ZBX_TYPE_INT_STR		"integer"
+#endif
+
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_CHAR_STR	"vargraphic"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#else
 #	define ZBX_TYPE_CHAR_STR	"varchar"
 #endif
 
@@ -87,7 +93,7 @@ zbx_db_version_t;
 #endif
 
 #if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_SHORTTEXT_STR	"varchar(2048)"
+#	define ZBX_TYPE_SHORTTEXT_STR	"dbclob(2048)"
 #elif defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
 #else
@@ -95,7 +101,7 @@ zbx_db_version_t;
 #endif
 
 #if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
+#	define ZBX_TYPE_TEXT_STR	"dbclob(2048)"
 #elif defined(HAVE_ORACLE)
 #	define ZBX_TYPE_TEXT_STR	"nclob"
 #else
