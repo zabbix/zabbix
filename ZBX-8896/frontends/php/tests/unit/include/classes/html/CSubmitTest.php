@@ -25,27 +25,27 @@ class CSubmitTest extends CTagTest {
 		return array(
 			array(
 				array(),
-				'<input class="input button shadow ui-corner-all" type="submit" id="submit" name="submit" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="submit" name="submit" value="" />'
 			),
 			array(
 				array('my-button'),
-				'<input class="input button shadow ui-corner-all" type="submit" id="my-button" name="my-button" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="my-button" name="my-button" value="" />'
 			),
 			array(
 				array('button[value]'),
-				'<input class="input button shadow ui-corner-all" type="submit" id="button_value" name="button[value]" value="" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button_value" name="button[value]" value="" />'
 			),
 			array(
 				array('button', 'caption'),
-				'<input class="input button shadow ui-corner-all" type="submit" id="button" name="button" value="caption" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption" />'
 			),
 			array(
 				array('button', 'caption', 'callback()'),
-				'<input class="input button shadow ui-corner-all" type="submit" id="button" name="button" value="caption" onclick="callback()" />'
+				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption" onclick="callback()" />'
 			),
 			array(
 				array('button', 'caption', null, 'my-class'),
-				'<input class="input my-class" type="submit" id="button" name="button" value="caption" />'
+				'<input class="input button my-class" type="submit" id="button" name="button" value="caption" />'
 			),
 		);
 	}
@@ -56,7 +56,7 @@ class CSubmitTest extends CTagTest {
 	 * @param $class
 	 * @return CSubmit
 	 */
-	protected function createTag($name = 'submit', $caption = '', $action = null, $class = null) {
+	protected function createTag($name = 'submit', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
 		return new CSubmit($name, $caption, $action, $class);
 	}
 }

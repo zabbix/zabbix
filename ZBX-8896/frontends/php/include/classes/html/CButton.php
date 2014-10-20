@@ -28,8 +28,8 @@ class CButton extends CInput {
 	 */
 	protected $attrEncStrategy = self::ENC_NOAMP;
 
-	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
-		parent::__construct('button', $name, $caption, $class);
+	public function __construct($name = 'button', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
+		parent::__construct('button', $name, $caption, 'button '.$class);
 		$this->addAction('onclick', $action);
 		return $this;
 	}
