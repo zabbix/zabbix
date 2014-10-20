@@ -1059,7 +1059,7 @@ jQuery(function ($) {
 	 *
 	 * @param options
 	 */
-	$.fn.enterSubmit = function(options) {
+	$.fn.enterSubmit = function (options) {
 		options = $.extend({}, options);
 
 		if (options.submitButtonSelector == null) {
@@ -1067,7 +1067,7 @@ jQuery(function ($) {
 		}
 
 		// Take only form elements.
-		$(this).filter('form').each(function() {
+		$(this).filter('form').each(function () {
 			var form = $(this);
 
 			function keypressHandler(e) {
@@ -1076,30 +1076,48 @@ jQuery(function ($) {
 					return true;
 				}
 
-				// Determine where to look for submit button. If there are anything with "subform" class
-				// in given form, use that as place where to look. Otherwise just use given form.
-				var submitButtonContainer = $(this).closest('.subform', form);
-				if (submitButtonContainer.length == 0) {
+				/* Determine where to look for submit button. If there are anything with "subform" class
+				in given form, use that as place where to look. Otherwise just use given form. */
+				var submitButtonContainer;
+				var subFormContainer = $(this).closest('.subform', form);
+				if (subFormContainer.length == 0) {
 					submitButtonContainer = form;
 				}
-
-				// Look for submit button using given selector.
-				options.submitButton = $(options.submitButtonSelector, submitButtonContainer);
-
-				// If nothing is found, leave and let keypress event bubble up.
-				if (options.submitButton.length == 0) {
-					return true;
+				else {
+					submitButtonContainer = subFormContainer;
 				}
 
-				// If all went well, click found submit button and do not bubble event.
-				options.submitButton.click();
+				/* Look for submit button using given selector. Selector in options.submitButtonSelector alone will
+				return all submit buttons found, which is not what we need. Depending on whether element that
+				received "Enter" is inside "subform", a filter is applied:
+				- When activated inside "subform" reject all submit buttons that are not from current "subform",
+				i.e. parent is a "subform" element, but not the right one.
+				- When activated outside "subform" reject any submit button that is inside a "subform". */
+				var submitButton = $(options.submitButtonSelector, submitButtonContainer);
+				if (subFormContainer.length != 0) {
+					submitButton = submitButton.filter(function() {
+						return $(this).parent('.subform').is(submitButtonContainer);
+					});
+				}
+				else {
+					submitButton = submitButton.filter(function() {
+						return $(this).parent('.subform').length == 0
+					});
+				}
 
-				return false;
+				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
+				if (submitButton.length == 0) {
+					return true;
+				}
+				else {
+					submitButton.click();
+					return false;
+				}
 			}
 
 			// Attach to inputs and selects (both those that exist now and that will be created in this form).
-			form.on('keypress', 'input', keypressHandler)
-				.on('keypress', 'select', keypressHandler);
+			form.on('keypress', 'input', keypressHandler);
+			form.on('keypress', 'select', keypressHandler);
 		});
 
 		return this;
