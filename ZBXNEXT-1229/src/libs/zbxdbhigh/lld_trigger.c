@@ -89,6 +89,7 @@ zbx_lld_function_t;
 
 typedef struct
 {
+	zbx_uint64_t		parent_triggerid;
 	zbx_uint64_t		itemid;
 	zbx_lld_trigger_t	*trigger;
 }
@@ -495,16 +496,16 @@ static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t
  * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_trigger_t	*lld_trigger_get(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers,
+static zbx_lld_trigger_t	*lld_trigger_get(zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_hashset_t *items_triggers, zbx_vector_ptr_t *item_links)
 {
 	int			i, index;
 	zbx_lld_item_link_t	*item_link;
-	zbx_lld_item_trigger_t	*item_trigger;
+	zbx_lld_item_trigger_t	*item_trigger, item_trigger_local;
 
-	for (i = 0; i < functions_proto->values_num; i++)
+	for (i = 0; i < trigger_prototype->functions.values_num; i++)
 	{
-		zbx_lld_function_t	*function = (zbx_lld_function_t *)functions_proto->values[i];
+		zbx_lld_function_t	*function = (zbx_lld_function_t *)trigger_prototype->functions.values[i];
 
 		index = zbx_vector_ptr_bsearch(item_links, &function->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -513,7 +514,10 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_vector_ptr_t *functions_proto, zbx
 
 		item_link = (zbx_lld_item_link_t *)item_links->values[index];
 
-		if (NULL != (item_trigger = zbx_hashset_search(items_triggers, &item_link->itemid)))
+		item_trigger_local.parent_triggerid = trigger_prototype->triggerid;
+		item_trigger_local.itemid = item_link->itemid;
+
+		if (NULL != (item_trigger = zbx_hashset_search(items_triggers, &item_trigger_local)))
 			return item_trigger->trigger;
 	}
 
@@ -770,7 +774,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	trigger = lld_trigger_get(&trigger_prototype->functions, triggers, items_triggers, &lld_row->item_links);
+	trigger = lld_trigger_get(trigger_prototype, items_triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, trigger_prototype->expression);
 	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
@@ -852,6 +856,27 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static zbx_hash_t	items_triggers_hash_func(const void *data)
+{
+	const zbx_lld_item_trigger_t	*item_trigger = data;
+	zbx_hash_t			hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&item_trigger->parent_triggerid);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&item_trigger->itemid, sizeof(zbx_uint64_t), hash);
+
+	return hash;
+}
+
+static int	items_triggers_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_trigger_t	*item_trigger1 = d1, *item_trigger2 = d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item_trigger1->parent_triggerid, item_trigger2->parent_triggerid);
+	ZBX_RETURN_IF_NOT_EQUAL(item_trigger1->itemid, item_trigger2->itemid);
+
+	return 0;
+}
+
 static void	lld_triggers_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
 		zbx_vector_ptr_t *items, zbx_vector_ptr_t *lld_rows, char **error)
 {
@@ -863,7 +888,7 @@ static void	lld_triggers_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 	zbx_lld_item_trigger_t		item_trigger;
 
 	/* used for fast search of trigger by item prototype */
-	zbx_hashset_create(&items_triggers, 512, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
@@ -873,6 +898,7 @@ static void	lld_triggers_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 		{
 			function = (zbx_lld_function_t *)trigger->functions.values[j];
 
+			item_trigger.parent_triggerid = trigger->parent_triggerid;
 			item_trigger.itemid = function->itemid;
 			item_trigger.trigger = trigger;
 			zbx_hashset_insert(&items_triggers, &item_trigger, sizeof(item_trigger));
