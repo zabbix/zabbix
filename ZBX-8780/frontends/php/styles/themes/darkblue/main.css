@@ -476,7 +476,7 @@ input[type="submit"].input[disabled].formlist {
 	color: #ffffff;
 }
 
-.input[disabled], .input[disabled]:hover, .input[disabled]:focus,
+.input[disabled], .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #4e738c;
 	background: #2b495e;
