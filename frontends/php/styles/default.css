@@ -159,7 +159,6 @@ form { margin: 0; }
 }
 select[multiple="multiple"], select.openView { height: auto; }
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
-input[type="reset"],
 input[type="file"] { height: auto; }
 input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #fff; height: 20px; }
 input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
