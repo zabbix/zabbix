@@ -25,27 +25,37 @@ class CSubmitTest extends CTagTest {
 		return array(
 			array(
 				array(),
-				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="submit" name="submit" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="submit" name="submit" value=""></button>'
 			),
 			array(
 				array('my-button'),
-				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="my-button" name="my-button" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="my-button" name="my-button" value=""></button>'
 			),
 			array(
 				array('button[value]'),
-				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button_value" name="button[value]" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button_value" name="button[value]" value=""></button>'
 			),
 			array(
 				array('button', 'caption'),
-				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption" />'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption">caption</button>'
 			),
 			array(
 				array('button', 'caption', 'callback()'),
-				'<input class="input button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption" onclick="callback()" />'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" onclick="callback()" value="caption">caption</button>'
 			),
 			array(
 				array('button', 'caption', null, 'my-class'),
-				'<input class="input button my-class" type="submit" id="button" name="button" value="caption" />'
+				'<button class="button my-class" type="submit" id="button" name="button" value="caption">caption</button>'
+			),
+			// value encoding
+			array(
+				array('button', '</button>'),
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="&lt;/button&gt;">&lt;/button&gt;</button>'
+			),
+			// parameter encoding
+			array(
+				array('button"&"'),
+				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;" value=""></button>'
 			),
 		);
 	}
