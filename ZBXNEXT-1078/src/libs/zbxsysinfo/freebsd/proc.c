@@ -22,18 +22,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 
-#if(__FreeBSD_version > 500000)
-#	define ZBX_COMMLEN	COMMLEN
-#	define ZBX_PROC_PID	ki_pid
-#	define ZBX_PROC_COMM	ki_comm
-#	define ZBX_PROC_STAT	ki_stat
-#	define ZBX_PROC_TSIZE	ki_tsize
-#	define ZBX_PROC_DSIZE	ki_dsize
-#	define ZBX_PROC_SSIZE	ki_ssize
-#	define ZBX_PROC_RSSIZE	ki_rssize
-#	define ZBX_PROC_VSIZE	ki_size
-#	define ZBX_PROC_FLAG 	ki_flag
-#else
+#if (__FreeBSD_version) < 500000
 #	define ZBX_COMMLEN	MAXCOMLEN
 #	define ZBX_PROC_PID	kp_proc.p_pid
 #	define ZBX_PROC_COMM	kp_proc.p_comm
@@ -43,7 +32,27 @@
 #	define ZBX_PROC_SSIZE	kp_eproc.e_vm.vm_ssize
 #	define ZBX_PROC_RSSIZE	kp_eproc.e_vm.vm_rssize
 #	define ZBX_PROC_VSIZE	kp_eproc.e_vm.vm_map.size
+#else
+#	define ZBX_COMMLEN	COMMLEN
+#	define ZBX_PROC_PID	ki_pid
+#	define ZBX_PROC_COMM	ki_comm
+#	define ZBX_PROC_STAT	ki_stat
+#	define ZBX_PROC_TSIZE	ki_tsize
+#	define ZBX_PROC_DSIZE	ki_dsize
+#	define ZBX_PROC_SSIZE	ki_ssize
+#	define ZBX_PROC_RSSIZE	ki_rssize
+#	define ZBX_PROC_VSIZE	ki_size
+#endif
+
+#if (__FreeBSD_version) < 500000
 #	define ZBX_PROC_FLAG 	kp_proc.p_flag
+#	define ZBX_PROC_MASK	P_INMEM
+#elif (__FreeBSD_version) < 700000
+#	define ZBX_PROC_FLAG 	ki_sflag
+#	define ZBX_PROC_MASK	PS_INMEM
+#else
+#	define ZBX_PROC_FLAG 	ki_flag
+#	define ZBX_PROC_MASK	P_INMEM
 #endif
 
 static char	*get_commandline(struct kinfo_proc *proc)
@@ -103,12 +112,11 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
-#if(__FreeBSD_version > 500000)
-	unsigned long 	mem_pages;
-#else
+#if (__FreeBSD_version) < 500000
 	int		mem_pages;
+#else
+	unsigned long 	mem_pages;
 #endif
-
 	size_t	sz;
 
 	struct kinfo_proc	*proc = NULL;
@@ -206,10 +214,10 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-#if(__FreeBSD_version > 500000)
-		mib[2] = KERN_PROC_PROC;
-#else
+#if (__FreeBSD_version) < 500000
 		mib[2] = KERN_PROC_ALL;
+#else
+		mib[2] = KERN_PROC_PROC;
 #endif
 		mib[3] = 0;
 		mibs = 3;
@@ -273,12 +281,11 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				byte_value = proc[i].ZBX_PROC_VSIZE;
 				break;
 			case ZBX_PMEM:
-				/* P_INMEM is defined differently on FreeBSD 4.2 and 9.3 */
-				if (0 != (proc[i].ZBX_PROC_FLAG & P_INMEM))
-#if(__FreeBSD_version > 500000)
-					pct_value = ((float)proc[i].ZBX_PROC_RSSIZE / mem_pages) * 100.0;
-#else
+				if (0 != (proc[i].ZBX_PROC_FLAG & ZBX_PROC_MASK))
+#if (__FreeBSD_version) < 500000
 					pct_value = ((float)(proc[i].ZBX_PROC_RSSIZE + UPAGES) / mem_pages) * 100.0;
+#else
+					pct_value = ((float)proc[i].ZBX_PROC_RSSIZE / mem_pages) * 100.0;
 #endif
 				else
 					pct_value = 0.0;
@@ -428,7 +435,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-#if(__FreeBSD_version > 500000)
+#if (__FreeBSD_version) > 500000
 		mib[2] = KERN_PROC_PROC;
 #else
 		mib[2] = KERN_PROC_ALL;
