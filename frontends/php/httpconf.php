@@ -529,7 +529,7 @@ if (isset($_REQUEST['form'])) {
 		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', 60);
 		$data['retries'] = getRequest('retries', 1);
-		$data['agent'] = getRequest('agent', '');
+		$data['agent'] = getRequest('agent', 'Zabbix');
 		$data['variables'] = getRequest('variables', array());
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
