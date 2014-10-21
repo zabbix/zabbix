@@ -70,6 +70,11 @@ class CFrontendSetup {
 		if (extension_loaded('mbstring')) {
 			$result[] = $this->checkPhpMbstringFuncOverload();
 		}
+
+		// check for deprecated PHP 5.6.0 option 'always_populate_raw_post_data'
+		if (version_compare(PHP_VERSION, '5.6', '>=')) {
+			$result[] = $this->checkPhpAlwaysPopulateRawPostData();
+		}
 		$result[] = $this->checkPhpSockets();
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
@@ -326,6 +331,27 @@ class CFrontendSetup {
 			'required' => _('off'),
 			'result' => ($current & 2) ? self::CHECK_FATAL : self::CHECK_OK,
 			'error' => _('PHP string function overloading must be disabled.')
+		);
+	}
+
+	/**
+	 * Checks for PHP option always_populate_raw_post_data. As of PHP version 5.6.0 this option is deprecated.
+	 * In case this option is not set or is enabled, PHP will throw E_DEPRECATED error. This option should be set to -1
+	 * ini php.ini and cannot be set at runtime.
+	 *
+	 * See: http://php.net/manual/en/ini.core.php#ini.always-populate-raw-post-data
+	 *
+	 * @return array
+	 */
+	public function checkPhpAlwaysPopulateRawPostData() {
+		$current = ini_get('always_populate_raw_post_data');
+
+		return array(
+			'name' => _('PHP always_populate_raw_post_data'),
+			'current' => ($current != -1) ? _('on') : _('off'),
+			'required' => _('off'),
+			'result' => ($current != -1) ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _('PHP always_populate_raw_post_data must be set to -1.')
 		);
 	}
 
