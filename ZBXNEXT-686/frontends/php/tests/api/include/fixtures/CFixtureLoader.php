@@ -65,9 +65,6 @@ class CFixtureLoader {
 			catch (InvalidArgumentException $e) {
 				throw new InvalidArgumentException($this->getExceptionMessage($name, $e->getMessage()), null, $e);
 			}
-			catch (UnexpectedValueException $e) {
-				throw new UnexpectedValueException($this->getExceptionMessage($name, $e->getMessage()), null, $e);
-			}
 		}
 
 		return $fixtures;

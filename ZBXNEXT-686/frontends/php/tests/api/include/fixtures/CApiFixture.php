@@ -27,6 +27,8 @@ class CApiFixture extends CFixture {
 	 * - params	- array of parameters for the method
 	 */
 	public function load(array $params) {
+		$this->checkMissingParams($params, array('method', 'params'));
+
 		// if the client is not authenticated - log in
 		// TODO: pass credentials as a parameter
 		if (!$this->apiWrapper->auth) {

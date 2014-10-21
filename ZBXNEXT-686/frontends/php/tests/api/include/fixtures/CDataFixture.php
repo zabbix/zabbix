@@ -15,6 +15,8 @@ class CDataFixture extends CFixture {
 	 * - generateIds	- whether to automatically generate IDs for the inserted rows; defaults to true
 	 */
 	public function load(array $params) {
+		$this->checkMissingParams($params, array('table', 'values'));
+
 		$generateIds = isset($params['generateIds']) ? $params['generateIds'] : true;
 
 		try {
@@ -28,10 +30,17 @@ class CDataFixture extends CFixture {
 			DBend(false);
 
 			global $ZBX_MESSAGES;
-			$lastMessage = array_pop($ZBX_MESSAGES);
+
+			if ($ZBX_MESSAGES) {
+				$lastMessage = array_pop($ZBX_MESSAGES);
+				$message = $lastMessage['message'];
+			}
+			else {
+				$message = $e->getMessage();
+			}
 
 			// treat all DB errors as invalid argument exceptions
-			throw new InvalidArgumentException($lastMessage['message'], $e->getCode(), $e);
+			throw new InvalidArgumentException($message, $e->getCode(), $e);
 		}
 
 		return $ids;

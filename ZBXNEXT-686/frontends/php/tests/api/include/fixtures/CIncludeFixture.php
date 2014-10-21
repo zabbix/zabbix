@@ -33,6 +33,8 @@ class CIncludeFixture extends CFixture {
 	 * - params	- parameters passed to the file
 	 */
 	public function load(array $params) {
+		$this->checkMissingParams($params, array('file'));
+
 		if (!isset($params['params'])) {
 			$params['params'] = array();
 		}
@@ -45,9 +47,17 @@ class CIncludeFixture extends CFixture {
 			);
 		}
 
-		$fixtureFile = yaml_parse_file($path);
+		try {
+			$fixtureFile = yaml_parse_file($path);
+		}
+		catch (Exception $e) {
+			throw new InvalidArgumentException(
+				sprintf('Cannot parse fixture file: %1$s', $e->getMessage())
+			);
+		}
 
-		$fixtures = $this->fixtureLoader->load($fixtureFile['fixtures'], $params['params']);
+		$fixtures = (isset($fixtureFile['fixtures'])) ? $fixtureFile['fixtures'] : array();
+		$fixtures = $this->fixtureLoader->load($fixtures, $params['params']);
 
 		$return = (isset($fixtureFile['return'])) ? $fixtureFile['return'] : array();
 

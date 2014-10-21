@@ -9,6 +9,8 @@ class CUpdateFixture extends CFixture {
 	 * - where	- where condition
 	 */
 	public function load(array $params) {
+		$this->checkMissingParams($params, array('table', 'values', 'where'));
+
 		try {
 			DB::update($params['table'], array(
 				'values' => $params['values'],
