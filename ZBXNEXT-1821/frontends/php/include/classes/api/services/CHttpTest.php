@@ -286,6 +286,14 @@ class CHttpTest extends CApiService {
 
 		$this->validateCreate($httpTests);
 
+		// set default user agent "Zabbix"
+		foreach ($httpTests as &$httpTest) {
+			if (!isset($httpTest['agent'])) {
+				$httpTest['agent'] = 'Zabbix';
+			}
+		}
+		unset($httpTest);
+
 		$httpTests = Manager::HttpTest()->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
