@@ -35,6 +35,7 @@ PROXY_SUBDIRS = \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
+	zbxmedia \
 	zbxself
 endif
 
