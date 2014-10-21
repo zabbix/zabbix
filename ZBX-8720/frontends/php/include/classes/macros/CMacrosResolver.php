@@ -651,17 +651,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($hostKeyPairs as $host => $keys) {
 			$queryParts[] = '(h.host='.zbx_dbstr($host).' AND '.dbConditionString('i.key_', array_keys($keys)).')';
 		}
-		$query = 'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
-					' FROM items i,hosts h'.
-					' WHERE i.hostid=h.hostid AND ('.join(' OR ', $queryParts).')';
 
 		// get necessary items for all graph strings
-		$items = DBfetchArrayAssoc(DBselect($query), 'itemid');
+		$items = DBfetchArrayAssoc(DBselect(
+			'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND ('.join(' OR ', $queryParts).')'
+		), 'itemid');
 
 		$allowedItems = API::Item()->get(array(
+			'output' => array('itemid'),
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => array('itemid', 'value_type'),
 			'preservekeys' => true
 		));
 
