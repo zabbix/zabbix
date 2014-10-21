@@ -25,27 +25,37 @@ class CButtonTest extends CTagTest {
 		return array(
 			array(
 				array(),
-				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>'
 			),
 			array(
 				array('my-button'),
-				'<input class="input button button-plain shadow ui-corner-all" type="button" id="my-button" name="my-button" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="my-button" name="my-button"></button>'
 			),
 			array(
 				array('button[value]'),
-				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button_value" name="button[value]" value="" />'
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button_value" name="button[value]"></button>'
 			),
 			array(
 				array('button', 'caption'),
-				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="caption" />'
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">caption</button>'
 			),
 			array(
 				array('button', 'caption', 'callback()'),
-				'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="caption" onclick="callback()" />'
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" onclick="callback()">caption</button>'
 			),
 			array(
 				array('button', 'caption', null, 'my-class'),
-				'<input class="input button my-class" type="button" id="button" name="button" value="caption" />'
+				'<button class="button my-class" type="button" id="button" name="button">caption</button>'
+			),
+			// value encoding
+			array(
+				array('button', '</button>'),
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">&lt;/button&gt;</button>'
+			),
+			// parameter encoding
+			array(
+				array('button"&"'),
+				'<button class="button button-plain shadow ui-corner-all" type="button" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;"></button>'
 			),
 		);
 	}
@@ -54,7 +64,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setReadonly(true);
 		$this->assertEquals(
-			'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" readonly="readonly" />',
+			'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" readonly="readonly"></button>',
 			(string) $button
 		);
 	}
@@ -63,7 +73,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setEnabled(false);
 		$this->assertEquals(
-			'<input class="input button button-plain shadow ui-corner-all" type="button" id="button" name="button" value="" disabled="disabled" />',
+			'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" disabled="disabled"></button>',
 			(string) $button
 		);
 	}
@@ -72,7 +82,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->useJQueryStyle();
 		$this->assertEquals(
-			'<input class="jqueryinput input button shadow ui-corner-all" type="button" id="button" name="button" value="" />',
+			'<button class="jqueryinput button button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>',
 			(string) $button
 		);
 	}
@@ -81,7 +91,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->main();
 		$this->assertEquals(
-			'<input class="input button button-plain shadow ui-corner-all main" type="button" id="button" name="button" value="" />',
+			'<button class="button button-plain shadow ui-corner-all main" type="button" id="button" name="button"></button>',
 			(string) $button
 		);
 	}

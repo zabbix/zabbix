@@ -19,19 +19,14 @@
 **/
 
 
-class CButton extends CInput {
-
-	/**
-	 * For inputs of type "button", the "&" symbol should not be encoded.
-	 *
-	 * @var int
-	 */
-	protected $attrEncStrategy = self::ENC_NOAMP;
+class CButton extends CTag {
 
 	public function __construct($name = 'button', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
-		parent::__construct('button', $name, $caption, 'button '.$class);
+		parent::__construct('button', 'yes', $caption, 'button '.$class);
+		$this->setAttribute('type', 'button');
+		$this->setAttribute('id', zbx_formatDomId($name));
+		$this->setAttribute('name', $name);
 		$this->addAction('onclick', $action);
-		return $this;
 	}
 
 	public function useJQueryStyle() {
@@ -40,5 +35,23 @@ class CButton extends CInput {
 
 	public function main() {
 		$this->addClass('main');
+	}
+
+	public function setReadonly($value) {
+		if ($value) {
+			$this->attr('readonly', 'readonly');
+		}
+		else {
+			$this->removeAttribute('readonly');
+		}
+	}
+
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
+		}
 	}
 }
