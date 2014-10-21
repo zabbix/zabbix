@@ -577,7 +577,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Trigger prototype expression "{Simple form test host:someItem.uptime.last(0)}<0" must contain at least one item prototype.'
+						'Cannot implode expression "{Simple form test host:someItem.uptime.last(0)}<0". Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
 					)
 				)
 			),
