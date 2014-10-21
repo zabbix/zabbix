@@ -1900,12 +1900,12 @@ int	DCsync_history(int sync_type)
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			i, history_num, n, f;
-	int			syncs;
+	int			syncs, iterations;
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
 	int			candidate_num;
-	int			indices[ZBX_SYNC_MAX], iterations;
+	int			indices[ZBX_SYNC_MAX];
 	zbx_uint64_t		itemids[ZBX_SYNC_MAX];
 	zbx_vector_uint64_t	triggerids;
 
@@ -1962,10 +1962,15 @@ int	DCsync_history(int sync_type)
 				continue;
 			}
 
-			/* limit iteration count to improve handling of situation when few items */
-			/* have flooded history cache with several hundred thousands of values   */
-			if (ZBX_SYNC_MAX * 10 <= ++iterations)
+			/* Limit iteration count to improve handling of situation when few items */
+			/* have flooded history cache with several hundred thousands of values.  */
+			/* This is achieved by breaking out of the loop if the number of values  */
+			/* that we take is less than 10% of the values that we see. This way, at */
+			/* least ZBX_SYNC_MAX and at most ZBX_SYNC_MAX * 10 iterations are done. */
+			if (ZBX_SYNC_MAX <= iterations && candidate_num * 10 < iterations)
 				break;
+
+			iterations++;
 
 			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 					cache->history[f].itemid))
