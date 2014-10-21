@@ -99,15 +99,15 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	proccomm = get_rparam(request, 3);
 	memtype = get_rparam(request, 4);
 
-	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "pr_size"))
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vsize"))
 	{
 		p_value = &psinfo.pr_size;	/* size of process image in Kbytes */
 	}
-	else if (0 == strcmp(memtype, "pr_rssize"))
+	else if (0 == strcmp(memtype, "rss"))
 	{
 		p_value = &psinfo.pr_rssize;	/* resident set size in Kbytes */
 	}
-	else if (0 == strcmp(memtype, "pr_pctmem"))
+	else if (0 == strcmp(memtype, "pmem"))
 	{
 		p_value = NULL;			/* for % of system memory used by process */
 	}
