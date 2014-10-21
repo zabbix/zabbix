@@ -127,7 +127,7 @@ class CScreenHistory extends CScreenBase {
 			elseif ($this->action == HISTORY_VALUES) {
 				$config = select_config();
 
-				$options['time_from'] = $stime - 10; // some seconds to allow script to execute
+				$options['time_from'] = $stime;
 				$options['time_till'] = $stime + $this->timeline['period'];
 				$options['limit'] = $config['search_limit'];
 			}
