@@ -362,8 +362,8 @@ $newFlexInt = new CDiv(array(
 	' ',
 	new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
 	' ',
-	new CSubmit('add_delay_flex', _('Add'), null, 'formlist main')
-), 'subform', 'row-new-delay-flex-fields');
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+), null, 'row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');

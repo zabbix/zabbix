@@ -301,8 +301,8 @@ $newFlexInt = new CSpan(array(
 	' ',
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	' ',
-	new CSubmit('add_delay_flex', _('Add'), null, 'formlist main')
-), 'subform');
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
