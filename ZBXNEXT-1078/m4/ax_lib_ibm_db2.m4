@@ -46,7 +46,11 @@ AC_DEFUN([AX_LIB_IBM_DB2],
         IBM_DB2_LIBS="-ldb2"
 
         saved_CPPFLAGS="$CPPFLAGS"
-        CPPFLAGS="$CPPFLAGS $IBM_DB2_CPPFLAGS $IBM_DB2_LDFLAGS $IBM_DB2_LIBS"
+        saved_LDFLAGS="$LDFLAGS"
+        saved_LIBS="$LIBS"
+        CPPFLAGS="$CPPFLAGS $IBM_DB2_CPPFLAGS"
+        LDFLAGS="$LDFLAGS $IBM_DB2_LDFLAGS"
+        LIBS="$LIBS $IBM_DB2_LIBS"
 
         AC_MSG_CHECKING([for IBM DB2 CLI libraries])
         AC_TRY_LINK([#include <sqlcli1.h>],
@@ -60,5 +64,7 @@ AC_DEFUN([AX_LIB_IBM_DB2],
                 AC_MSG_RESULT(no))
 
         CPPFLAGS="$saved_CPPFLAGS"
+        LDFLAGS="$saved_LDFLAGS"
+        LIBS="$saved_LIBS"
     fi
 ])

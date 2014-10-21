@@ -1038,10 +1038,10 @@ class testFormGraphPrototype extends CWebTest {
 					'yaxismax' => 'name',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "0" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Incorrect value "0" for "Height (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not decimal number.',
-						'Field "yaxismax" is not decimal number.'
+						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
+						'Value "name" of "yaxismin" has incorrect decimal format.',
+						'Value "name" of "yaxismax" has incorrect decimal format.'
 					)
 				)
 			),
@@ -1056,8 +1056,8 @@ class testFormGraphPrototype extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "65536" for "Width (min:20, max:65535)" field: must be between 20 and 65535.',
-						'Incorrect value "-22" for "Height (min:20, max:65535)" field: must be between 20 and 65535.'
+						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'
 					)
 				)
 			)
@@ -1146,7 +1146,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			switch($ymin_type) {
 				case 'Fixed':
-					$this->input_type('yaxismin', $this->yaxismin);
+					$this->input_type('yaxismin', isset($data['yaxismin']) ? $data['yaxismin'] : $this->yaxismin);
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
@@ -1162,7 +1162,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			switch($ymax_type) {
 				case 'Fixed':
-					$this->input_type('yaxismax', $this->yaxismax);
+					$this->input_type('yaxismax', isset($data['yaxismax']) ? $data['yaxismax'] : $this->yaxismax);
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
