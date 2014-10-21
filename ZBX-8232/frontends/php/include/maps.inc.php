@@ -987,7 +987,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 
 	$config = select_config();
-	$show_unack = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
+	$showUnacknowledged = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
 
 	$triggers_map = array();
 	$triggers_map_submaps = array();
@@ -1128,14 +1128,14 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	if (!empty($triggers_map)) {
 		$triggerOptions = array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('state' => null),
 			'nopermissions' => true
 		);
 
-		if ($show_unack) {
+		if ($showUnacknowledged) {
 			$triggerOptions['selectLastEvent'] = array('acknowledged');
 		}
 
@@ -1153,7 +1153,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	// triggers from submaps, skip dependent
 	if (!empty($triggers_map_submaps)) {
 		$triggerOptions = array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
 			'filter' => array('state' => null),
@@ -1162,7 +1162,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'only_true' => true
 		);
 
-		if ($show_unack) {
+		if ($showUnacknowledged) {
 			$triggerOptions['selectLastEvent'] = array('acknowledged');
 		}
 
@@ -1180,9 +1180,9 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	// triggers from all hosts/hostgroups, skip dependent
 	if (!empty($monitored_hostids)) {
 		$triggerOptions = array(
-			'hostids' => $monitored_hostids,
-			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
+			'hostids' => $monitored_hostids,
 			'nopermissions' => true,
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
@@ -1191,7 +1191,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'only_true' => true
 		);
 
-		if ($show_unack) {
+		if ($showUnacknowledged) {
 			$triggerOptions['selectLastEvent'] = array('acknowledged');
 		}
 
@@ -1253,7 +1253,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						}
 					}
 
-					if ($show_unack && $trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
+					if ($showUnacknowledged && $trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
 						$i['problem_unack']++;
 					}
 
@@ -1290,22 +1290,22 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$info[$selementId] = getMapsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getMapsInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$info[$selementId] = getHostGroupsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getHostGroupsInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
-				$info[$selementId] = getHostsInfo($selement, $i, $show_unack);
+				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap, $hostInventories[$selement['elementid']]);
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$info[$selementId] = getTriggersInfo($selement, $i, $show_unack);
+				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
