@@ -29,10 +29,10 @@ $header = array(
 );
 $headerPlaintext = array();
 
-if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$item = reset($this->data['items']);
-	$host = reset($item['hosts']);
+$item = reset($this->data['items']);
+$host = reset($item['hosts']);
 
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$header['left'] = array(
 		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
@@ -47,6 +47,13 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 			'elname' => 'itemid'
 		));
 	}
+} else {
+	$header['left'] = array(
+		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		NAME_DELIMITER,
+		$header['left']
+	);
+
 }
 
 $header['right'][] = ' ';
