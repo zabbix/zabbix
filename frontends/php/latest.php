@@ -404,7 +404,7 @@ $filterTable->addRow(array(
 			new CButton('application_name', _('Select'),
 				'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 					'&with_applications=1&dstfrm='.$filterForm->getName().'");',
-				'filter-select-button'
+				'button-form'
 			)
 		),
 		'inputcol'
