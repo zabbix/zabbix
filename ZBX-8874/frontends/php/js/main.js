@@ -1076,34 +1076,8 @@ jQuery(function ($) {
 					return true;
 				}
 
-				/* Determine where to look for submit button. If there are anything with "subform" class
-				in given form, use that as place where to look. Otherwise just use given form. */
-				var submitButtonContainer;
-				var subFormContainer = $(this).closest('.subform', form);
-				if (subFormContainer.length == 0) {
-					submitButtonContainer = form;
-				}
-				else {
-					submitButtonContainer = subFormContainer;
-				}
-
-				/* Look for submit button using given selector. Selector in options.submitButtonSelector alone will
-				return all submit buttons found, which is not what we need. Depending on whether element that
-				received "Enter" is inside "subform", a filter is applied:
-				- When activated inside "subform" reject all submit buttons that are not from current "subform",
-				i.e. parent is a "subform" element, but not the right one.
-				- When activated outside "subform" reject any submit button that is inside a "subform". */
-				var submitButton = $(options.submitButtonSelector, submitButtonContainer);
-				if (subFormContainer.length != 0) {
-					submitButton = submitButton.filter(function() {
-						return $(this).parent('.subform').is(submitButtonContainer);
-					});
-				}
-				else {
-					submitButton = submitButton.filter(function() {
-						return $(this).parent('.subform').length == 0
-					});
-				}
+				// Look for submit button in form.
+				var submitButton = $(options.submitButtonSelector, form);
 
 				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
 				if (submitButton.length == 0) {
