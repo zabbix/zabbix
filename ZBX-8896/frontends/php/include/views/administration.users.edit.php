@@ -67,10 +67,10 @@ if (!$this->data['is_profile']) {
 		array(
 			$lstGroups,
 			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'formlist'),
+				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
-				? new CSubmit('del_user_group', _('Delete selected'), null, 'formlist')
+				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
 				: null
 		)
 	);
@@ -93,7 +93,7 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		}
 	}
 	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
+		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'button-form');
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
 			$passwdButton->setAttribute('disabled', 'disabled');
 		}

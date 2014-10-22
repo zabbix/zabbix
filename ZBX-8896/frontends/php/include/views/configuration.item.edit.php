@@ -71,7 +71,7 @@ $itemFormList->addRow(_('Key'), array(
 		? new CButton('keyButton', _('Select'),
 			'return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
 				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-			'formlist')
+			'button-form')
 		: null
 ));
 
@@ -301,7 +301,7 @@ $newFlexInt = new CSpan(array(
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'formlist')
+	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 

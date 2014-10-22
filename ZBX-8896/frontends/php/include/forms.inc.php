@@ -579,7 +579,7 @@ function getItemFilterForm(&$items) {
 					'&with_applications=1'.
 					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 					.', 550, 450, "application");',
-				'filter-select-button'
+				'button-form'
 			)
 		), 'col1'),
 		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
