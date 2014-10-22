@@ -138,6 +138,14 @@ a.weight_normal { font-weight: normal; }
 
 .parent-discovery, a.parent-discovery, a.parent-discovery:hover	{ color: #999900; }
 
+/* buttons */
+.button { height: auto; cursor: pointer; }
+.button:disabled { cursor: default; }
+
+.button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
+
+.ui-button { padding: .3em 1em; }
+
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
@@ -168,14 +176,6 @@ textarea.textarea_big { height: auto; }
 .listInfo { width: 100%; display: table; }
 .textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
-
-/* buttons */
-.button { height: auto; cursor: pointer; }
-.button:disabled { cursor: default; }
-
-.button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
-
-.ui-button { padding: .3em 1em; }
 
 /* button displayed as link */
 .link_menu {
@@ -420,6 +420,8 @@ table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
 table.warningTable tr.content { vertical-align: text-top; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
+table.warningTable .button-form { background: #fff; border: 1px solid #ACA899; }
+table.warningTable .button-form:hover { border-color: #6e8ab4; }
 
 /* history */
 table.history { color: #448; margin: 0 0 0 2px; }
