@@ -1459,8 +1459,6 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
-			addUnknownEvent($triggerid);
-
 			$hosts = array();
 			try {
 				$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
@@ -1545,7 +1543,6 @@ class CTrigger extends CTriggerGeneral {
 
 				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
 					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-						addUnknownEvent($trigger['triggerid']);
 
 						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 					}
