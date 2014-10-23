@@ -28,17 +28,16 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-int	hk_period;
+static int	hk_period;
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS	4
 
-#ifdef HAVE_SIGQUEUE
 void	zbx_housekeeper_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
 	{
-		if (0 < zbx_get_sleep_remains())
+		if (0 < zbx_sleep_get_remainder())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
 			zbx_wakeup();
@@ -47,7 +46,6 @@ void	zbx_housekeeper_sigusr_handler(int flags)
 			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
 	}
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -159,7 +157,7 @@ static int	housekeeping_history(int now)
         return records;
 }
 
-static double	set_housekeeper_period(double time_slept)
+static int	get_housekeeper_period(double time_slept)
 {
 	if (SEC_PER_HOUR > time_slept)
 		return SEC_PER_HOUR;
@@ -208,7 +206,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_slept = zbx_time() - sec;
 
-		hk_period = set_housekeeper_period(time_slept);
+		hk_period = get_housekeeper_period(time_slept);
 
 		start = time(NULL);
 

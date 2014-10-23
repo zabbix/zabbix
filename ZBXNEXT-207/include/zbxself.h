@@ -75,7 +75,7 @@ void		get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int
 void		zbx_sleep_loop(int sleeptime);
 void		zbx_sleep_forever(void);
 void		zbx_wakeup(void);
-int		zbx_get_sleep_remains(void);
+int		zbx_sleep_get_remainder(void);
 void		zbx_set_sigusr_handler(void (*handler)(int flags));
 #endif
 

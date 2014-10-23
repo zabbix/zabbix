@@ -593,7 +593,7 @@ void	zbx_wakeup(void)
 	sleep_remains = 0;
 }
 
-int	zbx_get_sleep_remains(void)
+int	zbx_sleep_get_remainder(void)
 {
 	return sleep_remains;
 }
