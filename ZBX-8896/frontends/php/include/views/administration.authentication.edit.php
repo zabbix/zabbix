@@ -103,7 +103,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	else {
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CSubmit('change_bind_password', _('Change password'), null, 'formlist')
+			new CSubmit('change_bind_password', _('Change password'), null, 'button-form')
 		);
 	}
 

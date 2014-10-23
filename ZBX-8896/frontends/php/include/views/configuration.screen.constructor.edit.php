@@ -121,7 +121,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
 				'&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 	else {
@@ -129,7 +129,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&real_hosts=1&with_graphs=1&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 
@@ -169,7 +169,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 			'&only_hostid='.$this->data['screen']['templateid'].
 			'&templated_hosts=1&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 	else {
@@ -177,7 +177,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
 			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 			'&real_hosts=1&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 
@@ -218,7 +218,8 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1&numeric=1", 800, 450);', 'formlist'
+				'&writeonly=1&numeric=1", 800, 450);',
+			'button-form'
 		);
 	}
 	else {
@@ -226,7 +227,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&numeric=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 
@@ -266,7 +267,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
 				'&writeonly=1&numeric=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 	else {
@@ -274,7 +275,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&numeric=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 
@@ -311,7 +312,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1", 400, 450);',
-			'formlist'
+			'button-form'
 		)
 	), false, null, 'nowrap');
 }
@@ -344,7 +345,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
 				'&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 	else {
@@ -352,7 +353,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption&real_hosts=1'.
 				'&writeonly=1", 800, 450);',
-			'formlist'
+			'button-form'
 		);
 	}
 
@@ -535,7 +536,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1&screenid='.$_REQUEST['screenid'].'", 800, 450);',
-			'formlist'
+			'button-form'
 		)
 	), false, null, 'nowrap');
 }
@@ -609,13 +610,15 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 			$selectButton = new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
 					'&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1'.
-					'&only_hostid='.$this->data['screen']['templateid']."', 800, 450);", 'formlist'
+					'&only_hostid='.$this->data['screen']['templateid']."', 800, 450);",
+				'button-form'
 			);
 		}
 		else {
 			$selectButton = new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1', 800, 450);", 'formlist'
+					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1', 800, 450);",
+				'button-form'
 			);
 		}
 		$screenFormList->addRow(_('Item'), array(

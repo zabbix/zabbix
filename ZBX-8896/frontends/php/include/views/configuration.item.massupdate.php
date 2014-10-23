@@ -363,7 +363,7 @@ $newFlexInt = new CDiv(
 		SPACE,
 		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
 		SPACE,
-		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+		new CSubmit('add_delay_flex', _('Add'), null, 'button-form')
 	),
 	null,
 	'row-new-delay-flex-fields'

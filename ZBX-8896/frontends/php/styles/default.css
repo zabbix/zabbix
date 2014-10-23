@@ -283,9 +283,7 @@ div.onajaxload { position: absolute; background-color: #000000; filter: alpha(op
 
 /* tween box table */
 .tweenBoxTable tr td { padding: 0; vertical-align: middle; height: 24px; }
-.tweenBoxTable tr td input { margin: 5px; padding: 5px; }
-.tweenBoxTable input[type="button"] { height: auto; }
-#groups_tweenbox input[type="button"].formlist { margin-top: 1px; }
+.tweenBoxTable .button { height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px; }
 
 /* page header */
 table.page_header { padding-right: 0; padding-left: 0; background-color: #FFF; border: 0; vertical-align: middle; }
@@ -394,8 +392,6 @@ table.right_table .deny option { color: #CC0000; }
 
 /* graph */
 table.graph { width: 100%; text-align: center; }
-#graphTab input[type="button"].formlist { margin-top: 1px; }
-doesnotexist:-o-prefocus, #graphTab .formlist select { padding-top: 1px; padding-bottom: 3px; } /* opera */
 
 /* menu */
 table.menu { height: 2.8em; }
@@ -420,8 +416,10 @@ table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
 table.warningTable tr.content { vertical-align: text-top; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
-table.warningTable .button-form { background: #fff; border: 1px solid #ACA899; }
-table.warningTable .button-form:hover { border-color: #6e8ab4; }
+table.warningTable .button { background: #fff; border: 1px solid #ACA899;
+	margin: 0 2px 0 0; height: 20px; padding-top: 2px; padding-bottom: 2px;
+}
+table.warningTable .button:hover { border-color: #6e8ab4; }
 
 /* history */
 table.history { color: #448; margin: 0 0 0 2px; }
