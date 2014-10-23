@@ -34,15 +34,21 @@
 .hostprototype-edit .interface-row .interface-drag-control,
 .hostprototype-edit .interface-row .interface-add-control { width: 28px; }
 .host-edit .interface-row .interface-ip,
-.hostprototype-edit .interface-row .interface-ip { width: 16.5em; }
+.hostprototype-edit .interface-row .interface-ip { width: 165px; }
+.host-edit .interface-row .interface-ip input,
+.hostprototype-edit .interface-row .interface-ip input { width: 158px; }
 .host-edit .interface-row .interface-dns,
-.hostprototype-edit .interface-row .interface-dns { width: 20em; }
+.hostprototype-edit .interface-row .interface-dns { width: 200px; }
+.host-edit .interface-row .interface-dns input,
+.hostprototype-edit .interface-row .interface-dns input { width: 194px; }
 .host-edit .interface-row .interface-connect-to,
-.hostprototype-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
+.hostprototype-edit .interface-row .interface-connect-to { width: 80px; white-space: nowrap; }
 .host-edit .interface-row .interface-port,
-.hostprototype-edit .interface-row .interface-port { width: 11em; }
+.hostprototype-edit .interface-row .interface-port { width: 100px; }
+.host-edit .interface-row .interface-port input,
+.hostprototype-edit .interface-row .interface-port input { width: 94px; }
 .host-edit .interface-row .interface-default,
-.hostprototype-edit .interface-row .interface-default { width: 4em; }
+.hostprototype-edit .interface-row .interface-default { width: 40px; }
 .host-edit .interface-row .interface-bulk,
 .hostprototype-edit .interface-row .interface-bulk { height: 25px; margin-top: 5px; }
 .host-edit .interface-row-first .dd,
