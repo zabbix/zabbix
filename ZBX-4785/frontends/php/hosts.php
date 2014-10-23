@@ -43,7 +43,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
+	'groups' =>			array(T_ZBX_JSON, O_OPT, P_SYS,			DB_ID,		null),
 	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
