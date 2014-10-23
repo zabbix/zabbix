@@ -24,6 +24,7 @@ class CTweenBox {
 	public function __construct(&$form, $name, $value = null, $size = 10) {
 		zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
 
+		/* @var $form CForm */
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
@@ -34,7 +35,6 @@ class CTweenBox {
 		$this->rbox = new CListBox($this->id_r, null, $size);
 		$this->lbox->setAttribute('style', 'width: 280px;');
 		$this->rbox->setAttribute('style', 'width: 280px;');
-		$this->form->addVar($this->varname, CJs::encodeJson($this->value));
 	}
 
 	public function setName($name = null) {
@@ -62,6 +62,7 @@ class CTweenBox {
 				|| (is_int($selected) && $selected != 0)
 				|| (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected == 'on'))) {
 			$this->lbox->addItem($value, $caption, null, $enabled);
+			$this->value[$value] = $value;
 		}
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);
@@ -83,7 +84,7 @@ class CTweenBox {
 		$grp_tab->setCellPadding(0);
 
 		if (!is_null($caption_l) || !is_null($caption_r)) {
-			$grp_tab->addRow(array($caption_l, SPACE, $caption_r));
+			$grp_tab->addRow(array($caption_l,  '', $caption_r));
 		}
 
 		$add_btn = new CButton('add', '  &laquo;  ', null, 'formlist');
@@ -92,14 +93,17 @@ class CTweenBox {
 		$rmv_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
 		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn)), $this->rbox));
+
+		$grp_tab->addItem(new CVar($this->varname, CJs::encodeJson($this->value)));
+
 		return $grp_tab;
 	}
 
 	public function show($caption_l = null, $caption_r = null) {
-		if (empty($caption_l)) {
+		if (!$caption_l) {
 			$caption_l = _('In');
 		}
-		if (empty($caption_r)) {
+		if (!$caption_r) {
 			$caption_r = _('Other');
 		}
 		$tab = $this->get($caption_l, $caption_r);
