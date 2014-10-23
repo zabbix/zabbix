@@ -451,9 +451,4 @@
 		}
 		return typeNum;
 	}
-
-	function removeTemplate(templateid) {
-		jQuery('#templates_' + templateid).remove();
-		jQuery('#template_row_' + templateid).remove();
-	}
 </script>
