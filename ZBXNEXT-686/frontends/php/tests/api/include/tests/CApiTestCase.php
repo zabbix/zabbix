@@ -160,46 +160,52 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * Check that the body of a response matches the given schema.
 	 *
-	 * @param mixed $definition
+	 * @param mixed 		$definition
+	 * @param CApiResponse 	$response
+	 * @param string 		$message
 	 *
 	 * @param CApiResponse $response
 	 */
-	protected function assertResponse($definition, CApiResponse $response) {
-		 $this->assertArraySchema($definition, $response->getBody());
+	protected function assertResponse($definition, CApiResponse $response, $message = 'Failed assertion: %1$s') {
+		$this->assertArraySchema($definition, $response->getBody(), $message);
 	}
 
 	/**
 	 * Check that the error data of a failed request matches the given schema.
 	 *
-	 * @param mixed $definition
-	 * @param CApiResponse $response
+	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
+	 *
+	 * @param mixed 		$definition
+	 * @param CApiResponse 	$response
+	 * @param string 		$message
 	 *
 	 * @throws Exception
 	 */
-	protected function assertError($definition, CApiResponse $response) {
+	protected function assertError($definition, CApiResponse $response, $message = 'Failed assertion: %1$s') {
 		if (!$response->isError()) {
-			throw new Exception(
-				sprintf('Failed asserting that the request has failed with an error.')
-			);
+			throw new Exception(sprintf($message, 'an error was expected but the request has been executed successfully'));
 		}
-		$this->assertArraySchema($definition, $response->getError());
+		$this->assertArraySchema($definition, $response->getError(), $message);
 	}
 
 	/**
 	 * Check that the result of a successful request matches the given schema.
 	 *
-	 * @param mixed $definition
-	 * @param CApiResponse $response
+	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
+	 *
+	 * @param mixed 		$definition
+	 * @param CApiResponse 	$response
+	 * @param string 		$message
 	 *
 	 * @throws Exception
 	 */
-	protected function assertResult($definition, CApiResponse $response) {
+	protected function assertResult($definition, CApiResponse $response, $message = 'Failed assertion: %1$s') {
 		if ($response->isError()) {
-			throw new Exception(
-				sprintf('Failed asserting that the request has been executed correctly.')
-			);
+			throw new Exception(sprintf($message,
+				'request was expected to be executed successfully but an error occured: '.$response->getErrorData()
+			));
 		}
-		$this->assertArraySchema($definition, $response->getResult());
+		$this->assertArraySchema($definition, $response->getResult(), $message);
 	}
 
 	/**
@@ -207,15 +213,16 @@ class CApiTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * TODO: rewrite this method as a proper PHPunit assert using a constraint.
 	 *
-	 * @param mixed $definition
-	 * @param mixed $response
+	 * @param mixed 	$definition
+	 * @param mixed 	$response
+	 * @param string 	$message
 	 *
 	 * @throws Exception
 	 */
-	protected function assertArraySchema($definition, $response) {
+	protected function assertArraySchema($definition, $response, $message = 'Failed assertion: %1$s') {
 		$validator = new CTestSchemaValidator(array('schema' => $definition));
 		if (!$validator->validate($response)) {
-			throw new Exception($validator->getError());
+			throw new Exception(sprintf($message, $validator->getError()));
 		}
 	}
 

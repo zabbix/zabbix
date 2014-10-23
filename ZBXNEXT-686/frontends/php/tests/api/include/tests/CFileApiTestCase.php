@@ -35,6 +35,7 @@ class CFileApiTestCase extends CApiTestCase {
 		$test = $this->parseTestFile($path);
 
 		$fixtures = (isset($test['fixtures'])) ? $test['fixtures'] : array();
+		$steps = (isset($test['steps'])) ? $test['steps'] : array();
 
 		// always load a user and a user group
 		$fixtures = array_merge(
@@ -52,7 +53,7 @@ class CFileApiTestCase extends CApiTestCase {
 		$fixtures = $this->loadFixtures($fixtures);
 
 		$this->login('Admin', 'zabbix');
-		$this->runSteps($test['steps'], $fixtures);
+		$this->runSteps($steps, $fixtures);
 	}
 
 	/**
@@ -77,7 +78,7 @@ class CFileApiTestCase extends CApiTestCase {
 	protected function runSteps(array $steps, array $fixtures) {
 		foreach ($steps as $stepName => &$definition) {
 			if (!isset($definition['request'])) {
-				throw new InvalidArgumentException(sprintf('Each step should have "request" field, "%s" has not', $stepName));
+				throw new InvalidArgumentException(sprintf('Missing "request" parameter for step "%1$s"', $stepName));
 			}
 
 			if (is_array($definition['request']['params'])) {
@@ -91,19 +92,19 @@ class CFileApiTestCase extends CApiTestCase {
 			// assert error
 			if (isset($definition['assertError'])) {
 				$expectedError = $this->resolveStepMacros($definition['assertError'], $steps, $fixtures);
-				$this->assertError($expectedError, $response);
+				$this->assertError($expectedError, $response, 'Failed assertion for step "'.$stepName.'": %1$s');
 			}
 
 			// assert result
 			if (isset($definition['assertResult'])) {
 				$expectedResult = $this->resolveStepMacros($definition['assertResult'], $steps, $fixtures);
-				$this->assertResult($expectedResult, $response);
+				$this->assertResult($expectedResult, $response, 'Failed assertion for step "'.$stepName.'": %1$s');
 			}
 
 			// assert response
 			if (isset($definition['assertResponse'])) {
 				$expectedResponse = $this->resolveStepMacros($definition['assertResponse'], $steps, $fixtures);
-				$this->assertResponse($expectedResponse, $response);
+				$this->assertResponse($expectedResponse, $response, 'Failed assertion for step "'.$stepName.'": %1$s');
 			}
 		}
 		unset($definition);
