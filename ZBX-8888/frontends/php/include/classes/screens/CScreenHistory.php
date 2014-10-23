@@ -126,10 +126,10 @@ class CScreenHistory extends CScreenBase {
 			}
 			elseif ($this->action == HISTORY_VALUES) {
 				$config = select_config();
-				$options['time_from'] = $stime;
-				// -1 is needed because we use "non inclusive" filter.
-				// If period is 13:00:00 to 14:00:00 - we show items in range 13:00:00-13:59:59, not including 14:00:00
-				$options['time_till'] = $stime + $this->timeline['period'] - 1;
+
+				// Interval start value is non-inclusive, hense the + 1 second
+				$options['time_from'] = $stime + 1;
+				$options['time_till'] = $stime + $this->timeline['period'];
 				$options['limit'] = $config['search_limit'];
 			}
 
