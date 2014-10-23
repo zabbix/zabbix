@@ -294,7 +294,7 @@ class CMacrosResolverGeneral {
 				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 			));
 
-			$history = Manager::History()->getLast($functions);
+			$history = Manager::History()->getLast($functions, 1, ZBX_HISTORY_PERIOD);
 
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			foreach ($functions as $func) {
