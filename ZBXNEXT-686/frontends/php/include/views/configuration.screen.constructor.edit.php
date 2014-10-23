@@ -457,7 +457,6 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
 		))
 	);
-	$screenFormList->addVar('resourceid', 0);
 }
 
 /*
@@ -597,8 +596,6 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 	}
 
-	$screenFormList->addVar('resourceid', $resourceId);
-
 	$styleComboBox = new CComboBox('style', $style, 'javascript: submit();');
 	$styleComboBox->addItem(TIME_TYPE_LOCAL, _('Local time'));
 	$styleComboBox->addItem(TIME_TYPE_SERVER, _('Server time'));
@@ -606,6 +603,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	$screenFormList->addRow(_('Time type'), $styleComboBox);
 
 	if (TIME_TYPE_HOST == $style) {
+		$screenFormList->addVar('resourceid', $resourceId);
+
 		if ($this->data['screen']['templateid']) {
 			$selectButton = new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
@@ -628,25 +627,22 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		$screenFormList->addVar('caption', $caption);
 	}
 }
-else {
-	$screenFormList->addVar('resourceid', 0);
-}
 
 /*
  * Append common fields
  */
 if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style == STYLE_HORIZONTAL),
+		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style != STYLE_VERTICAL),
 		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
 		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
 		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
 	);
 	$screenFormList->addRow(_('Style'), new CDiv($styleRadioButton, 'jqueryinputset'));
 }
-elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))) {
+elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
 	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_LEFT, null, 'style_'.STYLE_LEFT, $style == STYLE_LEFT),
+		new CRadioButton('style', STYLE_LEFT, null, 'style_'.STYLE_LEFT, $style != STYLE_TOP),
 		new CLabel(_('Left'), 'style_'.STYLE_LEFT),
 		new CRadioButton('style', STYLE_TOP, null, 'style_'.STYLE_TOP, $style == STYLE_TOP),
 		new CLabel(_('Top'), 'style_'.STYLE_TOP)

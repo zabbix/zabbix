@@ -30,6 +30,8 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
+static int	hk_period;
+
 #define HK_INITIAL_DELETE_QUEUE_SIZE	4096
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
@@ -149,6 +151,22 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{NULL}
 };
 
+#ifdef HAVE_SIGQUEUE
+void	zbx_housekeeper_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
+	{
+		if (0 < zbx_sleep_get_remainder())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+			zbx_wakeup();
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: hk_item_update_cache_compare                                     *
@@ -206,8 +224,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		zbx_hk_delete_queue_t	*update_record;
 
 		/* update oldest timestamp in item cache */
-		item_record->min_clock = MIN(keep_from, item_record->min_clock +
-				HK_MAX_DELETE_PERIODS * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
+		item_record->min_clock = MIN(keep_from, item_record->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
 		update_record = zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
 		update_record->itemid = item_record->itemid;
@@ -549,8 +566,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	keep_from = now - *rule->phistory * SEC_PER_DAY;
 	if (keep_from > rule->min_clock)
 	{
-		rule->min_clock = MIN(keep_from, rule->min_clock +
-				HK_MAX_DELETE_PERIODS * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
+		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
 		rc = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
 				('\0' != *rule->filter ? " and " : ""), rule->min_clock);
@@ -778,10 +794,21 @@ static int	housekeeping_events(int now)
 	return deleted;
 }
 
+static int	get_housekeeping_period(double time_slept)
+{
+	if (SEC_PER_HOUR > time_slept)
+		return SEC_PER_HOUR;
+	else if (24 * SEC_PER_HOUR < time_slept)
+		return 24 * SEC_PER_HOUR;
+	else
+		return (int)time_slept;
+}
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
-	double	sec;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit, sleeptime;
+	double	sec, time_slept;
+	char	sleeptext[25];
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -790,14 +817,36 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
-			HOUSEKEEPER_STARTUP_DELAY);
+	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
+	{
+		zbx_setproctitle("%s [waiting for user command]", get_process_type_string(process_type));
+		zbx_snprintf(sleeptext, sizeof(sleeptext), "waiting for user command");
+	}
+	else
+	{
+		sleeptime = HOUSEKEEPER_STARTUP_DELAY * SEC_PER_MIN;
+		zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
+				HOUSEKEEPER_STARTUP_DELAY);
+		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
+	}
 
-	zbx_sleep_loop(HOUSEKEEPER_STARTUP_DELAY * SEC_PER_MIN);
+	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
 
 	for (;;)
 	{
+		sec = zbx_time();
+
+		if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
+			zbx_sleep_forever();
+		else
+			zbx_sleep_loop(sleeptime);
+
+		time_slept = zbx_time() - sec;
+
+		hk_period = get_housekeeping_period(time_slept);
+
 		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");
+
 		now = time(NULL);
 
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -827,16 +876,17 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms,"
-				" %d audit items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				" %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
+				d_sessions, d_services, d_audit, sec, sleeptext);
 		DBclose();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
-				"items in " ZBX_FS_DBL " sec, idle %d hour(s)]",
+				"items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, sec, CONFIG_HOUSEKEEPING_FREQUENCY);
+				d_sessions, d_services, d_audit, sec, sleeptext);
 
-		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
+		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
+			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
 }

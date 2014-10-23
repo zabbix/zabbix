@@ -5090,7 +5090,7 @@ int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
 	return SUCCEED;
 }
 
-static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
+static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -5107,32 +5107,15 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	old_poller_type = dc_item->poller_type;
 
 	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-	{
-		ZBX_DC_HOST	*dc_host;
-
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			return;
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			return;
-
 		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
-	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
+static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host)
 {
-	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
-
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-		return;
-
-	if (HOST_STATUS_MONITORED != dc_host->status)
-		return;
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
@@ -5160,6 +5143,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
@@ -5171,7 +5155,13 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->nextcheck)
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		dc_item->state = states[i];
@@ -5190,11 +5180,11 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
-				DCrequeue_reachable_item(dc_item, lastclocks[i]);
+				DCrequeue_reachable_item(dc_item, dc_host, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				DCrequeue_unreachable_item(dc_item);
+				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
