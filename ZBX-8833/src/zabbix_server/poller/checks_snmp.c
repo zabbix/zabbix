@@ -28,7 +28,8 @@ extern int	CONFIG_SNMP_BULK_REQUESTS;
 
 typedef struct
 {
-	zbx_uint64_t	interfaceid;
+	char		*addr;
+	unsigned short	port;
 	char		*oid;
 	zbx_hashset_t	*mappings;
 }
@@ -49,7 +50,8 @@ static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 
 	zbx_hash_t			hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&main_key->interfaceid);
+	hash = ZBX_DEFAULT_STRING_HASH_FUNC(main_key->addr);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&main_key->port, sizeof(main_key->port), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->oid, strlen(main_key->oid), hash);
 
 	return hash;
@@ -60,7 +62,12 @@ static int	__snmpidx_main_key_compare(const void *d1, const void *d2)
 	const zbx_snmpidx_main_key_t	*main_key1 = (const zbx_snmpidx_main_key_t *)d1;
 	const zbx_snmpidx_main_key_t	*main_key2 = (const zbx_snmpidx_main_key_t *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(main_key1->interfaceid, main_key2->interfaceid);
+	int				ret;
+
+	if (0 != (ret = strcmp(main_key1->addr, main_key2->addr)))
+		return ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(main_key1->port, main_key2->port);
 
 	return strcmp(main_key1->oid, main_key2->oid);
 }
@@ -69,6 +76,7 @@ static void	__snmpidx_main_key_clear(void *data)
 {
 	zbx_snmpidx_main_key_t	*main_key = (zbx_snmpidx_main_key_t *)data;
 
+	zbx_free(main_key->addr);
 	zbx_free(main_key->oid);
 	zbx_hashset_destroy(main_key->mappings);
 	zbx_free(main_key->mappings);
@@ -111,7 +119,8 @@ static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, cha
 	if (NULL == snmpidx.slots)
 		goto end;
 
-	main_key_local.interfaceid = item->interface.interfaceid;
+	main_key_local.addr = item->interface.addr;
+	main_key_local.port = item->interface.port;
 	main_key_local.oid = oid;
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
@@ -146,11 +155,13 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 				__snmpidx_main_key_clear);
 	}
 
-	main_key_local.interfaceid = item->interface.interfaceid;
+	main_key_local.addr = item->interface.addr;
+	main_key_local.port = item->interface.port;
 	main_key_local.oid = oid;
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 	{
+		main_key_local.addr = zbx_strdup(NULL, item->interface.addr);
 		main_key_local.oid = zbx_strdup(NULL, oid);
 
 		main_key_local.mappings = zbx_malloc(NULL, sizeof(zbx_hashset_t));
@@ -189,7 +200,8 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 	if (NULL == snmpidx.slots)
 		goto end;
 
-	main_key_local.interfaceid = item->interface.interfaceid;
+	main_key_local.addr = item->interface.addr;
+	main_key_local.port = item->interface.port;
 	main_key_local.oid = (char *)oid;
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
