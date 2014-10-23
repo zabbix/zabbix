@@ -440,6 +440,7 @@ static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	daemon_type;
 extern int		CONFIG_TIMER_FORKS;
+extern int		CONFIG_SNMP_BULK_REQUESTS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
@@ -537,7 +538,7 @@ static int	is_counted_in_item_queue(unsigned char type, const char *key)
 static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t interfaceid, unsigned char type,
 		const char *key)
 {
-	if (ITEM_TYPE_JMX == type || SUCCEED == is_snmp_type(type))
+	if (ITEM_TYPE_JMX == type || (1 == CONFIG_SNMP_BULK_REQUESTS && SUCCEED == is_snmp_type(type)))
 		return interfaceid;
 
 	if (ITEM_TYPE_SIMPLE == type)
@@ -4436,6 +4437,9 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 {
 	ZBX_DC_INTERFACE	*dc_interface;
 
+	if (0 == CONFIG_SNMP_BULK_REQUESTS)
+		return;
+
 	LOCK_CACHE;
 
 	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
@@ -4456,6 +4460,9 @@ static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, in
 	int			ret = FAIL;
 	ZBX_DC_INTERFACE	*dc_interface;
 
+	if (0 == CONFIG_SNMP_BULK_REQUESTS)
+		goto out;
+
 	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
 	{
 		*max_snmp_succeed = dc_interface->max_snmp_succeed;
@@ -4463,7 +4470,7 @@ static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, in
 
 		ret = SUCCEED;
 	}
-
+out:
 	return ret;
 }
 
@@ -4729,6 +4736,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		DCget_item(&items[num], dc_item);
 		num++;
 
+		/* override max_items value for SNMP items to support bulk operations */
 		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type) &&
 				0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
 		{
@@ -4957,7 +4965,7 @@ int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
 	return SUCCEED;
 }
 
-static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
+static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -4974,32 +4982,15 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	old_poller_type = dc_item->poller_type;
 
 	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-	{
-		ZBX_DC_HOST	*dc_host;
-
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			return;
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			return;
-
 		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key);
-	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
+static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host)
 {
-	ZBX_DC_HOST	*dc_host;
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
-
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-		return;
-
-	if (HOST_STATUS_MONITORED != dc_host->status)
-		return;
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
@@ -5027,6 +5018,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
@@ -5038,7 +5030,13 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status || 0 == dc_item->nextcheck)
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		dc_item->state = states[i];
@@ -5057,11 +5055,11 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
-				DCrequeue_reachable_item(dc_item, lastclocks[i]);
+				DCrequeue_reachable_item(dc_item, dc_host, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				DCrequeue_unreachable_item(dc_item);
+				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
