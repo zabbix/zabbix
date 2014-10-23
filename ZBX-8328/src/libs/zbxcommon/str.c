@@ -2953,13 +2953,13 @@ size_t	zbx_utf8_char_len(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strlen_utf8_n                                                *
+ * Function: zbx_strlen_utf8_nchars                                           *
  *                                                                            *
  * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
- * characters                                                                 *
+ *          characters                                                        *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen)
 {
 	size_t		sz = 0, csz = 0;
 	const char	*next;
@@ -2976,6 +2976,30 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 		utf8_maxlen--;
 	}
 
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strlen_utf8_nbytes                                           *
+ *                                                                            *
+ * Purpose: calculates number of bytes in utf8 text limited by maxlen bytes   *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
+{
+	size_t		sz = 0;
+
+	sz = strlen(text);
+	if (sz > maxlen)
+	{
+		sz = maxlen;
+
+		/* ensure that the string is not cut at the middle of utf-8 sequence */
+		while(0x80 == (0xc0 & text[sz]) && 0 < sz)
+			sz--;
+	}
 	return sz;
 }
 
