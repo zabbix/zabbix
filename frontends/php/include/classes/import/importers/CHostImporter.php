@@ -244,7 +244,7 @@ class CHostImporter extends CImporter {
 
 			// loop through all interfaces of current host and take interfaceids from ones that
 			// match completely, ignoring hosts from XML with set interfaceids and ignoring hosts
-			// from DB with reused intefaceids
+			// from DB with reused interfaceids
 			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
 				foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
 					$dbHostInterfaceId = $dbHostInterface['interfaceid'];

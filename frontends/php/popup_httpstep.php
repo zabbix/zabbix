@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Step of scenario');
+$page['title'] = _('Step of web scenario');
 $page['file'] = 'popup_httpstep.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
