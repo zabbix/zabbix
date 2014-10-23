@@ -1,7 +1,6 @@
 Changes for 2.5.0
 
 New features:
-.......PS. [ZBXNEXT-207] added forced housekeeper execution by using runtime control option (igors)
 ........S. [ZBXNEXT-1799] added support of low-level discovery macros in "IPMI sensor" field (Sasha)
 ........S. [ZBXNEXT-2079] added support of low-level discovery macros in "Units" field (Sasha)
 ...G...... [ZBXNEXT-689] added protocol option to net.dns and net.dns.query keys to enable tcp based queries (wiper)

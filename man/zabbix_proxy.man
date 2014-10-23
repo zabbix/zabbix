@@ -37,12 +37,6 @@ Default configuration file (unless \fB\-c\fR option is specified) will be used t
 .RE
 .RS 4
 .TP 4
-.B housekeeper_execute
-Execute the housekeeper.
-Ignored if housekeeper is being currently executed.
-.RE
-.RS 4
-.TP 4
 \fBlog_level_increase\fR[=\fItarget\fR]
 Increase log level, affects all processes if target is not specified
 .RE
