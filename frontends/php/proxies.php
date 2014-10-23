@@ -34,7 +34,7 @@ $fields = array(
 	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Proxy name')),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({add}) || isset({update})'),
 	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && {status} == '.HOST_STATUS_PROXY_PASSIVE),
-	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hosts' =>			array(T_ZBX_JSON, O_OPT, P_SYS,	DB_ID,		null),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
