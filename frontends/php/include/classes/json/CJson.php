@@ -134,7 +134,9 @@ class CJson {
 	 *
 	 */
 	public function encode($valueToEncode, $deQuote = array(), $forceObject = false) {
+		ini_set('mbstring.internal_encoding', 'ASCII');
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')) {
+
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
@@ -144,6 +146,7 @@ class CJson {
 			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
 			}
+
 		}
 		else {
 			// fall back to php-only method
@@ -155,6 +158,7 @@ class CJson {
 		if (!empty($deQuote)) {
 			$encoded = $this->_deQuote($encoded, $deQuote);
 		}
+		ini_set('mbstring.internal_encoding', 'UTF-8');
 
 		return $encoded;
 	}
@@ -240,9 +244,12 @@ class CJson {
 		$this->_level = 0;
 		$result = null;
 
+		// required for internal parser, it operates with ASCII data
+		ini_set('mbstring.internal_encoding', 'ASCII');
 		if ($this->isValid($encodedValue)) {
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
 		}
+		ini_set('mbstring.internal_encoding', 'UTF-8');
 
 		return $result;
 	}

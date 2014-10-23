@@ -149,6 +149,14 @@ class testFormDiscoveryRule extends CWebTest {
 				)
 			),
 			array(
+				array(
+					'type' => 'Zabbix agent',
+					'host' => 'Template inheritance test host',
+					'templatedHost' => 'Inheritance test template',
+					'form' => 'testInheritanceDiscoveryRule1'
+				)
+			),
+			array(
 				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template')
 			),
 			array(

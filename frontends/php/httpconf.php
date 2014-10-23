@@ -131,20 +131,36 @@ if (isset($_REQUEST['new_httpstep'])) {
 	unset($_REQUEST['new_httpstep']);
 }
 
-if (hasRequest('delete') && hasRequest('httptestid')) {
+if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
+	$result = false;
+
 	DBstart();
 
-	$result = API::HttpTest()->delete(array(getRequest('httptestid')));
+	$host = DBfetch(DBselect(
+		'SELECT h.host'.
+		' FROM hosts h,httptest ht'.
+		' WHERE ht.hostid=h.hostid'.
+			' AND ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])
+	));
+
+	$httptestData = get_httptest_by_httptestid($_REQUEST['httptestid']);
+	if ($httptestData) {
+		$result = API::HttpTest()->delete(array(getRequest('httptestid')));
+
+		if ($result) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
+				'Web scenario ['.$httptestData['name'].'] ['.$_REQUEST['httptestid'].'] Host ['.$host['host'].']'
+			);
+		}
+	}
+	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 
 	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
-
-	unset($_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid']);
@@ -154,33 +170,28 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$result = true;
 
-	$httpTestId = getRequest('httptestid');
+	DBstart();
 
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('name'),
-		'httptestids' => array($httpTestId),
-		'selectHosts' => array('name'),
-		'editable' => true
-	));
+	$httptestId = getRequest('httptestid');
 
-	if ($httpTests) {
-		DBstart();
-
-		$result = deleteHistoryByHttpTestIds(array($httpTestId));
-		$result = ($result && DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httpTestId)));
-
+	$httpTest = get_httptest_by_httptestid($httptestId);
+	if ($httpTest) {
+		$result = delete_history_by_httptestid($httptestId);
 		if ($result) {
-			$httpTest = reset($httpTests);
-			$host = reset($httpTest['hosts']);
+
+			$result = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
+			));
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-				_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTestId.'] '.
-					_('Host').' ['.$host['name'].'] '._('History cleared')
+				'Scenario ['.$httpTest['name'].'] ['.$httptestId.'] Host ['.$host['host'].'] history cleared'
 			);
 		}
-
-		$result = DBend($result);
 	}
+
+	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
@@ -188,12 +199,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if (hasRequest('update')) {
 		$action = AUDIT_ACTION_UPDATE;
-		$messageTrue = _('Web scenario updated');
+		$messageTrue = _('Scenario updated');
 		$messageFalse = _('Cannot update web scenario');
 	}
 	else {
 		$action = AUDIT_ACTION_ADD;
-		$messageTrue = _('Web scenario added');
+		$messageTrue = _('Scenario added');
 		$messageFalse = _('Cannot add web scenario');
 	}
 
@@ -310,11 +321,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO,
-			_('Web scenario').' ['.getRequest('name').'] ['.$httpTestId.'] '._('Host').' ['.$host['name'].']'
-		);
+		add_audit($action, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$_REQUEST['name'].'] ['.$httpTestId.'] Host ['.$host['host'].']');
 
-		unset($_REQUEST['form']);
+		unset($_REQUEST['httptestid'], $_REQUEST['form']);
 		show_messages(true, $messageTrue);
 		DBend(true);
 	}
@@ -328,56 +337,37 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages(false, null, $messageFalse);
 	}
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httptest.massenable', 'httptest.massdisable'))
-		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httptest.massenable', 'httptest.massdisable')) && hasRequest('group_httptestid')) {
 	$result = true;
-	$httpTestIds = getRequest('group_httptestid');
-	$enable = (getRequest('action') === 'httptest.massenable');
+	$groupHttpTestId = getRequest('group_httptestid');
+	$enable = (getRequest('action') == 'httptest.massenable');
 	$status = $enable ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
 	$statusName = $enable ? 'enabled' : 'disabled';
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
 
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('httptestid', 'name', 'status'),
-		'selectHosts' => array('name'),
-		'httptestids' => $httpTestIds,
-		'editable' => true
-	));
+	DBStart();
 
-	if ($httpTests) {
-		$httpTestsToUpdate = array();
-
-		DBstart();
-
-		foreach ($httpTests as $httpTest) {
-			// change status if it's necessary
-			if ($httpTest['status'] != $status) {
-				$httpTestsToUpdate[] = array(
-					'httptestid' => $httpTest['httptestid'],
-					'status' => $status
-				);
-			}
+	foreach ($groupHttpTestId as $id) {
+		if (!($httpTestData = get_httptest_by_httptestid($id))) {
+			continue;
 		}
 
-		if ($httpTestsToUpdate) {
-			$result = API::HttpTest()->update($httpTestsToUpdate);
+		$result &= (bool) API::HttpTest()->update(array(
+			'httptestid' => $id,
+			'status' => $status
+		));
 
-			if ($result) {
-				foreach ($httpTests as $httpTest) {
-					$host = reset($httpTest['hosts']);
-
-					add_audit($auditAction, AUDIT_RESOURCE_SCENARIO,
-						_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-							_('Host').' ['.$host['name'].'] '.$statusName
-					);
-				}
-			}
+		if ($result) {
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)
+			));
+			add_audit($auditAction, AUDIT_RESOURCE_SCENARIO,
+				'Scenario ['.$httpTestData['name'].'] ['.$id.'] Host ['.$host['host'].'] '.$statusName
+			);
 		}
 
-		$result = DBend($result);
-
-		$updated = count($httpTests);
+		$updated++;
 	}
 
 	$messageSuccess = $enable
@@ -387,55 +377,46 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httpte
 		? _n('Cannot enable web scenario', 'Cannot enable web scenarios', $updated)
 		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
 
+	$result = DBend($result);
+
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhistory'
-		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
-	$result = false;
+elseif (hasRequest('action') && getRequest('action') == 'httptest.massclearhistory' && hasRequest('group_httptestid')) {
+	$result = true;
+	$group_httptestid = getRequest('group_httptestid');
 
-	$httpTestIds = getRequest('group_httptestid');
+	DBStart();
 
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('httptestid', 'name'),
-		'httptestids' => $httpTestIds,
-		'selectHosts' => array('name'),
-		'editable' => true
-	));
-
-	if ($httpTests) {
-		DBstart();
-
-		$result = deleteHistoryByHttpTestIds($httpTestIds);
-		$result = ($result && DBexecute(
-			'UPDATE httptest SET nextcheck=0 WHERE '.dbConditionInt('httptestid', $httpTestIds)
-		));
-
-		if ($result) {
-			foreach ($httpTests as $httpTest) {
-				$host = reset($httpTest['hosts']);
-
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-					_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-						_('Host').' ['.$host['name'].'] '._('History cleared')
-				);
-			}
+	foreach ($group_httptestid as $id) {
+		if (!($httptest_data = get_httptest_by_httptestid($id))) {
+			continue;
 		}
 
-		$result = DBend($result);
-
+		$result &= delete_history_by_httptestid($id);
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			$result &= DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($id));
+
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)
+			));
+
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
+				'Scenario ['.$httptest_data['name'].'] ['.$id.'] Host ['.$host['host'].'] history cleared'
+			);
 		}
 	}
 
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
-elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
-		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
+elseif (hasRequest('action') && getRequest('action') == 'httptest.massdelete' && hasRequest('group_httptestid')) {
 	$result = API::HttpTest()->delete(getRequest('group_httptestid'));
 
 	if ($result) {

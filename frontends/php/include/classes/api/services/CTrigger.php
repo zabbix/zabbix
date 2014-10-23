@@ -548,8 +548,8 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$triggers = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
+			'output' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($triggers as $trigger) {
@@ -577,29 +577,24 @@ class CTrigger extends CTriggerGeneral {
 			$triggerDbFields = array('triggerid' => null);
 
 			$dbTriggers = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true
 			));
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 				'allowed' => array('triggerid', 'status'),
-				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
+				'messageAllowedField' => _('Cannot update "%1$s" for a discovered trigger.')
 			));
 			foreach ($triggers as $trigger) {
-				$triggerId = $trigger['triggerid'];
 				// check permissions
-				if (!isset($dbTriggers[$triggerId])) {
+				if (!isset($dbTriggers[$trigger['triggerid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
-				$dbTrigger = $dbTriggers[$triggerId];
-
-				$triggerName = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
-				$updateDiscoveredValidator->setObjectName($triggerName);
 
 				// discovered fields, except status, cannot be updated
-				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTrigger);
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $dbTriggers[$trigger['triggerid']]);
 			}
 
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
@@ -657,9 +652,13 @@ class CTrigger extends CTriggerGeneral {
 				$expressionHosts = $expressionData->getHosts();
 
 				$hosts = API::Host()->get(array(
-					'output' => array('hostid', 'host', 'status'),
 					'filter' => array('host' => $expressionHosts),
 					'editable' => true,
+					'output' => array(
+						'hostid',
+						'host',
+						'status'
+					),
 					'templated_hosts' => true,
 					'preservekeys' => true
 				));
@@ -802,8 +801,8 @@ class CTrigger extends CTriggerGeneral {
 
 		// select all triggers which are deleted (including children)
 		$delTriggers = $this->get(array(
-			'output' => array('triggerid', 'description', 'expression'),
 			'triggerids' => $triggerIds,
+			'output' => array('triggerid', 'description', 'expression'),
 			'nopermissions' => true,
 			'selectHosts' => array('name')
 		));
@@ -839,21 +838,6 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if (!$nopermissions) {
-			$dbTriggers = $this->get(array(
-				'output' => array('triggerid', 'flags', 'description'),
-				'triggerids' => $triggerIds,
-				'editable' => true,
-				'filter' => array('flags' => null)
-			));
-
-			foreach ($dbTriggers as $dbTrigger) {
-				if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered trigger "%1$s".', $dbTrigger['description'])
-					);
-				}
-			}
-
 			$this->checkPermissions($triggerIds);
 			$this->checkNotInherited($triggerIds);
 		}
@@ -1131,8 +1115,8 @@ class CTrigger extends CTriggerGeneral {
 		$triggerIds = zbx_objectValues($triggers, 'triggerid');
 
 		$dbTriggers = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
 			'triggerids' => $triggerIds,
+			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'selectDependencies' => array('triggerid'),
 			'preservekeys' => true,
@@ -1279,11 +1263,11 @@ class CTrigger extends CTriggerGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$triggers = $this->get(array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => true,
 			'output' => array(
 				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			),
-			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			)
 		));
 
 		foreach ($triggers as $trigger) {
@@ -1311,19 +1295,19 @@ class CTrigger extends CTriggerGeneral {
 		$hostIds = zbx_toArray($data['hostids']);
 
 		$parentTriggers = $this->get(array(
-			'output' => array('triggerid'),
 			'hostids' => $templateIds,
 			'preservekeys' => true,
+			'output' => array('triggerid'),
 			'selectDependencies' => array('triggerid')
 		));
 
 		if ($parentTriggers) {
 			$childTriggers = $this->get(array(
-				'output' => array('triggerid', 'templateid'),
 				'hostids' => ($hostIds) ? $hostIds : null,
 				'filter' => array('templateid' => array_keys($parentTriggers)),
 				'nopermissions' => true,
 				'preservekeys' => true,
+				'output' => array('triggerid', 'templateid'),
 				'selectHosts' => array('hostid')
 			));
 
@@ -1380,8 +1364,8 @@ class CTrigger extends CTriggerGeneral {
 			// forbid dependencies from hosts to templates
 			if (!$triggerTemplates) {
 				$triggerDependencyTemplates = API::Template()->get(array(
-					'output' => array('templateid'),
 					'triggerids' => $trigger['dependencies'],
+					'output' => array('templateid'),
 					'nopermissions' => true,
 					'limit' => 1
 				));
@@ -1428,8 +1412,8 @@ class CTrigger extends CTriggerGeneral {
 
 			// fetch all templates that are used in dependencies
 			$triggerDependencyTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
 				'triggerids' => $trigger['dependencies'],
+				'output' => array('templateid'),
 				'nopermissions' => true,
 			));
 			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
@@ -1865,7 +1849,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Checks if all of the given triggers are available for writing.
 	 *
-	 * @throws APIException     if a trigger is not writable or does not exist or is not normal
+	 * @throws APIException     if a trigger is not writable or does not exist
 	 *
 	 * @param array $triggerIds
 	 */
@@ -1904,130 +1888,49 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyPostSqlFiltering(array $triggers, array $options) {
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
-		// unset triggers which depend on at least one problem trigger upstream into dependency tree
-		if ($options['skipDependent'] !== null) {
-			// Result trigger IDs of all triggers in results.
-			$resultTriggerIds = zbx_objectValues($triggers, 'triggerid');
+		// skipDependent
+		if (!is_null($options['skipDependent'])) {
+			$triggerIds = zbx_objectValues($triggers, 'triggerid');
+			$map = array();
 
-			// Will contain IDs of all triggers on which some other trigger depends.
-			$allUpTriggerIds = array();
-
-			// Trigger dependency map.
-			$downToUpTriggerIds = array();
-
-			// Values (state) of each "up" trigger ID is stored in here.
-			$upTriggerValues = array();
-
-			// Will contain IDs of all triggers either disabled directly, or by having disabled item or disabled host.
-			$disabledTriggerIds = array();
-
-			// First loop uses result trigger IDs.
-			$triggerIds = $resultTriggerIds;
 			do {
-				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
 					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
-					' FROM trigger_depends d,triggers t'.
-					' WHERE d.triggerid_up=t.triggerid'.
-					' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
+						' FROM trigger_depends d,triggers t'.
+						' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds).
+						' AND d.triggerid_up=t.triggerid'
 				);
-
-				// Add trigger IDs as keys and empty arrays as values.
-				$downToUpTriggerIds = $downToUpTriggerIds + array_fill_keys($triggerIds, array());
-
 				$triggerIds = array();
-				while ($dependency = DBfetch($dbResult)) {
-					// Trigger ID for "down" trigger, which has dependencies.
-					$downTriggerId = $dependency['triggerid_down'];
-
-					// Trigger ID for "up" trigger, on which the other ("up") trigger depends.
-					$upTriggerId = $dependency['triggerid_up'];
-
-					// Add "up" trigger ID to mapping. We also index by $upTrigger because later these arrays
-					// are combined with + and this way indexes and values do not break.
-					$downToUpTriggerIds[$downTriggerId][$upTriggerId] = $upTriggerId;
-
-					// Add ID of this "up" trigger to all known "up" triggers.
-					$allUpTriggerIds[] = $upTriggerId;
-
-					// Remember value of this "up" trigger.
-					$upTriggerValues[$upTriggerId] = $dependency['value'];
-
-					// Add ID of this "up" trigger to the list of trigger IDs which should be mapped.
-					$triggerIds[] = $upTriggerId;
-				}
-			} while ($triggerIds);
-
-			// Fetch trigger IDs for triggers that are disabled, have disabled items or disabled item hosts.
-			$dbResult = DBSelect(
-				'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i,hosts h'.
-				' WHERE t.triggerid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.hostid=h.hostid'.
-				' AND ('.
-				'i.status='.ITEM_STATUS_DISABLED.
-				' OR h.status='.HOST_STATUS_NOT_MONITORED.
-				' OR t.status='.TRIGGER_STATUS_DISABLED.
-				')'.
-				' AND '.dbConditionInt('t.triggerid', $allUpTriggerIds)
-			);
-			while ($row = DBfetch($dbResult)) {
-				$resultTriggerId = $row['triggerid'];
-				$disabledTriggerIds[$resultTriggerId] = $resultTriggerId;
-			}
-
-			// Now process all mapped dependencies and unset any disabled "up" triggers so they do not participate in
-			// decisions regarding nesting resolution in next step.
-			foreach ($downToUpTriggerIds as $downTriggerId => $upTriggerIds) {
-				$upTriggerIdsToUnset = array();
-				foreach ($upTriggerIds as $upTriggerId) {
-					if (isset($disabledTriggerIds[$upTriggerId])) {
-						unset($downToUpTriggerIds[$downTriggerId][$upTriggerId]);
-					}
-				}
-			}
-
-			// Resolve dependencies for all result set triggers.
-			foreach ($resultTriggerIds as $resultTriggerId) {
-				// We start with result trigger.
-				$triggerIds = array($resultTriggerId);
-
-				// This also is unrolled recursive function and is repeated until there are no more trigger IDs to
-				// check, add and resolve.
-				do {
-					$nextTriggerIds = array();
-					foreach ($triggerIds as $triggerId) {
-						// Loop through all "up" triggers.
-						foreach ($downToUpTriggerIds[$triggerId] as $upTriggerId) {
-							if ($downToUpTriggerIds[$upTriggerId]) {
-								// If there this "up" trigger has "up" triggers of it's own, merge them and proceed with recursion.
-								$downToUpTriggerIds[$resultTriggerId] += $downToUpTriggerIds[$upTriggerId];
-
-								// Add trigger ID to be processed in next loop iteration.
-								$nextTriggerIds[] = $upTriggerId;
+				while ($row = DBfetch($dbResult)) {
+					if (TRIGGER_VALUE_TRUE == $row['value']) {
+						if (isset($map[$row['triggerid_down']])) {
+							foreach ($map[$row['triggerid_down']] as $triggerid => $state) {
+								unset($triggers[$triggerid]);
 							}
 						}
+						else {
+							unset($triggers[$row['triggerid_down']]);
+						}
 					}
-					$triggerIds = $nextTriggerIds;
-				} while ($triggerIds);
-			}
+					else {
+						if (isset($map[$row['triggerid_down']])) {
+							if (!isset($map[$row['triggerid_up']])) {
+								$map[$row['triggerid_up']] = array();
+							}
 
-			// Clean result set.
-			foreach ($resultTriggerIds as $resultTriggerId) {
-				foreach ($downToUpTriggerIds[$resultTriggerId] as $upTriggerId) {
-					// If "up" trigger is in problem state, dependent trigger should not be returned and is removed
-					// from results.
-					if ($upTriggerValues[$upTriggerId] == TRIGGER_VALUE_TRUE) {
-						unset($triggers[$resultTriggerId]);
+							$map[$row['triggerid_up']] += $map[$row['triggerid_down']];
+						}
+						else {
+							if (!isset($map[$row['triggerid_up']])) {
+								$map[$row['triggerid_up']] = array();
+							}
+
+							$map[$row['triggerid_up']][$row['triggerid_down']] = 1;
+						}
+						$triggerIds[] = $row['triggerid_up'];
 					}
 				}
-
-				// Check if result trigger is disabled and if so, remove from results.
-				if (isset($disabledTriggerIds[$resultTriggerId])) {
-					unset($triggers[$resultTriggerId]);
-				}
-			}
+			} while (!empty($triggerIds));
 		}
 
 		// withLastEventUnacknowledged
