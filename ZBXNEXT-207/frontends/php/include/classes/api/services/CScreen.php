@@ -169,6 +169,12 @@ class CScreen extends CApiService {
 							$itemsToCheck[] = $screenItem['resourceid'];
 							break;
 
+						case SCREEN_RESOURCE_CLOCK:
+							if ($screenItem['style'] == TIME_TYPE_HOST) {
+								$itemsToCheck[] = $screenItem['resourceid'];
+							}
+							break;
+
 						case SCREEN_RESOURCE_MAP:
 							$mapsToCheck[] = $screenItem['resourceid'];
 							break;
@@ -278,7 +284,8 @@ class CScreen extends CApiService {
 			foreach ($restrItems as $resourceId) {
 				foreach ($screensItems as $screenItemId => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
+							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_CLOCK,
+								SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
 					}
 				}
