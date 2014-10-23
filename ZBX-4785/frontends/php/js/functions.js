@@ -303,8 +303,8 @@ function getNextColor(paletteType) {
  *
  * @formname string	form name where hidden fields will be added
  * @objname string	unique name for hidden field naming
- * @from string		from select id
- * @to string		to select id
+ * @source string		from select id
+ * @target string		to select id
  * @action string	action to perform with hidden field
  *
  * @return true
