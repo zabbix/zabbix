@@ -1417,6 +1417,20 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
+					'formula' => '',
+					'formulaValue' => '',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Value "" of "Custom multiplier" has incorrect decimal format.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => TEST_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
 					'formula' => ' ',
 					'formulaValue' => '',
 					'errors' => array(
@@ -1431,11 +1445,25 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => ' value ',
-					'formulaValue' => 'value',
+					'formula' => 'form ula',
+					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Value "value" of "Custom multiplier" has incorrect decimal format.'
+						'Value "form ula" of "Custom multiplier" has incorrect decimal format.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => TEST_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => '32 1',
+					'formulaValue' => '32 1',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Value "32 1" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),

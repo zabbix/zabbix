@@ -828,22 +828,41 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 }
 
 /**
- * Clear item history and trends by provided item IDs.
+ * Clear items history and trends.
  *
- * @param array $itemIds
+ * @param $itemIds
  *
  * @return bool
  */
-function deleteHistoryByItemIds(array $itemIds) {
-	$result = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
-	$result = ($result && DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds)));
-	$result = ($result && DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds)));
+function delete_history_by_itemid($itemIds) {
+	zbx_value2array($itemIds);
+	$result = delete_trends_by_itemid($itemIds);
+	if (!$result) {
+		return $result;
+	}
 
-	return $result;
+	$result &= DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
+
+	return (bool) $result;
+}
+
+/**
+ * Clear trends history for provided item ids.
+ *
+ * @param mixed $itemIds IDs of items for which history should be cleared
+ *
+ * @return bool
+ */
+function delete_trends_by_itemid($itemIds) {
+	zbx_value2array($itemIds);
+	$r1 = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
+	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds));
+
+	return $r1 && $r2;
 }
 
 /**

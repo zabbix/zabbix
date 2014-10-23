@@ -561,6 +561,8 @@ var CScrollBar = Class.create({
 			return false;
 		}
 
+		deselectAll();
+
 		var period = false;
 		if (empty(left)) {
 			period = timeControl.timeline.period();
@@ -597,6 +599,8 @@ var CScrollBar = Class.create({
 		if (this.disabled) {
 			return false;
 		}
+
+		deselectAll();
 
 		var period = false;
 		if (typeof(right) == 'undefined') {
@@ -1093,6 +1097,16 @@ var CScrollBar = Class.create({
 			x: e.clientX + document.body.scrollLeft - document.body.clientLeft,
 			y: e.clientY + document.body.scrollTop - document.body.clientTop
 		};
+	},
+
+	deselectall: function() {
+		if (IE) {
+			document.selection.empty();
+		}
+		else {
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+		}
 	},
 
 	//----------------------------------------------------------------
@@ -1641,6 +1655,7 @@ var sbox = Class.create({
 		}
 
 		this.optimizeEvent(e);
+		deselectAll();
 
 		var posxy = getPosition(this.dom_obj);
 		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {
@@ -1651,6 +1666,7 @@ var sbox = Class.create({
 
 		if (!this.is_active) {
 			this.optimizeEvent(e);
+			deselectAll();
 			this.createBox();
 
 			this.is_active = true;
@@ -1710,6 +1726,7 @@ var sbox = Class.create({
 
 		if (this.is_activeIE) {
 			this.optimizeEvent(e);
+			deselectAll();
 			this.mouseUp(e);
 			this.is_activeIE = false;
 
@@ -1724,6 +1741,7 @@ var sbox = Class.create({
 		}
 
 		this.optimizeEvent(e);
+		deselectAll();
 
 		var posxy = getPosition(this.dom_obj);
 		if (this.mouse_event.top < posxy.top || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) {

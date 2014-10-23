@@ -181,12 +181,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	size_t			offset = 0;
-	int			res, type, retrans, retry, use_tcp, i, ret = SYSINFO_RET_FAIL;
+	int			res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
 	int			saved_nscount, saved_retrans, saved_retry;
-	unsigned long		saved_options;
 	struct sockaddr_in	saved_ns;
 #endif
 	typedef struct
@@ -225,7 +224,6 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	wchar_t		*wzone;
 	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
-	DWORD		options;
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -257,7 +255,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	*buffer = '\0';
 
-	if (6 < request->nparam)
+	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -313,25 +311,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
-	param = get_rparam(request, 5);
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "udp"))
-		use_tcp = 0;
-	else if (0 == strcmp(param, "tcp"))
-		use_tcp = 1;
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
 #ifdef _WINDOWS
-	options = DNS_QUERY_STANDARD | DNS_QUERY_BYPASS_CACHE;
-	if (0 != use_tcp)
-		options |= DNS_QUERY_USE_TCP_ONLY;
-
 	wzone = zbx_utf8_to_unicode(zone);
-	res = DnsQuery(wzone, type, options, NULL, &pQueryResults, NULL);
+	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pQueryResults, NULL);
 	zbx_free(wzone);
 
 	if (1 == short_answer)
@@ -491,19 +473,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		_res.nscount = 1;
 	}
 
-	saved_options = _res.options;
 	saved_retrans = _res.retrans;
 	saved_retry = _res.retry;
-
-	if (0 != use_tcp)
-		_res.options |= RES_USEVC;
 
 	_res.retrans = retrans;
 	_res.retry = retry;
 
 	res = res_send(buf, res, answer.buffer, sizeof(answer.buffer));
 
-	_res.options = saved_options;
 	_res.retrans = saved_retrans;
 	_res.retry = saved_retry;
 

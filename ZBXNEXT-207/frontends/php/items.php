@@ -519,34 +519,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 // cleaning history for one item
-elseif (hasRequest('del_history') && hasRequest('itemid')) {
+elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = false;
 
-	$itemId = getRequest('itemid');
+	DBstart();
 
-	$items = API::Item()->get(array(
-		'output' => array('key_'),
-		'itemids' => array($itemId),
-		'selectHosts' => array('name'),
-		'editable' => true
-	));
-
-	if ($items) {
-		DBstart();
-
-		$result = deleteHistoryByItemIds(array($itemId));
-
-		if ($result) {
-			$item = reset($items);
-			$host = reset($item['hosts']);
-
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
-				_('Host').' ['.$host['name'].'] '._('History cleared')
-			);
-		}
-
-		$result = DBend($result);
+	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
+		$result = delete_history_by_itemid($_REQUEST['itemid']);
 	}
+
+	if ($result) {
+		$host = get_host_by_hostid($_REQUEST['hostid']);
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
+			_('Host').' ['.$host['name'].'] '._('History cleared')
+		);
+	}
+
+	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
@@ -778,43 +767,27 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
-	$result = false;
+elseif (hasRequest('action') && getRequest('action') == 'item.massclearhistory' && hasRequest('group_itemid')) {
+	DBstart();
 
-	$itemIds = getRequest('group_itemid');
+	$result = delete_history_by_itemid(getRequest('group_itemid'));
 
-	$items = API::Item()->get(array(
-		'output' => array('itemid', 'key_'),
-		'itemids' => $itemIds,
-		'selectHosts' => array('name'),
-		'editable' => true
-	));
-
-	if ($items) {
-		DBstart();
-
-		$result = deleteHistoryByItemIds($itemIds);
-
-		if ($result) {
-			foreach ($items as $item) {
-				$host = reset($item['hosts']);
-
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-						_('History cleared')
-				);
-			}
+	foreach (getRequest('group_itemid') as $id) {
+		if (!$item = get_item_by_itemid($id)) {
+			continue;
 		}
-
-		$result = DBend($result);
-
-		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
-		}
+		$host = get_host_by_hostid($item['hostid']);
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+			_('Item').' ['.$item['key_'].'] ['.$id.'] '._('Host').' ['.$host['host'].'] '._('History cleared')
+		);
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	$result = DBend($result);
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+	show_messages($result, _('History cleared'), $result);
 }
 elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
