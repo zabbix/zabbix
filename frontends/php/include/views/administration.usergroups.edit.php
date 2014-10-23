@@ -26,7 +26,11 @@ $userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 $userGroupForm = new CForm();
 $userGroupForm->setName('userGroupsForm');
 $userGroupForm->addVar('form', $this->data['form']);
-$userGroupForm->addVar('group_rights', CJs::encodeJson($this->data['group_rights']));
+$groupRightsArray = array();
+foreach($this->data['group_rights'] as $groupRight) {
+	$groupRightsArray[] = array('id' => $groupRight['id'], 'permission' => $groupRight['permission']);
+}
+$userGroupForm->addVar('group_rights', CJs::encodeJson($groupRightsArray));
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addVar('usrgrpid', $this->data['usrgrpid']);
 }
