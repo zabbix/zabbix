@@ -19,7 +19,9 @@
 **/
 
 // the host is not passed for item prototypes
-$host = isset($this->data['item']['hosts']) ? $this->data['item']['hosts'][0] : array();
+if (isset($this->data['item']['hosts'])) {
+	$host = $this->data['item']['hosts'][0];
+}
 
 $itemWidget = new CWidget();
 
@@ -442,7 +444,7 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
-	if ($host['status'] != HOST_STATUS_TEMPLATE && $this->data['parent_discoveryid'] == 0) {
+	if ($this->data['parent_discoveryid'] == 0 && $host['status'] != HOST_STATUS_TEMPLATE) {
 		$buttonDelHistory = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
