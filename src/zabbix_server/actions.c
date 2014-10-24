@@ -129,10 +129,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 						ZBX_STR2UINT64(triggerid, row[1]);
 
 						if (hostid == condition_value)
-						{
 							ret = SUCCEED;
-							break;
-						}
 					}
 					DBfree_result(result);
 				}
