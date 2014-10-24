@@ -64,11 +64,9 @@ $filterTable->addRow(array(
 	array(bold(_('Action')), ' ', $actionComboBox),
 	array(bold(_('Resource')), ' ', $resourceComboBox)
 ));
-$filterButton = new CSubmit('filter_set', _('Filter'));
+$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput');
 $filterButton->main();
-$filterButton->useJQueryStyle();
-$resetButton = new CSubmit('filter_rst', _('Reset'));
-$resetButton->useJQueryStyle();
+$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0;');
 

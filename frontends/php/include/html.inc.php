@@ -494,21 +494,28 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter(CButton $main = null, $others = null) {
-	if ($main) {
-		$main->main();
-		$main->useJQueryStyle();
+function makeFormFooter(CButton $mainButton = null, array $otherButtons = array()) {
+	if ($mainButton) {
+		$mainButton->main();
+		$mainButton->setButtonClass('jqueryinput');
 	}
 
-	$othersButtons = new CDiv($others);
-	$othersButtons->useJQueryStyle();
+	foreach ($otherButtons as $button) {
+		/* @var CButton $button */
+
+		// buttons will inherit the styles from the containing div, no need for a separate class
+		$button->setButtonClass(null);
+	}
+
+	$otherButtonDiv = new CDiv($otherButtons, 'dd left');
+	$otherButtonDiv->useJQueryStyle();
 
 	return new CDiv(
 		new CDiv(
 			new CDiv(
 				array(
-					new CDiv($main, 'dt right'),
-					new CDiv($othersButtons, 'dd left')
+					new CDiv($mainButton, 'dt right'),
+					$otherButtonDiv
 				),
 				'formrow'
 			),

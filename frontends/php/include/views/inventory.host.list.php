@@ -49,12 +49,10 @@ $filterTable->addRow(array(
 	),
 ), 'host-inventories');
 
-$filter = new CSubmit('filter_set', _('Filter'));
+$filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput');
 $filter->main();
-$filter->useJQueryStyle();
 
-$reset = new CSubmit('filter_rst', _('Reset'));
-$reset->useJQueryStyle();
+$reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
 
 $divButtons = new CDiv(array($filter, SPACE, $reset));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');

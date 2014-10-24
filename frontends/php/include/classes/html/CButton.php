@@ -21,16 +21,16 @@
 
 class CButton extends CTag {
 
-	public function __construct($name = 'button', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
-		parent::__construct('button', 'yes', $caption, 'button '.$class);
+	protected $buttonClass;
+
+	public function __construct($name = 'button', $caption = '', $action = null, $buttonClass = 'button-plain shadow ui-corner-all') {
+		parent::__construct('button', 'yes', $caption, 'button');
 		$this->setAttribute('type', 'button');
 		$this->setAttribute('id', zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->addAction('onclick', $action);
-	}
 
-	public function useJQueryStyle() {
-		$this->attr('class', 'jqueryinput '.$this->getAttribute('class'));
+		$this->buttonClass = $buttonClass;
 	}
 
 	public function main() {
@@ -53,5 +53,17 @@ class CButton extends CTag {
 		else {
 			$this->attr('disabled', 'disabled');
 		}
+	}
+
+	public function setButtonClass($class) {
+		$this->buttonClass = $class;
+	}
+
+	public function toString($destroy = true) {
+		if ($this->buttonClass !== null) {
+			$this->addClass($this->buttonClass);
+		}
+
+		return parent::toString($destroy);
 	}
 }

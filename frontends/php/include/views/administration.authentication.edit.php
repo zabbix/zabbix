@@ -133,7 +133,7 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter($saveButton, new CSubmit('test', _('Test'))));
+	$authenticationForm->addItem(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
 }
 else {
 	$authenticationForm->addItem(makeFormFooter($saveButton));

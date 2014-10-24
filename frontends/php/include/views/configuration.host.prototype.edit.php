@@ -345,7 +345,7 @@ if (isset($hostPrototype['hostid'])) {
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('parent_discoveryid'))
+		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 

@@ -750,7 +750,7 @@ if (isset($_REQUEST['screenitemid'])) {
 else {
 	$screenForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('screenid'))
+		array(new CButtonCancel(url_param('screenid')))
 	));
 }
 

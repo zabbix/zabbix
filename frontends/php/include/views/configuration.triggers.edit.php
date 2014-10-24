@@ -356,7 +356,7 @@ if (!empty($this->data['triggerid'])) {
 else {
 	$triggersForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+		array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 	));
 }
 

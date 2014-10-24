@@ -143,7 +143,7 @@ if (isset($this->data['usrgrpid'])) {
 else {
 	$userGroupForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('config'))
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 
