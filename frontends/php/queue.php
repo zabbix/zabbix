@@ -106,6 +106,7 @@ require_once 'include/page_header.php';
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
 			' AND NOT i.lastclock IS NULL'.
+			' AND i.lastclock<'.time().'+i.delay'.
 			' AND ('.
 				' i.type IN ('.implode(',',$norm_item_types).')'.
 				' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$zbx_item_types).'))'.
