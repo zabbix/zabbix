@@ -3,6 +3,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 
