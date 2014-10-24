@@ -833,12 +833,10 @@ else {
 		array(bold(_('Port')), ' ', new CTextBox('filter_port', $filter['port'], 20))
 	));
 
-	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
+	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput');
 	$filterButton->main();
-	$filterButton->useJQueryStyle();
 
-	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$resetButton->useJQueryStyle();
+	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput');
 
 	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');

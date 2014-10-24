@@ -122,7 +122,7 @@ $expressionForm->addItem($expressionTab);
 // append buttons to form
 $expressionForm->addItem(makeFormFooter(
 	new CSubmit('insert', _('Insert')),
-	new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1'))
+	array(new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1')))
 )));
 
 $expressionWidget->addItem($expressionForm);

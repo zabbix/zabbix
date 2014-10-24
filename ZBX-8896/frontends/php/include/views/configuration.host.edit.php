@@ -895,7 +895,7 @@ if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_c
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid'))
+		array(new CButtonCancel(url_param('groupid')))
 	));
 }
 

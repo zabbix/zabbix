@@ -474,7 +474,7 @@ if (!empty($this->data['itemid'])) {
 else {
 	$itemForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
 $itemWidget->addItem($itemForm);

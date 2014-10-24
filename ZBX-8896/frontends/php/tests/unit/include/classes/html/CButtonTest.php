@@ -78,20 +78,28 @@ class CButtonTest extends CTagTest {
 		);
 	}
 
-	public function testUseJQueryStyle() {
-		$button = $this->createTag();
-		$button->useJQueryStyle();
-		$this->assertEquals(
-			'<button class="jqueryinput button button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>',
-			(string) $button
-		);
-	}
-
 	public function testMain() {
 		$button = $this->createTag();
 		$button->main();
 		$this->assertEquals(
-			'<button class="button button-plain shadow ui-corner-all main" type="button" id="button" name="button"></button>',
+			'<button class="button main button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>',
+			(string) $button
+		);
+	}
+
+	public function testSetButtonStyle() {
+		$button = $this->createTag();
+		$button->setButtonClass('my-button');
+		$this->assertEquals(
+			'<button class="button my-button" type="button" id="button" name="button"></button>',
+			(string) $button
+		);
+
+		// test class reset
+		$button = $this->createTag('button', '', null, 'my-button');
+		$button->setButtonClass(null);
+		$this->assertEquals(
+			'<button class="button" type="button" id="button" name="button"></button>',
 			(string) $button
 		);
 	}

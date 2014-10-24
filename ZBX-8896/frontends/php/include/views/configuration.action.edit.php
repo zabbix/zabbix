@@ -1130,7 +1130,7 @@ if (!empty($this->data['actionid'])) {
 else {
 	$actionForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('actiontype'))
+		array(new CButtonCancel(url_param('actiontype')))
 	));
 }
 

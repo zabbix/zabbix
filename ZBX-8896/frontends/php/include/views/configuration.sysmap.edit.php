@@ -198,7 +198,7 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 else {
 	$sysmapForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 

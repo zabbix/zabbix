@@ -327,7 +327,7 @@ if (!empty($this->data['httptestid'])) {
 else {
 	$httpForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 $httpWidget->addItem($httpForm);

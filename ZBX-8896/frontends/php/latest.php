@@ -414,10 +414,10 @@ $filterTable->addRow(array(
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-$filterButton->useJQueryStyle();
+$filterButton->setButtonClass('jqueryinput');
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-$resetButton->useJQueryStyle();
+$resetButton->setButtonClass('jqueryinput');
 
 $divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');

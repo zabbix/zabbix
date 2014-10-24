@@ -305,7 +305,7 @@ if ($service['serviceid']) {
 else {
 	$servicesForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 

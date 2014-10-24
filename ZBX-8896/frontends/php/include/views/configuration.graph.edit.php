@@ -329,7 +329,7 @@ if (!empty($this->data['graphid'])) {
 else {
 	$graphForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('parent_discoveryid'))
+		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 

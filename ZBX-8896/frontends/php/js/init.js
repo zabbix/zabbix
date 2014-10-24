@@ -148,7 +148,7 @@ jQuery(function($) {
 	});
 
 	// create jquery buttons
-	$('input.jqueryinput').button();
+	$('.jqueryinput').button();
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();

@@ -397,7 +397,7 @@ if (isset($this->data['userid'])) {
 else {
 	$userForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('config'))
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 
