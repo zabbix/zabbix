@@ -3,6 +3,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 
 --------------------------------------------------------------------------------
@@ -1136,6 +1137,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
