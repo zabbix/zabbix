@@ -160,6 +160,9 @@ class CScript extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
+			if (strpos($script['name'], '\\') !== false) {
+				$script['name'] = preg_replace('/([^\\\\])\\\\{1}([^\/\\\\])/', '$1$2', $script['name']);
+			}
 			if ($options['countOutput']) {
 				$result = $script['rowscount'];
 			}
