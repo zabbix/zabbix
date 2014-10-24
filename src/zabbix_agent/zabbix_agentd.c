@@ -983,6 +983,12 @@ void	zbx_on_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+#if defined(HAVE_SIGQUEUE)
+void	zbx_sigusr_handler(int flags)
+{
+}
+#endif
+
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
