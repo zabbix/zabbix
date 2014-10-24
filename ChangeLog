@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thank
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 .......PS. [ZBX-8916] fixed "lastlogsize" not being updated in the configuration cache when values are received from the agent (asaveljevs, Sasha)
 ..F....... [ZBX-8877] fixed filters not hiding/showing for IE11 (Krists)
 ...G...PS. [ZBX-8794] fixed parsing of runtime control options and related error messages (igors)
@@ -450,6 +451,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.7
