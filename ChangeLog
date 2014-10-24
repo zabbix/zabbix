@@ -40,6 +40,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thank
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 .......PS. [ZBX-8916] fixed "lastlogsize" not being updated in the configuration cache when values are received from the agent (asaveljevs, Sasha)
@@ -487,6 +488,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 
