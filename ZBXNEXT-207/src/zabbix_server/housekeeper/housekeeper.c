@@ -151,7 +151,6 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{NULL}
 };
 
-#ifdef HAVE_SIGQUEUE
 void	zbx_housekeeper_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
@@ -165,7 +164,6 @@ void	zbx_housekeeper_sigusr_handler(int flags)
 			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
 	}
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
