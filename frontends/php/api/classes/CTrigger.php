@@ -628,20 +628,19 @@ class CTrigger extends CTriggerGeneral {
 		 */
 		// adding last event
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
-			$select = $options['selectLastEvent'] == API_OUTPUT_REFER ? 'e.eventid, e.objectid' : 'e.*';
-			$lastEvents = DBfetchArrayAssoc(DBselect(
-				'SELECT '.$select.' FROM events e JOIN ('.
-					'SELECT  max(eventid) as lasteventid FROM events e'.
-					' WHERE '.dbConditionInt('e.objectid', $triggerids).
-						' AND '.DBin_node('e.objectid').
-						' AND e.object='.EVENT_SOURCE_TRIGGERS.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-					' GROUP BY e.objectid'.
-				') ee ON e.eventid=ee.lasteventid'
-			), 'objectid');
+			foreach ($triggerids as $triggerId) {
+				$lastEvent = API::Event()->get(array(
+					'output' => $options['selectLastEvent'],
+					'object' => EVENT_SOURCE_TRIGGERS,
+					'triggerids' => $triggerId,
+					'nopermissions' => true,
+					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
+					'sortfield' => array('eventid'),
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => 1
+				));
 
-			foreach ($result as $triggerId => $trigger) {
-				$result[$triggerId]['lastEvent'] = isset($lastEvents[$triggerId]) ? $lastEvents[$triggerId] : array();
+				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
 			}
 		}
 
