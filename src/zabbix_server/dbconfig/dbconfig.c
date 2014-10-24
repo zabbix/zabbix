@@ -30,20 +30,6 @@ extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-void	zbx_dbconfig_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-	{
-		if (0 < zbx_sleep_get_remainder())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: main_dbconfig_loop                                               *
@@ -72,8 +58,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_setproctitle("%s [waiting %d sec for processes]", get_process_type_string(process_type),
 			CONFIG_CONFSYNCER_FREQUENCY);
-
-	zbx_set_sigusr_handler(zbx_dbconfig_sigusr_handler);
 
 	/* the initial configuration sync is done by server before worker processes are forked */
 	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
