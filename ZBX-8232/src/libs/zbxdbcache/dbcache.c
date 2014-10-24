@@ -1900,7 +1900,7 @@ int	DCsync_history(int sync_type)
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			i, history_num, n, f;
-	int			syncs;
+	int			syncs, iterations;
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
@@ -1937,6 +1937,7 @@ int	DCsync_history(int sync_type)
 
 		candidate_num = 0;
 		skipped_clock = 0;
+		iterations = 0;
 
 		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > candidate_num;)
 		{
@@ -1960,6 +1961,16 @@ int	DCsync_history(int sync_type)
 				f += num;
 				continue;
 			}
+
+			/* Limit iteration count to improve handling of situation when few items */
+			/* have flooded history cache with several hundred thousands of values.  */
+			/* This is achieved by breaking out of the loop if the number of values  */
+			/* that we take is less than 10% of the values that we see. This way, at */
+			/* least ZBX_SYNC_MAX and at most ZBX_SYNC_MAX * 10 iterations are done. */
+			if (ZBX_SYNC_MAX <= iterations && candidate_num * 10 < iterations)
+				break;
+
+			iterations++;
 
 			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
 					cache->history[f].itemid))
