@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 08:24+0300\n"
-"PO-Revision-Date: 2014-09-30 08:49+0300\n"
+"POT-Creation-Date: 2014-10-25 08:37+0300\n"
+"PO-Revision-Date: 2014-10-24 09:03+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412059782.0\n"
+"X-POOTLE-MTIME: 1414134201.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1609,22 +1609,22 @@ msgstr "依存関係を削除できません"
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたグラフ\"%1$s\"は削除できません。"
 
 #: include/classes/api/services/CHost.php:1314
 #, c-format
 msgid "Cannot delete discovered host \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたホスト\"%1$s\"は削除できません。"
 
 #: include/classes/api/services/CItem.php:659
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたアイテム\"%1$s\"は削除できません。"
 
 #: include/classes/api/services/CTrigger.php:852
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたトリガー\"%1$s\"は削除できません。"
 
 #: discoveryconf.php:179 host_discovery.php:184
 #: include/classes/api/services/CDiscoveryRule.php:431
@@ -2280,7 +2280,7 @@ msgstr "無効の状態のインベントリのフィールドは設定できま
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "スクリーンの要素のリソースIDが設定できません。"
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2355,17 +2355,17 @@ msgstr "トリガー\"%2$s\"の\"%1$s\"を更新できません。"
 #: include/classes/api/services/CHost.php:558
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたホスト\"%1$s\"の\"%2$s\"を更新できません。"
 
 #: include/classes/api/services/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたアイテム\"%1$s\"の\"%2$s\"を更新できません。"
 
 #: include/classes/api/services/CTrigger.php:588
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたトリガー\"%1$s\"の\"%2$s\"を更新できません。"
 
 #: include/classes/api/services/CImage.php:557
 #, c-format
@@ -3357,11 +3357,11 @@ msgstr "値のマッピングの作成"
 
 #: include/views/configuration.httpconf.list.php:34
 msgid "Create web scenario"
-msgstr ""
+msgstr "Webシナリオの作成"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create web scenario (select host first)"
-msgstr ""
+msgstr "Webシナリオの作成(最初にホストを選択)"
 
 #: include/classes/api/managers/CApplicationManager.php:73
 #, c-format
@@ -3521,7 +3521,7 @@ msgstr "DES"
 
 #: httpdetails.php:116
 msgid "DETAILS OF WEB SCENARIO"
-msgstr ""
+msgstr "Webシナリオの詳細"
 
 #: include/maps.inc.php:465 include/maps.inc.php:547 include/maps.inc.php:635
 #: include/maps.inc.php:725
@@ -4117,7 +4117,7 @@ msgstr "トリガーを削除しますか？"
 
 #: include/views/configuration.httpconf.edit.php:298
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Webシナリオを削除しますか？"
 
 #: auditlogs.php:132
 msgid "Deleted"
@@ -4263,7 +4263,7 @@ msgstr "詳細"
 
 #: httpdetails.php:27
 msgid "Details of web scenario"
-msgstr ""
+msgstr "Webシナリオの詳細"
 
 #: include/actions.inc.php:102
 msgid "Device"
@@ -6144,7 +6144,7 @@ msgstr "無効なトリガーを非表示"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Hide disabled web scenarios"
-msgstr ""
+msgstr "無効なWebシナリオを隠す"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
@@ -7652,7 +7652,7 @@ msgstr "ステータスが正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のスタイルが正しくありません。"
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7883,7 +7883,7 @@ msgstr "Zabbixデータベース内のユーザー情報"
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザー情報"
+msgstr "内部イベント"
 
 #: include/users.inc.php:84
 msgctxt "user type"
@@ -11099,11 +11099,11 @@ msgstr "ダッシュボード"
 
 #: include/classes/setup/CFrontendSetup.php:366
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_dataが-1に設定されている必要があります。"
 
 #: include/classes/setup/CFrontendSetup.php:307
 msgid "PHP bcmath"
@@ -12940,7 +12940,7 @@ msgstr "無効なトリガーを表示"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Show disabled web scenarios"
-msgstr ""
+msgstr "無効なWebシナリオを表示"
 
 #: adm.gui.php:76
 #, c-format
@@ -13344,7 +13344,7 @@ msgstr "ステップの間隔"
 
 #: include/views/configuration.httpconf.popup.php:103 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Webシナリオのステップ"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -15409,7 +15409,7 @@ msgstr "Web監視"
 #: httpconf.php:177 httpconf.php:314 httpconf.php:371 httpconf.php:422
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:428
 msgid "Web scenario"
-msgstr ""
+msgstr "Webシナリオ"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -15426,7 +15426,7 @@ msgstr "Webシナリオ\"%1$s\"はすでに存在します。"
 
 #: httpconf.php:196
 msgid "Web scenario added"
-msgstr ""
+msgstr "Webシナリオを追加しました"
 
 #: httpconf.php:145 httpconf.php:444
 msgid "Web scenario deleted"
@@ -15480,7 +15480,7 @@ msgstr "Webシナリオのステップ数は1以下にはできません。"
 
 #: httpconf.php:191
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Webシナリオを更新しました"
 
 #: httpmon.php:85 include/html.inc.php:484 include/html.inc.php:488
 #: include/views/configuration.host.edit.php:668
