@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
-"PO-Revision-Date: 2014-09-10 02:33+0300\n"
+"POT-Creation-Date: 2014-10-25 07:31+0300\n"
+"PO-Revision-Date: 2014-10-24 12:30+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410309239.0\n"
+"X-POOTLE-MTIME: 1414146652.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2259,7 +2259,7 @@ msgstr "無効の状態のインベントリのフィールドは設定できま
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "スクリーンの要素のリソースIDが設定できません。"
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -7627,7 +7627,7 @@ msgstr "ステータスが正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のスタイルが正しくありません。"
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7858,7 +7858,7 @@ msgstr "Zabbixデータベース内のユーザー情報"
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザー情報"
+msgstr "内部イベント"
 
 #: include/users.inc.php:84
 msgctxt "user type"
@@ -11064,11 +11064,11 @@ msgstr "ダッシュボード"
 
 #: include/classes/setup/CFrontendSetup.php:350
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_dataが-1に設定されている必要があります。"
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
-"PO-Revision-Date: 2014-05-08 17:11+0300\n"
-"Last-Translator: Saúl <saulortega.co@gmail.com>\n"
+"POT-Creation-Date: 2014-10-25 07:31+0300\n"
+"PO-Revision-Date: 2014-10-24 21:58+0300\n"
+"Last-Translator: Luis <luislopez72@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1399561895.0\n"
+"X-POOTLE-MTIME: 1414180685.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -77,8 +77,8 @@ msgstr[1] "%1$s días"
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s minuto"
+msgstr[1] "%1$s minutos"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
@@ -92,15 +92,15 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s segundo"
+msgstr[1] "%1$s segundos"
 
 #: include/page_header.php:344
-#, c-format
+#, fuzzy, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s intento de ingreso fallido registrado. El último intento fallido fue desde %1$s el %2$s a las %3$s."
+msgstr[1] "%4$s intentos de ingreso fallido registrados. El último intento fallido fue desde %1$s el %2$s a las %3$s."
 
 #: include/views/monitoring.discovery.php:133
 #, c-format
@@ -145,8 +145,9 @@ msgid "(no proxy)"
 msgstr "(sin proxy)"
 
 #: include/classes/setup/CSetupWizard.php:244
+#, fuzzy
 msgid "(with warnings)"
-msgstr ""
+msgstr "(con advertencias)"
 
 #: include/blocks.inc.php:1326
 msgid "-"
@@ -291,12 +292,14 @@ msgid "Acknowledged"
 msgstr "Aceptada"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
+#, fuzzy
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Eventos OK reconocidos"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
+#, fuzzy
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Eventos PROBLEMA reconocidos"
 
 #: acknow.php:27 tr_events.php:114
 msgid "Acknowledges"
@@ -340,9 +343,9 @@ msgstr "Acción"
 #: include/classes/api/services/CAction.php:1925
 #: include/classes/api/services/CAction.php:2021
 #: include/classes/api/services/CAction.php:2057
-#, c-format
+#, fuzzy, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Acción \"%1$s\" ya existe."
 
 #: include/classes/api/services/CAction.php:1905
 #: include/classes/api/services/CAction.php:2004
@@ -351,9 +354,9 @@ msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seco
 msgstr ""
 
 #: include/classes/api/services/CAction.php:2079
-#, c-format
+#, fuzzy, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "Acción \"%1$s\" sin operaciones definidas."
 
 #: actionconf.php:163
 msgid "Action added"
@@ -366,14 +369,14 @@ msgstr "Acción eliminada"
 #: actionconf.php:360
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Acción deshabilitada"
+msgstr[1] "Acciones deshabilitadas"
 
 #: actionconf.php:359
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Acción habilitada"
+msgstr[1] "Acciones habilitadas"
 
 #: auditacts.php:27 include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:29
@@ -511,8 +514,9 @@ msgid "Add"
 msgstr "Añadir"
 
 #: jsLoader.php:183
+#, fuzzy
 msgid "Add child"
-msgstr ""
+msgstr "Agregar hijo"
 
 #: acknow.php:227
 msgid "Add comment by"
@@ -531,12 +535,14 @@ msgid "Add link"
 msgstr "Añadir link"
 
 #: include/views/configuration.item.massupdate.php:546
+#, fuzzy
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Agregar aplicaciones nuevas o existentes"
 
 #: include/views/configuration.host.massupdate.php:119
+#, fuzzy
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Agregar grupos de host nuevos o existentes"
 
 #: include/views/configuration.graph.edit.php:251
 msgid "Add prototype"
@@ -597,8 +603,9 @@ msgstr "Agente"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:315
+#, fuzzy
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Nombre del host definido en el archivo de configuración del Agente. Valor: Cadena (string)"
 
 #: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.edit.php:352
@@ -708,11 +715,10 @@ msgid "Application added"
 msgstr "Aplicación añadida"
 
 #: applications.php:168 applications.php:208
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Aplicación eliminada"
-msgstr[1] "Aplicación eliminada"
+msgstr[1] "Aplicaciones eliminadas"
 
 #: include/classes/core/CJsonRpc.php:194
 msgid "Application error."
@@ -1124,16 +1130,18 @@ msgstr "CONFIGURACIÓN DE GRUPOS DE EQUIPOS"
 
 #: include/views/configuration.host.prototype.edit.php:30
 #: include/views/configuration.host.prototype.list.php:31
+#, fuzzy
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURACIÓN DE PROTOTIPOS DE HOST"
 
 #: hosts.php:699 hosts.php:764 hosts.php:816
 msgid "CONFIGURATION OF HOSTS"
 msgstr "CONFIGURACIÓN DE EQUIPOS"
 
 #: adm.housekeeper.php:141
+#, fuzzy
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "CONFIGURACIÓN DE MANTENIMIENTO"
 
 #: adm.iconmapping.php:131
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1227,12 +1235,12 @@ msgstr "CONFIGURACIÓN DEL INICIADOR"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "CONFIGURACIÓN DE GRUPOS DE USUARIOS"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "CONFIGURACIÓN DE USUARIOS"
 
 #: adm.valuemapping.php:149
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1325,9 +1333,9 @@ msgstr "No se pudo reconocer el evento"
 #: include/classes/api/services/CGraph.php:717
 #: include/classes/api/services/CGraph.php:731
 #: include/classes/api/services/CGraph.php:745
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "No se puede agregar un item no-numérico \"%1$s\" a la gráfica \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:693
 #: include/classes/api/services/CGraphPrototype.php:757
@@ -1440,7 +1448,7 @@ msgstr "No es posible añadir un mapa de red"
 #: httpconf.php:250
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "No se puede agregar la nueva aplicación \"%1$s\"."
 
 #: proxies.php:121
 msgid "Cannot add proxy"
@@ -1562,7 +1570,7 @@ msgstr "No se puede crear otra conexión a base de datos"
 
 #: include/classes/api/services/CTrigger.php:1407
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "No se puede crear dependencias circulares."
 
 #: include/classes/api/services/CTrigger.php:1379
 msgid "Cannot create dependency on trigger itself."
@@ -1835,8 +1843,8 @@ msgstr ""
 #: actionconf.php:363
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar la acción"
+msgstr[1] "No se puede deshabilitar las acciones"
 
 #: discoveryconf.php:206
 msgid "Cannot disable discovery rule"
@@ -1916,8 +1924,8 @@ msgstr ""
 #: actionconf.php:362
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede habilitar la acción"
+msgstr[1] "No se puede habilitar las acciones"
 
 #: discoveryconf.php:205
 msgid "Cannot enable discovery rule"

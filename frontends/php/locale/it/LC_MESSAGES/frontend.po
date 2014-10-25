@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
-"PO-Revision-Date: 2014-07-30 08:08+0300\n"
+"POT-Creation-Date: 2014-10-25 07:31+0300\n"
+"PO-Revision-Date: 2014-10-17 11:21+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1406700499.0\n"
+"X-POOTLE-MTIME: 1413537677.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -55,8 +55,8 @@ msgstr "%1$s (anno %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ITEM"
+msgstr[1] "%1$s ITEMS"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -2063,22 +2063,22 @@ msgstr "Impossibile trovare l'item \"%1$s\" su \"%2$s\" utilizzato come valore M
 #: include/classes/import/CConfigurationImport.php:1172
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "Non trovo l'item \"%1$s\" su \"%2$s\" utilizzato nel grafico \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1073
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Non trovo l'item \"%1$s\" su \"%2$s\" utilizzato nel grafico prototipo \"%3$s\" per la regola di discovery \"%4$s\" su \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1228
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Non trovo l'item \"%1$s\" su \"%2$s\" utilizzato nel trigger \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Non trovo l'item \"%1$s\" su \"%2$s\" utilizzato nel trigger prototipo \"%3$s\" per la regola di discovery \"%4$s\" su \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:537
 #: include/classes/import/importers/CAbstractScreenImporter.php:93
@@ -2303,7 +2303,7 @@ msgstr "Impossibile impostare campi inventario per un inventario disabilitato."
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Non posso definire la risorsa ID per l'elemento screen."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2705,12 +2705,12 @@ msgstr "Controlla se il servizio è disponibile. 0 - il servizio è giù, 1 - il
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:387
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Controllare se il servizio è disponibile. 0 - il servizio non è attivo, 1 - il servizio è in esecuzione. Se IP assente, viene utilizzato 127.0.0.1. Se il numero di porta non è presente, viene utilizzata la porta di servizio predefinito. Esempio: net.tcp.service [ftp,, 45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:383
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "Verifica le prestazioni del servizio \"servizio\". 0 - il servizio non è attivo, sec - numero di secondi spesi per la connessione al servizio. Se IP assente, viene utilizzato 127.0.0.1. Se il numero di porta non è presente, viene utilizzata la porta di servizio predefinito."
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2732,7 +2732,7 @@ msgstr "Tipo controllo"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:379
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Verifica, se è possibile effettuare la connessione TCP al numero di porta. 0 - non è possibile connettersi, 1 - in grado di connettersi. Indirizzo IP è opzionale. Se IP non è presente, viene utilizzato 127.0.0.1. Esempio: net.tcp.port [80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -2875,11 +2875,11 @@ msgstr "Colore (OK)"
 
 #: screenedit.php:290
 msgid "Column added"
-msgstr ""
+msgstr "Aggiunta colonna"
 
 #: screenedit.php:365
 msgid "Column deleted"
-msgstr ""
+msgstr "Cancellata colonna"
 
 #: include/views/configuration.screen.constructor.edit.php:715
 #: screenedit.php:73
@@ -2940,22 +2940,22 @@ msgstr "Condizione"
 #: include/classes/api/services/CAction.php:1782
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "Condizione \"%2$s\" non è utilizzata nella formula \"%3$s\" per l'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:860
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Condizione \"%2$s\" non è utilizzata nella formula \"%3$s\" per la regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1781
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "Condizione \"%2$s\" non è utilizzata nella formula \"%3$s\" per l'azione \"%1$s\" non  è definita."
 
 #: include/classes/api/services/CDiscoveryRule.php:859
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr ""
+msgstr "Condizione \"%2$s\" utilizzata nella formula \"%3$s\" per la regola di discovery \"%1$s\" non è definita."
 
 #: include/views/configuration.action.edit.php:135
 #: include/views/configuration.action.edit.php:1001
@@ -3227,8 +3227,8 @@ msgstr "Copia"
 #, c-format
 msgid "Copy %1$s element to..."
 msgid_plural "Copy %1$s elements to..."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Copia %1$s elemento verso..."
+msgstr[1] "Copia %1$s elementi verso..."
 
 #: include/views/configuration.graph.list.php:156
 #: include/views/configuration.item.list.php:276
@@ -3267,7 +3267,7 @@ msgstr "Crea applicazione (seleziona prima host)"
 
 #: adm.images.php:153
 msgid "Create background"
-msgstr ""
+msgstr "Crea background"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:28
@@ -3301,7 +3301,7 @@ msgstr "Crea prototipo host"
 
 #: adm.images.php:153
 msgid "Create icon"
-msgstr ""
+msgstr "Crea icona"
 
 #: adm.iconmapping.php:127
 msgid "Create icon map"
@@ -3333,7 +3333,7 @@ msgstr "Crea tipo di supporto"
 
 #: include/views/conf.import.php:24
 msgid "Create new"
-msgstr ""
+msgstr "Crea nuovo"
 
 #: include/views/administration.proxy.list.php:27
 msgid "Create proxy"
@@ -3480,7 +3480,7 @@ msgstr "Valore corrente"
 #: include/views/configuration.action.edit.php:122
 #: include/views/configuration.host.discovery.edit.php:280
 msgid "Custom expression"
-msgstr ""
+msgstr "Espressione custom"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -3850,7 +3850,7 @@ msgstr "Rimuovi"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Cancella tutti gli elementi che non sono presenti nel file XML?"
 
 #: include/views/configuration.template.edit.php:486
 msgid "Delete and clear"
@@ -3896,7 +3896,7 @@ msgstr "Rimuovere storico degli item selezionati?"
 
 #: include/views/configuration.httpconf.list.php:150
 msgid "Delete history of selected web scenarios?"
-msgstr ""
+msgstr "Cancella la history dello scenario web selezionato?"
 
 #: include/views/administration.general.iconmap.edit.php:147
 msgid "Delete icon map?"
@@ -3924,7 +3924,7 @@ msgstr "Rimuovere periodo di manutenzione?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
-msgstr ""
+msgstr "Cancella mancanti"
 
 #: include/views/configuration.sysmap.edit.php:193
 msgid "Delete network map?"
@@ -4116,7 +4116,7 @@ msgstr[1] "Rimuovere mappatura di valori selezionata? È utilizzata per %d item!
 
 #: include/views/configuration.httpconf.list.php:154
 msgid "Delete selected web scenarios?"
-msgstr ""
+msgstr "Cancella scenario web selezionato?"
 
 #: templates.php:673
 msgid "Delete selected with linked elements"
@@ -5224,7 +5224,7 @@ msgstr "Esegui errore SQL [%1$s] in [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Esegue query WMI e restituisce il primo oggetto selezionato."
 
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
@@ -5236,7 +5236,7 @@ msgstr "Esegui su"
 
 #: include/views/administration.auditacts.list.php:84
 msgid "Executed"
-msgstr ""
+msgstr "Eseguito"
 
 #: include/items.inc.php:1296
 #: include/views/configuration.host.discovery.edit.php:179
@@ -5359,7 +5359,7 @@ msgstr "Fallito"
 
 #: include/classes/api/services/CTemplate.php:540
 msgid "Failed to update template."
-msgstr ""
+msgstr "Aggiornamento template fallito."
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -5448,7 +5448,7 @@ msgstr "Il campo \"druleid\" è richiesto."
 
 #: include/classes/api/services/CTemplate.php:443
 msgid "Field \"host\" is mandatory."
-msgstr ""
+msgstr "Campo \"host\" è richiesto."
 
 #: include/classes/api/services/CDRule.php:354
 msgid "Field \"name\" is required."
@@ -5492,7 +5492,7 @@ msgstr "Filtro"
 #: include/views/common.filter.trigger.php:98
 #: include/views/monitoring.overview.items.php:72
 msgid "Filter by application"
-msgstr ""
+msgstr "Filtra per applicazione"
 
 #: report2.php:322
 msgid "Filter by host group"
@@ -5500,7 +5500,7 @@ msgstr "Filtra per gruppo host"
 
 #: include/views/common.filter.trigger.php:134
 msgid "Filter by host inventory"
-msgstr ""
+msgstr "Filtra per host inventory"
 
 #: include/views/common.filter.trigger.php:95
 msgid "Filter by name"
@@ -5509,7 +5509,7 @@ msgstr "Filtra per nome"
 #: include/views/configuration.host.discovery.edit.php:336
 #: include/views/configuration.host.discovery.edit.php:345
 msgid "Filters"
-msgstr ""
+msgstr "Filtri"
 
 #: popup_trexpr.php:305
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
@@ -5563,7 +5563,7 @@ msgstr "Intervalli flessibili"
 
 #: include/views/configuration.httpconf.popup.php:93
 msgid "Follow redirects"
-msgstr ""
+msgstr "Segui redirezioni"
 
 #: profile.php:117 users.php:198
 msgid "For guest, password must be empty"
@@ -5678,7 +5678,7 @@ msgstr "Tedesco (de_DE)"
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:559
 msgid "Get content of web page. Default path is /"
-msgstr ""
+msgstr "Ottieni contenuto della pagina web. Percorso di default è /"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:519
@@ -5688,7 +5688,7 @@ msgstr "Ottieni contenuti di un dato file."
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:567
 msgid "Get first occurrence of regexp in web page. Default path is /"
-msgstr ""
+msgstr "Ottieni la prima occorrenza della regexp sulla pagina web. Percorso predefinito è /"
 
 #: include/page_header.php:194
 msgid "Get support"
@@ -5697,7 +5697,7 @@ msgstr "Ottieni supporto"
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:563
 msgid "Get timing of loading full web page. Default path is /"
-msgstr ""
+msgstr "Ottieni tempo di caricamento totale della pagina web. Percorso predefinito è /"
 
 #: include/func.inc.php:666
 msgid "Giga"
@@ -5879,7 +5879,7 @@ msgstr "Grafico prototipo cancellato"
 
 #: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "Grafico prototipo non trovato."
 
 #: graphs.php:230
 msgid "Graph prototype updated"
@@ -7331,17 +7331,17 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:880
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Filtro non corretto per la macro della regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1829
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
-msgstr ""
+msgstr "Filtro non corretto per l'operatore condizione sull'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:892
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Filtro non corretto per l'operatore condizione sulla regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1817
 #, c-format

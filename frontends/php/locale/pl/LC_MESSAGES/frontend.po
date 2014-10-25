@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
-"PO-Revision-Date: 2014-09-10 17:16+0300\n"
+"POT-Creation-Date: 2014-10-25 07:31+0300\n"
+"PO-Revision-Date: 2014-10-20 10:10+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410362185.0\n"
+"X-POOTLE-MTIME: 1413792609.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -411,7 +411,7 @@ msgstr "Akcje"
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:90
 msgid "Active"
-msgstr "Aktywne"
+msgstr "Aktywny"
 
 #: include/views/configuration.maintenance.list.php:63
 msgctxt "maintenance status"
@@ -610,7 +610,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:315
 msgid "Agent host name defined in the configuration file. String value."
-msgstr "Nazwa hosta agenta zdefiniowana w pliku konfiguracyjnym. Wartość tekstowa."
+msgstr "Nazwa hosta agenta zdefiniowana w pliku konfiguracyjnym. Ciąg znaków."
 
 #: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.edit.php:352
@@ -695,7 +695,7 @@ msgstr "Dowolny"
 
 #: include/regexp.inc.php:208 include/views/js/adm.regexprs.edit.js.php:112
 msgid "Any character string included"
-msgstr "Dowolny ciąg znaków zawiera"
+msgstr "Zawiera dowolny ciąg znaków"
 
 #: applications.php:127 httpconf.php:42 include/actions.inc.php:88
 #: include/audit.inc.php:32 include/forms.inc.php:566
@@ -881,7 +881,7 @@ msgstr "Sierpień"
 #: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:290
 #: include/views/configuration.httpconf.list.php:68
 msgid "Authentication"
-msgstr "Uwierzytelnienie"
+msgstr "Uwierzytelnianie"
 
 #: include/views/configuration.host.edit.php:761
 #: include/views/configuration.host.edit.php:773
@@ -1025,7 +1025,7 @@ msgstr "Raporty słupkowe"
 #: authentication.php:43
 #: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
-msgstr "Podstawowe DN"
+msgstr "Bazowa DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1033,13 +1033,13 @@ msgstr "Podstawowy"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
-msgstr "DN do dowiązania"
+msgstr "DN dostępu"
 
 #: authentication.php:46
 #: include/views/administration.authentication.edit.php:99
 #: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
-msgstr "Hasło dowiązania"
+msgstr "Hasło dostępu"
 
 #: popup_trexpr.php:511
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
@@ -1273,7 +1273,7 @@ msgstr "Informacje CPU - wyświetla domyślnie wszystkie informacje o wszystkich
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr "Obciążenie CPU. Obciążenie procesora, cpu i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie wszystkie. Jeżeli tryb jest pusty, przyjęte będzie avg1. Uwaga, to nie jest skala procentowa."
+msgstr "Obciążenie CPU. Obciążenie procesora. cpu i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie all. Jeżeli tryb jest pusty, przyjęte będzie avg1. Uwaga, to nie jest skala procentowa."
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
@@ -1514,7 +1514,7 @@ msgstr "Nie można dodać scenariusza sieci www"
 
 #: authentication.php:136
 msgid "Cannot change authentication"
-msgstr "Nie można zmienić autoryzacji"
+msgstr "Nie można zmienić uwierzytelniania"
 
 #: authentication.php:183
 msgid "Cannot change authentication method to HTTP"
@@ -1534,11 +1534,11 @@ msgstr "Nie można wyczyścić historii"
 
 #: include/classes/api/services/CDiscoveryRule.php:1196
 msgid "Cannot clone graph prototypes."
-msgstr "Nie można powielić prototypu wykresów."
+msgstr "Nie można powielić prototypów wykresów."
 
 #: include/classes/api/services/CDiscoveryRule.php:1244
 msgid "Cannot clone host prototypes."
-msgstr "Nie można powielić prototypu hosta."
+msgstr "Nie można powielić prototypów hostów."
 
 #: include/classes/api/services/CDiscoveryRule.php:1080
 msgid "Cannot clone item prototypes."
@@ -2249,7 +2249,7 @@ msgstr "Nie można masowo zmienić nazwy hosta."
 
 #: include/classes/api/services/CTemplate.php:1021
 msgid "Cannot mass update template name."
-msgstr "Nie można zaktualizować masowo nazw szablonów."
+msgstr "Nie można masowo zmienić nazwy szablonu."
 
 #: include/classes/api/services/CHost.php:953
 msgid "Cannot mass update visible host name."
@@ -2257,7 +2257,7 @@ msgstr "Nie można masowo zmienić widocznej nazwy hosta."
 
 #: include/classes/api/services/CTemplate.php:986
 msgid "Cannot mass update visible template name."
-msgstr "Nie można zaktualizować masowo widocznych nazw szablonów."
+msgstr "Nie można masowo zmienić widocznej nazwy szablonu."
 
 #: include/classes/api/services/CHostBase.php:57
 #, c-format
@@ -2347,7 +2347,7 @@ msgstr "Nie można ustawić pól inwentarza dla wyłączonego inwentarza."
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Nie można ustawić ID zasobu dla elementu ekranu."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2749,12 +2749,12 @@ msgstr "Sprawdź czy usługa jest dostępna. 0 - usługa nie działa, 1 - usług
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:387
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr "Sprawdź, czy serwis jest dostępny. 0 - serwis nie działa, 1 - serwis działa. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Jeżeli port jest pusty, użyty zostanie domyślny port serwisu. Przykład: net.tcp.service[ftp,,45]."
+msgstr "Sprawdź czy usługa jest dostępna. 0 - usługa nie działa, 1 - usługa działa. Jeżeli IP jest puste, użyte zostanie 127.0.0.1. Jeżeli numer portu jest pusty, użyty zostanie domyślny port usługi. Przykład: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:383
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr "Sprawdź wydajność serwisu \"service\". 0 - serwis nie działa, sekundy - liczba sekund do podłączenia do serwisu. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Jeżeli port jest pusty, użyty zostanie domyślny port serwisu."
+msgstr "Sprawdź wydajność usługi \"service\". 0 - usługa nie działa, sek - liczba sekund zużyta na połączenie do usługi. Jeżeli IP jest puste, użyte zostanie 127.0.0.1. Jeżeli numer portu jest pusty, użyty zostanie domyślny port usługi."
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2776,7 +2776,7 @@ msgstr "Typ testu"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:379
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr "Sprawdź, czy możliwe jest połączenie TCP na numer portu. 0 - nie można się połączyć, 1 - można się połączyć. Adres IP jest opcjonalny. Jeżeli IP jest puste, przyjęte będzie 127.0.0.1. Przykład: net.tcp.port[,80]"
+msgstr "Sprawdź czy możliwe jest uzyskanie połączenia TCP na numer portu. 0 - nie można się połączyć, 1 - połączenie udane. Adres IP jest opcjonalny. Jeżeli IP jest puste, użyte zostanie 127.0.0.1. Przykład: net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -2923,7 +2923,7 @@ msgstr "Dodano kolumnę"
 
 #: screenedit.php:365
 msgid "Column deleted"
-msgstr "usunięto kolumnę"
+msgstr "Usunięto kolumnę"
 
 #: include/views/configuration.screen.constructor.edit.php:715
 #: screenedit.php:73
@@ -3196,7 +3196,7 @@ msgstr "Połącz z"
 #: include/page_footer.php:80
 #, c-format
 msgid "Connected as '%1$s'"
-msgstr "Połączony jako \"%1$s\""
+msgstr "Połączony jako '%1$s'"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -3280,7 +3280,7 @@ msgstr[2] "Kopiuj %1$s elementów do..."
 #: include/views/configuration.item.list.php:276
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
-msgstr "Kopiuj wybrane do …"
+msgstr "Kopiuj wybrane do ..."
 
 #: include/classes/api/services/CUser.php:1076
 #, c-format
@@ -4163,7 +4163,7 @@ msgstr[2] "Usunąć wybrane mapowanie wartości? Jest wykorzystywane przez %d po
 
 #: include/views/configuration.httpconf.list.php:154
 msgid "Delete selected web scenarios?"
-msgstr "Usunąć wybrane scenariuszy sieci www?"
+msgstr "Usunąć wybrane scenariusze sieci www?"
 
 #: templates.php:673
 msgid "Delete selected with linked elements"
@@ -4394,11 +4394,11 @@ msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
 
 #: popup_trexpr.php:193
 msgid "Difference between last and previous value is = N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest = N"
 
 #: popup_trexpr.php:189
 msgid "Difference between last and previous value is > N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest > N"
 
 #: popup_trexpr.php:197
 msgid "Difference between last and previous value is NOT N"
@@ -4411,7 +4411,7 @@ msgstr "Różne informacje o określonym procesie (określonych procesach)"
 
 #: include/views/configuration.screen.list.php:52
 msgid "Dimension (cols x rows)"
-msgstr "Wymiary (kol. x rzędy)"
+msgstr "Wymiary (kolumny x wiersze)"
 
 #: include/views/administration.auditlogs.list.php:49
 msgid "Disable"
@@ -4577,7 +4577,7 @@ msgstr "Testy wykrywania"
 
 #: include/html.inc.php:349
 msgid "Discovery list"
-msgstr "Lista wykrytych"
+msgstr "Lista reguł wykrywania"
 
 #: include/actions.inc.php:72
 msgid "Discovery object"
@@ -4772,12 +4772,12 @@ msgstr "Powielone ID grupy hostów \"%2$s\" dla prototypu hosta \"%1$s\"."
 #: include/classes/api/services/CHost.php:630
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr "Powielony host. Host o tej samej nazwie \"%s\" już istnieje."
+msgstr "Powielony host. Już istnieje host o tej samej nazwie \"%s\"."
 
 #: include/classes/api/services/CHost.php:648
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr "Powielony host. Host o tej samej widocznej nazwie \"%s\" już istnieje."
+msgstr "Powielony host. Już istnieje host o tej samej widocznej nazwie \"%s\"."
 
 #: include/classes/api/services/CMap.php:382
 #, c-format
@@ -5291,7 +5291,7 @@ msgstr "Wykonano"
 #: include/views/configuration.host.discovery.edit.php:179
 #: include/views/configuration.item.edit.php:185
 msgid "Executed script"
-msgstr "Wykonany skrypt"
+msgstr "Wykonywany skrypt"
 
 #: jsLoader.php:107
 msgid "Execution confirmation"
@@ -5497,7 +5497,7 @@ msgstr "Pole \"druleid\" jest wymagane."
 
 #: include/classes/api/services/CTemplate.php:443
 msgid "Field \"host\" is mandatory."
-msgstr "Pole \"host\" jest obowiązkowe."
+msgstr "Pole \"host\" jest wymagane."
 
 #: include/classes/api/services/CDRule.php:354
 msgid "Field \"name\" is required."
@@ -5602,7 +5602,7 @@ msgstr "Dopasuj do mapy"
 #: include/views/configuration.graph.edit.php:107
 #: include/views/configuration.graph.edit.php:165
 msgid "Fixed"
-msgstr "Stałe"
+msgstr "Stały"
 
 #: include/views/configuration.host.discovery.edit.php:223
 #: include/views/configuration.item.edit.php:290
@@ -5662,7 +5662,7 @@ msgstr "Zaktualizowano dostęp do interfejsu użytkownika"
 
 #: include/views/administration.users.edit.php:232
 msgid "Frontend messaging"
-msgstr "Wiadomości interfejsu użytkownika"
+msgstr "Komunikaty interfejsu użytkownika"
 
 #: include/views/configuration.host.edit.php:889
 #: include/views/configuration.template.edit.php:482
@@ -6261,7 +6261,7 @@ msgstr "Czyszczenie historii może zająć dużo czasu. Kontynuować?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr "Okres przechowywania danych historycznych"
+msgstr "Okres przechowywania danych historii"
 
 #: adm.housekeeper.php:112
 #, c-format
@@ -7276,12 +7276,12 @@ msgstr "Błędne argumenty przekazane do metody."
 #: include/classes/api/services/CDRule.php:321
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
-msgstr "Błędny protokół autoryzacji dla reguły wyszukiwania \"%1$s\"."
+msgstr "Błędny protokół uwierzytelniania dla reguły wyszukiwania \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:378
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr "Błędny protokół autoryzacji dla pozycji \"%1$s\"."
+msgstr "Błędny protokół uwierzytelniania dla pozycji \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:658
 msgid "Incorrect bulk value for interface."
@@ -7736,7 +7736,7 @@ msgstr "Błędny stan."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Podano błędny styl dla elementu ekranu."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7962,7 +7962,7 @@ msgstr "Interfejs z polem IP \"%1$s\" nie może mieć pustej nazwy DNS."
 #: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
 msgid "Internal"
-msgstr "Wewnętrzna"
+msgstr "Wewnętrzne"
 
 #: include/views/configuration.action.list.php:36
 msgctxt "event source"
@@ -8009,13 +8009,13 @@ msgstr "Internet Explorer"
 #: include/views/configuration.services.edit.php:131 latest.php:474
 #: latest.php:475
 msgid "Interval"
-msgstr "Okres"
+msgstr "Interwał"
 
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
-msgstr "Okres (w sek)"
+msgstr "Interwał (w sek)"
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8139,7 +8139,7 @@ msgstr "Tryb inwentarzowy"
 
 #: include/views/administration.users.list.php:59
 msgid "Is online?"
-msgstr "Czy jest włączony?"
+msgstr "Czy jest zalogowany?"
 
 #: include/blocks.inc.php:991 include/blocks.inc.php:1000
 #: include/blocks.inc.php:1296
@@ -8152,7 +8152,7 @@ msgstr "Nie można filtrować według hasła użytkownika."
 
 #: include/page_header.php:223
 msgid "It is not possible to logout from HTTP authentication."
-msgstr "Nie można się wylogować z autoryzacji HTTP."
+msgstr "Nie można się wylogować z uwierzytelniania HTTP."
 
 #: include/classes/api/services/CUser.php:150
 msgid "It is not possible to search by user password."
@@ -8223,7 +8223,7 @@ msgstr "Dodano pozycję"
 
 #: include/views/administration.proxy.list.php:44
 msgid "Item count"
-msgstr "Ilość pozycji"
+msgstr "Liczba pozycji"
 
 #: items.php:388
 msgid "Item deleted"
@@ -8328,7 +8328,7 @@ msgstr "Wartości pozycji"
 
 #: include/classes/api/services/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał odświeżania."
+msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał aktualizacji."
 
 #: include/classes/api/services/CItemGeneral.php:440
 #, c-format
@@ -8651,7 +8651,7 @@ msgstr "Ostatni z"
 
 #: include/views/administration.proxy.list.php:42
 msgid "Last seen (age)"
-msgstr "Ostatnio widziane (wiek)"
+msgstr "Ostatnio widziany (wiek)"
 
 #: latest.php:463 latest.php:464
 msgid "Last value"
@@ -8877,7 +8877,7 @@ msgstr "Logowanie się nie powiodło \"%s\"."
 #: include/classes/api/services/CUser.php:1034
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do autoryzacji HTTP."
+msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do uwierzytelniania HTTP."
 
 #: authentication.php:123
 msgid "Login name or password is incorrect!"
@@ -9367,7 +9367,7 @@ msgstr "Komunikaty"
 
 #: include/views/administration.users.edit.php:374
 msgid "Messaging"
-msgstr "Komunikacja"
+msgstr "Komunikaty"
 
 #: include/classes/core/CJsonRpc.php:179
 msgid "Method not found."
@@ -9947,17 +9947,17 @@ msgstr "Nie znaleziono pozycji logu audytu."
 #: include/classes/api/services/CAction.php:1333
 #, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Nie określono typu autoryzacji dla polecenia operacji akcji \"%s\"."
+msgstr "Nie określono typu uwierzytelniania dla polecenia operacji akcji \"%s\"."
 
 #: include/classes/api/services/CAction.php:1337
 #: include/classes/api/services/CAction.php:1351
 #, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Nie określono nazwy użytkownika autoryzacji dla polecenia operacji akcji \"%s\"."
+msgstr "Nie określono nazwy użytkownika uwierzytelniania dla polecenia operacji akcji \"%s\"."
 
 #: include/classes/api/services/CItemGeneral.php:334
 msgid "No authentication user name specified."
-msgstr "Nie określono nazwy użytkownika do autoryzacji."
+msgstr "Nie określono nazwy użytkownika do uwierzytelniania."
 
 #: include/classes/api/services/CAction.php:1320
 msgid "No command specified for action operation."
@@ -10565,7 +10565,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:232
 #: include/views/configuration.action.edit.php:1040
 msgid "Not Ack"
-msgstr "Nie zatw."
+msgstr "Niezatwierdzone"
 
 #: include/forms.inc.php:601 include/forms.inc.php:782
 msgid "Not Templated items"
@@ -10591,7 +10591,7 @@ msgstr "Niedostępne"
 #: adm.triggerseverities.php:55
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
-msgstr "Nie sklasyfikowany"
+msgstr "Niesklasyfikowane"
 
 #: include/page_footer.php:79
 msgid "Not connected"
@@ -10750,7 +10750,7 @@ msgstr "Liczba niewspieranych pozycji w bazie danych Zabbix."
 
 #: include/blocks.inc.php:844
 msgid "Number of users (online)"
-msgstr "Liczba użytkowników (online)"
+msgstr "Liczba użytkowników (zalogowanych)"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:503
@@ -11191,11 +11191,11 @@ msgstr "OSOBISTA TABLICA"
 
 #: include/classes/setup/CFrontendSetup.php:350
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data musi być ustawione na -1."
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"
@@ -11422,7 +11422,7 @@ msgstr "Błąd przetwarzania"
 #: include/views/administration.proxy.edit.php:41
 #: include/views/administration.proxy.list.php:90
 msgid "Passive"
-msgstr "Pasywne"
+msgstr "Pasywny"
 
 #: httpconf.php:55 include/classes/setup/CSetupWizard.php:326
 #: include/views/administration.mediatypes.edit.php:81
@@ -12395,7 +12395,7 @@ msgstr "SMTP"
 #: include/views/administration.mediatypes.edit.php:58
 #: include/views/administration.mediatypes.list.php:52
 msgid "SMTP email"
-msgstr "Poczta SMTP"
+msgstr "SMTP email"
 
 #: include/views/administration.mediatypes.edit.php:57
 #: include/views/administration.mediatypes.list.php:51
@@ -12917,7 +12917,7 @@ msgstr "Numer seryjny B"
 #: include/views/administration.script.list.php:66 popup.php:1745
 #: queue.php:146
 msgid "Server"
-msgstr "Usługa"
+msgstr "Serwer"
 
 #: include/screens.inc.php:37
 msgid "Server info"
@@ -13002,7 +13002,7 @@ msgstr "Usługi tworzą cykliczną zależność."
 
 #: include/classes/api/services/CUser.php:1119
 msgid "Session terminated, re-login, please."
-msgstr "Sesja zakończona, należy się ponownie zalogować"
+msgstr "Sesja zakończona, proszę zalogować się ponownie."
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
@@ -13062,12 +13062,12 @@ msgstr "Wyświetl zdarzenia, maksymalnie \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach)"
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach)"
 
 #: adm.gui.php:75
 #, c-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Wyświetl zdarzenia nie starcze niż (w dniach) \"%1$s\"."
+msgstr "Wyświetl zdarzenia nie starsze niż (w dniach) \"%1$s\"."
 
 #: include/classes/html/widget/CWidget.php:129
 msgid "Show filter"
@@ -13519,11 +13519,11 @@ msgstr "Suma wartości z okresu T jest < N"
 
 #: popup_trexpr.php:345
 msgid "Sum of values of a period T is = N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest = N"
 
 #: popup_trexpr.php:340
 msgid "Sum of values of a period T is > N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest > N"
 
 #: popup_trexpr.php:350
 msgid "Sum of values of a period T is NOT N"
@@ -13568,7 +13568,7 @@ msgstr "Szwedzki (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr "Zmiana metody autoryzacji spowoduje zresetowanie wszystkich sesji poza tą! Kontynuować?"
+msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji poza tą! Kontynuować?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:149
 msgid "System default"
@@ -13795,7 +13795,7 @@ msgstr "Test uwierzytelniania"
 
 #: include/views/administration.script.edit.php:108
 msgid "Test confirmation"
-msgstr "Potwierdzenie testu"
+msgstr "Test potwierdzenia"
 
 #: tr_testexpr.php:132
 msgid "Test data"
@@ -13847,12 +13847,12 @@ msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix. Aktualna w
 #: include/views/configuration.hostgroups.list.php:130
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: include/html.inc.php:556
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć hosta i zostanie on wykasowany z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć hosta i zostanie on wykasowany za %1$s (%2$s o %3$s)."
 
 #: include/classes/api/services/CImage.php:433
 #, c-format
@@ -13873,7 +13873,7 @@ msgstr[2] "Obraz został użyty w mapach %1$s."
 #: include/views/configuration.item.list.php:128
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć pozycji i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć pozycji i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -14072,7 +14072,7 @@ msgstr "Czas ogółem: %s"
 
 #: include/page_footer.php:61
 msgid "Transaction has not been closed. Aborting..."
-msgstr "Transakcja nie została zamknięta. Przerywanie…"
+msgstr "Transakcja nie została zamknięta. Przerywanie..."
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -14852,7 +14852,7 @@ msgstr "Aktualizuj istniejące"
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:66
 #: items.php:161
 msgid "Update interval"
-msgstr "Okres aktualizacji"
+msgstr "Interwał aktualizacji"
 
 #: disc_prototypes.php:47 host_discovery.php:54 httpconf.php:45
 #: include/views/configuration.host.discovery.edit.php:192
@@ -14860,7 +14860,7 @@ msgstr "Okres aktualizacji"
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
-msgstr "Okres aktualizacji (w sek)"
+msgstr "Interwał aktualizacji (w sek)"
 
 #: auditlogs.php:127 include/classes/html/CServerInfo.php:40
 msgid "Updated"
@@ -15146,7 +15146,7 @@ msgstr "Użytkownicy"
 
 #: include/classes/html/CServerInfo.php:41
 msgid "Users (online)"
-msgstr "Użytkownicy (online)"
+msgstr "Użytkownicy (zalogowani)"
 
 #: users.php:325
 msgid "Users unblocked"
@@ -16017,7 +16017,7 @@ msgstr "Wewnętrzny Zabbixa"
 
 #: include/perm.inc.php:48
 msgid "Zabbix internal authentication"
-msgstr "Wewnętrze uwierzytelnianie Zabbixa"
+msgstr "Wewnętrzne uwierzytelnianie Zabbixa"
 
 #: include/classes/html/CServerInfo.php:36
 #: include/classes/html/CServerInfo.php:37
@@ -16045,7 +16045,7 @@ msgstr "Nie ustawiono adresu IP lub numeru portu serwera Zabbix'a!"
 
 #: adm.gui.php:43
 msgid "Zabbix server activity check interval"
-msgstr "Okres sprawdzania aktywności serwera Zabbix"
+msgstr "Interwał sprawdzania aktywności serwera Zabbix"
 
 #: include/classes/html/CServerInfo.php:39
 msgid "Zabbix server info"
@@ -16062,7 +16062,7 @@ msgstr "Serwer Zabbixa jest uruchomiony"
 #: adm.gui.php:80
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "Serwer Zabbix działa, okres sprawdzania \"%1$s\"."
+msgstr "Serwer Zabbix działa, interwał sprawdzania \"%1$s\"."
 
 #: include/classes/setup/CSetupWizard.php:434
 msgid "Zabbix server name"
@@ -16144,7 +16144,7 @@ msgstr "automatycznie zarejestrowane hosty"
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:155
 msgid "avg"
-msgstr "śr."
+msgstr "śr"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
@@ -16228,11 +16228,11 @@ msgstr "wyrażenie jest puste"
 
 #: jsLoader.php:95
 msgid "fixed"
-msgstr "naprawione"
+msgstr "stały"
 
 #: include/func.inc.php:1578
 msgid "found"
-msgstr "znaleziony"
+msgstr "znalezionych"
 
 #: include/views/configuration.item.edit.php:320
 #: include/views/configuration.item.edit.php:325
@@ -16498,7 +16498,7 @@ msgstr "s"
 
 #: include/views/configuration.httpconf.edit.php:267
 msgid "sec"
-msgstr "sek."
+msgstr "sek"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
@@ -16529,7 +16529,7 @@ msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 
 #: include/func.inc.php:1571
 msgid "to"
-msgstr "dla"
+msgstr "do"
 
 #: include/classes/api/services/CMap.php:403 include/events.inc.php:34
 #: include/events.inc.php:63

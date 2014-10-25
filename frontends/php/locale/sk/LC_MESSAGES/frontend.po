@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
-"PO-Revision-Date: 2014-09-30 23:28+0300\n"
+"POT-Creation-Date: 2014-10-25 07:31+0300\n"
+"PO-Revision-Date: 2014-10-12 20:50+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412112523.0\n"
+"X-POOTLE-MTIME: 1413139801.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2348,7 +2348,7 @@ msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Nie je možné nastaviť ID zdroja pre prvok obrazovky."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -7736,7 +7736,7 @@ msgstr "Neplatný stav."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Neplatný štýl prvku obrazovky."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -11191,11 +11191,11 @@ msgstr "OSOBNÁ NÁSTENKA"
 
 #: include/classes/setup/CFrontendSetup.php:350
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data musí byť nastavený na -1."
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"
