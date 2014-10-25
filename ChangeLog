@@ -1,25 +1,25 @@
 Changes for 2.5.0
 
 New features:
-.......PS. [ZBXNEXT-207] added the runtime control option to force execution of housekeeper (igors, wiper)
-........S. [ZBXNEXT-1799] added support of low-level discovery macros in "IPMI sensor" field (Sasha)
-........S. [ZBXNEXT-2079] added support of low-level discovery macros in "Units" field (Sasha)
+.......PS. [ZBXNEXT-207] added a runtime control option to force execution of housekeeper (igors, wiper)
+........S. [ZBXNEXT-1799] added support of low-level discovery macros in the "IPMI sensor" field (Sasha)
+........S. [ZBXNEXT-2079] added support of low-level discovery macros in the "Units" field (Sasha)
 ...G...... [ZBXNEXT-689] added protocol option to net.dns and net.dns.query keys to enable tcp based queries (wiper)
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
+........S. [ZBX-8948] fixed memory leak when checking "Template" condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
 ..F.I..... [ZBX-8851] added "-1" and "0" as allowed values for "max_execution_time" and "max_input_time" PHP configuration settings (Krists)
 A.F....... [ZBX-8720] fixed resolving of macros in graph names when graph name contains strings similar to macros (Krists)
 .......PS. [ZBX-6163] added session restoring to MySQL connections in case of losing connection to the database (Juris)
 ...G...PS. [ZBX-8761] fixed potential lockup if signal is received during message logging (igors)
-...G...... [ZBX-8837] added bypassing of dns resolver cache on windows systems for net.dns items (wiper)
+...G...... [ZBX-8837] added bypassing of DNS resolver cache on Windows systems for net.dns items (wiper)
 A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
 ...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
 ..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
-...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernels NETLINK interface. Old method of information retrieval also improved (Juris)
+...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernel NETLINK interface. Old method of information retrieval also improved (Juris)
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
 ...G...PS. [ZBX-8763] fixed log message printing to syslog and undefined type log if debug level 5 is set (igors)
 ..F....... [ZBX-8671] fixed missing existence and permission checks for hosts and host groups (Krists)
