@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-11 02:15+0300\n"
+"POT-Creation-Date: 2014-10-25 07:30+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1141,8 +1141,8 @@ msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "項目原型的組態"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:831
-#: items.php:967
+#: include/views/configuration.item.massupdate.php:28 items.php:858
+#: items.php:994
 msgid "CONFIGURATION OF ITEMS"
 msgstr "項目的組態"
 
@@ -1381,10 +1381,6 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "無法新增圖片"
 
-#: include/classes/import/CXmlImport18.php:649
-msgid "Cannot add image."
-msgstr "無法新增圖片."
-
 #: items.php:499
 msgid "Cannot add item"
 msgstr "無法新增項目"
@@ -1428,7 +1424,7 @@ msgstr ""
 msgid "Cannot add network map"
 msgstr "無法新增網路拓墣圖"
 
-#: httpconf.php:262
+#: httpconf.php:250
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr ""
@@ -1485,7 +1481,7 @@ msgstr "無法新增用戶"
 msgid "Cannot add value map"
 msgstr "無法新增值對應"
 
-#: httpconf.php:199
+#: httpconf.php:187
 msgid "Cannot add web scenario"
 msgstr ""
 
@@ -1505,7 +1501,7 @@ msgstr "無法改變授權方式為LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "無法改變授權方式為Zabbix內部"
 
-#: httpconf.php:187 httpconf.php:408 items.php:526
+#: httpconf.php:175 httpconf.php:425 items.php:537 items.php:803
 msgid "Cannot clear history"
 msgstr "無法清除歷史"
 
@@ -1533,7 +1529,7 @@ msgstr "無法連接到系統主機主控程序的捉捕器的埠, 但是它應�
 msgid "Cannot copy graphs"
 msgstr "無法複製圖形"
 
-#: items.php:749
+#: items.php:760
 msgid "Cannot copy items"
 msgstr "無法複製項目"
 
@@ -1577,12 +1573,12 @@ msgstr "無法創建圖示對應"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "無法創建同名為\"%s\"的圖示對應."
 
-#: include/classes/import/CXmlImport18.php:853
+#: include/classes/import/CXmlImport18.php:864
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "無法創建拓墣圖 \"%s\"."
 
-#: httpconf.php:206
+#: httpconf.php:194
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr ""
 
@@ -1688,7 +1684,7 @@ msgstr ""
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:806
+#: items.php:833
 msgid "Cannot delete items"
 msgstr "無法刪除項目"
 
@@ -1815,7 +1811,7 @@ msgstr "無法刪除用戶示警媒介."
 msgid "Cannot delete value map"
 msgstr "無法刪除值對應"
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Cannot delete web scenario"
 msgstr ""
 
@@ -1844,7 +1840,7 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] ""
 
-#: applications.php:249 items.php:714
+#: applications.php:249 items.php:725
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
@@ -1875,7 +1871,7 @@ msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] ""
 
-#: httpconf.php:369
+#: httpconf.php:378
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] ""
@@ -1913,7 +1909,7 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] ""
 
-#: applications.php:248 items.php:713
+#: applications.php:248 items.php:724
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
@@ -1944,12 +1940,12 @@ msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] ""
 
-#: httpconf.php:368
+#: httpconf.php:377
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
-#: include/classes/import/CXmlImport18.php:701
+#: include/classes/import/CXmlImport18.php:695
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -1961,7 +1957,7 @@ msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選 \"%2$s\"中的圖形\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:752
+#: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1973,7 +1969,7 @@ msgstr "無法找到用在拓墣圖\"%2$s\"中的群組\"%1$s\"."
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:760
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -1998,7 +1994,7 @@ msgstr ""
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
 
-#: include/classes/import/CXmlImport18.php:802
+#: include/classes/import/CXmlImport18.php:796
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2055,7 +2051,7 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的項目\"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:738
+#: include/classes/import/CXmlImport18.php:732
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
@@ -2086,10 +2082,10 @@ msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:780
-#: include/classes/import/CXmlImport18.php:825
+#: include/classes/import/CXmlImport18.php:774
+#: include/classes/import/CXmlImport18.php:822
 #: include/classes/import/importers/CMapImporter.php:228
-#: include/classes/import/importers/CMapImporter.php:274
+#: include/classes/import/importers/CMapImporter.php:273
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖 \"%2$s\"中的觸發器\"%1$s\"."
@@ -2468,10 +2464,6 @@ msgstr "無法更新圖示對應"
 msgid "Cannot update image"
 msgstr "無法更新圖片"
 
-#: include/classes/import/CXmlImport18.php:656
-msgid "Cannot update image."
-msgstr "無法更新圖片."
-
 #: include/classes/api/services/CHostInterface.php:342
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
@@ -2485,7 +2477,7 @@ msgstr "無法更新項目"
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:693
+#: items.php:704
 msgid "Cannot update items"
 msgstr "無法更新項目"
 
@@ -2501,7 +2493,7 @@ msgstr "無法更新巨集"
 msgid "Cannot update maintenance"
 msgstr "無法更新維修"
 
-#: include/classes/import/CXmlImport18.php:844
+#: include/classes/import/CXmlImport18.php:855
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "無法更新拓拓墣圖\"%s\"."
@@ -2585,7 +2577,7 @@ msgstr "無法更新用户. 兩次輸入的密碼必須一致."
 msgid "Cannot update value map"
 msgstr "無法更新值對應"
 
-#: httpconf.php:194
+#: httpconf.php:182
 msgid "Cannot update web scenario"
 msgstr ""
 
@@ -3277,7 +3269,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr "創建圖示對應"
 
-#: include/views/configuration.item.list.php:37 items.php:812
+#: include/views/configuration.item.list.php:37 items.php:839
 msgid "Create item"
 msgstr "創建項目"
 
@@ -4793,12 +4785,12 @@ msgstr "電子郵件"
 msgid "Empty"
 msgstr "空"
 
-#: include/classes/api/services/CHttpTest.php:909
+#: include/classes/api/services/CHttpTest.php:910
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:902
+#: include/classes/api/services/CHttpTest.php:903
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr ""
@@ -5205,7 +5197,7 @@ msgstr "執行在"
 msgid "Executed"
 msgstr ""
 
-#: include/items.inc.php:1315
+#: include/items.inc.php:1296
 #: include/views/configuration.host.discovery.edit.php:179
 #: include/views/configuration.item.edit.php:185
 msgid "Executed script"
@@ -5536,7 +5528,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr "訪客的密碼必須為空"
 
-#: include/items.inc.php:1319 include/views/configuration.item.edit.php:197
+#: include/items.inc.php:1300 include/views/configuration.item.edit.php:197
 msgid "Formula"
 msgstr "公式"
 
@@ -5780,8 +5772,8 @@ msgstr "圖形\"%1$s\"不能繼承. \"%2$s\"中並無所要的項目."
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "圖形 \"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1889
-#: include/classes/import/CXmlImport18.php:1893
+#: include/classes/import/CXmlImport18.php:1900
+#: include/classes/import/CXmlImport18.php:1904
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "略過圖形\"%1$s\"-用戶規則."
@@ -6166,8 +6158,8 @@ msgstr "嚴重"
 msgid "History"
 msgstr "歷史記錄"
 
-#: httpconf.php:187 httpconf.php:408 items.php:520 items.php:526 items.php:767
-#: items.php:776
+#: httpconf.php:175 httpconf.php:425 items.php:530 items.php:537 items.php:791
+#: items.php:803
 msgid "History cleared"
 msgstr "歷史已清除"
 
@@ -6239,8 +6231,8 @@ msgstr "横向對齊"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:520 items.php:767
-#: items.php:796 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:530 items.php:790
+#: items.php:823 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
 #: popup.php:501 popup.php:1087 queue.php:229 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:296
 #, fuzzy
@@ -6259,7 +6251,7 @@ msgstr "主機 \"%1$s\" 已存在."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "主機\"%1$s\"是以系統代理程式\"%2$s\"來監控的."
 
-#: include/classes/import/CXmlImport18.php:986
+#: include/classes/import/CXmlImport18.php:997
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "主機 \"%s\" 有 \"useipmi\" 參數已檢驗,  但是沒有 \"ipmi_ip\" 參數! 使用主機IP位址為IPMI介面的位址."
@@ -7028,12 +7020,12 @@ msgstr "不正確的SNMP OID"
 msgid "Incorrect SNMP community."
 msgstr "不正確的SNMP community."
 
-#: include/classes/api/services/CHttpTest.php:892
+#: include/classes/api/services/CHttpTest.php:893
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:883
+#: include/classes/api/services/CHttpTest.php:884
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
 msgstr ""
@@ -7321,7 +7313,7 @@ msgstr "不正確的彈性間隔\"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在項目\"%1$s\"中不正確的彈性間隔. 彈性間隔必須是一個字串."
 
-#: include/classes/api/services/CHttpTest.php:683
+#: include/classes/api/services/CHttpTest.php:684
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
 msgstr ""
@@ -7585,7 +7577,7 @@ msgstr "提供了不正確的資源類型給篩選項目."
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:693
+#: include/classes/api/services/CHttpTest.php:694
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
 msgstr ""
 
@@ -7789,12 +7781,12 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "不正確的工作時間."
 
-#: include/classes/import/CXmlImport18.php:1921
+#: include/classes/import/CXmlImport18.php:1932
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y max項目."
 
-#: include/classes/import/CXmlImport18.php:1908
+#: include/classes/import/CXmlImport18.php:1919
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "圖形\"%1$s\"的不正確y min項目."
@@ -8005,8 +7997,8 @@ msgstr "無效的參數."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:749
-#: include/classes/api/services/CHttpTest.php:755
+#: include/classes/api/services/CHttpTest.php:750
+#: include/classes/api/services/CHttpTest.php:756
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "無效的回應編碼 \"%1$s\"."
@@ -8074,8 +8066,8 @@ msgstr "意大利語 (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:519
-#: items.php:767 items.php:796 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:529
+#: items.php:790 items.php:823 tr_logform.php:251
 msgid "Item"
 msgstr "項目"
 
@@ -8104,7 +8096,7 @@ msgstr "項目\"%1$s\"不能填入一個不存在的主機資產紀錄欄位號�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1850
+#: include/classes/import/CXmlImport18.php:1861
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "項目 \"%1$s\"不存在."
@@ -8114,8 +8106,8 @@ msgstr "項目 \"%1$s\"不存在."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 
-#: include/classes/import/CXmlImport18.php:1666
-#: include/classes/import/CXmlImport18.php:1672
+#: include/classes/import/CXmlImport18.php:1677
+#: include/classes/import/CXmlImport18.php:1683
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略過項目\"%1$s\"-用戶規則."
@@ -8137,12 +8129,12 @@ msgstr "項目數量"
 msgid "Item deleted"
 msgstr "項目已刪除"
 
-#: applications.php:246 items.php:711
+#: applications.php:246 items.php:722
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 
-#: applications.php:245 items.php:710
+#: applications.php:245 items.php:721
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -8287,11 +8279,11 @@ msgstr "項目"
 msgid "Items (m/d/n)"
 msgstr "項目 (m/d/n)"
 
-#: items.php:749
+#: items.php:760
 msgid "Items copied"
 msgstr "項目已複製"
 
-#: items.php:806
+#: items.php:833
 msgid "Items deleted"
 msgstr "項目已刪除"
 
@@ -8299,7 +8291,7 @@ msgstr "項目已刪除"
 msgid "Items list"
 msgstr "項目清單"
 
-#: items.php:693
+#: items.php:704
 msgid "Items updated"
 msgstr "監控項已更新"
 
@@ -8988,7 +8980,7 @@ msgstr "手動登出"
 msgid "Map"
 msgstr "拓墣圖"
 
-#: include/classes/import/CXmlImport18.php:692
+#: include/classes/import/CXmlImport18.php:686
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "略過拓墣圖\"%1$s\"-用戶規則."
@@ -8998,12 +8990,12 @@ msgstr "略過拓墣圖\"%1$s\"-用戶規則."
 msgid "Map \"%s\""
 msgstr "拓墣圖\"%s\""
 
-#: include/classes/import/CXmlImport18.php:856
+#: include/classes/import/CXmlImport18.php:867
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "拓墣圖\"%s\"已創建."
 
-#: include/classes/import/CXmlImport18.php:847
+#: include/classes/import/CXmlImport18.php:858
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "拓墣圖\"%s\"已更新."
@@ -9369,8 +9361,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "缺少圖形的\"名稱\"欄位"
 
-#: include/classes/import/CXmlImport18.php:1912
-#: include/classes/import/CXmlImport18.php:1925
+#: include/classes/import/CXmlImport18.php:1923
+#: include/classes/import/CXmlImport18.php:1936
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主機 \"%2$s\"缺少了項目\"%1$s\"."
@@ -9754,12 +9746,12 @@ msgstr ""
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1902
+#: include/classes/import/CXmlImport18.php:1913
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymax_type\"."
 
-#: include/classes/import/CXmlImport18.php:1898
+#: include/classes/import/CXmlImport18.php:1909
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "圖形 \"%s\"並無欄位 \"ymin_type\"."
@@ -10156,27 +10148,27 @@ msgstr ""
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1883
+#: include/classes/import/CXmlImport18.php:1894
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "不具圖形 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:1021
+#: include/classes/import/CXmlImport18.php:1032
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "不具主機 \"%1$s\"的許可權."
 
-#: include/classes/import/CXmlImport18.php:1841
+#: include/classes/import/CXmlImport18.php:1852
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "無項目\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1500
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "沒有模板\"%s\"的許可權"
 
-#: include/classes/import/CXmlImport18.php:1749
+#: include/classes/import/CXmlImport18.php:1760
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr ""
@@ -10185,12 +10177,12 @@ msgstr ""
 msgid "No permissions"
 msgstr "沒有許可權"
 
-#: include/classes/import/CXmlImport18.php:1115
+#: include/classes/import/CXmlImport18.php:1126
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:685
+#: include/classes/import/CXmlImport18.php:679
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "不具拓墣圖\"%1$s\"的許可權."
@@ -10245,9 +10237,9 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CHostPrototype.php:1047
 #: include/classes/api/services/CHostPrototype.php:1060
 #: include/classes/api/services/CHttpTest.php:369
-#: include/classes/api/services/CHttpTest.php:451
-#: include/classes/api/services/CHttpTest.php:497
-#: include/classes/api/services/CHttpTest.php:707
+#: include/classes/api/services/CHttpTest.php:452
+#: include/classes/api/services/CHttpTest.php:498
+#: include/classes/api/services/CHttpTest.php:708
 #: include/classes/api/services/CIconMap.php:304
 #: include/classes/api/services/CImage.php:414
 #: include/classes/api/services/CImage.php:486
@@ -10371,7 +10363,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "沒有選擇目標"
 
-#: graphs.php:377 items.php:752
+#: graphs.php:377 items.php:763
 msgid "No target selected."
 msgstr "沒有已選的目標"
 
@@ -12355,7 +12347,7 @@ msgstr "SNMPv3 端點代理程式"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "SQL計數: %s (selects: %s | 執行: %s)"
 
-#: include/items.inc.php:1317
+#: include/items.inc.php:1298
 #: include/views/configuration.host.discovery.edit.php:183
 #: include/views/configuration.item.edit.php:189
 msgid "SQL query"
@@ -12439,11 +12431,11 @@ msgstr "Scale"
 msgid "Scenario"
 msgstr "方案"
 
-#: httpconf.php:198
+#: httpconf.php:186
 msgid "Scenario added"
 msgstr "方案已新增"
 
-#: httpconf.php:193
+#: httpconf.php:181
 msgid "Scenario updated"
 msgstr "方案已更新"
 
@@ -13769,7 +13761,7 @@ msgstr "接收到的JSON不是一個有效的JSON-RPC請求."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "請求的遠程程序不存在/不可用"
 
-#: include/classes/api/services/CHttpTest.php:625
+#: include/classes/api/services/CHttpTest.php:626
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
@@ -14010,8 +14002,8 @@ msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1758
-#: include/classes/import/CXmlImport18.php:1762
+#: include/classes/import/CXmlImport18.php:1769
+#: include/classes/import/CXmlImport18.php:1773
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略過觸發器\"%1$s\"-用戶規則."
@@ -14528,7 +14520,7 @@ msgstr "未知的資源"
 msgid "Unknown step failed: %1$s"
 msgstr ""
 
-#: include/items.inc.php:896
+#: include/items.inc.php:877
 msgid "Unknown value type"
 msgstr "未知的值類型"
 
@@ -15415,60 +15407,60 @@ msgstr "Web監測"
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:473
-#: include/classes/api/services/CHttpTest.php:547
-#: include/classes/api/services/CHttpTest.php:593
+#: include/classes/api/services/CHttpTest.php:474
+#: include/classes/api/services/CHttpTest.php:548
+#: include/classes/api/services/CHttpTest.php:594
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Web scenario deleted"
 msgstr ""
 
-#: httpconf.php:366
+#: httpconf.php:375
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] ""
 
-#: httpconf.php:365
+#: httpconf.php:374
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
 
-#: include/classes/api/services/CHttpTest.php:445
+#: include/classes/api/services/CHttpTest.php:446
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:462
-#: include/classes/api/services/CHttpTest.php:645
+#: include/classes/api/services/CHttpTest.php:463
+#: include/classes/api/services/CHttpTest.php:646
 msgid "Web scenario must have at least one step."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:456
-#: include/classes/api/services/CHttpTest.php:573
+#: include/classes/api/services/CHttpTest.php:457
+#: include/classes/api/services/CHttpTest.php:574
 msgid "Web scenario name cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:724
+#: include/classes/api/services/CHttpTest.php:725
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:671
+#: include/classes/api/services/CHttpTest.php:672
 msgid "Web scenario step URL cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:666
+#: include/classes/api/services/CHttpTest.php:667
 msgid "Web scenario step name cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:650
+#: include/classes/api/services/CHttpTest.php:651
 msgid "Web scenario step name should contain only printable characters."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:675
+#: include/classes/api/services/CHttpTest.php:676
 msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-11 02:15+0300\n"
+"POT-Creation-Date: 2014-10-25 07:30+0300\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1184,8 +1184,8 @@ msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "НАЛАШТУВАННЯ ПРОТОТИПІВ ЕЛЕМЕНТІВ ДАННИХ"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:831
-#: items.php:967
+#: include/views/configuration.item.massupdate.php:28 items.php:858
+#: items.php:994
 msgid "CONFIGURATION OF ITEMS"
 msgstr "НАЛАШТУВАННЯ ЕЛЕМЕНТІВ ДАНИХ"
 
@@ -1424,10 +1424,6 @@ msgstr "Не вдалося додати прототип вузла мереж�
 msgid "Cannot add image"
 msgstr "Не вдалося додати картинку"
 
-#: include/classes/import/CXmlImport18.php:649
-msgid "Cannot add image."
-msgstr "Не вдалось додати картинку."
-
 #: items.php:499
 msgid "Cannot add item"
 msgstr "Не вдалося додати елемент даних"
@@ -1471,7 +1467,7 @@ msgstr "Неможливо додати більше одного елемент
 msgid "Cannot add network map"
 msgstr "Не вдалося додати карту мережі"
 
-#: httpconf.php:262
+#: httpconf.php:250
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Не вдалося додати нову групу елементів даних \"%1$s\"."
@@ -1528,7 +1524,7 @@ msgstr "Не вдалося додати користувачів."
 msgid "Cannot add value map"
 msgstr "Не вдалося додати перетворення значення"
 
-#: httpconf.php:199
+#: httpconf.php:187
 msgid "Cannot add web scenario"
 msgstr "Не вдалося додати веб-сценарій"
 
@@ -1548,7 +1544,7 @@ msgstr "Не вдалося змінити метод аутентифікаці
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не вдалося змінити метод аутентифікації на внутрішній Zabbix"
 
-#: httpconf.php:187 httpconf.php:408 items.php:526
+#: httpconf.php:175 httpconf.php:425 items.php:537 items.php:803
 msgid "Cannot clear history"
 msgstr "Не вдалося очистити історію"
 
@@ -1576,7 +1572,7 @@ msgstr "Не вдалося під'єднатись до порту трапер
 msgid "Cannot copy graphs"
 msgstr "Не вдалось скопіювати графіки"
 
-#: items.php:749
+#: items.php:760
 msgid "Cannot copy items"
 msgstr "Не вдалося скопіювати елементи даних"
 
@@ -1620,12 +1616,12 @@ msgstr "Не вдалося створити призначення іконок
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не вдалося створити призначення іконок з ідентичним ім'ям \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:853
+#: include/classes/import/CXmlImport18.php:864
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не вдалося створити карту мережі \"%s\"."
 
-#: httpconf.php:206
+#: httpconf.php:194
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не вдалося створити нову групу елементів даних, веб-сценарій вже приєднано до групи елементів даних."
 
@@ -1737,7 +1733,7 @@ msgstr ""
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:806
+#: items.php:833
 msgid "Cannot delete items"
 msgstr "Не вдалося видалити елементи даних"
 
@@ -1867,7 +1863,7 @@ msgstr "Не вдалось видалити метод повідомлень."
 msgid "Cannot delete value map"
 msgstr "Не вдалося видалити перетворення значення"
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Cannot delete web scenario"
 msgstr "Не вдалося видалити веб-сценарій"
 
@@ -1911,7 +1907,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: applications.php:249 items.php:714
+#: applications.php:249 items.php:725
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
@@ -1960,7 +1956,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:369
+#: httpconf.php:378
 #, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
@@ -2017,7 +2013,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: applications.php:248 items.php:713
+#: applications.php:248 items.php:724
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
@@ -2066,7 +2062,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:368
+#: httpconf.php:377
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
@@ -2074,7 +2070,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: include/classes/import/CXmlImport18.php:701
+#: include/classes/import/CXmlImport18.php:695
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -2086,7 +2082,7 @@ msgstr "Не вдалось знайти фонове зображення \"%1$
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти графік \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:752
+#: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -2098,7 +2094,7 @@ msgstr "Не вдалося знайти групу \"%1$s\" використо�
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти групу \"%1$s\" використовувану в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:760
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -2123,7 +2119,7 @@ msgstr ""
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Не вдалося знайти інтерфейс вузла мережі \"%1$s\" для ключа елемента даних \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:802
+#: include/classes/import/CXmlImport18.php:796
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2180,7 +2176,7 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти елемент даних \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:738
+#: include/classes/import/CXmlImport18.php:732
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не вдалося знайти карту мережі \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
@@ -2211,10 +2207,10 @@ msgstr "Не вдалося знайти комплексний екран \"%1$
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:780
-#: include/classes/import/CXmlImport18.php:825
+#: include/classes/import/CXmlImport18.php:774
+#: include/classes/import/CXmlImport18.php:822
 #: include/classes/import/importers/CMapImporter.php:228
-#: include/classes/import/importers/CMapImporter.php:274
+#: include/classes/import/importers/CMapImporter.php:273
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти тригер \"%1$s\" використовуваний в карті мережі \"%2$s\"."
@@ -2599,10 +2595,6 @@ msgstr "Не вдалося оновити призначення іконок"
 msgid "Cannot update image"
 msgstr "Не вдалося оновити картинку"
 
-#: include/classes/import/CXmlImport18.php:656
-msgid "Cannot update image."
-msgstr "Не вдалось оновити фонове зображення."
-
 #: include/classes/api/services/CHostInterface.php:342
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
@@ -2616,7 +2608,7 @@ msgstr "Не вдалося оновити елемент даних"
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:693
+#: items.php:704
 msgid "Cannot update items"
 msgstr "Не вдалося оновити елементи даних"
 
@@ -2632,7 +2624,7 @@ msgstr "Не вдалося оновити макроси"
 msgid "Cannot update maintenance"
 msgstr "Не вдалося оновити період сервісу"
 
-#: include/classes/import/CXmlImport18.php:844
+#: include/classes/import/CXmlImport18.php:855
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не вдалося оновити карту мережі \"%s\"."
@@ -2716,7 +2708,7 @@ msgstr "Не вдалося оновити дані користувача. Об
 msgid "Cannot update value map"
 msgstr "Не вдалося оновити перетворення значення"
 
-#: httpconf.php:194
+#: httpconf.php:182
 msgid "Cannot update web scenario"
 msgstr ""
 
@@ -3411,7 +3403,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr "Створити призначення іконок"
 
-#: include/views/configuration.item.list.php:37 items.php:812
+#: include/views/configuration.item.list.php:37 items.php:839
 msgid "Create item"
 msgstr "Створити елемент даних"
 
@@ -4936,12 +4928,12 @@ msgstr "Email"
 msgid "Empty"
 msgstr "Пусто"
 
-#: include/classes/api/services/CHttpTest.php:909
+#: include/classes/api/services/CHttpTest.php:910
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:902
+#: include/classes/api/services/CHttpTest.php:903
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr ""
@@ -5348,7 +5340,7 @@ msgstr "Виконати на"
 msgid "Executed"
 msgstr ""
 
-#: include/items.inc.php:1315
+#: include/items.inc.php:1296
 #: include/views/configuration.host.discovery.edit.php:179
 #: include/views/configuration.item.edit.php:185
 msgid "Executed script"
@@ -5679,7 +5671,7 @@ msgstr ""
 msgid "For guest, password must be empty"
 msgstr "Для Гостя пароль повинен бути пустим"
 
-#: include/items.inc.php:1319 include/views/configuration.item.edit.php:197
+#: include/items.inc.php:1300 include/views/configuration.item.edit.php:197
 msgid "Formula"
 msgstr "Формула"
 
@@ -5923,8 +5915,8 @@ msgstr "Графік \"%1$s\" не може бути успадковано. Н�
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Графік \"%1$s\" не існує в шаблоні \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1889
-#: include/classes/import/CXmlImport18.php:1893
+#: include/classes/import/CXmlImport18.php:1900
+#: include/classes/import/CXmlImport18.php:1904
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Графік \"%1$s\" пропущено - правило користувача."
@@ -6312,8 +6304,8 @@ msgstr "Висока"
 msgid "History"
 msgstr "Історія"
 
-#: httpconf.php:187 httpconf.php:408 items.php:520 items.php:526 items.php:767
-#: items.php:776
+#: httpconf.php:175 httpconf.php:425 items.php:530 items.php:537 items.php:791
+#: items.php:803
 msgid "History cleared"
 msgstr "Історію очищено"
 
@@ -6385,8 +6377,8 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:520 items.php:767
-#: items.php:796 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:530 items.php:790
+#: items.php:823 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
 #: popup.php:501 popup.php:1087 queue.php:229 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:296
 #, fuzzy
@@ -6408,7 +6400,7 @@ msgstr "Вузел мережі \"%1$s\" вже існує."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Вузел мережі \"%1$s\" під спостереженням через проксі \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:986
+#: include/classes/import/CXmlImport18.php:997
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "У вузла мережі \"%s\" вибрано параметр \"useipmi\", але не вказано параметр \"ipmi_ip\"! Буде використано IP адреса вузла мережі, як адреса для IPMI інтерфейсу."
@@ -7189,12 +7181,12 @@ msgstr "Некоректний SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Некоректне SNMP community."
 
-#: include/classes/api/services/CHttpTest.php:892
+#: include/classes/api/services/CHttpTest.php:893
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:883
+#: include/classes/api/services/CHttpTest.php:884
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
 msgstr ""
@@ -7482,7 +7474,7 @@ msgstr "Некоректний гнучкий інтервал \"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некоректний гнучкий інтервал в елементі даних \"%1$s\". Гнучкий інтервал має бути рядком."
 
-#: include/classes/api/services/CHttpTest.php:683
+#: include/classes/api/services/CHttpTest.php:684
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
 msgstr ""
@@ -7746,7 +7738,7 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:693
+#: include/classes/api/services/CHttpTest.php:694
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
 msgstr ""
 
@@ -7950,12 +7942,12 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "Некоректний робочий час."
 
-#: include/classes/import/CXmlImport18.php:1921
+#: include/classes/import/CXmlImport18.php:1932
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Некоректний елемент даних для Y макс. у графіка \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1908
+#: include/classes/import/CXmlImport18.php:1919
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Некоректний елемент даних для Y мін. у графіка \"%1$s\"."
@@ -8166,8 +8158,8 @@ msgstr "Помилкові параметри."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:749
-#: include/classes/api/services/CHttpTest.php:755
+#: include/classes/api/services/CHttpTest.php:750
+#: include/classes/api/services/CHttpTest.php:756
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Помилковий код відповіді \"%1$s\"."
@@ -8235,8 +8227,8 @@ msgstr "Італійська (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:519
-#: items.php:767 items.php:796 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:529
+#: items.php:790 items.php:823 tr_logform.php:251
 msgid "Item"
 msgstr "Елемент даних"
 
@@ -8265,7 +8257,7 @@ msgstr "Елемент даних \"%1$s\" не може заповнювати 
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Елемент даних \"%1$s\" не існує в шаблоні \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1850
+#: include/classes/import/CXmlImport18.php:1861
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" не існує."
@@ -8275,8 +8267,8 @@ msgstr "Елемент даних \"%1$s\" не існує."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" в \"%2$s\": група елементів даних \"%3$s\" не існує."
 
-#: include/classes/import/CXmlImport18.php:1666
-#: include/classes/import/CXmlImport18.php:1672
+#: include/classes/import/CXmlImport18.php:1677
+#: include/classes/import/CXmlImport18.php:1683
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент даних \"%1$s\" пропущено - правило користувача."
@@ -8298,7 +8290,7 @@ msgstr "Кількість елементів даних"
 msgid "Item deleted"
 msgstr "Елемент даних видалено"
 
-#: applications.php:246 items.php:711
+#: applications.php:246 items.php:722
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
@@ -8306,7 +8298,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: applications.php:245 items.php:710
+#: applications.php:245 items.php:721
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -8460,11 +8452,11 @@ msgstr "Елементи даних"
 msgid "Items (m/d/n)"
 msgstr "Елементи даних (а/д/нп)"
 
-#: items.php:749
+#: items.php:760
 msgid "Items copied"
 msgstr "Елементи даних скопійовано"
 
-#: items.php:806
+#: items.php:833
 msgid "Items deleted"
 msgstr "Елементи даних видалено"
 
@@ -8472,7 +8464,7 @@ msgstr "Елементи даних видалено"
 msgid "Items list"
 msgstr "Список елементів"
 
-#: items.php:693
+#: items.php:704
 msgid "Items updated"
 msgstr "Елементи оновлено"
 
@@ -9164,7 +9156,7 @@ msgstr "Примусовий вихід"
 msgid "Map"
 msgstr "Карта мережі"
 
-#: include/classes/import/CXmlImport18.php:692
+#: include/classes/import/CXmlImport18.php:686
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Карту мережі \"%1$s\" пропущено - правило користувача."
@@ -9174,12 +9166,12 @@ msgstr "Карту мережі \"%1$s\" пропущено - правило к�
 msgid "Map \"%s\""
 msgstr "Карта мережі \"%s\""
 
-#: include/classes/import/CXmlImport18.php:856
+#: include/classes/import/CXmlImport18.php:867
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Карту мережі \"%s\" створено."
 
-#: include/classes/import/CXmlImport18.php:847
+#: include/classes/import/CXmlImport18.php:858
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Карту мережі \"%s\" оновлено."
@@ -9557,8 +9549,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "Відсутнє поле \"name\" для графіку."
 
-#: include/classes/import/CXmlImport18.php:1912
-#: include/classes/import/CXmlImport18.php:1925
+#: include/classes/import/CXmlImport18.php:1923
+#: include/classes/import/CXmlImport18.php:1936
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Відсутній елемент даних \"%1$s\" для вузла мережі \"%2$s\"."
@@ -9942,12 +9934,12 @@ msgstr ""
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1902
+#: include/classes/import/CXmlImport18.php:1913
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Немає поля \"ymax_type\" для графіка \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1898
+#: include/classes/import/CXmlImport18.php:1909
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Немає поля \"ymin_type\" для графіка \"%s\"."
@@ -10344,27 +10336,27 @@ msgstr ""
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1883
+#: include/classes/import/CXmlImport18.php:1894
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Немає прав доступу до графіка \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1021
+#: include/classes/import/CXmlImport18.php:1032
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Немає прав доступу до вузла мережі \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1841
+#: include/classes/import/CXmlImport18.php:1852
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Немає прав доступу до елемента даних \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1500
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Немає прав доступу до шаблону \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1749
+#: include/classes/import/CXmlImport18.php:1760
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr ""
@@ -10373,12 +10365,12 @@ msgstr ""
 msgid "No permissions"
 msgstr "Немає прав доступу"
 
-#: include/classes/import/CXmlImport18.php:1115
+#: include/classes/import/CXmlImport18.php:1126
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:685
+#: include/classes/import/CXmlImport18.php:679
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Немає прав доступу до карти мережі \"%1$s\"."
@@ -10433,9 +10425,9 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CHostPrototype.php:1047
 #: include/classes/api/services/CHostPrototype.php:1060
 #: include/classes/api/services/CHttpTest.php:369
-#: include/classes/api/services/CHttpTest.php:451
-#: include/classes/api/services/CHttpTest.php:497
-#: include/classes/api/services/CHttpTest.php:707
+#: include/classes/api/services/CHttpTest.php:452
+#: include/classes/api/services/CHttpTest.php:498
+#: include/classes/api/services/CHttpTest.php:708
 #: include/classes/api/services/CIconMap.php:304
 #: include/classes/api/services/CImage.php:414
 #: include/classes/api/services/CImage.php:486
@@ -10559,7 +10551,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Ціль не обрано"
 
-#: graphs.php:377 items.php:752
+#: graphs.php:377 items.php:763
 msgid "No target selected."
 msgstr "Ціль не обрано."
 
@@ -12546,7 +12538,7 @@ msgstr "SNMPv3 агент"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Кількість SQL: %s (selects: %s | executes: %s)"
 
-#: include/items.inc.php:1317
+#: include/items.inc.php:1298
 #: include/views/configuration.host.discovery.edit.php:183
 #: include/views/configuration.item.edit.php:189
 msgid "SQL query"
@@ -12630,11 +12622,11 @@ msgstr "Період"
 msgid "Scenario"
 msgstr "Сценарій"
 
-#: httpconf.php:198
+#: httpconf.php:186
 msgid "Scenario added"
 msgstr "Сценарій додано"
 
-#: httpconf.php:193
+#: httpconf.php:181
 msgid "Scenario updated"
 msgstr "Сценарій оновлено"
 
@@ -13972,7 +13964,7 @@ msgstr "Отриманий JSON не являється правильним з�
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Запитувана віддалена процедура не існує / недоступна"
 
-#: include/classes/api/services/CHttpTest.php:625
+#: include/classes/api/services/CHttpTest.php:626
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
@@ -14216,8 +14208,8 @@ msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" залежить від тригера \"%2$s\", який не існує."
 
-#: include/classes/import/CXmlImport18.php:1758
-#: include/classes/import/CXmlImport18.php:1762
+#: include/classes/import/CXmlImport18.php:1769
+#: include/classes/import/CXmlImport18.php:1773
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропущено - правило користувача."
@@ -14746,7 +14738,7 @@ msgstr "Невідомий ресурс"
 msgid "Unknown step failed: %1$s"
 msgstr ""
 
-#: include/items.inc.php:896
+#: include/items.inc.php:877
 msgid "Unknown value type"
 msgstr "Невідомий тип"
 
@@ -15639,18 +15631,18 @@ msgstr "Веб моніторинг"
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:473
-#: include/classes/api/services/CHttpTest.php:547
-#: include/classes/api/services/CHttpTest.php:593
+#: include/classes/api/services/CHttpTest.php:474
+#: include/classes/api/services/CHttpTest.php:548
+#: include/classes/api/services/CHttpTest.php:594
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Web scenario deleted"
 msgstr ""
 
-#: httpconf.php:366
+#: httpconf.php:375
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] ""
@@ -15658,7 +15650,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:365
+#: httpconf.php:374
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
@@ -15666,39 +15658,39 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: include/classes/api/services/CHttpTest.php:445
+#: include/classes/api/services/CHttpTest.php:446
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:462
-#: include/classes/api/services/CHttpTest.php:645
+#: include/classes/api/services/CHttpTest.php:463
+#: include/classes/api/services/CHttpTest.php:646
 msgid "Web scenario must have at least one step."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:456
-#: include/classes/api/services/CHttpTest.php:573
+#: include/classes/api/services/CHttpTest.php:457
+#: include/classes/api/services/CHttpTest.php:574
 msgid "Web scenario name cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:724
+#: include/classes/api/services/CHttpTest.php:725
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:671
+#: include/classes/api/services/CHttpTest.php:672
 msgid "Web scenario step URL cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:666
+#: include/classes/api/services/CHttpTest.php:667
 msgid "Web scenario step name cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:650
+#: include/classes/api/services/CHttpTest.php:651
 msgid "Web scenario step name should contain only printable characters."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:675
+#: include/classes/api/services/CHttpTest.php:676
 msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 

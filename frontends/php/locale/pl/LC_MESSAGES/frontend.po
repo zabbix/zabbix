@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-11 02:15+0300\n"
+"POT-Creation-Date: 2014-10-25 07:30+0300\n"
 "PO-Revision-Date: 2014-09-10 17:16+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1168,8 +1168,8 @@ msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "KONFIGURACJA PROTOTYPÓW POZYCJI"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:831
-#: items.php:967
+#: include/views/configuration.item.massupdate.php:28 items.php:858
+#: items.php:994
 msgid "CONFIGURATION OF ITEMS"
 msgstr "KONFIGURACJA POZYCJI"
 
@@ -1408,10 +1408,6 @@ msgstr "Nie można dodać prototypu hosta"
 msgid "Cannot add image"
 msgstr "Nie można dodać obrazu"
 
-#: include/classes/import/CXmlImport18.php:649
-msgid "Cannot add image."
-msgstr "Nie można dodać obrazu."
-
 #: items.php:499
 msgid "Cannot add item"
 msgstr "Nie można dodać pozycji"
@@ -1455,7 +1451,7 @@ msgstr "Nie można dodać więcej niż jednej pozycji typu \"Suma wykresu\" do p
 msgid "Cannot add network map"
 msgstr "Nie można dodać mapy sieci"
 
-#: httpconf.php:262
+#: httpconf.php:250
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Nie można dodać nowej aplikacji \"%1$s\"."
@@ -1512,7 +1508,7 @@ msgstr "Nie można dodać użytkowników."
 msgid "Cannot add value map"
 msgstr "Nie można dodać mapy wartości"
 
-#: httpconf.php:199
+#: httpconf.php:187
 msgid "Cannot add web scenario"
 msgstr "Nie można dodać scenariusza sieci www"
 
@@ -1532,7 +1528,7 @@ msgstr "Nie można zmienić metody uwierzytelniania na LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Nie można zmienić metod uwierzytelniania na wewnętrzną Zabbix'a"
 
-#: httpconf.php:187 httpconf.php:408 items.php:526
+#: httpconf.php:175 httpconf.php:425 items.php:537 items.php:803
 msgid "Cannot clear history"
 msgstr "Nie można wyczyścić historii"
 
@@ -1560,7 +1556,7 @@ msgstr "Nie można połączyć z portem trappera serwera ZABBIX, jednakże powin
 msgid "Cannot copy graphs"
 msgstr "Nie można skopiować wykresów"
 
-#: items.php:749
+#: items.php:760
 msgid "Cannot copy items"
 msgstr "Nie można skopiować pozycji"
 
@@ -1604,12 +1600,12 @@ msgstr "Nie można utworzyć mapy ikon"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Nie można utworzyć map ikon o identycznej nazwie \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:853
+#: include/classes/import/CXmlImport18.php:864
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Nie można utworzyć mapy \"%s\"."
 
-#: httpconf.php:206
+#: httpconf.php:194
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Nie można utworzyć nowej aplikacji, scenariusz sieci www jest już powiązany z aplikacją."
 
@@ -1717,7 +1713,7 @@ msgstr "Nie można usunąć prototypu pozycji"
 msgid "Cannot delete item prototypes"
 msgstr "Nie można usunąć prototypów pozycji"
 
-#: items.php:806
+#: items.php:833
 msgid "Cannot delete items"
 msgstr "Nie można usunąć pozycji"
 
@@ -1846,7 +1842,7 @@ msgstr "Nie można usunąć mediów użytkownika."
 msgid "Cannot delete value map"
 msgstr "Nie można usunąć mapy wartości"
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Cannot delete web scenario"
 msgstr "Nie można usunąć scenariusza sieci www"
 
@@ -1885,7 +1881,7 @@ msgstr[0] "Nie można wyłączyć prototypu hosta"
 msgstr[1] "Nie można wyłączyć prototypów hostów"
 msgstr[2] "Nie można wyłączyć prototypów hostów"
 
-#: applications.php:249 items.php:714
+#: applications.php:249 items.php:725
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Nie można wyłączyć pozycji"
@@ -1927,7 +1923,7 @@ msgstr[0] "Nie można wyłączyć grupy użytkowników"
 msgstr[1] "Nie można wyłączyć grup użytkowników"
 msgstr[2] "Nie można wyłączyć grup użytkowników"
 
-#: httpconf.php:369
+#: httpconf.php:378
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Nie można wyłączyć scenariusza sieci www"
@@ -1977,7 +1973,7 @@ msgstr[0] "Nie można włączyć prototypu hosta"
 msgstr[1] "Nie można włączyć prototypów hostów"
 msgstr[2] "Nie można włączyć prototypów hostów"
 
-#: applications.php:248 items.php:713
+#: applications.php:248 items.php:724
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Nie można włączyć pozycji"
@@ -2019,14 +2015,14 @@ msgstr[0] "Nie można włączyć grupy użytkowników"
 msgstr[1] "Nie można włączyć grup użytkowników"
 msgstr[2] "Nie można włączyć grup użytkowników"
 
-#: httpconf.php:368
+#: httpconf.php:377
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Nie można włączyć scenariusza sieci www"
 msgstr[1] "Nie można włączyć scenariuszy sieci www"
 msgstr[2] "Nie można włączyć scenariuszy sieci www"
 
-#: include/classes/import/CXmlImport18.php:701
+#: include/classes/import/CXmlImport18.php:695
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -2038,7 +2034,7 @@ msgstr "Nie można znaleźć obrazu tła \"%1$s\" użytego na mapie \"%2$s\"."
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć wykresu \"%1$s\" użytego na ekranie \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:752
+#: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -2050,7 +2046,7 @@ msgstr "Nie można znaleźć grupy \"%1$s\" użytej na mapie \"%2$s\"."
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć grupy \"%1$s\" użytej na ekranie \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:760
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -2075,7 +2071,7 @@ msgstr "Nie można znaleźć grupy hostów \"%1$s\" dla prototypu hosta \"%2$s\"
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Nie można znaleźć interfejsu hosta \"%1$s\" dla klucza pozycji \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:802
+#: include/classes/import/CXmlImport18.php:796
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2132,7 +2128,7 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w prototypie w
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" użytej na ekranie \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:738
+#: include/classes/import/CXmlImport18.php:732
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Nie można znaleźć mapy \"%1$s\" użytej na wyeksportowanej mapie \"%2$s\"."
@@ -2163,10 +2159,10 @@ msgstr "Nie można znaleźć ekranu \"%1$s\" użytego na ekranie \"%2$s\"."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nie można znaleźć szablonu \"%1$s\" dla prototypu hosta \"%2$s\" dla reguły wykrywania \"%3$s\" w \"%4$s\"."
 
-#: include/classes/import/CXmlImport18.php:780
-#: include/classes/import/CXmlImport18.php:825
+#: include/classes/import/CXmlImport18.php:774
+#: include/classes/import/CXmlImport18.php:822
 #: include/classes/import/importers/CMapImporter.php:228
-#: include/classes/import/importers/CMapImporter.php:274
+#: include/classes/import/importers/CMapImporter.php:273
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Nie można znaleźć wyzwalacza \"%1$s\" użytego na mapie \"%2$s\"."
@@ -2549,10 +2545,6 @@ msgstr "Nie można zaktualizować mapy ikon"
 msgid "Cannot update image"
 msgstr "Nie można zaktualizować obrazu"
 
-#: include/classes/import/CXmlImport18.php:656
-msgid "Cannot update image."
-msgstr "Nie można zaktualizować obrazu."
-
 #: include/classes/api/services/CHostInterface.php:342
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
@@ -2566,7 +2558,7 @@ msgstr "Nie można zaktualizować pozycji"
 msgid "Cannot update item prototype"
 msgstr "Nie można zaktualizować prototypu pozycji"
 
-#: items.php:693
+#: items.php:704
 msgid "Cannot update items"
 msgstr "Nie można zaktualizować pozycji"
 
@@ -2582,7 +2574,7 @@ msgstr "Nie można zaktualizować makr"
 msgid "Cannot update maintenance"
 msgstr "Nie można zaktualizować utrzymania"
 
-#: include/classes/import/CXmlImport18.php:844
+#: include/classes/import/CXmlImport18.php:855
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Nie można zaktualizować mapy \"%s\"."
@@ -2666,7 +2658,7 @@ msgstr "Nie można zaktualizować użytkownika. Oba hasła muszą być identyczn
 msgid "Cannot update value map"
 msgstr "Nie można zaktualizować mapy wartości"
 
-#: httpconf.php:194
+#: httpconf.php:182
 msgid "Cannot update web scenario"
 msgstr "Nie można zaktualizować scenariusza sieci www"
 
@@ -3361,7 +3353,7 @@ msgstr "Utwórz ikonę"
 msgid "Create icon map"
 msgstr "Utwórz mapę ikon"
 
-#: include/views/configuration.item.list.php:37 items.php:812
+#: include/views/configuration.item.list.php:37 items.php:839
 msgid "Create item"
 msgstr "Utwórz pozycję"
 
@@ -4883,12 +4875,12 @@ msgstr "Email"
 msgid "Empty"
 msgstr "Pusty"
 
-#: include/classes/api/services/CHttpTest.php:909
+#: include/classes/api/services/CHttpTest.php:910
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
 msgstr "Plik certyfikatu SSL dla scenariusza sieci www \"%1$s\" jest pusty."
 
-#: include/classes/api/services/CHttpTest.php:902
+#: include/classes/api/services/CHttpTest.php:903
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr "Plik klucza SSL dla scenariusza sieci www \"%1$s\" jest pusty."
@@ -5295,7 +5287,7 @@ msgstr "Wykonaj na"
 msgid "Executed"
 msgstr "Wykonano"
 
-#: include/items.inc.php:1315
+#: include/items.inc.php:1296
 #: include/views/configuration.host.discovery.edit.php:179
 #: include/views/configuration.item.edit.php:185
 msgid "Executed script"
@@ -5626,7 +5618,7 @@ msgstr "Podążaj za przekierowaniami"
 msgid "For guest, password must be empty"
 msgstr "Hasło użytkownika guest musi być puste"
 
-#: include/items.inc.php:1319 include/views/configuration.item.edit.php:197
+#: include/items.inc.php:1300 include/views/configuration.item.edit.php:197
 msgid "Formula"
 msgstr "Formuła"
 
@@ -5870,8 +5862,8 @@ msgstr "Wykres \"%1$s\" nie może dziedziczyć. Brak wymaganej pozycji dla \"%2$
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "W szablonie \"%2$s\" nie ma wykresu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1889
-#: include/classes/import/CXmlImport18.php:1893
+#: include/classes/import/CXmlImport18.php:1900
+#: include/classes/import/CXmlImport18.php:1904
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Pominięto wykres \"%1$s\" - reguła użytkownika."
@@ -6257,8 +6249,8 @@ msgstr "Wysoki"
 msgid "History"
 msgstr "Historia"
 
-#: httpconf.php:187 httpconf.php:408 items.php:520 items.php:526 items.php:767
-#: items.php:776
+#: httpconf.php:175 httpconf.php:425 items.php:530 items.php:537 items.php:791
+#: items.php:803
 msgid "History cleared"
 msgstr "Wyczyszczono historię"
 
@@ -6330,8 +6322,8 @@ msgstr "Ułożenie poziome"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:520 items.php:767
-#: items.php:796 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:530 items.php:790
+#: items.php:823 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
 #: popup.php:501 popup.php:1087 queue.php:229 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:296
 msgid "Host"
@@ -6351,7 +6343,7 @@ msgstr "Host \"%1$s\" już istnieje."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" jest monitorowany przez proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:986
+#: include/classes/import/CXmlImport18.php:997
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Wybrano parametr \"useipmi\" dla hosta \"%s\", jednakże nie podano parametru \"ipmi_ip\"! Użyto adresu IP hosta jako adresu interfejsu IPMI."
@@ -7128,12 +7120,12 @@ msgstr "Błędny OID SNMP."
 msgid "Incorrect SNMP community."
 msgstr "Błędne hasło SNMP."
 
-#: include/classes/api/services/CHttpTest.php:892
+#: include/classes/api/services/CHttpTest.php:893
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
 msgstr "Błędna wartość hosta weryfikacji SSL dla scenariusza sieci www \"%1$s\"."
 
-#: include/classes/api/services/CHttpTest.php:883
+#: include/classes/api/services/CHttpTest.php:884
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
 msgstr "Błędna wartość podmiotu weryfikacji SSL dla scenariusza sieci www \"%1$s\"."
@@ -7421,7 +7413,7 @@ msgstr "Błędny elastyczny interwał \"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Nieprawidłowy elastyczny interwał w pozycji \"%1$s\". Elastyczny interwał musi być ciągiem znaków."
 
-#: include/classes/api/services/CHttpTest.php:683
+#: include/classes/api/services/CHttpTest.php:684
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
 msgstr "Błędna wartość podążaj za dowiązaniami dla kroku \"%1$s\" scenariusza sieci www \"%2$s\"."
@@ -7685,7 +7677,7 @@ msgstr "Podano błędny typ zasobu dla pozycji ekranu."
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Otrzymano błędną odpowiedź z serwera Zabbix \"%1$s\"."
 
-#: include/classes/api/services/CHttpTest.php:693
+#: include/classes/api/services/CHttpTest.php:694
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
 msgstr "Błędna wartość trybu odzyskiwania dla kroku \"%1$s\" scenariusza sieci www \"%2$\"."
 
@@ -7889,12 +7881,12 @@ msgstr "Błędne ID scenariusza sieci www."
 msgid "Incorrect working time."
 msgstr "Błędny czas pracy."
 
-#: include/classes/import/CXmlImport18.php:1921
+#: include/classes/import/CXmlImport18.php:1932
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Błędna pozycja maksymalna y dla wykresu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1908
+#: include/classes/import/CXmlImport18.php:1919
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Błędna pozycja minimalna y dla wykresu \"%1$s\"."
@@ -8105,8 +8097,8 @@ msgstr "Nieprawidłowe parametry."
 msgid "Invalid period for field \"%1$s\"."
 msgstr "Nieprawidłowy okres dla pola \"%1$s\"."
 
-#: include/classes/api/services/CHttpTest.php:749
-#: include/classes/api/services/CHttpTest.php:755
+#: include/classes/api/services/CHttpTest.php:750
+#: include/classes/api/services/CHttpTest.php:756
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Nieprawidłowy kod odpowiedzi \"%1$s\"."
@@ -8174,8 +8166,8 @@ msgstr "Włoski (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:519
-#: items.php:767 items.php:796 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:529
+#: items.php:790 items.php:823 tr_logform.php:251
 msgid "Item"
 msgstr "Pozycja"
 
@@ -8204,7 +8196,7 @@ msgstr "Pozycja \"%1$s\" nie może wypełnić brakującego pola inwentarzowego h
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "W szablonie \"%2$s\" nie ma pozycji \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1850
+#: include/classes/import/CXmlImport18.php:1861
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Pozycja \"%1$s\" nie istnieje."
@@ -8214,8 +8206,8 @@ msgstr "Pozycja \"%1$s\" nie istnieje."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Pozycja \"%1$s\" w \"%2$s\": aplikacja \"%3$s\" nie istnieje."
 
-#: include/classes/import/CXmlImport18.php:1666
-#: include/classes/import/CXmlImport18.php:1672
+#: include/classes/import/CXmlImport18.php:1677
+#: include/classes/import/CXmlImport18.php:1683
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Pominięto pozycję \"%1$s\" - reguła użytkownika."
@@ -8237,14 +8229,14 @@ msgstr "Ilość pozycji"
 msgid "Item deleted"
 msgstr "Usunięto pozycję"
 
-#: applications.php:246 items.php:711
+#: applications.php:246 items.php:722
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Wyłączono pozycję"
 msgstr[1] "Wyłączono pozycje"
 msgstr[2] "Wyłączono pozycje"
 
-#: applications.php:245 items.php:710
+#: applications.php:245 items.php:721
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Włączono pozycję"
@@ -8395,11 +8387,11 @@ msgstr "Pozycje"
 msgid "Items (m/d/n)"
 msgstr "Pozycje (m/wył./nw)"
 
-#: items.php:749
+#: items.php:760
 msgid "Items copied"
 msgstr "Skopiowano pozycje"
 
-#: items.php:806
+#: items.php:833
 msgid "Items deleted"
 msgstr "Usunięto pozycje"
 
@@ -8407,7 +8399,7 @@ msgstr "Usunięto pozycje"
 msgid "Items list"
 msgstr "Lista pozycji"
 
-#: items.php:693
+#: items.php:704
 msgid "Items updated"
 msgstr "Zaktualizowano pozycje"
 
@@ -9098,7 +9090,7 @@ msgstr "Ręczne Wylogowanie"
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/import/CXmlImport18.php:692
+#: include/classes/import/CXmlImport18.php:686
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Pominięto mapę \"%1$s\" - reguła użytkownika."
@@ -9108,12 +9100,12 @@ msgstr "Pominięto mapę \"%1$s\" - reguła użytkownika."
 msgid "Map \"%s\""
 msgstr "Mapa \"%s\""
 
-#: include/classes/import/CXmlImport18.php:856
+#: include/classes/import/CXmlImport18.php:867
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Utworzono mapę \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:847
+#: include/classes/import/CXmlImport18.php:858
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Zaktualizowano mapę \"%s\"."
@@ -9485,8 +9477,8 @@ msgstr "Brakujące pole \"name\" dla prototypu wykresu."
 msgid "Missing \"name\" field for graph."
 msgstr "Brakujące pole \"name\" dla wykresu."
 
-#: include/classes/import/CXmlImport18.php:1912
-#: include/classes/import/CXmlImport18.php:1925
+#: include/classes/import/CXmlImport18.php:1923
+#: include/classes/import/CXmlImport18.php:1936
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Brakująca pozycja \"%1$s\" dla hosta \"%2$s\"."
@@ -9870,12 +9862,12 @@ msgstr "Nie podano \"%2$s\" dla filtra akcji \"%1$s\"."
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Nie podano \"%2$s\" dla filtra reguły wykrywania \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1902
+#: include/classes/import/CXmlImport18.php:1913
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Brak pola \"ymax_type\" dla wykresu \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1898
+#: include/classes/import/CXmlImport18.php:1909
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Brak pola \"ymin_type\" dla wykresu \"%s\"."
@@ -10272,27 +10264,27 @@ msgstr "Nie znaleziono powiadomień."
 msgid "No operations defined."
 msgstr "Nie zdefiniowano operacji."
 
-#: include/classes/import/CXmlImport18.php:1883
+#: include/classes/import/CXmlImport18.php:1894
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Brak uprawnień dla wykresu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1021
+#: include/classes/import/CXmlImport18.php:1032
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Brak uprawnień dla hosta \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1841
+#: include/classes/import/CXmlImport18.php:1852
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Brak uprawnień dla pozycji \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1500
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Brak uprawnień dla szablonu \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1749
+#: include/classes/import/CXmlImport18.php:1760
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr "Brak uprawnień dla wyzwalacza \"%1$s\"."
@@ -10301,12 +10293,12 @@ msgstr "Brak uprawnień dla wyzwalacza \"%1$s\"."
 msgid "No permissions"
 msgstr "Brak uprawnień"
 
-#: include/classes/import/CXmlImport18.php:1115
+#: include/classes/import/CXmlImport18.php:1126
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr "Brak uprawnień dla grupy hostów \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:685
+#: include/classes/import/CXmlImport18.php:679
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Brak uprawnień dla mapy \"%1$s\"."
@@ -10361,9 +10353,9 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: include/classes/api/services/CHostPrototype.php:1047
 #: include/classes/api/services/CHostPrototype.php:1060
 #: include/classes/api/services/CHttpTest.php:369
-#: include/classes/api/services/CHttpTest.php:451
-#: include/classes/api/services/CHttpTest.php:497
-#: include/classes/api/services/CHttpTest.php:707
+#: include/classes/api/services/CHttpTest.php:452
+#: include/classes/api/services/CHttpTest.php:498
+#: include/classes/api/services/CHttpTest.php:708
 #: include/classes/api/services/CIconMap.php:304
 #: include/classes/api/services/CImage.php:414
 #: include/classes/api/services/CImage.php:486
@@ -10487,7 +10479,7 @@ msgstr "Brak stanu dla proxy."
 msgid "No target selected"
 msgstr "Nie wybrano żadnego celu"
 
-#: graphs.php:377 items.php:752
+#: graphs.php:377 items.php:763
 msgid "No target selected."
 msgstr "Nie wybrano żadnego celu."
 
@@ -12473,7 +12465,7 @@ msgstr "Agent SNMPv3"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Liczniki SQL: %s (select-y: %s | uruchomienia: %s)"
 
-#: include/items.inc.php:1317
+#: include/items.inc.php:1298
 #: include/views/configuration.host.discovery.edit.php:183
 #: include/views/configuration.item.edit.php:189
 msgid "SQL query"
@@ -12557,11 +12549,11 @@ msgstr "Skala"
 msgid "Scenario"
 msgstr "Scenariusz"
 
-#: httpconf.php:198
+#: httpconf.php:186
 msgid "Scenario added"
 msgstr "Dodano scenariusz"
 
-#: httpconf.php:193
+#: httpconf.php:181
 msgid "Scenario updated"
 msgstr "Zaktualizowano scenariusz"
 
@@ -13895,7 +13887,7 @@ msgstr "Otrzymane dane JSON nie są poprawnym żądaniem JSON-RPC."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Żądana zdalna procedura nie istnieje / nie jest dostępna"
 
-#: include/classes/api/services/CHttpTest.php:625
+#: include/classes/api/services/CHttpTest.php:626
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Aplikacja scenariusza sieci www należy do innego hosta niż host scenariusza sieci www."
 
@@ -14138,8 +14130,8 @@ msgstr "Wyzwalacz \"%1$s\" już istnieje w \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Wyzwalacz \"%1$s\" zależy od wyzwalacza \"%2$s\", którego nie ma."
 
-#: include/classes/import/CXmlImport18.php:1758
-#: include/classes/import/CXmlImport18.php:1762
+#: include/classes/import/CXmlImport18.php:1769
+#: include/classes/import/CXmlImport18.php:1773
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Pominięto wyzwalacz \"%1$s\" - reguła użytkownika."
@@ -14665,7 +14657,7 @@ msgstr "Nieznany zasób"
 msgid "Unknown step failed: %1$s"
 msgstr "Nieznany krok zakończył się niepowodzeniem: %1$s"
 
-#: include/items.inc.php:896
+#: include/items.inc.php:877
 msgid "Unknown value type"
 msgstr "Nieznany typ wartości"
 
@@ -15556,64 +15548,64 @@ msgstr "Monitorowanie WWW"
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Scenariusz sieci www \"%1$s\" już istnieje na hoście \"%2$s\"."
 
-#: include/classes/api/services/CHttpTest.php:473
-#: include/classes/api/services/CHttpTest.php:547
-#: include/classes/api/services/CHttpTest.php:593
+#: include/classes/api/services/CHttpTest.php:474
+#: include/classes/api/services/CHttpTest.php:548
+#: include/classes/api/services/CHttpTest.php:594
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Scenariusz sieci www \"%1$s\" już istnieje."
 
-#: httpconf.php:154 httpconf.php:416
+#: httpconf.php:136 httpconf.php:434
 msgid "Web scenario deleted"
 msgstr "Usunięto scenariusz sieci www"
 
-#: httpconf.php:366
+#: httpconf.php:375
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Wyłączono scenariusz sieci www"
 msgstr[1] "Wyłączono scenariusze sieci www"
 msgstr[2] "Wyłączono scenariusze sieci www"
 
-#: httpconf.php:365
+#: httpconf.php:374
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Włączono scenariusz sieci www"
 msgstr[1] "Włączono scenariusze sieci www"
 msgstr[2] "Włączono scenariusze sieci www"
 
-#: include/classes/api/services/CHttpTest.php:445
+#: include/classes/api/services/CHttpTest.php:446
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr "Brakujące parametry scenariusza sieci www: %1$s"
 
-#: include/classes/api/services/CHttpTest.php:462
-#: include/classes/api/services/CHttpTest.php:645
+#: include/classes/api/services/CHttpTest.php:463
+#: include/classes/api/services/CHttpTest.php:646
 msgid "Web scenario must have at least one step."
 msgstr "Scenariusz sieci www musi mieć przynajmniej jeden krok."
 
-#: include/classes/api/services/CHttpTest.php:456
-#: include/classes/api/services/CHttpTest.php:573
+#: include/classes/api/services/CHttpTest.php:457
+#: include/classes/api/services/CHttpTest.php:574
 msgid "Web scenario name cannot be empty."
 msgstr "Nazwa scenariusza sieci www nie może być pusta."
 
-#: include/classes/api/services/CHttpTest.php:724
+#: include/classes/api/services/CHttpTest.php:725
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr "Krok scenariusza sieci www \"%1$s\" już istnieje."
 
-#: include/classes/api/services/CHttpTest.php:671
+#: include/classes/api/services/CHttpTest.php:672
 msgid "Web scenario step URL cannot be empty."
 msgstr "URL kroku scenariusza sieci www nie może być pusty."
 
-#: include/classes/api/services/CHttpTest.php:666
+#: include/classes/api/services/CHttpTest.php:667
 msgid "Web scenario step name cannot be empty."
 msgstr "Nazwa kroku scenariusza sieci www nie może być pusta."
 
-#: include/classes/api/services/CHttpTest.php:650
+#: include/classes/api/services/CHttpTest.php:651
 msgid "Web scenario step name should contain only printable characters."
 msgstr "Nazwa kroku scenariusza sieci www powinna zawierać wyłącznie znaki drukowalne."
 
-#: include/classes/api/services/CHttpTest.php:675
+#: include/classes/api/services/CHttpTest.php:676
 msgid "Web scenario step number cannot be less than 1."
 msgstr "Numer kroku scenariusza sieci www nie powinien być mniejszy niż 1."
 
