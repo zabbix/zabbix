@@ -36,7 +36,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (ite
 Changes for 2.4.2rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese and Greek translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Polish, Slovak an Spanish translations; thanks to Zabbix translators (Richlv)
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
