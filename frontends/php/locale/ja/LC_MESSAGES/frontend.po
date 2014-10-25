@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-14 20:07+0300\n"
+"POT-Creation-Date: 2014-10-25 08:24+0300\n"
 "PO-Revision-Date: 2014-09-30 08:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -714,7 +714,7 @@ msgstr "アプリケーションを更新しました"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは利用できません。"
 
-#: hosts.php:862 hosts.php:951 include/forms.inc.php:902
+#: hosts.php:857 hosts.php:946 include/forms.inc.php:902
 #: include/html.inc.php:361 include/html.inc.php:365
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:446
@@ -816,7 +816,7 @@ msgstr "少なくとも1つ以上のホストまたはホストグループを�
 msgid "At least one maintenance period must be created."
 msgstr "少なくとも1つ以上のメンテナンス期間を作成する必要があります。"
 
-#: include/classes/setup/CFrontendSetup.php:233
+#: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 msgstr "少なくともMySQL、PostgreSQL、Oracle、SQLite3、IBM DB2のうち1つがサポートされている必要があります。"
 
@@ -934,7 +934,7 @@ msgstr "アイコンの自動マッピング"
 msgid "Automatic icon selection"
 msgstr "アイコンの自動選択"
 
-#: hosts.php:871
+#: hosts.php:866
 msgid "Availability"
 msgstr "エージェントの状態"
 
@@ -1112,7 +1112,7 @@ msgstr "ホストグループの設定"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr "ホストのプロトタイプの設定"
 
-#: hosts.php:699 hosts.php:764 hosts.php:818
+#: hosts.php:699 hosts.php:759 hosts.php:813
 msgid "CONFIGURATION OF HOSTS"
 msgstr "ホストの設定"
 
@@ -1379,10 +1379,6 @@ msgstr "ホストのプロトタイプを追加できません"
 msgid "Cannot add image"
 msgstr "イメージを追加できません"
 
-#: include/classes/import/CXmlImport18.php:649
-msgid "Cannot add image."
-msgstr "イメージを追加できません。"
-
 #: items.php:513
 msgid "Cannot add item"
 msgstr "アイテムを追加できません"
@@ -1575,7 +1571,7 @@ msgstr "アイコンのマッピングを作成できません"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "\"%s\"と同名のアイコンのマッピングは作成できません。"
 
-#: include/classes/import/CXmlImport18.php:853
+#: include/classes/import/CXmlImport18.php:864
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "マップ\"%s\"を作成できません。"
@@ -1963,7 +1959,7 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Webシナリオを有効にできません"
 
-#: include/classes/import/CXmlImport18.php:701
+#: include/classes/import/CXmlImport18.php:695
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -1975,7 +1971,7 @@ msgstr "マップ\"%2$s\"で利用されている背景画像\"%1$s\"が見つ�
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているグラフ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:752
+#: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1987,7 +1983,7 @@ msgstr "マップ\"%2$s\"で利用されているグループ\"%1$s\"が見つ�
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているグループ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:766
+#: include/classes/import/CXmlImport18.php:760
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -2012,7 +2008,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません"
 
-#: include/classes/import/CXmlImport18.php:802
+#: include/classes/import/CXmlImport18.php:796
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2069,7 +2065,7 @@ msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のトリガーのプ�
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:738
+#: include/classes/import/CXmlImport18.php:732
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "エクスポートされたマップ\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
@@ -2100,10 +2096,10 @@ msgstr "スクリーン\"%2$s\"で利用されているスクリーン\"%1$s\"�
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのテンプレート\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:780
-#: include/classes/import/CXmlImport18.php:825
+#: include/classes/import/CXmlImport18.php:774
+#: include/classes/import/CXmlImport18.php:822
 #: include/classes/import/importers/CMapImporter.php:228
-#: include/classes/import/importers/CMapImporter.php:274
+#: include/classes/import/importers/CMapImporter.php:273
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
@@ -2482,10 +2478,6 @@ msgstr "アイコンのマッピングを更新できません"
 msgid "Cannot update image"
 msgstr "イメージを更新できません"
 
-#: include/classes/import/CXmlImport18.php:656
-msgid "Cannot update image."
-msgstr "イメージを更新できません。"
-
 #: include/classes/api/services/CHostInterface.php:342
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
@@ -2515,7 +2507,7 @@ msgstr "マクロを更新できません"
 msgid "Cannot update maintenance"
 msgstr "メンテナンスを更新できません"
 
-#: include/classes/import/CXmlImport18.php:844
+#: include/classes/import/CXmlImport18.php:855
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "マップ\"%s\"を更新できません。"
@@ -3270,7 +3262,7 @@ msgstr "グラフの作成 (先にホストを選択)"
 msgid "Create graph prototype"
 msgstr "グラフのプロトタイプの作成"
 
-#: hosts.php:813
+#: hosts.php:808
 msgid "Create host"
 msgstr "ホストの作成"
 
@@ -3540,7 +3532,7 @@ msgstr "無効"
 msgid "DISCOVERED"
 msgstr "DISCOVERED"
 
-#: events.php:456 hosts.php:831 include/views/administration.proxy.edit.php:60
+#: events.php:456 hosts.php:826 include/views/administration.proxy.edit.php:60
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3930,7 +3922,7 @@ msgstr "スクリーンを削除しますか？"
 msgid "Delete script?"
 msgstr "スクリプトを削除しますか？"
 
-#: hosts.php:1077 include/reports.inc.php:111 include/reports.inc.php:201
+#: hosts.php:1072 include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
 #: include/views/administration.general.regularexpressions.list.php:66
 #: include/views/administration.mediatypes.list.php:124
@@ -4012,7 +4004,7 @@ msgstr "選択したホストのプロトタイプを削除しますか？"
 msgid "Delete selected host?"
 msgstr "選択したホストを削除しますか？"
 
-#: hosts.php:1078
+#: hosts.php:1073
 msgid "Delete selected hosts?"
 msgstr "選択したホストを削除しますか？"
 
@@ -4366,7 +4358,7 @@ msgstr "選択したグループのデバッグモードを無効にしますか
 msgid "Disable host"
 msgstr "ホストを無効"
 
-#: hosts.php:991
+#: hosts.php:986
 msgid "Disable host?"
 msgstr "ホストを無効にしますか？"
 
@@ -4378,7 +4370,7 @@ msgstr "選択したホストグループのホストを無効にしますか？
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
-#: hosts.php:1073 include/views/administration.mediatypes.list.php:120
+#: hosts.php:1068 include/views/administration.mediatypes.list.php:120
 #: include/views/administration.proxy.list.php:106
 #: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:110
@@ -4416,7 +4408,7 @@ msgstr "選択したグループを無効にしますか？"
 msgid "Disable selected host prototypes?"
 msgstr "選択したホストのプロトタイプを無効にしますか？"
 
-#: hosts.php:1074
+#: hosts.php:1069
 msgid "Disable selected hosts?"
 msgstr "選択したホストを無効にしますか？"
 
@@ -4444,7 +4436,7 @@ msgstr "選択したトリガーを無効にしますか？"
 msgid "Disable selected web scenarios?"
 msgstr "選択したWebシナリオを無効にしますか？"
 
-#: auditlogs.php:144 dashboard.php:295 hosts.php:995
+#: auditlogs.php:144 dashboard.php:295 hosts.php:990
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
 #: include/items.inc.php:209 include/triggers.inc.php:1502
@@ -4485,7 +4477,7 @@ msgstr "Discovered by"
 msgid "Discovered device"
 msgstr "発見されたホスト"
 
-#: events.php:333 hosts.php:866 hosts.php:959 include/html.inc.php:351
+#: events.php:333 hosts.php:861 hosts.php:954 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:234
@@ -4982,7 +4974,7 @@ msgstr "イベントの障害対応コメントを有効"
 msgid "Enable host"
 msgstr "ホストを有効"
 
-#: hosts.php:997
+#: hosts.php:992
 msgid "Enable host?"
 msgstr "ホストを有効にしますか？"
 
@@ -4999,7 +4991,7 @@ msgstr "選択したプロキシによるホストの監視を有効にします
 msgid "Enable internal housekeeping"
 msgstr "データの削除処理を有効"
 
-#: hosts.php:1069 include/views/administration.mediatypes.list.php:116
+#: hosts.php:1064 include/views/administration.mediatypes.list.php:116
 #: include/views/administration.proxy.list.php:102
 #: include/views/administration.usergroups.list.php:132
 #: include/views/configuration.action.list.php:106
@@ -5037,7 +5029,7 @@ msgstr "選択したグループを有効にしますか？"
 msgid "Enable selected host prototypes?"
 msgstr "選択したホストのプロトタイプを有効にしますか？"
 
-#: hosts.php:1070 include/views/configuration.hostgroups.list.php:157
+#: hosts.php:1065 include/views/configuration.hostgroups.list.php:157
 msgid "Enable selected hosts?"
 msgstr "選択したホストを有効にしますか？"
 
@@ -5065,7 +5057,7 @@ msgstr "選択したトリガーを有効にしますか？"
 msgid "Enable selected web scenarios?"
 msgstr "選択したWebシナリオを有効にしますか？"
 
-#: auditlogs.php:141 dashboard.php:295 hosts.php:987
+#: auditlogs.php:141 dashboard.php:295 hosts.php:982
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
 #: include/items.inc.php:206 include/triggers.inc.php:2336
@@ -5254,7 +5246,7 @@ msgstr "メンテナンス期間の終了"
 msgid "Exploded"
 msgstr "分解円グラフ"
 
-#: hosts.php:1066 include/views/configuration.screen.list.php:68
+#: hosts.php:1061 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:62 templates.php:669
 msgid "Export selected"
 msgstr "選択をエクスポート"
@@ -5462,7 +5454,7 @@ msgstr "ファイルの時刻情報。秒数。modeはオプション。modeが�
 msgid "Filled region"
 msgstr "面"
 
-#: events.php:395 hosts.php:836 include/forms.inc.php:629
+#: events.php:395 hosts.php:831 include/forms.inc.php:629
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/common.filter.trigger.php:143
@@ -5704,7 +5696,7 @@ msgstr "グローバルスクリプト"
 msgid "Global scripts"
 msgstr "グローバルスクリプト"
 
-#: hosts.php:1081
+#: hosts.php:1076
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:128
 #: include/views/administration.proxy.list.php:114
@@ -5800,8 +5792,8 @@ msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテム�
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "グラフ\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1889
-#: include/classes/import/CXmlImport18.php:1893
+#: include/classes/import/CXmlImport18.php:1900
+#: include/classes/import/CXmlImport18.php:1904
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "グラフ\"%1$s\"はスキップされました - ユーザの指定。"
@@ -5909,7 +5901,7 @@ msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフの�
 msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
-#: dashboard.php:317 hosts.php:865 hosts.php:957 include/html.inc.php:435
+#: dashboard.php:317 hosts.php:860 hosts.php:952 include/html.inc.php:435
 #: include/html.inc.php:439 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:49
@@ -5941,7 +5933,7 @@ msgstr "ギリシャ語 (el_GR)"
 msgid "Grid"
 msgstr "グリッド"
 
-#: events.php:321 hostinventoriesoverview.php:90 hosts.php:821 httpmon.php:77
+#: events.php:321 hostinventoriesoverview.php:90 hosts.php:816 httpmon.php:77
 #: include/classes/html/CHostsInfo.php:105
 #: include/classes/html/CTriggersInfo.php:102
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -6238,7 +6230,7 @@ msgstr "横位置"
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:671
-#: include/views/configuration.host.massupdate.php:335
+#: include/views/configuration.host.massupdate.php:333
 #: include/views/configuration.host.prototype.edit.php:160
 #: include/views/configuration.httpconf.list.php:44
 #: include/views/configuration.httpconf.list.php:62
@@ -6275,7 +6267,7 @@ msgstr "ホスト\"%1$s\"はすでに存在しています。"
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "ホスト\"%1$s\"はプロキシ\"%2$s\"経由で監視されています。"
 
-#: include/classes/import/CXmlImport18.php:986
+#: include/classes/import/CXmlImport18.php:997
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "ホスト\"%s\"は\"IPMIを使用\"にチェックが入っていますが、\"IPMI IP\"にIPアドレスが入力されていません。IPMIインターフェースとしてホストのIPを利用します。"
@@ -6553,7 +6545,7 @@ msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在�
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します。"
 
-#: hostinventoriesoverview.php:92 hosts.php:823 include/forms.inc.php:212
+#: hostinventoriesoverview.php:92 hosts.php:818 include/forms.inc.php:212
 #: include/forms.inc.php:897 include/items.inc.php:723
 #: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:367 include/views/administration.proxy.edit.php:86
@@ -6639,7 +6631,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:455 hosts.php:832
+#: events.php:455 hosts.php:827
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
@@ -6680,7 +6672,7 @@ msgstr "IPレンジは必須項目です"
 #: include/views/administration.script.list.php:53
 #: include/views/configuration.action.edit.php:763
 #: include/views/configuration.host.edit.php:781
-#: include/views/configuration.host.massupdate.php:337
+#: include/views/configuration.host.massupdate.php:335
 #: include/views/configuration.host.prototype.edit.php:278
 msgid "IPMI"
 msgstr "IPMI"
@@ -6951,7 +6943,7 @@ msgstr "すべてのマップのイメージがアップデートされます！
 msgid "Immediately"
 msgstr "すぐに"
 
-#: hosts.php:814 include/views/configuration.screen.list.php:33
+#: hosts.php:809 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:83 include/views/conf.import.php:88
 #: templates.php:492
@@ -6994,7 +6986,7 @@ msgstr "グループに所属"
 msgid "In groups"
 msgstr "所属グループ"
 
-#: hosts.php:983 include/html.inc.php:329
+#: hosts.php:978 include/html.inc.php:329
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -7805,12 +7797,12 @@ msgstr "WebシナリオIDが正しくありません。"
 msgid "Incorrect working time."
 msgstr "ワーキングタイムの設定が正しくありません。"
 
-#: include/classes/import/CXmlImport18.php:1921
+#: include/classes/import/CXmlImport18.php:1932
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のY軸の最大値のアイテムが正しくありません。"
 
-#: include/classes/import/CXmlImport18.php:1908
+#: include/classes/import/CXmlImport18.php:1919
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のY軸の最小値のアイテムが正しくありません。"
@@ -7853,7 +7845,7 @@ msgstr "インストール"
 msgid "Installer name"
 msgstr "インストーラ名"
 
-#: disc_prototypes.php:40 host_discovery.php:48 hosts.php:868
+#: disc_prototypes.php:40 host_discovery.php:48 hosts.php:863
 #: include/views/administration.proxy.edit.php:69 items.php:40
 msgid "Interface"
 msgstr "インターフェース"
@@ -8044,7 +8036,7 @@ msgstr "時間の指定が正しくありません。"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "表示名\"%s\"が正しくありません。利用できる文字: \"a-z\"および\".\"。"
 
-#: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:338
+#: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:336
 msgid "Inventory"
 msgstr "インベントリ"
 
@@ -8123,7 +8115,7 @@ msgstr "アイテム\"%1$s\"はフィールド番号が存在しないホスト�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1850
+#: include/classes/import/CXmlImport18.php:1861
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "アイテム\"%1$s\"は存在しません。"
@@ -8133,8 +8125,8 @@ msgstr "アイテム\"%1$s\"は存在しません。"
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1666
-#: include/classes/import/CXmlImport18.php:1672
+#: include/classes/import/CXmlImport18.php:1677
+#: include/classes/import/CXmlImport18.php:1683
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "アイテム\"%1$s\"はスキップされました - ユーザの指定。"
@@ -8286,7 +8278,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2
 msgid "Item with key \"%1$s\" already exists."
 msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します。"
 
-#: hosts.php:863 hosts.php:953 include/html.inc.php:385
+#: hosts.php:858 hosts.php:948 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
 #: include/reports.inc.php:117 include/reports.inc.php:250
 #: include/views/configuration.application.list.php:94
@@ -9009,7 +9001,7 @@ msgstr "手動ログアウト"
 msgid "Map"
 msgstr "マップ"
 
-#: include/classes/import/CXmlImport18.php:692
+#: include/classes/import/CXmlImport18.php:686
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "マップ\"%1$s\"はスキップされました - ユーザの指定。"
@@ -9019,12 +9011,12 @@ msgstr "マップ\"%1$s\"はスキップされました - ユーザの指定。"
 msgid "Map \"%s\""
 msgstr "マップ\"%s\""
 
-#: include/classes/import/CXmlImport18.php:856
+#: include/classes/import/CXmlImport18.php:867
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "マップ\"%s\"を作成しました。"
 
-#: include/classes/import/CXmlImport18.php:847
+#: include/classes/import/CXmlImport18.php:858
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "マップ\"%s\"を更新しました。"
@@ -9092,7 +9084,7 @@ msgstr "選択をマーク"
 msgid "Mask"
 msgstr "マスク"
 
-#: hosts.php:1068 include/views/configuration.item.list.php:273
+#: hosts.php:1063 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.trigger.prototype.list.php:143
 #: include/views/configuration.triggers.list.php:222
@@ -9311,12 +9303,12 @@ msgstr "PHPアップロードファイルサイズの最小値は%sです (\"upl
 msgid "Minimum required PHP version is %s."
 msgstr "PHPの最小バージョンは%sです。"
 
-#: include/classes/setup/CFrontendSetup.php:176
+#: include/classes/setup/CFrontendSetup.php:188
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 msgstr "PHPスクリプトの実行時間の最小値は%sです (\"max_execution_time\"設定オプション)。"
 
-#: include/classes/setup/CFrontendSetup.php:193
+#: include/classes/setup/CFrontendSetup.php:209
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
 msgstr "PHPスクリプトの入力パース時間の最小値は%sです (\"max_input_time\"設定オプション)。"
@@ -9388,8 +9380,8 @@ msgstr "グラフのプロトタイプの\"name\"フィールドが存在しま�
 msgid "Missing \"name\" field for graph."
 msgstr "グラフの\"name\"フィールドが存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1912
-#: include/classes/import/CXmlImport18.php:1925
+#: include/classes/import/CXmlImport18.php:1923
+#: include/classes/import/CXmlImport18.php:1936
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"のアイテム\"%1$s\"が存在しません。"
@@ -9518,7 +9510,7 @@ msgstr "NTLM"
 
 #: actionconf.php:37 actionconf.php:169 adm.regexps.php:37 adm.regexps.php:147
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:41
-#: graphs.php:41 host_discovery.php:49 hosts.php:830 hosts.php:861
+#: graphs.php:41 host_discovery.php:49 hosts.php:825 hosts.php:856
 #: httpconf.php:44 httpmon.php:92 include/classes/setup/CSetupWizard.php:384
 #: include/forms.inc.php:604 include/hosts.inc.php:115
 #: include/reports.inc.php:169
@@ -9774,12 +9766,12 @@ msgstr "アクション\"%1$s\"のフィルターの\"%2$s\"が定義されて�
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"のフィルターの\"%2$s\"が定義されていません。"
 
-#: include/classes/import/CXmlImport18.php:1902
+#: include/classes/import/CXmlImport18.php:1913
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "グラフ\"%s\"のフィールド\"ymax_type\"がありません。"
 
-#: include/classes/import/CXmlImport18.php:1898
+#: include/classes/import/CXmlImport18.php:1909
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "グラフ\"%s\"のフィールド\"ymin_type\"がありません。"
@@ -10050,7 +10042,7 @@ msgstr "ホストが選択されていません。"
 msgid "No host with hostid \"%s\"."
 msgstr "ホストID\"%s\"を持つホストが設定されていません。"
 
-#: hostinventoriesoverview.php:95 hosts.php:858
+#: hostinventoriesoverview.php:95 hosts.php:853
 #: include/views/inventory.host.list.php:72 popup.php:732 popup.php:806
 #: search.php:129
 msgid "No hosts found."
@@ -10176,27 +10168,27 @@ msgstr "通知はありません。"
 msgid "No operations defined."
 msgstr "アクションの実行内容が設定されていません。"
 
-#: include/classes/import/CXmlImport18.php:1883
+#: include/classes/import/CXmlImport18.php:1894
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1021
+#: include/classes/import/CXmlImport18.php:1032
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1841
+#: include/classes/import/CXmlImport18.php:1852
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1500
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "テンプレート\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1749
+#: include/classes/import/CXmlImport18.php:1760
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
 msgstr "トリガー\"%1$s\"への権限がありません。"
@@ -10205,12 +10197,12 @@ msgstr "トリガー\"%1$s\"への権限がありません。"
 msgid "No permissions"
 msgstr "権限がありません"
 
-#: include/classes/import/CXmlImport18.php:1115
+#: include/classes/import/CXmlImport18.php:1126
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
 msgstr "ホストグループ\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:685
+#: include/classes/import/CXmlImport18.php:679
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "マップ\"%1$s\"への権限がありません。"
@@ -10980,7 +10972,7 @@ msgstr "Or"
 #: include/views/configuration.host.massupdate.php:264
 #: include/views/configuration.host.massupdate.php:273
 #: include/views/configuration.host.massupdate.php:289
-#: include/views/configuration.host.massupdate.php:320
+#: include/views/configuration.host.massupdate.php:319
 #: include/views/configuration.item.massupdate.php:47
 #: include/views/configuration.item.massupdate.php:81
 #: include/views/configuration.item.massupdate.php:97
@@ -11105,99 +11097,99 @@ msgstr "P"
 msgid "PERSONAL DASHBOARD"
 msgstr "ダッシュボード"
 
-#: include/classes/setup/CFrontendSetup.php:350
+#: include/classes/setup/CFrontendSetup.php:366
 msgid "PHP always_populate_raw_post_data"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:354
+#: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP always_populate_raw_post_data must be set to -1."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:291
+#: include/classes/setup/CFrontendSetup.php:307
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:295
+#: include/classes/setup/CFrontendSetup.php:311
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパラメータ --enable-bcmath)。"
 
-#: include/classes/setup/CFrontendSetup.php:547
+#: include/classes/setup/CFrontendSetup.php:563
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:551
+#: include/classes/setup/CFrontendSetup.php:567
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパラメータ --enable-ctype)。"
 
-#: include/classes/setup/CFrontendSetup.php:229
+#: include/classes/setup/CFrontendSetup.php:245
 msgid "PHP databases support"
 msgstr "PHPデータベースサポート"
 
-#: include/classes/setup/CFrontendSetup.php:392
+#: include/classes/setup/CFrontendSetup.php:408
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:463
+#: include/classes/setup/CFrontendSetup.php:479
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeTypeのサポート"
 
-#: include/classes/setup/CFrontendSetup.php:467
+#: include/classes/setup/CFrontendSetup.php:483
 msgid "PHP gd FreeType support missing."
 msgstr "PHP gd FreeTypeのサポート"
 
-#: include/classes/setup/CFrontendSetup.php:444
+#: include/classes/setup/CFrontendSetup.php:460
 msgid "PHP gd JPEG image support missing."
 msgstr "PHP gd JPEGイメージがサポートされていません。"
 
-#: include/classes/setup/CFrontendSetup.php:440
+#: include/classes/setup/CFrontendSetup.php:456
 msgid "PHP gd JPEG support"
 msgstr "PHP gd JPEGのサポート"
 
-#: include/classes/setup/CFrontendSetup.php:419
+#: include/classes/setup/CFrontendSetup.php:435
 msgid "PHP gd PNG image support missing."
 msgstr "PHP gd PNGイメージがサポートされていません。"
 
-#: include/classes/setup/CFrontendSetup.php:415
+#: include/classes/setup/CFrontendSetup.php:431
 msgid "PHP gd PNG support"
 msgstr "PHP gd PNGのサポート"
 
-#: include/classes/setup/CFrontendSetup.php:396
+#: include/classes/setup/CFrontendSetup.php:412
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラメータ --with-gd)。"
 
-#: include/classes/setup/CFrontendSetup.php:598
+#: include/classes/setup/CFrontendSetup.php:614
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:602
+#: include/classes/setup/CFrontendSetup.php:618
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時のパラメータ --with-gettext)。翻訳が利用できません。"
 
-#: include/classes/setup/CFrontendSetup.php:486
+#: include/classes/setup/CFrontendSetup.php:502
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:490
+#: include/classes/setup/CFrontendSetup.php:506
 msgid "PHP libxml extension missing."
 msgstr "PHP libxmlモジュールが存在しません。"
 
-#: include/classes/setup/CFrontendSetup.php:308
+#: include/classes/setup/CFrontendSetup.php:324
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:312
+#: include/classes/setup/CFrontendSetup.php:328
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時のパラメータ --enable-mbstring)。"
 
-#: include/classes/setup/CFrontendSetup.php:329
+#: include/classes/setup/CFrontendSetup.php:345
 msgid "PHP mbstring.func_overload"
 msgstr "PHP mbstring.func_overload"
 
-#: include/classes/setup/CFrontendSetup.php:172
+#: include/classes/setup/CFrontendSetup.php:184
 msgid "PHP option max_execution_time"
 msgstr "PHP max_execution_timeオプション"
 
-#: include/classes/setup/CFrontendSetup.php:189
+#: include/classes/setup/CFrontendSetup.php:205
 msgid "PHP option max_input_time"
 msgstr "PHP max_input_timeオプション"
 
@@ -11213,35 +11205,35 @@ msgstr "PHP post_max_sizeオプション"
 msgid "PHP option upload_max_filesize"
 msgstr "PHP upload_max_filesizeオプション"
 
-#: include/classes/setup/CFrontendSetup.php:564
+#: include/classes/setup/CFrontendSetup.php:580
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:581
+#: include/classes/setup/CFrontendSetup.php:597
 msgid "PHP session auto start"
 msgstr "PHP session auto start"
 
-#: include/classes/setup/CFrontendSetup.php:585
+#: include/classes/setup/CFrontendSetup.php:601
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP session auto startは無効に設定する必要があります (PHPのパラメータ\"session.auto_start\")。"
 
-#: include/classes/setup/CFrontendSetup.php:568
+#: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "PHP sessionモジュールが存在しません (PHPのconfigure時のパラメータ --enable-session)。"
 
-#: include/classes/setup/CFrontendSetup.php:367
+#: include/classes/setup/CFrontendSetup.php:383
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:371
+#: include/classes/setup/CFrontendSetup.php:387
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時のパラメータ --enable-sockets)。"
 
-#: include/classes/setup/CFrontendSetup.php:333
+#: include/classes/setup/CFrontendSetup.php:349
 msgid "PHP string function overloading must be disabled."
 msgstr "PHP文字列関数のオーバーロードは無効に設定する必要があります。"
 
-#: include/classes/setup/CFrontendSetup.php:206
+#: include/classes/setup/CFrontendSetup.php:222
 msgid "PHP time zone"
 msgstr "PHP time zone"
 
@@ -11249,19 +11241,19 @@ msgstr "PHP time zone"
 msgid "PHP version"
 msgstr "PHPバージョン"
 
-#: include/classes/setup/CFrontendSetup.php:520
+#: include/classes/setup/CFrontendSetup.php:536
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:524
+#: include/classes/setup/CFrontendSetup.php:540
 msgid "PHP xmlreader extension missing."
 msgstr "PHP xmlreaderモジュールが存在しません。"
 
-#: include/classes/setup/CFrontendSetup.php:503
+#: include/classes/setup/CFrontendSetup.php:519
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:507
+#: include/classes/setup/CFrontendSetup.php:523
 msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriterモジュールが存在しません。"
 
@@ -11474,7 +11466,7 @@ msgid "Populates host inventory field"
 msgstr "ホストインベントリフィールドの自動設定"
 
 #: authentication.php:41 disc_prototypes.php:81 host_discovery.php:85
-#: hosts.php:833 include/classes/setup/CSetupWizard.php:379
+#: hosts.php:828 include/classes/setup/CSetupWizard.php:379
 #: include/forms.inc.php:483
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:55
@@ -12034,7 +12026,7 @@ msgstr "要求ステータスコード"
 msgid "Required string"
 msgstr "要求文字列"
 
-#: events.php:396 hosts.php:839 include/forms.inc.php:632
+#: events.php:396 hosts.php:834 include/forms.inc.php:632
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
@@ -13266,7 +13258,7 @@ msgstr "ステータス"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "サービスの状態。0 - 実行中、1 - 一時停止中、2 - 開始待ち、3 - 一時停止待ち、4 - 続行待ち、5 - 停止待ち、6 - 停止、7 - 不明、255 - 該当サービスなし"
 
-#: events.php:458 events.php:473 hosts.php:870 httpdetails.php:134
+#: events.php:458 events.php:473 hosts.php:865 httpdetails.php:134
 #: httpmon.php:95 include/actions.inc.php:1124 include/actions.inc.php:1219
 #: include/actions.inc.php:1275 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13654,11 +13646,11 @@ msgstr "同じ表示名\"%s\"を持つテンプレートがすでに存在しま
 msgid "Templated items"
 msgstr "テンプレートのアイテム"
 
-#: hosts.php:869 include/menu.inc.php:158
+#: hosts.php:864 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:747
 #: include/views/configuration.hostgroups.list.php:144
-#: include/views/configuration.host.massupdate.php:336
+#: include/views/configuration.host.massupdate.php:334
 #: include/views/configuration.host.prototype.edit.php:263
 #: include/views/configuration.host.prototype.list.php:49
 #: include/views/conf.import.php:29 popup.php:39 search.php:280 search.php:309
@@ -13886,7 +13878,7 @@ msgstr "タイムシフト"
 msgid "Time type"
 msgstr "時間の形式"
 
-#: include/classes/setup/CFrontendSetup.php:210
+#: include/classes/setup/CFrontendSetup.php:226
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "PHPのタイムゾーンが設定されていません (\"date.timezone\"設定パラメータ)。"
 
@@ -14018,8 +14010,8 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
 
-#: include/classes/import/CXmlImport18.php:1758
-#: include/classes/import/CXmlImport18.php:1762
+#: include/classes/import/CXmlImport18.php:1769
+#: include/classes/import/CXmlImport18.php:1773
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "トリガー\"%1$s\"はスキップされました - ユーザの指定。"
@@ -14202,7 +14194,7 @@ msgstr "トリガーを更新しました"
 msgid "Trigger value"
 msgstr "トリガーの値"
 
-#: hosts.php:864 hosts.php:955 include/forms.inc.php:595
+#: hosts.php:859 hosts.php:950 include/forms.inc.php:595
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
 #: include/triggers.inc.php:1095
 #: include/views/configuration.action.list.php:33
@@ -14692,7 +14684,7 @@ msgstr "Up"
 #: include/views/configuration.host.discovery.edit.php:361
 #: include/views/configuration.host.edit.php:886
 #: include/views/configuration.hostgroups.edit.php:84
-#: include/views/configuration.host.massupdate.php:342
+#: include/views/configuration.host.massupdate.php:340
 #: include/views/configuration.host.prototype.edit.php:337
 #: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
@@ -15400,7 +15392,7 @@ msgstr "警告"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "要素を保存できる最大値に達しました"
 
-#: hosts.php:867 hosts.php:961 include/menu.inc.php:41
+#: hosts.php:862 hosts.php:956 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:208
 #: include/views/inventory.host.view.php:236
 #: include/views/inventory.host.view.php:245 search.php:139 search.php:145
@@ -16182,7 +16174,7 @@ msgstr "キーが設定されていません"
 msgid "last"
 msgstr "最新値"
 
-#: hosts.php:830 hosts.php:831 hosts.php:832 include/actions.inc.php:29
+#: hosts.php:825 hosts.php:826 hosts.php:827 include/actions.inc.php:29
 #: include/forms.inc.php:462 include/forms.inc.php:469
 #: include/forms.inc.php:476 include/forms.inc.php:483
 #: include/forms.inc.php:604 include/forms.inc.php:619
@@ -16304,42 +16296,42 @@ msgstr "現在"
 msgid "of"
 msgstr "of"
 
-#: include/classes/setup/CFrontendSetup.php:230
-#: include/classes/setup/CFrontendSetup.php:292
-#: include/classes/setup/CFrontendSetup.php:309
-#: include/classes/setup/CFrontendSetup.php:330
-#: include/classes/setup/CFrontendSetup.php:331
-#: include/classes/setup/CFrontendSetup.php:351
-#: include/classes/setup/CFrontendSetup.php:352
+#: include/classes/setup/CFrontendSetup.php:246
+#: include/classes/setup/CFrontendSetup.php:308
+#: include/classes/setup/CFrontendSetup.php:325
+#: include/classes/setup/CFrontendSetup.php:346
+#: include/classes/setup/CFrontendSetup.php:347
+#: include/classes/setup/CFrontendSetup.php:367
 #: include/classes/setup/CFrontendSetup.php:368
-#: include/classes/setup/CFrontendSetup.php:416
-#: include/classes/setup/CFrontendSetup.php:441
-#: include/classes/setup/CFrontendSetup.php:464
-#: include/classes/setup/CFrontendSetup.php:504
-#: include/classes/setup/CFrontendSetup.php:521
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:565
-#: include/classes/setup/CFrontendSetup.php:582
-#: include/classes/setup/CFrontendSetup.php:583
+#: include/classes/setup/CFrontendSetup.php:384
+#: include/classes/setup/CFrontendSetup.php:432
+#: include/classes/setup/CFrontendSetup.php:457
+#: include/classes/setup/CFrontendSetup.php:480
+#: include/classes/setup/CFrontendSetup.php:520
+#: include/classes/setup/CFrontendSetup.php:537
+#: include/classes/setup/CFrontendSetup.php:564
+#: include/classes/setup/CFrontendSetup.php:581
+#: include/classes/setup/CFrontendSetup.php:598
 #: include/classes/setup/CFrontendSetup.php:599
+#: include/classes/setup/CFrontendSetup.php:615
 #: include/views/administration.users.edit.php:205
 msgid "off"
 msgstr "off"
 
-#: include/classes/setup/CFrontendSetup.php:292
-#: include/classes/setup/CFrontendSetup.php:309
-#: include/classes/setup/CFrontendSetup.php:330
-#: include/classes/setup/CFrontendSetup.php:351
-#: include/classes/setup/CFrontendSetup.php:368
-#: include/classes/setup/CFrontendSetup.php:416
-#: include/classes/setup/CFrontendSetup.php:441
-#: include/classes/setup/CFrontendSetup.php:464
-#: include/classes/setup/CFrontendSetup.php:504
-#: include/classes/setup/CFrontendSetup.php:521
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:565
-#: include/classes/setup/CFrontendSetup.php:582
-#: include/classes/setup/CFrontendSetup.php:599
+#: include/classes/setup/CFrontendSetup.php:308
+#: include/classes/setup/CFrontendSetup.php:325
+#: include/classes/setup/CFrontendSetup.php:346
+#: include/classes/setup/CFrontendSetup.php:367
+#: include/classes/setup/CFrontendSetup.php:384
+#: include/classes/setup/CFrontendSetup.php:432
+#: include/classes/setup/CFrontendSetup.php:457
+#: include/classes/setup/CFrontendSetup.php:480
+#: include/classes/setup/CFrontendSetup.php:520
+#: include/classes/setup/CFrontendSetup.php:537
+#: include/classes/setup/CFrontendSetup.php:564
+#: include/classes/setup/CFrontendSetup.php:581
+#: include/classes/setup/CFrontendSetup.php:598
+#: include/classes/setup/CFrontendSetup.php:615
 #: include/views/administration.users.edit.php:205
 #: include/views/monitoring.hostscreen.php:54
 msgid "on"
@@ -16428,9 +16420,9 @@ msgstr "検索文字列を入力"
 msgid "unexpected end of key"
 msgstr "キーの末尾が間違っています"
 
-#: include/classes/setup/CFrontendSetup.php:207
-#: include/classes/setup/CFrontendSetup.php:387
-#: include/classes/setup/CFrontendSetup.php:481
+#: include/classes/setup/CFrontendSetup.php:223
+#: include/classes/setup/CFrontendSetup.php:403
+#: include/classes/setup/CFrontendSetup.php:497
 msgid "unknown"
 msgstr "不明"
 
