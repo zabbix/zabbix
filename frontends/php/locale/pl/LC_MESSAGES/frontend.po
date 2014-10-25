@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 08:24+0300\n"
-"PO-Revision-Date: 2014-10-13 13:43+0300\n"
+"POT-Creation-Date: 2014-10-25 08:37+0300\n"
+"PO-Revision-Date: 2014-10-20 10:11+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1413200634.0\n"
+"X-POOTLE-MTIME: 1413792664.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1641,22 +1641,22 @@ msgstr "Nie można usunąć zależności"
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "Nie można usunąć wykrytego wykresu \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1314
 #, c-format
 msgid "Cannot delete discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie można usunąć wykrytego hosta \"%1$s\"."
 
 #: include/classes/api/services/CItem.php:659
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "Nie można usunąć wykrytej pozycji \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:852
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Nie można usunąć wykrytego wyzwalacza \"%1$s\"."
 
 #: discoveryconf.php:179 host_discovery.php:184
 #: include/classes/api/services/CDiscoveryRule.php:431
@@ -2368,7 +2368,7 @@ msgstr "Nie można ustawić pól inwentarza dla wyłączonego inwentarza."
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Nie można ustawić ID zasobu dla elementu ekranu."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2443,17 +2443,17 @@ msgstr "Nie można zaktualizować \"%1$s\" dla wyzwalacza \"%2$s\"."
 #: include/classes/api/services/CHost.php:558
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować \"%2$s\" dla wykrytego hosta \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować \"%2$s\" dla wykrytej pozycji \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:588
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować \"%2$s\" dla wykrytego wyzwalacza \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:557
 #, c-format
@@ -3448,11 +3448,11 @@ msgstr "Utwórz mapę wartości"
 
 #: include/views/configuration.httpconf.list.php:34
 msgid "Create web scenario"
-msgstr ""
+msgstr "Utwórz scenariusz sieci www"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create web scenario (select host first)"
-msgstr ""
+msgstr "Utwórz scenariusz sieci www (najpierw wybierz host)"
 
 #: include/classes/api/managers/CApplicationManager.php:73
 #, c-format
@@ -3612,7 +3612,7 @@ msgstr "DES"
 
 #: httpdetails.php:116
 msgid "DETAILS OF WEB SCENARIO"
-msgstr ""
+msgstr "SZCZEGÓŁY SCENARIUSZA SIECI WWW"
 
 #: include/maps.inc.php:465 include/maps.inc.php:547 include/maps.inc.php:635
 #: include/maps.inc.php:725
@@ -4210,7 +4210,7 @@ msgstr "Usunąć wyzwalacz?"
 
 #: include/views/configuration.httpconf.edit.php:298
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Usunąć scenariusz sieci www?"
 
 #: auditlogs.php:132
 msgid "Deleted"
@@ -4356,7 +4356,7 @@ msgstr "Szczegóły"
 
 #: httpdetails.php:27
 msgid "Details of web scenario"
-msgstr ""
+msgstr "Szczegóły scenariusza sieci www"
 
 #: include/actions.inc.php:102
 msgid "Device"
@@ -4416,11 +4416,11 @@ msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
 
 #: popup_trexpr.php:193
 msgid "Difference between last and previous value is = N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest = N"
 
 #: popup_trexpr.php:189
 msgid "Difference between last and previous value is > N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest > N"
 
 #: popup_trexpr.php:197
 msgid "Difference between last and previous value is NOT N"
@@ -5315,7 +5315,7 @@ msgstr "Wykonano"
 #: include/views/configuration.host.discovery.edit.php:179
 #: include/views/configuration.item.edit.php:185
 msgid "Executed script"
-msgstr "Wykonany skrypt"
+msgstr "Wykonywany skrypt"
 
 #: jsLoader.php:107
 msgid "Execution confirmation"
@@ -6243,7 +6243,7 @@ msgstr "Ukryj wyłączone wyzwalacze"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Hide disabled web scenarios"
-msgstr ""
+msgstr "Ukryj wyłączone scenariusze sieci www"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
@@ -7761,7 +7761,7 @@ msgstr "Błędny stan."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Błędny styl ustawiony dla elementu ekranu."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -11226,11 +11226,11 @@ msgstr "OSOBISTA TABLICA"
 
 #: include/classes/setup/CFrontendSetup.php:366
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data musi być ustawione na -1."
 
 #: include/classes/setup/CFrontendSetup.php:307
 msgid "PHP bcmath"
@@ -13071,7 +13071,7 @@ msgstr "Wyświetl wyłączone wyzwalacze"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Show disabled web scenarios"
-msgstr ""
+msgstr "Pokaż wyłączone scenariusze sieci www"
 
 #: adm.gui.php:76
 #, c-format
@@ -13477,7 +13477,7 @@ msgstr "Czas trwania kroku"
 
 #: include/views/configuration.httpconf.popup.php:103 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Krok scenariusza sieci www"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -13538,11 +13538,11 @@ msgstr "Suma wartości z okresu T jest < N"
 
 #: popup_trexpr.php:345
 msgid "Sum of values of a period T is = N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest = N"
 
 #: popup_trexpr.php:340
 msgid "Sum of values of a period T is > N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest > N"
 
 #: popup_trexpr.php:350
 msgid "Sum of values of a period T is NOT N"
@@ -15561,7 +15561,7 @@ msgstr "Monitorowanie WWW"
 #: httpconf.php:177 httpconf.php:314 httpconf.php:371 httpconf.php:422
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:428
 msgid "Web scenario"
-msgstr ""
+msgstr "Scenariusz sieci www"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -15578,7 +15578,7 @@ msgstr "Scenariusz sieci www \"%1$s\" już istnieje."
 
 #: httpconf.php:196
 msgid "Web scenario added"
-msgstr ""
+msgstr "Dodano scenariusz sieci www"
 
 #: httpconf.php:145 httpconf.php:444
 msgid "Web scenario deleted"
@@ -15636,7 +15636,7 @@ msgstr "Numer kroku scenariusza sieci www nie powinien być mniejszy niż 1."
 
 #: httpconf.php:191
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Zaktualizowano scenariusz sieci www"
 
 #: httpmon.php:85 include/html.inc.php:484 include/html.inc.php:488
 #: include/views/configuration.host.edit.php:668
