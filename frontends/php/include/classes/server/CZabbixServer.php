@@ -153,6 +153,23 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Reschedule items
+	 *
+	 * @param array $itemids
+	 * @param string $sid   user session ID
+	 *
+	 * @return bool
+	 */
+	public function rescheduleItems(array $itemids, $sid) {
+		return $this->request([
+			'request' => 'queue.get',
+			'sid' => $sid,
+			'type' => 'reschedule',
+			'items' => $itemids
+		]);
+	}
+
+	/**
 	 * Returns true if the Zabbix server is running and false otherwise.
 	 *
 	 * @return bool
