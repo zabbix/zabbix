@@ -74,7 +74,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 										<?php echo _('Remember me for 30 days'); ?>
 									</label>
 									<div style="height: 8px;"></div>
-									<input type="submit" class="input jqueryinput" name="enter" id="enter" value="<?php echo _('Sign in'); ?>" />
+									<button type="submit" class="button jqueryinput" name="enter" id="enter" value="<?php echo _('Sign in'); ?>"><?php echo _('Sign in'); ?></button>
 									<?php if (CWebUser::$data['userid'] > 0) { ?>
 										<span style="margin-left: 14px;">
 												<a class="highlight underline" href="dashboard.php"><?php echo _('Login as Guest'); ?></a>
