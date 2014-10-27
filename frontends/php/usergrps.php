@@ -425,6 +425,17 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
+		// Add host group names.
+		$dbGroupsForGroupRights = API::HostGroup()->get(array(
+			'output' => array('name'),
+			'groupids' => array_keys($groupRights),
+			'preservekeys' => true
+		));
+		foreach($groupRights as $groupId => &$groupRight) {
+			$groupRight['name'] = $dbGroupsForGroupRights[$groupId]['name'];
+		}
+		unset($groupRight);
+
 		$data['name'] = getRequest('gname', '');
 		$data['users_status'] = getRequest('users_status', GROUP_STATUS_ENABLED);
 		$data['gui_access'] = getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM);
