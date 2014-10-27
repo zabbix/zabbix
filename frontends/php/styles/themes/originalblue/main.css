@@ -45,6 +45,12 @@ div.preloader {
 	border-color: #d0d0d0; background: #eeeeee; color: #aca899;
 }
 
+.link_menu { border-color: #3c3089; color: #3c3089; }
+.link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
+.link_menu[disabled], .link_menu[disabled]:hover {
+	background-color: #ffffff; color: #aca899; background-color: white;
+}
+
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #ACA899; background-color: white; }
 .input[readonly], .input[readonly]:hover {
@@ -64,11 +70,6 @@ div.preloader {
 
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
-	color: #aca899;
-}
-
-.link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
-	background-color: #ffffff;
 	color: #aca899;
 }
 
