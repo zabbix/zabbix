@@ -1,3 +1,21 @@
+Changes for 2.2.8rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
+.......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
+..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
+........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.7
+
+New features:
+A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.7rc2
 
 Bug fixes:
@@ -380,7 +398,7 @@ A......... [ZBX-7660] fixed host.get returning the "templates" property even if 
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
-.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+.......PS. [ZBX-7576] fixed network discovery processing broadcast responses as valid hosts (wiper)
 ..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
 .......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
@@ -1122,6 +1140,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
 ........S. [ZBX-8754] fixed crash in escalator when processing an alert without an user, but with a media type set (wiper)
 ..F....... [ZBX-8693] fixed "Add" button in Configuration->Triggers->Create Trigger->Add for IE11 (arvids)
@@ -1156,7 +1175,7 @@ A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxm
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
-.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+.......PS. [ZBX-7576] fixed network discovery processing broadcast responses as valid hosts (wiper)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
