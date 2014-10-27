@@ -94,7 +94,7 @@ class CTweenBox {
 
 		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn)), $this->rbox));
 
-		$grp_tab->addItem(new CVar($this->varname, CJs::encodeJson($this->value)));
+		$grp_tab->addItem(new CVar($this->varname, CJs::encodeJson(array_values($this->value))));
 
 		return $grp_tab;
 	}

@@ -329,25 +329,37 @@ function moveListBoxSelectedItem(formname, objname, source, target, action) {
 		// Fetch "variable" input element into which JSON'ed values of chosen items are stored.
 		var variableInput = jQuery("input[name=" + objname + "]", document.forms[formname]);
 
-		// Ensure we have an object
-		var value = JsonParser.parse(variableInput.val());
-		if (value instanceof Array) {
-			value = {};
-		}
+		// Read current value of target input.
+		var currentValue = JsonParser.parse(variableInput.val());
 
-		// Fetch value (presumably some ID) from selected option.
+		// Take currently selected value.
 		var selectedValue = selectedElement.val();
 
-		// Add or remove item from value-object.
+		// Add or remove one item from current value.
 		if (action.toLowerCase() == 'add') {
-			value[selectedValue] = selectedValue;
+			var found = false;
+			for (i in currentValue) {
+				if (currentValue.hasOwnProperty(i) && currentValue[i] == selectedValue) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				currentValue.push(selectedValue);
+			}
 		}
 		else if (action.toLowerCase() == 'rmv') {
-			delete value[selectedValue];
+			for (i in currentValue) {
+				if (currentValue.hasOwnProperty(i) && currentValue[i] == selectedValue) {
+					// Use .splice() instead of delete to avoid making a hole in indexes.
+					currentValue.splice(i, 1);
+					break;
+				}
+			}
 		}
 
 		// JSONize and store value back to "variable" input element.
-		variableInput.val(JsonParser.stringify(value));
+		variableInput.val(JsonParser.stringify(currentValue));
 	});
 
 	return true;
