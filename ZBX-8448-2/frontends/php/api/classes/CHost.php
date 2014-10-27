@@ -629,16 +629,11 @@ class CHost extends CHostGeneral {
 		if ($update) {
 			$dbHosts = $this->get(array(
 				'output' => array('hostid', 'host', 'flags'),
-				'selectGroups' => array('groupid'),
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
 		}
-
-		$newGroupIds = array();
-		$oldGroupIds = array();
-		$validateGroupIds = array();
 
 		foreach ($hosts as $host) {
 			// validate mandatory fields
@@ -658,47 +653,17 @@ class CHost extends CHostGeneral {
 					);
 				}
 
-				$dbHost = $dbHosts[$hostId];
-
-				// gather new groups assigned to current host
-				if (isset($host['groups'])) {
-					foreach ($host['groups'] as $group) {
-						$newGroupIds[$group['groupid']] = $group['groupid'];
-					}
-				}
-				elseif (!is_array($host['groups']) || !$host['groups']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $dbHost['host']));
-				}
-
-				// gather current groups assigned to host
-				foreach ($dbHost['groups'] as $group) {
-					$oldGroupIds[$group['groupid']] = $group['groupid'];
+				if (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".',
+						$dbHosts[$hostId]['host'])
+					);
 				}
 			}
 			else {
 				if (!isset($host['groups'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 				}
-
-				foreach ($host['groups'] as $group) {
-					$newGroupIds[$group['groupid']] = $group['groupid'];
-				}
 			}
-		}
-
-		if ($update) {
-			// validate groups that are added
-			$validateGroupIds = array_diff($newGroupIds, $oldGroupIds);
-
-			// validate groups that are removed
-			$validateGroupIds += array_diff($oldGroupIds, $newGroupIds);
-		}
-		else {
-			$validateGroupIds = $newGroupIds;
-		}
-
-		if ($validateGroupIds && !API::HostGroup()->isWritable($validateGroupIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$inventoryFields = getHostInventories();
