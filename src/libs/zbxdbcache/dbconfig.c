@@ -4603,10 +4603,6 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 
 static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int *bulk)
 {
-	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
-	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
-	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
-
 	int			num;
 	ZBX_DC_INTERFACE	*dc_interface;
 
@@ -4618,6 +4614,10 @@ static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int
 	if (NULL == dc_interface || SNMP_BULK_ENABLED != dc_interface->bulk)
 		return 1;
 
+	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
+	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
+	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
+
 	if (1 >= dc_interface->max_snmp_succeed || MAX_SNMP_ITEMS + 1 != dc_interface->min_snmp_fail)
 		num = dc_interface->max_snmp_succeed + 1;
 	else
@@ -4626,7 +4626,13 @@ static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int
 	if (num < dc_interface->min_snmp_fail)
 		return num;
 
-	return dc_interface->min_snmp_fail - 1;
+	/* If we have already found the optimal number of variables to query, we wish to base our suggestion on that */
+	/* number. If we occasionally get a timeout in this area, it can mean two things: either the device's actual */
+	/* limit is a bit lower than that (it can process requests above it, but only sometimes) or a UDP packet in  */
+	/* one of the directions was lost. In order to account for the former, we allow ourselves to lower the count */
+	/* of variables, but only up to two times. Otherwise, performance will gradually degrade due to the latter.  */
+
+	return MAX(dc_interface->max_snmp_succeed - 2, dc_interface->min_snmp_fail - 1);
 }
 
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
