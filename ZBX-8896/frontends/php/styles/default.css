@@ -144,8 +144,7 @@ a.weight_normal { font-weight: normal; }
 
 .button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 
-.ui-button { padding: 0; }
-button.ui-button { margin: 1px; height: 19px; }
+.ui-button { padding: 0; height: 19px; }
 
 .link_menu {
 	border: 0; border-bottom-width: 1px; border-bottom-style: dotted; background: none;
@@ -223,6 +222,7 @@ div.footer .formtable { display: table; width: 100%; }
 div.footer .formrow { display: table-row; }
 div.footer .formrow .dt { width: 20%; display: table-cell; }
 div.footer .formrow .dd { margin-left: 10px; }
+div.footer .ui-button { margin: 1px; }
 div.footer .formrow .main,
 div.footer .formrow .main[disabled]:hover,
 div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main {
@@ -458,6 +458,7 @@ table.filter tr td {
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
 table.filter tr td.controls { text-align: center; }
+table.filter tr td.controls .ui-button { margin: 1px; }
 table.filter .text { height: 16px; }
 table.filter .button-form { height: 20px; }
 table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; }
