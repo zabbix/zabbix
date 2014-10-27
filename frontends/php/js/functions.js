@@ -330,7 +330,7 @@ function moveListBoxSelectedItem(formname, objname, source, target, action) {
 		var variableInput = jQuery("input[name=" + objname + "]", document.forms[formname]);
 
 		// Ensure we have an object
-		var value = JSON.parse(variableInput.val());
+		var value = JsonParser.parse(variableInput.val());
 		if (value instanceof Array) {
 			value = {};
 		}
@@ -347,7 +347,7 @@ function moveListBoxSelectedItem(formname, objname, source, target, action) {
 		}
 
 		// JSONize and store value back to "variable" input element.
-		variableInput.val(Object.toJSON(value));
+		variableInput.val(JsonParser.stringify(value));
 	});
 
 	return true;

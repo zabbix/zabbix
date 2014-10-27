@@ -393,7 +393,7 @@ var CDoll = Class.create({
 							});
 
 							sendAjaxData({
-								data: {widgetSort: Object.toJSON(widgetPositions)}
+								data: {widgetSort: JsonParser.stringify(widgetPositions)}
 							});
 						}
 					}

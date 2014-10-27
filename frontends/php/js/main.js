@@ -1061,7 +1061,23 @@ jQuery(function($) {
 		}
 
 		$(this).on('change', function() {
-			options.target.val(Object.toJSON($(this).val()));
+			options.target.val(JsonParser.stringify($(this).val()));
 		});
 	}
 });
+
+/**
+ * This module is used to ensure correct functions are invoked because Prototype clobbers "stringify" on window.JSON object.
+ * Dependency on Prototype will be removed in future.
+ */
+var JsonParser = (function() {
+	return {
+		stringify: function(object) {
+			return Object.toJSON(object)
+		},
+
+		parse: function(jsonString) {
+			return JSON.parse(jsonString);
+		}
+	};
+})();
