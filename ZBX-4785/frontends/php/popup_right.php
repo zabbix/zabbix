@@ -96,7 +96,7 @@ $hostGroupForm->show();
 				};
 			}
 		});
-		add_variable('input', 'new_right', Object.toJSON(resultValue), formName, parentDocument);
+		add_variable('input', 'new_right', JsonParser.stringify(resultValue), formName, parentDocument);
 
 		parentDocument.forms[formName].submit();
 
