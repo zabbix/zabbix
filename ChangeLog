@@ -40,7 +40,7 @@ A.F....... [ZBX-8151] fixed XXE vulnerability on XML import using obsolete libxm
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
-.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+.......PS. [ZBX-7576] fixed network discovery processing broadcast responses as valid hosts (wiper)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
