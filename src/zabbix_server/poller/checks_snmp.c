@@ -304,8 +304,6 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			break;
 	}
 
-	session.retries = 0;				/* number of retries after failed attempt */
-							/* (net-snmp default = 5) */
 	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
 
@@ -875,6 +873,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			pdu->max_repetitions = max_vars;
 		}
 
+		ss->retries = (0 == bulk || (1 == max_vars && 0 == level) ? 1 : 0);
+
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
@@ -1067,6 +1067,8 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 		snmp_free_pdu(pdu);
 		goto out;
 	}
+
+	ss->retries = (1 == mapping_num && 0 == level ? 1 : 0);
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
