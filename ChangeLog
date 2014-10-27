@@ -38,6 +38,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
+.......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
 ..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
@@ -486,6 +488,8 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
+.......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
 ..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 ........S. [ZBX-6353] improved history cache performance when it's flooded with data from less than 1000 items (wiper)
