@@ -295,7 +295,7 @@ $httpForm->addItem($httpTab);
 if (!empty($this->data['httptestid'])) {
 	if ($this->data['templated'] == 0) {
 		$btnDelete = new CButtonDelete(
-			_('Delete scenario?'),
+			_('Delete web scenario?'),
 			url_param('form').url_param('httptestid').url_param('hostid')
 		);
 	}

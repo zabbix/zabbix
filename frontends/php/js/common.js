@@ -242,16 +242,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 	return false;
 }
 
-function deselectAll() {
-	if (IE) {
-		document.selection.empty();
-	}
-	else {
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-	}
-}
-
 function getDimensions(obj, trueSide) {
 	obj = $(obj);
 
