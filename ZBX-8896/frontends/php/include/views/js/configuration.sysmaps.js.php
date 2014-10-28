@@ -117,7 +117,7 @@
 			<tr id="application-select-row">
 				<td><?php echo _('Application'); ?></td>
 				<td>
-					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu select-popup"><?php echo _('Select'); ?></button>
+					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
 				</td>
 			</tr>
 
