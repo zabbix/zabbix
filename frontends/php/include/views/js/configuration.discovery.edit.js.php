@@ -4,12 +4,14 @@
 			<span class="bold">#{name}</span>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>"
-				onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');" />
+			<button type="button" class="button link_menu" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');">
+				<?php echo _('Edit'); ?>
+			</button>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>"
-				onclick="javascript: removeDCheckRow('#{dcheckid}');" />
+			<button type="button" class="button link_menu" onclick="javascript: removeDCheckRow('#{dcheckid}');">
+				<?php echo _('Remove'); ?>
+			</button>
 		</td>
 	</tr>
 </script>
@@ -106,12 +108,14 @@
 			<table class="formElementTable">
 				<tr>
 					<td>
-						<input type="button" id="add_new_dcheck" name="add_new_dcheck" class="input button link_menu"
-							value="<?php echo CHtml::encode(_('Add')); ?>" />
+						<button type="button" id="add_new_dcheck" name="add_new_dcheck" class="button link_menu">
+							<?php echo _('Add') ?>
+						</button>
 					</td>
 					<td>
-						<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" class="input button link_menu"
-							value="<?php echo CHtml::encode(_('Cancel')); ?>" />
+						<button type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" class="button link_menu">
+							<?php echo _('Cancel') ?>
+						</button>
 					</td>
 				</tr>
 			</table>

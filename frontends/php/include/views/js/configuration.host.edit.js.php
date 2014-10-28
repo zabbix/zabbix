@@ -30,7 +30,7 @@
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="interface-control">
-		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled}><?php echo _('Remove'); ?></button>
+		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="button link_menu remove" #{*attrs.disabled}><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>

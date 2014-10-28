@@ -87,7 +87,9 @@
 
 	<!-- remove button -->
 	<td>
-		<input type="button" class="input link_menu" id="items_#{number}_remove" data-remove="#{number}" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeItem(this);" />
+		<button type="button" class="button link_menu" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);">
+			<?php echo _('Remove') ?>
+		</button>
 	</td>
 </tr>
 </script>
