@@ -461,7 +461,6 @@ table.filter tr td.controls { text-align: center; }
 table.filter tr td.controls .ui-button { margin: 1px; }
 table.filter .text { height: 16px; }
 table.filter .button-form { height: 20px; }
-table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -532,7 +531,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	border: 1px solid #5897FB;
 }
 .multiselect-button { width: 50px; height: 20px; float: left; }
-.multiselect-button .select-popup { margin-left: 8px; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
