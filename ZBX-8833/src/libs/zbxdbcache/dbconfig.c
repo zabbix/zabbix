@@ -3427,9 +3427,8 @@ void	init_configuration_cache()
 
 #define CREATE_HASHSET_EXT(hashset, hash_func, compare_func)								\
 															\
-	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE, hash_func, compare_func,					\
-				__config_mem_malloc_func, __config_mem_realloc_func,					\
-				__config_mem_free_func,	NULL)
+	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE, hash_func, compare_func, NULL,				\
+				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items);
 	CREATE_HASHSET(config->numitems);

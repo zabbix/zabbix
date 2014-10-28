@@ -71,7 +71,7 @@ void	zbx_default_mem_free_func(void *ptr);
 #define ZBX_DEFAULT_MEM_REALLOC_FUNC	zbx_default_mem_realloc_func
 #define ZBX_DEFAULT_MEM_FREE_FUNC	zbx_default_mem_free_func
 
-typedef void (*zbx_mem_clear_func_t)(void *data);
+typedef void (*zbx_clean_func_t)(void *data);
 
 #define ZBX_RETURN_IF_NOT_EQUAL(a, b)	\
 					\
@@ -121,10 +121,10 @@ typedef struct
 	int			num_data;
 	zbx_hash_func_t		hash_func;
 	zbx_compare_func_t	compare_func;
+	zbx_clean_func_t	clean_func;
 	zbx_mem_malloc_func_t	mem_malloc_func;
 	zbx_mem_realloc_func_t	mem_realloc_func;
 	zbx_mem_free_func_t	mem_free_func;
-	zbx_mem_clear_func_t	mem_clear_func;
 }
 zbx_hashset_t;
 
@@ -134,10 +134,10 @@ void	zbx_hashset_create(zbx_hashset_t *hs, size_t init_size,
 void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_hash_func_t hash_func,
 				zbx_compare_func_t compare_func,
+				zbx_clean_func_t clean_func,
 				zbx_mem_malloc_func_t mem_malloc_func,
 				zbx_mem_realloc_func_t mem_realloc_func,
-				zbx_mem_free_func_t mem_free_func,
-				zbx_mem_clear_func_t mem_clear_func);
+				zbx_mem_free_func_t mem_free_func);
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);

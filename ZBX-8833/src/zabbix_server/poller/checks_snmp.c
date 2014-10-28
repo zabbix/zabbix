@@ -72,7 +72,7 @@ static int	__snmpidx_main_key_compare(const void *d1, const void *d2)
 	return strcmp(main_key1->oid, main_key2->oid);
 }
 
-static void	__snmpidx_main_key_clear(void *data)
+static void	__snmpidx_main_key_clean(void *data)
 {
 	zbx_snmpidx_main_key_t	*main_key = (zbx_snmpidx_main_key_t *)data;
 
@@ -97,7 +97,7 @@ static int	__snmpidx_mapping_compare(const void *d1, const void *d2)
 	return strcmp(mapping1->value, mapping2->value);
 }
 
-static void	__snmpidx_mapping_clear(void *data)
+static void	__snmpidx_mapping_clean(void *data)
 {
 	zbx_snmpidx_mapping_t	*mapping = (zbx_snmpidx_mapping_t *)data;
 
@@ -150,9 +150,8 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	if (NULL == snmpidx.slots)
 	{
 		zbx_hashset_create_ext(&snmpidx, 100,
-				__snmpidx_main_key_hash, __snmpidx_main_key_compare,
-				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC,
-				__snmpidx_main_key_clear);
+				__snmpidx_main_key_hash, __snmpidx_main_key_compare, __snmpidx_main_key_clean,
+				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	}
 
 	main_key_local.addr = item->interface.addr;
@@ -166,9 +165,8 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 		main_key_local.mappings = zbx_malloc(NULL, sizeof(zbx_hashset_t));
 		zbx_hashset_create_ext(main_key_local.mappings, 100,
-				__snmpidx_mapping_hash, __snmpidx_mapping_compare,
-				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC,
-				__snmpidx_mapping_clear);
+				__snmpidx_mapping_hash, __snmpidx_mapping_compare, __snmpidx_mapping_clean,
+				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 		main_key = zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
 	}
