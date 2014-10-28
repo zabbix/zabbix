@@ -144,7 +144,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 form { margin: 0; }
 .input {
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
-	border: 1px solid #ACA899; background-color: white; margin: 0 2px 0 0; height: 12px;
+	border: 1px solid #ACA899; background-color: white; margin: 0 2px 0 0;
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
