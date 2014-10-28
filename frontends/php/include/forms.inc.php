@@ -511,8 +511,7 @@ function getItemFilterForm(&$items) {
 					'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
 						'&srcfld1=groupid&writeonly=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			))
 		), 'col1'),
@@ -556,8 +555,7 @@ function getItemFilterForm(&$items) {
 					'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
 						'&srcfld1=hostid&writeonly=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			))
 		), 'col1'),
