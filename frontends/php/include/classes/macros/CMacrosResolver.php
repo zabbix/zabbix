@@ -602,16 +602,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Second parameter like {hostname:key.last(0,86400) and offsets like {hostname:key.last(#1)} are not supported.
 	 * Supports postfixes s,m,h,d and w for parameter.
 	 *
-	 * @param array  $strList				list of string in which macros should be resolved
-	 * @param array  $itemsList				list of	lists of graph items
-	 * @param int    $items[n][m]['hostid']	n-th graph m-th item corresponding host Id
-	 * @param string $items[n][m]['host']	n-th graph m-th item corresponding host name
+	 * @param array  $strList					list of string in which macros should be resolved
+	 * @param array  $itemsList					list of	lists of graph items
+	 * @param int    $itemsList[n][m]['hostid']	n-th graph m-th item corresponding host Id
+	 * @param string $itemsList[n][m]['host']	n-th graph m-th item corresponding host name
 	 *
 	 * @return array	list of strings with macros replaced with corresponding values
 	 */
-	private function resolveGraphsFunctionalItemMacros($strList, $itemsList) {
+	private function resolveGraphsFunctionalItemMacros(array $strList, array $itemsList) {
 		// retrieve all string macros and all host-key pairs
-		$hostKeyPairs = $matchesList = array();
+		$hostKeyPairs = array();
+		$matchesList = array();
 		$items = reset($itemsList);
 
 		foreach ($strList as $str) {
@@ -624,53 +625,45 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'(?P<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
-			if (!empty($matches['hosts'])) {
-				foreach ($matches['hosts'] as $i => $host) {
-					$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
+			foreach ($matches['hosts'] as $i => $host) {
+				$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
 
-					if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
-						if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
-							$hostKeyPairs[$matches['hosts'][$i][0]] = array();
-						}
-
-						$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
+				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
+					if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
+						$hostKeyPairs[$matches['hosts'][$i][0]] = array();
 					}
-				}
 
-				$matchesList[] = $matches;
-				$items = next($itemsList);
+					$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
+				}
 			}
+
+			$matchesList[] = $matches;
+			$items = next($itemsList);
 		}
 
 		// stop, if no macros found
-		if (empty($matchesList)) {
+		if (!$matchesList) {
 			return $strList;
 		}
 
 		// build item retrieval query from host-key pairs
-		$query = 'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
-					' FROM items i, hosts h'.
-					' WHERE i.hostid=h.hostid AND (';
-
+		$queryParts = array();
 		foreach ($hostKeyPairs as $host => $keys) {
-			$query .= '(h.host='.zbx_dbstr($host).' AND i.key_ IN(';
-
-			foreach ($keys as $key => $val) {
-				$query .= zbx_dbstr($key).',';
-			}
-
-			$query = substr($query, 0, -1).')) OR ';
+			$queryParts[] = '(h.host='.zbx_dbstr($host).' AND '.dbConditionString('i.key_', array_keys($keys)).')';
 		}
 
-		$query = substr($query, 0, -4).')';
-
 		// get necessary items for all graph strings
-		$items = DBfetchArrayAssoc(DBselect($query), 'itemid');
+		$items = DBfetchArrayAssoc(DBselect(
+			'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND ('.join(' OR ', $queryParts).')'
+		), 'itemid');
 
 		$allowedItems = API::Item()->get(array(
+			'output' => array('itemid'),
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => array('itemid', 'value_type'),
 			'preservekeys' => true
 		));
 
