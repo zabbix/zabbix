@@ -941,9 +941,9 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	p_count = 4 * s_count;
 
 	ret = process_logrt(logtype, filename, &metric->lastlogsize, &metric->mtime, &metric->skip_old_data,
-			&metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
-			server, port, CONFIG_HOSTNAME, metric->key_orig);
+			&metric->big_rec, &metric->use_ino, error, &metric->logfiles, &metric->logfiles_num, encoding,
+			&regexps, pattern, template, &p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME,
+			metric->key_orig);
 
 	if (SUCCEED == ret)
 	{
@@ -954,7 +954,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		metric->error_count++;
 
 		/* suppress first two errors */
-		if (2 >= metric->error_count)
+		if (3 > metric->error_count)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt) processing error #%d: %s",
 					metric->error_count, NULL != *error ? *error : "unknown error");
