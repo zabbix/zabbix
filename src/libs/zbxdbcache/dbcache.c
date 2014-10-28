@@ -2843,7 +2843,7 @@ static void	init_trend_cache()
 #define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef INIT_HASHSET_SIZE
