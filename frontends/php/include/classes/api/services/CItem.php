@@ -438,34 +438,6 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Validates items to be created.
-	 *
-	 * @throws APIException if validation fails
-	 *
-	 * @param array $items
-	 *
-	 * @return void
-	 */
-	protected function validateCreate(array $items) {
-		parent::checkInput($items, false);
-		self::validateInventoryLinks($items, false);
-	}
-
-	/**
-	 * Validates item update data.
-
-	 * @throws APIException if validation fails
-	 *
-	 * @param array $items
-	 *
-	 * @return void
-	 */
-	protected function validateUpdate(array $items) {
-		parent::checkInput($items, true);
-		self::validateInventoryLinks($items, true);
-	}
-
-	/**
 	 * Create item.
 	 *
 	 * @param $items
@@ -475,7 +447,8 @@ class CItem extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 
-		$this->validateCreate($items);
+		parent::checkInput($items);
+		self::validateInventoryLinks($items);
 
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
@@ -606,7 +579,8 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		));
 
-		$this->validateUpdate($items);
+		parent::checkInput($items, true);
+		self::validateInventoryLinks($items, true);
 
 		foreach ($items as &$item) {
 			$item['flags'] = $dbItems[$item['itemid']]['flags'];
