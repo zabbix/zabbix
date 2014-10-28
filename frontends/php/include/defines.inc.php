@@ -1027,10 +1027,10 @@ define('RSM_HOST',	'rsm');
 define('RSM_TLDS_GROUP',	'TLDs');
 
 // TLD types
-define('RSM_CC_TLD_GROUP',		'ccTLDs');
-define('RSM_G_TLD_GROUP',		'gTLDs');
-define('RSM_OTHER_TLD_GROUP',	'otherTLDs');
-define('RSM_TEST_GROUP',		'testTLDs');
+define('RSM_CC_TLD_GROUP',		'ccTLD');
+define('RSM_G_TLD_GROUP',		'gTLD');
+define('RSM_OTHER_TLD_GROUP',	'otherTLD');
+define('RSM_TEST_GROUP',		'testTLD');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

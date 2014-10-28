@@ -87,25 +87,25 @@ $filterTable->addRow(array(
 				isset($this->data['filter_cctld_group']) ? $this->data['filter_cctld_group'] : null, null, 1
 			),
 			SPACE,
-			bold(_('ccTLDs')),
+			bold(_(RSM_CC_TLD_GROUP)),
 		),
 		new CSpan(array(new CCheckBox('filter_gtld_group',
 				isset($this->data['filter_gtld_group']) ? $this->data['filter_gtld_group'] : null, null, 1
 			),
 			SPACE,
-			bold(_('gTLDs'))
+			bold(_(RSM_G_TLD_GROUP))
 		), 'checkbox-block'),
 		new CSpan(array(new CCheckBox('filter_othertld_group',
 				isset($this->data['filter_othertld_group']) ? $this->data['filter_othertld_group'] : null, null, 1
 			),
 			SPACE,
-			bold(_('otherTLDs'))
+			bold(_(RSM_OTHER_TLD_GROUP))
 		), 'checkbox-block'),
 		new CSpan(array(new CCheckBox('filter_test_group',
 				isset($this->data['filter_test_group']) ? $this->data['filter_test_group'] : null, null, 1
 			),
 			SPACE,
-			bold(_('testTLDs'))
+			bold(_(RSM_TEST_GROUP))
 		), 'checkbox-block'),
 		new CButton('checkAllGroups', _('All/Any'), null, 'link_menu checkbox-block')
 	)),
