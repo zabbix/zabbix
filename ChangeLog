@@ -39,6 +39,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+.D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
 A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
 .......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
@@ -491,6 +492,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+.D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
 A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
 .......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
@@ -1630,6 +1632,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces (asaveljevs)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
 A......... [ZBX-6174] fixed "skipDependent" option in trigger.get API call to correctly handle cases when triggers on which they depend are disabled (Krists)
