@@ -4503,7 +4503,13 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 	if (num < min_snmp_fail)
 		return num;
 
-	return min_snmp_fail - 1;
+	/* If we have already found the optimal number of variables to query, we wish to base our suggestion on that */
+	/* number. If we occasionally get a timeout in this area, it can mean two things: either the device's actual */
+	/* limit is a bit lower than that (it can process requests above it, but only sometimes) or a UDP packet in  */
+	/* one of the directions was lost. In order to account for the former, we allow ourselves to lower the count */
+	/* of variables, but only up to two times. Otherwise, performance will gradually degrade due to the latter.  */
+
+	return MAX(max_snmp_succeed - 2, min_snmp_fail - 1);
 }
 
 /******************************************************************************
