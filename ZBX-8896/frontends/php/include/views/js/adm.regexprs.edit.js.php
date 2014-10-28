@@ -4,8 +4,8 @@
 		<td>#{type}</td>
 		<td>#{case_sensitive}</td>
 		<td class="nowrap">
-			<button class="input link_menu exprEdit" type="button" data-id="#{id}"><?php echo _('Edit'); ?></button>&nbsp;
-			<button class="input link_menu exprRemove" type="button" data-id="#{id}"><?php echo _('Remove'); ?></button>
+			<button class="button link_menu exprEdit" type="button" data-id="#{id}"><?php echo _('Edit'); ?></button>&nbsp;
+			<button class="button link_menu exprRemove" type="button" data-id="#{id}"><?php echo _('Remove'); ?></button>
 		</td>
 	</tr>
 </script>
