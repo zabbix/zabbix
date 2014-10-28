@@ -39,6 +39,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
 .......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
 .......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
 ..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
@@ -489,6 +490,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
 .......PS. [ZBX-8538] added Net-SNMP retry of 1 for cases where Zabbix will not be retrying itself (asaveljevs)
 .......PS. [ZBX-8538] changed the strategy to decrease the optimal number of variables two times only (asaveljevs)
 ..F....... [ZBX-8232] fixed performance issues in maps (Ivo)
