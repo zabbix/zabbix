@@ -34,44 +34,60 @@ class CMapImporter extends CImporter {
 		$this->checkCircularMapReferences($maps);
 
 		/**
-		 * Get all imported maps we want to import with removed elements
-		 * We import maps first, then update maps with the elements from import file. This way we make sure we are
-		 * able to resolve any references between maps that are imported
+		 * Get all imported maps we want to import with removed elements and links
+		 * We import maps first, then update maps with the elements and links from import file.
+		 * This way we make sure we are able to resolve any references between maps and links that are imported
 		 */
 		$mapsWithoutElements = $this->getMapsWithoutElements($maps);
 
-		$mapsToCreate = array();
-		$mapsToUpdate = array();
+		$mapsToProcess = array('createMissing' => array(), 'updateExisting' => array());
 
 		foreach ($mapsWithoutElements as $mapName => $mapWithoutElements) {
-			if ($mapId = $this->referencer->resolveMap($mapWithoutElements['name'])) {
+			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
+			if ($mapId !== false) {
 				// Update sysmapid in source map too
 				$maps[$mapName]['sysmapid'] = $mapWithoutElements['sysmapid'] = $mapId;
-				$mapsToUpdate[] = $mapWithoutElements;
+				$mapsToProcess['updateExisting'][] = $mapWithoutElements;
 			}
 			else {
-				$mapsToCreate[] = $mapWithoutElements;
+				$mapsToProcess['createMissing'][] = $mapWithoutElements;
 			}
 		}
 
-		// Create or update the maps
-		if ($this->options['maps']['createMissing'] && $mapsToCreate) {
-			$newMapIds = API::Map()->create($mapsToCreate);
-			foreach ($mapsToCreate as $num => $map) {
+		// Create or update the maps, respect the create/update options
+		if ($this->options['maps']['createMissing'] && $mapsToProcess['createMissing']) {
+			$newMapIds = API::Map()->create($mapsToProcess['createMissing']);
+			foreach ($mapsToProcess['createMissing'] as $num => $map) {
 				$mapId = $newMapIds['sysmapids'][$num];
 				$this->referencer->addMapRef($map['name'], $mapId);
 				// Update sysmapid in source map too
 				$maps[$map['name']]['sysmapid'] = $mapId;
 			}
 		}
-		if ($this->options['maps']['updateExisting'] && $mapsToUpdate) {
-			API::Map()->update($mapsToUpdate);
+		if ($this->options['maps']['updateExisting'] && $mapsToProcess['updateExisting']) {
+			API::Map()->update($mapsToProcess['updateExisting']);
 		}
 
-		// Now, we go through maps, resolve all the references and update maps.
-		foreach ($maps as $map) {
-			$map = $this->resolveMapReferences($map);
-			API::Map()->update($map);
+		// Form an array of maps that need to be updated with elements and links, respecting the create/update options
+		$mapsToUpdate = array();
+		foreach ($mapsToProcess as $mapActionKey => $mapActionArray) {
+			if ($this->options['maps'][$mapActionKey] && $mapsToProcess[$mapActionKey]) {
+
+				foreach ($mapActionArray as $actionMapItem) {
+					if (array_key_exists($actionMapItem['name'], $maps)) {
+						$map = array(
+							'sysmapid' => $maps[$actionMapItem['name']]['sysmapid'],
+							'name' => $actionMapItem['name'],
+							'selements' => $maps[$actionMapItem['name']]['selements'],
+							'links' => $maps[$actionMapItem['name']]['links'],
+						);
+						$mapsToUpdate[] = $this->resolveMapReferences($map);
+					}
+				}
+			}
+		}
+		if ($mapsToUpdate) {
+			API::Map()->update($mapsToUpdate);
 		}
 	}
 
@@ -154,10 +170,14 @@ class CMapImporter extends CImporter {
 	 */
 	protected function getMapsWithoutElements(array $maps) {
 		foreach ($maps as &$map) {
-			if (!empty($map['selements'])) {
+			if (array_key_exists('selements', $map)) {
 				unset($map['selements']);
 			}
+			if (array_key_exists('links', $map)) {
+				unset($map['links']);
+			}
 		}
+		unset($map);
 		return $maps;
 	}
 
