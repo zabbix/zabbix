@@ -156,10 +156,11 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
-	 * @param object options['popup']				popup data {parameters, width, height} (optional)
+	 * @param object options['popup']				popup data {parameters, width, height, buttonClass} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
+	 * @param string options['popup']['buttonClass'](optional)
 	 *
 	 * @return object
 	 */
@@ -471,6 +472,10 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
+				var popupBlock = $('<div>', {
+					'class': 'select-popup'
+				});
+
 				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
@@ -481,7 +486,7 @@ jQuery(function($) {
 
 				var popupButton = $('<button>', {
 					type: 'button',
-					'class': 'button button-form',
+					'class': options.popup.buttonClass ? options.popup.buttonClass : 'button button-form',
 					text: options.labels['Select']
 				});
 
