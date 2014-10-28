@@ -1904,7 +1904,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyPostSqlFiltering(array $triggers, array $options) {
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
-		// unset triggers which are dependant on at least one problem trigger upstream into dependency tree
+		// unset triggers which depend on at least one problem trigger upstream into dependency tree
 		if ($options['skipDependent'] !== null) {
 			// Result trigger IDs of all triggers in results.
 			$resultTriggerIds = zbx_objectValues($triggers, 'triggerid');
