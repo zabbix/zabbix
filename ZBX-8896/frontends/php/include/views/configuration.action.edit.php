@@ -234,8 +234,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TRIGGER_VALUE:
 		$condition = new CComboBox('new_condition[value]');
-		foreach (array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $trigerValue) {
-			$condition->addItem($trigerValue, trigger_value2str($trigerValue));
+		foreach (array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $triggerValue) {
+			$condition->addItem($triggerValue, trigger_value2str($triggerValue));
 		}
 		break;
 

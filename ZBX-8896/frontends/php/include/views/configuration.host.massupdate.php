@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
 // create form
 $hostForm = new CForm();
@@ -278,7 +278,7 @@ $ipmiFormList->addRow(
 $inventoryFormList = new CFormList('inventoryFormList');
 
 // append inventories to form list
-$inventoryModesComboBox = new CComboBox('inventory_mode', $this->data['inventory_mode'], 'submit()');
+$inventoryModesComboBox = new CComboBox('inventory_mode', $this->data['inventory_mode']);
 $inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
 $inventoryModesComboBox->addItem(HOST_INVENTORY_MANUAL, _('Manual'));
 $inventoryModesComboBox->addItem(HOST_INVENTORY_AUTOMATIC, _('Automatic'));
@@ -292,37 +292,35 @@ $inventoryFormList->addRow(
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
-if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-	foreach ($this->data['inventories'] as $field => $fieldInfo) {
-		if (!isset($this->data['host_inventory'][$field])) {
-			$this->data['host_inventory'][$field] = '';
-		}
-
-		if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
-			$fieldInput = new CTextArea('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
-			$fieldInput->addStyle('width: 64em;');
-		}
-		else {
-			$fieldLength = $hostInventoryTable['fields'][$field]['length'];
-			$fieldInput = new CTextBox('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
-			$fieldInput->setAttribute('maxlength', $fieldLength);
-			$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
-		}
-
-		$inventoryFormList->addRow(
-			array(
-				$fieldInfo['title'],
-				SPACE,
-				new CVisibilityBox(
-					'visible['.$field.']',
-					isset($this->data['visible'][$field]),
-					'host_inventory['.$field.']',
-					_('Original')
-				)
-			),
-			$fieldInput
-		);
+foreach ($this->data['inventories'] as $field => $fieldInfo) {
+	if (!isset($this->data['host_inventory'][$field])) {
+		$this->data['host_inventory'][$field] = '';
 	}
+
+	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
+		$fieldInput = new CTextArea('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
+		$fieldInput->addStyle('width: 64em;');
+	}
+	else {
+		$fieldLength = $hostInventoryTable['fields'][$field]['length'];
+		$fieldInput = new CTextBox('host_inventory['.$field.']', $this->data['host_inventory'][$field]);
+		$fieldInput->setAttribute('maxlength', $fieldLength);
+		$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+	}
+
+	$inventoryFormList->addRow(
+		array(
+			$fieldInfo['title'],
+			SPACE,
+			new CVisibilityBox(
+				'visible['.$field.']',
+				isset($this->data['visible'][$field]),
+				'host_inventory['.$field.']',
+				_('Original')
+			)
+		),
+		$fieldInput, false, null, 'formrow-inventory'
+	);
 }
 
 // append tabs to form

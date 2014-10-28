@@ -425,7 +425,9 @@ class CHttpTest extends CApiService {
 
 			info(_s('Deleted: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $host['host']));
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-				'Web scenario "'.$httpTest['name'].'" "'.$httpTest['httptestid'].'" host "'.$host['host'].'".');
+				_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
+				_('Host').' ['.$host['name'].']'
+			);
 		}
 
 		return array('httptestids' => $httpTestIds);

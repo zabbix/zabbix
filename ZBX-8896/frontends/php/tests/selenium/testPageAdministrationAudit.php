@@ -52,7 +52,7 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_MEDIA_TYPE => 'Media type',
 		AUDIT_RESOURCE_PROXY => 'Proxy',
 		AUDIT_RESOURCE_REGEXP => 'Regular expression',
-		AUDIT_RESOURCE_SCENARIO => 'Scenario',
+		AUDIT_RESOURCE_SCENARIO => 'Web scenario',
 		AUDIT_RESOURCE_SCREEN => 'Screen',
 		AUDIT_RESOURCE_SCRIPT => 'Script',
 		AUDIT_RESOURCE_SLIDESHOW => 'Slide show',

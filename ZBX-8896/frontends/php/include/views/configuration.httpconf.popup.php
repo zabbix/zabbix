@@ -100,7 +100,7 @@ else {
 
 	// append tabs to form
 	$httpPopupTab = new CTabView();
-	$httpPopupTab->addTab('scenarioStepTab', _('Step of scenario'), $httpPopupFormList);
+	$httpPopupTab->addTab('scenarioStepTab', _('Step of web scenario'), $httpPopupFormList);
 	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
