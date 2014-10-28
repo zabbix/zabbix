@@ -1544,7 +1544,7 @@ class CXmlImport18 {
 						// we must know interface ids to assign them to items
 						$agent_interface_id = null;
 						$ipmi_interface_id = null;
-						$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+						$snmp_interfaces = array(); // hash 'port' => 'interfaceid'
 
 						foreach ($interfaces as $interface) {
 							switch ($interface['type']) {
