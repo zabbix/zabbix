@@ -107,12 +107,12 @@ static void	__snmpidx_mapping_clean(void *data)
 
 static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
 {
-	const char			*__function_name = "cache_get_snmp_index";
+	const char		*__function_name = "cache_get_snmp_index";
 
-	int				ret = FAIL;
-	zbx_snmpidx_main_key_t		*main_key, main_key_local;
-	zbx_snmpidx_mapping_t		*mapping;
-	size_t				idx_offset = 0;
+	int			ret = FAIL;
+	zbx_snmpidx_main_key_t	*main_key, main_key_local;
+	zbx_snmpidx_mapping_t	*mapping;
+	size_t			idx_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s'", __function_name, oid, value);
 
@@ -140,10 +140,10 @@ end:
 
 static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, const char *idx)
 {
-	const char			*__function_name = "cache_put_snmp_index";
+	const char		*__function_name = "cache_put_snmp_index";
 
-	zbx_snmpidx_main_key_t		*main_key, main_key_local;
-	zbx_snmpidx_mapping_t		*mapping, mapping_local;
+	zbx_snmpidx_main_key_t	*main_key, main_key_local;
+	zbx_snmpidx_mapping_t	*mapping, mapping_local;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s' idx:'%s'", __function_name, oid, value, idx);
 
@@ -189,9 +189,9 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 {
-	const char			*__function_name = "cache_del_snmp_index_subtree";
+	const char		*__function_name = "cache_del_snmp_index_subtree";
 
-	zbx_snmpidx_main_key_t		*main_key, main_key_local;
+	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s'", __function_name, oid);
 
