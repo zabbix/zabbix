@@ -73,10 +73,43 @@ $filterTable->addRow(array(
 			SPACE,
 			bold(_('EPP'))
 		), 'checkbox-block'),
-		new CButton('checkAll', _('All/Any'), null, 'link_menu checkbox-block'),
+		new CButton('checkAllServices', _('All/Any'), null, 'link_menu checkbox-block'),
 		new CSpan(array(SPACE, bold(_('Exceeding or equal to')), ':'.SPACE, $filterValue), 'select-block'),
 	)),
 	array(array(bold(_('Current status')), ':'.SPACE), $filterStatus)
+));
+
+$filterTable->addRow(array(
+	'',
+	array(array(
+		array(
+			new CCheckBox('filter_cctld_group',
+				isset($this->data['filter_cctld_group']) ? $this->data['filter_cctld_group'] : null, null, 1
+			),
+			SPACE,
+			bold(_('ccTLDs')),
+		),
+		new CSpan(array(new CCheckBox('filter_gtld_group',
+				isset($this->data['filter_gtld_group']) ? $this->data['filter_gtld_group'] : null, null, 1
+			),
+			SPACE,
+			bold(_('gTLDs'))
+		), 'checkbox-block'),
+		new CSpan(array(new CCheckBox('filter_othertld_group',
+				isset($this->data['filter_othertld_group']) ? $this->data['filter_othertld_group'] : null, null, 1
+			),
+			SPACE,
+			bold(_('otherTLDs'))
+		), 'checkbox-block'),
+		new CSpan(array(new CCheckBox('filter_test_group',
+				isset($this->data['filter_test_group']) ? $this->data['filter_test_group'] : null, null, 1
+			),
+			SPACE,
+			bold(_('testTLDs'))
+		), 'checkbox-block'),
+		new CButton('checkAllGroups', _('All/Any'), null, 'link_menu checkbox-block')
+	)),
+	''
 ));
 
 $filter = new CButton('filter', _('Filter'), "submit();");
@@ -94,13 +127,15 @@ $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addItem($filterTable);
-$filterForm->addVar('checkallvalue', 0);
+$filterForm->addVar('checkAllServicesValue', 0);
+$filterForm->addVar('checkAllGroupsValue', 0);
 $filterForm->addVar('filter_set', 1);
 $rsmWidget->addFlicker($filterForm, CProfile::get('web.rsm.rollingweekstatus.filter.state', 0));
 
 $table = new CTableInfo(_('No TLD\'s found.'));
 $table->setHeader(array(
 	make_sorting_header(_('TLD'), 'name'),
+	make_sorting_header(_('Type'), 'type'),
 	make_sorting_header(_('DNS (4Hrs)') , 'dns'),
 	make_sorting_header(_('DNSSEC (4Hrs)'), 'dnssec'),
 	make_sorting_header(_('RDDS (24Hrs)'), 'rdds'),
@@ -278,6 +313,7 @@ if (isset($this->data['tld'])) {
 		}
 		$row = array(
 			$tld['name'],
+			$tld['type'],
 			$dns,
 			$dnssec,
 			$rdds,

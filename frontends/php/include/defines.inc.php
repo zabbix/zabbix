@@ -1023,6 +1023,15 @@ define('MONTHLY_REPORTS_EPP_UPDATE',		'rsm.slv.epp.rtt.update.month');
 // SLA monitoring "rsm" host name
 define('RSM_HOST',	'rsm');
 
+// SLA monitoring TLDs group
+define('RSM_TLDS_GROUP',	'TLDs');
+
+// TLD types
+define('RSM_CC_TLD_GROUP',		'ccTLDs');
+define('RSM_G_TLD_GROUP',		'gTLDs');
+define('RSM_OTHER_TLD_GROUP',	'otherTLDs');
+define('RSM_TEST_GROUP',		'testTLDs');
+
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
