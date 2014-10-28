@@ -48,7 +48,7 @@ use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api
 use TLDs;
 
 sub create_global_macros;
-sub create_tld_host($$$);
+sub create_tld_host($$$$);
 sub create_probe_health_tmpl;
 sub manage_tld_objects($$$$$);
 sub manage_tld_hosts($$);
@@ -63,11 +63,12 @@ my ($rsm_groupid, $rsm_hostid);
 
 my ($ns_servers, $root_servers_macros);
 
-my ($main_templateid, $tld_groupid, $tlds_groupid, $tld_hostid, $probes_groupid, $probes_mon_groupid, $proxy_mon_templateid);
+my ($main_templateid, $tld_groupid, $tld_type_groupid, $tlds_groupid, $tld_hostid, $probes_groupid, $probes_mon_groupid, $proxy_mon_templateid);
 
 my %OPTS;
 my $rv = GetOptions(\%OPTS,
 		    "tld=s",
+		    "type=s",
 		    "delete!",
 		    "disable!",
 		    "rdds43-servers=s",
@@ -200,7 +201,11 @@ $tlds_groupid = create_group('TLDs');
 
 pfail $tlds_groupid->{'data'} if check_api_error($tlds_groupid) eq true;
 
-$tld_hostid = create_tld_host($OPTS{'tld'}, $tld_groupid, $tlds_groupid);
+$tld_type_groupid = create_group($OPTS{'type'});
+
+pfail $tld_type_groupid->{'data'} if check_api_error($tld_type_groupid) eq true;
+
+$tld_hostid = create_tld_host($OPTS{'tld'}, $tld_groupid, $tlds_groupid, $tld_type_groupid);
 
 $probes_groupid = create_group('Probes');
 
@@ -1368,7 +1373,8 @@ Required options
                 domain test prefix for DNS monitoring (specify '*randomtld*' for root servers monitoring)
 
 Other options
-
+        --type=STRING
+                Type of TLD. Possible values: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]}, @{[TLD_TYPE_TEST]}.
         --ipv4
                 enable IPv4
 		(default: disabled)
@@ -1434,12 +1440,15 @@ sub validate_input {
     return if (defined($OPTS{'only-cron'}));
 
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
+    $msg .= "type (--type) of TLD must be specified: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]} or @{[TLD_TYPE_TEST]}\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and (!defined($OPTS{'type'}) or
+										($OPTS{'type'} ne TLD_TYPE_G and $OPTS{'type'} ne TLD_TYPE_CC and $OPTS{'type'} ne TLD_TYPE_OTHER and $OPTS{'type'} ne TLD_TYPE_TEST)));
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'}));
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
 									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
+
     if ($OPTS{'epp-servers'}) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
 	$msg .= "EPP Client certificate file must be specified (--epp-cert)\n" unless ($OPTS{'epp-cert'});
@@ -1541,12 +1550,13 @@ sub create_global_macros() {
     create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef); # For finding unreachable probes. Probes are considered unreachable if last access time is over this limit of seconds.
 }
 
-sub create_tld_host($$$) {
+sub create_tld_host($$$$) {
     my $tld_name = shift;
     my $tld_groupid = shift;
     my $tlds_groupid = shift;
+    my $tld_type_groupid = shift;
 
-    my $tld_hostid = create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $tlds_groupid}],
+    my $tld_hostid = create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $tlds_groupid}, {'groupid' => $tld_type_groupid}],
                               'host' => $tld_name,
                               'interfaces' => [{'type' => INTERFACE_TYPE_AGENT, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
