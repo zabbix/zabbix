@@ -482,7 +482,6 @@ jQuery(function($) {
 				var popupButton = $('<button>', {
 					type: 'button',
 					'class': 'button button-form',
-					value: options.labels['Select'],
 					text: options.labels['Select']
 				});
 
