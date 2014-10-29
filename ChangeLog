@@ -9,7 +9,6 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-8780] Removed hover effect from readonly and disabled fields (arvids)
-..F....... [ZBX-8901] added ability to use scientific notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes (arvids)
 ..F....... [ZBX-8844] fixed testing LDAP authentication (Krists)
 ..F.I..... [ZBX-8851] added "-1" and "0" as allowed values for "max_execution_time" and "max_input_time" PHP configuration settings (Krists)
 A.F....... [ZBX-8720] fixed resolving of macros in graph names when graph name contains strings similar to macros (Krists)
