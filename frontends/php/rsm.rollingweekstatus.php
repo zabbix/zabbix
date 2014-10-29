@@ -284,9 +284,9 @@ if ($notEmptyResult) {
 
 		foreach ($hostGroups as $hostGroup) {
 			foreach ($hostGroup['hosts'] as $hostsArray) {
-				$tlds[$hostsArray['hostid']]['groups'] = array(array(
+				$tlds[$hostsArray['hostid']]['groups'][] = array(
 					'name' => $hostGroup['name']
-				));
+				);
 			}
 		}
 	}
