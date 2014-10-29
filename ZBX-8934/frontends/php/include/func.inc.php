@@ -661,14 +661,14 @@ function convert_units($options = array()) {
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
 			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
-			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
-			array('pow' => 3, 'short' => _x('G', 'Giga short'), 'long' => _('Giga')),
-			array('pow' => 4, 'short' => _x('T', 'Tera short'), 'long' => _('Tera')),
-			array('pow' => 5, 'short' => _x('P', 'Peta short'), 'long' => _('Peta')),
-			array('pow' => 6, 'short' => _x('E', 'Exa short'), 'long' => _('Exa')),
-			array('pow' => 7, 'short' => _x('Z', 'Zetta short'), 'long' => _('Zetta')),
-			array('pow' => 8, 'short' => _x('Y', 'Yotta short'), 'long' => _('Yotta'))
+			array('pow' => 1, 'short' => 'K', 'long' => _('Kilo')),
+			array('pow' => 2, 'short' => 'M', 'long' => _('Mega')),
+			array('pow' => 3, 'short' => 'G', 'long' => _('Giga')),
+			array('pow' => 4, 'short' => 'T', 'long' => _('Tera')),
+			array('pow' => 5, 'short' => 'P', 'long' => _('Peta')),
+			array('pow' => 6, 'short' => 'E', 'long' => _('Exa')),
+			array('pow' => 7, 'short' => 'Z', 'long' => _('Zetta')),
+			array('pow' => 8, 'short' => 'Y', 'long' => _('Yotta'))
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
