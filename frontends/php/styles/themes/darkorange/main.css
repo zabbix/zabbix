@@ -444,7 +444,7 @@ select[disabled]::-ms-value {
 
 select[disabled] option { background-color: #2f2f2f; }
 
-.input.link_menu[disabled], .input.link_menu[disabled]:focus, .input.link_menu[disabled]:hover {
+.input.link_menu[disabled], .input.link_menu[disabled]:hover {
 	background-color: transparent;
 }
 
