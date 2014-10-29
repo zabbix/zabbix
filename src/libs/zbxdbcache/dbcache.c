@@ -1266,7 +1266,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	DCadd_update_inventory_sql(&sql_offset, &inventory_values);
 
-	zbx_vector_ptr_clean(&inventory_values, (zbx_mem_free_func_t)DCinventory_value_free);
+	zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 	zbx_vector_ptr_destroy(&inventory_values);
 
 	/* disable processing of deleted and disabled items by setting value_null */

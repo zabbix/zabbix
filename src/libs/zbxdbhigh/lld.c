@@ -109,7 +109,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 static void	lld_filter_clean(lld_filter_t *filter)
 {
 	zbx_free(filter->expression);
-	zbx_vector_ptr_clean(&filter->conditions, (zbx_mem_free_func_t)lld_condition_free);
+	zbx_vector_ptr_clear_ext(&filter->conditions, (zbx_clean_func_t)lld_condition_free);
 	zbx_vector_ptr_destroy(&filter->conditions);
 }
 
@@ -473,7 +473,7 @@ static void	lld_item_link_free(zbx_lld_item_link_t *item_link)
 
 static void	lld_row_free(zbx_lld_row_t *lld_row)
 {
-	zbx_vector_ptr_clean(&lld_row->item_links, (zbx_mem_free_func_t)lld_item_link_free);
+	zbx_vector_ptr_clear_ext(&lld_row->item_links, (zbx_clean_func_t)lld_item_link_free);
 	zbx_vector_ptr_destroy(&lld_row->item_links);
 	zbx_free(lld_row);
 }
@@ -602,7 +602,7 @@ clean:
 
 	lld_filter_clean(&filter);
 
-	zbx_vector_ptr_clean(&lld_rows, (zbx_mem_free_func_t)lld_row_free);
+	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

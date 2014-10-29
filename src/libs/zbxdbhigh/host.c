@@ -2337,7 +2337,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zbx_vector_ptr_clean(&applications, (zbx_mem_free_func_t)zbx_application_clean);
+	zbx_vector_ptr_clear_ext(&applications, (zbx_clean_func_t)zbx_application_clean);
 	zbx_vector_ptr_destroy(&applications);
 	zbx_free(sql);
 

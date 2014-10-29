@@ -63,13 +63,7 @@ void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
 														\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)					\
 {														\
-	if (NULL != vector->values)										\
-	{													\
-		vector->mem_free_func(vector->values);								\
-		vector->values = NULL;										\
-		vector->values_num = 0;										\
-		vector->values_alloc = 0;									\
-	}													\
+	zbx_vector_ ## __id ## _clear(vector);									\
 														\
 	vector->mem_malloc_func = NULL;										\
 	vector->mem_realloc_func = NULL;									\
@@ -196,7 +190,7 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, const __t
 	return FAIL;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, const __type value,				\
+int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, const __type value,			\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	index;												\
@@ -223,6 +217,29 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	if (NULL != vector->values)										\
 	{													\
+		vector->mem_free_func(vector->values);								\
+		vector->values = NULL;										\
+		vector->values_num = 0;										\
+		vector->values_alloc = 0;									\
+	}													\
+}
+
+#define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
+														\
+ZBX_VECTOR_IMPL(__id, __type);											\
+														\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func)	\
+{														\
+	if (NULL != vector->values)										\
+	{													\
+		if (NULL != clean_func)										\
+		{												\
+			int	index;										\
+														\
+			for (index = 0; index < vector->values_num; index++)					\
+				clean_func(vector->values[index]);						\
+		}												\
+														\
 		vector->mem_free_func(vector->values);								\
 		vector->values = NULL;										\
 		vector->values_num = 0;										\
