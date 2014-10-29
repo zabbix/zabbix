@@ -1053,7 +1053,7 @@ class CItem extends CItemGeneral {
 			$interfaces = API::HostInterface()->get(array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectInterfaces'],
-				'intefaceids' => $relationMap->getRelatedIds(),
+				'interfaceids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
