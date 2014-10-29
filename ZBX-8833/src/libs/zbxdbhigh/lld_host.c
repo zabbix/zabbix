@@ -111,9 +111,9 @@ static void	lld_host_free(zbx_lld_host_t *host)
 	zbx_vector_uint64_destroy(&host->new_groupids);
 	zbx_vector_uint64_destroy(&host->lnk_templateids);
 	zbx_vector_uint64_destroy(&host->del_templateids);
-	zbx_vector_ptr_clean(&host->new_hostmacros, (zbx_mem_free_func_t)lld_hostmacro_free);
+	zbx_vector_ptr_clear_ext(&host->new_hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 	zbx_vector_ptr_destroy(&host->new_hostmacros);
-	zbx_vector_ptr_clean(&host->interfaces, (zbx_mem_free_func_t)lld_interface_free);
+	zbx_vector_ptr_clear_ext(&host->interfaces, (zbx_clean_func_t)lld_interface_free);
 	zbx_vector_ptr_destroy(&host->interfaces);
 	zbx_free(host->host_proto);
 	zbx_free(host->host);
@@ -155,7 +155,7 @@ zbx_lld_group_t;
 
 static void	lld_group_free(zbx_lld_group_t *group)
 {
-	/* zbx_vector_ptr_clean(&group->hosts, (zbx_mem_free_func_t)lld_host_free); is not missing here */
+	/* zbx_vector_ptr_clear_ext(&group->hosts, (zbx_clean_func_t)lld_host_free); is not missing here */
 	zbx_vector_ptr_destroy(&group->hosts);
 	zbx_free(group->name_proto);
 	zbx_free(group->name);
@@ -2798,9 +2798,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 		lld_hosts_remove(&hosts, lifetime, lastcheck);
 		lld_groups_remove(&groups, lifetime, lastcheck);
 
-		zbx_vector_ptr_clean(&groups, (zbx_mem_free_func_t)lld_group_free);
-		zbx_vector_ptr_clean(&group_prototypes, (zbx_mem_free_func_t)lld_group_prototype_free);
-		zbx_vector_ptr_clean(&hosts, (zbx_mem_free_func_t)lld_host_free);
+		zbx_vector_ptr_clear_ext(&groups, (zbx_clean_func_t)lld_group_free);
+		zbx_vector_ptr_clear_ext(&group_prototypes, (zbx_clean_func_t)lld_group_prototype_free);
+		zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)lld_host_free);
 
 		groupids.values_num = 0;
 		del_hostgroupids.values_num = 0;
@@ -2808,8 +2808,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 	}
 	DBfree_result(result);
 
-	zbx_vector_ptr_clean(&hostmacros, (zbx_mem_free_func_t)lld_hostmacro_free);
-	zbx_vector_ptr_clean(&interfaces, (zbx_mem_free_func_t)lld_interface_free);
+	zbx_vector_ptr_clear_ext(&hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
+	zbx_vector_ptr_clear_ext(&interfaces, (zbx_clean_func_t)lld_interface_free);
 
 	zbx_vector_ptr_destroy(&hostmacros);
 	zbx_vector_ptr_destroy(&interfaces);
