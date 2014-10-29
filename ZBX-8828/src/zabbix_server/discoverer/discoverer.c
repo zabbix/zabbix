@@ -110,7 +110,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
-	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
+	char		key[MAX_STRING_LEN];
 	const char	*service = NULL;
 	AGENT_RESULT 	result;
 	DC_ITEM		item;
@@ -287,7 +287,9 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
-				if (SUCCEED != do_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
+				do_ping(&host, 1, 3, 0, 0, 0);
+
+				if (SUCCEED !=host.status || 0 == host.rcv)
 					ret = FAIL;
 
 				zbx_free(host.addr);

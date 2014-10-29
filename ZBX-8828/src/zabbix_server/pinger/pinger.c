@@ -118,7 +118,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
-		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
+		int hosts_count, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "process_values";
 	int		i, h;
@@ -129,9 +129,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 
 	for (h = 0; h < hosts_count; h++)
 	{
-		if (NOTSUPPORTED == ping_result)
-			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] %s",
-					hosts[h].addr, error);
+		if (NOTSUPPORTED == hosts[h].status)
+			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] %s", hosts[h].addr, hosts[h].error);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] cnt=%d rcv=%d min/max/avg=" ZBX_FS_DBL "/" ZBX_FS_DBL "/" ZBX_FS_DBL,
 					hosts[h].addr, hosts[h].cnt, hosts[h].rcv, hosts[h].min, hosts[h].max, hosts[h].avg);
@@ -144,7 +143,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 				{
 					case ICMPPING:
 						value_uint64 = hosts[h].rcv ? 1 : 0;
-						process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
+						process_value(items[i].itemid, &value_uint64, NULL, ts, hosts[h].status, hosts[h].error);
 						break;
 					case ICMPPINGSEC:
 						switch (items[i].type)
@@ -159,14 +158,14 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 								value_dbl = hosts[h].avg;
 								break;
 						}
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, hosts[h].status, hosts[h].error);
 						break;
 					case ICMPPINGLOSS:
 						if (0 == hosts[h].cnt)
-							value_dbl = 0;
+							value_dbl = 100;
 						else
 							value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, hosts[h].status, hosts[h].error);
 						break;
 				}
 			}
@@ -480,8 +479,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
 	const char		*__function_name = "process_pinger_hosts";
-	int			i, first_index = 0, ping_result;
-	char			error[ITEM_ERROR_LEN_MAX];
+	int			i, first_index = 0;
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
@@ -503,11 +501,9 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 
 			zbx_timespec(&ts);
 
-			ping_result = do_ping(hosts, hosts_count,
-						items[i].count, items[i].interval, items[i].size, items[i].timeout,
-						error, sizeof(error));
+			do_ping(hosts, hosts_count, items[i].count, items[i].interval, items[i].size, items[i].timeout);
 
-			process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
+			process_values(items, first_index, i + 1, hosts, hosts_count, &ts);
 
 			hosts_count = 0;
 			first_index = i + 1;
