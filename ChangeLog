@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8901] added ability to use science notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
 A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
