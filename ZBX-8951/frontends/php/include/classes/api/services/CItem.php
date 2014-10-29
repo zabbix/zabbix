@@ -1001,7 +1001,7 @@ class CItem extends CItemGeneral {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'interfaceid');
 			$interfaces = API::HostInterface()->get(array(
 				'output' => $options['selectInterfaces'],
-				'intefaceids' => $relationMap->getRelatedIds(),
+				'interfaceids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
