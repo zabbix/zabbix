@@ -112,8 +112,8 @@ static void	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int 
 		{
 			if (FAIL == is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
 			{
-				zbx_snprintf(error, sizeof(error),
-					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
+				zbx_snprintf(error, sizeof(error), "You should enable IPv6 support to use IPv6 family"
+						" address for SourceIP '%s'.",CONFIG_SOURCE_IP);
 				fping_status = FAIL;
 				goto error;
 			}
@@ -126,8 +126,8 @@ static void	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int 
 	{
 		if (0 == (fping_existence & FPING_EXISTS))
 		{
-			zbx_snprintf(error, sizeof(error), "At least one of '%s', '%s' must exist. Both are missing in the system.",
-					CONFIG_FPING_LOCATION,
+			zbx_snprintf(error, sizeof(error), "At least one of '%s', '%s' must exist."
+					" Both are missing in the system.", CONFIG_FPING_LOCATION,
 					CONFIG_FPING6_LOCATION);
 			fping_status = FAIL;
 			goto error;
