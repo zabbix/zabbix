@@ -418,14 +418,14 @@ function str2mem($val) {
 }
 
 function mem2str($size) {
-	$prefix = _x('B', 'Byte short');
+	$prefix = 'B';
 	if ($size > 1048576) {
 		$size = $size / 1048576;
-		$prefix = _x('M', 'Mega short');
+		$prefix = 'M';
 	}
 	elseif ($size > 1024) {
 		$size = $size / 1024;
-		$prefix = _x('K', 'Kilo short');
+		$prefix = 'K';
 	}
 
 	return round($size, 6).$prefix;
