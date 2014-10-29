@@ -471,7 +471,7 @@ table.filter.sub-filter tr td:first-child { width: 8%; }
 /* old-style filter */
 .old-filter .form_row_l { text-align: right; }
 .old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
-.old-filter .button-form { height: 16px; vertical-align: middle; }
+.old-filter .button-form { height: 16px; vertical-align: baseline; }
 
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }
