@@ -426,33 +426,48 @@ class CApplicationManager {
 	 * @return array with applications, existing apps have 'applicationid' key.
 	 */
 	protected function prepareInheritedApps(array $applications, array $hostsTemplatesMap, array $hostApps) {
-		$result = array();
+		/* This variable holds array of working copies of results, indexed first by host ID (hence pre-filling
+		with host IDs from $hostApps as keys and empty arrays as values), and then by application name. For each
+		host ID / application name pair there is only 1 array with application data with key "applicationTemplates"
+		getting updated if application with same name is inherited from more than one template. In the end this
+		variable gets looped through and plain result array is constructed. */
+		$newApplications = array_fill_keys(array_keys($hostApps), array());
+
 		foreach ($applications as $application) {
 			$appId = $application['applicationid'];
 			foreach ($hostApps as $hostId => $hostApp) {
-				// if application template is not linked to host we skip it
+				// If application template is not linked to host we skip it.
 				if (!isset($hostsTemplatesMap[$hostId][$application['hostid']])) {
 					continue;
 				}
 
+				if (!isset($newApplications[$hostId][$application['name']])) {
+					$newApplication = array(
+						'name' => $application['name'],
+						'hostid' => $hostId,
+						'applicationTemplates' => array()
+					);
+				}
+				else {
+					$newApplication = $newApplications[$hostId][$application['name']];
+				}
+
 				$exApplication = null;
 
-				// look for an application with the same name, it one exists - link the parent app to it
+				// Look for an application with the same name, if one exists - link the parent app to it.
 				if (isset($hostApp['byName'][$application['name']])) {
 					$exApplication = $hostApp['byName'][$application['name']];
 				}
-				// if no application with the same name exists, look for a child app via templateid
-				// use it only if it has only one parent, otherwise a new app must be created
+				// If no application with the same name exists, look for a child app via templateid.
+				// Use it only if it has only one parent, otherwise a new app must be created.
 				elseif (isset($hostApp['byTemplateId'][$appId]) && count($hostApp['byTemplateId'][$appId]['applicationTemplates']) == 1) {
 					$exApplication = $hostApp['byTemplateId'][$appId];
 				}
 
-				$newApplication = $application;
-				$newApplication['hostid'] = $hostId;
 				if ($exApplication) {
 					$newApplication['applicationid'] = $exApplication['applicationid'];
 
-					// add the new template link to an existing child applications if it's not present yet
+					// Add the new template link to an existing child applications if it's not present yet.
 					$exApplicationTemplates = isset($exApplication['applicationTemplates']) ? $exApplication['applicationTemplates'] : array();
 					$newApplication['applicationTemplates'] = $exApplicationTemplates;
 					if (!in_array($appId, zbx_objectValues($newApplication['applicationTemplates'], 'templateid'))) {
@@ -462,13 +477,19 @@ class CApplicationManager {
 						);
 					}
 				}
-				// if no matching child app exists - create a new one
+				// If no matching child application exists - add a new one.
 				else {
-					$newApplication['applicationTemplates'] = array(array(
-						'templateid' => $appId
-					));
-					unset($newApplication['applicationid']);
+					$newApplication['applicationTemplates'][] = array('templateid' => $appId);
 				}
+
+				// Store new (or updated) application data so it can be reused.
+				$newApplications[$hostId][$application['name']] = $newApplication;
+			}
+		}
+
+		$result = array();
+		foreach ($newApplications as $hostId => $newApplicationsPerHost) {
+			foreach ($newApplicationsPerHost as $newApplication) {
 				$result[] = $newApplication;
 			}
 		}
