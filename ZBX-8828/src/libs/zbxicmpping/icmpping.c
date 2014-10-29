@@ -237,7 +237,7 @@ static void	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int 
 		goto error;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", filename);
+	zabbix_log(LOG_LEVEL_DEBUG, "filename: %s", filename);
 
 	for (i = 0; i < hosts_count; i++)
 	{
@@ -247,7 +247,7 @@ static void	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int 
 
 	fclose(f);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
+	zabbix_log(LOG_LEVEL_DEBUG, "command: %s", tmp);
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
