@@ -8,7 +8,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-..F....... [ZBX-8901] added ability to use sciense notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes
+..F....... [ZBX-8901] added ability to use scientific notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes (arvids)
 ..F....... [ZBX-8844] fixed testing LDAP authentication (Krists)
 ..F.I..... [ZBX-8851] added "-1" and "0" as allowed values for "max_execution_time" and "max_input_time" PHP configuration settings (Krists)
 A.F....... [ZBX-8720] fixed resolving of macros in graph names when graph name contains strings similar to macros (Krists)
@@ -41,7 +41,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 
 Bug fixes:
 ...G...... [ZBX-8961] fixed agent crash on HP-UX 11.31 when processing "net.if.discovery" item (asaveljevs, wiper)
-..F....... [ZBX-8901] added ability to use sciense notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes
+..F....... [ZBX-8901] added ability to use scientific notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes (arvids)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
 A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
