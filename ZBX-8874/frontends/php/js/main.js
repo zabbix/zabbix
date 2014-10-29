@@ -1058,12 +1058,14 @@ jQuery(function ($) {
 	 * - submitButtonSelector	- selector that is used to get default button element in form
 	 *
 	 * @param options
+	 *
+	 * @return object
 	 */
 	$.fn.enterSubmit = function (options) {
 		options = $.extend({}, options);
 
 		if (options.submitButtonSelector == null) {
-			return;
+			return this;
 		}
 
 		// Take only form elements.
