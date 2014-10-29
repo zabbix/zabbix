@@ -139,7 +139,7 @@ a.weight_normal { font-weight: normal; }
 .parent-discovery, a.parent-discovery, a.parent-discovery:hover	{ color: #999900; }
 
 /* buttons */
-.button { height: auto; cursor: pointer; }
+.button { height: auto; line-height: normal; cursor: pointer; }
 .button:disabled { cursor: default; }
 
 .button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
@@ -161,9 +161,7 @@ form { margin: 0; }
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
 }
 .input, .button-form { margin: 0 2px 0 0; height: 12px; }
-.button-form { vertical-align: top; margin-bottom: 1px; height: 20px;
-	padding-top: 2px; padding-bottom: 2px;
-}
+.button-form { vertical-align: top; height: 20px; }
 .input option { color: #000000; }
 .select {
 	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;
@@ -453,7 +451,7 @@ table.requirements select { width: 152px; }
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; }
 table.filter tr td {
-	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
+	height: 26px; vertical-align: middle; border-left: 0 !important;
 	padding: 0 2px 0 6px;
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
