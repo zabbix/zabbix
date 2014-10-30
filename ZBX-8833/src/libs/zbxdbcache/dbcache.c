@@ -1218,7 +1218,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DCconfig_get_items_by_itemids(items, ids.values, errcodes, history_num);
 	DCget_delta_items(&delta_history, &ids);
 
-	ids.values_num = 0;	/* item ids that are not disabled and not deleted in DB */
+	zbx_vector_uint64_clear(&ids);	/* item ids that are not disabled and not deleted in DB */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 

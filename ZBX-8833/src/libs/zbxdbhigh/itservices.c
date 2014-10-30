@@ -328,7 +328,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.servicedownid", serviceids->values,
 			serviceids->values_num);
 
-	serviceids->values_num = 0;
+	zbx_vector_uint64_clear(serviceids);
 
 	result = DBselect("%s", sql);
 

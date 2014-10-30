@@ -2596,7 +2596,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 
 	/* select list of templates which already linked to host prototypes */
 
-	hostids.values_num = 0;
+	zbx_vector_uint64_clear(&hostids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -2727,7 +2727,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 
 	/* select list of group prototypes which already linked to host prototypes */
 
-	hostids.values_num = 0;
+	zbx_vector_uint64_clear(&hostids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
