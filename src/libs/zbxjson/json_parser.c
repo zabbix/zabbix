@@ -113,7 +113,7 @@ static int	json_parse_string(const char *start, char **error)
 					/* check if the \u is followed with 4 hex digits */
 					for (i = 0; i < 4; i++)
 					{
-						if (0 == isxdigit(*(++ptr)))
+						if (0 == isxdigit((unsigned char)*(++ptr)))
 						{
 							return json_error("invalid escape sequence in string",
 									escape_start, error);
@@ -128,7 +128,7 @@ static int	json_parse_string(const char *start, char **error)
 		}
 
 		/* found control character in string, failing */
-		if (0 != iscntrl(*ptr))
+		if (0 != iscntrl((unsigned char)*ptr))
 			return json_error("invalid control character in string data", ptr, error);
 
 		ptr++;
@@ -221,7 +221,7 @@ static int	json_parse_number(const char *start, char **error)
 				break;
 			point = 1;
 		}
-		else if (0 == isdigit(*ptr))
+		else if (0 == isdigit((unsigned char)*ptr))
 			break;
 
 		ptr++;
@@ -248,12 +248,12 @@ static int	json_parse_number(const char *start, char **error)
 				return json_error("unexpected end of numeric value", NULL, error);
 		}
 
-		if (0 == isdigit(*ptr))
+		if (0 == isdigit((unsigned char)*ptr))
 			return json_error("invalid power value of number in E notation", ptr, error);
 
 		while ('\0' != *(++ptr))
 		{
-			if (0 == isdigit(*ptr))
+			if (0 == isdigit((unsigned char)*ptr))
 				break;
 		}
 	}
