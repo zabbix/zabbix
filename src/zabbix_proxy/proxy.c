@@ -595,7 +595,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
 #else
 #	define SNMP_FEATURE_STATUS 	" NO"
@@ -738,7 +738,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_POLLER_FORKS))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		init_snmp("zabbix_proxy");
 #endif
 
@@ -748,7 +748,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_UNREACHABLE_POLLER_FORKS))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		init_snmp("zabbix_proxy");
 #endif
 
@@ -782,7 +782,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (proxy_num <= (proxy_count += CONFIG_DISCOVERER_FORKS))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		init_snmp("zabbix_proxy");
 #endif
 
