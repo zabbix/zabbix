@@ -63,7 +63,13 @@ void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
 														\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)					\
 {														\
-	zbx_vector_ ## __id ## _clear(vector);									\
+	if (NULL != vector->values)										\
+	{													\
+		vector->mem_free_func(vector->values);								\
+		vector->values = NULL;										\
+		vector->values_num = 0;										\
+		vector->values_alloc = 0;									\
+	}													\
 														\
 	vector->mem_malloc_func = NULL;										\
 	vector->mem_realloc_func = NULL;									\
@@ -215,13 +221,7 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 														\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
-	if (NULL != vector->values)										\
-	{													\
-		vector->mem_free_func(vector->values);								\
-		vector->values = NULL;										\
-		vector->values_num = 0;										\
-		vector->values_alloc = 0;									\
-	}													\
+	vector->values_num = 0;											\
 }
 
 #define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
@@ -230,20 +230,14 @@ ZBX_VECTOR_IMPL(__id, __type);											\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func)	\
 {														\
-	if (NULL != vector->values)										\
+	if (0 != vector->values_num)										\
 	{													\
-		if (NULL != clean_func)										\
-		{												\
-			int	index;										\
+		int	index;											\
 														\
-			for (index = 0; index < vector->values_num; index++)					\
-				clean_func(vector->values[index]);						\
-		}												\
+		for (index = 0; index < vector->values_num; index++)						\
+			clean_func(vector->values[index]);							\
 														\
-		vector->mem_free_func(vector->values);								\
-		vector->values = NULL;										\
 		vector->values_num = 0;										\
-		vector->values_alloc = 0;									\
 	}													\
 }
 
