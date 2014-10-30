@@ -40,6 +40,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
 ...G...... [ZBX-8951] fixed agent crash on HP-UX 11.31 when processing "net.if.discovery" item (asaveljevs, wiper)
 ..F....... [ZBX-8901] added ability to use scientific notation and floats without leading 0 to Configuration -> Hosts -> Discovery -> Item Prototypes (arvids)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
@@ -495,6 +496,7 @@ Changes for 2.2.8rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces, optimized cache performance (asaveljevs)
 A.F....... [ZBX-8904] fixed item.get API to not read all host interfaces when option "selectInterfaces" is used (Krists)
