@@ -2588,7 +2588,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 
 	/* validate interfaces which should be deleted */
 
-	interfaceids.values_num = 0;
+	zbx_vector_uint64_clear(&interfaceids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -2802,9 +2802,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 		zbx_vector_ptr_clear_ext(&group_prototypes, (zbx_clean_func_t)lld_group_prototype_free);
 		zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)lld_host_free);
 
-		groupids.values_num = 0;
-		del_hostgroupids.values_num = 0;
-		del_hostmacroids.values_num = 0;
+		zbx_vector_uint64_clear(&groupids);
+		zbx_vector_uint64_clear(&del_hostgroupids);
+		zbx_vector_uint64_clear(&del_hostmacroids);
 	}
 	DBfree_result(result);
 

@@ -96,7 +96,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
 {
-	int i;
+	int	i;
 
 	for (i = 0; i < httptest->macros.values_num; i++)
 	{
@@ -105,7 +105,8 @@ static void	httptest_remove_macros(zbx_httptest_t *httptest)
 		zbx_free(pair->first);
 		zbx_free(pair->second);
 	}
-	httptest->macros.values_num = 0;
+
+	zbx_vector_ptr_pair_clear(&httptest->macros);
 }
 
 static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, double speed_download,
