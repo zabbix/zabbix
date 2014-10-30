@@ -1295,6 +1295,7 @@ static void	DCsync_htmpls(DB_RESULT result)
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
 						__config_mem_free_func);
+				zbx_vector_uint64_reserve(&htmpl->templateids, 1);
 			}
 			else
 				zbx_vector_uint64_clear(&htmpl->templateids);
