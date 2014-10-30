@@ -7,7 +7,7 @@ use TLD_constants qw(:general :templates :api :config);
 use Data::Dumper;
 use base 'Exporter';
 
-our @EXPORT = qw(zbx_connect get_tld_list get_proxies_list
+our @EXPORT = qw(zbx_connect check_api_error get_tld_list get_proxies_list
 		create_probe_status_host
 		create_probe_template create_probe_status_template create_host create_group create_template create_item create_trigger create_macro update_root_servers
 		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host
@@ -16,7 +16,7 @@ our @EXPORT = qw(zbx_connect get_tld_list get_proxies_list
 		disable_items
 		macro_value get_global_macro_value
 		set_proxy_status
-		get_application_id get_items_like
+		get_application_id get_items_like set_tld_type
 		add_dependency
 		create_cron_items
 		pfail);
@@ -33,6 +33,14 @@ sub zbx_connect($$$) {
     return $zabbix->{'error'} if defined($zabbix->{'error'}) and $zabbix->{'error'} ne '';
 
     return true;
+}
+
+sub check_api_error($) {
+    my $result = shift;
+
+    return true if 'HASH' eq ref($result) and (defined $result->{'error'} or defined $result->{'code'});
+
+    return false;
 }
 
 sub get_proxies_list {
@@ -277,8 +285,6 @@ sub create_host {
 
     return $hostid;
 }
-
-
 
 sub create_group {
     my $name = shift;
@@ -683,7 +689,7 @@ sub get_items_like($$$) {
 
     my $result;
 
-    if (!defined($is_template) or $is_template == 0 ) {
+    if (!defined($is_template) or $is_template == false) {
 	$result = $zabbix->get('item', {'hostids' => [$hostid], 'output' => ['itemid', 'name', 'hostid'], 'search' => {'key_' => $like}, 'preservekeys' => true});
 	return $result;
     }
@@ -691,6 +697,76 @@ sub get_items_like($$$) {
     $result = $zabbix->get('item', {'templateids' => [$hostid], 'output' => ['itemid', 'name', 'hostid'], 'search' => {'key_' => $like}, 'preservekeys' => true});
 
     return $result;
+}
+
+sub set_tld_type($$) {
+	my $tld = shift;
+	my $tld_type = shift;
+
+	my %tld_type_groups = (@{[TLD_TYPE_G]} => undef, @{[TLD_TYPE_CC]} => undef, @{[TLD_TYPE_OTHER]} => undef, @{[TLD_TYPE_TEST]} => undef);
+
+	foreach my $group (keys(%tld_type_groups))
+	{
+		my $groupid = create_group($group);
+
+		pfail($groupid->{'data'}) if (check_api_error($groupid) == true);
+
+		$tld_type_groups{$group} = int($groupid);
+	}
+
+	my $result = get_host($tld, true);
+
+	pfail($result->{'data'}) if (check_api_error($result) == true);
+
+	pfail("host \"$tld\" not found") unless ($result->{'hostid'});
+
+	my $hostid = $result->{'hostid'};
+	my $hostgroups_ref = $result->{'groups'};
+	my $current_tld_type;
+	my $alreadyset = false;
+
+	my $options = {'hostid' => $hostid, 'host' => $tld, 'groups' => []};
+
+	foreach my $hostgroup_ref (@$hostgroups_ref)
+	{
+		my $hostgroupname = $hostgroup_ref->{'name'};
+		my $hostgroupid = $hostgroup_ref->{'groupid'};
+
+		my $skip_hostgroup = false;
+
+		foreach my $group (keys(%tld_type_groups))
+		{
+			my $groupid = $tld_type_groups{$group};
+
+			if ($hostgroupid == $groupid)
+			{
+				if ($tld_type eq $hostgroupname)
+				{
+					$alreadyset = true;
+				}
+
+				pfail("TLD \"$tld\" linked to more than one TLD type") if (defined($current_tld_type));
+
+				$current_tld_type = $hostgroupid;
+				$skip_hostgroup = true;
+
+				last;
+			}
+		}
+
+		push(@{$options->{'groups'}}, {'groupid' => $hostgroupid}) if ($skip_hostgroup == false);
+	}
+
+	return false if ($alreadyset == true);
+
+	# add new group to the options
+	push(@{$options->{'groups'}}, {'groupid' => $tld_type_groups{$tld_type}});
+
+	$result = create_host($options);
+
+	pfail($result->{'data'}) if (check_api_error($result) == true);
+
+	return true;
 }
 
 sub create_cron_items($) {

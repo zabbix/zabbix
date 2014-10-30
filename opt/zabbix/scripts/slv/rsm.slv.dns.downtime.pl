@@ -41,7 +41,7 @@ foreach (@$tlds_ref)
 
 init_values();
 
-# NB! Make the current month downtime calculation in a separate loop to effectively use MySQL binds.
+# use bind for faster execution of the same SQL query
 my $sth = get_downtime_prepare();
 
 foreach (keys(%tld_items))
@@ -50,7 +50,7 @@ foreach (keys(%tld_items))
 
     my $itemid = $tld_items{$tld};
 
-    my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # no incidents check
+    my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # ignore incidents
 
     push_value($tld, $cfg_key_out, $value_ts, $downtime, "$downtime minutes of downtime from ",
 	       ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");

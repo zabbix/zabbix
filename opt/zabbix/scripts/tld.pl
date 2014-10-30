@@ -53,8 +53,6 @@ sub create_probe_health_tmpl;
 sub manage_tld_objects($$$$$);
 sub manage_tld_hosts($$);
 
-sub check_api_error($);
-
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
 my $cfg_global_macros = cfg_global_macros;
@@ -68,9 +66,10 @@ my ($main_templateid, $tld_groupid, $tld_type_groupid, $tlds_groupid, $tld_hosti
 my %OPTS;
 my $rv = GetOptions(\%OPTS,
 		    "tld=s",
-		    "type=s",
 		    "delete!",
 		    "disable!",
+		    "type=s",
+		    "set-type!",
 		    "rdds43-servers=s",
 		    "rdds80-servers=s",
 		    "dns-test-prefix=s",
@@ -127,6 +126,18 @@ if ($result ne true) {
     pfail("Could not connect to Zabbix API. ".$result->{'data'});
 }
 
+if (defined($OPTS{'set-type'})) {
+    if (set_tld_type($OPTS{'tld'}, $OPTS{'type'}) == true)
+    {
+	print("${OPTS{'tld'}} set to \"${OPTS{'type'}}\"\n");
+    }
+    else
+    {
+	print("${OPTS{'tld'}} is already set to \"${OPTS{'type'}}\"\n");
+    }
+    exit;
+}
+
 #### Deleting TLD or TLD objects ####
 if (defined($OPTS{'delete'})) {
     manage_tld_objects('delete', $OPTS{'tld'}, $OPTS{'dns'}, $OPTS{'epp'}, $OPTS{'rdds'});
@@ -177,7 +188,6 @@ if (defined($rsm_groupid)) {
 else {
     print "Could not create/update '".rsm_group."' host group. RSM host is not created/updated.\n";
 }
-
 
 $ns_servers = get_ns_servers($OPTS{'tld'});
 
@@ -1373,8 +1383,14 @@ Required options
                 domain test prefix for DNS monitoring (specify '*randomtld*' for root servers monitoring)
 
 Other options
+        --delete
+                delete specified TLD
+        --disable
+                disable specified TLD
         --type=STRING
                 Type of TLD. Possible values: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]}, @{[TLD_TYPE_TEST]}.
+        --set-type
+                set specified TLD type and exit
         --ipv4
                 enable IPv4
 		(default: disabled)
@@ -1418,7 +1434,6 @@ Other options
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
         --only-cron
 		only create cron jobs and exit
-The default option is add new TLD. There is possible to --delete or --disable a part of TLD or all of TLD objects
 	--epp
 		Action with EPP
 		(default: no)
@@ -1440,8 +1455,27 @@ sub validate_input {
     return if (defined($OPTS{'only-cron'}));
 
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
-    $msg .= "type (--type) of TLD must be specified: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]} or @{[TLD_TYPE_TEST]}\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and (!defined($OPTS{'type'}) or
-										($OPTS{'type'} ne TLD_TYPE_G and $OPTS{'type'} ne TLD_TYPE_CC and $OPTS{'type'} ne TLD_TYPE_OTHER and $OPTS{'type'} ne TLD_TYPE_TEST)));
+    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}))
+    {
+	    if (!defined($OPTS{'type'}))
+	    {
+		    $msg .= "type (--type) of TLD must be specified: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]} or @{[TLD_TYPE_TEST]}\n";
+	    }
+	    elsif ($OPTS{'type'} ne TLD_TYPE_G and $OPTS{'type'} ne TLD_TYPE_CC and $OPTS{'type'} ne TLD_TYPE_OTHER and $OPTS{'type'} ne TLD_TYPE_TEST)
+	    {
+		    $msg .= "invalid TLD type \"${OPTS{'type'}}\", type must be one of: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]} or @{[TLD_TYPE_TEST]}\n";
+	    }
+    }
+
+    if (defined($OPTS{'set-type'}))
+    {
+	    unless ($msg eq "") {
+		    print($msg);
+		    usage();
+	    }
+	    return;
+    }
+
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'}));
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
@@ -1725,12 +1759,4 @@ sub compare_arrays($$) {
     }
 
     return @result;
-}
-
-sub check_api_error($) {
-    my $str = shift;
-
-    return true if 'HASH' eq ref($str) and (defined $str->{'error'} or defined $str->{'code'});
-
-    return false;
 }
