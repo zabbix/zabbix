@@ -223,7 +223,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
  ******************************************************************************/
 static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_shared_free);
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_shared_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
 	if (NULL != vm->id)
@@ -252,10 +252,10 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_shared_free);
+	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_shared_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
 
-	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_shared_free);
+	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
 	if (NULL != hv->uuid)
@@ -312,10 +312,10 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 {
 	if (NULL != data)
 	{
-		zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_shared_free);
+		zbx_vector_ptr_clear_ext(&data->hvs, (zbx_clean_func_t)vmware_hv_shared_free);
 		zbx_vector_ptr_destroy(&data->hvs);
 
-		zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_shared_free);
+		zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_shared_free);
 		zbx_vector_ptr_destroy(&data->clusters);
 
 		if (NULL != data->events)
@@ -562,7 +562,7 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
  ******************************************************************************/
 static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_free);
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
 	zbx_free(vm->id);
@@ -583,10 +583,10 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_free);
+	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
 
-	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_free);
+	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
 	zbx_free(hv->uuid);
@@ -625,10 +625,10 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  ******************************************************************************/
 static void	vmware_data_free(zbx_vmware_data_t *data)
 {
-	zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_free);
+	zbx_vector_ptr_clear_ext(&data->hvs, (zbx_clean_func_t)vmware_hv_free);
 	zbx_vector_ptr_destroy(&data->hvs);
 
-	zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_free);
+	zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_free);
 	zbx_vector_ptr_destroy(&data->clusters);
 
 	zbx_free(data->events);
@@ -1868,10 +1868,10 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clean(&vms);
+	zbx_vector_str_clear_ext(&vms, zbx_ptr_free);
 	zbx_vector_str_destroy(&vms);
 
-	zbx_vector_str_clean(&datastores);
+	zbx_vector_str_clear_ext(&datastores, zbx_ptr_free);
 	zbx_vector_str_destroy(&datastores);
 
 	if (SUCCEED != ret)
@@ -2563,7 +2563,7 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 
 out:
 	zbx_free(cluster_data);
-	zbx_vector_str_clean(&ids);
+	zbx_vector_str_clear_ext(&ids, zbx_ptr_free);
 	zbx_vector_str_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
@@ -2690,7 +2690,7 @@ clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 
-	zbx_vector_str_clean(&hvs);
+	zbx_vector_str_clear_ext(&hvs, zbx_ptr_free);
 	zbx_vector_str_destroy(&hvs);
 out:
 	zbx_vmware_lock();
