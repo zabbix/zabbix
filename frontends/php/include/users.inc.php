@@ -36,7 +36,10 @@ function getUserTheme($userData) {
 
 function user_type2str($user_type = null) {
 	$user_types = array(
+		USER_TYPE_EBERO => _('EBERO'),
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
+		USER_TYPE_TEHNICAL_SERVICE => _('Technical Services'),
+		USER_TYPE_COMPLIANCE => _('Compliance profile'),
 		USER_TYPE_ZABBIX_ADMIN => _('Zabbix Admin'),
 		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin')
 	);

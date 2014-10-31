@@ -47,7 +47,7 @@ $fields = array(
 	'surname' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Surname')),
 	'password1' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
-	'user_type' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),'isset({save})'),
+	'user_type' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3,4,5,6'),'isset({save})'),
 	'user_groups' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 	'user_groups_to_del' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),

@@ -24,7 +24,9 @@ global $ZBX_MENU;
 $ZBX_MENU = array(
 	'view' => array(
 		'label'				=> _('Monitoring'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
+		'user_type'			=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
+			USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+		),
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'pages' => array(
@@ -45,7 +47,10 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'latest.php',
 				'label' => _('Latest data'),
-				'sub_pages' => array('history.php', 'chart.php')
+				'sub_pages' => array('history.php', 'chart.php'),
+				'user_type'	=> array(USER_TYPE_EBERO, USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE,
+					USER_TYPE_COMPLIANCE, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+				),
 			),
 			array(
 				'url' => 'tr_status.php',
@@ -75,7 +80,7 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'discovery.php',
 				'label' => _('Discovery'),
-				'user_type' => USER_TYPE_ZABBIX_ADMIN
+				'user_type' => array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN),
 			),
 			array(
 				'url' => 'srv_status.php',
@@ -99,7 +104,9 @@ $ZBX_MENU = array(
 	),
 	'rsm' => array(
 		'label'				=> _('SLA monitoring'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
+		'user_type'			=> array(USER_TYPE_EBERO, USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE,
+			USER_TYPE_COMPLIANCE, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+		),
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'pages' => array(
@@ -119,13 +126,18 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'rsm.monthlyreports.php',
-				'label' => _('Monthly reports')
+				'label' => _('Monthly reports'),
+				'user_type'	=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
+					USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+				),
 			)
 		)
 	),
 	'cm' => array(
 		'label'				=> _('Inventory'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
+		'user_type'			=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
+			USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+		),
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'pages' => array(
@@ -141,14 +153,16 @@ $ZBX_MENU = array(
 	),
 	'reports' => array(
 		'label'				=> _('Reports'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
+		'user_type'			=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
+			USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+		),
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
 				'url' => 'report1.php',
 				'label' => _('Status of Zabbix'),
-				'user_type' => USER_TYPE_SUPER_ADMIN
+				'user_type' => array(USER_TYPE_SUPER_ADMIN)
 			),
 			array(
 				'url' => 'report2.php',
@@ -173,7 +187,7 @@ $ZBX_MENU = array(
 	),
 	'config' => array(
 		'label'				=> _('Configuration'),
-		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
+		'user_type'			=> array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN),
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'force_disable_all_nodes' => true,
@@ -244,7 +258,7 @@ $ZBX_MENU = array(
 	),
 	'admin' => array(
 		'label'				=> _('Administration'),
-		'user_type'			=> USER_TYPE_SUPER_ADMIN,
+		'user_type'			=> array(USER_TYPE_SUPER_ADMIN),
 		'node_perm'			=> PERM_READ_WRITE,
 		'default_page_id'	=> 1,
 		'force_disable_all_nodes'=> true,
@@ -309,7 +323,7 @@ $ZBX_MENU = array(
 	),
 	'login' => array(
 		'label'					=> _('Login'),
-		'user_type'				=> 0,
+		'user_type'				=> array(0),
 		'default_page_id'		=> 0,
 		'hide_node_selection'	=> 1,
 		'force_disable_all_nodes'=> true,
@@ -346,7 +360,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 		$show_menu = true;
 
 		if (isset($menu['user_type'])) {
-			$show_menu &= ($menu['user_type'] <= $USER_DETAILS['type']);
+			$show_menu &= (in_array($USER_DETAILS['type'], $menu['user_type']));
 		}
 		if ($label == 'login') {
 			$show_menu = false;
@@ -365,7 +379,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 			if (!isset($sub_page['user_type'])) {
 				$sub_page['user_type'] = $menu['user_type'];
 			}
-			if ($USER_DETAILS['type'] < $sub_page['user_type']) {
+			if (!in_array($USER_DETAILS['type'], $sub_page['user_type'])) {
 				$show_sub_menu = false;
 			}
 
@@ -379,8 +393,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 
 			if ($sub_menu_active) {
-				// permition check
-				$deny &= ($USER_DETAILS['type'] < $menu['user_type'] || $USER_DETAILS['type'] < $sub_page['user_type']);
+				// permission check
+				$deny &= (!in_array($USER_DETAILS['type'], $sub_page['user_type']));
 
 				$menu_class = 'active';
 				$page_exists = true;

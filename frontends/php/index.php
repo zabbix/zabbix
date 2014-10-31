@@ -74,7 +74,12 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		$request = get_request('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
-			$url = 'dashboard.php';
+			if (CWebUser::$data['type'] == USER_TYPE_EBERO) {
+				$url = 'rsm.rollingweekstatus.php';
+			}
+			else {
+				$url = 'dashboard.php';
+			}
 		}
 		redirect($url);
 		exit();
@@ -110,5 +115,12 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	}
 }
 else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
+	if (CWebUser::$data['type'] == USER_TYPE_EBERO) {
+		$url = 'rsm.rollingweekstatus.php';
+	}
+	else {
+		$url = 'dashboard.php';
+	}
+
+	redirect(zbx_empty(CWebUser::$data['url']) ? $url : CWebUser::$data['url']);
 }

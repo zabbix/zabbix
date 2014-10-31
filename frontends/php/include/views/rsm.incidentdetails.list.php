@@ -282,7 +282,8 @@ $rsmWidget->additem($detailsInfoTable);
 
 $rsmWidget->additem(array($data['paging'], $detailsTable, $data['paging']));
 
-if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
+if (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN || CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+		|| CWebUser::getType() == USER_TYPE_TEHNICAL_SERVICE) {
 	$filterTable = new CTable('', 'filter');
 
 	$filter = new CButton('mark_incident', $changeIncidentTypeName,
