@@ -104,14 +104,6 @@ abstract class CHostGeneral extends CHostBase {
 	public function massRemove(array $data) {
 		$allHostIds = array_merge($data['hostids'], $data['templateids']);
 
-		if (isset($data['groupids'])) {
-			API::HostGroup()->massRemove(array(
-				'hostids' => $data['hostids'],
-				'templateids' => $data['templateids'],
-				'groupids' => zbx_toArray($data['groupids'])
-			));
-		}
-
 		if (!empty($data['templateids_link'])) {
 			$this->unlink(zbx_toArray($data['templateids_link']), $allHostIds);
 		}
@@ -129,6 +121,14 @@ abstract class CHostGeneral extends CHostBase {
 			));
 			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
 			API::UserMacro()->delete($hostMacroIds);
+		}
+
+		if (isset($data['groupids'])) {
+			API::HostGroup()->massRemove(array(
+				'hostids' => $data['hostids'],
+				'templateids' => $data['templateids'],
+				'groupids' => zbx_toArray($data['groupids'])
+			));
 		}
 
 		return array($this->pkOption() => $data[$this->pkOption()]);
