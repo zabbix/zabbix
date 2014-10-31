@@ -40,6 +40,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8970] fixed interfaces list not being displayed correctly for discovered hosts (Krists)
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
 ...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
 ...G...... [ZBX-8951] fixed agent crash on HP-UX 11.31 when processing "net.if.discovery" item (asaveljevs, wiper)
