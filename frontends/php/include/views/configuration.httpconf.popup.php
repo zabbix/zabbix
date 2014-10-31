@@ -107,7 +107,7 @@ else {
 	if (hasRequest('stepid')) {
 		$httpPopupForm->addItem(makeFormFooter(
 			new CSubmit('update', _('Update')),
-			new CButtonCancel(null, 'close_window();')
+			array(new CButtonCancel(null, 'close_window();'))
 		));
 	}
 	else {
