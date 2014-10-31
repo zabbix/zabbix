@@ -1048,24 +1048,19 @@ jQuery(function ($) {
 	};
 
 	/**
-	 * Sets a default submit button to input and select form elements so "Enter" keypress does not
-	 * grab first submit button.
-	 * If input which receives "Enter" is located inside element with "subform" class, this element is used
-	 * to locate submit button.
-	 * If submit button can not be found, "Enter" keypress event is bubbled up.
+	 * Sets a default submit button (via provided selector string) to input and select form elements so
+	 * "Enter" keypress does not just grab first submit button in the form. If submit button can not be
+	 * located, the keypress event is bubbled up.
 	 *
-	 * Supported options:
-	 * - submitButtonSelector	- selector that is used to get default button element in form
+	 * @param {string}  submitButtonSelector	selector that is used to get default button element in form
 	 *
-	 * @param options
+	 * @throws throws exception if submit button selector is not provided
 	 *
-	 * @return object
+	 * @return {object}
 	 */
-	$.fn.enterSubmit = function (options) {
-		options = $.extend({}, options);
-
-		if (options.submitButtonSelector == null) {
-			return this;
+	$.fn.enterSubmit = function (submitButtonSelector) {
+		if (submitButtonSelector == null || typeof submitButtonSelector != 'string') {
+			throw 'Submit button selector string must be provided.';
 		}
 
 		// Take only form elements.
@@ -1079,7 +1074,7 @@ jQuery(function ($) {
 				}
 
 				// Look for submit button in form.
-				var submitButton = $(options.submitButtonSelector, form);
+				var submitButton = $(submitButtonSelector, form);
 
 				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
 				if (submitButton.length == 0) {

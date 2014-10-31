@@ -153,5 +153,5 @@ jQuery(function($) {
 
 	createPlaceholders();
 
-	$('form').enterSubmit({submitButtonSelector: 'input[type=submit].main'});
+	$('form').enterSubmit('input[type=submit].main');
 });
