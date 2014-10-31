@@ -63,7 +63,7 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK)
-#define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000040)	/* interfaces which should be deleted */
+#define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 	zbx_uint64_t	flags;
 }
 zbx_lld_interface_t;
