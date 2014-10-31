@@ -148,10 +148,6 @@ form { margin: 0; }
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
-.input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { border-color: #d0d0d0; background-color: #eee; color: #aca899; cursor: default; }
-.input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
-.input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
 .select {
 	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;

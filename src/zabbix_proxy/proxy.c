@@ -734,7 +734,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
 #else
 #	define SNMP_FEATURE_STATUS 	" NO"
