@@ -496,6 +496,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.8rc1
 
 New features:
+A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
