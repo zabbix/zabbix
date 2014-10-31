@@ -940,6 +940,16 @@ class CHost extends CHostGeneral {
 
 		$macros = array();
 		foreach ($hosts as $host) {
+			if (isset($host['macros'])) {
+				$macros[$host['hostid']] = $host['macros'];
+			}
+		}
+
+		if ($macros) {
+			API::UserMacro()->replaceMacros($macros);
+		}
+
+		foreach ($hosts as $host) {
 			// extend host inventory with the required data
 			if (isset($host['inventory']) && $host['inventory']) {
 				$inventory = $inventories[$host['hostid']];
@@ -956,7 +966,6 @@ class CHost extends CHostGeneral {
 			unset($host['interfaces']);
 
 			if (isset($host['macros'])) {
-				$macros[$host['hostid']] = $host['macros'];
 				unset($host['macros']);
 			}
 
@@ -967,10 +976,6 @@ class CHost extends CHostGeneral {
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 			}
-		}
-
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
 		}
 
 		return array('hostids' => $hostids);
@@ -1155,37 +1160,6 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Update hostgroups linkage
-		 */
-		if (isset($updateGroups)) {
-			$updateGroups = zbx_toArray($updateGroups);
-
-			$hostGroups = API::HostGroup()->get(array('hostids' => $hostids));
-			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
-			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
-
-			$result = $this->massAdd(array(
-				'hosts' => $hosts,
-				'groups' => $updateGroups
-			));
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
-			}
-
-			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
-
-			if ($groupidsToDel) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
-				}
-			}
-		}
-
-		/*
 		 * Update interfaces
 		 */
 		if (isset($updateInterfaces)) {
@@ -1260,6 +1234,35 @@ class CHost extends CHostGeneral {
 				'hosts' => $hosts,
 				'macros' => $updateMacros
 			));
+		}
+
+		// update host and host group linkage
+		if (isset($updateGroups)) {
+			$updateGroups = zbx_toArray($updateGroups);
+
+			$hostGroups = API::HostGroup()->get(array('hostids' => $hostids));
+			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
+
+			$result = $this->massAdd(array(
+				'hosts' => $hosts,
+				'groups' => $updateGroups
+			));
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
+			}
+
+			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
+
+			if ($groupidsToDel) {
+				$result = $this->massRemove(array(
+					'hostids' => $hostids,
+					'groupids' => $groupidsToDel
+				));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
+				}
+			}
 		}
 
 		/*

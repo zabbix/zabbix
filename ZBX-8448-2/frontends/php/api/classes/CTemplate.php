@@ -583,30 +583,34 @@ class CTemplate extends CHostGeneral {
 
 		$macros = array();
 		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
-				$template['name'] = $template['host'];
-			}
-			$tplTmp = $template;
-
-			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
-
 			if (isset($template['macros'])) {
 				$macros[$template['templateid']] = $template['macros'];
-				unset($template['macros']);
 			}
-
-			unset($template['templates']);
-			unset($template['templateid']);
-			unset($tplTmp['templates']);
-
-			$template['templates'] = array($tplTmp);
-			$result = $this->massUpdate($template);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
 		}
 
 		if ($macros) {
 			API::UserMacro()->replaceMacros($macros);
+		}
+
+		foreach ($templates as $template) {
+			// if visible name is not given or empty it should be set to host name
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
+			}
+
+			if (isset($template['macros'])) {
+				unset($template['macros']);
+			}
+
+			$tplTmp = $template;
+			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
+			unset($template['templateid'], $tplTmp['templates']);
+			$template['templates'] = array($tplTmp);
+
+			$result = $this->massUpdate($template);
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
+			}
 		}
 
 		return array('templateids' => $templateids);
@@ -934,39 +938,6 @@ class CTemplate extends CHostGeneral {
 		}
 		// }}} UPDATE TEMPLATES PROPERTIES
 
-
-		// UPDATE HOSTGROUPS LINKAGE {{{
-		if (isset($data['groups']) && !is_null($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
-			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
-
-			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
-
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'templates' => $templates,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
-				}
-			}
-
-			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
-			if (!empty($groupidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
-				}
-			}
-		}
-		// }}} UPDATE HOSTGROUPS LINKAGE
-
 		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
 		$templateidsClear = zbx_objectValues($data['templates_clear'], 'templateid');
 
@@ -1044,7 +1015,6 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
-
 			$hostsToAdd = array_diff($newHostids, $templateHostids);
 			if (!empty($hostsToAdd)) {
 				$result = $this->massAdd(array('templates' => $templates, 'hosts' => $hostsToAdd));
@@ -1073,6 +1043,37 @@ class CTemplate extends CHostGeneral {
 				'hosts' => $templates,
 				'macros' => $data['macros']
 			));
+		}
+
+		// update template and host group linkage
+		if (isset($data['groups']) && !is_null($data['groups'])) {
+			$data['groups'] = zbx_toArray($data['groups']);
+			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
+			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
+
+			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
+
+			if (!empty($groupsToAdd)) {
+				$result = $this->massAdd(array(
+					'templates' => $templates,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
+				}
+			}
+
+			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
+			if (!empty($groupidsToDel)) {
+				$result = $this->massRemove(array(
+					'templateids' => $templateids,
+					'groupids' => $groupidsToDel
+				));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
+				}
+			}
 		}
 
 		return array('templateids' => $templateids);
