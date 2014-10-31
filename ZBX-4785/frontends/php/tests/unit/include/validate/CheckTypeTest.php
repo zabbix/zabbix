@@ -57,17 +57,17 @@ class CheckTypeTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider testValidProvider
 	 *
+	 * @param string	$field
 	 * @param integer	$flags
 	 * @param mixed		$var
 	 * @param integer	$type
-	 * @param string	$caption
 	 */
 	public function testValidCheckType($field, $flags, $var, $type) {
 
 		$varBefore = $var;
 		$ok = check_type($field, $flags, $var, $type, $field);
 
-		$this->assertSame(0, $ok);
+		$this->assertSame(ZBX_VALID_OK, $ok);
 		$this->assertSame(CJs::encodeJson($var), $varBefore);
 	}
 
@@ -87,7 +87,7 @@ class CheckTypeTest extends PHPUnit_Framework_TestCase {
 		global $ZBX_MESSAGES;
 		$ok = check_type($field, $flags, $var, $type, $field);
 
-		$this->assertSame(1, $ok);
+		$this->assertSame(ZBX_VALID_ERROR, $ok);
 		$this->assertSame($messageType, $ZBX_MESSAGES[0]['type']);
 		$this->assertSame($messageText, $ZBX_MESSAGES[0]['message']);
 	}
