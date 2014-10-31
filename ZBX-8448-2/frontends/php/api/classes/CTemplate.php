@@ -1046,34 +1046,11 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// update template and host group linkage
-		if (isset($data['groups']) && !is_null($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array('hostids' => $templateids));
-			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
-
-			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
-
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'templates' => $templates,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
-				}
-			}
-
-			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
-			if (!empty($groupidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
-				}
-			}
+		if (isset($data['groups']) && is_array($data['groups'])) {
+			API::HostGroup()->massUpdate(array(
+				'templates' => $templates,
+				'groups' => $data['groups']
+			));
 		}
 
 		return array('templateids' => $templateids);

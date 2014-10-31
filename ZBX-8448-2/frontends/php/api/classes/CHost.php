@@ -1238,31 +1238,10 @@ class CHost extends CHostGeneral {
 
 		// update host and host group linkage
 		if (isset($updateGroups)) {
-			$updateGroups = zbx_toArray($updateGroups);
-
-			$hostGroups = API::HostGroup()->get(array('hostids' => $hostids));
-			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
-			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
-
-			$result = $this->massAdd(array(
+			API::HostGroup()->massUpdate(array(
 				'hosts' => $hosts,
 				'groups' => $updateGroups
 			));
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
-			}
-
-			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
-
-			if ($groupidsToDel) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
-				}
-			}
 		}
 
 		/*
