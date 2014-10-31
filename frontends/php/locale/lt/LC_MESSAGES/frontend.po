@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 07:30+0300\n"
+"POT-Creation-Date: 2014-10-31 10:25+0200\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1169,14 +1169,14 @@ msgstr "CONFIGURATION OF IMAGES"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "CONFIGURATION OF IT SERVICES"
 
-#: disc_prototypes.php:367
+#: disc_prototypes.php:369
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "CONFIGURATION OF ITEM PROTOTYPES"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:858
-#: items.php:994
+#: include/views/configuration.item.massupdate.php:28 items.php:860
+#: items.php:996
 msgid "CONFIGURATION OF ITEMS"
 msgstr "CONFIGURATION OF ITEMS"
 
@@ -1415,7 +1415,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Negalima pridėti atvaizdo"
 
-#: items.php:499
+#: items.php:501
 msgid "Cannot add item"
 msgstr "Negalima pridėti elemento"
 
@@ -1424,7 +1424,7 @@ msgstr "Negalima pridėti elemento"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:302
+#: disc_prototypes.php:304
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1535,7 +1535,7 @@ msgstr "Negalima pakeisti autentifikacijos metodo į LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Negalima pakeisti autentifikacijos metodo į Zabbix vidinį"
 
-#: httpconf.php:175 httpconf.php:425 items.php:537 items.php:803
+#: httpconf.php:175 httpconf.php:425 items.php:539 items.php:805
 msgid "Cannot clear history"
 msgstr "Negalima išvalyti istorijos"
 
@@ -1563,7 +1563,7 @@ msgstr "Negalima prisijungti prie traperio jungties zabbixo serverio tarnybos, b
 msgid "Cannot copy graphs"
 msgstr "Negalima nukopijuoti grafiko"
 
-#: items.php:760
+#: items.php:762
 msgid "Cannot copy items"
 msgstr "Negalima nukopijuoti elementų"
 
@@ -1708,19 +1708,19 @@ msgstr ""
 msgid "Cannot delete inventory."
 msgstr ""
 
-#: items.php:388
+#: items.php:390
 msgid "Cannot delete item"
 msgstr ""
 
-#: disc_prototypes.php:203
+#: disc_prototypes.php:205
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:343
+#: disc_prototypes.php:345
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:833
+#: items.php:835
 msgid "Cannot delete items"
 msgstr ""
 
@@ -1888,14 +1888,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:249 items.php:725
+#: applications.php:249 items.php:727
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:327
+#: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
@@ -1980,14 +1980,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:248 items.php:724
+#: applications.php:248 items.php:726
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:326
+#: disc_prototypes.php:328
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
@@ -2557,15 +2557,15 @@ msgstr ""
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:496
+#: items.php:498
 msgid "Cannot update item"
 msgstr ""
 
-#: disc_prototypes.php:298
+#: disc_prototypes.php:300
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:704
+#: items.php:706
 msgid "Cannot update items"
 msgstr ""
 
@@ -3348,7 +3348,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr ""
 
-#: include/views/configuration.item.list.php:37 items.php:839
+#: include/views/configuration.item.list.php:37 items.php:841
 msgid "Create item"
 msgstr ""
 
@@ -3536,8 +3536,8 @@ msgstr ""
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr ""
 
-#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
-#: items.php:115
+#: disc_prototypes.php:109 include/views/configuration.item.massupdate.php:300
+#: items.php:116
 msgid "Custom multiplier"
 msgstr ""
 
@@ -6238,14 +6238,14 @@ msgstr ""
 #: include/page_header.php:323
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.prototype.list.php:50 items.php:162
+#: include/views/configuration.item.prototype.list.php:50 items.php:164
 #: jsLoader.php:203 latest.php:477 latest.php:478 latest.php:583
 #: latest.php:770
 msgid "History"
 msgstr ""
 
-#: httpconf.php:175 httpconf.php:425 items.php:530 items.php:537 items.php:791
-#: items.php:803
+#: httpconf.php:175 httpconf.php:425 items.php:532 items.php:539 items.php:793
+#: items.php:805
 msgid "History cleared"
 msgstr ""
 
@@ -6267,7 +6267,7 @@ msgstr ""
 msgid "History of events"
 msgstr ""
 
-#: disc_prototypes.php:115 items.php:54
+#: disc_prototypes.php:117 items.php:54
 msgid "History storage period"
 msgstr ""
 
@@ -6317,8 +6317,8 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:530 items.php:790
-#: items.php:823 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:532 items.php:792
+#: items.php:825 jsLoader.php:141 latest.php:449 latest.php:451 popup.php:475
 #: popup.php:501 popup.php:1087 queue.php:229 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:296
 msgid "Host"
@@ -8106,7 +8106,7 @@ msgstr ""
 msgid "Invalid third parameter."
 msgstr ""
 
-#: disc_prototypes.php:192 host_discovery.php:175 items.php:375
+#: disc_prototypes.php:194 host_discovery.php:175 items.php:377
 msgid "Invalid time period"
 msgstr ""
 
@@ -8161,8 +8161,8 @@ msgstr ""
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1093
 #: include/reports.inc.php:425 include/views/configuration.graph.edit.php:108
 #: include/views/configuration.graph.edit.php:166
-#: include/views/configuration.triggers.expression.php:57 items.php:529
-#: items.php:790 items.php:823 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:531
+#: items.php:792 items.php:825 tr_logform.php:251
 msgid "Item"
 msgstr ""
 
@@ -8212,7 +8212,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:499
+#: items.php:501
 msgid "Item added"
 msgstr ""
 
@@ -8220,18 +8220,18 @@ msgstr ""
 msgid "Item count"
 msgstr ""
 
-#: items.php:388
+#: items.php:390
 msgid "Item deleted"
 msgstr ""
 
-#: applications.php:246 items.php:722
+#: applications.php:246 items.php:724
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:245 items.php:721
+#: applications.php:245 items.php:723
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -8264,29 +8264,29 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:302
+#: disc_prototypes.php:304
 msgid "Item prototype added"
 msgstr ""
 
-#: disc_prototypes.php:203
+#: disc_prototypes.php:205
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:324
+#: disc_prototypes.php:326
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:323
+#: disc_prototypes.php:325
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:298
+#: disc_prototypes.php:300
 msgid "Item prototype updated"
 msgstr ""
 
@@ -8297,7 +8297,7 @@ msgstr ""
 msgid "Item prototypes"
 msgstr ""
 
-#: disc_prototypes.php:343
+#: disc_prototypes.php:345
 msgid "Item prototypes deleted"
 msgstr ""
 
@@ -8305,7 +8305,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:496
+#: items.php:498
 msgid "Item updated"
 msgstr ""
 
@@ -8382,11 +8382,11 @@ msgstr ""
 msgid "Items (m/d/n)"
 msgstr ""
 
-#: items.php:760
+#: items.php:762
 msgid "Items copied"
 msgstr ""
 
-#: items.php:833
+#: items.php:835
 msgid "Items deleted"
 msgstr ""
 
@@ -8394,7 +8394,7 @@ msgstr ""
 msgid "Items list"
 msgstr ""
 
-#: items.php:704
+#: items.php:706
 msgid "Items updated"
 msgstr ""
 
@@ -10474,7 +10474,7 @@ msgstr ""
 msgid "No target selected"
 msgstr ""
 
-#: graphs.php:377 items.php:763
+#: graphs.php:377 items.php:765
 msgid "No target selected."
 msgstr ""
 
@@ -11574,7 +11574,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:154 items.php:89 items.php:158
+#: include/views/inventory.host.view.php:154 items.php:89 items.php:160
 #: setup.php:48
 msgid "Port"
 msgstr ""
@@ -14082,7 +14082,7 @@ msgstr ""
 msgid "Trend data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: disc_prototypes.php:119 items.php:62
+#: disc_prototypes.php:121 items.php:62
 msgid "Trend storage period"
 msgstr ""
 
@@ -14094,7 +14094,7 @@ msgstr ""
 #: include/forms.inc.php:595 include/forms.inc.php:929
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:70
-#: include/views/configuration.item.prototype.list.php:51 items.php:163
+#: include/views/configuration.item.prototype.list.php:51 items.php:165
 #: latest.php:480 latest.php:481
 msgid "Trends"
 msgstr ""
@@ -14844,7 +14844,7 @@ msgid "Update existing"
 msgstr ""
 
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:66
-#: items.php:161
+#: items.php:163
 msgid "Update interval"
 msgstr ""
 
