@@ -153,17 +153,12 @@ end:
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	struct zbx_json	j;
+	char		*if_name;
 #if HPUX_VERSION < 1131
-	char			*if_list = NULL, *if_name_end;
-	size_t			if_list_alloc = 64, if_list_offset = 0;
-#else
-	struct if_nameindex	*ni;
-	int			i;
-#endif
-	struct zbx_json		j;
-	char			*if_name;
+	char		*if_list = NULL, *if_name_end;
+	size_t		if_list_alloc = 64, if_list_offset = 0;
 
-#if HPUX_VERSION < 1131
 	if_list = zbx_malloc(if_list, if_list_alloc);
 	*if_list = '\0';
 
@@ -184,15 +179,11 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL != (if_name_end = strchr(if_name, ZBX_IF_SEP)))
 			*if_name_end = '\0';
-#else
-	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
-	{
-		if_name = ni[i].if_name;
-#endif
+
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", if_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
-#if HPUX_VERSION < 1131
+
 		if (NULL != if_name_end)
 		{
 			*if_name_end = ZBX_IF_SEP;
@@ -200,17 +191,35 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else
 			if_name = NULL;
-#endif
 	}
 
-#if HPUX_VERSION < 1131
 	zbx_free(if_list);
 #else
+	struct if_nameindex	*ni;
+	int			i;
+
+	if (NULL == (ni = if_nameindex()))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; 0 != ni[i].if_index; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#IFNAME}", ni[i].if_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
 	if_freenameindex(ni);
 #endif
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 
