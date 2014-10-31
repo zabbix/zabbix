@@ -78,7 +78,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($parentHost['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
