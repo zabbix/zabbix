@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 11:17+0200\n"
-"PO-Revision-Date: 2014-10-20 10:11+0300\n"
+"POT-Creation-Date: 2014-10-31 11:20+0200\n"
+"PO-Revision-Date: 2014-10-30 09:49+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1413792664.0\n"
+"X-POOTLE-MTIME: 1414655374.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -3247,7 +3247,7 @@ msgstr ""
 "Odmowa połączenia do serwera Zabbix \"%s\". Możliwe przyczyny:\n"
 "1. Błędne IP/DNS serwera w \"zabbix.conf.php\";\n"
 "2. Usługa środowiska (np. SELinux) blokuje połączenie;\n"
-"3. Serwer Zabbix nie został działa;\n"
+"3. Serwer Zabbix nie działa;\n"
 "4. Zapora blokuje połączenia TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:278
@@ -8929,11 +8929,11 @@ msgstr "Stracone"
 
 #: include/actions.inc.php:1462
 msgid "Low-level discovery rule in \"normal\" state"
-msgstr "Nisko-poziomowa reguła wykrywania w stanie \"normalny\""
+msgstr "Niskopoziomowa reguła wykrywania w stanie \"normalny\""
 
 #: include/actions.inc.php:1461
 msgid "Low-level discovery rule in \"not supported\" state"
-msgstr "Nisko-poziomowa reguła wykrywania w stanie \"niewspierany\""
+msgstr "Niskopoziomowa reguła wykrywania w stanie \"niewspierany\""
 
 #: include/func.inc.php:424 include/func.inc.php:665
 msgctxt "Mega short"
@@ -14641,7 +14641,7 @@ msgstr "Nieznany"
 
 #: auditlogs.php:147
 msgid "Unknown action"
-msgstr "Nieznane działanie"
+msgstr "Nieznana akcja"
 
 #: httpdetails.php:161 httpdetails.php:233 httpmon.php:151
 #: include/views/configuration.httpconf.list.php:99
@@ -16340,7 +16340,7 @@ msgstr "podobne"
 
 #: include/events.inc.php:68
 msgid "low-level discovery rule"
-msgstr "nisko-poziomowa reguła wykrywania"
+msgstr "niskopoziomowa reguła wykrywania"
 
 #: include/func.inc.php:554
 msgctxt "minute short"
