@@ -246,13 +246,13 @@
 					};
 					this.selectedID = null;
 
-					$('#saveExpression').val(<?php echo CJs::encodeJson(_('Add')); ?>);
+					$('#saveExpression').text(<?php echo CJs::encodeJson(_('Add')); ?>);
 				}
 				else {
 					data = this.expressions[id].data;
 					this.selectedID = id;
 
-					$('#saveExpression').val(<?php echo CJs::encodeJson(_('Update')); ?>);
+					$('#saveExpression').text(<?php echo CJs::encodeJson(_('Update')); ?>);
 				}
 
 				$('#expressionNew').val(data.expression);
@@ -396,15 +396,15 @@
 	}(jQuery));
 
 	jQuery(function($) {
-		$('#exprTable').on('click', 'button.exprRemove', function() {
+		$('#exprTable').on('click', '.exprRemove', function() {
 			zabbixRegExp.removeExpression($(this).attr('data-id'));
 		});
 
-		$('#exprTable').on('click', 'input.exprAdd', function() {
+		$('#exprTable').on('click', '.exprAdd', function() {
 			zabbixRegExp.showForm();
 		});
 
-		$('#exprTable').on('click', 'button.exprEdit', function() {
+		$('#exprTable').on('click', '.exprEdit', function() {
 			zabbixRegExp.showForm($(this).attr('data-id'));
 		});
 
