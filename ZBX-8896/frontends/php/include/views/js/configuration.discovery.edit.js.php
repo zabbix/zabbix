@@ -356,7 +356,7 @@
 
 			// rename button to "update"
 			if (isUpdate) {
-				jQuery('#add_new_dcheck').val(<?php echo CJs::encodeJson(_('Update')); ?>);
+				jQuery('#add_new_dcheck').text(<?php echo CJs::encodeJson(_('Update')); ?>);
 			}
 
 			// button "remove" form
@@ -663,7 +663,8 @@
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {
-			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
