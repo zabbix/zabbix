@@ -347,24 +347,18 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
+	$buttons[] = new CSubmit('clone', _('Clone'));
+
 	if (!$this->data['limited']) {
-		$btnDelete = new CButtonDelete(
+		$buttons[] = new CButtonDelete(
 			_('Delete discovery rule?'),
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
-	else {
-		$btnDelete = null;
-	}
 
-	$itemForm->addItem(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		array(
-			new CSubmit('clone', _('Clone')),
-			$btnDelete,
-			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
-		)
-	));
+	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
+
+	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemForm->addItem(makeFormFooter(
