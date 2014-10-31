@@ -1295,6 +1295,7 @@ static void	DCsync_htmpls(DB_RESULT result)
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
 						__config_mem_free_func);
+				zbx_vector_uint64_reserve(&htmpl->templateids, 1);
 			}
 			else
 				zbx_vector_uint64_clear(&htmpl->templateids);
@@ -2512,7 +2513,7 @@ static void	DCsync_trigdeps(DB_RESULT tdep_result)
 						dependencies.values_num * sizeof(const ZBX_DC_TRIGGER_DEPLIST *));
 				trigdep_down->dependencies[dependencies.values_num] = NULL;
 
-				dependencies.values_num = 0;
+				zbx_vector_ptr_clear(&dependencies);
 			}
 
 			triggerid = triggerid_down;
@@ -2611,7 +2612,7 @@ static void	DCsync_functions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
-		config->time_triggers[i].values_num = 0;
+		zbx_vector_ptr_clear(&config->time_triggers[i]);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->functions.num_data + 32);
@@ -2743,7 +2744,7 @@ static void	DCsync_expressions(DB_RESULT result)
 
 	/* reset regexp -> expressions mapping */
 	while (NULL != (regexp = zbx_hashset_iter_next(&iter)))
-		regexp->expressionids.values_num = 0;
+		zbx_vector_uint64_clear(&regexp->expressionids);
 
 	/* update expressions from db */
 	while (NULL != (row = DBfetch(result)))
@@ -4321,7 +4322,7 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
 
-	triggerids->values_num = 0;
+	zbx_vector_uint64_clear(triggerids);
 
 	LOCK_CACHE;
 
@@ -4576,7 +4577,7 @@ void	DCfree_triggers(zbx_vector_ptr_t *triggers)
 	for (i = 0; i < triggers->values_num; i++)
 		DCclean_trigger((DC_TRIGGER *)triggers->values[i]);
 
-	triggers->values_num = 0;
+	zbx_vector_ptr_clear(triggers);
 }
 
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail)
