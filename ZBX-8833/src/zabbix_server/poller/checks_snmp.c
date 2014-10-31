@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 
 typedef struct
 {
@@ -447,7 +447,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 		zabbix_log(LOG_LEVEL_DEBUG, "SNMPv3 [%s@%s]", session.securityName, session.peername);
 	}
 
-#ifdef HAVE_SNMP_SESSION_LOCALNAME
+#ifdef HAVE_NETSNMP_SESSION_LOCALNAME
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		/* In some cases specifying just local host (without local port) is not enough. We do */
@@ -1682,4 +1682,4 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
