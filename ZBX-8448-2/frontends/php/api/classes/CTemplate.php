@@ -951,6 +951,10 @@ class CTemplate extends CHostGeneral {
 		// UPDATE TEMPLATE LINKAGE {{{
 		// firstly need to unlink all things, to correctly check circulars
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
+			/*
+			 * Get all currently linked hosts and templates (skip discovered hosts) to these templates
+			 * that user has read permissions.
+			 */
 			$templateHosts = API::Host()->get(array(
 				'output' => array('hostid'),
 				'templateids' => $templateids,
@@ -968,6 +972,10 @@ class CTemplate extends CHostGeneral {
 			$hostIds = array_merge($hostIdsToAdd, $hostIdsToDel);
 
 			if ($hostIds) {
+				/*
+				 * Get all currently linked hosts and templates (skip discovered hosts) to these templates
+				 * that user has write permissions.
+				 */
 				$templatesHostsAllowed = API::Host()->get(array(
 					'output' => array('hostid'),
 					'templated_hosts' => true,
@@ -976,8 +984,8 @@ class CTemplate extends CHostGeneral {
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				foreach ($hostIds as $hostid) {
-					if (!isset($templatesHostsAllowed[$hostid])) {
+				foreach ($hostIds as $hostId) {
+					if (!isset($templatesHostsAllowed[$hostId])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('No permissions to referred object or it does not exist!')
 						);
@@ -985,7 +993,7 @@ class CTemplate extends CHostGeneral {
 				}
 			}
 
-			if (!empty($hostidsToDel)) {
+			if ($hostIdsToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostIdsToDel,
 					'templateids' => $templateids
