@@ -39,7 +39,7 @@ div.preloader {
 }
 
 /* button */
-.button-plain { border: 1px solid #808080; vertical-align: top; }
+.button-plain { border: 1px solid #808080; }
 .button-plain:hover { border-color: black; }
 .button-plain[disabled], .button-plain[disabled]:hover {
 	border-color: #d0d0d0; background: #eeeeee; color: #aca899;
