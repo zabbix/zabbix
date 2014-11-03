@@ -53,7 +53,7 @@ div.preloader {
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #ACA899; background-color: white; }
-.input[readonly], .input[readonly]:hover {
+.input[readonly], .input[readonly]:hover, .input[readonly]:focus {
 	border-color: #d0d0d0; background: #eeeeee; color: #000000;
 }
 .input[disabled], .input[disabled]:hover,
