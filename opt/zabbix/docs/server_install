@@ -183,5 +183,10 @@ Do not forget configure all other parameters in the configuration file to use co
     0 23 * * *	root	perl	/opt/zabbix/scripts/MySQL_part_management.pl 1>2 2>/dev/null
     0 2 * * *	root	perl	/opt/zabbix/scripts/MySQL_part_management.pl 1>2 2>/dev/null
 
-30. Do not forget to add Zabbix server port (10051 TCP) to allow incoming packets from web-interface from required hosts 
+30. Do not forget to add Zabbix server port (10051 TCP) to allow incoming packets from web-interface from required hosts
+
 31. Do not forget to add MySQL port (3306 TCP) to allow communication between web-interface and database from Zabbix web-interface and additional sources.
+
+32. Install rsyslog rules needed for SLV scripts logging:
+    cp /opt/zabbix/docs/config/rsyslog.d-rsm.slv.conf /etc/rsyslog.d/rsm.slv.conf
+    /etc/init.d/rsyslog restart

@@ -138,9 +138,9 @@ sub send_arrref {
     my $start = time();
 
     my $status = 0;
-    my $attempt;
+    my $attempts = 0;
     foreach ( 1 .. $self->retries() ) {
-	$attempt = $_;
+	$attempts++;
         if ( $self->_send( $data_ref ) ) {
             $status = 1;
             last;
@@ -149,7 +149,7 @@ sub send_arrref {
 
     return 1 if ($status == 1);
 
-    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempt attempts)");
+    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempts attempts)");
 
     return;
 }

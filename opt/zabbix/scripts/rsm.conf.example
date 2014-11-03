@@ -7,7 +7,6 @@ password = zabbix
 path = /opt/zabbix/scripts/slv
 zserver = 127.0.0.1
 zport = 10051
-logdir = /var/log/zabbix
 
 [db]
 name = zabbix
