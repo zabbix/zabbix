@@ -121,7 +121,10 @@ elseif (hasRequest('action')) {
 /*
  * Actions
  */
-$groupRights = zbx_toHash(getRequest('group_rights', array()), 'id');
+$groupRights = array();
+foreach (getRequest('group_rights', array()) as $groupId => $permission) {
+	$groupRights[$groupId] = array('id' => $groupId, 'permission' => $permission);
+}
 if (hasRequest('del_deny') && hasRequest('right_to_del_deny')) {
 	foreach (getRequest('right_to_del_deny', array()) as $id) {
 		if (!isset($groupRights[$id])) {

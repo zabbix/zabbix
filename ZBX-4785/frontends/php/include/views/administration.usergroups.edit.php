@@ -28,7 +28,7 @@ $userGroupForm->setName('userGroupsForm');
 $userGroupForm->addVar('form', $this->data['form']);
 $groupRightsArray = array();
 foreach($this->data['group_rights'] as $groupRight) {
-	$groupRightsArray[] = array('id' => $groupRight['id'], 'permission' => $groupRight['permission']);
+	$groupRightsArray[$groupRight['id']] = $groupRight['permission'];
 }
 $userGroupForm->addVar('group_rights', CJs::encodeJson($groupRightsArray));
 if (isset($this->data['usrgrpid'])) {
