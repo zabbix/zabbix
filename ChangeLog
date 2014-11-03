@@ -8,7 +8,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-...G...PS. [ZBX-8470] fixed possbile crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
+...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)
 ..F....... [ZBX-8844] fixed testing LDAP authentication (Krists)
 ..F.I..... [ZBX-8851] added "-1" and "0" as allowed values for "max_execution_time" and "max_input_time" PHP configuration settings (Krists)
