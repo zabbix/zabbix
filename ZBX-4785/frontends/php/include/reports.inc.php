@@ -310,7 +310,8 @@ function valueComparisonFormForMultiplePeriods() {
 	$reportForm->addVar('sortorder', 0);
 
 	$groupids = getRequest('groupids', array());
-	$group_tb = new CTweenBox($reportForm, 'groupids', $groupids, 10);
+	$group_tb = new CTweenBox($reportForm, 'groupids', 10);
+	$group_tb->setSelectedValues($groupids);
 
 	$db_groups = API::HostGroup()->get(array(
 		'real_hosts' => true,
@@ -319,7 +320,7 @@ function valueComparisonFormForMultiplePeriods() {
 	order_result($db_groups, 'name');
 	foreach ($db_groups as $group) {
 		$groupids[$group['groupid']] = $group['groupid'];
-		$group_tb->addItem($group['groupid'],$group['name']);
+		$group_tb->addNewItem($group['groupid'], $group['name']);
 	}
 
 	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
@@ -334,7 +335,8 @@ function valueComparisonFormForMultiplePeriods() {
 	$td_groups = new CCol(array(_('Group'), SPACE, $cmbGroups));
 	$td_groups->setAttribute('style', 'text-align: right;');
 
-	$host_tb = new CTweenBox($reportForm, 'hostids', $hostids, 10);
+	$host_tb = new CTweenBox($reportForm, 'hostids', 10);
+	$host_tb->setSelectedValues($hostids);
 
 	$options = array(
 		'real_hosts' => true,
@@ -348,7 +350,7 @@ function valueComparisonFormForMultiplePeriods() {
 	order_result($db_hosts, 'name');
 
 	foreach ($db_hosts as $hnum => $host) {
-		$host_tb->addItem($host['hostid'],$host['name']);
+		$host_tb->addNewItem($host['hostid'], $host['name']);
 	}
 
 	$options = array(
@@ -360,7 +362,7 @@ function valueComparisonFormForMultiplePeriods() {
 	order_result($db_hosts2, 'name');
 	foreach ($db_hosts2 as $hnum => $host) {
 		if (!isset($db_hosts[$host['hostid']])) {
-			$host_tb->addItem($host['hostid'], $host['name']);
+			$host_tb->addNewItem($host['hostid'], $host['name']);
 		}
 	}
 

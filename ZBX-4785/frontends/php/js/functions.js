@@ -297,24 +297,25 @@ function getNextColor(paletteType) {
 }
 
 /**
- * Used for php ctweenbox object.
- * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
- * Moving perserves alphabetical order.
+ * Used by CTweenBox class.
+ * Moves item from 'source' multiselect to 'target' multiselect. Sets values of items in left multiselect as JSON
+ * array to input named variableName in form named formName.
  *
- * @formname string	form name where hidden fields will be added
- * @objname string	unique name for hidden field naming
- * @source string		from select id
- * @target string		to select id
- * @action string	action to perform with hidden field
+ * Moving preserves alphabetical order.
  *
- * @return true
+ * @formName string     form name where values input exists
+ * @variableName string input name for left multiselect option values
+ * @source string       source multiselect ID
+ * @target string       target multiselect ID
+ * @action string       action to perform with hidden field ("add" or "rmv")
  */
-function moveListBoxSelectedItem(formname, objname, source, target, action) {
+function moveListBoxSelectedItem(formName, variableName, source, target, action) {
 	target = jQuery('#' + target);
+	source = jQuery('#' + source);
 
-	jQuery('#' + source).find('option:selected').each(function(i, selectedElement) {
+	source.find('option:selected').each(function(i, selectedElement) {
 		var notAppended = true;
-		target.find('option').each(function(j, elementInTarget) {
+		target.find('option').each(function (j, elementInTarget) {
 			if (elementInTarget.innerHTML.toLowerCase() > selectedElement.innerHTML.toLowerCase()) {
 				jQuery(elementInTarget).before(selectedElement);
 				notAppended = false;
@@ -324,45 +325,16 @@ function moveListBoxSelectedItem(formname, objname, source, target, action) {
 		if (notAppended) {
 			target.append(selectedElement);
 		}
-		selectedElement = jQuery(selectedElement);
-
-		// Fetch "variable" input element into which JSON'ed values of chosen items are stored.
-		var variableInput = jQuery("input[name=" + objname + "]", document.forms[formname]);
-
-		// Read current value of target input.
-		var currentValue = JsonParser.parse(variableInput.val());
-
-		// Take currently selected value.
-		var selectedValue = selectedElement.val();
-
-		// Add or remove one item from current value.
-		if (action.toLowerCase() == 'add') {
-			var found = false;
-			for (i in currentValue) {
-				if (currentValue.hasOwnProperty(i) && currentValue[i] == selectedValue) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				currentValue.push(selectedValue);
-			}
-		}
-		else if (action.toLowerCase() == 'rmv') {
-			for (i in currentValue) {
-				if (currentValue.hasOwnProperty(i) && currentValue[i] == selectedValue) {
-					// Use .splice() instead of delete to avoid making a hole in indexes.
-					currentValue.splice(i, 1);
-					break;
-				}
-			}
-		}
-
-		// JSONize and store value back to "variable" input element.
-		variableInput.val(JsonParser.stringify(currentValue));
 	});
 
-	return true;
+	var valuesSource = (action == 'add') ? target : source;
+	var currentValues = [];
+	jQuery('option', valuesSource).each(function(key, value) {
+		currentValues.push(jQuery(value).val());
+	});
+
+	// JSONize and store current values to input element.
+	jQuery('form[name="' + formName + '"]').find('input[name="' + variableName + '"]').val(JsonParser.stringify(currentValues));
 }
 
 /**

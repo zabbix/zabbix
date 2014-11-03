@@ -51,9 +51,10 @@ foreach ($this->data['usergroups'] as $group) {
 }
 
 // append user tweenbox to form list
-$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $this->data['group_users'], 10);
+$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', 10);
+$usersTweenBox->setSelectedValues($this->data['group_users']);
 foreach ($this->data['users'] as $user) {
-	$usersTweenBox->addItem($user['userid'], getUserFullname($user));
+	$usersTweenBox->addNewItem($user['userid'], getUserFullname($user));
 }
 $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), array(_('Other groups'), SPACE, $groupsComboBox)));
 
