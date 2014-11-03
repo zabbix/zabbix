@@ -97,7 +97,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		new CCol(SPACE, 'interface-control')
 	));
 
-	$row = new CRow(null, null, 'agentIterfacesFooter');
+	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
@@ -111,7 +111,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'SNMPInterfaces');
 	$ifTab->setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
@@ -124,7 +124,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'JMXInterfaces');
 	$ifTab->setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
@@ -137,7 +137,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'IPMIInterfaces');
 	$ifTab->setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
