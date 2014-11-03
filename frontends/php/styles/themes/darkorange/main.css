@@ -430,7 +430,7 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #dfdfdf; background-color: #2f2f2f; color: #fff; }
-.input[readonly], .input[readonly]:hover {
+.input[readonly], .input[readonly]:hover, .input[readonly]:focus {
 	border-color: #444; background: #2f2f2f; color: #dfdfdf;
 }
 .input[disabled], .input[disabled]:hover,
