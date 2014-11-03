@@ -497,14 +497,14 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 function makeFormFooter(CButton $mainButton = null, array $otherButtons = array()) {
 	if ($mainButton) {
 		$mainButton->main();
-		$mainButton->setButtonClass('jqueryinput');
+		$mainButton->setButtonClass('jqueryinput shadow');
 	}
 
 	foreach ($otherButtons as $button) {
 		/* @var CButton $button */
 
-		// buttons will inherit the styles from the containing div, no need for a separate class
-		$button->setButtonClass(null);
+		// buttons will inherit the styles from the containing div, so only the shadow class is required
+		$button->setButtonClass('shadow');
 	}
 
 	$otherButtonDiv = new CDiv($otherButtons, 'dd left');
