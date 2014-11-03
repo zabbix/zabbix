@@ -74,8 +74,8 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 }
 else {
 	$groupIds = getRequest('groups', array());
-	if (getRequest('groupid') > 0 && !$groupIds) {
-		array_push($groupIds, getRequest('groupid'));
+	if (getRequest('groupid') != 0 && !$groupIds) {
+		$groupIds[] = getRequest('groupid');
 	}
 	$hostIdsLinkedTo = getRequest('hosts', array());
 }
@@ -165,7 +165,7 @@ if ($twb_groupid == 0) {
 	$twb_groupid = $gr['groupid'];
 }
 $cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-foreach ($groupsAllowed as $gnum => $group) {
+foreach ($groupsAllowed as $group) {
 	$cmbGroups->addItem($group['groupid'], $group['name']);
 }
 

@@ -27,8 +27,8 @@ if (!isset($_REQUEST['form_refresh'])) {
 }
 
 $groupIds = getRequest('groups', array());
-if (getRequest('groupid') > 0 && !$groupIds) {
-	array_push($groupIds, getRequest('groupid'));
+if (getRequest('groupid') != 0 && !$groupIds) {
+	$groupIds[]= getRequest('groupid');
 }
 
 $newgroup = get_request('newgroup', '');
@@ -208,13 +208,13 @@ if (!$isDiscovered) {
 				$groupsTB->addItem($group['groupid'], $group['name'], true,
 					isset($groupsAllowed[$group['groupid']])
 				);
-				$groupsInList[] = $group['groupid'];
+				$groupsInList[$group['groupid']] = $group['groupid'];
 			}
 		}
 
 		// then add other host groups that user has permissions to, if not yet added to list
 		foreach ($groupsAllowed as $group) {
-			if (!in_array($group['groupid'], $groupsInList)) {
+			if (!isset($groupsInList[$group['groupid']])) {
 				$groupsTB->addItem($group['groupid'], $group['name']);
 			}
 		}
