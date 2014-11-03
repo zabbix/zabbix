@@ -1300,6 +1300,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for PolarSSL libpolarssl [by default - skip]
 	LIBPOLARSSL_CHECK_CONFIG([no])
 	if test "x$want_polarssl" = "xyes"; then
+		if test "x$have_tls" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		fi
+
 		if test "x$found_polarssl" != "xyes"; then
 			AC_MSG_ERROR([PolarSSL library libpolarssl not found])
 		else
@@ -1319,6 +1323,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for GnuTLS libgnutls [by default - skip]
 	LIBGNUTLS_CHECK_CONFIG([no])
 	if test "x$want_gnutls" = "xyes"; then
+		if test "x$have_tls" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		fi
+
 		if test "x$found_gnutls" != "xyes"; then
 			AC_MSG_ERROR([GnuTLS library libgnutls not found])
 		else
@@ -1338,6 +1346,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	dnl Check for OpenSSL libssl [by default - skip]
 	LIBOPENSSL_CHECK_CONFIG([no])
 	if test "x$want_openssl" = "xyes"; then
+		if test "x$have_tls" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		fi
+
 		if test "x$found_openssl" != "xyes"; then
 			AC_MSG_ERROR([OpenSSL library libssl not found])
 		else
