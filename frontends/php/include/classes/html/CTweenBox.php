@@ -19,99 +19,271 @@
 **/
 
 
+/**
+ * Class CTweenBox
+ *
+ * Renders two list boxes (multiselects) with buttons to move items between them. Move happens on client side.
+ * Item values of left side list box gets sent to server on form submit. All items are instances of CComboItem.
+ * Items in both list boxes are sorted  by captions, alphabetically.
+ */
 class CTweenBox {
 
-	public function __construct(&$form, $name, $value = null, $size = 10) {
+	/**
+	 * Stores form in which tween box is used.
+	 *
+	 * @var CForm
+	 */
+	protected $form;
+
+	/**
+	 * Name of tween box element.
+	 *
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * Name of element used for storing selected values.
+	 *
+	 * @var string
+	 */
+	protected $variableName;
+
+	/**
+	 * Holds currently selected (i.e. in left list box) item values.
+	 *
+	 * @var array
+	 */
+	protected $selectedValues = array();
+
+	/**
+	 * Holds all items used in this tween box.  Indexed by item value.
+	 *
+	 * @var CComboItem[]
+	 */
+	protected $items = array();
+
+	/**
+	 * Height of list boxes.
+	 *
+	 * @var int
+	 */
+	protected $size;
+
+	/**
+	 * Constructs new instance of CTweenBox.
+	 *
+	 * @param CForm  $form form in which this tween combo box is in
+	 * @param string $name name of tween combo box
+	 * @param int    $size height of list boxes
+	 */
+	public function __construct(CForm $form, $name, $size = 10) {
 		zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
 
-		/* @var $form CForm */
-		$this->form = &$form;
-		$this->name = $name.'_tweenbox';
-		$this->varname = $name;
-		$this->value = zbx_toHash($value);
-		$this->id_l = $this->varname.'_left';
-		$this->id_r = $this->varname.'_right';
-		$this->lbox = new CListBox($this->id_l, null, $size);
-		$this->rbox = new CListBox($this->id_r, null, $size);
-		$this->lbox->setAttribute('style', 'width: 280px;');
-		$this->rbox->setAttribute('style', 'width: 280px;');
+		$this->form = $form;
+		$this->name = $name . '_tweenbox';
+		$this->variableName = $name;
+
+		$this->size = $size;
 	}
 
-	public function setName($name = null) {
-		if (is_string($name)) {
-			$this->name = $name;
+	/**
+	 * Adds item to the possible items list. Uses value of combo item as key. Overwrites previous item with same value.
+	 *
+	 * @param CComboItem $item
+	 */
+	public function addItem(CComboItem $item) {
+		$value = $item->getValue();
+		$this->items[$value] = $item;
+	}
+
+	/**
+	 * Constructs new item and adds it to the possible items list. Uses CTweenBox::addItem() to add.
+	 *
+	 * @param int|string $value   value of item
+	 * @param string     $caption caption of item
+	 * @param bool       $enabled specifies whether it will be possible to move item between lists
+	 */
+	public function addNewItem($value, $caption, $enabled = true) {
+		$item = new CComboItem($value, $caption, null, $enabled);
+
+		$this->addItem($item);
+	}
+
+	/**
+	 * Returns item for given $value, or null if no such item is present.
+	 *
+	 * @param int|string $value value to look for
+	 *
+	 * @return CComboItem|null
+	 */
+	public function getItem($value) {
+		return isset($this->items[$value]) ? $this->items[$value] : null;
+	}
+
+	/**
+	 * Returns all items of this tween box.
+	 *
+	 * @return CComboItem[]
+	 */
+	public function getItems() {
+		return $this->items;
+	}
+
+	/**
+	 * Sets $values to be selected. Items with these values will appear in the left list box.
+	 *
+	 * @param array $values
+	 */
+	public function setSelectedValues(array $values) {
+		$this->selectedValues = zbx_toHash($values);
+	}
+
+	/**
+	 * Marks $value to be selected. Item with this value will appear in the left list box.
+	 *
+	 * @param int|string $value
+	 */
+	public function addSelectedValue($value) {
+		$this->selectedValues[$value] = $value;
+	}
+
+	/**
+	 * Generates and returns layout element for tween box based on current items and selected values.
+	 * It is possible to set custom captions for the list boxes with anything that layout engine supports -
+	 * a string, subclass of CTag, or even array of previous.
+	 *
+	 * @param mixed|null $leftCaption  custom caption for left list box caption
+	 * @param mixed|null $rightCaption custom caption for right list box caption
+	 *
+	 * @return CTable
+	 */
+	public function get($leftCaption = null, $rightCaption = null) {
+		if ($leftCaption === null) {
+			$leftCaption = _('In');
 		}
+		if ($rightCaption === null) {
+			$rightCaption = _('Other');
+		}
+
+		$tweenBoxTable = new CTable(null, 'tweenBoxTable');
+		$tweenBoxTable->attr('name', $this->name);
+		$tweenBoxTable->attr('id', zbx_formatDomId($this->name));
+		$tweenBoxTable->setCellSpacing(0);
+		$tweenBoxTable->setCellPadding(0);
+
+		if ($leftCaption || $rightCaption) {
+			$tweenBoxTable->addRow(array($leftCaption, '', $rightCaption));
+		}
+
+		$leftListBoxName = $this->variableName . '_left';
+		$leftListBox = new CListBox($leftListBoxName, null, $this->size);
+		$leftListBox->setAttribute('style', 'width: 280px;');
+
+		$rightListBoxName = $this->variableName . '_right';
+		$rightListBox = new CListBox($rightListBoxName, null, $this->size);
+		$rightListBox->setAttribute('style', 'width: 280px;');
+
+		// Items for left and right list boxes are sorted by checking if value of item is in $selectedValues.
+		$leftItems = array();
+		$rightItems = array();
+		foreach ($this->items as $value => $item) {
+			if (isset($this->selectedValues[$value])) {
+				$leftItems[] = $item;
+			}
+			else {
+				$rightItems[] = $item;
+			}
+		}
+
+		// Left and right list box items are sorted by caption to behave same way as client side.
+		foreach ($this->sortItemsByCaptions($leftItems) as $item) {
+			$leftListBox->addItem($item);
+		}
+
+		foreach ($this->sortItemsByCaptions($rightItems) as $item) {
+			$rightListBox->addItem($item);
+		}
+
+		$formName = $this->form->getName();
+		$leftListBoxId = $leftListBox->getAttribute('id');
+		$rightListBoxId = $rightListBox->getAttribute('id');
+
+		$moveToLeftListButton = new CButton('add', '  &laquo;  ', null, 'formlist');
+		$moveToLeftListButton->setAttribute(
+			'onclick',
+			'moveListBoxSelectedItem("' . $formName . '", "' . $this->variableName . '", "' . $rightListBoxId . '", "' .
+			$leftListBoxId . '", "add");'
+		);
+
+		$moveToRightListButton = new CButton('remove', '  &raquo;  ', null, 'formlist');
+		$moveToRightListButton->setAttribute(
+			'onclick',
+			'moveListBoxSelectedItem("' . $formName . '", "' . $this->variableName . '", "' . $leftListBoxId . '", "' .
+			$rightListBoxId . '", "rmv");'
+		);
+
+		$tweenBoxTable->addRow(
+			array(
+				$leftListBox,
+				new CCol(array($moveToLeftListButton, BR(), $moveToRightListButton)),
+				$rightListBox
+			)
+		);
+
+		$tweenBoxTable->addItem(new CVar($this->variableName, CJs::encodeJson(array_values($this->selectedValues))));
+
+		return $tweenBoxTable;
 	}
 
-	public function getName() {
-		return $this->name;
-	}
+	/**
+	 * Sorts array of CComboItem items by captions.
+	 *
+	 * @param CComboItem[] $items
+	 *
+	 * @return CComboItem[]
+	 */
+	protected function sortItemsByCaptions(array $items) {
+		$itemCaptions = array();
+		$unsortableItems = array();
 
-	public function addItem($value, $caption, $selected = null, $enabled = 'yes') {
-		if (is_null($selected)) {
-			if (is_array($this->value)) {
-				if (isset($this->value[$value])) {
-					$selected = 1;
+		foreach ($items as $key => $item) {
+			if (!$item instanceof CComboItem) {
+				$unsortableItems[$key] = $item;
+			}
+			elseif (!isset($item->items[0])) {
+				$unsortableItems[$key] = $item;
+			}
+			else {
+				$itemCaption = $item->items[0];
+				if (is_string($itemCaption)) {
+					$itemCaptions[$key] = array('caption' => $itemCaption);
+				}
+				else {
+					$unsortableItems[$key] = $item;
 				}
 			}
-			elseif (strcmp($value, $this->value) == 0) {
-				$selected = 1;
-			}
 		}
-		if ((is_bool($selected) && $selected)
-				|| (is_int($selected) && $selected != 0)
-				|| (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected == 'on'))) {
-			$this->lbox->addItem($value, $caption, null, $enabled);
-			$this->value[$value] = $value;
+		CArrayHelper::sort($itemCaptions, array('caption'));
+
+		$resultItems = array();
+		foreach (array_keys($itemCaptions) as $key) {
+			$resultItems[$key] = $items[$key];
 		}
-		else {
-			$this->rbox->addItem($value, $caption, null, $enabled);
+
+		foreach ($unsortableItems as $key => $item) {
+			$resultItems[$key] = $item;
 		}
+
+		return $resultItems;
 	}
 
-	public function get($caption_l = null, $caption_r = null) {
-		if (empty($caption_l)) {
-			$caption_l = _('In');
-		}
-		if (empty($caption_r)) {
-			$caption_r = _('Other');
-		}
-
-		$grp_tab = new CTable(null, 'tweenBoxTable');
-		$grp_tab->attr('name', $this->name);
-		$grp_tab->attr('id', zbx_formatDomId($this->name));
-		$grp_tab->setCellSpacing(0);
-		$grp_tab->setCellPadding(0);
-
-		if (!is_null($caption_l) || !is_null($caption_r)) {
-			$grp_tab->addRow(array($caption_l,  '', $caption_r));
-		}
-
-		$add_btn = new CButton('add', '  &laquo;  ', null, 'formlist');
-		$add_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
-		$rmv_btn = new CButton('remove', '  &raquo;  ', null, 'formlist');
-		$rmv_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
-
-		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn)), $this->rbox));
-
-		$grp_tab->addItem(new CVar($this->varname, CJs::encodeJson(array_values($this->value))));
-
-		return $grp_tab;
-	}
-
-	public function show($caption_l = null, $caption_r = null) {
-		if (!$caption_l) {
-			$caption_l = _('In');
-		}
-		if (!$caption_r) {
-			$caption_r = _('Other');
-		}
-		$tab = $this->get($caption_l, $caption_r);
-		$tab->show();
-	}
-
+	/**
+	 * Returns generated layout element as string.
+	 *
+	 * @return string
+	 */
 	public function toString() {
-		$tab = $this->get();
-		return $tab->toString();
+		return $this->get()->toString();
 	}
 }

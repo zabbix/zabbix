@@ -198,14 +198,15 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
+	$grp_tb = new CTweenBox($frmHost, 'groups', 10);
+	$grp_tb->setSelectedValues($hostGroups);
 	$all_groups = API::HostGroup()->get(array(
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND
 	));
 	order_result($all_groups, 'name');
 	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+		$grp_tb->addNewItem($group['groupid'], $group['name']);
 	}
 
 	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
