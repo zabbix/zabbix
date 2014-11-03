@@ -389,7 +389,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	elseif ($type == T_ZBX_JSON) {
 		if (!is_string($var)) {
 			$error = true;
-			$message = _s('Field "%1$s" is not string.', $caption);
+			$message = _s('Field "%1$s" is not a JSON-encoded array.', $caption);
 		}
 		else {
 			$var = CJs::decodeJson($var);
