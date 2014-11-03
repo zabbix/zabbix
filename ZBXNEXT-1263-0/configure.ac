@@ -1316,6 +1316,25 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="$AGENT_LDFLAGS $POLARSSL_LDFLAGS"
 	AGENT_LIBS="$AGENT_LIBS $POLARSSL_LIBS"
 
+	dnl Check for GnuTLS libgnutls [by default - skip]
+	LIBGNUTLS_CHECK_CONFIG([no])
+	if test "x$want_gnutls" = "xyes"; then
+		if test "x$found_gnutls" != "xyes"; then
+			AC_MSG_ERROR([GnuTLS library libgnutls not found])
+		else
+			have_tls="GnuTLS"
+		fi
+	fi
+	CFLAGS="$CFLAGS $GNUTLS_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $GNUTLS_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $GNUTLS_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $GNUTLS_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $GNUTLS_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
+
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
