@@ -248,27 +248,37 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* recommended for pure IBM DB2 CLI, but not required */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION,
 			(void *)SQL_OV_ODBC3, 0)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* allocate a database connection handle */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv,
 			&ibm_db2.hdbc)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* connect to the database */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect,
 			SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* set autocommit on */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* we do not generate vendor escape clause sequences */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
 			(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* set current schema */
 	if (NULL != dbschema && '\0' != *dbschema && ZBX_DB_OK == ret)
@@ -629,7 +639,7 @@ int	zbx_db_begin(void)
 
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
-		(SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+			(SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
 	{
 		rc = ZBX_DB_DOWN;
 	}
@@ -682,7 +692,7 @@ int	zbx_db_commit(void)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
 		rc = ZBX_DB_DOWN;
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
-		(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 	{
 		rc = ZBX_DB_DOWN;
 	}
@@ -736,7 +746,7 @@ int	zbx_db_rollback(void)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
 		rc = ZBX_DB_DOWN;
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
-		(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 	{
 		rc = ZBX_DB_DOWN;
 	}
@@ -797,8 +807,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
 			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
 	{
-		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0,
-				OCI_ATTR_ROW_COUNT, oracle.errhp);
+		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT,
+				oracle.errhp);
 	}
 
 	oci_ids_num = 0;
@@ -1869,7 +1879,7 @@ int	IBM_DB2server_status()
 	int	server_status = SQL_CD_TRUE;
 
 	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
-								&server_status, SQL_IS_POINTER, NULL)))
+			&server_status, SQL_IS_POINTER, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
