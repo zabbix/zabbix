@@ -796,6 +796,12 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
 			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
+			if (!API::Host()->isWritable($hostIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
 			// check if any of the hosts are discovered
 			$this->checkValidator($hostIds, new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
@@ -1085,6 +1091,12 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hostids'])) {
+			if (!API::Host()->isWritable($data['hostids'])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
 			// check if any of the hosts are discovered
 			$this->checkValidator($data['hostids'], new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
