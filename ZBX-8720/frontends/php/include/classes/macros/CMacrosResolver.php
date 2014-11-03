@@ -716,7 +716,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				// Replace macro string with actual, resolved string value. This is safe because we start from far
 				// end of $sourceString.
-				$sourceString = substr_replace($sourceString, $value, $matches['macros'][$i][1], strlen($matches['macros'][$i][0]));
+				$sourceString = substr_replace($sourceString, $value, $matches['macros'][$i][1],
+					strlen($matches['macros'][$i][0])
+				);
 			}
 
 			// Advance to next matches for next $sourceString
