@@ -46,9 +46,9 @@ div.preloader {
 }
 
 .link_menu { border-color: #3c3089; color: #3c3089; }
-.link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
+.link_menu:hover { color: #6C80B9; border-color: #6C80B9; }
 .link_menu[disabled], .link_menu[disabled]:hover {
-	background-color: #ffffff; color: #aca899; background-color: white;
+	background-color: #ffffff; color: #aca899;
 }
 
 /* form input and form buttons */
@@ -71,19 +71,6 @@ div.preloader {
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
 	color: #aca899;
-}
-
-/* disabled form buttons */
-.formtable .input.button[disabled]:hover {
-	background-color: #fafbfc;
-	border-color: #ced8e6;
-	color: #a8bfd4;
-}
-
-/* disabled save button */
-.formtable .jqueryinput.input.button[disabled]:hover {
-	border-color: #ffaa33;
-	color: #a8bfd4;
 }
 
 /* show non-gray background for disabled multiselect inputs on hover */
