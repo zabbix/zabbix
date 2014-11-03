@@ -1335,6 +1335,25 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
 	AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
 
+	dnl Check for OpenSSL libssl [by default - skip]
+	LIBOPENSSL_CHECK_CONFIG([no])
+	if test "x$want_openssl" = "xyes"; then
+		if test "x$found_openssl" != "xyes"; then
+			AC_MSG_ERROR([OpenSSL library libssl not found])
+		else
+			have_tls="OpenSSL"
+		fi
+	fi
+	CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENSSL_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $OPENSSL_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $OPENSSL_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $OPENSSL_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $OPENSSL_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $OPENSSL_LIBS"
+
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
