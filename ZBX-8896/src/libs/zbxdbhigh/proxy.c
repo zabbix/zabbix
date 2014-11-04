@@ -1088,7 +1088,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						zbx_free(value->str);
 				}
 			}
-			zbx_vector_ptr_clean(&values, zbx_ptr_free);
+			zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 
 			if (f != fields_count)
 			{

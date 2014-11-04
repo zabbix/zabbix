@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 08:37+0300\n"
+"POT-Creation-Date: 2014-10-31 11:17+0200\n"
 "PO-Revision-Date: 2014-10-24 09:03+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1133,14 +1133,14 @@ msgstr "イメージの設定"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "ITサービスの設定"
 
-#: disc_prototypes.php:353
+#: disc_prototypes.php:355
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "アイテムのプロトタイプの設定"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:872
-#: items.php:1009
+#: include/views/configuration.item.massupdate.php:28 items.php:874
+#: items.php:1011
 msgid "CONFIGURATION OF ITEMS"
 msgstr "アイテムの設定"
 
@@ -1379,7 +1379,7 @@ msgstr "ホストのプロトタイプを追加できません"
 msgid "Cannot add image"
 msgstr "イメージを追加できません"
 
-#: items.php:513
+#: items.php:515
 msgid "Cannot add item"
 msgstr "アイテムを追加できません"
 
@@ -1388,7 +1388,7 @@ msgstr "アイテムを追加できません"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "\"%2$s\"のアイテム\"%1$s\"を\"%4$s\"のアプリケーション\"%3$s\"に追加できません"
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Cannot add item prototype"
 msgstr "アイテムのプロトタイプが追加できません"
 
@@ -1499,7 +1499,7 @@ msgstr "認証方式をLDAPに変更できません"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "認証方式をZabbix内部データベースに変更できません"
 
-#: httpconf.php:185 httpconf.php:435 items.php:551 items.php:817
+#: httpconf.php:185 httpconf.php:435 items.php:553 items.php:819
 msgid "Cannot clear history"
 msgstr "ヒストリを削除できません"
 
@@ -1527,7 +1527,7 @@ msgstr "ZabbixサーバーデーモンのTrapperポートに接続できませ�
 msgid "Cannot copy graphs"
 msgstr "グラフをコピーできません"
 
-#: items.php:774
+#: items.php:776
 msgid "Cannot copy items"
 msgstr "アイテムをコピーできません"
 
@@ -1616,7 +1616,7 @@ msgstr "ディスカバリされたグラフ\"%1$s\"は削除できません。"
 msgid "Cannot delete discovered host \"%1$s\"."
 msgstr "ディスカバリされたホスト\"%1$s\"は削除できません。"
 
-#: include/classes/api/services/CItem.php:659
+#: include/classes/api/services/CItem.php:633
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
 msgstr "ディスカバリされたアイテム\"%1$s\"は削除できません。"
@@ -1688,19 +1688,19 @@ msgstr "イメージを削除できません"
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
-#: items.php:402
+#: items.php:404
 msgid "Cannot delete item"
 msgstr "アイテムを削除できません"
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Cannot delete item prototype"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Cannot delete item prototypes"
 msgstr "アイテムのプロトタイプを削除できません"
 
-#: items.php:847
+#: items.php:849
 msgid "Cannot delete items"
 msgstr "アイテムを削除できません"
 
@@ -1776,7 +1776,7 @@ msgstr "テンプレートのグラフを削除できません。"
 msgid "Cannot delete templated host prototype."
 msgstr "テンプレートのホストのプロトタイプを削除できません"
 
-#: include/classes/api/services/CItem.php:654
+#: include/classes/api/services/CItem.php:628
 msgid "Cannot delete templated item."
 msgstr "テンプレートのアイテムを削除できません"
 
@@ -1856,12 +1856,12 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] "ホストのプロトタイプを無効にできません"
 
-#: applications.php:249 items.php:739
+#: applications.php:249 items.php:741
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "アイテムを無効にできません"
 
-#: disc_prototypes.php:313
+#: disc_prototypes.php:315
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "アイテムのプロトタイプを無効にできません"
@@ -1924,12 +1924,12 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] "ホストのプロトタイプを有効にできません"
 
-#: applications.php:248 items.php:738
+#: applications.php:248 items.php:740
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "アイテムを有効にできません"
 
-#: disc_prototypes.php:312
+#: disc_prototypes.php:314
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "アイテムのプロトタイプを有効にできません"
@@ -2483,15 +2483,15 @@ msgstr "イメージを更新できません"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のインターフェースを更新できません"
 
-#: items.php:510
+#: items.php:512
 msgid "Cannot update item"
 msgstr "アイテムを更新できません"
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Cannot update item prototype"
 msgstr "アイテムのプロトタイプを更新できません"
 
-#: items.php:718
+#: items.php:720
 msgid "Cannot update items"
 msgstr "アイテムを更新できません"
 
@@ -3283,7 +3283,7 @@ msgstr "アイコンの作成"
 msgid "Create icon map"
 msgstr "アイコンのマッピングの作成"
 
-#: include/views/configuration.item.list.php:37 items.php:853
+#: include/views/configuration.item.list.php:37 items.php:855
 msgid "Create item"
 msgstr "アイテムの作成"
 
@@ -3378,7 +3378,7 @@ msgstr "作成: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のホストのプロトタイプ\"%1$s\"。"
 
-#: include/classes/api/services/CItem.php:536
+#: include/classes/api/services/CItem.php:509
 #, c-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のアイテム\"%1$s\"。"
@@ -3471,8 +3471,8 @@ msgstr "カスタムラベル"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "マップ\"%2$s\"のカスタムラベルのタイプ要素\"%1$s\"を設定してください。"
 
-#: disc_prototypes.php:107 include/views/configuration.item.massupdate.php:300
-#: items.php:115
+#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
+#: items.php:116
 msgid "Custom multiplier"
 msgstr "乗数"
 
@@ -4148,7 +4148,7 @@ msgstr "削除: ホスト\"%1$s\"。"
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のホストのプロトタイプ\"%1$s\"。"
 
-#: include/classes/api/services/CItem.php:756
+#: include/classes/api/services/CItem.php:730
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のアイテム\"%1$s\"。"
@@ -4869,7 +4869,7 @@ msgstr "ホストが空白です。"
 #: include/classes/api/services/CHost.php:1301
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
-#: include/classes/api/services/CItem.php:632
+#: include/classes/api/services/CItem.php:606
 #: include/classes/api/services/CItemPrototype.php:456
 #: include/classes/api/services/CProxy.php:474
 #: include/classes/api/services/CService.php:341
@@ -6167,14 +6167,14 @@ msgstr "重度の障害"
 #: include/page_header.php:323
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.prototype.list.php:50 items.php:162
+#: include/views/configuration.item.prototype.list.php:50 items.php:164
 #: jsLoader.php:203 latest.php:473 latest.php:474 latest.php:581
 #: latest.php:768
 msgid "History"
 msgstr "ヒストリ"
 
 #: httpconf.php:178 httpconf.php:185 httpconf.php:423 httpconf.php:435
-#: items.php:544 items.php:551 items.php:805 items.php:817
+#: items.php:546 items.php:553 items.php:807 items.php:819
 msgid "History cleared"
 msgstr "ヒストリを削除しました"
 
@@ -6196,7 +6196,7 @@ msgstr "ヒストリデータ保存期間(日) \"%1$s\""
 msgid "History of events"
 msgstr "イベント履歴"
 
-#: disc_prototypes.php:114 items.php:54
+#: disc_prototypes.php:116 items.php:54
 msgid "History storage period"
 msgstr "ヒストリ保存期間"
 
@@ -6248,8 +6248,8 @@ msgstr "横位置"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:544 items.php:804
-#: items.php:837 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:546 items.php:806
+#: items.php:839 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
 #: popup.php:501 popup.php:1089 queue.php:248 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:297
 msgid "Host"
@@ -8027,7 +8027,7 @@ msgstr "2つ目のパラメータが正しくありません。"
 msgid "Invalid third parameter."
 msgstr "3つ目のパラメータが正しくありません。"
 
-#: disc_prototypes.php:178 host_discovery.php:175 items.php:389
+#: disc_prototypes.php:180 host_discovery.php:175 items.php:391
 msgid "Invalid time period"
 msgstr "時間の指定が正しくありません。"
 
@@ -8085,8 +8085,8 @@ msgstr "イタリア語 (it_IT)"
 #: include/views/configuration.screen.constructor.edit.php:234
 #: include/views/configuration.screen.constructor.edit.php:360
 #: include/views/configuration.screen.constructor.edit.php:621
-#: include/views/configuration.triggers.expression.php:57 items.php:543
-#: items.php:804 items.php:837 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:545
+#: items.php:806 items.php:839 tr_logform.php:251
 msgid "Item"
 msgstr "アイテム"
 
@@ -8105,7 +8105,7 @@ msgstr "アイテム\"%1$s\"は\"%2$s\"にすでに存在します (他のテン
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "アイテム\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: include/classes/api/services/CItem.php:932
+#: include/classes/api/services/CItem.php:906
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "アイテム\"%1$s\"はフィールド番号が存在しないホストインベントリ\"%2$d\"を自動設定することができません。0 (自動設定しない)から%3$dの間で設定してください。"
@@ -8136,7 +8136,7 @@ msgstr "アイテム\"%1$s\"はスキップされました - ユーザの指定�
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "アイテム\"%1$s:%2$s\"のポート\"%3$s\"は正しくありません。"
 
-#: items.php:513
+#: items.php:515
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
@@ -8144,16 +8144,16 @@ msgstr "アイテムを追加しました"
 msgid "Item count"
 msgstr "アイテム数"
 
-#: items.php:402
+#: items.php:404
 msgid "Item deleted"
 msgstr "アイテムを削除しました"
 
-#: applications.php:246 items.php:736
+#: applications.php:246 items.php:738
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "アイテムを無効にしました"
 
-#: applications.php:245 items.php:735
+#: applications.php:245 items.php:737
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
@@ -8185,25 +8185,25 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Item prototype added"
 msgstr "アイテムのプロトタイプを追加しました"
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Item prototype deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
-#: disc_prototypes.php:310
+#: disc_prototypes.php:312
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "アイテムのプロトタイプを無効にしました"
 
-#: disc_prototypes.php:309
+#: disc_prototypes.php:311
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "アイテムにプロトタイプを有効にしました"
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Item prototype updated"
 msgstr "アイテムのプロトタイプを更新しました"
 
@@ -8214,7 +8214,7 @@ msgstr "アイテムのプロトタイプを更新しました"
 msgid "Item prototypes"
 msgstr "アイテムのプロトタイプ"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Item prototypes deleted"
 msgstr "アイテムのプロトタイプを削除しました"
 
@@ -8222,7 +8222,7 @@ msgstr "アイテムのプロトタイプを削除しました"
 msgid "Item prototypes of"
 msgstr "アイテムのプロトタイプ:"
 
-#: items.php:510
+#: items.php:512
 msgid "Item updated"
 msgstr "アイテムを更新しました"
 
@@ -8299,11 +8299,11 @@ msgstr "アイテム"
 msgid "Items (m/d/n)"
 msgstr "アイテム数 (有効/無効/取得不可)"
 
-#: items.php:774
+#: items.php:776
 msgid "Items copied"
 msgstr "アイテムをコピーしました"
 
-#: items.php:847
+#: items.php:849
 msgid "Items deleted"
 msgstr "アイテムを削除しました"
 
@@ -8311,7 +8311,7 @@ msgstr "アイテムを削除しました"
 msgid "Items list"
 msgstr "アイテムのリスト"
 
-#: items.php:718
+#: items.php:720
 msgid "Items updated"
 msgstr "アイテムを更新しました"
 
@@ -8453,11 +8453,11 @@ msgstr "LDAP認証を変更しました"
 msgid "LDAP host"
 msgstr "LDAPホスト"
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login successful"
 msgstr "LDAPによるログインが成功しました"
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login was not successful"
 msgstr "LDAPによるログインが失敗しました"
 
@@ -10267,7 +10267,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
 #: include/classes/api/services/CItemGeneral.php:239
-#: include/classes/api/services/CItem.php:649
+#: include/classes/api/services/CItem.php:623
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
 #: include/classes/api/services/CMaintenance.php:315
@@ -10383,7 +10383,7 @@ msgstr "プロキシにステータスが設定されていません。"
 msgid "No target selected"
 msgstr "何も選択されていません"
 
-#: graphs.php:376 items.php:777
+#: graphs.php:376 items.php:779
 msgid "No target selected."
 msgstr "何も選択されていません。"
 
@@ -11480,7 +11480,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:154 items.php:89 items.php:158
+#: include/views/inventory.host.view.php:154 items.php:89 items.php:160
 #: setup.php:48
 msgid "Port"
 msgstr "ポート"
@@ -13967,7 +13967,7 @@ msgstr "トレンドデータ保存期間"
 msgid "Trend data storage period (in days) \"%1$s\"."
 msgstr "トレンドデータ保存期間(日) \"%1$s\"。"
 
-#: disc_prototypes.php:118 items.php:62
+#: disc_prototypes.php:120 items.php:62
 msgid "Trend storage period"
 msgstr "トレンド保存期間"
 
@@ -13979,7 +13979,7 @@ msgstr "トレンド保存期間 (日)"
 #: include/forms.inc.php:608 include/forms.inc.php:942
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:70
-#: include/views/configuration.item.prototype.list.php:51 items.php:163
+#: include/views/configuration.item.prototype.list.php:51 items.php:165
 #: latest.php:476 latest.php:477
 msgid "Trends"
 msgstr "トレンド"
@@ -14274,7 +14274,7 @@ msgstr "トルコ語 (tr_TR)"
 msgid "Two elements should be selected"
 msgstr "2つの要素を選択する必要があります"
 
-#: include/classes/api/services/CItem.php:993
+#: include/classes/api/services/CItem.php:967
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "2つのアイテム(\"%1$s\"と\"%2$s\")から1つのホストのインベントリフィールド\"%3$s\"を自動的に設定することはできません。"
@@ -14718,7 +14718,7 @@ msgid "Update existing"
 msgstr "既存の設定を上書"
 
 #: include/forms.inc.php:441 include/views/configuration.httpconf.list.php:66
-#: items.php:161
+#: items.php:163
 msgid "Update interval"
 msgstr "更新間隔"
 
@@ -14761,7 +14761,7 @@ msgstr "更新: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のホストのプロトタイプ\"%1$s\"。"
 
-#: include/classes/api/services/CItem.php:588
+#: include/classes/api/services/CItem.php:561
 #, c-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のアイテム\"%1$s\"。"
