@@ -597,7 +597,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* modal window */
 .ui-widget-overlay { z-index: 1000; }
-.ui-dialog { z-index: 1001; opacity: 1; }
+.ui-dialog { z-index: 1001; opacity: 1; min-width: 170px; }
 
 /* trigger expression */
 .trigger-expression, table.tableinfo .trigger-expression { white-space: pre-wrap; }
