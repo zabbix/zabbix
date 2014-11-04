@@ -51,7 +51,7 @@ $buttons = array(
 	new CButtonCancel('&triggerid='.$this->data['triggerid'])
 );
 
-if (!$this->data['isCommentExist']) {
+if ($this->data['isCommentExist']) {
 	$editButton = new CButton('edit', _('Edit'));
 	$editButton->setEnabled($this->data['isTriggerEditable']);
 
