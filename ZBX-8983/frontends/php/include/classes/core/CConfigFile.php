@@ -155,7 +155,7 @@ $DB[\'DATABASE\'] = \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
 $DB[\'USER\']     = \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
 $DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
-// SCHEMA is relevant only for IBM_DB2 database
+// SCHEMA is relevant only for IBM_DB2 or PostgreSQL database
 $DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
 $ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
