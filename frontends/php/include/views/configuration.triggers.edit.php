@@ -82,7 +82,7 @@ $addExpressionButton = new CButton(
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
 		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()), 800, 265);',
-	'button-form'
+	'button-form top'
 );
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
@@ -91,7 +91,7 @@ $expressionRow = array($expressionTextBox, $addExpressionButton);
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
-	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'button-form');
+	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'button-form top');
 	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
 	if ($this->data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
