@@ -674,12 +674,24 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($items as $item) {
 			if (isset($allowedItems[$item['itemid']])) {
 				$hostKeyPairs[$item['host']][$item['key_']] = $item;
-				$allowedItems[$item['itemid']]['value_type'] = $item['value_type'];
 			}
 		}
 
-		// Fetch history for allowed items.
-		$allowedItemsHistory = Manager::History()->getLast($allowedItems);
+		// Gather items from macros where function last() is used and then fetch last history only for those items.
+		$itemsNeedingLastHistory = array();
+		foreach ($matchesList as $matches) {
+			$macroCount = count($matches['macros']);
+			for ($i = 0; $i != $macroCount; $i++) {
+				$host = $matches['hosts'][$i][0];
+				$key = $matches['keys'][$i][0];
+
+				if ($host !== UNRESOLVED_MACRO_STRING && is_array($hostKeyPairs[$host][$key])
+						&& $matches['functions'][$i][0] == 'last') {
+					$itemsNeedingLastHistory[] = $hostKeyPairs[$host][$key];
+				}
+			}
+		}
+		$lastHistoryOfItems = Manager::History()->getLast($itemsNeedingLastHistory);
 
 		// Replace macros with their resolved values in source strings.
 		$matches = reset($matchesList);
@@ -700,8 +712,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					// If macro function is "last", try to use history value directly.
 					if ($function == 'last') {
-						$value = isset($allowedItemsHistory[$item['itemid']])
-							? formatHistoryValue($allowedItemsHistory[$item['itemid']][0]['value'], $item)
+						$value = isset($lastHistoryOfItems[$item['itemid']])
+							? formatHistoryValue($lastHistoryOfItems[$item['itemid']][0]['value'], $item)
 							: UNRESOLVED_MACRO_STRING;
 					}
 					// For other macro functions ("max", "min" or "avg") get item value.
