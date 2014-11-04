@@ -561,14 +561,8 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 	zbx_uint64_t	seed;
 	int		nextcheck;
 
-	if (NULL == host)
-		host = zbx_hashset_search(&config->hosts, &item->hostid);
-
-	if (NULL != host && 0 != host->proxy_hostid &&
-			NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-	{
+	if (0 != host->proxy_hostid && NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 		now -= proxy->timediff;
-	}
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -1039,8 +1033,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
-			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found ||
-					HOST_STATUS_PROXY_PASSIVE != host->status))
+			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
 			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
@@ -5012,7 +5005,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, NULL, lastclock);
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
