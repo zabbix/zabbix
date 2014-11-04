@@ -1218,7 +1218,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DCconfig_get_items_by_itemids(items, ids.values, errcodes, history_num);
 	DCget_delta_items(&delta_history, &ids);
 
-	ids.values_num = 0;	/* item ids that are not disabled and not deleted in DB */
+	zbx_vector_uint64_clear(&ids);	/* item ids that are not disabled and not deleted in DB */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1266,7 +1266,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	DCadd_update_inventory_sql(&sql_offset, &inventory_values);
 
-	zbx_vector_ptr_clean(&inventory_values, (zbx_mem_free_func_t)DCinventory_value_free);
+	zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 	zbx_vector_ptr_destroy(&inventory_values);
 
 	/* disable processing of deleted and disabled items by setting value_null */
@@ -2843,7 +2843,7 @@ static void	init_trend_cache()
 #define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef INIT_HASHSET_SIZE

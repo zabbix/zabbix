@@ -459,13 +459,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 {
-	int	i;
-
-	for (i = 0; i < rule->delete_queue.values_num; i++)
-	{
-		zbx_free(rule->delete_queue.values[i]);
-	}
-	rule->delete_queue.values_num = 0;
+	zbx_vector_ptr_clear_ext(&rule->delete_queue, zbx_ptr_free);
 }
 
 /******************************************************************************
