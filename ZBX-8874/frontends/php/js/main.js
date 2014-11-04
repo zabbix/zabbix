@@ -1052,15 +1052,15 @@ jQuery(function ($) {
 	 * "Enter" keypress does not just grab first submit button in the form. If submit button can not be
 	 * located, the keypress event is bubbled up.
 	 *
-	 * @param {string}  submitButtonSelector	selector that is used to get default button element in form
+	 * @param {string} selector			selector that is used to get default button element in form
 	 *
-	 * @throws throws exception if submit button selector is not provided
+	 * @throws exception if submit button selector is not string
 	 *
 	 * @return {object}
 	 */
-	$.fn.enterSubmit = function (submitButtonSelector) {
-		if (submitButtonSelector == null || typeof submitButtonSelector != 'string') {
-			throw 'Submit button selector string must be provided.';
+	$.fn.enterSubmit = function (selector) {
+		if (typeof selector !== 'string') {
+			throw Error('Invalid input type. String required, got ' + typeof selector);
 		}
 
 		// Take only form elements.
@@ -1074,7 +1074,7 @@ jQuery(function ($) {
 				}
 
 				// Look for submit button in form.
-				var submitButton = $(submitButtonSelector, form);
+				var submitButton = $(selector, form);
 
 				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
 				if (submitButton.length == 0) {
