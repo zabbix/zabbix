@@ -1082,8 +1082,8 @@ retry:
 
 			if (NULL == var)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
-						" all of the requested variable bindings", items[0].host.host);
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+						" too few variable bindings", items[0].host.host);
 
 				zbx_strlcpy(error, "Invalid SNMP response: too few variable bindings.", max_error_len);
 
@@ -1093,13 +1093,16 @@ retry:
 
 			j = mapping[i];
 
-			if (parsed_oid_lens[j] != var->name_length ||
-					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
+			if (1 == mapping_num && 0 == level && (parsed_oid_lens[j] != var->name_length ||
+					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid))))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
-						" variable bindings in the requested order", items[0].host.host);
+				/* Validation of response OID matching the request is only done for bulk requests. */
+				/* Otherwise, there would be no way to monitor devices that are very non-conformant. */
 
-				zbx_strlcpy(error, "Invalid SNMP response: variable bindings out of order.",
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+						" variable bindings that do not match the request", items[0].host.host);
+
+				zbx_strlcpy(error, "Invalid SNMP response: variable bindings do not match the request.",
 						max_error_len);
 
 				ret = NOTSUPPORTED;
