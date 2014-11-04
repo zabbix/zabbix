@@ -31,8 +31,12 @@ class CButton extends CTag {
 	public function __construct($name = 'button', $caption = '', $action = null, $buttonClass = 'button-plain shadow ui-corner-all') {
 		parent::__construct('button', 'yes', $caption, 'button');
 		$this->setAttribute('type', 'button');
-		$this->setAttribute('id', zbx_formatDomId($name));
-		$this->setAttribute('name', $name);
+
+		if ($name !== null) {
+			$this->setAttribute('id', zbx_formatDomId($name));
+			$this->setAttribute('name', $name);
+		}
+
 		$this->addAction('onclick', $action);
 
 		$this->buttonClass = $buttonClass;

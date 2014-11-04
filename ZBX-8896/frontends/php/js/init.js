@@ -152,4 +152,14 @@ jQuery(function($) {
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
+
+	// redirect buttons
+	$('button[data-url]').click(function() {
+		var button = $(this);
+		var confirmation = button.data('confirmation');
+
+		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
+			redirect(button.data('url'));
+		}
+	})
 });
