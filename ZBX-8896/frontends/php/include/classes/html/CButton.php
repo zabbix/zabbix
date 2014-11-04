@@ -21,6 +21,11 @@
 
 class CButton extends CTag {
 
+	/**
+	 * Button class that will be added to the other classes of the element.
+	 *
+	 * @var string
+	 */
 	protected $buttonClass;
 
 	public function __construct($name = 'button', $caption = '', $action = null, $buttonClass = 'button-plain shadow ui-corner-all') {
@@ -33,19 +38,18 @@ class CButton extends CTag {
 		$this->buttonClass = $buttonClass;
 	}
 
+	/**
+	 * Mark the button as main.
+	 */
 	public function main() {
 		$this->addClass('main');
 	}
 
-	public function setReadonly($value) {
-		if ($value) {
-			$this->attr('readonly', 'readonly');
-		}
-		else {
-			$this->removeAttribute('readonly');
-		}
-	}
-
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param $value
+	 */
 	public function setEnabled($value) {
 		if ($value) {
 			$this->removeAttribute('disabled');
@@ -55,11 +59,15 @@ class CButton extends CTag {
 		}
 	}
 
+	/**
+	 * @param string $class
+	 */
 	public function setButtonClass($class) {
 		$this->buttonClass = $class;
 	}
 
 	public function toString($destroy = true) {
+		// append the button class
 		if ($this->buttonClass !== null) {
 			$this->addClass($this->buttonClass);
 		}

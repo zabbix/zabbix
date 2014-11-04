@@ -36,6 +36,11 @@ class CRadioButton extends CTag {
 		}
 	}
 
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param $value
+	 */
 	public function setEnabled($value) {
 		if ($value) {
 			$this->removeAttribute('disabled');
