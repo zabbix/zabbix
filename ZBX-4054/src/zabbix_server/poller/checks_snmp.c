@@ -524,6 +524,9 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 	}
 	else
 	{
+		/* snprint_value() escapes hintless ASCII strings, so */
+		/* we are copying the raw unescaped value in this case */
+
 		strval_dyn = zbx_malloc(strval_dyn, var->val_len + 1);
 		memcpy(strval_dyn, var->val.string, var->val_len);
 		strval_dyn[var->val_len] = '\0';
