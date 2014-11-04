@@ -1510,8 +1510,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_uint64_t		hostid;
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
-	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
+	char			*tmp = NULL, *sql = NULL, *error_esc;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset,
+				tmp_alloc = 4 * ZBX_KIBIBYTE;
 	int			availability_alloc = 0, availability_num = 0;
 	zbx_host_availability_t	*availability = NULL;
 
@@ -1528,6 +1529,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	tmp = zbx_malloc(tmp, tmp_alloc);
 
 	DBbegin();
 
@@ -1541,7 +1543,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, tmp_alloc) ||
 				SUCCEED != is_uint64(tmp, &hostid))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
@@ -1552,7 +1554,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, tmp_alloc))
 		{
 			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
 
@@ -1568,7 +1570,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			availability_num++;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, tmp_alloc))
 		{
 			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
 
@@ -1584,7 +1586,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			availability_num++;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, tmp_alloc))
 		{
 			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
 
@@ -1600,7 +1602,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			availability_num++;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, tmp_alloc))
 		{
 			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
 
@@ -1616,30 +1618,30 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			availability_num++;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_string_len(tmp, strlen(tmp));
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, tmp, tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_string_len(tmp, strlen(tmp));
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, tmp, tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_string_len(tmp, strlen(tmp));
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
+			error_esc = DBdyn_escape_string_len(tmp, strlen(tmp));
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
@@ -1669,6 +1671,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 out:
 	zbx_free(availability);
 	zbx_free(sql);
+	zbx_free(tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
