@@ -51,6 +51,9 @@ div.preloader {
 	background-color: #ffffff; color: #aca899;
 }
 
+.ui-button.main { border-color: #ffaa33 !important; }
+.ui-button.main:hover { border-color: #dd7711 !important; }
+
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #ACA899; background-color: white; }
 .input[readonly], .input[readonly]:hover, .input[readonly]:focus {
