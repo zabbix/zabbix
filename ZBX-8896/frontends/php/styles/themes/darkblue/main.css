@@ -443,12 +443,7 @@ div.formElement{ border: 1px solid #77B7DA;}
 div.objectgroup { border-color: #4B7489; }
 div.border_dotted { border: 1px dotted #4B7489; }
 
-.footer .dt input.main{ border-color: #77B7DA; }
-.footer .dt input.main:hover{ border-color: #77B7DA; }
-
-
 ul.objectlist li{ color: #FFFFFF; }
-
 
 .formElementTable tr td{ color: #FFFFFF; }
 
@@ -472,6 +467,9 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 	background: none; color: #aca899;
 }
 
+.ui-button.main { border-color: #77b7da !important; }
+.ui-button.main:hover { border-color: #77b7da !important; }
+
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #b3c9d6; background-color: #2f6487; color: #fff; }
 .input[readonly], .input[readonly]:hover, .input[readonly]:focus {
@@ -486,8 +484,6 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 
 .input:focus, .input:hover { border-color: #6e8ab4; }
 .input option { background: #2F6487; color: #FFFFFF; }
-
-.button-form:hover, .button-form.main { border-color: #77b7dA; }
 
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
