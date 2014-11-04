@@ -60,15 +60,6 @@ class CButtonTest extends CTagTest {
 		);
 	}
 
-	public function testSetReadonly() {
-		$button = $this->createTag();
-		$button->setReadonly(true);
-		$this->assertEquals(
-			'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" readonly="readonly"></button>',
-			(string) $button
-		);
-	}
-
 	public function testSetEnabled() {
 		$button = $this->createTag();
 		$button->setEnabled(false);

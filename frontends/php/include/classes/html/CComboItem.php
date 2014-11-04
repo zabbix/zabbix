@@ -52,6 +52,11 @@ class CComboItem extends CTag {
 		$this->removeAttribute('selected');
 	}
 
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param $value
+	 */
 	public function setEnabled($value) {
 		if ($value) {
 			$this->removeAttribute('disabled');
