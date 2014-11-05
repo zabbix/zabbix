@@ -273,6 +273,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
+	int		timediff;
 	unsigned char	location;
 }
 ZBX_DC_PROXY;
@@ -640,10 +641,14 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	return itemid;
 }
 
-static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
+static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
 {
-	int		nextcheck;
+	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
+	int		nextcheck;
+
+	if (0 != host->proxy_hostid && NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
+		now -= proxy->timediff;
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -661,6 +666,9 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 
 		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now);
 	}
+
+	if (NULL != proxy)
+		nextcheck += proxy->timediff + 1;
 
 	return nextcheck;
 }
@@ -691,7 +699,7 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 			/* nothing to do */;
 	}
 
-	return DCget_reachable_nextcheck(item, time(NULL));
+	return DCget_reachable_nextcheck(item, host, time(NULL));
 }
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
@@ -1077,8 +1085,6 @@ static void	DCsync_hosts(DB_RESULT result)
 				host->data_expected_from = now;
 		}
 
-		host->status = status;
-
 		/* update hosts_h index using new data, if not done already */
 
 		if (1 == update_index)
@@ -1112,21 +1118,31 @@ static void	DCsync_hosts(DB_RESULT result)
 			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
 
-		/* passive proxies */
+		/* proxies */
 
-		if (HOST_STATUS_PROXY_PASSIVE == host->status)
+		if (HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status)
 		{
 			proxy = DCfind_id(&config->proxies, hostid, sizeof(ZBX_DC_PROXY), &found);
 
 			if (0 == found)
 			{
+				proxy->timediff = 0;
+				proxy->location = ZBX_LOC_NOWHERE;
+			}
+
+			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
+			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-				proxy->location = ZBX_LOC_NOWHERE;
 
 				DCupdate_proxy_queue(proxy);
+			}
+			else if (HOST_STATUS_PROXY_ACTIVE == status && ZBX_LOC_QUEUE == proxy->location)
+			{
+				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
+				proxy->location = ZBX_LOC_NOWHERE;
 			}
 		}
 		else if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
@@ -1139,6 +1155,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			zbx_hashset_remove(&config->proxies, &hostid);
 		}
+
+		host->status = status;
 	}
 
 	/* remove deleted hosts from buffer */
@@ -1164,7 +1182,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			zbx_hashset_remove(&config->ipmihosts, &hostid);
 		}
 
-		/* passive proxies */
+		/* proxies */
 
 		if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
 		{
@@ -1943,17 +1961,28 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 					(ITEM_STATE_NORMAL == item->state &&
 					(item->delay != delay || 0 != delay_flex_changed))))
 			{
+				ZBX_DC_PROXY	*proxy = NULL;
 				zbx_uint64_t	seed;
+				int		proxy_timediff;
+
+				if (0 != host->proxy_hostid)
+					proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid);
+
+				proxy_timediff = (NULL == proxy ? 0 : proxy->timediff);
 
 				seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, type, item->key);
 
 				if (ITEM_STATE_NOTSUPPORTED == item->state)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
-							config->config->refresh_unsupported, NULL, now);
+							config->config->refresh_unsupported, NULL,
+							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
 				}
 				else
-					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16], now);
+				{
+					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
+							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+				}
 			}
 		}
 		else
@@ -3038,7 +3067,7 @@ void	DCsync_configuration(void)
 	ifsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	/* relies on hosts and interfaces, must be after DCsync_{hosts,interfaces}() */
+	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 	DCsync_items(item_result, refresh_unsupported_changed);
 	isec2 = zbx_time() - sec;
 
@@ -4820,7 +4849,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
 			old_nextcheck = dc_item->nextcheck;
-			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+			dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
 
 			DCupdate_item_queue(dc_item, dc_item->poller_type, old_nextcheck);
 			continue;
@@ -4835,7 +4864,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 						dc_item->key);
 
 				old_nextcheck = dc_item->nextcheck;
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
 
 				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
@@ -5100,7 +5129,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5679,7 +5708,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 				if (ITEM_STATUS_ACTIVE != dc_item->status || ZBX_NO_POLLER != dc_item->poller_type)
 					continue;
 
-				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, now);
 			}
 		}
 
@@ -5867,7 +5896,9 @@ int	DCconfig_get_proxypoller_nextcheck()
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 {
 	const char	*__function_name = "DCrequeue_proxy";
+
 	time_t		now;
+	ZBX_DC_HOST	*dc_host;
 	ZBX_DC_PROXY	*dc_proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d", __function_name, (int)update_nextcheck);
@@ -5876,28 +5907,104 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)) &&
+			NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
 	{
-		if (0 != (0x01 & update_nextcheck))
-		{
-			dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
-		}
-		if (0 != (0x02 & update_nextcheck))
-		{
-			dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
-					hostid, CONFIG_PROXYDATA_FREQUENCY, now);
-		}
-
 		if (ZBX_LOC_POLLER == dc_proxy->location)
 			dc_proxy->location = ZBX_LOC_NOWHERE;
 
-		DCupdate_proxy_queue(dc_proxy);
+		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
+		{
+			if (0 != (0x01 & update_nextcheck))
+			{
+				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
+			}
+			if (0 != (0x02 & update_nextcheck))
+			{
+				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+			}
+
+			DCupdate_proxy_queue(dc_proxy);
+		}
 	}
 
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_set_proxy_timediff                                      *
+ *                                                                            *
+ * Purpose: set rounded time difference between server clock and proxy clock  *
+ *                                                                            *
+ * Comments: When we calculate "nextcheck" for items on proxied hosts, we     *
+ *           take the time difference between server and proxy into account.  *
+ *                                                                            *
+ *           For instance, suppose an item was processed on the proxy at 10   *
+ *           seconds and there is a time difference between server and proxy  *
+ *           of -2 seconds (that is, proxy's time is 2 seconds in front). In  *
+ *           the server's database, we will store the timestamp of 8 seconds. *
+ *           However, when we calculate "nextcheck" on the server side, we    *
+ *           should calculate it from 10 seconds. Otherwise, if we calculate  *
+ *           it from 8 seconds, we will probably get those 10 seconds as the  *
+ *           "nextcheck". Finally, after calculating "nextcheck", we should   *
+ *           utilize the time difference again to get Zabbix server's time.   *
+ *                                                                            *
+ *           Now, suppose we have a non-integer time difference, say, of -1.5 *
+ *           seconds. Suppose also that one item on the proxy was checked at  *
+ *           4.7 seconds, whereas a second item was checked at 5.2 seconds,   *
+ *           which corresponds to server times of 3.2 and 3.7 seconds. Since  *
+ *           "nextcheck" calculation only uses the integer part, server will  *
+ *           use 3 seconds as the basis, before using the time difference.    *
+ *           However, it is very likely that the first item was scheduled for *
+ *           4 seconds on the proxy and the second item for 5 seconds, so in  *
+ *           order to be precise we would need to store time differences for  *
+ *           each individual item. That would lead to a significant increase  *
+ *           in memory consumption, which we rather avoid. For this reason    *
+ *           we only store a single time difference between server and proxy, *
+ *           and use it for all items. However, the way time difference is    *
+ *           used is different before and after "nextcheck" calculation.      *
+ *                                                                            *
+ *           Consider the example above. Server uses 3 seconds as the basis,  *
+ *           and subtracts a unified difference of -2 (rounded down) to both  *
+ *           items, yielding 5. It then calculates "nextcheck" for these two  *
+ *           items, yielding 4 and 5 (assuming a one-minute delay). It then   *
+ *           adds a unified difference of -1 (rounded up), to get Zabbix      *
+ *           server's time of 3 and 4.                                        *
+ *                                                                            *
+ *           This has the effect that items will get into the delayed item    *
+ *           queue at most one second later, but this is feasible: in proxy   *
+ *           to server communication there is a communication latency, which  *
+ *           also has the effect of putting items into the delayed item queue *
+ *           a bit later, and we do not account for that anyway.              *
+ *                                                                            *
+ *           As described above, we subtract a rounded down difference before *
+ *           "nextcheck" calculation and a rounded up difference after. Since *
+ *           we have a 1/10^9 chance of hitting an integer "timediff" value,  *
+ *           which would yield the same value rounded down and rounded up, in *
+ *           the proxy structure we only store the difference rounded down to *
+ *           save space. This is achieved by discarding the "ns" part of the  *
+ *           "timediff" structure. We then assume that the rounded down value *
+ *           and the rounded up values are different.                         *
+ *                                                                            *
+ *           Calculations of "nextchecks" themselves are done in functions    *
+ *           DCget_reachable_nextcheck() and DCsync_items() functions.        *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
+		dc_proxy->timediff = timediff->sec;
+
+	UNLOCK_CACHE;
 }
 
 static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
