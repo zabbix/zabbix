@@ -378,12 +378,13 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Get array with hosts that are linked with templates which passed applications belongs to as key and templateid that host
-	 * is linked to as value.
-	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
+	 * Get array with hosts that are linked with templates which passed applications belongs to as key and
+	 * templateid that host is linked to as value. If second parameter $hostIds is not empty, result should contain
+	 * only passed host IDs.
 	 *
-	 * For example we have template T1 with application A1 and template T1 with application A2 both linked to hosts H1
-	 * and H2 when we pass A1 to this function it should return array like:
+	 * Example:
+	 * We have template T1 with application A1 and template T1 with application A2 both linked to hosts H1 and H2.
+	 * When we pass A1 to this function it should return array like:
 	 *     array(H1_id => array(T1_id, T2_id), H2_id => array(T1_id, T2_id));
 	 *
 	 * @param array $applications
@@ -397,8 +398,8 @@ class CApplicationManager {
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', array_unique(zbx_objectValues($applications, 'hostid'))).
-			($hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '')
+			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($applications, 'hostid')).
+				($hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '')
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
 			$hostId = $dbHost['hostid'];
@@ -414,30 +415,31 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Generate applications data for inheritance.
-	 * Using passed parameters decide if new application must be created on host or existing one must be updated.
+	 * Generate application data for inheritance. Using passed parameters, decide if new application must be
+	 * created on host or existing application must be updated.
 	 *
-	 * @param array $applications 		applications which we need to inherit
+	 * @param array $applications 		applications to prepare for inheritance
 	 * @param array $hostsTemplatesMap	map of host IDs to templates they are linked to
 	 * @param array $hostApplications	array of existing applications on the child host returned by
 	 * 									self::getApplicationMapsByHostIds()
 	 *
-	 * @return array with applications, existing applications have 'applicationid' key.
+	 * @return array					Return array with applications. Existing applications have "applicationid" key.
 	 */
 	protected function prepareInheritedApps(array $applications, array $hostsTemplatesMap, array $hostApplications) {
 		/*
 		 * This variable holds array of working copies of results, indexed first by host ID (hence pre-filling
-		 * with host IDs from $hostApplications as keys and empty arrays as values), and then by application name. For each
-		 * host ID / application name pair there is only 1 array with application data with key "applicationTemplates"
-		 * getting updated if application with same name is inherited from more than one template. In the end this
-		 * variable gets looped through and plain result array is constructed.
+		 * with host IDs from $hostApplications as keys and empty arrays as values), and then by application name.
+		 * For each host ID / application name pair, there is only one array with application data
+		 * with key "applicationTemplates" which is updated, if application with same name is inherited from
+		 * more than one template. In the end this variable gets looped through and plain result array is constructed.
 		 */
 		$newApplications = array_fill_keys(array_keys($hostApplications), array());
 
 		foreach ($applications as $application) {
 			$applicationId = $application['applicationid'];
+
 			foreach ($hostApplications as $hostId => $hostApplication) {
-				// If application template is not linked to host we skip it.
+				// If application template is not linked to host, skip it.
 				if (!isset($hostsTemplatesMap[$hostId][$application['hostid']])) {
 					continue;
 				}
@@ -455,12 +457,14 @@ class CApplicationManager {
 
 				$existingApplication = null;
 
-				// Look for an application with the same name, if one exists - link the parent app to it.
+				/*
+				 * Look for an application with the same name, if one exists - link the parent application to it.
+				 * If no application with the same name exists, look for a child application via "templateid".
+				 * Use it only if it has only one parent. Otherwise a new application must be created.
+				 */
 				if (isset($hostApplication['byName'][$application['name']])) {
 					$existingApplication = $hostApplication['byName'][$application['name']];
 				}
-				// If no application with the same name exists, look for a child app via templateid.
-				// Use it only if it has only one parent, otherwise a new app must be created.
 				elseif (isset($hostApplication['byTemplateId'][$applicationId])
 						&& count($hostApplication['byTemplateId'][$applicationId]['applicationTemplates']) == 1) {
 					$existingApplication = $hostApplication['byTemplateId'][$applicationId];
@@ -469,12 +473,13 @@ class CApplicationManager {
 				if ($existingApplication) {
 					$newApplication['applicationid'] = $existingApplication['applicationid'];
 
-					// Add the new template link to an existing child applications if it's not present yet.
+					// Add the new template link to an existing child application if it's not present yet.
 					$newApplication['applicationTemplates'] = isset($existingApplication['applicationTemplates'])
 						? $existingApplication['applicationTemplates']
 						: array();
 
 					$applicationTemplateIds = zbx_objectValues($newApplication['applicationTemplates'], 'templateid');
+
 					if (!in_array($applicationId, $applicationTemplateIds)) {
 						$newApplication['applicationTemplates'][] = array(
 							'applicationid' => $newApplication['applicationid'],
@@ -483,11 +488,11 @@ class CApplicationManager {
 					}
 				}
 				else {
-					// If no matching child application exists - add a new one.
+					// If no matching child application exists, add a new one.
 					$newApplication['applicationTemplates'][] = array('templateid' => $applicationId);
 				}
 
-				// Store new (or updated) application data so it can be reused.
+				// Store new or updated application data so it can be reused.
 				$newApplications[$hostId][$application['name']] = $newApplication;
 			}
 		}
