@@ -26,6 +26,8 @@
 #       include <polarssl/ctr_drbg.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -92,7 +94,13 @@ int	zbx_tls_init(void)
 	zbx_free(pers);		/* TODO Can we free the personalization string immediately after instantiation ? */
 #elif defined(HAVE_GNUTLS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
-		ret = FAIL;
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
+		exit(EXIT_FAILURE);
+	}
+#elif defined(HAVE_OPENSSL)
+	SSL_load_error_strings();
+	SSL_library_init();
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -118,6 +126,8 @@ int	zbx_tls_free(void)
 	entropy_free(&entropy);
 #elif defined(HAVE_GNUTLS)
 	gnutls_global_deinit();
+#elif defined(HAVE_OPENSSL)
+	/* ERR_free_strings(); */ /* TODO there is no ERR_free_strings() in my libssl. Commented out temporarily. */
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

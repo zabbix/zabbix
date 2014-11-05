@@ -740,7 +740,7 @@ int	MAIN_ZABBIX_ENTRY()
 #else
 #	define IPV6_FEATURE_STATUS	" NO"
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
 #	define TLS_FEATURE_STATUS	" NO"
@@ -832,7 +832,7 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
@@ -993,7 +993,7 @@ void	zbx_on_exit(void)
 	zbx_remove_sqlite3_mutex();
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
 
