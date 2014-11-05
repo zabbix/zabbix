@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 
 extern int	CONFIG_SNMP_BULK_REQUESTS;
 
@@ -449,7 +449,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 		zabbix_log(LOG_LEVEL_DEBUG, "SNMPv3 [%s@%s]", session.securityName, session.peername);
 	}
 
-#ifdef HAVE_SNMP_SESSION_LOCALNAME
+#ifdef HAVE_NETSNMP_SESSION_LOCALNAME
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		/* In some cases specifying just local host (without local port) is not enough. We do */
@@ -495,8 +495,7 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 
 	const char	*hint;
 	char		buffer[MAX_STRING_LEN];
-	char		*strval_dyn = NULL, is_hex = 0;
-	size_t          offset = 0;
+	char		*strval_dyn = NULL;
 	struct tree     *subtree;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -511,27 +510,26 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s' hint:'%s'", __function_name, buffer, ZBX_NULL2STR(hint));
 
-	/* decide if it's Hex, offset will be possibly needed later */
 	if (0 == strncmp(buffer, "Hex-STRING: ", 12))
 	{
-		is_hex = 1;
-		offset = 12;
+		strval_dyn = zbx_strdup(strval_dyn, buffer + 12);
 	}
-
-	/* in case of no hex and no display hint take the value from */
-	/* var->val, it contains unquoted and unescaped string */
-	if (0 == is_hex && NULL == hint)
+	else if (NULL != hint && 0 == strncmp(buffer, "STRING: ", 8))
 	{
-		strval_dyn = zbx_malloc(strval_dyn, var->val_len + 1);
-		memcpy(strval_dyn, var->val.string, var->val_len);
-		strval_dyn[var->val_len] = '\0';
+		strval_dyn = zbx_strdup(strval_dyn, buffer + 8);
+	}
+	else if (0 == strncmp(buffer, "OID: ", 5))
+	{
+		strval_dyn = zbx_strdup(strval_dyn, buffer + 5);
 	}
 	else
 	{
-		if (0 == is_hex && 0 == strncmp(buffer, "STRING: ", 8))
-			offset = 8;
+		/* snprint_value() escapes hintless ASCII strings, so */
+		/* we are copying the raw unescaped value in this case */
 
-		strval_dyn = zbx_strdup(strval_dyn, buffer + offset);
+		strval_dyn = zbx_malloc(strval_dyn, var->val_len + 1);
+		memcpy(strval_dyn, var->val.string, var->val_len);
+		strval_dyn[var->val_len] = '\0';
 	}
 
 	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
@@ -551,7 +549,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d value_type:%d data_type:%d", __function_name,
 			(int)var->type, (int)value_type, (int)data_type);
 
-	if (ASN_OCTET_STR == var->type)
+	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
 		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var)))
 		{
@@ -1679,4 +1677,4 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
