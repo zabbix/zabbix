@@ -470,7 +470,7 @@ if (isset($_REQUEST['form'])) {
 		$httpTestId = $data['httptestid'];
 		while ($httpTestId) {
 			$dbTest = DBfetch(DBselect(
-				'SELECT h.hostid,h.name,h.status,ht.httptestid,ht.templateid'.
+				'SELECT h.hostid,h.name,ht.httptestid,ht.templateid'.
 					' FROM hosts h,httptest ht'.
 					' WHERE ht.hostid=h.hostid'.
 					' AND ht.httptestid='.zbx_dbstr($httpTestId)

@@ -865,8 +865,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
-			),
-			'selectHosts' => array('status')
+			)
 		));
 		$item = reset($item);
 	}
@@ -875,6 +874,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
+	$data['host'] = $host;
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
