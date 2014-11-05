@@ -149,6 +149,7 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 .input[readonly], .input[readonly]:hover {
 	background-color: #f5f5f5;
 	color: #000000;
+	border-color: #d0d0d0;
 }
 
 .input[disabled], .input[disabled]:hover,
@@ -156,6 +157,7 @@ input.input.formlist[type="button"][disabled], input.input.formlist[type="submit
 	background-color: #f5f5f5;
 	/* ignored by IE for <select> */
 	color: #8a867a;
+	border-color: #d0d0d0;
 }
 
 /* disabled <select> font color for IE 10+ */
@@ -164,7 +166,7 @@ select[disabled]::-ms-value {
 	background-color: #f5f5f5;
 }
 
-.link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
+.link_menu[disabled], .link_menu[disabled]:hover {
 	background-color: #eee;
 	color: #aaa;
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 08:37+0300\n"
+"POT-Creation-Date: 2014-10-31 11:17+0200\n"
 "PO-Revision-Date: 2013-11-04 20:24+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1164,14 +1164,14 @@ msgstr "NASTAVENÍ OBRÁZKŮ"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "NASTAVENÍ IT-SLUŽEB"
 
-#: disc_prototypes.php:353
+#: disc_prototypes.php:355
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "NASTAVENÍ PŘEDLOH PRO POLOŽKY"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:872
-#: items.php:1009
+#: include/views/configuration.item.massupdate.php:28 items.php:874
+#: items.php:1011
 msgid "CONFIGURATION OF ITEMS"
 msgstr "NASTAVENÍ POLOŽEK"
 
@@ -1410,7 +1410,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Nelze přidat obrázek"
 
-#: items.php:513
+#: items.php:515
 msgid "Cannot add item"
 msgstr "Nelze přidat položku"
 
@@ -1419,7 +1419,7 @@ msgstr "Nelze přidat položku"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr ""
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Cannot add item prototype"
 msgstr ""
 
@@ -1530,7 +1530,7 @@ msgstr ""
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr ""
 
-#: httpconf.php:185 httpconf.php:435 items.php:551 items.php:817
+#: httpconf.php:185 httpconf.php:435 items.php:553 items.php:819
 msgid "Cannot clear history"
 msgstr "Nelze smazat historii"
 
@@ -1558,7 +1558,7 @@ msgstr "Připojení na trapper port daemona Zabbix serveru selhalo. Pro spuště
 msgid "Cannot copy graphs"
 msgstr "Nelze kopírovat grafy"
 
-#: items.php:774
+#: items.php:776
 msgid "Cannot copy items"
 msgstr "Nelze zkopírovat položky"
 
@@ -1650,7 +1650,7 @@ msgstr ""
 msgid "Cannot delete discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:659
+#: include/classes/api/services/CItem.php:633
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
 msgstr ""
@@ -1725,19 +1725,19 @@ msgstr "Nelze smazat obrázek"
 msgid "Cannot delete inventory."
 msgstr ""
 
-#: items.php:402
+#: items.php:404
 msgid "Cannot delete item"
 msgstr "Nelze smazat položku"
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Cannot delete item prototype"
 msgstr ""
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:847
+#: items.php:849
 msgid "Cannot delete items"
 msgstr "Nelze smazat položky"
 
@@ -1815,7 +1815,7 @@ msgstr ""
 msgid "Cannot delete templated host prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:654
+#: include/classes/api/services/CItem.php:628
 msgid "Cannot delete templated item."
 msgstr ""
 
@@ -1905,14 +1905,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:249 items.php:739
+#: applications.php:249 items.php:741
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:313
+#: disc_prototypes.php:315
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] ""
@@ -1997,14 +1997,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:248 items.php:738
+#: applications.php:248 items.php:740
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:312
+#: disc_prototypes.php:314
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] ""
@@ -2574,15 +2574,15 @@ msgstr "Nelze upravit obrázek"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: items.php:510
+#: items.php:512
 msgid "Cannot update item"
 msgstr "Nelze upravit položku"
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Cannot update item prototype"
 msgstr ""
 
-#: items.php:718
+#: items.php:720
 msgid "Cannot update items"
 msgstr ""
 
@@ -3365,7 +3365,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr ""
 
-#: include/views/configuration.item.list.php:37 items.php:853
+#: include/views/configuration.item.list.php:37 items.php:855
 msgid "Create item"
 msgstr ""
 
@@ -3460,7 +3460,7 @@ msgstr ""
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:536
+#: include/classes/api/services/CItem.php:509
 #, c-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3553,8 +3553,8 @@ msgstr ""
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr ""
 
-#: disc_prototypes.php:107 include/views/configuration.item.massupdate.php:300
-#: items.php:115
+#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
+#: items.php:116
 msgid "Custom multiplier"
 msgstr "Vlastní multiplikátor"
 
@@ -4232,7 +4232,7 @@ msgstr ""
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:756
+#: include/classes/api/services/CItem.php:730
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -4957,7 +4957,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1301
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
-#: include/classes/api/services/CItem.php:632
+#: include/classes/api/services/CItem.php:606
 #: include/classes/api/services/CItemPrototype.php:456
 #: include/classes/api/services/CProxy.php:474
 #: include/classes/api/services/CService.php:341
@@ -6258,14 +6258,14 @@ msgstr "Závažný"
 #: include/page_header.php:323
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.prototype.list.php:50 items.php:162
+#: include/views/configuration.item.prototype.list.php:50 items.php:164
 #: jsLoader.php:203 latest.php:473 latest.php:474 latest.php:581
 #: latest.php:768
 msgid "History"
 msgstr "Historie"
 
 #: httpconf.php:178 httpconf.php:185 httpconf.php:423 httpconf.php:435
-#: items.php:544 items.php:551 items.php:805 items.php:817
+#: items.php:546 items.php:553 items.php:807 items.php:819
 msgid "History cleared"
 msgstr "Historie byla pročištěna"
 
@@ -6287,7 +6287,7 @@ msgstr ""
 msgid "History of events"
 msgstr "Historie událostí"
 
-#: disc_prototypes.php:114 items.php:54
+#: disc_prototypes.php:116 items.php:54
 msgid "History storage period"
 msgstr ""
 
@@ -6339,8 +6339,8 @@ msgstr "Vodorovné zarovnání"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:544 items.php:804
-#: items.php:837 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:546 items.php:806
+#: items.php:839 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
 #: popup.php:501 popup.php:1089 queue.php:248 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:297
 msgid "Host"
@@ -8128,7 +8128,7 @@ msgstr ""
 msgid "Invalid third parameter."
 msgstr ""
 
-#: disc_prototypes.php:178 host_discovery.php:175 items.php:389
+#: disc_prototypes.php:180 host_discovery.php:175 items.php:391
 msgid "Invalid time period"
 msgstr ""
 
@@ -8186,8 +8186,8 @@ msgstr "Italsky (it_IT)"
 #: include/views/configuration.screen.constructor.edit.php:234
 #: include/views/configuration.screen.constructor.edit.php:360
 #: include/views/configuration.screen.constructor.edit.php:621
-#: include/views/configuration.triggers.expression.php:57 items.php:543
-#: items.php:804 items.php:837 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:545
+#: items.php:806 items.php:839 tr_logform.php:251
 msgid "Item"
 msgstr "Položka"
 
@@ -8206,7 +8206,7 @@ msgstr ""
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:932
+#: include/classes/api/services/CItem.php:906
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
@@ -8237,7 +8237,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: items.php:513
+#: items.php:515
 msgid "Item added"
 msgstr "Položka byla přidána"
 
@@ -8245,18 +8245,18 @@ msgstr "Položka byla přidána"
 msgid "Item count"
 msgstr "Počet položek"
 
-#: items.php:402
+#: items.php:404
 msgid "Item deleted"
 msgstr "Položka byla smazána"
 
-#: applications.php:246 items.php:736
+#: applications.php:246 items.php:738
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:245 items.php:735
+#: applications.php:245 items.php:737
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -8290,29 +8290,29 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Item prototype added"
 msgstr ""
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Item prototype deleted"
 msgstr ""
 
-#: disc_prototypes.php:310
+#: disc_prototypes.php:312
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:309
+#: disc_prototypes.php:311
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Item prototype updated"
 msgstr ""
 
@@ -8323,7 +8323,7 @@ msgstr ""
 msgid "Item prototypes"
 msgstr ""
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Item prototypes deleted"
 msgstr ""
 
@@ -8331,7 +8331,7 @@ msgstr ""
 msgid "Item prototypes of"
 msgstr ""
 
-#: items.php:510
+#: items.php:512
 msgid "Item updated"
 msgstr "Položka byla aktualizována"
 
@@ -8408,11 +8408,11 @@ msgstr "Položky"
 msgid "Items (m/d/n)"
 msgstr "Položky (sl/nesl/nep)[šab]"
 
-#: items.php:774
+#: items.php:776
 msgid "Items copied"
 msgstr "Položky byly zkopírovány"
 
-#: items.php:847
+#: items.php:849
 msgid "Items deleted"
 msgstr "Položky byly smazány"
 
@@ -8420,7 +8420,7 @@ msgstr "Položky byly smazány"
 msgid "Items list"
 msgstr "Seznam položek"
 
-#: items.php:718
+#: items.php:720
 msgid "Items updated"
 msgstr "Položky byly aktualizovány"
 
@@ -8562,11 +8562,11 @@ msgstr ""
 msgid "LDAP host"
 msgstr ""
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login successful"
 msgstr ""
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login was not successful"
 msgstr ""
 
@@ -10386,7 +10386,7 @@ msgstr ""
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
 #: include/classes/api/services/CItemGeneral.php:239
-#: include/classes/api/services/CItem.php:649
+#: include/classes/api/services/CItem.php:623
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
 #: include/classes/api/services/CMaintenance.php:315
@@ -10502,7 +10502,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
-#: graphs.php:376 items.php:777
+#: graphs.php:376 items.php:779
 msgid "No target selected."
 msgstr ""
 
@@ -11599,7 +11599,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:154 items.php:89 items.php:158
+#: include/views/inventory.host.view.php:154 items.php:89 items.php:160
 #: setup.php:48
 msgid "Port"
 msgstr "Port"
@@ -14098,7 +14098,7 @@ msgstr ""
 msgid "Trend data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: disc_prototypes.php:118 items.php:62
+#: disc_prototypes.php:120 items.php:62
 msgid "Trend storage period"
 msgstr ""
 
@@ -14110,7 +14110,7 @@ msgstr ""
 #: include/forms.inc.php:608 include/forms.inc.php:942
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:70
-#: include/views/configuration.item.prototype.list.php:51 items.php:163
+#: include/views/configuration.item.prototype.list.php:51 items.php:165
 #: latest.php:476 latest.php:477
 msgid "Trends"
 msgstr "Trendy"
@@ -14413,7 +14413,7 @@ msgstr ""
 msgid "Two elements should be selected"
 msgstr "Musí být vybrané dva prvky"
 
-#: include/classes/api/services/CItem.php:993
+#: include/classes/api/services/CItem.php:967
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
@@ -14857,7 +14857,7 @@ msgid "Update existing"
 msgstr ""
 
 #: include/forms.inc.php:441 include/views/configuration.httpconf.list.php:66
-#: items.php:161
+#: items.php:163
 msgid "Update interval"
 msgstr "Interval aktualizací"
 
@@ -14900,7 +14900,7 @@ msgstr ""
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:588
+#: include/classes/api/services/CItem.php:561
 #, c-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
