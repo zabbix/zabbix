@@ -24,7 +24,7 @@
  *
  * Should be used as a newer alternative to CButton.
  */
-class CSimpleButton extends CTag {
+class CSimpleButton extends CTag implements CButtonInterface {
 
 	/**
 	 * Button class that will be added to the other classes of the element.
