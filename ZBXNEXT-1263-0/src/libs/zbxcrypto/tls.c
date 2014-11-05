@@ -24,6 +24,8 @@
 #if defined(HAVE_POLARSSL)
 #       include <polarssl/entropy.h>
 #       include <polarssl/ctr_drbg.h>
+#elif defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -88,8 +90,12 @@ int	zbx_tls_init(void)
 		exit(EXIT_FAILURE);
 	}
 	zbx_free(pers);		/* TODO Can we free the personalization string immediately after instantiation ? */
+#elif defined(HAVE_GNUTLS)
+	if (GNUTLS_E_SUCCESS != gnutls_global_init())
+		ret = FAIL;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -110,7 +116,10 @@ int	zbx_tls_free(void)
 #if defined(HAVE_POLARSSL)
 	ctr_drbg_free(&ctr_drbg);
 	entropy_free(&entropy);
+#elif defined(HAVE_GNUTLS)
+	gnutls_global_deinit();
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
