@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-25 08:37+0300\n"
+"POT-Creation-Date: 2014-10-31 11:17+0200\n"
 "PO-Revision-Date: 2014-07-30 08:08+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1148,14 +1148,14 @@ msgstr "CONFIGURAZIONE IMMAGINI"
 msgid "CONFIGURATION OF IT SERVICES"
 msgstr "CONFIGURAZIONE SERVIZI IT"
 
-#: disc_prototypes.php:353
+#: disc_prototypes.php:355
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr "CONFIGURAZIONE PROTOTIPI DI ITEM"
 
 #: include/views/configuration.item.list.php:39
-#: include/views/configuration.item.massupdate.php:28 items.php:872
-#: items.php:1009
+#: include/views/configuration.item.massupdate.php:28 items.php:874
+#: items.php:1011
 msgid "CONFIGURATION OF ITEMS"
 msgstr "CONFIGURAZIONE PARAMETRI"
 
@@ -1394,7 +1394,7 @@ msgstr "Impossibile aggiungere prototipo host"
 msgid "Cannot add image"
 msgstr "Impossibile aggiungere l'immagine"
 
-#: items.php:513
+#: items.php:515
 msgid "Cannot add item"
 msgstr "Impossibile aggiungere l'item"
 
@@ -1403,7 +1403,7 @@ msgstr "Impossibile aggiungere l'item"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Non posso aggiungere l'item \"%1$s\" da \"%2$s\" all'applicazione \"%3$s\" da \"%4$s\"."
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Cannot add item prototype"
 msgstr "Impossibile aggiungere l'item prototipo"
 
@@ -1514,7 +1514,7 @@ msgstr "Impossibile cambiare metodo di autenticazione in LDAP"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Impossibile cambiare metodo di autenticazione in interna Zabbix"
 
-#: httpconf.php:185 httpconf.php:435 items.php:551 items.php:817
+#: httpconf.php:185 httpconf.php:435 items.php:553 items.php:819
 msgid "Cannot clear history"
 msgstr "Impossibile cancellare storico"
 
@@ -1542,7 +1542,7 @@ msgstr "Non è possibile connettersi alla porta del trapper del demone Zabbix se
 msgid "Cannot copy graphs"
 msgstr "Impossibile copiare grafici"
 
-#: items.php:774
+#: items.php:776
 msgid "Cannot copy items"
 msgstr "Impossibile copiare item"
 
@@ -1632,7 +1632,7 @@ msgstr ""
 msgid "Cannot delete discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:659
+#: include/classes/api/services/CItem.php:633
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
 msgstr ""
@@ -1705,19 +1705,19 @@ msgstr "Impossibile rimuovere l'immagine"
 msgid "Cannot delete inventory."
 msgstr "Impossibile rimuovere inventario."
 
-#: items.php:402
+#: items.php:404
 msgid "Cannot delete item"
 msgstr "Impossibile rimuovere l'item"
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Cannot delete item prototype"
 msgstr "Non posso cancellare l'item prototipo"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Cannot delete item prototypes"
 msgstr "Non posso cancellare l'item prototipo"
 
-#: items.php:847
+#: items.php:849
 msgid "Cannot delete items"
 msgstr "Impossibile rimuovere gli item"
 
@@ -1794,7 +1794,7 @@ msgstr "Impossibile rimuovere i grafici basati su template."
 msgid "Cannot delete templated host prototype."
 msgstr "Impossibile rimuovere prototipo host con template."
 
-#: include/classes/api/services/CItem.php:654
+#: include/classes/api/services/CItem.php:628
 msgid "Cannot delete templated item."
 msgstr "Impossibile rimuovere l'item basato su template."
 
@@ -1879,13 +1879,13 @@ msgid_plural "Cannot disable host prototypes"
 msgstr[0] "Impossibile disabilitare prototipo host"
 msgstr[1] "Impossibile disabilitare prototipi host"
 
-#: applications.php:249 items.php:739
+#: applications.php:249 items.php:741
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Impossibile disabilitare item"
 msgstr[1] "Impossibile disabilitare gli item"
 
-#: disc_prototypes.php:313
+#: disc_prototypes.php:315
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
 msgstr[0] "Impossibile disabilitare prototipo item"
@@ -1959,13 +1959,13 @@ msgid_plural "Cannot enable host prototypes"
 msgstr[0] "Impossibile abilitare prototipo host"
 msgstr[1] "Impossibile abilitare prototipi host"
 
-#: applications.php:248 items.php:738
+#: applications.php:248 items.php:740
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Impossibile abilitare item"
 msgstr[1] "Impossibile abilitare gli item"
 
-#: disc_prototypes.php:312
+#: disc_prototypes.php:314
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
 msgstr[0] "Impossibile abilitare prototipo item"
@@ -2527,15 +2527,15 @@ msgstr "Impossibile aggiornare immagine"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Impossibile aggiornare l'interfaccia per l'host discoverato \"%1$s\"."
 
-#: items.php:510
+#: items.php:512
 msgid "Cannot update item"
 msgstr "Impossibile aggiornare l'item"
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Cannot update item prototype"
 msgstr "Impossibile aggiornare item prototipo"
 
-#: items.php:718
+#: items.php:720
 msgid "Cannot update items"
 msgstr "Impossibile aggiornare gli item"
 
@@ -3328,7 +3328,7 @@ msgstr ""
 msgid "Create icon map"
 msgstr "Crea mappa di icone"
 
-#: include/views/configuration.item.list.php:37 items.php:853
+#: include/views/configuration.item.list.php:37 items.php:855
 msgid "Create item"
 msgstr "Crea item"
 
@@ -3423,7 +3423,7 @@ msgstr "Creato: Regola di discovery \"%1$s\" su \"%2$s\"."
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Creato: Prototipo host \"%1$s\" su \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:536
+#: include/classes/api/services/CItem.php:509
 #, c-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Creato: Item \"%1$s\" su \"%2$s\"."
@@ -3516,8 +3516,8 @@ msgstr "Etichette personalizzate"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "L'etichetta personalizzata per gli elementi della mappa \"%2$s\" del tipo \"%1$s\" non può esser vuota."
 
-#: disc_prototypes.php:107 include/views/configuration.item.massupdate.php:300
-#: items.php:115
+#: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
+#: items.php:116
 msgid "Custom multiplier"
 msgstr "Moltiplicatore personalizzato"
 
@@ -4194,7 +4194,7 @@ msgstr "Rimosso: Host \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Rimosso: Prototipo host \"%1$s\" su \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:756
+#: include/classes/api/services/CItem.php:730
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Rimosso: Item \"%1$s\" su \"%2$s\"."
@@ -4917,7 +4917,7 @@ msgstr "Host vuoto."
 #: include/classes/api/services/CHost.php:1301
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
-#: include/classes/api/services/CItem.php:632
+#: include/classes/api/services/CItem.php:606
 #: include/classes/api/services/CItemPrototype.php:456
 #: include/classes/api/services/CProxy.php:474
 #: include/classes/api/services/CService.php:341
@@ -6216,14 +6216,14 @@ msgstr "Alta"
 #: include/page_header.php:323
 #: include/views/administration.general.housekeeper.edit.php:140
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.prototype.list.php:50 items.php:162
+#: include/views/configuration.item.prototype.list.php:50 items.php:164
 #: jsLoader.php:203 latest.php:473 latest.php:474 latest.php:581
 #: latest.php:768
 msgid "History"
 msgstr "Storico"
 
 #: httpconf.php:178 httpconf.php:185 httpconf.php:423 httpconf.php:435
-#: items.php:544 items.php:551 items.php:805 items.php:817
+#: items.php:546 items.php:553 items.php:807 items.php:819
 msgid "History cleared"
 msgstr "Storico pulito"
 
@@ -6245,7 +6245,7 @@ msgstr "Periodo di storicizzazione History data (in giorni) \"%1$s\"."
 msgid "History of events"
 msgstr "Storico eventi"
 
-#: disc_prototypes.php:114 items.php:54
+#: disc_prototypes.php:116 items.php:54
 msgid "History storage period"
 msgstr "Periodo storicizzazione History"
 
@@ -6297,8 +6297,8 @@ msgstr "Allinea in orizzontale"
 #: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
-#: include/views/monitoring.slides.php:83 items.php:544 items.php:804
-#: items.php:837 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
+#: include/views/monitoring.slides.php:83 items.php:546 items.php:806
+#: items.php:839 jsLoader.php:141 latest.php:445 latest.php:447 popup.php:475
 #: popup.php:501 popup.php:1089 queue.php:248 report2.php:359 report2.php:393
 #: report5.php:58 search.php:131 tr_status.php:219 tr_status.php:297
 msgid "Host"
@@ -8081,7 +8081,7 @@ msgstr "Secondo parametro non valido."
 msgid "Invalid third parameter."
 msgstr "Terzo parametro non valido."
 
-#: disc_prototypes.php:178 host_discovery.php:175 items.php:389
+#: disc_prototypes.php:180 host_discovery.php:175 items.php:391
 msgid "Invalid time period"
 msgstr "Periodo di tempo non valido"
 
@@ -8139,8 +8139,8 @@ msgstr "Italiano (it_IT)"
 #: include/views/configuration.screen.constructor.edit.php:234
 #: include/views/configuration.screen.constructor.edit.php:360
 #: include/views/configuration.screen.constructor.edit.php:621
-#: include/views/configuration.triggers.expression.php:57 items.php:543
-#: items.php:804 items.php:837 tr_logform.php:251
+#: include/views/configuration.triggers.expression.php:57 items.php:545
+#: items.php:806 items.php:839 tr_logform.php:251
 msgid "Item"
 msgstr "Item"
 
@@ -8159,7 +8159,7 @@ msgstr "L'item \"%1$s\" esiste già su \"%2$s\", ereditato da un altro template.
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "L'item \"%1$s\" esiste già su \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:932
+#: include/classes/api/services/CItem.php:906
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "L'item \"%1$s\" non può popolare un campo numero \"%2$d\" mancante nell'inventario host. Le scelte sono: da 0 (non popolare) a \"%3$d\"."
@@ -8190,7 +8190,7 @@ msgstr "Item \"%1$s\" saltato - regola utente."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "L'item \"%1$s\":\"%2$s\" ha una porta non valida: \"%3$s\"."
 
-#: items.php:513
+#: items.php:515
 msgid "Item added"
 msgstr "Item aggiunto"
 
@@ -8198,17 +8198,17 @@ msgstr "Item aggiunto"
 msgid "Item count"
 msgstr "Numero item"
 
-#: items.php:402
+#: items.php:404
 msgid "Item deleted"
 msgstr "Item rimosso"
 
-#: applications.php:246 items.php:736
+#: applications.php:246 items.php:738
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Item disabilitato"
 msgstr[1] "Item disabilitati"
 
-#: applications.php:245 items.php:735
+#: applications.php:245 items.php:737
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Item abilitato"
@@ -8241,27 +8241,27 @@ msgstr "Il prototipo item \"%1$s\" esiste già su \"%2$s\", ereditato da un altr
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototipo Item \"%1$s\" gia' definito in \"%2$s\"."
 
-#: disc_prototypes.php:288
+#: disc_prototypes.php:290
 msgid "Item prototype added"
 msgstr "Item prototipo aggiunto"
 
-#: disc_prototypes.php:189
+#: disc_prototypes.php:191
 msgid "Item prototype deleted"
 msgstr "Item prototipo cancellato"
 
-#: disc_prototypes.php:310
+#: disc_prototypes.php:312
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
 msgstr[0] "Item prototipo disabilitato"
 msgstr[1] "Item prototipo disabilitati"
 
-#: disc_prototypes.php:309
+#: disc_prototypes.php:311
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
 msgstr[0] "Item prototipo abilitato"
 msgstr[1] "Item prototipo abilitati"
 
-#: disc_prototypes.php:284
+#: disc_prototypes.php:286
 msgid "Item prototype updated"
 msgstr "Item prototipo aggiornato"
 
@@ -8272,7 +8272,7 @@ msgstr "Item prototipo aggiornato"
 msgid "Item prototypes"
 msgstr "Prototipi item"
 
-#: disc_prototypes.php:329
+#: disc_prototypes.php:331
 msgid "Item prototypes deleted"
 msgstr "Prototipo Item cancellato"
 
@@ -8280,7 +8280,7 @@ msgstr "Prototipo Item cancellato"
 msgid "Item prototypes of"
 msgstr "Prototipi item di"
 
-#: items.php:510
+#: items.php:512
 msgid "Item updated"
 msgstr "Item aggiornato"
 
@@ -8357,11 +8357,11 @@ msgstr "Item"
 msgid "Items (m/d/n)"
 msgstr "Item (m/d/n)"
 
-#: items.php:774
+#: items.php:776
 msgid "Items copied"
 msgstr "Item copiati"
 
-#: items.php:847
+#: items.php:849
 msgid "Items deleted"
 msgstr "Item rimossi"
 
@@ -8369,7 +8369,7 @@ msgstr "Item rimossi"
 msgid "Items list"
 msgstr "Lista item"
 
-#: items.php:718
+#: items.php:720
 msgid "Items updated"
 msgstr "Item aggiornati"
 
@@ -8511,11 +8511,11 @@ msgstr "Autenticazione LDAP modificata"
 msgid "LDAP host"
 msgstr "Host LDAP"
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login successful"
 msgstr "Login LDAP riuscito"
 
-#: authentication.php:164
+#: authentication.php:163
 msgid "LDAP login was not successful"
 msgstr "Il login LDAP è fallito"
 
@@ -10330,7 +10330,7 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
 #: include/classes/api/services/CItemGeneral.php:239
-#: include/classes/api/services/CItem.php:649
+#: include/classes/api/services/CItem.php:623
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
 #: include/classes/api/services/CMaintenance.php:315
@@ -10446,7 +10446,7 @@ msgstr "Nessuno stato per il proxy."
 msgid "No target selected"
 msgstr "Nessun target selezionato"
 
-#: graphs.php:376 items.php:777
+#: graphs.php:376 items.php:779
 msgid "No target selected."
 msgstr "Nessun target selezionato."
 
@@ -11543,7 +11543,7 @@ msgstr "Popola campo inventario host"
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:154 items.php:89 items.php:158
+#: include/views/inventory.host.view.php:154 items.php:89 items.php:160
 #: setup.php:48
 msgid "Port"
 msgstr "Porta"
@@ -14036,7 +14036,7 @@ msgstr "Periodo storicizzazione valori Trend"
 msgid "Trend data storage period (in days) \"%1$s\"."
 msgstr "Periodo storicizzazione valori Trend (in giorni) \"%1$s\"."
 
-#: disc_prototypes.php:118 items.php:62
+#: disc_prototypes.php:120 items.php:62
 msgid "Trend storage period"
 msgstr "Periodo storicizzazione Trend"
 
@@ -14048,7 +14048,7 @@ msgstr "Periodo storicizzazione Trend (in giorni)"
 #: include/forms.inc.php:608 include/forms.inc.php:942
 #: include/views/administration.general.housekeeper.edit.php:161
 #: include/views/configuration.item.list.php:70
-#: include/views/configuration.item.prototype.list.php:51 items.php:163
+#: include/views/configuration.item.prototype.list.php:51 items.php:165
 #: latest.php:476 latest.php:477
 msgid "Trends"
 msgstr "Trend"
@@ -14347,7 +14347,7 @@ msgstr "Turco (tr_TR)"
 msgid "Two elements should be selected"
 msgstr "Due elementi devono esser selezionati"
 
-#: include/classes/api/services/CItem.php:993
+#: include/classes/api/services/CItem.php:967
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Due item (\"%1$s\" e \"%2$s\") non possono popolare un campo dell'inventario host \"%3$s\", questo porterebbe ad un conflitto."
@@ -14791,7 +14791,7 @@ msgid "Update existing"
 msgstr "Aggiorna esistenti"
 
 #: include/forms.inc.php:441 include/views/configuration.httpconf.list.php:66
-#: items.php:161
+#: items.php:163
 msgid "Update interval"
 msgstr "Intervallo di aggiornamento"
 
@@ -14834,7 +14834,7 @@ msgstr "Aggiornata: Regola di discovery \"%1$s\" su \"%2$s\"."
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Aggiornato: Prototipo host \"%1$s\" su \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:588
+#: include/classes/api/services/CItem.php:561
 #, c-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Aggiornato: Item \"%1$s\" su \"%2$s\"."
