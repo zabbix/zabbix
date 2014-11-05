@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 10:29+0200\n"
-"PO-Revision-Date: 2014-09-11 07:10+0300\n"
+"POT-Creation-Date: 2014-10-31 10:25+0200\n"
+"PO-Revision-Date: 2014-11-03 21:37+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1410412233.0\n"
+"X-POOTLE-MTIME: 1415043443.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1278,12 +1278,12 @@ msgstr "Загрузка ЦПУ. Загрузка процессора. ЦПУ �
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Утилизация ЦПУ. Загрузка процессора в процентах. Параметры цпу, тип и режим опциональны. Если цпу не указан, используются все. Если тип не указан, используется user. Если режим не указан, используется avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "Вычисление MD5 контрольной суммы заданного файла. Строковый хэш MD5 этого файла. Можно использовать для файлов меньших 64МБ, в противном случае не поддерживается. Пример: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1292,12 +1292,12 @@ msgstr "Вычислять SLA, допустимый уровень SLA (в %)"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:515
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
-msgstr ""
+msgstr "Вычисление контрольной суммы заданного файла. Контрольная сумма файла вычисляется с использованием стандартного алгоритма с помощью UNIX утилиты cksum. Пример: vfs.file.cksum[/etc/passwd]"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Вычисление размера диска у указанного раздела. Размер диска в КБ. Если режим не указан, используется всего. В случае примонтированного раздела возвращается не используемый размер диска для локальной файловой системы. Пример: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:106
 #: include/views/configuration.graph.edit.php:164
@@ -2347,7 +2347,7 @@ msgstr "Не удалось задать поля инвентарных дан�
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Не удалось установить ID ресурса для элемента комплексного экрана."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2677,11 +2677,11 @@ msgstr "Регистрозависимое"
 
 #: include/classes/items/CHelpItems.php:797
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
-msgstr ""
+msgstr "Отлов всех SNMP трапов с соответствующего адреса, которые совпадают с регулярным выражением. По умолчанию регулярным выражением является пустая строка."
 
 #: include/classes/items/CHelpItems.php:793
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
-msgstr ""
+msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[] с соответствующего адреса интерфейса."
 
 #: include/views/configuration.screen.constructor.edit.php:694
 msgid "Center"
@@ -2744,26 +2744,26 @@ msgstr "Проверяется существует ли файл. 0 - файл 
 
 #: include/classes/items/CHelpItems.php:599
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr ""
+msgstr "Проверка, доступен ли сервис. 0 - сервис недоступен, 1 - сервис запущен. Если <ip> не указан, IP или DNS имя берется из настроек узла сети. Если <порт> не указан, то используется порт сервиса по умолчанию."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:387
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Проверка, доступен ли сервис. 0 - сервис недоступен, 1 - сервис запущен. Если ip не указан используется 127.0.0.1. Если <порт> не указан, то используется порт сервиса по умолчанию. Пример: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:383
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
-msgstr ""
+msgstr "Проверка производительности сервиса \"услуги\". 0 - сервис недоступен, сек - количество секунд потраченное на подключение к этому сервису. Если ip не указан, используется 127.0.0.1. Если номер порта не указан, то используется порт сервиса по умолчанию."
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr ""
+msgstr "Проверка производительности сервиса. 0 - сервис недоступен, сек - количество секунд потраченное на подключение к этому сервису. Если ip не указан, IP или DNS имя берется из настроек узла сети. Если <порт> не указан, то используется порт сервиса по умолчанию."
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:319
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
-msgstr ""
+msgstr "Проверка работоспособности агента. Всегда возвращает 1. Может быть использован как TCP ping."
 
 #: include/classes/api/services/CItemGeneral.php:282
 msgid "Check the key, please. Default example was passed."
@@ -2776,7 +2776,7 @@ msgstr "Тип проверки"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:379
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Проверка возможности создать TCP подключение на указанный номер порта. 0 - не удалось подключиться, 2 - удалось подключиться. IP адрес опционален. Если ip не указан, используется 127.0.0.1. Например: net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:62
 #: include/views/configuration.discovery.list.php:43
@@ -2786,18 +2786,18 @@ msgstr "Проверки"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:351
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
-msgstr ""
+msgstr "Проверка работоспособности DNS сервиса. 0 - DNS недоступен (сервер не ответил или ответ DNS ошибочен), 1 - DNS работает."
 
 #: include/classes/items/CHelpItems.php:583
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
-msgstr ""
+msgstr "Проверка доступности сервера через ICMP ping. 0 - ICMP ping не успешен. 1 - ICMP ping успешен. Один из процессов zabbix_server выполняет ICMP ping раз в PingerFrequency секунд."
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:375
 #: include/classes/items/CHelpItems.php:391
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
-msgstr ""
+msgstr "Проверка находится ли этот порт в LISTEN состоянии. 0 - не находится, 1 - находится в LISTEN состоянии."
 
 #: include/classes/api/services/CDRule.php:378
 msgid "Checks should be unique."
@@ -9825,22 +9825,22 @@ msgstr "Не задано \"%1$s\" для прототипа узла сети."
 #: include/classes/api/services/CScreen.php:477
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Не задан \"%1$s\" для комплексного экрана."
 
 #: include/classes/api/services/CTemplateScreen.php:596
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Не задан \"%1$s\" для шаблонного комплексного экрана."
 
 #: include/classes/api/services/CHttpTest.php:309
 #, c-format
 msgid "No \"%1$s\" given for web scenario."
-msgstr ""
+msgstr "Не задан \"%1$s\" для веб-сценария."
 
 #: include/classes/api/services/CAction.php:1836
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Не задан \"%2$s\" для фильтра условия действия \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
