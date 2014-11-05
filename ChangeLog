@@ -40,6 +40,7 @@ New features:
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
 ..F....... [ZBX-8983] fixed "schema" option description in frontend configuration file (Oleg)
 
@@ -519,6 +520,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
 ........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
 ...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
