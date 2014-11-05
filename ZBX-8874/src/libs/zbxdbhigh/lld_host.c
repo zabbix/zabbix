@@ -50,17 +50,20 @@ typedef struct
 	unsigned char	type;
 	unsigned char	type_orig;
 	unsigned char	useip;
+	unsigned char	bulk;
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE	__UINT64_C(0x00000001)	/* interface.type field should be updated  */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN	__UINT64_C(0x00000002)	/* interface.main field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP	__UINT64_C(0x00000004)	/* interface.useip field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_IP	__UINT64_C(0x00000008)	/* interface.ip field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS	__UINT64_C(0x00000010)	/* interface.dns field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT	__UINT64_C(0x00000020)	/* interface.port field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK	__UINT64_C(0x00000040)	/* interface.bulk field should be updated */
 #define ZBX_FLAG_LLD_INTERFACE_UPDATE								\
 		(ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE | ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN |	\
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
-		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
-#define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000040)	/* interfaces which should be deleted */
+		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT |	\
+		ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK)
+#define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 	zbx_uint64_t	flags;
 }
 zbx_lld_interface_t;
@@ -1709,7 +1712,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
 		zbx_db_insert_prepare(&db_insert_interface, "interface", "interfaceid", "hostid", "type", "main",
-				"useip", "ip", "dns", "port", NULL);
+				"useip", "ip", "dns", "port", "bulk", NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "interface_discovery", "interfaceid",
 				"parent_interfaceid", NULL);
@@ -1829,7 +1832,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 				zbx_db_insert_add_values(&db_insert_interface, interface->interfaceid, host->hostid,
 						(int)interface->type, (int)interface->main, (int)interface->useip,
-						interface->ip, interface->dns, interface->port);
+						interface->ip, interface->dns, interface->port, (int)interface->bulk);
 
 				zbx_db_insert_add_values(&db_insert_idiscovery, interface->interfaceid,
 						interface->parent_interfaceid);
@@ -1877,6 +1880,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sport='%s'",
 							d, port_esc);
 					zbx_free(port_esc);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sbulk=%d",
+							d, (int)interface->bulk);
 				}
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
@@ -2268,7 +2277,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 	zbx_lld_interface_t	*interface;
 
 	result = DBselect(
-			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port"
+			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,hi.bulk"
 			" from interface hi,items i"
 			" where hi.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
@@ -2285,10 +2294,13 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
+		interface->bulk = (unsigned char)atoi(row[7]);
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
 	DBfree_result(result);
+
+	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -2298,7 +2310,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
  ******************************************************************************/
 static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent_interfaceid,
 		zbx_uint64_t interfaceid, unsigned char type, unsigned char main, unsigned char useip, const char *ip,
-		const char *dns, const char *port)
+		const char *dns, const char *port, unsigned char bulk)
 {
 	zbx_lld_interface_t	*interface;
 	int			i;
@@ -2327,6 +2339,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		interface->ip = NULL;
 		interface->dns = NULL;
 		interface->port = NULL;
+		interface->bulk = SNMP_BULK_ENABLED;
 		interface->flags = ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 		zbx_vector_ptr_append(interfaces, interface);
@@ -2352,6 +2365,8 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS;
 		if (0 != strcmp(interface->port, port))
 			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT;
+		if (interface->bulk != bulk)
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK;
 	}
 
 	interface->interfaceid = interfaceid;
@@ -2405,6 +2420,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
 			new_interface->port = zbx_strdup(NULL, interface->port);
+			new_interface->bulk = interface->bulk;
 			new_interface->flags = 0x00;
 
 			zbx_vector_ptr_append(&host->interfaces, new_interface);
@@ -2421,7 +2437,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
-					"hi.dns,hi.port"
+					"hi.dns,hi.port,hi.bulk"
 				" from interface hi"
 					" left join interface_discovery id"
 						" on hi.interfaceid=id.interfaceid"
@@ -2448,7 +2464,8 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 			lld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
 					(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]),
-					(unsigned char)atoi(row[5]), row[6], row[7], row[8]);
+					(unsigned char)atoi(row[5]), row[6], row[7], row[8],
+					(unsigned char)atoi(row[9]));
 		}
 		DBfree_result(result);
 	}

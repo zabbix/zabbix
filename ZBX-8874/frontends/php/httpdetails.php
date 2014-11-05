@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Details of web scenario');
+$page['title'] = _('Details of scenario');
 $page['file'] = 'httpdetails.php';
 $page['hist_arg'] = array('httptestid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
@@ -113,7 +113,7 @@ $itemHistory = Manager::History()->getLast($items);
 $httpdetailsWidget = new CWidget();
 $httpdetailsWidget->addPageHeader(
 	array(
-		_('DETAILS OF WEB SCENARIO'),
+		_('DETAILS OF SCENARIO'),
 		SPACE,
 		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
 		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null

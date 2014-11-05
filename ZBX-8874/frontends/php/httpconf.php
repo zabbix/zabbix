@@ -165,8 +165,7 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 			$host = reset($httpTest['hosts']);
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-				_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTestId.'] '.
-					_('Host').' ['.$host['name'].'] '._('History cleared')
+				'Scenario ['.$httpTest['name'].'] ['.$httpTestId.'] Host ['.$host['name'].'] history cleared'
 			);
 		}
 
@@ -179,12 +178,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if (hasRequest('update')) {
 		$action = AUDIT_ACTION_UPDATE;
-		$messageTrue = _('Web scenario updated');
+		$messageTrue = _('Scenario updated');
 		$messageFalse = _('Cannot update web scenario');
 	}
 	else {
 		$action = AUDIT_ACTION_ADD;
-		$messageTrue = _('Web scenario added');
+		$messageTrue = _('Scenario added');
 		$messageFalse = _('Cannot add web scenario');
 	}
 
@@ -302,7 +301,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit($action, AUDIT_RESOURCE_SCENARIO,
-			_('Web scenario').' ['.getRequest('name').'] ['.$httpTestId.'] '._('Host').' ['.$host['name'].']'
+			'Scenario ['.getRequest('name').'] ['.$httpTestId.'] Host ['.$host['name'].']'
 		);
 
 		unset($_REQUEST['form']);
@@ -359,8 +358,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('httpte
 					$host = reset($httpTest['hosts']);
 
 					add_audit($auditAction, AUDIT_RESOURCE_SCENARIO,
-						_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-							_('Host').' ['.$host['name'].'] '.$statusName
+						'Scenario ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
+							'Host ['.$host['name'].'] '.$statusName
 					);
 				}
 			}
@@ -410,8 +409,8 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhist
 				$host = reset($httpTest['hosts']);
 
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-					_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
-						_('Host').' ['.$host['name'].'] '._('History cleared')
+					'Scenario ['.$httpTest['name'].'] ['.$httpTest['httptestid'].'] '.
+						'Host ['.$host['name'].'] history cleared'
 				);
 			}
 		}
