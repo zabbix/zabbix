@@ -40,6 +40,7 @@ New features:
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
 A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
