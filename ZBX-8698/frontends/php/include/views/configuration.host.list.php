@@ -24,7 +24,7 @@ $frmForm->addItem(new CDiv(array(
 	new CSubmit('form', _('Create host')),
 	new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 )));
-$frmForm->addItem(new CVar('groupid', getRequest('groupid'), 'filter_groupid_id'));
+$frmForm->addItem(new CVar('groupid', $groupId, 'filter_groupid_id'));
 
 $hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
 

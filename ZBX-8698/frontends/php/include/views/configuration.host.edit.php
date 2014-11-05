@@ -149,11 +149,9 @@ $clearTemplates = array_diff($clearTemplates, array_keys($templateIds));
 natcasesort($templateIds);
 
 // whether this is a discovered host
-$isDiscovered = (
-	getRequest('hostid')
+$isDiscovered = getRequest('hostid')
 	&& ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-	&& ($this->data['form'] == 'update')
-);
+	&& ($this->data['form'] == 'update');
 
 $divTabs = new CTabView();
 if (!hasRequest('form_refresh')) {
@@ -424,7 +422,7 @@ $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
 $hostList->addRow(_('Enabled'), new CCheckBox('status', ($status == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED));
 
-if ($this->data['form'] == 'full_clone') {
+if ($this->data['form'] === 'full_clone') {
 	// host applications
 	$hostApps = API::Application()->get(array(
 		'hostids' => $hostId,
