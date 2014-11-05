@@ -2088,7 +2088,13 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 			continue;
 		}
 
-		if (max_src_len < (csize = zbx_utf8_char_len(s)))
+		csize = zbx_utf8_char_len(s);
+
+		/* process non utf-8 characters as single byte characters */
+		if (0 == csize)
+			csize = 1;
+
+		if (max_src_len < csize)
 			break;
 
 		if ('\'' == *s)
