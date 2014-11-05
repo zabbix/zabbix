@@ -34,6 +34,12 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (ite
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.2
+
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 2.4.2rc1
 
 New features:
@@ -500,7 +506,7 @@ Changes for 2.2.8rc1
 
 New features:
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
-A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
