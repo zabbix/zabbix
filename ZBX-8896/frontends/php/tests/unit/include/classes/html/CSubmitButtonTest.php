@@ -29,19 +29,19 @@ class CSubmitButtonTest extends CTagTest {
 			),
 			array(
 				array('caption', 'button'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button">caption</button>'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button">caption</button>'
 			),
 			array(
 				array('caption', 'button[value]'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button_value" name="button[value]">caption</button>'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button[value]">caption</button>'
 			),
 			array(
 				array('caption', 'button', 'value'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="value">caption</button>'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="value">caption</button>'
 			),
 			array(
 				array('caption', 'button', 'value', 'my-class'),
-				'<button class="button my-class" type="submit" id="button" name="button" value="value">caption</button>'
+				'<button class="button my-class" type="submit" name="button" value="value">caption</button>'
 			),
 			// caption encoding
 			array(
@@ -51,7 +51,7 @@ class CSubmitButtonTest extends CTagTest {
 			// parameter encoding
 			array(
 				array('caption', 'button', 'button"&"'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="button&quot;&amp;&quot;">caption</button>'
+				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
 			),
 		);
 	}
