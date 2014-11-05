@@ -39,6 +39,7 @@ Changes for 2.4.3rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
 ..F....... [ZBX-8983] fixed "schema" option description in frontend configuration file (Oleg)
 
 --------------------------------------------------------------------------------
