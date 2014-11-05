@@ -37,6 +37,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (ite
 Changes for 2.4.3rc1
 
 New features:
+.......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
