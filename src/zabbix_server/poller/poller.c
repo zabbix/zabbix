@@ -625,7 +625,7 @@ static int	get_values(unsigned char poller_type)
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num);
 #else
@@ -768,7 +768,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		init_snmp(progname);
 #endif

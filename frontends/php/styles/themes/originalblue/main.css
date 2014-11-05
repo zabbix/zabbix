@@ -57,7 +57,7 @@ select[disabled]::-ms-value {
 	color: #aca899;
 }
 
-.link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
+.link_menu[disabled], .link_menu[disabled]:hover {
 	background-color: #ffffff;
 	color: #aca899;
 }
