@@ -22,7 +22,7 @@
 /**
  * A button used for submitting a form.
  */
-class CSubmitButton extends CButton {
+class CSubmitButton extends CSimpleButton {
 
 	/**
 	 * @param string $caption
@@ -31,9 +31,12 @@ class CSubmitButton extends CButton {
 	 * @param string $class
 	 */
 	public function __construct($caption, $name = null, $value = null, $class = 'button-plain shadow ui-corner-all') {
-		parent::__construct($name, $caption, null, $class);
+		parent::__construct($caption, $class);
 		$this->setAttribute('type', 'submit');
 
+		if ($name !== null) {
+			$this->setAttribute('name', $name);
+		}
 		if ($value !== null) {
 			$this->setAttribute('value', $value);
 		}

@@ -22,7 +22,7 @@
 /**
  * A class for creating buttons that redirect you to a different page.
  */
-class CRedirectButton extends CButton {
+class CRedirectButton extends CSimpleButton {
 
 	/**
 	 * @param string $caption
@@ -31,7 +31,7 @@ class CRedirectButton extends CButton {
 	 * @param string $class
 	 */
 	public function __construct($caption, $url, $confirmation = null, $class = 'button-plain shadow ui-corner-all') {
-		parent::__construct(null, $caption, null, $class);
+		parent::__construct($caption, $class);
 
 		$this->setUrl($url, $confirmation);
 	}
