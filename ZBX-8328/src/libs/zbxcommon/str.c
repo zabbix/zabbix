@@ -2985,21 +2985,22 @@ size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen)
  *                                                                            *
  * Purpose: calculates number of bytes in utf8 text limited by maxlen bytes   *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
 {
-	size_t		sz = 0;
+	size_t	sz;
 
 	sz = strlen(text);
+
 	if (sz > maxlen)
 	{
 		sz = maxlen;
 
-		/* ensure that the string is not cut at the middle of utf-8 sequence */
-		while(0x80 == (0xc0 & text[sz]) && 0 < sz)
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		while (0x80 == (0xc0 & text[sz]) && 0 < sz)
 			sz--;
 	}
+
 	return sz;
 }
 

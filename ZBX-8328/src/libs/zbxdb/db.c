@@ -2028,9 +2028,12 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 	char		*dst = NULL;
 	size_t		len = 1;	/* '\0' */
 
+	if (NULL == src)
+		goto out;
+
 	max_src_len++;
 
-	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
+	for (s = src; '\0' != *s && 0 < max_src_len; s++)
 	{
 		if ('\r' == *s)
 			continue;
@@ -2050,7 +2053,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 		len++;
 	}
-
+out:
 	dst = zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len);
@@ -2064,15 +2067,15 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Comments: This function is used to escape strings for DB2 where fields are *
- *           limited by bytes rather than characters.                         *
+ * Comments: This function is used to escape strings for IBM DB2 where fields *
+ *           are limited by bytes rather than characters.                     *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	size_t		len = 1, csize;	/* '\0' */
+	size_t		csize, len = 1;	/* '\0' */
 
 	if (NULL == src)
 		goto out;
@@ -2103,25 +2106,6 @@ out:
 	return dst;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_strlen_n                                                  *
- *                                                                            *
- * Purpose: return the string length to fit into a database field of the      *
- *          specified size                                                    *
- *                                                                            *
- * Return value: the string length in bytes                                   *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_strlen_n(const char *text, size_t maxlen)
-{
-#ifdef HAVE_IBM_DB2
-	return zbx_strlen_utf8_nbytes(text, maxlen);
-#else
-	return zbx_strlen_utf8_nchars(text, maxlen);
-#endif
-}
 
 /******************************************************************************
  *                                                                            *
@@ -2228,3 +2212,21 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return dst;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_strlen_n                                                  *
+ *                                                                            *
+ * Purpose: return the string length to fit into a database field of the      *
+ *          specified size                                                    *
+ *                                                                            *
+ * Return value: the string length in bytes                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_strlen_n(const char *text, size_t maxlen)
+{
+#ifdef HAVE_IBM_DB2
+	return zbx_strlen_utf8_nbytes(text, maxlen);
+#else
+	return zbx_strlen_utf8_nchars(text, maxlen);
+#endif
+}
