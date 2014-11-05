@@ -39,6 +39,7 @@ Changes for 2.4.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8983] fixed "schema" option description in frontend configuration file (Oleg)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.2
