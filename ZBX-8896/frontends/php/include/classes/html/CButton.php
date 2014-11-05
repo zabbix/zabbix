@@ -19,7 +19,7 @@
 **/
 
 
-class CButton extends CTag {
+class CButton extends CTag implements CButtonInterface {
 
 	/**
 	 * Button class that will be added to the other classes of the element.
@@ -43,7 +43,7 @@ class CButton extends CTag {
 	}
 
 	/**
-	 * Mark the button as main.
+	 * @see CButtonInterface::main()
 	 */
 	public function main() {
 		$this->addClass('main');
@@ -64,7 +64,7 @@ class CButton extends CTag {
 	}
 
 	/**
-	 * @param string $class
+	 * @see CButtonInterface::setButtonClass()
 	 */
 	public function setButtonClass($class) {
 		$this->buttonClass = $class;
