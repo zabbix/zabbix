@@ -18,7 +18,7 @@ A.F....... [ZBX-8720] fixed resolving of macros in graph names when graph name c
 ...G...... [ZBX-8837] added bypassing of DNS resolver cache on Windows systems for net.dns items (wiper)
 A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
 ...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
-..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
+..F....... [ZBX-8713] improved screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
 ...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernel NETLINK interface. Old method of information retrieval also improved (Juris)
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
