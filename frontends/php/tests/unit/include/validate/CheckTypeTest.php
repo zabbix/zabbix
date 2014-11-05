@@ -42,9 +42,9 @@ class CheckTypeTest extends PHPUnit_Framework_TestCase {
 			array($fieldName, P_SYS, '', T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
 			array($fieldName, P_SYS, '"sadasd"', T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
 			array($fieldName, P_SYS, 'aa.ee', T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
-			array($fieldName, P_SYS, false, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not string.'),
-			array($fieldName, P_SYS, 1234, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not string.'),
-			array($fieldName, P_SYS, null, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not string.'),
+			array($fieldName, P_SYS, false, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
+			array($fieldName, P_SYS, 1234, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
+			array($fieldName, P_SYS, null, T_ZBX_JSON, 'error', 'Field "'.$fieldName.'" is not a JSON-encoded array.'),
 		);
 	}
 
