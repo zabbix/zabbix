@@ -19,8 +19,8 @@
 **/
 
 // the host is not passed for item prototypes
-if (isset($this->data['item']['hosts'])) {
-	$host = $this->data['item']['hosts'][0];
+if (isset($this->data['host'])) {
+	$host = $this->data['host'];
 }
 
 $itemWidget = new CWidget();
