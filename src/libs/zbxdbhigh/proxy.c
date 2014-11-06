@@ -2333,6 +2333,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	else
 		ret = SUCCEED;
 
+	if (SUCCEED == ret && 0 != proxy_hostid)
+		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+
 	p = NULL;
 	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
@@ -2369,7 +2372,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				}
 			}
 			else
-				av->ts.ns = -1;
+				av->ts.ns = proxy_timediff.ns;
 		}
 		else
 			zbx_timespec(&av->ts);
