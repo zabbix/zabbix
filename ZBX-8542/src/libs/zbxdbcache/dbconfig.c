@@ -6607,8 +6607,6 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 	zbx_vector_ptr_destroy(&fset);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_idset_free                                                   *
