@@ -2285,6 +2285,8 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		zbx_vector_ptr_append(interfaces, interface);
 	}
 	DBfree_result(result);
+
+	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************

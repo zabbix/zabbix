@@ -183,7 +183,7 @@ void	free_result(AGENT_RESULT *result);
 void	init_request(AGENT_REQUEST *request);
 void	free_request(AGENT_REQUEST *request);
 
-int	parse_item_key(char *cmd, AGENT_REQUEST *request);
+int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 
 zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
 void		set_log_result_empty(AGENT_RESULT *result);
