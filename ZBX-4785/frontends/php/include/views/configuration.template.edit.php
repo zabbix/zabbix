@@ -103,13 +103,12 @@ $templateList->addRow(_('Visible name'), $visiblenameTB);
 $group_tb = new CTweenBox($frmHost, 'groups', 10);
 $group_tb->setSelectedValues($groups);
 $options = array(
-	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND
+	'output' => array('groupid', 'name'),
+	'editable' => true
 );
 $all_groups = API::HostGroup()->get($options);
-order_result($all_groups, 'name');
 
-foreach ($all_groups as $gnum => $group) {
+foreach ($all_groups as $group) {
 	$group_tb->addNewItem($group['groupid'], $group['name']);
 }
 $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
@@ -140,32 +139,30 @@ $host_tb->setSelectedValues($hosts_linked_to);
 
 // get hosts from selected twb_groupid combo
 $params = array(
+	'output' => array('hostid', 'name'),
 	'groupids' => $twb_groupid,
-	'templated_hosts' => 1,
-	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND,
-	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+	'templated_hosts' => true,
+	'editable' => true
 );
 $db_hosts = API::Host()->get($params);
-order_result($db_hosts, 'name');
-
-foreach ($db_hosts as $hnum => $db_host) {
+foreach ($db_hosts as $db_host) {
+	// add all except selected hosts
 	if (isset($hosts_linked_to[$db_host['hostid']])) {
 		continue;
-	} // add all except selected hosts
+	}
 	$host_tb->addNewItem($db_host['hostid'], $db_host['name']);
 }
 
 // select selected hosts and add them
 $params = array(
+	'output' => array('hostid', 'name', 'flags'),
 	'hostids' => $hosts_linked_to,
-	'templated_hosts' => 1,
-	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND
+	'templated_hosts' => true,
+	'editable' => true
 );
 $db_hosts = API::Host()->get($params);
-order_result($db_hosts, 'name');
-foreach ($db_hosts as $hnum => $db_host) {
+foreach ($db_hosts as $db_host) {
 	$host_tb->addNewItem($db_host['hostid'], $db_host['name'], $db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
 }
 

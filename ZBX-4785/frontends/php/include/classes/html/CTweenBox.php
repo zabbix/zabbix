@@ -88,16 +88,6 @@ class CTweenBox {
 	}
 
 	/**
-	 * Adds item to the possible items list. Uses value of combo item as key. Overwrites previous item with same value.
-	 *
-	 * @param CComboItem $item
-	 */
-	public function addItem(CComboItem $item) {
-		$value = $item->getValue();
-		$this->items[$value] = $item;
-	}
-
-	/**
 	 * Constructs new item and adds it to the possible items list. Uses CTweenBox::addItem() to add.
 	 *
 	 * @param int|string $value   value of item
@@ -105,29 +95,7 @@ class CTweenBox {
 	 * @param bool       $enabled specifies whether it will be possible to move item between lists
 	 */
 	public function addNewItem($value, $caption, $enabled = true) {
-		$item = new CComboItem($value, $caption, null, $enabled);
-
-		$this->addItem($item);
-	}
-
-	/**
-	 * Returns item for given $value, or null if no such item is present.
-	 *
-	 * @param int|string $value value to look for
-	 *
-	 * @return CComboItem|null
-	 */
-	public function getItem($value) {
-		return isset($this->items[$value]) ? $this->items[$value] : null;
-	}
-
-	/**
-	 * Returns all items of this tween box.
-	 *
-	 * @return CComboItem[]
-	 */
-	public function getItems() {
-		return $this->items;
+		$this->items[$value] = new CComboItem($value, $caption, null, $enabled);
 	}
 
 	/**
@@ -176,13 +144,13 @@ class CTweenBox {
 			$tweenBoxTable->addRow(array($leftCaption, '', $rightCaption));
 		}
 
-		$leftListBoxName = $this->variableName . '_left';
-		$leftListBox = new CListBox($leftListBoxName, null, $this->size);
-		$leftListBox->setAttribute('style', 'width: 280px;');
+		$listBoxAttributes = array('name' => null, 'style' => 'width: 280px;');
 
-		$rightListBoxName = $this->variableName . '_right';
-		$rightListBox = new CListBox($rightListBoxName, null, $this->size);
-		$rightListBox->setAttribute('style', 'width: 280px;');
+		$leftListBox = new CListBox($this->variableName . '_left', null, $this->size);
+		$leftListBox->setAttributes($listBoxAttributes);
+
+		$rightListBox = new CListBox($this->variableName . '_right', null, $this->size);
+		$rightListBox->setAttributes($listBoxAttributes);
 
 		// Items for left and right list boxes are sorted by checking if value of item is in $selectedValues.
 		$leftItems = array();
@@ -212,24 +180,22 @@ class CTweenBox {
 		$moveToLeftListButton = new CButton('add', '  &laquo;  ', null, 'formlist');
 		$moveToLeftListButton->setAttribute(
 			'onclick',
-			'moveListBoxSelectedItem("' . $formName . '", "' . $this->variableName . '", "' . $rightListBoxId . '", "' .
-			$leftListBoxId . '", "add");'
+			'moveListBoxSelectedItem("'.$formName.'", "'.$this->variableName.'", "'.$rightListBoxId.'", "'.
+			$leftListBoxId.'", "add");'
 		);
 
 		$moveToRightListButton = new CButton('remove', '  &raquo;  ', null, 'formlist');
 		$moveToRightListButton->setAttribute(
 			'onclick',
-			'moveListBoxSelectedItem("' . $formName . '", "' . $this->variableName . '", "' . $leftListBoxId . '", "' .
-			$rightListBoxId . '", "rmv");'
+			'moveListBoxSelectedItem("'.$formName.'", "'.$this->variableName.'", "'.$leftListBoxId.'", "'.
+			$rightListBoxId.'", "rmv");'
 		);
 
-		$tweenBoxTable->addRow(
-			array(
-				$leftListBox,
-				new CCol(array($moveToLeftListButton, BR(), $moveToRightListButton)),
-				$rightListBox
-			)
-		);
+		$tweenBoxTable->addRow(array(
+			$leftListBox,
+			new CCol(array($moveToLeftListButton, BR(), $moveToRightListButton)),
+			$rightListBox
+		));
 
 		$tweenBoxTable->addItem(new CVar($this->variableName, CJs::encodeJson(array_values($this->selectedValues))));
 
@@ -237,7 +203,7 @@ class CTweenBox {
 	}
 
 	/**
-	 * Sorts array of CComboItem items by captions.
+	 * Sorts array of CComboItem items by their captions.
 	 *
 	 * @param CComboItem[] $items
 	 *
@@ -245,34 +211,15 @@ class CTweenBox {
 	 */
 	protected function sortItemsByCaptions(array $items) {
 		$itemCaptions = array();
-		$unsortableItems = array();
 
 		foreach ($items as $key => $item) {
-			if (!$item instanceof CComboItem) {
-				$unsortableItems[$key] = $item;
-			}
-			elseif (!isset($item->items[0])) {
-				$unsortableItems[$key] = $item;
-			}
-			else {
-				$itemCaption = $item->items[0];
-				if (is_string($itemCaption)) {
-					$itemCaptions[$key] = array('caption' => $itemCaption);
-				}
-				else {
-					$unsortableItems[$key] = $item;
-				}
-			}
+			$itemCaptions[$key] = array('caption' => $item->items[0]);
 		}
 		CArrayHelper::sort($itemCaptions, array('caption'));
 
 		$resultItems = array();
 		foreach (array_keys($itemCaptions) as $key) {
 			$resultItems[$key] = $items[$key];
-		}
-
-		foreach ($unsortableItems as $key => $item) {
-			$resultItems[$key] = $item;
 		}
 
 		return $resultItems;

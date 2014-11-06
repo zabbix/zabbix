@@ -307,21 +307,18 @@ if (hasRequest('form')) {
 	$data['db_hosts'] = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
 		'groupids' => $data['twb_groupid'] ? $data['twb_groupid'] : null,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'templated_hosts' => true,
-		'editable' => true,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		'editable' => true
 	));
-	order_result($data['db_hosts'], 'name');
 
 	// get selected hosts
 	if ($data['hosts']) {
 		$data['r_hosts'] = API::Host()->get(array(
 			'output' => array('hostid', 'name', 'flags'),
 			'hostids' => $data['hosts'],
-			'templated_hosts' => true,
-			'preservekeys' => true
+			'templated_hosts' => true
 		));
-		order_result($data['r_hosts'], 'name');
 	}
 
 	// deletable groups
