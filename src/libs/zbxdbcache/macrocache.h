@@ -35,5 +35,4 @@ typedef struct
 }
 zbx_umc_object_t;
 
-
 #endif

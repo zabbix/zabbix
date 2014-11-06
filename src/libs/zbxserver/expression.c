@@ -3223,8 +3223,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 						if (FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 						{
-							zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric"
-									, m);
+							zbx_snprintf(error, maxerrlen,
+									"Macro '%s' value is not numeric", m);
 						}
 					}
 				}
