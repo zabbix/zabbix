@@ -2090,7 +2090,7 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 		csize = zbx_utf8_char_len(s);
 
-		/* process non utf-8 characters as single byte characters */
+		/* process non-UTF-8 characters as single byte characters */
 		if (0 == csize)
 			csize = 1;
 
