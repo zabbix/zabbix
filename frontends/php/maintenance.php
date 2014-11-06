@@ -479,12 +479,11 @@ if (!empty($data['form'])) {
 
 	// get groups
 	$data['all_groups'] = API::HostGroup()->get(array(
-		'editable' => true,
 		'output' => array('groupid', 'name'),
+		'editable' => true,
 		'real_hosts' => true,
 		'preservekeys' => true
 	));
-	order_result($data['all_groups'], 'name');
 
 	$data['twb_groupid'] = getRequest('twb_groupid', 0);
 	if (!isset($data['all_groups'][$data['twb_groupid']])) {
@@ -503,13 +502,12 @@ if (!empty($data['form'])) {
 	// selected hosts
 	$hostsSelected = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
+		'hostids' => $data['hostids'],
 		'real_hosts' => true,
-		'editable' => true,
-		'hostids' => $data['hostids']
+		'editable' => true
 	));
 	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
 	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
-	order_result($data['hosts'], 'name');
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);

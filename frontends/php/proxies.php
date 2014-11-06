@@ -251,7 +251,6 @@ if (isset($_REQUEST['form'])) {
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
-	order_result($data['dbHosts'], 'name');
 
 	// render view
 	$proxyView = new CView('administration.proxy.edit', $data);

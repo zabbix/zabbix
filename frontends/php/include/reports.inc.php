@@ -314,12 +314,12 @@ function valueComparisonFormForMultiplePeriods() {
 	$group_tb->setSelectedValues($groupids);
 
 	$db_groups = API::HostGroup()->get(array(
-		'real_hosts' => true,
-		'output' => array('groupid', 'name')
+		'output' => array('groupid', 'name'),
+		'real_hosts' => true
 	));
+	// Order now because it is also used in combo box.
 	order_result($db_groups, 'name');
 	foreach ($db_groups as $group) {
-		$groupids[$group['groupid']] = $group['groupid'];
 		$group_tb->addNewItem($group['groupid'], $group['name']);
 	}
 
@@ -332,43 +332,37 @@ function valueComparisonFormForMultiplePeriods() {
 		$cmbGroups->addItem($group['groupid'], $group['name']);
 	}
 
-	$td_groups = new CCol(array(_('Group'), SPACE, $cmbGroups));
-	$td_groups->setAttribute('style', 'text-align: right;');
-
 	$host_tb = new CTweenBox($reportForm, 'hostids', 10);
 	$host_tb->setSelectedValues($hostids);
 
+	// Get and add all hosts that are selected (to be on left side).
 	$options = array(
+		'output' => array('hostid', 'name'),
+		'hostids' => $hostids,
 		'real_hosts' => true,
-		'output' => array('hostid', 'name')
+		'preservekeys' => true
 	);
-	if ($groupid > 0) {
-		$options['groupids'] = $groupid;
-	}
 	$db_hosts = API::Host()->get($options);
-	$db_hosts = zbx_toHash($db_hosts, 'hostid');
-	order_result($db_hosts, 'name');
-
-	foreach ($db_hosts as $hnum => $host) {
+	foreach ($db_hosts as $host) {
 		$host_tb->addNewItem($host['hostid'], $host['name']);
 	}
 
+	// Get and add either ALL hosts or ones in selected group (to be on right side).
 	$options = array(
-		'real_hosts' => true,
 		'output' => array('hostid', 'name'),
-		'hostids' => $hostids,
+		'groupids' => $groupid > 0 ? $groupid : null,
+		'real_hosts' => true
 	);
 	$db_hosts2 = API::Host()->get($options);
-	order_result($db_hosts2, 'name');
-	foreach ($db_hosts2 as $hnum => $host) {
+	foreach ($db_hosts2 as $host) {
 		if (!isset($db_hosts[$host['hostid']])) {
 			$host_tb->addNewItem($host['hostid'], $host['name']);
 		}
 	}
 
 	$reportForm->addRow(_('Hosts'),
-		$host_tb->Get(_('Selected hosts'),
-		array(_('Other hosts | Group').SPACE, $cmbGroups)
+		$host_tb->get(_('Selected hosts'),
+		array(_('Other hosts | Group').' ', $cmbGroups)
 	));
 
 	$reporttimetab = new CTable(null,'calendar');
