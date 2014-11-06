@@ -144,9 +144,6 @@ typedef struct
 	/* the vmware service instance contents */
 	char			*contents;
 
-	/* the performance counter values */
-	zbx_hashset_t		stats;
-
 	/* the performance counters */
 	zbx_hashset_t 		counters;
 
