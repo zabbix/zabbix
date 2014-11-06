@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
 A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
 ........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
