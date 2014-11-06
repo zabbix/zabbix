@@ -8,6 +8,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)
 ..F....... [ZBX-8844] fixed testing LDAP authentication (Krists)
 ..F.I..... [ZBX-8851] added "-1" and "0" as allowed values for "max_execution_time" and "max_input_time" PHP configuration settings (Krists)
@@ -17,7 +18,7 @@ A.F....... [ZBX-8720] fixed resolving of macros in graph names when graph name c
 ...G...... [ZBX-8837] added bypassing of DNS resolver cache on Windows systems for net.dns items (wiper)
 A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (items, triggers, graphs, hosts) and add validation so that only allowed fields of discovered entities can be updated (Krists)
 ...G...PS. [ZBX-8728] changed item key parameter parsing to use dynamic buffers for parsed parameters (wiper)
-..F....... [ZBX-8713] improve screen element resource parameter labels (Krists)
+..F....... [ZBX-8713] improved screen element resource parameter labels (Krists)
 ..F....... [ZBX-8643] fixed performance problem in action configuration pages (Ivo)
 ...G...... [ZBX-8545] rewrote net.tcp.listen for Linux kernels 2.6.14 and above to employ the kernel NETLINK interface. Old method of information retrieval also improved (Juris)
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
@@ -33,6 +34,25 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered entities (ite
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.3rc1
+
+New features:
+.......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
+
+Bug fixes:
+..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
+.......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
+A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
+A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
+..F....... [ZBX-8983] fixed "schema" option description in frontend configuration file (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.2
+
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 2.4.2rc1
 
 New features:
@@ -40,6 +60,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Italian, Japanese, Po
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
 
 Bug fixes:
+........S. [ZBX-8978] fixed propagation of the SNMP bulk flag into discovered hosts (Sasha)
+........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
 ..F....... [ZBX-8970] fixed interfaces list not being displayed correctly for discovered hosts (Krists)
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
 ...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
@@ -496,9 +518,13 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.8rc1
 
 New features:
-A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
+.......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
+A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
+........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
 ...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
