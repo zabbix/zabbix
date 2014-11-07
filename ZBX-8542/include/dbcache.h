@@ -400,7 +400,7 @@ void	zbx_umc_add_hostids(zbx_hashset_t *cache, zbx_uint64_t objectid, const zbx_
 void	zbx_umc_resolve(zbx_hashset_t *cache);
 const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *macro);
 
-void	DCget_grouped_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
+void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	zbx_idset_free(zbx_idset_t *idset);
 
