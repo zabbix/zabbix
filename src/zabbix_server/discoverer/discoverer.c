@@ -228,7 +228,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						ret = FAIL;
 				}
 				else
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 				{
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
@@ -279,7 +279,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				}
 #else
 					ret = FAIL;
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
 
 				if (FAIL == ret && ISSET_MSG(&result))
 				{
@@ -840,10 +840,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 	init_snmp(progname);
 #endif
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 
