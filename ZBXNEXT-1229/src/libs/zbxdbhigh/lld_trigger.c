@@ -118,7 +118,7 @@ static void	lld_function_free(zbx_lld_function_t *function)
 
 static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prototype)
 {
-	zbx_vector_ptr_clean(&trigger_prototype->functions, (zbx_mem_free_func_t)lld_function_free);
+	zbx_vector_ptr_clear_ext(&trigger_prototype->functions, (zbx_mem_free_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger_prototype->functions);
 	zbx_free(trigger_prototype->url);
 	zbx_free(trigger_prototype->comments);
@@ -129,7 +129,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
-	zbx_vector_ptr_clean(&trigger->functions, (zbx_mem_free_func_t)lld_function_free);
+	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger->functions);
 	zbx_free(trigger->comments_orig);
 	zbx_free(trigger->comments);
@@ -1203,7 +1203,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			}
 		}
 
-		zbx_vector_ptr_clean(&db_triggers, (zbx_mem_free_func_t)lld_trigger_free);
+		zbx_vector_ptr_clear_ext(&db_triggers, (zbx_clean_func_t)lld_trigger_free);
 		zbx_vector_ptr_destroy(&db_triggers);
 
 		zbx_free(sql);
@@ -1618,12 +1618,12 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 
 	/* cleaning */
 
-	zbx_vector_ptr_clean(&items, (zbx_mem_free_func_t)lld_item_free);
-	zbx_vector_ptr_clean(&triggers, (zbx_mem_free_func_t)lld_trigger_free);
+	zbx_vector_ptr_clear_ext(&items, (zbx_mem_free_func_t)lld_item_free);
+	zbx_vector_ptr_clear_ext(&triggers, (zbx_mem_free_func_t)lld_trigger_free);
 	zbx_vector_ptr_destroy(&items);
 	zbx_vector_ptr_destroy(&triggers);
 out:
-	zbx_vector_ptr_clean(&trigger_prototypes, (zbx_mem_free_func_t)lld_trigger_prototype_free);
+	zbx_vector_ptr_clear_ext(&trigger_prototypes, (zbx_mem_free_func_t)lld_trigger_prototype_free);
 	zbx_vector_ptr_destroy(&trigger_prototypes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

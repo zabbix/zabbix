@@ -380,6 +380,7 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 
@@ -728,6 +729,7 @@ zbx_task_t;
 
 #define ZBX_RTC_LOG_LEVEL_INCREASE	1
 #define ZBX_RTC_LOG_LEVEL_DECREASE	2
+#define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 
 typedef enum
@@ -988,7 +990,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
