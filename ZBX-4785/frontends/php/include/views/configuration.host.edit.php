@@ -205,7 +205,7 @@ if (!$isDiscovered) {
 		'editable' => true
 	));
 	foreach ($all_groups as $group) {
-		$grp_tb->addNewItem($group['groupid'], $group['name']);
+		$grp_tb->addItem($group['groupid'], $group['name']);
 	}
 
 	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));

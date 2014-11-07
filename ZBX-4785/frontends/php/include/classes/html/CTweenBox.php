@@ -94,7 +94,7 @@ class CTweenBox {
 	 * @param string     $caption caption of item
 	 * @param bool       $enabled specifies whether it will be possible to move item between lists
 	 */
-	public function addNewItem($value, $caption, $enabled = true) {
+	public function addItem($value, $caption, $enabled = true) {
 		$this->items[$value] = new CComboItem($value, $caption, null, $enabled);
 	}
 
@@ -213,9 +213,9 @@ class CTweenBox {
 		$itemCaptions = array();
 
 		foreach ($items as $key => $item) {
-			$itemCaptions[$key] = array('caption' => $item->items[0]);
+			$itemCaptions[$key] = $item->items[0];
 		}
-		CArrayHelper::sort($itemCaptions, array('caption'));
+		order_result($itemCaptions);
 
 		$resultItems = array();
 		foreach (array_keys($itemCaptions) as $key) {

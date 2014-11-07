@@ -484,6 +484,7 @@ if (!empty($data['form'])) {
 		'real_hosts' => true,
 		'preservekeys' => true
 	));
+	order_result($data['all_groups'], 'name');
 
 	$data['twb_groupid'] = getRequest('twb_groupid', 0);
 	if (!isset($data['all_groups'][$data['twb_groupid']])) {
