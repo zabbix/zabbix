@@ -29,10 +29,10 @@ $header = array(
 );
 $headerPlaintext = array();
 
-$hosts = array();
-foreach ($this->data['items'] as $item_data) {
-	if (!in_array($item_data['hosts'][0]['name'], $hosts)) {
-		$hosts[] = $item_data['hosts'][0]['name'];
+$hostNames = array();
+foreach ($this->data['items'] as $itemData) {
+	if (!in_array($itemData['hosts'][0]['name'], $hostNames)) {
+		$hostNames[] = $itemData['hosts'][0]['name'];
 	}
 }
 
@@ -55,7 +55,7 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 		));
 	}
 }
-elseif(count($hosts) == 1) {
+elseif (count($hostNames) == 1) {
 	$header['left'] = array(
 		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
