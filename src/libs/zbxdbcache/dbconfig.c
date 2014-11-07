@@ -6519,7 +6519,7 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_grouped_hostids_by_functionids                             *
+ * Function: DCget_bulk_hostids_by_functionids                                *
  *                                                                            *
  * Purpose: get function host ids grouped by an object (trigger) id           *
  *                                                                            *
@@ -6527,9 +6527,9 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
  *             hostids     - [OUT] the host ids                               *
  *                                                                            *
  ******************************************************************************/
-void	DCget_grouped_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids)
+void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids)
 {
-	const char	*__function_name = "DCget_grouped_hostids_by_functionids";
+	const char	*__function_name = "DCget_bulk_hostids_by_functionids";
 	zbx_idset_t	*fset, *hset;
 	ZBX_DC_FUNCTION	*function;
 	ZBX_DC_ITEM	*item;
@@ -6592,7 +6592,7 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 	idset->ids = *functionids;
 	zbx_vector_ptr_append(&fset, idset);
 
-	DCget_grouped_hostids_by_functionids(&fset, &hset);
+	DCget_bulk_hostids_by_functionids(&fset, &hset);
 
 	/* copy the result to output vector */
 	idset = (zbx_idset_t *)hset.values[0];

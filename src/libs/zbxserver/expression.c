@@ -3870,7 +3870,8 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	zbx_vector_ptr_create(&functionids);
 	zbx_vector_ptr_create(&hostids);
 
-	/* extract user macros and function ids from trigger expressions */
+	/* add triggers with their macros to user macro cache and create a vector with */
+	/* triggerid => functionids[] associations, extracted from trigger expressions */
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
@@ -3878,8 +3879,10 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		tr->expression = zbx_strdup(NULL, tr->expression_orig);
 		zbx_remove_whitespace(tr->expression);
 
+		/* add trigger macros to user macro cache */
 		zbx_umc_add_expression(&macro_cache, tr->triggerid, tr->expression);
 
+		/* add triggerd => functionids[] association to a vector */
 		idset = zbx_malloc(NULL, sizeof(zbx_idset_t));
 		idset->id = tr->triggerid;
 		zbx_vector_uint64_create(&idset->ids);
@@ -3887,15 +3890,18 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		zbx_vector_ptr_append(&functionids, idset);
 	}
 
-	/* resolve user macros */
-	DCget_grouped_hostids_by_functionids(&functionids, &hostids);
+	/* convert the vector with extracted triggerid => functionids[] associations to */
+	/* a vector with triggerid => hostids[] associations                            */
+	DCget_bulk_hostids_by_functionids(&functionids, &hostids);
 
+	/* assign the associated hosts to respective macro cache records (by trigger id) */
 	for (i = 0; i < hostids.values_num; i++)
 	{
 		idset = (zbx_idset_t *)hostids.values[i];
 		zbx_umc_add_hostids(&macro_cache, idset->id, idset->ids.values, idset->ids.values_num);
 	}
 
+	/* resolve user macros */
 	zbx_umc_resolve(&macro_cache);
 
 	/* evaluate expressions */

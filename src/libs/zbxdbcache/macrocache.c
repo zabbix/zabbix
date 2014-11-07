@@ -27,11 +27,73 @@
  * The purpose of user macro cache is to reduce configuration cache locking when
  * performing multiple macro resolves during single operation.
  *
- * Instead of resolving macros during expression evaluation and locking configuration
- * for every user macro, the user macro cache must be populated by scanning all
- * expressions involved in operation for user macros, then the user macro cache
- * is resolved (with a single configuration cache lock) and then the resolved
- * values from user macro cache are using during expression evaluation.
+ * For example when processing triggers we can have 1000+ expressions each containing
+ * multiple user macros. So instead of locking configuration cache to resolve each
+ * macro we first scan all expressions for user macros, link with involved hosts,
+ * resolve cached macros with a single configuration cache lock and then use the
+ * resolved macros from cache to evaluate trigger expressions.
+ *
+ * The macros in the cache are grouped by object id referring to the object 'owning'
+ * them. For example when resolving trigger expressions macro owners are triggers.
+ *
+ * Each object in cache can have multiple macros and also several associated hosts
+ * that are used to resolve host level user macros.
+ *
+ * The user macro cache usage is described in following steps:
+ *
+ *   1) Initialize cache with zbx_umc_init() function.
+ *
+ *   2) Fill cache with objects and their macros with zbx_umc_add_expression() function.
+ *      This function parses expression and adds the specified object with parsed
+ *      macros to the cache.
+ *
+ *      Cache now contains following records:
+ *
+ *       .-----------------------------------------------------.
+ *       |                    cache record                     |-.
+ *       |-----------------------------------------------------| |-.
+ *       | objectid                                            |-| |
+ *       | hostids[]                                           | |-|
+ *       | macros[(name1,null),(name2,null),...,(nameN, null)] | | |
+ *       '-----------------------------------------------------' | |
+ *         '-----------------------------------------------------' |
+ *           '-----------------------------------------------------'
+ *
+ *     Each record has its owner object id, an empty list of associated hosts and
+ *     a list of macros in a form of (name, value) pairs, where values are null.
+ *
+ *   3) Set associated hosts for cache objects with zbx_umc_add_hostids() function.
+ *
+ *      Cache now contains following records:
+ *
+ *       .-----------------------------------------------------.
+ *       |                    cache record                     |-.
+ *       |-----------------------------------------------------| |-.
+ *       | objectid                                            |-| |
+ *       | hostids[hostid1,hostid2,...,hostidK]                | |-|
+ *       | macros[(name1,null),(name2,null),...,(nameN,null)]  | | |
+ *       '-----------------------------------------------------' | |
+ *         '-----------------------------------------------------' |
+ *           '-----------------------------------------------------'
+ *
+ *   4) Resolve cached macros with zbx_umc_resolve() function (because this function
+ *      locks configuration cache it is defined in dbconfig.c file).
+ *
+ *      Cache now contains following records:
+ *
+ *       .----------------------------------------------------------.
+ *       |                       cache record                       |-.
+ *       |----------------------------------------------------------| |-.
+ *       | objectid                                                 |-| |
+ *       | hostids[hostid1,hostid2,...,hostidK]                     | |-|
+ *       | macros[(name1,value1),(name2,value2),...,(nameN,valueN)] | | |
+ *       '----------------------------------------------------------' | |
+ *         '----------------------------------------------------------' |
+ *           '----------------------------------------------------------'
+ *
+ *   5) Access the resolved macro values with zbx_umc_get_macro_value() function.
+ *
+ *   6) Destroy the user macro cache with zbx_umc_destroy() function.
  */
 
 /******************************************************************************
