@@ -44,7 +44,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
 		$this->assertElementPresent('image');
-		$this->assertElementPresent('save');
+		$this->assertElementPresent('add');
 		$this->assertElementPresent('cancel');
 
 	}
@@ -57,8 +57,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('name');
 		$this->input_type('name', $this->icon_image_name);
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
-		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/UPS.png');
-		$this->zbxTestClickWait('save');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
@@ -76,7 +76,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickWait('link='.$this->icon_image_name);
 		$this->input_type('name', $this->icon_image_name2);
-		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Workstation.png');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png');
 		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
@@ -89,8 +89,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickWait('link='.$this->icon_image_name);
 		$this->input_type('name', $this->icon_image_name2);
-		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Notebook.png');
-		$this->zbxTestClickWait('save');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
@@ -120,8 +120,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->input_type('name', $this->bg_image_name);
 		$this->zbxTestDropdownSelect('imagetype', 'Background');
-		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
-		$this->zbxTestClickWait('save');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
@@ -137,8 +137,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent('Type');
 		$this->zbxTestClickWait("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name."']");
 		$this->input_type('name', $this->bg_image_name2);
-		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
-		$this->zbxTestClickWait('save');
+		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 

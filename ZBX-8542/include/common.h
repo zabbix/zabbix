@@ -380,6 +380,9 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
+#define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
+#define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -694,7 +697,7 @@ while (0)
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
-extern const char	usage_message[];
+extern const char	*usage_message[];
 extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
@@ -711,13 +714,23 @@ typedef enum
 	ZBX_TASK_PRINT_SUPPORTED,
 	ZBX_TASK_TEST_METRIC,
 	ZBX_TASK_SHOW_USAGE,
+	ZBX_TASK_SHOW_VERSION,
+	ZBX_TASK_SHOW_HELP,
+#ifdef _WINDOWS
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CONFIG_CACHE_RELOAD
+	ZBX_TASK_STOP_SERVICE
+#else
+	ZBX_TASK_RUNTIME_CONTROL
+#endif
 }
 zbx_task_t;
+
+#define ZBX_RTC_LOG_LEVEL_INCREASE	1
+#define ZBX_RTC_LOG_LEVEL_DECREASE	2
+#define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
+#define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 
 typedef enum
 {
@@ -735,6 +748,21 @@ typedef struct
 	int		flags;
 }
 ZBX_TASK_EX;
+
+#define ZBX_RTC_MSG_SHIFT	0
+#define ZBX_RTC_SCOPE_SHIFT	8
+#define ZBX_RTC_DATA_SHIFT	16
+
+#define ZBX_RTC_MSG_MASK	0x000000ff
+#define ZBX_RTC_SCOPE_MASK	0x0000ff00
+#define ZBX_RTC_DATA_MASK	0xffff0000
+
+#define ZBX_RTC_GET_MSG(task)	(int)((task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
+#define ZBX_RTC_GET_SCOPE(task)	(int)((task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
+#define ZBX_RTC_GET_DATA(task)	(int)((task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
+
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
+	(data << ZBX_RTC_DATA_SHIFT))
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
@@ -808,7 +836,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 		size_t maxerrlen);
 
 void	remove_param(char *param, int num);
-const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -904,11 +931,6 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
 
-#define ZBX_COMMAND_ERROR		0
-#define ZBX_COMMAND_WITHOUT_PARAMS	1
-#define ZBX_COMMAND_WITH_PARAMS		2
-int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
-
 /* misc functions */
 #ifdef HAVE_IPV6
 int	is_ip6(const char *ip);
@@ -916,7 +938,7 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 int	is_ip(const char *ip);
 
-void	zbx_on_exit(); /* calls exit() at the end! */
+void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
@@ -942,11 +964,11 @@ int	zbx_mismatch(const char *s1, const char *s2);
 int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
-int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
+int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
-int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
-void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value);
+void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num);
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
@@ -968,7 +990,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'

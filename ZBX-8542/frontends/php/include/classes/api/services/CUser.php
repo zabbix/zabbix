@@ -146,7 +146,7 @@ class CUser extends CApiService {
 
 		// search
 		if (is_array($options['search'])) {
-			if ($options['search']['passwd']) {
+			if (isset($options['search']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password.'));
 			}
 
@@ -1057,7 +1057,7 @@ class CUser extends CApiService {
 
 			DBexecute(
 				'UPDATE users'.
-				' SET attempt_failed='.zbx_dbstr($userInfo['attempt_failed']).'),'.
+				' SET attempt_failed='.zbx_dbstr($userInfo['attempt_failed']).','.
 					' attempt_clock='.time().','.
 					' attempt_ip='.zbx_dbstr($ip).
 				' WHERE userid='.zbx_dbstr($userInfo['userid'])

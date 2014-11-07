@@ -410,15 +410,15 @@ jQuery(function($) {
 				.focusin(function() {
 					if (options.selectedLimit > 0) {
 						if ($('.selected li', obj).length == 0) {
-							$('.selected ul', obj).addClass('active');
+							$(obj).addClass('active');
 						}
 					}
 					else {
-						$('.selected ul', obj).addClass('active');
+						$(obj).addClass('active');
 					}
 				})
 				.focusout(function() {
-					$('.selected ul', obj).removeClass('active');
+					$(obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
 				obj.append(input);
@@ -437,10 +437,7 @@ jQuery(function($) {
 			if (!options.disabled) {
 				var available = $('<div>', {
 					'class': 'available',
-					css: {
-						width: values.width + 1,
-						display: 'none'
-					}
+					css: { display: 'none' }
 				})
 				.append($('<ul>'))
 				.mouseenter(function() {
@@ -502,7 +499,7 @@ jQuery(function($) {
 					});
 				}
 
-				obj.parent().append(popupButton);
+				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
 			}
 
 			// IE browsers use default width
@@ -787,7 +784,7 @@ jQuery(function($) {
 
 	function showAvailable(obj, values) {
 		if ($('.label-empty-result', obj).length > 0 || objectLength(values.available) > 0) {
-			$('.selected ul', obj).addClass('active');
+			$(obj).addClass('active');
 			$('.available', obj).fadeIn(0);
 
 			// remove selected item pressed state
@@ -837,7 +834,7 @@ jQuery(function($) {
 		// settings
 		var settingTopPaddingsEmpty = IE8 ? 1 : 0,
 			settingTopPaddingsExist = IE8 ? 1 : 2,
-			settingTopPaddingsInit = 3,
+			settingTopPaddingsInit = 2,
 			settingRightPaddings = 4,
 			settingMinimumWidth = 50,
 			settingMinimumHeight = 12,
@@ -994,7 +991,7 @@ jQuery(function($) {
 	function setReadonly(obj) {
 		cleanSearchInput(obj);
 		$('input[type="text"]', obj).prop('disabled', true);
-		$('.selected ul', obj).removeClass('active');
+		$(obj).removeClass('active');
 	}
 
 	function setPlaceholder(obj, options) {

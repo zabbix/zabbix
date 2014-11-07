@@ -306,7 +306,7 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 		zbx_free(regexp);
 	}
 
-	expressions->values_num = 0;
+	zbx_vector_ptr_clear(expressions);
 }
 
 void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,

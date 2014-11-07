@@ -91,7 +91,6 @@
 			</td>
 			<td style="padding-left: 0;">
 				<div id="opCmdTargetSelect" class="inlineblock">
-					<input name="action" type="hidden" value="#{action}" />
 					<input name="opCmdId" type="hidden" value="#{opcmdid}" />
 				</div>
 			</td>
@@ -305,7 +304,6 @@
 			return true;
 		}
 
-		objectTPL.action = 'create';
 		objectTPL.opcmdid = 'new';
 		objectTPL.objectid = 0;
 		objectTPL.name = '';
@@ -328,7 +326,6 @@
 		var objectForm = jQuery('#opcmdEditForm'),
 			object = {};
 
-		object.action = jQuery(objectForm).find('input[name="action"]').val();
 		object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
 
 		// host group
@@ -353,7 +350,6 @@
 						addPopupValues({
 							object: 'groupid',
 							values: [{
-								action: object.action,
 								target: object.target,
 								opcommand_grpid: object.opcommand_grpid,
 								groupid: data.id,
@@ -387,7 +383,6 @@
 						addPopupValues({
 							object: 'hostid',
 							values: [{
-								action: object.action,
 								target: object.target,
 								opcommand_hstid: object.opcommand_hstid,
 								hostid: data.id,
@@ -449,6 +444,9 @@
 					height: 450
 				}
 			});
+			if (IE8) {
+				jQuery('.formElementTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			}
 		}
 	}
 
@@ -629,6 +627,15 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
+			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+
+			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=operations]').each(function() {
+				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+					$(this).remove();
+				}
+			});
+
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();

@@ -134,7 +134,7 @@ void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare
 	}													\
 }														\
 														\
-int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, __type value,			\
+int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, const __type value,		\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	lo = 0, hi = vector->values_num, mid, c;							\
@@ -160,7 +160,7 @@ int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, __ty
 	return hi;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type value,			\
+int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, const __type value,			\
 									zbx_compare_func_t compare_func)	\
 {														\
 	__type	*ptr;												\
@@ -173,7 +173,7 @@ int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type va
 		return FAIL;											\
 }														\
 														\
-int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type value, int *index,		\
+int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, const __type value, int *index,	\
 									zbx_compare_func_t compare_func)	\
 {														\
 	while (*index < vector->values_num)									\
@@ -196,7 +196,7 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type va
 	return FAIL;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type value,				\
+int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, const __type value,			\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	index;												\
@@ -221,12 +221,23 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 														\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
-	if (NULL != vector->values)										\
+	vector->values_num = 0;											\
+}
+
+#define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
+														\
+ZBX_VECTOR_IMPL(__id, __type);											\
+														\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func)	\
+{														\
+	if (0 != vector->values_num)										\
 	{													\
-		vector->mem_free_func(vector->values);								\
-		vector->values = NULL;										\
+		int	index;											\
+														\
+		for (index = 0; index < vector->values_num; index++)						\
+			clean_func(vector->values[index]);							\
+														\
 		vector->values_num = 0;										\
-		vector->values_alloc = 0;									\
 	}													\
 }
 

@@ -64,6 +64,11 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
 
+/* type of database */
+#define ZBX_DB_UNKNOWN	0
+#define ZBX_DB_SERVER	1
+#define ZBX_DB_PROXY	2
+
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
@@ -97,6 +102,7 @@ struct	_DC_TRIGGER;
 
 #define ITEM_NAME_LEN			255
 #define ITEM_KEY_LEN			255
+#define ITEM_UNITS_LEN			255
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
 #define ITEM_SNMP_OID_LEN		255
@@ -147,13 +153,6 @@ struct	_DC_TRIGGER;
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
 
-#define ALERT_SENDTO_LEN		100
-#define ALERT_SUBJECT_LEN		255
-#ifdef HAVE_IBM_DB2
-#	define ALERT_MESSAGE_LEN	2048
-#else
-#	define ALERT_MESSAGE_LEN	65535
-#endif
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
 
@@ -416,7 +415,6 @@ DB_ESCALATION;
 
 int	DBconnect(int flag);
 void	DBinit(void);
-
 void	DBclose(void);
 
 #ifdef HAVE_ORACLE
@@ -444,9 +442,9 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
-void		DBbegin();
-void		DBcommit();
-void		DBrollback();
+void		DBbegin(void);
+void		DBcommit(void);
+void		DBrollback(void);
 void		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
@@ -545,8 +543,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 
-int	DBtxn_status();
-int	DBtxn_ongoing();
+int	DBtxn_status(void);
+int	DBtxn_ongoing(void);
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
@@ -596,5 +594,6 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+int	zbx_db_get_database_type(void);
 
 #endif

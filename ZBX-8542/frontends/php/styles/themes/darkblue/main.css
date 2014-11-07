@@ -470,7 +470,13 @@ input[type="submit"].input[disabled].formlist {
 .input option { background: #2F6487; color: #FFFFFF; }
 .input:focus, .input:hover { border-color: #77B7DA; }
 
-.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
+.input[readonly], .input[readonly]:hover {
+	border-color: #4e738c;
+	background: #2b495e;
+	color: #ffffff;
+}
+
+.input[disabled], .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
 	border-color: #4e738c;
 	background: #2b495e;
@@ -478,22 +484,22 @@ input.input.formlist[type="button"][disabled], input.input.formlist[type="submit
 	color: #aca899;
 }
 
-/* disabled <select> font color for IE 9+ */
-select[disabled="disabled"]::-ms-value {
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
 	color: #aca899;
 }
 
-select[disabled="disabled"] option { background: #2b495e; }
+select[disabled] option { background: #2b495e; }
 
 /* disabled form buttons */
-.input.button[disabled]:hover {
+.formtable .input.button[disabled]:hover {
 	background-color: #000e19;
 	border-color: #77b7da;
 	color: #77b7da;
 }
 
 /* disabled save button */
-.jqueryinput.input.button[disabled]:hover {
+.formtable .jqueryinput.input.button[disabled]:hover {
 	border-color: #77b7da;
 	color: #77b7da;
 }
@@ -539,8 +545,8 @@ div.preloader {
 /* multiselect */
 .multiselect input[type="text"] { color: #FFFFFF; }
 .multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
-.multiselect .selected ul { border: 1px solid #B3C9D6; background: #001C31; }
-.multiselect .selected ul.active { border: 1px solid #41789D; }
+.multiselect { border: 1px solid #B3C9D6; background: #001C31; }
+.multiselect.active { border: 1px solid #41789D; }
 .multiselect .selected ul li {
 	border: 1px solid #B3C9D6; background: #32698E; color: #FFFFFF;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #2F6588), color-stop(15%, #3A7AA6));

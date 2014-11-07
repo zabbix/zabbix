@@ -91,7 +91,7 @@ $severities = array();
 foreach ($this->data['severities'] as $severity) {
 	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']', isset($this->data['severity'][$severity]), '', 1);
 	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
-	$severities[] = array($serverityCheckBox, getSeverityCaption($severity));
+	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
 	$severities[] = BR();
 }
 array_pop($severities);
@@ -116,7 +116,10 @@ $dashconfTab = new CTabView();
 $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 
 $dashconfForm->addItem($dashconfTab);
-$dashconfForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonCancel())));
+$dashconfForm->addItem(makeFormFooter(
+	new CSubmit('update', _('Update')),
+	new CButtonCancel()
+));
 
 $dashconfWidget->addItem($dashconfForm);
 

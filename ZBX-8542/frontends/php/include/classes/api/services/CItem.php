@@ -386,19 +386,23 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Get itemid by host.name and item.key.
+	 * Get items by item key and hostid.
 	 *
-	 * @param array $itemData
-	 * @param array $itemData['key_']
-	 * @param array $itemData['hostid']
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array  $itemData
+	 * @param string $itemData['key_']
+	 * @param string $itemData['hostid']
 	 *
 	 * @return array
 	 */
-	public function getObjects($itemData) {
+	public function getObjects(array $itemData) {
+		$this->deprecated('item.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $itemData,
 			'output' => API_OUTPUT_EXTEND,
-			'webitems' => true
+			'webitems' => true,
+			'filter' => $itemData
 		));
 	}
 
@@ -415,9 +419,9 @@ class CItem extends CItemGeneral {
 		$this->deprecated('item.exists method is deprecated.');
 
 		$options = array(
+			'output' => array('itemid'),
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => true,
-			'output' => array('itemid'),
 			'limit' => 1
 		);
 
@@ -428,47 +432,9 @@ class CItem extends CItemGeneral {
 			$options['filter']['host'] = $object['host'];
 		}
 
-		$objs = $this->get($options);
+		$item = $this->get($options);
 
-		return !empty($objs);
-	}
-
-	/**
-	 * Check item data and set flags field.
-	 *
-	 * @param array $items
-	 * @param bool  $update
-	 *
-	 * @return void
-	 */
-	protected function checkInput(array &$items, $update = false) {
-		parent::checkInput($items, $update);
-		self::validateInventoryLinks($items, $update);
-
-		// set proper flags to divide normal and discovered items in future processing
-		if ($update) {
-			$dbItems = $this->get(array(
-				'itemids' => zbx_objectValues($items, 'itemid'),
-				'output' => array('itemid', 'flags'),
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($items as &$item) {
-				$item['flags'] = $dbItems[$item['itemid']]['flags'];
-			}
-			unset($item);
-		}
-		else {
-			foreach ($items as &$item) {
-				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-
-				// set default formula value
-				if (!isset($item['formula'])) {
-					$item['formula'] = '1';
-				}
-			}
-			unset($item);
-		}
+		return (bool) $item;
 	}
 
 	/**
@@ -481,7 +447,19 @@ class CItem extends CItemGeneral {
 	public function create($items) {
 		$items = zbx_toArray($items);
 
-		$this->checkInput($items);
+		parent::checkInput($items);
+		self::validateInventoryLinks($items);
+
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+
+			// set default formula value
+			if (!isset($item['formula'])) {
+				$item['formula'] = '1';
+			}
+		}
+		unset($item);
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -521,8 +499,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -573,8 +551,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
 			'output' => array('name'),
+			'itemids' => $itemids,
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
@@ -594,7 +572,21 @@ class CItem extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$this->checkInput($items, true);
+		$dbItems = $this->get(array(
+			'output' => array('itemid', 'flags'),
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		parent::checkInput($items, true);
+		self::validateInventoryLinks($items, true);
+
+		foreach ($items as &$item) {
+			$item['flags'] = $dbItems[$item['itemid']]['flags'];
+		}
+		unset($item);
+
 		$this->updateReal($items);
 		$this->inherit($items);
 
@@ -604,97 +596,111 @@ class CItem extends CItemGeneral {
 	/**
 	 * Delete items.
 	 *
-	 * @param array $itemids
+	 * @param array $itemIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemids, $nopermissions = false) {
-		if (empty($itemids)) {
+	public function delete(array $itemIds, $nopermissions = false) {
+		if (!$itemIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$itemids = array_keys(array_flip($itemids));
+		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get(array(
-			'itemids' => $itemids,
+			'output' => array('name', 'templateid', 'flags'),
+			'selectHosts' => array('name'),
+			'itemids' => $itemIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'output' => array('name', 'templateid'),
-			'selectHosts' => array('name')
+			'preservekeys' => true
 		));
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
-			foreach ($itemids as $itemid) {
-				if (!isset($delItems[$itemid])) {
+			foreach ($itemIds as $itemId) {
+				if (!isset($delItems[$itemId])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delItems[$itemid]['templateid'] != 0) {
+				$delItem = $delItems[$itemId];
+
+				if ($delItem['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
+				}
+
+				if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot delete discovered item "%1$s".', $delItem['name']
+					));
 				}
 			}
 		}
 
 		// first delete child items
-		$parentItemids = $itemids;
+		$parentItemIds = $itemIds;
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = array();
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemIds));
+			$parentItemIds = array();
 			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[] = $dbItem['itemid'];
-				$itemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$parentItemIds[] = $dbItem['itemid'];
+				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parentItemids));
+		} while ($parentItemIds);
 
 		// delete graphs, leave if graph still have item
 		$delGraphs = array();
 		$dbGraphs = DBselect(
 			'SELECT gi.graphid'.
 			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $itemids).
+			' WHERE '.dbConditionInt('gi.itemid', $itemIds).
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM graphs_items gii'.
 					' WHERE gii.graphid=gi.graphid'.
-						' AND '.dbConditionInt('gii.itemid', $itemids, true).
+						' AND '.dbConditionInt('gii.itemid', $itemIds, true).
 				')'
 		);
 		while ($dbGraph = DBfetch($dbGraphs)) {
 			$delGraphs[$dbGraph['graphid']] = $dbGraph['graphid'];
 		}
 
-		if (!empty($delGraphs)) {
-			$result = API::Graph()->delete($delGraphs, true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph.'));
-			}
+		if ($delGraphs) {
+			API::Graph()->delete($delGraphs, true);
 		}
 
 		// check if any graphs are referencing this item
-		$this->checkGraphReference($itemids);
+		$this->checkGraphReference($itemIds);
 
 		$triggers = API::Trigger()->get(array(
-			'itemids' => $itemids,
-			'output' => array('triggerid'),
+			'output' => array(),
+			'itemids' => $itemIds,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($triggers)) {
-			$result = API::Trigger()->delete(array_keys($triggers), true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger.'));
-			}
+		if ($triggers) {
+			API::Trigger()->delete(array_keys($triggers), true);
+		}
+
+		$triggerPrototypes = API::TriggerPrototype()->get(array(
+			'output' => array(),
+			'itemids' => $itemIds,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if ($triggerPrototypes) {
+			API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
 		}
 
 		DB::delete('screens_items', array(
-			'resourceid' => $itemids,
-			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)
+			'resourceid' => $itemIds,
+			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK)
 		));
-		DB::delete('items', array('itemid' => $itemids));
+
+		DB::delete('items', array('itemid' => $itemIds));
 		DB::delete('profiles', array(
 			'idx' => 'web.favorite.graphids',
 			'source' => 'itemid',
-			'value_id' => $itemids
+			'value_id' => $itemIds
 		));
 
 		$itemDataTables = array(
@@ -707,12 +713,12 @@ class CItem extends CItemGeneral {
 			'history'
 		);
 		$insert = array();
-		foreach ($itemids as $itemid) {
+		foreach ($itemIds as $itemId) {
 			foreach ($itemDataTables as $table) {
 				$insert[] = array(
 					'tablename' => $table,
 					'field' => 'itemid',
-					'value' => $itemid
+					'value' => $itemId
 				);
 			}
 		}
@@ -724,7 +730,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $itemids);
+		return array('itemids' => $itemIds);
 	}
 
 	public function syncTemplates($data) {
@@ -739,10 +745,10 @@ class CItem extends CItemGeneral {
 		}
 
 		$items = $this->get(array(
+			'output' => $selectFields,
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'selectApplications' => array('applicationid'),
-			'output' => $selectFields,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
@@ -991,7 +997,7 @@ class CItem extends CItemGeneral {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'interfaceid');
 			$interfaces = API::HostInterface()->get(array(
 				'output' => $options['selectInterfaces'],
-				'intefaceids' => $relationMap->getRelatedIds(),
+				'interfaceids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

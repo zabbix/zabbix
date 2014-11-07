@@ -58,10 +58,10 @@ void	DBclose(void)
 int	DBconnect(int flag)
 {
 	const char	*__function_name = "DBconnect";
+
 	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
-
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -143,7 +143,7 @@ static void	DBtxn_operation(int (*txn_operation)())
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin()
+void	DBbegin(void)
 {
 	DBtxn_operation(zbx_db_begin);
 }
@@ -159,7 +159,7 @@ void	DBbegin()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit()
+void	DBcommit(void)
 {
 	DBtxn_operation(zbx_db_commit);
 }
@@ -175,7 +175,7 @@ void	DBcommit()
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback()
+void	DBrollback(void)
 {
 	DBtxn_operation(zbx_db_rollback);
 }
@@ -663,6 +663,7 @@ out:
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	const char	*__function_name = "DBadd_trend";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
@@ -711,6 +712,7 @@ void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	const char	*__function_name = "DBadd_trend_uint";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
@@ -759,6 +761,7 @@ void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 int	DBget_row_count(const char *table_name)
 {
 	const char	*__function_name = "DBget_row_count";
+
 	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -779,6 +782,7 @@ int	DBget_row_count(const char *table_name)
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
 	const char	*__function_name = "DBget_proxy_lastaccess";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
@@ -898,6 +902,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
@@ -1495,7 +1500,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *                                                                            *
  * Parameters: host_name_sample - a host name to start constructing from      *
  *                                                                            *
- * Return value: unique host name which does not exist in the data base       *
+ * Return value: unique host name which does not exist in the database        *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
@@ -1508,6 +1513,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 {
 	const char		*__function_name = "DBget_unique_hostname_by_sample";
+
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			full_match = 0, i;
@@ -1702,12 +1708,12 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 
 #undef ZBX_MAX_INVENTORY_FIELDS
 
-int	DBtxn_status()
+int	DBtxn_status(void)
 {
 	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
 }
 
-int	DBtxn_ongoing()
+int	DBtxn_ongoing(void)
 {
 	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
@@ -2008,7 +2014,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
-	int		i, j;
+	int	i, j;
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
@@ -2272,7 +2278,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
 
-	zbx_vector_ptr_clean(&values, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
 
@@ -2545,3 +2551,65 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	exit(EXIT_FAILURE);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_database_type                                         *
+ *                                                                            *
+ * Purpose: determine is it a server or a proxy database                      *
+ *                                                                            *
+ * Return value: ZBX_DB_SERVER - server database                              *
+ *               ZBX_DB_PROXY - proxy database                                *
+ *               ZBX_DB_UNKNOWN - an error occurred                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_database_type(void)
+{
+	const char	*__function_name = "zbx_db_get_database_type";
+
+	const char	*result_string;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = ZBX_DB_UNKNOWN;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (NULL == (result = DBselectN("select userid from users", 1)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot select records from \"users\" table");
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
+		ret = ZBX_DB_SERVER;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no records in \"users\" table");
+		ret = ZBX_DB_PROXY;
+	}
+
+	DBfree_result(result);
+out:
+	DBclose();
+
+	switch (ret)
+	{
+		case ZBX_DB_SERVER:
+			result_string = "ZBX_DB_SERVER";
+			break;
+		case ZBX_DB_PROXY:
+			result_string = "ZBX_DB_PROXY";
+			break;
+		case ZBX_DB_UNKNOWN:
+			result_string = "ZBX_DB_UNKNOWN";
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
+
+	return ret;
+}

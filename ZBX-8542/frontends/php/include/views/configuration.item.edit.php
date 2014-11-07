@@ -294,14 +294,14 @@ $itemFormList->addRow(_('Flexible intervals'),
 // append new flexible interval to form list
 $newFlexInt = new CSpan(array(
 	_('Interval (in sec)'),
-	SPACE,
+	' ',
 	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
-	SPACE,
+	' ',
 	_('Period'),
-	SPACE,
+	' ',
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
-	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'formlist')
+	' ',
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 
@@ -311,10 +311,9 @@ $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
-$dataConfig = select_config();
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -324,13 +323,13 @@ if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['
 	else {
 		$keepHistory[] = _x('global housekeeping settings', 'item_form');
 	}
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')';
+	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
 }
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -340,7 +339,7 @@ if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['i
 	else {
 		$keepTrend[] = _x('global housekeeping settings', 'item_form');
 	}
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')';
+	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
 }
 
 $itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
@@ -440,24 +439,44 @@ $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['itemid'])) {
-	array_push($buttons, new CSubmit('clone', _('Clone')));
-
 	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
-		array_push($buttons,
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
+		$buttonDelHistory = new CButtonQMessage(
+			'del_history',
+			_('Clear history and trends'),
+			_('History clearing can take a long time. Continue?')
 		);
 	}
+	else {
+		$buttonDelHistory = null;
+	}
+
 	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(
+		$buttonDelete = new CButtonDelete(
 			$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
+	else {
+		$buttonDelete = null;
+	}
+
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$buttonDelHistory,
+			$buttonDelete,
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		)
+	));
 }
-array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
+else {
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+	));
+}
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';

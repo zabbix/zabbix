@@ -63,11 +63,11 @@ foreach ($this->data['screens'] as $screen) {
 }
 
 // create go button
-$goComboBox = new CComboBox('go');
+$goComboBox = new CComboBox('action');
 if (empty($this->data['templateid'])) {
-	$goComboBox->addItem('export', _('Export selected'));
+	$goComboBox->addItem('screen.export', _('Export selected'));
 }
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('screen.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected screens?'));
 $goComboBox->addItem($goOption);
 

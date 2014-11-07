@@ -41,11 +41,8 @@ $fields = array(
 	'triggerid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
 	'eventid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	// actions
-	'save' =>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, null,	null),
-	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'filter','hat'"), null),
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"filter","hat"'), null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );
@@ -67,7 +64,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $triggers = API::Trigger()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_EXTEND,
-	'expandData' => true,
 	'triggerids' => getRequest('triggerid')
 ));
 

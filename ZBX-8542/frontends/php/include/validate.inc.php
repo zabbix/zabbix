@@ -239,7 +239,6 @@ function calc_exp2($fields, $expression) {
 	foreach ($fields as $field => $checks) {
 		$expression = str_replace('{'.$field.'}', '$_REQUEST["'.$field.'"]', $expression);
 	}
-
 	return eval('return ('.trim($expression, '& ').') ? 1 : 0;');
 }
 
@@ -358,6 +357,17 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		if (!$decimalValidator->validate($var)) {
 			$error = true;
 			$message = $decimalValidator->getError();
+		}
+	}
+	elseif ($type == T_ZBX_DBL_STR) {
+		$decimalStringValidator = new CDecimalStringValidator(array(
+			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.')
+		));
+		$decimalStringValidator->setObjectName($caption);
+
+		if (!$decimalStringValidator->validate($var)) {
+			$error = true;
+			$message = $decimalStringValidator->getError();
 		}
 	}
 	elseif ($type == T_ZBX_STR) {

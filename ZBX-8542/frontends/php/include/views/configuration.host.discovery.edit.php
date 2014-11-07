@@ -227,13 +227,13 @@ $itemFormList->addRow(_('Flexible intervals'),
 // append new flexible interval to form list
 $newFlexInt = new CSpan(array(
 	_('Interval (in sec)'),
-	SPACE,
+	' ',
 	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
-	SPACE,
+	' ',
 	_('Period'),
-	SPACE,
+	' ',
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
-	SPACE,
+	' ',
 	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
@@ -346,18 +346,32 @@ $itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$buttons = array();
 if (!empty($this->data['itemid'])) {
-	array_push($buttons, new CSubmit('clone', _('Clone')));
-
 	if (!$this->data['limited']) {
-		array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
+		$btnDelete = new CButtonDelete(
+			_('Delete discovery rule?'),
+			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
+	else {
+		$btnDelete = null;
+	}
+
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$btnDelete,
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		)
+	));
 }
-array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
+else {
+	$itemForm->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+	));
+}
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';

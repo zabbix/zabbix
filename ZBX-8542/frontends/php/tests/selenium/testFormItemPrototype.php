@@ -1316,8 +1316,8 @@ class testFormItemPrototype extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('add');
+		$this->assertAttribute("//input[@id='add']/@value", 'Add');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -1353,7 +1353,7 @@ class testFormItemPrototype extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array(
 			'Item prototype updated', $data['name'],
@@ -1417,25 +1417,11 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => '',
-					'formulaValue' => '',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
 					'formula' => ' ',
 					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
@@ -1445,53 +1431,11 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => 'form ula',
-					'formulaValue' => 'form ula',
+					'formula' => ' value ',
+					'formulaValue' => 'value',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' a1b2 c3 ',
-					'formulaValue' => 'a1b2 c3',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => ' 32 1 abc',
-					'formulaValue' => '32 1 abc',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => TEST_BAD,
-					'name' => 'Item formula',
-					'key' => 'item-formula-test',
-					'formula' => '32 1 abc',
-					'formulaValue' => '32 1 abc',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "value" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
@@ -1505,7 +1449,7 @@ class testFormItemPrototype extends CWebTest {
 					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Field "Custom multiplier" is not decimal number.'
+						'Value "321abc" of "Custom multiplier" has incorrect decimal format.'
 					)
 				)
 			),
@@ -2615,7 +2559,7 @@ class testFormItemPrototype extends CWebTest {
 		$data_type = $this->getSelectedLabel('data_type');
 
 		if ($itemFlexFlag == true) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
@@ -2712,7 +2656,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

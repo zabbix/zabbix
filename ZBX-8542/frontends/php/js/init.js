@@ -149,7 +149,9 @@ jQuery(function($) {
 
 	// create jquery buttons
 	$('input.jqueryinput').button();
-	$('div.jqueryinputset').buttonset();
+	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
+
+	$('form').enterSubmit('input[type=submit].main');
 });

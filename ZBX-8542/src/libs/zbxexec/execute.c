@@ -162,6 +162,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	/* child process */
 	close(fd[0]);
 	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd[1], STDERR_FILENO);
 	close(fd[1]);
 
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */

@@ -372,29 +372,17 @@ static void	DCexpand_trigger_expression(char **expression)
  * Purpose: substitute key parameters and user macros in                      *
  *          the item description string with real values                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
-	char	c, *p, *m, *n, *str_out = NULL, *replace_to = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+	AGENT_REQUEST	request;
+	const char	*param;
+	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
 
-	switch (parse_command(key, NULL, 0, params, sizeof(params)))
-	{
-		case ZBX_COMMAND_ERROR:
-			return;
-		case ZBX_COMMAND_WITHOUT_PARAMS:
-			*params = '\0';
-		case ZBX_COMMAND_WITH_PARAMS:
-			/* do nothing */
-			;
-	}
+	init_request(&request);
+
+	if (SUCCEED != parse_item_key(key, &request))
+		goto out;
 
 	p = *data;
 
@@ -421,16 +409,15 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)		/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9')				/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
 			*m++ = '$';
 
-			if (0 != get_param(params, *m - '0', param, sizeof(param)))
-				*param = '\0';
+			if (NULL != (param = get_rparam(&request, *m - '0' - 1)))
+				str_out = zbx_strdcat(str_out, param);
 
-			str_out = zbx_strdcat(str_out, param);
 			p = m + 1;
 		}
 		else									/* just a dollar sign */
@@ -449,6 +436,8 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		zbx_free(*data);
 		*data = str_out;
 	}
+out:
+	free_request(&request);
 }
 
 /******************************************************************************
@@ -1202,7 +1191,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	const char		*__function_name = "DBget_history_log_value";
 
 	DC_ITEM			item;
-	int			ret = FAIL, found, errcode = FAIL;
+	int			ret = FAIL, errcode = FAIL;
 	zbx_timespec_t		ts = {clock, ns};
 	zbx_history_record_t	value;
 
@@ -1213,7 +1202,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
 
-	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value, &found) || 1 != found)
+	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
 		goto out;
 
 	switch (request)
@@ -1333,7 +1322,6 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		zbx_uint64_t		valuemapid;
 		zbx_history_record_t	vc_value;
 		zbx_timespec_t		ts;
-		int			found;
 
 		ts.sec = time(NULL);
 		ts.ns = 999999999;
@@ -1341,7 +1329,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
 			char	tmp[MAX_STRING_LEN];
 
@@ -1377,7 +1365,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL, found;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1400,7 +1388,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
@@ -2342,7 +2330,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					cache_trigger_hostids(&hostids, c_event->trigger.expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2354,12 +2342,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_escalation_history(event, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -2398,8 +2386,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+						0 == strncmp(m, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 				{
 					ret = get_host_inventory(m, c_event->trigger.expression, &replace_to,
 							N_functionid);
@@ -2586,7 +2574,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					cache_trigger_hostids(&hostids, c_event->trigger.expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2598,12 +2586,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_escalation_history(event, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -2642,8 +2630,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+						0 == strncmp(m, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 				{
 					ret = get_host_inventory(m, c_event->trigger.expression, &replace_to,
 							N_functionid);
@@ -2751,7 +2739,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					DCget_user_macro(NULL, 0, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2759,7 +2747,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -2874,7 +2862,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					DCget_user_macro(NULL, 0, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2882,7 +2870,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -2949,7 +2937,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					cache_item_hostid(&hostids, c_event->objectid);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2961,12 +2949,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_escalation_history(event, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -2999,8 +2987,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+						0 == strncmp(m, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 				{
 					ret = get_host_inventory_by_itemid(m, c_event->objectid, &replace_to);
 				}
@@ -3056,7 +3044,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					cache_item_hostid(&hostids, c_event->objectid);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3068,12 +3056,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_escalation_history(event, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
-				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
 					get_event_value(m, event, &replace_to);
 				}
@@ -3106,8 +3094,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+						0 == strncmp(m, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 				{
 					ret = get_host_inventory_by_itemid(m, c_event->objectid, &replace_to);
 				}

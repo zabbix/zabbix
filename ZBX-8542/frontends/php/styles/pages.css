@@ -55,7 +55,7 @@
 .host-edit #linkedTemplateTable { width: 100%; }
 .host-edit #newTemplateTable { width: 100%; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
-.template-link-block { min-width: 400px; }
+.template-link-block { min-width: 400px; float: left; display: block; }
 
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
@@ -95,6 +95,7 @@ table.tableinfo-overview-hint { width: 200px; }
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
+.latest-mon .tableinfo td.latest-checkbox { width: 15px; }
 .latest-mon .tableinfo td.latest-host { width: 9%; }
 .latest-mon .tableinfo td.latest-interval { width: 5%; }
 .latest-mon .tableinfo td.latest-history { width: 5%; }
@@ -112,6 +113,15 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .tableinfo td span,
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
+.latest-mon .filter tr td.label { width: 15%; }
+.latest-mon .filter tr td.inputcol { min-width: 277px; width: 35%; }
+.latest-mon .filter tr td.inputcol .checkbox { margin-top: 4px; }
+.latest-mon .filter tr td .text { width: 216px; }
+.latest-mon .filter .multiselect-wrapper { width: 280px; }
+.latest-mon .filter .multiselect { width: 216px; line-height: 12px; }
+
+/*history */
+.history .filter tr td { width: 50%; }
 
 /* trigger list */
 .trigger-list .dependencies { padding-left: 8px; }
@@ -129,14 +139,14 @@ table.tableinfo-overview-hint { width: 200px; }
 
 /* item list */
 .item-list table.filter { text-align: left; min-width: 1024px; }
-.item-list table.filter tr td.label { text-align: right; }
 .item-list table.filter tr td.col1 { width: 230px; }
 .item-list table.filter tr td.label.col1 { width: 6%; }
 .item-list table.filter tr td.label.col4 { width: 8%; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
+.item-list .filter .col1 span.text { padding: 0 4px; }
+.item-list .filter .multiselect-wrapper { width: 225px; }
 .item-list .menuPopup { width: 200px; }
-.item-list .filter .multiselect .selected ul { margin: 0;}
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -163,13 +173,12 @@ table.tableinfo-overview-hint { width: 200px; }
 #sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
 #map-window { z-index: 100; position: absolute; display: none; top: 50px; left: 500px; box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
 #map-window .formtable { width: 100%; }
-#map-window .formtable #application { width: 313px; }
+#map-window .formtable #application { width: 312px; }
 #map-window #elements-selected { border: 1px dotted black; margin-bottom: 5px; height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
-#selementForm .multiselect .selected ul { margin: 0;}
-#map-window #application-select-row .link_menu { margin-left: 3px; }
+#map-window .link_menu { margin-left: 6px; }
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

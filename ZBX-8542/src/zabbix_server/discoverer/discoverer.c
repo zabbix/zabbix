@@ -33,9 +33,8 @@
 #include "../poller/checks_snmp.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
-extern unsigned char	daemon_type;
-extern unsigned char	process_type;
-extern int		process_num;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -229,7 +228,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						ret = FAIL;
 				}
 				else
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 				{
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
@@ -280,7 +279,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				}
 #else
 					ret = FAIL;
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
 
 				if (FAIL == ret && ISSET_MSG(&result))
 				{
@@ -831,11 +830,21 @@ static int	get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void	main_discoverer_loop(void)
+ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	int	now, nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+#ifdef HAVE_NETSNMP
+	init_snmp(progname);
+#endif
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

@@ -41,6 +41,47 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
+const char	*zabbix_get_log_level_string(void)
+{
+	switch (log_level)
+	{
+		case LOG_LEVEL_EMPTY:
+			return "0 (none)";
+		case LOG_LEVEL_CRIT:
+			return "1 (critical)";
+		case LOG_LEVEL_ERR:
+			return "2 (error)";
+		case LOG_LEVEL_WARNING:
+			return "3 (warning)";
+		case LOG_LEVEL_DEBUG:
+			return "4 (debug)";
+		case LOG_LEVEL_TRACE:
+			return "5 (trace)";
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	zabbix_increase_log_level(void)
+{
+	if (LOG_LEVEL_TRACE == log_level)
+		return FAIL;
+
+	log_level = log_level + 1;
+
+	return SUCCEED;
+}
+
+int	zabbix_decrease_log_level(void)
+{
+	if (LOG_LEVEL_EMPTY == log_level)
+		return FAIL;
+
+	log_level = log_level - 1;
+
+	return SUCCEED;
+}
 
 #if !defined(_WINDOWS)
 void	redirect_std(const char *filename)
@@ -77,13 +118,12 @@ void	redirect_std(const char *filename)
 }
 #endif	/* not _WINDOWS */
 
-int zabbix_open_log(int type, int level, const char *filename)
+int	zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE	*log_file = NULL;
 #ifdef _WINDOWS
 	wchar_t	*wevent_source;
 #endif
-
 	log_level = level;
 
 	if (LOG_TYPE_FILE == type && NULL == filename)
@@ -92,7 +132,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 	if (LOG_TYPE_SYSLOG == type)
 	{
 		log_type = LOG_TYPE_SYSLOG;
-
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
@@ -129,7 +168,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	return SUCCEED;
 }
 
-void zabbix_close_log()
+void	zabbix_close_log(void)
 {
 	if (LOG_TYPE_SYSLOG == log_type)
 	{
@@ -146,12 +185,12 @@ void zabbix_close_log()
 	}
 }
 
-void zabbix_set_log_level(int level)
+void	zabbix_set_log_level(int level)
 {
 	log_level = level;
 }
 
-void zabbix_errlog(zbx_err_codes_t err, ...)
+void	zabbix_errlog(zbx_err_codes_t err, ...)
 {
 	const char	*msg;
 	char		*s = NULL;
@@ -203,12 +242,12 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int zabbix_check_log_level(int level)
+int	zabbix_check_log_level(int level)
 {
 	return ZBX_CHECK_LOG_LEVEL(level);
 }
 
-void __zbx_zabbix_log(int level, const char *fmt, ...)
+void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE			*log_file = NULL;
 	char			message[MAX_BUFFER_LEN], filename_old[MAX_STRING_LEN];
@@ -223,6 +262,13 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	wchar_t			thread_id[20], *strings[2];
 #else
 	struct timeval		current_time;
+	sigset_t		mask, orig_mask;
+	struct tm		tm_local;
+#endif
+
+#ifndef _WINDOWS
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
 #endif
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
@@ -230,6 +276,10 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 	if (LOG_TYPE_FILE == log_type)
 	{
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
@@ -252,7 +302,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 						milliseconds = current_time.millitm;
 #else
 						gettimeofday(&current_time,NULL);
-						tm = localtime(&current_time.tv_sec);
+						tm = localtime_r(&current_time.tv_sec, &tm_local);
 						milliseconds = current_time.tv_usec / 1000;
 #endif
 						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
@@ -306,7 +356,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			milliseconds = current_time.millitm;
 #else
 			gettimeofday(&current_time,NULL);
-			tm = localtime(&current_time.tv_sec);
+			tm = localtime_r(&current_time.tv_sec, &tm_local);
 			milliseconds = current_time.tv_usec / 1000;
 #endif
 			fprintf(log_file,
@@ -331,6 +381,10 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 		zbx_mutex_unlock(&log_file_access);
 
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
+#endif
 		return;
 	}
 
@@ -387,6 +441,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				syslog(LOG_WARNING, "%s", message);
 				break;
 			case LOG_LEVEL_DEBUG:
+			case LOG_LEVEL_TRACE:
 				syslog(LOG_DEBUG, "%s", message);
 				break;
 			case LOG_LEVEL_INFORMATION:
@@ -401,6 +456,10 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_SYSLOG */
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+			zbx_error("cannot set sigprocmask to block the user signal");
+#endif
 		zbx_mutex_lock(&log_file_access);
 
 		switch (level)
@@ -417,12 +476,19 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			case LOG_LEVEL_DEBUG:
 				zbx_error("DEBUG: %s", message);
 				break;
+			case LOG_LEVEL_TRACE:
+				zbx_error("TRACE: %s", message);
+				break;
 			default:
 				zbx_error("%s", message);
 				break;
 		}
 
 		zbx_mutex_unlock(&log_file_access);
+#ifndef _WINDOWS
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
+#endif
 	}
 }
 
@@ -433,7 +499,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  ******************************************************************************/
 char	*zbx_strerror(int errnum)
 {
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
@@ -445,11 +512,13 @@ char	*strerror_from_system(unsigned long error)
 #ifdef _WINDOWS
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
+	/* we don't know the inserts so we pass NULL and enable appropriate flag */
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, ZBX_MESSAGE_BUF_SIZE, NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
@@ -473,18 +542,18 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! not thread-safe for Win32 */
-	char		*strings[2];
 	HMODULE		hmodule;
+	/* !!! Attention: static !!! not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
-	memset(strings, 0, sizeof(char *) * 2);
 	*utf8_string = '\0';
 	hmodule = GetModuleHandle(module);
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
-	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY, hmodule, error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), strings))
+	/* we don't know the inserts so we pass NULL and enable appropriate flag */
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS, hmodule, error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
 				"unable to find message text: %s", strerror_from_system(GetLastError()));

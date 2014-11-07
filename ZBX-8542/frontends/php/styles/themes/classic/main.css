@@ -39,6 +39,7 @@ table.tableinfo tr.header td.hover_grey { background: #BBB; }
 table.tableinfo tr.header td.hover_grey:hover { background: #999; color: #EEE; }
 table.tableinfo tr.odd_row > td { background: #DDD; }
 table.tableinfo tr.even_row > td{ background: #EEE; }
+table.tableinfo tr.selected > td { background-color: #FFFFBB; }
 
 ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 
@@ -59,11 +60,11 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	background: #EEE; color: #383838;
 }
 
-.classic .filter .ui-state-default {
+.classic .filter .ui-state-default.button {
 	background: url("images/menu_not_active2.gif") repeat-x scroll left top #5473AA; color: #FFF;
 }
 
-.classic .filter .ui-state-hover {
+.classic .filter .ui-state-hover.button {
 	background: #5473AA
 }
 
@@ -134,7 +135,7 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect .selected ul.active { border: 1px solid #6681B2; }
+.multiselect.active { border: 1px solid #6681B2; }
 .multiselect .available ul li.hover { background: #4F70A8; }
 
 /* suggest */
@@ -145,33 +146,39 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 .menuPopup .title { color: #ffffff; background: #4E6EA7 url(images/widget_header.gif) repeat-x top left; }
 .menuPopup .ui-menu { border: 1px solid #314979; }
 
-.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover,
+.input[readonly], .input[readonly]:hover {
+	background-color: #f5f5f5;
+	color: #000000;
+	border-color: #d0d0d0;
+}
+
+.input[disabled], .input[disabled]:hover,
 input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
-	border-color: #aca899;
-	background-color: #fbfbfb;
+	background-color: #f5f5f5;
 	/* ignored by IE for <select> */
-	color: #505050;
+	color: #8a867a;
+	border-color: #d0d0d0;
 }
 
-/* disabled <select> font color for IE 9+ */
-select[disabled="disabled"]::-ms-value {
-	color: #505050;
-	background-color: #fbfbfb;
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
+	color: #8a867a;
+	background-color: #f5f5f5;
 }
 
-.link_menu[disabled], .link_menu[disabled]:focus, .link_menu[disabled]:hover {
+.link_menu[disabled], .link_menu[disabled]:hover {
 	background-color: #eee;
 	color: #aaa;
 }
 
 /* disabled form buttons */
-.input.button[disabled]:hover {
+.formtable .input.button[disabled]:hover {
 	background-color: #eee;
 	border-color: #d0d0d0;
 }
 
 /* disabled save button */
-.jqueryinput.input.button[disabled]:hover {
+.formtable .jqueryinput.input.button[disabled]:hover {
 	border-color: #ffaa33;
 }
 

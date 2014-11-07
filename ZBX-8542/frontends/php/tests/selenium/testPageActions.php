@@ -191,7 +191,7 @@ class testPageActions extends CWebTest {
 			$this->zbxTestTextPresent(array($dbRow['name'], $statusStr));
 		}
 
-		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
@@ -203,7 +203,7 @@ class testPageActions extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestClickWait('link='.$action['name']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');
 		$this->zbxTestTextPresent($action['name']);
@@ -223,12 +223,12 @@ class testPageActions extends CWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestHrefClickWait('actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestHrefClickWait('actionconf.php?action=action.massdisable&g_actionid%5B%5D='.$action['actionid'].'&');
 				$this->zbxTestTextPresent('Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$this->zbxTestHrefClickWait('actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].'&');
+				$this->zbxTestHrefClickWait('actionconf.php?action=action.massenable&g_actionid%5B%5D='.$action['actionid'].'&');
 				$this->zbxTestTextPresent('Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;
@@ -261,7 +261,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestDropdownSelect('action', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
@@ -293,7 +293,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestDropdownSelect('action', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
@@ -329,7 +329,7 @@ class testPageActions extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckboxSelect('g_actionid['.$action['actionid'].']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
