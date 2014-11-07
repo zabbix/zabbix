@@ -973,11 +973,14 @@ class CMap extends CMapElement {
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
 			$iconMapIds = array();
 
+			// collect icon mapping ids
 			foreach ($result as $map) {
 				if ($map['iconmapid'] != 0) {
-					$iconMapIds[$map['iconmapid']] = $map['sysmapid'];
+					$iconMapIds[$map['iconmapid']] = true;
 				}
 			}
+
+			$relationMap = $this->createRelationMap($result, 'sysmapid', 'iconmapid');
 
 			$iconMaps = API::IconMap()->get(array(
 				'output' => $this->outputExtend($options['selectIconMap'], array('iconmapid')),
@@ -986,14 +989,6 @@ class CMap extends CMapElement {
 				'nopermissions' => true
 			));
 
-			foreach ($iconMaps as &$iconMap) {
-				$iconMap['sysmapid'] = $iconMapIds[$iconMap['iconmapid']];
-			}
-			unset($iconMap);
-
-			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
-
-			$iconMaps = $this->unsetExtraFields($iconMaps, array('sysmapid', 'iconmapid'), $options['selectIconMap']);
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
 		}
 
