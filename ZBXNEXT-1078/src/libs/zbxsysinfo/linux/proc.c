@@ -516,34 +516,43 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			case ZBX_SIZE:
 				{
 					zbx_uint64_t	m;
-					int		res2, res3;
 
 					/* VmData, VmStk and VmExe follow in /proc/PID/status file in that order. */
 					/* Therefore we do not rewind f_stat between calls. */
 
 					mem_type_search = "VmData:\t";
-					res = byte_value_from_proc_file(f_stat, mem_type_search, &byte_value);
 
-					mem_type_search = "VmStk:\t";
-					res2 = byte_value_from_proc_file(f_stat, mem_type_search, &m);
-					byte_value += m;
-
-					mem_type_search = "VmExe:\t";
-					res3 = byte_value_from_proc_file(f_stat, mem_type_search, &m);
-					byte_value += m;
-
-					if (SUCCEED != res || SUCCEED != res2 || SUCCEED != res3)
+					if (SUCCEED == (res = byte_value_from_proc_file(f_stat, mem_type_search,
+							&byte_value)))
 					{
-						if (FAIL == res || FAIL == res2 ||  FAIL == res3)
+						mem_type_search = "VmStk:\t";
+
+						if (SUCCEED == (res = byte_value_from_proc_file(f_stat, mem_type_search,
+								&m)))
 						{
-							invalid_read = 1;
-							goto out;
+							byte_value += m;
+							mem_type_search = "VmExe:\t";
+
+							if (SUCCEED == (res = byte_value_from_proc_file(f_stat,
+									mem_type_search, &m)))
+							{
+								byte_value += m;
+							}
 						}
-						else
+					}
+
+					if (SUCCEED != res)
+					{
+						if (NOTSUPPORTED == res)
 						{
 							/* NOTSUPPORTED - at least one of data strings not found in */
 							/* the /proc/PID/status file */
 							continue;
+						}
+						else	/* FAIL */
+						{
+							invalid_read = 1;
+							goto out;
 						}
 					}
 				}
