@@ -102,11 +102,10 @@ $templateList->addRow(_('Visible name'), $visiblenameTB);
 // get all Groups
 $group_tb = new CTweenBox($frmHost, 'groups', 10);
 $group_tb->setSelectedValues($groups);
-$options = array(
+$all_groups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name'),
 	'editable' => true
-);
-$all_groups = API::HostGroup()->get($options);
+));
 order_result($all_groups, 'name');
 
 foreach ($all_groups as $group) {
@@ -139,14 +138,13 @@ $host_tb = new CTweenBox($frmHost, 'hosts', 20);
 $host_tb->setSelectedValues($hosts_linked_to);
 
 // get hosts from selected twb_groupid combo
-$params = array(
+$db_hosts = API::Host()->get(array(
 	'output' => array('hostid', 'name'),
 	'groupids' => $twb_groupid,
 	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 	'templated_hosts' => true,
 	'editable' => true
-);
-$db_hosts = API::Host()->get($params);
+));
 foreach ($db_hosts as $db_host) {
 	// add all except selected hosts
 	if (isset($hosts_linked_to[$db_host['hostid']])) {
@@ -156,13 +154,12 @@ foreach ($db_hosts as $db_host) {
 }
 
 // select selected hosts and add them
-$params = array(
+$db_hosts = API::Host()->get(array(
 	'output' => array('hostid', 'name', 'flags'),
 	'hostids' => $hosts_linked_to,
 	'templated_hosts' => true,
 	'editable' => true
-);
-$db_hosts = API::Host()->get($params);
+));
 foreach ($db_hosts as $db_host) {
 	$host_tb->addItem($db_host['hostid'], $db_host['name'], $db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
 }

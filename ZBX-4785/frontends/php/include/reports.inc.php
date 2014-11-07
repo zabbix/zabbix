@@ -336,24 +336,22 @@ function valueComparisonFormForMultiplePeriods() {
 	$host_tb->setSelectedValues($hostids);
 
 	// Get and add all hosts that are selected (to be on left side).
-	$options = array(
+	$db_hosts = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
 		'hostids' => $hostids,
 		'real_hosts' => true,
 		'preservekeys' => true
-	);
-	$db_hosts = API::Host()->get($options);
+	));
 	foreach ($db_hosts as $host) {
 		$host_tb->addItem($host['hostid'], $host['name']);
 	}
 
 	// Get and add either ALL hosts or ones in selected group (to be on right side).
-	$options = array(
+	$db_hosts2 = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
 		'groupids' => $groupid > 0 ? $groupid : null,
 		'real_hosts' => true
-	);
-	$db_hosts2 = API::Host()->get($options);
+	));
 	foreach ($db_hosts2 as $host) {
 		if (!isset($db_hosts[$host['hostid']])) {
 			$host_tb->addItem($host['hostid'], $host['name']);
