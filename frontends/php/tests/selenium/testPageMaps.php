@@ -40,7 +40,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0');
 		$this->zbxTestTextPresent(array('Name', 'Width', 'Height', 'Edit'));
 		$this->zbxTestTextPresent(array($map['name'], $map['width'], $map['height']));
-		$this->zbxTestDropdownHasOptions('go', array('Delete selected', 'Export selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Delete selected', 'Export selected'));
 	}
 
 	/**
@@ -67,7 +67,7 @@ class testPageMaps extends CWebTest {
 
 //		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
 
-		$this->zbxTestClickWait('sysmap_save');
+		$this->zbxTestClickWait('sysmap_update');
 
 //		$this->waitForCondition("selenium.browserbot.getUserWindow().ZBX_SYSMAPS[0].map.saved == true", 3000);
 
@@ -105,7 +105,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->href_click("sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=");
 		$this->wait();
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent("Network map updated");
 		$this->zbxTestTextPresent("$name");
@@ -130,7 +130,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckboxSelect('maps['.$sysmapid.']');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();

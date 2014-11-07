@@ -150,12 +150,13 @@ foreach ($this->data['graphs'] as $graph) {
 }
 
 // create go buttons
-$goComboBox = new CComboBox('go');
+$goComboBox = new CComboBox('action');
+
 if (!$this->data['parent_discoveryid']) {
-	$goComboBox->addItem('copy_to', _('Copy selected to ...'));
+	$goComboBox->addItem('graph.masscopyto', _('Copy selected to ...'));
 }
 
-$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption = new CComboItem('graph.massdelete', _('Delete selected'));
 $goOption->setAttribute(
 	'confirm',
 	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')

@@ -372,7 +372,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-		$this->zbxTestTextPresent('Scenario');
+		$this->zbxTestTextPresent('Web scenario');
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent web scenarios');
@@ -518,7 +518,7 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('http_proxy');
 		$this->assertAttribute("//input[@id='http_proxy']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='http_proxy']/@size", 50);
-		$this->assertElementPresent("//input[@placeholder='http://[username[:password]@]proxy.example.com[:port]']");
+		$this->assertElementPresent("//input[@placeholder='http://[user[:password]@]proxy.example.com[:port]']");
 
 		$this->zbxTestTextPresent('Variables');
 		$this->assertVisible('variables');
@@ -528,9 +528,9 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
-		$this->assertAttribute("//input[@id='save']/@role", 'button');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
+		$this->assertAttribute("//input[@id='update']/@role", 'button');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -597,9 +597,9 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Web scenarios');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent('Scenario updated');
+		$this->zbxTestTextPresent('Web scenario updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
@@ -1459,7 +1459,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-		$this->zbxTestTextPresent('Scenario');
+		$this->zbxTestTextPresent('Web scenario');
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
@@ -1533,7 +1533,7 @@ class testFormWeb extends CWebTest {
 				$this->input_type('name',$step);
 				$url = $step." url";
 				$this->input_type('url', $url);
-				$this->zbxTestClick('save');
+				$this->zbxTestClick('add');
 				$this->selectWindow(null);
 
 				if(isset($item['remove'])) {
@@ -1547,11 +1547,11 @@ class testFormWeb extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
-				$this->zbxTestTextPresent('Scenario added');
+				$this->zbxTestTextPresent('Web scenario added');
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 				$this->zbxTestTextPresent(array('Number of steps', 'Update interval', 'Status'));
@@ -1563,7 +1563,7 @@ class testFormWeb extends CWebTest {
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
-				$this->zbxTestTextNotPresent('Scenario added');
+				$this->zbxTestTextNotPresent('Web scenario added');
 				break;
 		}
 
@@ -1603,7 +1603,7 @@ class testFormWeb extends CWebTest {
 				$this->input_type('description', $trigger);
 				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
 				$this->input_type('expression', $expressionTrigger);
-				$this->zbxTestClickWait('save');
+				$this->zbxTestClickWait('add');
 
 				$this->zbxTestTextPresent('Trigger added');
 				$this->zbxTestCheckTitle('Configuration of triggers');
@@ -1613,7 +1613,7 @@ class testFormWeb extends CWebTest {
 
 		if (isset($data['remove'])) {
 			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

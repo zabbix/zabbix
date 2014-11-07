@@ -261,7 +261,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceAgent);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'agentIterfacesFooter');
+	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -278,7 +278,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceSNMP);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
+	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -294,7 +294,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceJMX);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'JMXIterfacesFooter');
+	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -309,7 +309,7 @@ if (!$isDiscovered) {
 	$col = new CCol($helpTextWhenDragInterfaceIPMI);
 	$col->setAttribute('colspan', 6);
 	$buttonRow = new CRow(array($buttonCol, $col));
-	$buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
+	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -323,7 +323,7 @@ else {
 		$existingInterfaceTypes[$interface['type']] = true;
 		$interfaces[$interface['interfaceid']] = $interface;
 	}
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($interfaces)).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
@@ -342,7 +342,7 @@ else {
 		new CCol(SPACE, 'interface-control')
 	));
 
-	$row = new CRow(null, null, 'agentIterfacesFooter');
+	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
@@ -356,7 +356,7 @@ else {
 	$ifTab->setAttribute('id', 'SNMPInterfaces');
 	$ifTab->setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
@@ -369,7 +369,7 @@ else {
 	$ifTab->setAttribute('id', 'JMXInterfaces');
 	$ifTab->setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
@@ -382,7 +382,7 @@ else {
 	$ifTab->setAttribute('id', 'IPMIInterfaces');
 	$ifTab->setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
@@ -880,15 +880,24 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$others = array();
 // do not display the clone and delete buttons for clone forms and new host forms
 if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
-	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = new CSubmit('full_clone', _('Full clone'));
-	$others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array(
+			new CSubmit('clone', _('Clone')),
+			new CSubmit('full_clone', _('Full clone')),
+			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid')),
+			new CButtonCancel(url_param('groupid'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('groupid'));
+else {
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('groupid'))
+	));
+}
 
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

@@ -93,7 +93,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestDropdownSelect('typeNew', $expression_type);
 		$this->zbxTestCheckboxSelect('case_sensitiveNew');
 		$this->zbxTestClick('saveExpression');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Regular expression added');
 
 		// select * from regexps r, expressions e where r.name='...' and r.regexpid=e.regexpid
@@ -126,7 +126,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->input_type('expressionNew', 'first test string');
 		$this->zbxTestCheckboxSelect('case_sensitiveNew');
 		$this->zbxTestClick('saveExpression');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent(array('ERROR: Cannot add regular expression', 'Regular expression', 'already exists.'));
 	}
 
@@ -138,7 +138,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', '1_regexp3');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Field "expressions" is mandatory.'));
 	}
 
@@ -173,7 +173,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->zbxTestClick('clone');
 		$this->input_type('name', $this->regexp.'_clone');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
@@ -185,7 +185,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->input_type('name', $this->regexp.'2');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Regular expression updated');
 
 		//$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name=\''.$this->regexp.'2\' AND r.regexpid=e.regexpid';
@@ -231,7 +231,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestDropdownSelect('action', 'Delete selected');
 
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');

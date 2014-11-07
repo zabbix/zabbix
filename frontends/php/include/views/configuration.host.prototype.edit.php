@@ -56,7 +56,7 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 	$hostList->addRow(_('Parent discovery rules'), $parents);
 }
 
-if ($hostPrototype['hostid']) {
+if (isset($hostPrototype['hostid'])) {
 	$frmHost->addVar('hostid', $hostPrototype['hostid']);
 }
 
@@ -78,7 +78,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($parentHost['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
@@ -97,7 +97,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		new CCol(SPACE, 'interface-control')
 	));
 
-	$row = new CRow(null, null, 'agentIterfacesFooter');
+	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
@@ -111,7 +111,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'SNMPInterfaces');
 	$ifTab->setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
@@ -124,7 +124,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'JMXInterfaces');
 	$ifTab->setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
@@ -137,7 +137,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab->setAttribute('id', 'IPMIInterfaces');
 	$ifTab->setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
@@ -326,17 +326,28 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$others = array();
-if ($hostPrototype['hostid']) {
-	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_discoveryid'));
-	$btnDelete->setEnabled(!$hostPrototype['templateid']);
+if (isset($hostPrototype['hostid'])) {
+	$btnDelete = new CButtonDelete(
+		_('Delete selected host prototype?'),
+		url_param('form').url_param('hostid').url_param('parent_discoveryid')
+	);
+	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
-	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = $btnDelete;
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		array (
+			new CSubmit('clone', _('Clone')),
+			$btnDelete,
+			new CButtonCancel(url_param('parent_discoveryid'))
+		)
+	));
 }
-$others[] = new CButtonCancel(url_param('parent_discoveryid'));
-
-$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
+else {
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		new CButtonCancel(url_param('parent_discoveryid'))
+	));
+}
 
 $widget->addItem($frmHost);
 

@@ -56,9 +56,9 @@ class testInheritanceWeb extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('httpconf.php?form=update&hostid='.$data['hostid'].'&httptestid='.$data['httptestid']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
-		$this->zbxTestTextPresent('Scenario updated');
+		$this->zbxTestTextPresent('Web scenario updated');
 
 		$this->assertEquals($oldHashHttpTests, DBhash($sqlHttpTests));
 		$this->assertEquals($oldHashHttpSteps, DBhash($sqlHttpSteps));
@@ -85,7 +85,7 @@ class testInheritanceWeb extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceWeb_SimpleCreate($data) {
-		$this->zbxTestLogin('httpconf.php?form=Create+scenario&hostid='.$this->templateid);
+		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
 
 		$this->input_type('name', $data['name']);
 
@@ -94,18 +94,18 @@ class testInheritanceWeb extends CWebTest {
 			$this->zbxTestLaunchPopup('add_step');
 			$this->input_type('name', $step['name']);
 			$this->input_type('url', $step['url']);
-			$this->zbxTestClick('save');
+			$this->zbxTestClick('add');
 			$this->selectWindow();
 			sleep(1);
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-				$this->zbxTestTextPresent('Scenario added');
+				$this->zbxTestTextPresent('Web scenario added');
 				break;
 
 			case TEST_BAD:

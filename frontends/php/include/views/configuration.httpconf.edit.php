@@ -133,7 +133,7 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append HTTP proxy to form list
 $httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255);
-$httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]proxy.example.com[:port]');
+$httpProxyTextBox->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
 $httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
 // append variables to form list
@@ -151,13 +151,22 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
 $httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
 
 // Authentication type
-$authenticationComboBox = new CComboBox('authentication', $this->data['authentication'], 'submit();');
+$authenticationComboBox = new CComboBox('authentication', $this->data['authentication']);
 $authenticationComboBox->addItems(httptest_authentications());
-$httpAuthenticationFormList->addRow(_('Authentication'), $authenticationComboBox);
-if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM))) {
-	$httpAuthenticationFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
-	$httpAuthenticationFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64));
+$httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
+
+$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
+$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
+
+$authenticationInputsHidden = $this->data['authentication'] == HTTPTEST_AUTH_NONE;
+
+if ($authenticationInputsHidden) {
+	$httpAuthenticationUserTB->setAttribute('disabled', true);
+	$httpAuthenticationPasswordTB->setAttribute('disabled', true);
 }
+
+$httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden);
+$httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
 
 // SSL verify peer checkbox
 $httpAuthenticationFormList->addRow(_('SSL verify peer'), new CCheckBox('verify_peer', $this->data['verify_peer']));
@@ -284,19 +293,40 @@ $httpForm->addItem($httpTab);
 
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
+	if ($this->data['templated'] == 0) {
+		$btnDelete = new CButtonDelete(
+			_('Delete web scenario?'),
+			url_param('form').url_param('httptestid').url_param('hostid')
+		);
+	}
+	else {
+		$btnDelete = null;
+	}
+
+	if (!$this->data['is_template']) {
+		$buttonDelHistory = new CButtonQMessage(
+			'del_history',
+			_('Clear history and trends'),
+			_('History clearing can take a long time. Continue?')
+		);
+	}
+	else {
+		$buttonDelHistory = null;
+	}
+
 	$httpForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?')),
-			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
-			new CButtonCancel(url_param('hostid'))
+			$buttonDelHistory,
+			$btnDelete,
+			new CButtonCancel()
 		)
 	));
 }
 else {
 	$httpForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
+		new CSubmit('add', _('Add')),
 		new CButtonCancel()
 	));
 }

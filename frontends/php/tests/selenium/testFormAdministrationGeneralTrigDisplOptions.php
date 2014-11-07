@@ -105,7 +105,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->input_type('ok_period', '120');
 		$this->input_type('blink_period', '120');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
 
 		// checking values in the DB
@@ -157,7 +157,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClick("//button[@type='button']");
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
 
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('DC0000').'';

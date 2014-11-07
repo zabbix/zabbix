@@ -1331,21 +1331,33 @@ class CConfigurationImport {
 			return;
 		}
 
-		$imagesToUpdate = array();
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.dbConditionString('i.name', array_keys($allImages)));
-		while ($dbImage = DBfetch($dbImages)) {
-			$dbImage['image'] = $allImages[$dbImage['name']]['image'];
-			$imagesToUpdate[] = $dbImage;
-			unset($allImages[$dbImage['name']]);
+		$dbImages = API::Image()->get(array(
+			'output' => array('imageid', 'name'),
+			'filter' => array('name' => array_keys($allImages))
+		));
+		$dbImages = zbx_toHash($dbImages, 'name');
+
+		$imagesToUpdate = array();
+		$imagesToCreate = array();
+
+		foreach ($allImages as $imageName => $image) {
+			if (isset($dbImages[$imageName])) {
+				$image['imageid'] = $dbImages[$imageName]['imageid'];
+				unset($image['imagetype']);
+				$imagesToUpdate[] = $image;
+			}
+			else {
+				$imagesToCreate[] = $image;
+			}
 		}
 
-		if ($this->options['images']['createMissing']) {
-			API::Image()->create(array_values($allImages));
+		if ($this->options['images']['createMissing'] && $imagesToCreate) {
+			API::Image()->create($imagesToCreate);
 		}
 
-		if ($this->options['images']['updateExisting']) {
+		if ($this->options['images']['updateExisting'] && $imagesToUpdate) {
 			API::Image()->update($imagesToUpdate);
 		}
 	}

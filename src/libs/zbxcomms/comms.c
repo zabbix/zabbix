@@ -1166,7 +1166,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 				if (nbytes < left)	/* should we stop reading? */
 				{
 					/* XML protocol? */
-					if (0 == strncmp(s->buf_stat, "<req>", sizeof("<req>") - 1))
+					if (0 == strncmp(s->buf_stat, "<req>", ZBX_CONST_STRLEN("<req>")))
 					{
 						/* closing tag received in the last 10 bytes? */
 						s->buf_stat[read_bytes] = '\0';
@@ -1212,7 +1212,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 				if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 				{
 					/* XML protocol? */
-					if (0 == strncmp(s->buffer, "<req>", sizeof("<req>") - 1))
+					if (0 == strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
 					{
 						/* closing tag received in the last 10 bytes? */
 						if (NULL != strstr(s->buffer + read_bytes - 10, "</req>"))

@@ -129,10 +129,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 						ZBX_STR2UINT64(triggerid, row[1]);
 
 						if (hostid == condition_value)
-						{
 							ret = SUCCEED;
-							break;
-						}
 					}
 					DBfree_result(result);
 				}
@@ -286,11 +283,11 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_IN:
-				if (SUCCEED == check_time_period(condition->value, (time_t)NULL))
+				if (SUCCEED == check_time_period(condition->value, (time_t)0))
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NOT_IN:
-				if (FAIL == check_time_period(condition->value, (time_t)NULL))
+				if (FAIL == check_time_period(condition->value, (time_t)0))
 					ret = SUCCEED;
 				break;
 			default:
@@ -1335,7 +1332,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 				else
 				{
 					if (FAIL == ret)
-						goto out;
+						goto clean;
 
 					ret = condition_result;
 					old_type = condition.conditiontype;
@@ -1385,7 +1382,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 	}
 clean:
 	DBfree_result(result);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

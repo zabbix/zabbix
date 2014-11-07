@@ -175,8 +175,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		// buttons
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
 		$this->assertVisible('resetDefaults');
 		$this->assertAttribute("//input[@id='resetDefaults']/@value", 'Reset defaults');
@@ -296,7 +296,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');
-			$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
+			$this->zbxTestClick("//button[@type='button']/span[text()='Reset defaults']");
 		}
 		else {
 			// events and alerts
@@ -380,7 +380,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPING');
 

@@ -35,6 +35,7 @@
 
 #include "daemon.h"
 #include "zbxself.h"
+#include "../libs/zbxnix/control.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
@@ -52,28 +53,37 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 
-#define INIT_PROXY(type, count)									\
-	process_type = type;									\
-	process_num = proxy_num - proxy_count + count;						\
-	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #%d started [%s #%d]",				\
-			proxy_num, get_process_type_string(process_type), process_num)
-
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix proxy";
+const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
-const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
+const char	*usage_message[] = {
+	"[-c config-file]",
+	"[-c config-file] -R runtime-option",
+	"-h",
+	"-V",
+	NULL	/* end of text */
+};
 
 const char	*help_message[] = {
+	"A Zabbix daemon that collects monitoring data from devices and sends it to Zabbix server.",
+	"",
 	"Options:",
-	"  -c --config <file>              Absolute path to the configuration file",
-	"  -R --runtime-control <option>   Perform administrative functions",
+	"  -c --config config-file               Absolute path to the configuration file",
+	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
-	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"    Runtime control options:",
+	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "               Execute the housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
-	"Other options:",
-	"  -h --help                       Give this help",
-	"  -V --version                    Display version number",
+	"      Log level control targets:",
+	"        pid                             Process identifier",
+	"        process-type                    All processes of specified type (e.g., poller)",
+	"        process-type,N                  Process type and number (e.g., poller,3)",
+	"",
+	"  -h --help                             Display this help message",
+	"  -V --version                          Display version number",
 	NULL	/* end of text */
 };
 
@@ -99,8 +109,9 @@ pid_t	*threads = NULL;
 
 unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
-int		process_num		= 0;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
+int		process_num		= 0;
+int		server_num		= 0;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
@@ -121,6 +132,9 @@ int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 0;
 int	CONFIG_WATCHDOG_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 1;
+int	CONFIG_COLLECTOR_FORKS		= 0;
+int	CONFIG_PASSIVE_FORKS		= 0;
+int	CONFIG_ACTIVE_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -202,6 +216,103 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 #endif
 
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	int	server_count = 0;
+
+	if (0 == local_server_num)
+	{
+		/* fail if the main process is queried */
+		return FAIL;
+	}
+	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
+		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
+		*local_process_num = local_server_num - server_count + CONFIG_HEARTBEAT_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_DATASENDER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_DATASENDER;
+		*local_process_num = local_server_num - server_count + CONFIG_DATASENDER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+		*local_process_num = local_server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRAPPER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PINGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
+		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
+		*local_process_num = local_server_num - server_count + CONFIG_HOUSEKEEPER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_HTTPPOLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
+		*local_process_num = local_server_num - server_count + CONFIG_DISCOVERER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
+		*local_process_num = local_server_num - server_count + CONFIG_HISTSYNCER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_JAVAPOLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
+		*local_process_num = local_server_num - server_count + CONFIG_SNMPTRAPPER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SELFMON_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SELFMON;
+		*local_process_num = local_server_num - server_count + CONFIG_SELFMON_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_VMWARE_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
+		*local_process_num = local_server_num - server_count + CONFIG_VMWARE_FORKS;
+	}
+	else
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_defaults                                                 *
@@ -211,7 +322,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_set_defaults()
+static void	zbx_set_defaults(void)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -361,7 +472,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config()
+static void	zbx_load_config(void)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -508,24 +619,6 @@ static void	zbx_load_config()
 	zbx_validate_config();
 }
 
-#ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(zbx_task_t task)
-{
-	switch (task)
-	{
-		case ZBX_TASK_CONFIG_CACHE_RELOAD:
-			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-				zbx_wakeup();
-			}
-			break;
-		default:
-			break;
-	}
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_free_config                                                  *
@@ -533,7 +626,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_LOAD_MODULE);
 }
@@ -549,8 +642,9 @@ static void	zbx_free_config()
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	zbx_task_t	task = ZBX_TASK_START;
+	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -563,16 +657,16 @@ int	main(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				opt_c++;
+				if (NULL == CONFIG_FILE)
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'R':
-				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
-					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
-				else
-				{
-					printf("invalid runtime control option: %s\n", zbx_optarg);
+				opt_r++;
+				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t.flags))
 					exit(EXIT_FAILURE);
-				}
+
+				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
 				help();
@@ -589,6 +683,29 @@ int	main(int argc, char **argv)
 		}
 	}
 
+	/* every option may be specified only once */
+	if (1 < opt_c || 1 < opt_r)
+	{
+		if (1 < opt_c)
+			zbx_error("option \"-c\" specified multiple times");
+		if (1 < opt_r)
+			zbx_error("option \"-R\" specified multiple times");
+
+		exit(EXIT_FAILURE);
+	}
+
+	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
+	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
+	if (argc > zbx_optind)
+	{
+		int	i;
+
+		for (i = zbx_optind; i < argc; i++)
+			zbx_error("invalid parameter \"%s\"", argv[i]);
+
+		exit(EXIT_FAILURE);
+	}
+
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_proxy.conf");
 
@@ -597,8 +714,8 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
-		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
+	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
+		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -609,16 +726,15 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	pid_t		pid;
 	zbx_sock_t	listen_sock;
-	int		i, proxy_num = 0, proxy_count = 0;
+	int		i, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
 #else
 #	define SNMP_FEATURE_STATUS 	" NO"
@@ -686,6 +802,20 @@ int	MAIN_ZABBIX_ENTRY()
 		zbx_vmware_init();
 
 	DBinit();
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_PROXY != db_type)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 
@@ -701,7 +831,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
-	if (0 < CONFIG_TRAPPER_FORKS)
+	if (0 != CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
@@ -710,150 +840,102 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+
 	for (i = 0; i < threads_num; i++)
 	{
-		if (0 == (pid = zbx_child_fork()))
+		zbx_thread_args_t	thread_args;
+		unsigned char		poller_type;
+
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
-			proxy_num = i + 1;	/* child processes are numbered starting from 1 */
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		thread_args.server_num = i + 1;
+		thread_args.args = NULL;
+
+		switch (thread_args.process_type)
+		{
+			case ZBX_PROCESS_TYPE_CONFSYNCER:
+				threads[i] = zbx_thread_start(proxyconfig_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HEARTBEAT:
+				threads[i] = zbx_thread_start(heart_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_DATASENDER:
+				threads[i] = zbx_thread_start(datasender_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_POLLER:
+				poller_type = ZBX_PROCESS_TYPE_POLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_UNREACHABLE:
+				poller_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_TRAPPER:
+				thread_args.args = &listen_sock;
+				threads[i] = zbx_thread_start(trapper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_PINGER:
+				threads[i] = zbx_thread_start(pinger_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				threads[i] = zbx_thread_start(housekeeper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HTTPPOLLER:
+				threads[i] = zbx_thread_start(httppoller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_DISCOVERER:
+				threads[i] = zbx_thread_start(discoverer_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_HISTSYNCER:
+				threads[i] = zbx_thread_start(dbsyncer_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_IPMIPOLLER:
+				poller_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_JAVAPOLLER:
+				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
+				thread_args.args = &poller_type;
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
+				threads[i] = zbx_thread_start(snmptrapper_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_SELFMON:
+				threads[i] = zbx_thread_start(selfmon_thread, &thread_args);
+				break;
+			case ZBX_PROCESS_TYPE_VMWARE:
+				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
+				break;
+		}
+	}
+
+	while (-1 == wait(&i))	/* wait for any child to exit */
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;
 		}
-		else
-			threads[i] = pid;
 	}
 
-	if (0 == proxy_num)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+	/* all exiting child processes should be caught by signal handlers */
+	THIS_SHOULD_NEVER_HAPPEN;
 
-		while (-1 == wait(&i))	/* wait for any child to exit */
-		{
-			if (EINTR != errno)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-				break;
-			}
-		}
-
-		/* all exiting child processes should be caught by signal handlers */
-		THIS_SHOULD_NEVER_HAPPEN;
-
-		zbx_on_exit();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_CONFSYNCER_FORKS))
-	{
-		/* !!! configuration syncer must be proxy #1 - child_signal_handler() uses threads[0] !!! */
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
-
-		main_proxyconfig_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HEARTBEAT_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HEARTBEAT, CONFIG_HEARTBEAT_FORKS);
-
-		main_heart_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_DATASENDER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_DATASENDER, CONFIG_DATASENDER_FORKS);
-
-		main_datasender_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_POLLER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_POLLER, CONFIG_POLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_UNREACHABLE_POLLER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_TRAPPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_TRAPPER, CONFIG_TRAPPER_FORKS);
-
-		main_trapper_loop(&listen_sock);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_PINGER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_PINGER, CONFIG_PINGER_FORKS);
-
-		main_pinger_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HOUSEKEEPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HOUSEKEEPER, CONFIG_HOUSEKEEPER_FORKS);
-
-		main_housekeeper_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HTTPPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HTTPPOLLER, CONFIG_HTTPPOLLER_FORKS);
-
-		main_httppoller_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_DISCOVERER_FORKS))
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_proxy");
-#endif
-
-		INIT_PROXY(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
-
-		main_discoverer_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_HISTSYNCER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_HISTSYNCER, CONFIG_HISTSYNCER_FORKS);
-
-		main_dbsyncer_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_IPMIPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_IPMIPOLLER, CONFIG_IPMIPOLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_IPMI);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_JAVAPOLLER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_JAVAPOLLER, CONFIG_JAVAPOLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_JAVA);
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_SNMPTRAPPER_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_SNMPTRAPPER, CONFIG_SNMPTRAPPER_FORKS);
-
-		main_snmptrapper_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_SELFMON_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_SELFMON, CONFIG_SELFMON_FORKS);
-
-		main_selfmon_loop();
-	}
-	else if (proxy_num <= (proxy_count += CONFIG_VMWARE_FORKS))
-	{
-		INIT_PROXY(ZBX_PROCESS_TYPE_VMWARE, CONFIG_VMWARE_FORKS);
-
-		main_vmware_loop();
-	}
+	zbx_on_exit();
 
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 

@@ -35,20 +35,22 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'description' =>	array(T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({save_trigger})'),
-	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({save_trigger})'),
+	'description' =>	array(T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({add}) || isset({update})'),
+	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({add}) || isset({update})'),
 	'sform' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'sitems' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'triggerid' =>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null),
 	'type' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'priority' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
-	'expressions' =>	array(T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({save_trigger})'),
+	'priority' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({add}) || isset({update})'),
+	'expressions' =>	array(T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({add}) || isset({update})'),
 	'expr_type' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'comments' =>		array(T_ZBX_STR, O_OPT,  null,			null,				null),
 	'url' =>			array(T_ZBX_STR, O_OPT,  null,			null,				null),
 	'status' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 null,			null,				null),
-	'save_trigger' =>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
+	// actions
+	'add' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
+	'update' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
 	'keys' => 			array(T_ZBX_STR, O_OPT,  null,			null,				null),
 );
 check_fields($fields);
@@ -77,7 +79,7 @@ $constructor = new CTextTriggerConstructor(new CTriggerExpression());
 /**
  * Save a trigger
  */
-if (hasRequest('save_trigger')) {
+if (hasRequest('add') || hasRequest('update')) {
 	show_messages();
 
 	$exprs = getRequest('expressions', false);
@@ -333,7 +335,14 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(SPACE, $table);
 
 	$sev_select = new CComboBox('priority', $priority);
-	$sev_select->addItems(getSeverityCaption());
+
+	$config = select_config();
+
+	$severityNames = array();
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		$severityNames[] = getSeverityName($severity, $config);
+	}
+	$sev_select->addItems($severityNames);
 
 	$frmTRLog->addRow(_('Severity'), $sev_select);
 	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
@@ -341,7 +350,12 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(_('Disabled'),
 		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
 	);
-	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save')));
+	if (hasRequest('triggerid')) {
+		$frmTRLog->addItemToBottomRow(new CSubmit('update', _('Update')));
+	}
+	else {
+		$frmTRLog->addItemToBottomRow(new CSubmit('add', _('Add')));
+	}
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 

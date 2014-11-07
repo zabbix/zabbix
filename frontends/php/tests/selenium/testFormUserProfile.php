@@ -30,7 +30,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestCheckTitle('User profile');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -39,7 +39,7 @@ class testFormUserProfile extends CWebTest {
 	public function testFormProfile_Cancel() {
 		$this->zbxTestLogin('profile.php');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('cancel');
 		$this->zbxTestTextPresent('Copyright');
 	}
 
@@ -55,7 +55,7 @@ class testFormUserProfile extends CWebTest {
 		$this->input_type('password1', $pwd);
 		$this->input_type('password2', $pwd);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
 
 		$row = DBfetch(DBselect('select passwd from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
@@ -70,7 +70,7 @@ class testFormUserProfile extends CWebTest {
 		$this->input_type('password1', PHPUNIT_LOGIN_PWD);
 		$this->input_type('password2', PHPUNIT_LOGIN_PWD);
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -86,7 +86,7 @@ class testFormUserProfile extends CWebTest {
 		$this->input_type('password1', '');
 		$this->input_type('password2', '');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Password should not be empty');
 		$this->zbxTestCheckTitle('User profile');
 
@@ -103,7 +103,7 @@ class testFormUserProfile extends CWebTest {
 		$this->input_type('password1', 'abc');
 		$this->input_type('password2', 'def');
 
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');
 		$this->zbxTestCheckTitle('User profile');
 
@@ -117,7 +117,7 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestDropdownSelect('theme', 'Original blue');
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
 
 		$row = DBfetch(DBselect('select theme from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));

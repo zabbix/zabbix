@@ -32,7 +32,8 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-extern unsigned char	process_type;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -140,7 +141,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	main_alerter_loop(void)
+ZBX_THREAD_ENTRY(alerter_thread, args)
 {
 	char		error[MAX_STRING_LEN], *error_esc;
 	int		res, alerts_success, alerts_fail;
@@ -149,6 +150,13 @@ void	main_alerter_loop(void)
 	DB_ROW		row;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

@@ -29,7 +29,8 @@
 #include "datasender.h"
 #include "../servercomms.h"
 
-extern unsigned char	process_type;
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -95,6 +96,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
+	zbx_timespec_t	ts;
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -115,7 +117,9 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+		zbx_timespec(&ts);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, ts.ns);
 
 		if (SUCCEED != (ret = put_data_to_server(&sock, j, &error)))
 		{
@@ -152,11 +156,18 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_datasender_loop(void)
+ZBX_THREAD_ENTRY(datasender_thread, args)
 {
 	int		records = 0, r;
 	double		sec = 0.0;
 	struct zbx_json	j;
+
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	server_num = ((zbx_thread_args_t *)args)->server_num;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

@@ -1088,7 +1088,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						zbx_free(value->str);
 				}
 			}
-			zbx_vector_ptr_clean(&values, zbx_ptr_free);
+			zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 
 			if (f != fields_count)
 			{
@@ -2333,6 +2333,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	else
 		ret = SUCCEED;
 
+	if (SUCCEED == ret && 0 != proxy_hostid)
+		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+
 	p = NULL;
 	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
@@ -2347,11 +2350,20 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
-			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
+			if (FAIL == is_uint31(tmp, &av->ts.sec))
+				continue;
+
+			av->ts.sec += proxy_timediff.sec;
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
-				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
+				if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
+					0LL, 999999999LL))
+				{
+					continue;
+				}
+
+				av->ts.ns += proxy_timediff.ns;
 
 				if (av->ts.ns > 999999999)
 				{
@@ -2360,7 +2372,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				}
 			}
 			else
-				av->ts.ns = -1;
+				av->ts.ns = proxy_timediff.ns;
 		}
 		else
 			zbx_timespec(&av->ts);
@@ -2651,7 +2663,7 @@ exit:
  * Return value: the number of history values                                 *
  *                                                                            *
  ******************************************************************************/
-int	proxy_get_history_count()
+int	proxy_get_history_count(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;

@@ -90,6 +90,8 @@ int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error
 
 	if (1 == fscanf(fpid, "%d", (int *)pid))
 		ret = SUCCEED;
+	else
+		zbx_snprintf(error, max_error_len, "cannot retrieve PID from file [%s]", pidfile);
 
 	zbx_fclose(fpid);
 

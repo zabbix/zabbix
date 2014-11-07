@@ -172,24 +172,24 @@ function getMenuPopupHistory(options) {
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		items[items.length] = {
 			label: t('Last hour graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=3600').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=3600').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last week graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=604800').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=604800').getUrl()
 		};
 
 		items[items.length] = {
 			label: t('Last month graph'),
-			url: new Curl('history.php?itemid=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
+			url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showgraph&period=2678400').getUrl()
 		};
 	}
 
 	// latest values
 	items[items.length] = {
 		label: t('Latest values'),
-		url: new Curl('history.php?itemid=' + options.itemid + '&action=showvalues&period=3600').getUrl()
+		url: new Curl('history.php?itemids[]=' + options.itemid + '&action=showvalues&period=3600').getUrl()
 	};
 
 	return [{
@@ -237,7 +237,7 @@ function getMenuPopupHost(options) {
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+			url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
 		};
 
 		// triggers
@@ -329,7 +329,7 @@ function getMenuPopupMap(options) {
 
 		// latest
 		if (typeof options.gotos.latestData !== 'undefined') {
-			var url = new Curl('latest.php');
+			var url = new Curl('latest.php?filter_set=1');
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
 				url.setArgument(name, value);
@@ -642,10 +642,8 @@ function getMenuPopupTrigger(options) {
 
 		jQuery.each(options.items, function(i, item) {
 			var url = new Curl('history.php');
-
-			jQuery.each(item.params, function(key, value) {
-				url.setArgument(key, value);
-			});
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
 
 			items[items.length] = {
 				label: item.name,
@@ -1016,6 +1014,8 @@ jQuery(function($) {
 			item.addClass(options.css);
 		}
 
+		item.append(link);
+
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
 			var menu = $('<ul>');
 
@@ -1026,7 +1026,7 @@ jQuery(function($) {
 			item.append(menu);
 		}
 
-		return item.append(link);
+		return item;
 	}
 
 	/**

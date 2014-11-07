@@ -30,9 +30,9 @@ $itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 // create form
 $itemForm = new CForm();
 $itemForm->setName('itemForm');
-$itemForm->addVar('massupdate', 1);
 $itemForm->addVar('group_itemid', $this->data['itemids']);
 $itemForm->addVar('hostid', $this->data['hostid']);
+$itemForm->addVar('action', $this->data['action']);
 
 // create form list
 $itemFormList = new CFormList('itemFormList');
@@ -353,21 +353,17 @@ $itemFormList->addRow(
 );
 
 // append new delay to form list
-$newFlexInt = new CDiv(
-	array(
-		_('Interval (in sec)'),
-		SPACE,
-		new CNumericBox('new_delay_flex[delay]', 50, 5),
-		SPACE,
-		_('Period'),
-		SPACE,
-		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
-		SPACE,
-		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
-	),
-	null,
-	'row-new-delay-flex-fields'
-);
+$newFlexInt = new CDiv(array(
+	_('Interval (in sec)'),
+	' ',
+	new CNumericBox('new_delay_flex[delay]', 50, 5),
+	' ',
+	_('Period'),
+	' ',
+	new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+	' ',
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+), null, 'row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
@@ -567,7 +563,10 @@ $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))));
+$itemForm->addItem(makeFormFooter(
+	new CSubmit('massupdate', _('Update')),
+	new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))
+));
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

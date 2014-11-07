@@ -463,17 +463,21 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Get Host ID by Host name.
+	 * Get hosts by name.
 	 *
-	 * @param array $host_data
-	 * @param string $host_data['host']
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array  $hostData
+	 * @param string $hostData['host']
 	 *
 	 * @return array
 	 */
-	public function getObjects($hostData) {
+	public function getObjects(array $hostData) {
+		$this->deprecated('host.getobjects method is deprecated.');
+
 		return $this->get(array(
-			'filter' => $hostData,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $hostData
 		));
 	}
 
@@ -486,16 +490,16 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$this->deprecated('host.exists method is deprecated.');
 
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
+		$host = $this->get(array(
 			'output' => array('hostid'),
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'limit' => 1
 		));
 
-		return !empty($objs);
+		return (bool) $host;
 	}
 
 	protected function checkInput(&$hosts, $method) {
@@ -549,6 +553,11 @@ class CHost extends CHostGeneral {
 			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		));
 
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+			'allowed' => array('hostid', 'status', 'inventory', 'description'),
+			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
+		));
+
 		$hostNames = array();
 		foreach ($hosts as &$host) {
 			if (!check_db_fields($hostDBfields, $host)) {
@@ -556,9 +565,15 @@ class CHost extends CHostGeneral {
 					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
-			if (isset($host['status'])) {
-				$hostName = (isset($host['host'])) ? $host['host'] : $dbHosts[$host['hostid']]['host'];
+			if ($update) {
+				$dbHost = $dbHosts[$host['hostid']];
+				$hostName = isset($host['host']) ? $host['host'] : $dbHost['host'];
+			}
+			else {
+				$hostName = $host['host'];
+			}
 
+			if (isset($host['status'])) {
 				$statusValidator->setObjectName($hostName);
 				$this->checkValidator($host['status'], $statusValidator);
 			}
@@ -576,17 +591,14 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-				'allowed' => array('hostid', 'status', 'inventory', 'description'),
-				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
-			));
 			if ($update) {
 				// cannot update certain fields for discovered hosts
-				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
+				$updateDiscoveredValidator->setObjectName($hostName);
+				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHost);
 			}
 			else {
 				// if visible name is not given or empty it should be set to host name
-				if (!isset($host['name']) || zbx_empty(trim($host['name']))) {
+				if (!isset($host['name']) || !trim($host['name'])) {
 					$host['name'] = $host['host'];
 				}
 
@@ -833,9 +845,6 @@ class CHost extends CHostGeneral {
 				$host['inventory'] = $inventory;
 			}
 
-			API::HostInterface()->replaceHostInterfaces($host);
-			unset($host['interfaces']);
-
 			if (isset($host['macros'])) {
 				$macros[$host['hostid']] = $host['macros'];
 				unset($host['macros']);
@@ -923,18 +932,18 @@ class CHost extends CHostGeneral {
 	public function massUpdate($data) {
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
-		$hostids = array_unique($inputHostIds);
+		$hostIds = array_unique($inputHostIds);
 
-		sort($hostids);
+		sort($hostIds);
 
-		$updHosts = $this->get(array(
-			'hostids' => $hostids,
+		$dbHosts = $this->get(array(
+			'hostids' => $hostIds,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('hostid'),
 			'preservekeys' => true,
 		));
 		foreach ($hosts as $host) {
-			if (!isset($updHosts[$host['hostid']])) {
+			if (!isset($dbHosts[$host['hostid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
@@ -964,25 +973,25 @@ class CHost extends CHostGeneral {
 
 			$curHost = reset($hosts);
 
-			$hostExists = $this->get(array(
+			$sameHostnameHost = $this->get(array(
 				'output' => array('hostid'),
 				'filter' => array('host' => $data['host']),
 				'nopermissions' => true,
 				'limit' => 1
 			));
-			$hostExist = reset($hostExists);
-			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
+			$sameHostnameHost = reset($sameHostnameHost);
+			if ($sameHostnameHost && (bccomp($sameHostnameHost['hostid'], $curHost['hostid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $data['host']));
 			}
 
 			// can't add host with the same name as existing template
-			$templateExists = API::Template()->get(array(
+			$sameHostnameTemplate = API::Template()->get(array(
 				'output' => array('templateid'),
 				'filter' => array('host' => $data['host']),
 				'nopermissions' => true,
 				'limit' => 1
 			));
-			if ($templateExists) {
+			if ($sameHostnameTemplate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
 		}
@@ -995,7 +1004,10 @@ class CHost extends CHostGeneral {
 			$updateInterfaces = $data['interfaces'];
 		}
 
-		if (isset($data['templates_clear'])) {
+		$b = isset($data['templates_clear']);
+		$c = array_key_exists('templates_clear', $data);
+		$d = array_keys($data);
+		if ($b) {
 			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
 		}
 
@@ -1034,12 +1046,12 @@ class CHost extends CHostGeneral {
 		if (!zbx_empty($data)) {
 			DB::update('hosts', array(
 				'values' => $data,
-				'where' => array('hostid' => $hostids)
+				'where' => array('hostid' => $hostIds)
 			));
 		}
 
 		if (isset($updateStatus)) {
-			updateHostStatus($hostids, $updateStatus);
+			updateHostStatus($hostIds, $updateStatus);
 		}
 
 		/*
@@ -1050,10 +1062,10 @@ class CHost extends CHostGeneral {
 
 			$hostGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
-				'hostids' => $hostids
+				'hostids' => $hostIds
 			));
-			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
-			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
+			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
 
 			$result = $this->massAdd(array(
 				'hosts' => $hosts,
@@ -1063,12 +1075,12 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
 			}
 
-			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
+			$groupIdsToDel = array_diff($hostGroupIds, $newGroupIds);
 
-			if ($groupidsToDel) {
+			if ($groupIdsToDel) {
 				$result = $this->massRemove(array(
-					'hostids' => $hostids,
-					'groupids' => $groupidsToDel
+					'hostids' => $hostIds,
+					'groupids' => $groupIdsToDel
 				));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
@@ -1077,43 +1089,23 @@ class CHost extends CHostGeneral {
 		}
 
 		/*
-		 * Update interfaces
+		 * Update template linkage
 		 */
-		if (isset($updateInterfaces)) {
-			$hostInterfaces = API::HostInterface()->get(array(
-				'hostids' => $hostids,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-
-			$this->massRemove(array(
-				'hostids' => $hostids,
-				'interfaces' => $hostInterfaces
-			));
-			$this->massAdd(array(
-				'hosts' => $hosts,
-				'interfaces' => $updateInterfaces
-			));
-		}
-
 		if (isset($updateTemplatesClear)) {
-			$templateidsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
+			$templateIdsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
 
 			if ($updateTemplatesClear) {
-				$this->massRemove(array('hostids' => $hostids, 'templateids_clear' => $templateidsClear));
+				$this->massRemove(array('hostids' => $hostIds, 'templateids_clear' => $templateIdsClear));
 			}
 		}
 		else {
-			$templateidsClear = array();
+			$templateIdsClear = array();
 		}
 
-		/*
-		 * Update template linkage
-		 */
+		// unlink templates
 		if (isset($updateTemplates)) {
 			$hostTemplates = API::Template()->get(array(
-				'hostids' => $hostids,
+				'hostids' => $hostIds,
 				'output' => array('templateid'),
 				'preservekeys' => true
 			));
@@ -1122,22 +1114,38 @@ class CHost extends CHostGeneral {
 			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
 
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
-			$templatesToDel = array_diff($templatesToDel, $templateidsClear);
+			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
 
 			if ($templatesToDel) {
 				$result = $this->massRemove(array(
-					'hostids' => $hostids,
+					'hostids' => $hostIds,
 					'templateids' => $templatesToDel
 				));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template'));
 				}
 			}
+		}
 
+		/*
+		 * update interfaces
+		 */
+		if (isset($updateInterfaces)) {
+			foreach($hostIds as $hostId) {
+				API::HostInterface()->replaceHostInterfaces(array(
+					'hostid' => $hostId,
+					'interfaces' => $updateInterfaces
+				));
+			}
+		}
+
+		// link new templates
+		if (isset($updateTemplates)) {
 			$result = $this->massAdd(array(
 				'hosts' => $hosts,
 				'templates' => $updateTemplates
 			));
+
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot link template'));
 			}
@@ -1145,7 +1153,7 @@ class CHost extends CHostGeneral {
 
 		// macros
 		if (isset($updateMacros)) {
-			DB::delete('hostmacro', array('hostid' => $hostids));
+			DB::delete('hostmacro', array('hostid' => $hostIds));
 
 			$this->massAdd(array(
 				'hosts' => $hosts,
@@ -1159,7 +1167,7 @@ class CHost extends CHostGeneral {
 		if (isset($updateInventory)) {
 			// disabling inventory
 			if ($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				$sql = 'DELETE FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids);
+				$sql = 'DELETE FROM host_inventory WHERE '.dbConditionInt('hostid', $hostIds);
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 				}
@@ -1169,13 +1177,13 @@ class CHost extends CHostGeneral {
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
 					'SELECT hostid,inventory_mode'.
 					' FROM host_inventory'.
-					' WHERE '.dbConditionInt('hostid', $hostids)
+					' WHERE '.dbConditionInt('hostid', $hostIds)
 				), 'hostid');
 
 				// check existing host inventory data
 				$automaticHostIds = array();
 				if ($updateInventory['inventory_mode'] === null) {
-					foreach ($hostids as $hostId) {
+					foreach ($hostIds as $hostId) {
 						// if inventory is disabled for one of the updated hosts, throw an exception
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
@@ -1191,7 +1199,7 @@ class CHost extends CHostGeneral {
 				}
 
 				$inventoriesToSave = array();
-				foreach ($hostids as $hostId) {
+				foreach ($hostIds as $hostId) {
 					$hostInventory = $updateInventory;
 					$hostInventory['hostid'] = $hostId;
 
@@ -1209,7 +1217,7 @@ class CHost extends CHostGeneral {
 
 					$itemsToInventories = API::item()->get(array(
 						'output' => array('inventory_link', 'hostid'),
-						'hostids' => $automaticHostIds ? $automaticHostIds : $hostids,
+						'hostids' => $automaticHostIds ? $automaticHostIds : $hostIds,
 						'nopermissions' => true
 					));
 
@@ -1331,7 +1339,7 @@ class CHost extends CHostGeneral {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
-// delete web tests
+		// delete web tests
 		$delHttptests = array();
 		$dbHttptests = get_httptests_by_hostid($hostIds);
 		while ($dbHttptest = DBfetch($dbHttptests)) {
@@ -1342,13 +1350,13 @@ class CHost extends CHostGeneral {
 		}
 
 
-// delete screen items
+		// delete screen items
 		DB::delete('screens_items', array(
 			'resourceid' => $hostIds,
 			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
 		));
 
-// delete host from maps
+		// delete host from maps
 		if (!empty($hostIds)) {
 			DB::delete('sysmaps_elements', array(
 				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
@@ -1356,8 +1364,8 @@ class CHost extends CHostGeneral {
 			));
 		}
 
-// disable actions
-// actions from conditions
+		// disable actions
+		// actions from conditions
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
@@ -1368,7 +1376,7 @@ class CHost extends CHostGeneral {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
 		}
 
-// actions from operations
+		// actions from operations
 		$sql = 'SELECT DISTINCT o.actionid'.
 				' FROM operations o, opcommand_hst oh'.
 				' WHERE o.operationid=oh.operationid'.
@@ -1387,13 +1395,13 @@ class CHost extends CHostGeneral {
 			DB::update('actions', $update);
 		}
 
-// delete action conditions
+		// delete action conditions
 		DB::delete('conditions', array(
 			'conditiontype' => CONDITION_TYPE_HOST,
 			'value' => $hostIds
 		));
 
-// delete action operation commands
+		// delete action operation commands
 		$operationids = array();
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
@@ -1407,7 +1415,7 @@ class CHost extends CHostGeneral {
 			'hostid' => $hostIds,
 		));
 
-// delete empty operations
+		// delete empty operations
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 				' FROM operations o'.
@@ -1431,16 +1439,16 @@ class CHost extends CHostGeneral {
 			'nopermissions' => true
 		));
 
-// delete host inventory
+		// delete host inventory
 		DB::delete('host_inventory', array('hostid' => $hostIds));
 
-// delete host applications
+		// delete host applications
 		DB::delete('applications', array('hostid' => $hostIds));
 
-// delete host
+		// delete host
 		DB::delete('hosts', array('hostid' => $hostIds));
 
-// TODO: remove info from API
+		// TODO: remove info from API
 		foreach ($hosts as $host) {
 			info(_s('Deleted: Host "%1$s".', $host['name']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);

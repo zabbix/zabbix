@@ -804,6 +804,15 @@ function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
 
+/**
+ * Returns true if the value is an empty string, empty array or null.
+ *
+ * @deprecated use strict comparison instead
+ *
+ * @param $value
+ *
+ * @return bool
+ */
 function zbx_empty($value) {
 	if ($value === null) {
 		return true;
@@ -2115,7 +2124,7 @@ function get_status() {
 
 	// comments: !!! Don't forget sync code with C !!!
 	$row = DBfetch(DBselect(
-		'SELECT SUM(1.0/i.delay) AS qps'.
+		'SELECT SUM(CAST(1.0/i.delay AS DECIMAL(20,10))) AS qps'.
 		' FROM items i,hosts h'.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 		' AND i.hostid=h.hostid'.
@@ -2229,7 +2238,7 @@ function checkRequiredKeys(array $array, array $keys) {
  * @param string $id	parent id, is used as cookie suffix
  */
 function uncheckTableRows($cookieId = null) {
-	insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($cookieId ? '_'.$cookieId : '').'")');
+	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($cookieId ? '_'.$cookieId : '').'")');
 }
 
 /**

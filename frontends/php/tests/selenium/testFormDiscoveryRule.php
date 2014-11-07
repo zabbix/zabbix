@@ -149,14 +149,6 @@ class testFormDiscoveryRule extends CWebTest {
 				)
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
-					'templatedHost' => 'Inheritance test template',
-					'form' => 'testInheritanceDiscoveryRule1'
-				)
-			),
-			array(
 				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template')
 			),
 			array(
@@ -682,7 +674,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$name);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
@@ -1616,7 +1608,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if ($itemFlexFlag == true) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
 			switch ($expected) {
 				case TEST_GOOD:
@@ -1701,7 +1693,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickWait("link=Discovery rules");
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

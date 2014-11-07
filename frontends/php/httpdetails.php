@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Details of scenario');
+$page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
 $page['hist_arg'] = array('httptestid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
@@ -113,7 +113,7 @@ $itemHistory = Manager::History()->getLast($items);
 $httpdetailsWidget = new CWidget();
 $httpdetailsWidget->addPageHeader(
 	array(
-		_('DETAILS OF SCENARIO'),
+		_('DETAILS OF WEB SCENARIO'),
 		SPACE,
 		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
 		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
@@ -143,6 +143,7 @@ $totalTime = array(
 	'units' => null
 );
 
+$itemIds = array();
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
@@ -168,7 +169,6 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		}
 	}
 
-	$itemIds = array();
 	foreach ($httpStepItemsByType as &$httpStepItem) {
 		// calculate the total time it took to execute the scenario
 		// skip steps that come after a failed step

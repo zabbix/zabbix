@@ -391,8 +391,8 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
 
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+		$this->assertVisible('update');
+		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
@@ -435,7 +435,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestClickWait('link=Trigger prototypes');
 
 		$this->zbxTestClickWait('link='.$description);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Trigger prototype updated');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
@@ -577,7 +577,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Trigger prototype expression "{Simple form test host:someItem.uptime.last(0)}<0" must contain at least one item prototype.'
+						'Cannot implode expression "{Simple form test host:someItem.uptime.last(0)}<0". Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
 					)
 				)
 			),
@@ -828,7 +828,7 @@ class testFormTriggerPrototype extends CWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$this->zbxTestClickWait('save');
+			$this->zbxTestClickWait('add');
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Trigger prototype added');
@@ -880,7 +880,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickWait("link=Trigger prototypes");
 
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestDropdownSelect('action', 'Delete selected');
 			$this->zbxTestClick('goButton');
 
 			$this->getConfirmation();

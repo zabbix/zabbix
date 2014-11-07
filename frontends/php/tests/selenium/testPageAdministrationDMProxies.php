@@ -68,7 +68,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 			'Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'
 		));
 
-		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
@@ -80,7 +80,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 
 		$this->zbxTestLogin('proxies.php');
 		$this->zbxTestClickWait('link='.$proxy['host']);
-		$this->zbxTestClickWait('save');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestTextPresent($proxy['host']);
