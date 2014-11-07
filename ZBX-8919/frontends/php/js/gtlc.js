@@ -1617,11 +1617,11 @@ var sbox = Class.create(CDebug, {
 		jQuery(this.grphobj).off();
 		jQuery(this.dom_obj).off();
 
-		if (IE6 || IE7 || IE8 || IE9 || IE10) {
+		if (IE8 || IE9 || IE10) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
 			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
 			jQuery(this.grphobj).click(function() {
-				ZBX_SBOX[this.sbox_id].ieMouseClick();
+				ZBX_SBOX[obj.sbox_id].ieMouseClick();
 			});
 		}
 		else {
@@ -1633,7 +1633,6 @@ var sbox = Class.create(CDebug, {
 	},
 
 	mouseDown: function(e) {
-		e.preventDefault();
 		e = e || window.event;
 
 		if (e.which && e.which != 1) {
