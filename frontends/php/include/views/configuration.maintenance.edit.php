@@ -159,7 +159,7 @@ $hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
 $hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', 10);
 $hostTweenBox->setSelectedValues($this->data['hostids']);
 foreach ($this->data['hosts'] as $host) {
-	$hostTweenBox->addNewItem($host['hostid'], $host['name']);
+	$hostTweenBox->addItem($host['hostid'], $host['name']);
 }
 $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'submit()');
 foreach ($this->data['all_groups'] as $group) {
@@ -173,7 +173,7 @@ $groupTable = new CTable(null, 'formElementTable');
 $groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', 10);
 $groupTweenBox->setSelectedValues($this->data['groupids']);
 foreach ($this->data['all_groups'] as $group) {
-	$groupTweenBox->addNewItem($group['groupid'], $group['name']);
+	$groupTweenBox->addItem($group['groupid'], $group['name']);
 }
 $groupTable->addRow($groupTweenBox->get(_('In maintenance'), _('Other groups')));
 

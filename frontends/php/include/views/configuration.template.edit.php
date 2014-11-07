@@ -107,9 +107,10 @@ $options = array(
 	'editable' => true
 );
 $all_groups = API::HostGroup()->get($options);
+order_result($all_groups, 'name');
 
 foreach ($all_groups as $group) {
-	$group_tb->addNewItem($group['groupid'], $group['name']);
+	$group_tb->addItem($group['groupid'], $group['name']);
 }
 $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
@@ -151,7 +152,7 @@ foreach ($db_hosts as $db_host) {
 	if (isset($hosts_linked_to[$db_host['hostid']])) {
 		continue;
 	}
-	$host_tb->addNewItem($db_host['hostid'], $db_host['name']);
+	$host_tb->addItem($db_host['hostid'], $db_host['name']);
 }
 
 // select selected hosts and add them
@@ -163,7 +164,7 @@ $params = array(
 );
 $db_hosts = API::Host()->get($params);
 foreach ($db_hosts as $db_host) {
-	$host_tb->addNewItem($db_host['hostid'], $db_host['name'], $db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
+	$host_tb->addItem($db_host['hostid'], $db_host['name'], $db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
 }
 
 $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(

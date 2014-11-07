@@ -49,10 +49,10 @@ foreach ($this->data['db_groups'] as $group) {
 $hostsComboBox = new CTweenBox($hostGroupForm, 'hosts', 25);
 $hostsComboBox->setSelectedValues($this->data['hosts']);
 foreach ($this->data['db_hosts'] as $host) {
-	$hostsComboBox->addNewItem($host['hostid'], $host['name']);
+	$hostsComboBox->addItem($host['hostid'], $host['name']);
 }
 foreach ($this->data['r_hosts'] as $host) {
-	$hostsComboBox->addNewItem($host['hostid'], $host['name'], $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
+	$hostsComboBox->addItem($host['hostid'], $host['name'], $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
 }
 $hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
 

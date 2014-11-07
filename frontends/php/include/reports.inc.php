@@ -320,7 +320,7 @@ function valueComparisonFormForMultiplePeriods() {
 	// Order now because it is also used in combo box.
 	order_result($db_groups, 'name');
 	foreach ($db_groups as $group) {
-		$group_tb->addNewItem($group['groupid'], $group['name']);
+		$group_tb->addItem($group['groupid'], $group['name']);
 	}
 
 	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
@@ -344,7 +344,7 @@ function valueComparisonFormForMultiplePeriods() {
 	);
 	$db_hosts = API::Host()->get($options);
 	foreach ($db_hosts as $host) {
-		$host_tb->addNewItem($host['hostid'], $host['name']);
+		$host_tb->addItem($host['hostid'], $host['name']);
 	}
 
 	// Get and add either ALL hosts or ones in selected group (to be on right side).
@@ -356,7 +356,7 @@ function valueComparisonFormForMultiplePeriods() {
 	$db_hosts2 = API::Host()->get($options);
 	foreach ($db_hosts2 as $host) {
 		if (!isset($db_hosts[$host['hostid']])) {
-			$host_tb->addNewItem($host['hostid'], $host['name']);
+			$host_tb->addItem($host['hostid'], $host['name']);
 		}
 	}
 

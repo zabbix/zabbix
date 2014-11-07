@@ -77,7 +77,7 @@ foreach ($this->data['dbHosts'] as $host) {
 	// for new proxies display only normal hosts
 	if (($this->data['proxyid'] && idcmp($this->data['proxyid'], $host['proxy_hostid']))
 			|| $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$hostsTweenBox->addNewItem(
+		$hostsTweenBox->addItem(
 			$host['hostid'],
 			$host['name'],
 			!$host['proxy_hostid'] || ($this->data['proxyid']
