@@ -1073,6 +1073,14 @@ jQuery(function ($) {
 					return true;
 				}
 
+				// Do nothing if "Enter" was received on input with type "submit", "reset" or "button".
+				if ($(this).prop('tagName').toLowerCase() == 'input') {
+					var type = $(this).attr('type').toLowerCase();
+					if (type == 'submit' || type == 'reset' || type == 'button') {
+						return true;
+					}
+				}
+
 				// Look for submit button in form.
 				var submitButton = $(selector, form);
 
