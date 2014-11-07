@@ -45,7 +45,7 @@ Bug fixes:
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
 ..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
-A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
+A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
 ..F....... [ZBX-8983] fixed "schema" option description in frontend configuration file (Oleg)
 
@@ -528,7 +528,7 @@ Bug fixes:
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
-A......... [ZBX-8832] fixed importing applications from linked templates (Krists)
+A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
 ........S. [ZBX-8978] fixed propagation of the interfaces into discovered hosts in same order as in the parent host (Sasha)
 ....I..PS. [ZBX-8849] fixed redundant linking with -lcrypto when linking with Net-SNMP (asaveljevs)
 ...G...PS. [ZBX-8913] fixed JSON validation sometimes failing to process utf-8 sequences (wiper)
