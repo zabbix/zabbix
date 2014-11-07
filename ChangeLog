@@ -8,6 +8,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+........S. [ZBX-8542] improved performance and reduced configuration cache locking when evaluating trigger expressions (wiper)
 ...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)
 ..F....... [ZBX-8844] fixed testing LDAP authentication (Krists)
