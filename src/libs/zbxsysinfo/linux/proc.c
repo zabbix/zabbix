@@ -303,7 +303,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	mem_size = 0, byte_value = 0, total_memory;
 	double		pct_size = 0.0, pct_value = 0.0;
-	int		do_task, proccount = 0, invalid_read = 0, mem_type_tried = 0, mem_type_code, res, skip = 1;
+	int		do_task, proccount = 0, invalid_read = 0, mem_type_tried = 0, mem_type_code, res;
 	char		*mem_type = NULL;
 	const char	*mem_type_search = NULL;
 
@@ -358,12 +358,12 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/*    https://www.kernel.org/doc/Documentation/filesystems/proc.txt */
 	/*    Himanshu Arora, Linux Processes explained - Part II, http://mylinuxbook.com/linux-processes-part2/ */
 
-	if (NULL == mem_type || '\0' == *mem_type || 0 == strcmp(mem_type, "vmsize") || 0 == strcmp(mem_type, "vsize"))
+	if (NULL == mem_type || '\0' == *mem_type || 0 == strcmp(mem_type, "vsize"))
 	{
 		mem_type_code = ZBX_VSIZE;		/* current virtual memory size (total program size) */
 		mem_type_search = "VmSize:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmrss") || 0 == strcmp(mem_type, "rss"))
+	else if (0 == strcmp(mem_type, "rss"))
 	{
 		mem_type_code = ZBX_RSS;		/* current resident set size (size of memory portions) */
 		mem_type_search = "VmRSS:\t";
@@ -376,52 +376,52 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		mem_type_code = ZBX_SIZE;		/* size of process (code + data + stack) */
 	}
-	else if (0 == strcmp(mem_type, "vmpeak"))
+	else if (0 == strcmp(mem_type, "peak"))
 	{
 		mem_type_code = ZBX_VMPEAK;		/* peak virtual memory size */
 		mem_type_search = "VmPeak:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmswap"))
+	else if (0 == strcmp(mem_type, "swap"))
 	{
 		mem_type_code = ZBX_VMSWAP;		/* size of swap space used */
 		mem_type_search = "VmSwap:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmlib"))
+	else if (0 == strcmp(mem_type, "lib"))
 	{
 		mem_type_code = ZBX_VMLIB;		/* size of shared libraries */
 		mem_type_search = "VmLib:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmlck"))
+	else if (0 == strcmp(mem_type, "lck"))
 	{
 		mem_type_code = ZBX_VMLCK;		/* size of locked memory */
 		mem_type_search = "VmLck:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmpin"))
+	else if (0 == strcmp(mem_type, "pin"))
 	{
 		mem_type_code = ZBX_VMPIN;		/* size of pinned pages, they are never swappable */
 		mem_type_search = "VmPin:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmhwm"))
+	else if (0 == strcmp(mem_type, "hwm"))
 	{
 		mem_type_code = ZBX_VMHWM;		/* peak resident set size ("high water mark") */
 		mem_type_search = "VmHWM:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmdata"))
+	else if (0 == strcmp(mem_type, "data"))
 	{
 		mem_type_code = ZBX_VMDATA;		/* size of data segment */
 		mem_type_search = "VmData:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmstk"))
+	else if (0 == strcmp(mem_type, "stk"))
 	{
 		mem_type_code = ZBX_VMSTK;		/* size of stack segment */
 		mem_type_search = "VmStk:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmexe"))
+	else if (0 == strcmp(mem_type, "exe"))
 	{
 		mem_type_code = ZBX_VMEXE;		/* size of text (code) segment */
 		mem_type_search = "VmExe:\t";
 	}
-	else if (0 == strcmp(mem_type, "vmpte"))
+	else if (0 == strcmp(mem_type, "pte"))
 	{
 		mem_type_code = ZBX_VMPTE;		/* size of page table entries */
 		mem_type_search = "VmPTE:\t";
@@ -500,22 +500,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			case ZBX_VMSTK:
 			case ZBX_VMEXE:
 			case ZBX_VMPTE:
-				res = byte_value_from_proc_file(f_stat, mem_type_search, &byte_value);
-
-				if (SUCCEED == res)
+				if (SUCCEED != (res = byte_value_from_proc_file(f_stat, mem_type_search, &byte_value)))
 				{
-					skip = 0;
+					if (NOTSUPPORTED == res)
+					{
+						continue;
+					}
+					else	/* FAIL */
+					{
+						invalid_read = 1;
+						goto out;
+					}
 				}
-				else if (NOTSUPPORTED == res)
-				{
-					skip = 1;
-				}
-				else	/* FAIL */
-				{
-					invalid_read = 1;
-					goto out;
-				}
-
 				break;
 			case ZBX_SIZE:
 				{
@@ -536,20 +532,19 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					res3 = byte_value_from_proc_file(f_stat, mem_type_search, &m);
 					byte_value += m;
 
-					if (SUCCEED == res && SUCCEED == res2 && SUCCEED == res3)
+					if (SUCCEED != res || SUCCEED != res2 || SUCCEED != res3)
 					{
-						skip = 0;
-					}
-					else if (FAIL == res || FAIL == res2 ||  FAIL == res3)
-					{
-						invalid_read = 1;
-						goto out;
-					}
-					else
-					{
-						/* NOTSUPPORTED - at least one of data strings not found in */
-						/* the /proc/PID/status file */
-						skip = 1;
+						if (FAIL == res || FAIL == res2 ||  FAIL == res3)
+						{
+							invalid_read = 1;
+							goto out;
+						}
+						else
+						{
+							/* NOTSUPPORTED - at least one of data strings not found in */
+							/* the /proc/PID/status file */
+							continue;
+						}
 					}
 				}
 				break;
@@ -561,11 +556,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					if (SUCCEED == res)
 					{
 						pct_value = ((double)byte_value / (double)total_memory) * 100.0;
-						skip = 0;
 					}
 					else if (NOTSUPPORTED == res)
 					{
-						skip = 1;
+						continue;
 					}
 					else	/* FAIL */
 					{
@@ -578,22 +572,19 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PMEM != mem_type_code)
 		{
-			if (0 == skip)
+			if (0 != proccount++)
 			{
-				if (0 != proccount++)
-				{
-					if (ZBX_DO_MAX == do_task)
-						mem_size = MAX(mem_size, byte_value);
-					else if (ZBX_DO_MIN == do_task)
-						mem_size = MIN(mem_size, byte_value);
-					else
-						mem_size += byte_value;
-				}
+				if (ZBX_DO_MAX == do_task)
+					mem_size = MAX(mem_size, byte_value);
+				else if (ZBX_DO_MIN == do_task)
+					mem_size = MIN(mem_size, byte_value);
 				else
-					mem_size = byte_value;
+					mem_size += byte_value;
 			}
+			else
+				mem_size = byte_value;
 		}
-		else if (0 == skip)
+		else
 		{
 			if (0 != proccount++)
 			{
