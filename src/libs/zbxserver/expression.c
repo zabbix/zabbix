@@ -3479,12 +3479,12 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ha
 {
 	const char	*__function_name = "zbx_populate_function_items";
 
-	int			i, j;
-	DC_TRIGGER		*tr;
-	DC_FUNCTION		*functions = NULL;
-	int			*errcodes = NULL;
-	zbx_ifunc_t		*ifunc;
-	zbx_func_t		*func;
+	int		i, j;
+	DC_TRIGGER	*tr;
+	DC_FUNCTION	*functions = NULL;
+	int		*errcodes = NULL;
+	zbx_ifunc_t	*ifunc;
+	zbx_func_t	*func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
