@@ -1093,7 +1093,7 @@ retry:
 
 			j = mapping[i];
 
-			if (1 == mapping_num && 0 == level && (parsed_oid_lens[j] != var->name_length ||
+			if (1 != mapping_num && (parsed_oid_lens[j] != var->name_length ||
 					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid))))
 			{
 				/* Validation of response OID matching the request is only done for bulk requests. */
