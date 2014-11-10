@@ -582,11 +582,14 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$macros = array();
-		foreach ($templates as $template) {
+		foreach ($templates as &$template) {
 			if (isset($template['macros'])) {
 				$macros[$template['templateid']] = $template['macros'];
+
+				unset($template['macros']);
 			}
 		}
+		unset($template);
 
 		if ($macros) {
 			API::UserMacro()->replaceMacros($macros);
@@ -596,10 +599,6 @@ class CTemplate extends CHostGeneral {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
 				$template['name'] = $template['host'];
-			}
-
-			if (isset($template['macros'])) {
-				unset($template['macros']);
 			}
 
 			$tplTmp = $template;
@@ -1059,7 +1058,11 @@ class CTemplate extends CHostGeneral {
 			));
 		}
 
-		// update template and host group linkage
+		/*
+		 * Update template and host group linkage. This procedure should be done the last because user can unlink
+		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * host-template linking, macros update, must be done before this.
+		 */
 		if (isset($data['groups']) && is_array($data['groups'])) {
 			API::HostGroup()->massUpdate(array(
 				'templates' => $templates,

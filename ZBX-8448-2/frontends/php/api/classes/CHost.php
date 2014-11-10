@@ -941,11 +941,14 @@ class CHost extends CHostGeneral {
 		$inventories = zbx_toHash($inventories, 'hostid');
 
 		$macros = array();
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			if (isset($host['macros'])) {
 				$macros[$host['hostid']] = $host['macros'];
+
+				unset($host['macros']);
 			}
 		}
+		unset($host);
 
 		if ($macros) {
 			API::UserMacro()->replaceMacros($macros);
@@ -966,10 +969,6 @@ class CHost extends CHostGeneral {
 
 			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
-
-			if (isset($host['macros'])) {
-				unset($host['macros']);
-			}
 
 			$data = $host;
 			$data['hosts'] = $host;
@@ -1238,14 +1237,6 @@ class CHost extends CHostGeneral {
 			));
 		}
 
-		// update host and host group linkage
-		if (isset($updateGroups)) {
-			API::HostGroup()->massUpdate(array(
-				'hosts' => $hosts,
-				'groups' => $updateGroups
-			));
-		}
-
 		/*
 		 * Inventory
 		 */
@@ -1330,6 +1321,18 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
+		}
+
+		/*
+		 * Update host and host group linkage. This procedure should be done the last because user can unlink
+		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * host-template linkage, inventory update, macros update, must be done before this.
+		 */
+		if (isset($updateGroups)) {
+			API::HostGroup()->massUpdate(array(
+				'hosts' => $hosts,
+				'groups' => $updateGroups
+			));
 		}
 
 		return array('hostids' => $inputHostIds);
