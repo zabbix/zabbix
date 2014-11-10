@@ -228,12 +228,12 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						ret = FAIL;
 				}
 				else
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 				{
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
 
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
@@ -251,13 +251,13 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 								&item.snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 					}
 
@@ -279,7 +279,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				}
 #else
 					ret = FAIL;
-#endif	/* HAVE_SNMP */
+#endif	/* HAVE_NETSNMP */
 
 				if (FAIL == ret && ISSET_MSG(&result))
 				{
@@ -840,10 +840,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 	init_snmp(progname);
 #endif
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 

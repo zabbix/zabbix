@@ -191,16 +191,16 @@
 
 			switch (hostInterfaceType) {
 				case getHostInterfaceNumericType('agent'):
-					footerRowId = '#agentIterfacesFooter';
+					footerRowId = '#agentInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('snmp'):
-					footerRowId = '#SNMPIterfacesFooter';
+					footerRowId = '#SNMPInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('jmx'):
-					footerRowId = '#JMXIterfacesFooter';
+					footerRowId = '#JMXInterfacesFooter';
 					break;
 				case getHostInterfaceNumericType('ipmi'):
-					footerRowId = '#IPMIIterfacesFooter';
+					footerRowId = '#IPMIInterfacesFooter';
 					break;
 				default:
 					throw new Error('Unknown host interface type.');
@@ -450,10 +450,5 @@
 				throw new Error('Unknown host interface type name.');
 		}
 		return typeNum;
-	}
-
-	function removeTemplate(templateid) {
-		jQuery('#templates_' + templateid).remove();
-		jQuery('#template_row_' + templateid).remove();
 	}
 </script>

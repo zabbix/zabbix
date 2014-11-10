@@ -828,41 +828,22 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 }
 
 /**
- * Clear items history and trends.
+ * Clear item history and trends by provided item IDs.
  *
- * @param $itemIds
- *
- * @return bool
- */
-function delete_history_by_itemid($itemIds) {
-	zbx_value2array($itemIds);
-	$result = delete_trends_by_itemid($itemIds);
-	if (!$result) {
-		return $result;
-	}
-
-	$result &= DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
-	$result &= DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
-	$result &= DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
-	$result &= DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
-	$result &= DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
-
-	return (bool) $result;
-}
-
-/**
- * Clear trends history for provided item ids.
- *
- * @param mixed $itemIds IDs of items for which history should be cleared
+ * @param array $itemIds
  *
  * @return bool
  */
-function delete_trends_by_itemid($itemIds) {
-	zbx_value2array($itemIds);
-	$r1 = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
-	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds));
+function deleteHistoryByItemIds(array $itemIds) {
+	$result = DBexecute('DELETE FROM trends WHERE '.dbConditionInt('itemid', $itemIds));
+	$result = ($result && DBexecute('DELETE FROM trends_uint WHERE '.dbConditionInt('itemid', $itemIds)));
+	$result = ($result && DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds)));
+	$result = ($result && DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds)));
+	$result = ($result && DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds)));
+	$result = ($result && DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds)));
+	$result = ($result && DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds)));
 
-	return $r1 && $r2;
+	return $result;
 }
 
 /**

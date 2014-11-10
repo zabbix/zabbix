@@ -129,10 +129,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 						ZBX_STR2UINT64(triggerid, row[1]);
 
 						if (hostid == condition_value)
-						{
 							ret = SUCCEED;
-							break;
-						}
 					}
 					DBfree_result(result);
 				}
@@ -223,7 +220,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
