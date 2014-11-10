@@ -62,7 +62,7 @@ $fields = array(
 	'screenitemid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	IN($knownResourceTypes), 'isset({add}) || isset({update})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
-	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({add}) || isset({update})',
+	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null,
 		hasRequest('add') || hasRequest('update') ? getResourceNameByType(getRequest('resourcetype')) : null),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
@@ -183,7 +183,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 if (hasRequest('add') || hasRequest('update')) {
 	$screenItem = array(
 		'screenid' => getRequest('screenid'),
-		'resourceid' => getRequest('resourceid'),
 		'resourcetype' => getRequest('resourcetype'),
 		'caption' => getRequest('caption'),
 		'style' => getRequest('style'),
@@ -200,6 +199,10 @@ if (hasRequest('add') || hasRequest('update')) {
 		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
 		'application' => getRequest('application', '')
 	);
+
+	if (hasRequest('resourceid')) {
+		$screenItem['resourceid'] = getRequest('resourceid');
+	}
 
 	DBstart();
 

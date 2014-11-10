@@ -304,10 +304,6 @@ if ($items) {
 	}
 }
 
-if ($filter['showDetails']) {
-	$config = select_config();
-}
-
 // multiselect hosts
 $multiSelectHostData = array();
 if ($filter['hostids']) {
@@ -356,7 +352,7 @@ $filterTable->setCellSpacing(0);
 
 $filterTable->addRow(
 	array(
-		new CCol(bold(_('Host groups').':'), 'label'),
+		new CCol(bold(_('Host groups')), 'label'),
 		new CCol(new CMultiSelect(
 			array(
 				'name' => 'groupids[]',
@@ -372,14 +368,14 @@ $filterTable->addRow(
 			)),
 			'inputcol'
 		),
-		new CCol(bold(_('Name').':'), 'label'),
+		new CCol(bold(_('Name')), 'label'),
 		new CCol(new CTextBox('select', $filter['select'], 40), 'inputcol'),
 	)
 );
 
 $filterTable->addRow(
 	array(
-		new CCol(bold(_('Hosts').':'), 'label'),
+		new CCol(bold(_('Hosts')), 'label'),
 		new CCol(new CMultiSelect(
 			array(
 				'name' => 'hostids[]',
@@ -395,13 +391,13 @@ $filterTable->addRow(
 			)),
 			'inputcol'
 		),
-		new CCol(bold(_('Show items without data').':'), 'label'),
+		new CCol(bold(_('Show items without data')), 'label'),
 		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'inputcol')
 	)
 );
 
 $filterTable->addRow(array(
-	new CCol(bold(_('Application').':'), 'label'),
+	new CCol(bold(_('Application')), 'label'),
 	new CCol(
 		array(
 			new CTextBox('application', $filter['application']),
@@ -413,12 +409,12 @@ $filterTable->addRow(array(
 		),
 		'inputcol'
 	),
-	new CCol(bold(_('Show details').':'), 'label'),
+	new CCol(bold(_('Show details')), 'label'),
 	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'inputcol'),
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-$filterButton->useJQueryStyle();
+$filterButton->useJQueryStyle('main');
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 $resetButton->useJQueryStyle();
@@ -517,6 +513,8 @@ else {
 }
 
 $tab_rows = array();
+
+$config = select_config();
 
 foreach ($items as $key => $item){
 	if (!$item['applications']) {

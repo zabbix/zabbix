@@ -157,7 +157,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, j, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
 	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
 				*package;
 	zbx_vector_str_t	packages;
@@ -229,10 +229,7 @@ next:
 				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 
-				/* deallocate memory used for string vector elements */
-				for (j = 0; j < packages.values_num; j++)
-					zbx_free(packages.values[j]);
-				packages.values_num = 0;
+				zbx_vector_str_clear_ext(&packages, zbx_ptr_free);
 			}
 		}
 	}
@@ -243,10 +240,7 @@ next:
 	{
 		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
 
-		/* deallocate memory used for string vector elements */
-		for (j = 0; j < packages.values_num; j++)
-			zbx_free(packages.values[j]);
-		packages.values_num = 0;
+		zbx_vector_str_clear_ext(&packages, zbx_ptr_free);
 	}
 	else if (0 != offset)
 		buffer[--offset] = '\0';

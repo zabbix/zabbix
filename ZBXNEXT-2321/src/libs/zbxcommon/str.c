@@ -20,6 +20,17 @@
 #include "common.h"
 #include "threads.h"
 
+static const char	copyright_message[] =
+	"Copyright (C) 2014 Zabbix SIA\n"
+	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+	"This is free software: you are free to change and redistribute it according to the license.\n"
+	"There is NO WARRANTY, to the extent permitted by law.";
+
+static const char	help_message_footer[] =
+	"Report bugs to: <https://support.zabbix.com>\n"
+	"Zabbix home page: <http://www.zabbix.com>\n"
+	"Documentation: <https://www.zabbix.com/documentation>";
+
 /******************************************************************************
  *                                                                            *
  * Function: app_title                                                        *
@@ -34,7 +45,7 @@
  ******************************************************************************/
 static void	app_title(void)
 {
-	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 }
 
 /******************************************************************************
@@ -50,7 +61,8 @@ static void	app_title(void)
 void	version(void)
 {
 	app_title();
-	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
+	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
+	puts(copyright_message);
 }
 
 /******************************************************************************
@@ -67,7 +79,13 @@ void	version(void)
  ******************************************************************************/
 void	usage(void)
 {
-	printf("usage: %s %s\n", progname, usage_message);
+	const char	**p = usage_message;
+
+	if (NULL != *p)
+		printf("usage:\n");
+
+	while (NULL != *p)
+		printf("       %s %s\n", progname, *p++);
 }
 
 /******************************************************************************
@@ -87,14 +105,14 @@ void	help(void)
 {
 	const char	**p = help_message;
 
-	app_title();
-	printf("\n");
-
 	usage();
 	printf("\n");
 
 	while (NULL != *p)
 		printf("%s\n", *p++);
+
+	printf("\n");
+	puts(help_message_footer);
 }
 
 /******************************************************************************
@@ -2751,13 +2769,13 @@ size_t	zbx_utf8_char_len(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strlen_utf8_n                                                *
+ * Function: zbx_strlen_utf8_nchars                                           *
  *                                                                            *
  * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
- * characters                                                                 *
+ *          characters                                                        *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen)
 {
 	size_t		sz = 0, csz = 0;
 	const char	*next;
@@ -2772,6 +2790,31 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 		}
 		sz += csz;
 		utf8_maxlen--;
+	}
+
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strlen_utf8_nbytes                                           *
+ *                                                                            *
+ * Purpose: calculates number of bytes in utf8 text limited by maxlen bytes   *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
+{
+	size_t	sz;
+
+	sz = strlen(text);
+
+	if (sz > maxlen)
+	{
+		sz = maxlen;
+
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		while (0x80 == (0xc0 & text[sz]) && 0 < sz)
+			sz--;
 	}
 
 	return sz;

@@ -52,7 +52,7 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_MEDIA_TYPE => 'Media type',
 		AUDIT_RESOURCE_PROXY => 'Proxy',
 		AUDIT_RESOURCE_REGEXP => 'Regular expression',
-		AUDIT_RESOURCE_SCENARIO => 'Scenario',
+		AUDIT_RESOURCE_SCENARIO => 'Web scenario',
 		AUDIT_RESOURCE_SCREEN => 'Screen',
 		AUDIT_RESOURCE_SCRIPT => 'Script',
 		AUDIT_RESOURCE_SLIDESHOW => 'Slide show',
@@ -65,7 +65,7 @@ class testPageAdministrationAudit extends CWebTest {
 	);
 
 	public function testPageAdministrationAudit_CheckLayout() {
-		$this->zbxTestLogin('auditlogs.php?stime=1328684400&period=63072000');
+		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit logs');
 		$this->assertElementPresent('config');
 
