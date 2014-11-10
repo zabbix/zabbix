@@ -111,7 +111,6 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 					{
 						zbx_snprintf(colname, MAX_STRING_LEN, "{#%s}", column_names[i]);
 						zbx_json_addstring(&json, colname, row[i], ZBX_JSON_TYPE_STRING);
-						zbx_free(column_names[i]);
 					}
 
 					zbx_json_close(&json);
@@ -125,6 +124,11 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 				ret = SUCCEED;
 			}
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert column name to macro."));
+
+			for (i = 0; i < dbh.col_num; i++)
+				zbx_free(column_names[i]);
 		}
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
