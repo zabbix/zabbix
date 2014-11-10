@@ -90,7 +90,7 @@ img.bottom { vertical-align: text-bottom; }
 /* header */
 .header { height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px; }
 .header .header_l { padding-left: 5px; }
-.header .header_r { padding-right: 5px; }
+.header .header_r { padding: 1px 5px 1px 0; }
 .header a { color: #FFFFFF; }
 
 /* link */
@@ -148,10 +148,6 @@ form { margin: 0; }
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
-.input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { border-color: #d0d0d0; background-color: #eee; color: #aca899; cursor: default; }
-.input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
-.input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
 .select {
 	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;

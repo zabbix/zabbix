@@ -212,6 +212,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	int		ret = ZBX_DB_OK;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
+#elif defined(HAVE_MYSQL)
+	my_bool		mysql_reconnect = 1;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -299,6 +301,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 		ret = ZBX_DB_FAIL;
 	}
+
+	/* The RECONNECT option setting is placed here, AFTER the connection	*/
+	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
+	/* reset the options value to the default, regardless of what it was	*/
+	/* set to prior to the connection. MySQL allows changing connection	*/
+	/* options on an open connection, so setting it here is safe.		*/
+
+	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
@@ -2023,6 +2034,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return dst;
 }
 
+#ifndef HAVE_IBM_DB2
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_dyn_escape_string_len                                     *
@@ -2036,9 +2048,12 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 	char		*dst = NULL;
 	size_t		len = 1;	/* '\0' */
 
+	if (NULL == src)
+		goto out;
+
 	max_src_len++;
 
-	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
+	for (s = src; '\0' != *s && 0 < max_src_len; s++)
 	{
 		/* only UTF-8 characters should reduce a variable max_src_len */
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
@@ -2055,13 +2070,65 @@ char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
 
 		len++;
 	}
-
+out:
 	dst = zbx_malloc(dst, len);
 
 	zbx_db_escape_string(src, dst, len);
 
 	return dst;
 }
+#else
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string_len                                     *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Comments: This function is used to escape strings for IBM DB2 where fields *
+ *           are limited by bytes rather than characters.                     *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
+{
+	const char	*s;
+	char		*dst = NULL;
+	size_t		csize, len = 1;	/* '\0' */
+
+	if (NULL == src)
+		goto out;
+
+	for (s = src; '\0' != *s;)
+	{
+		if ('\r' == *s)
+		{
+			s++;
+			continue;
+		}
+
+		csize = zbx_utf8_char_len(s);
+
+		/* process non-UTF-8 characters as single byte characters */
+		if (0 == csize)
+			csize = 1;
+
+		if (max_src_len < csize)
+			break;
+
+		if ('\'' == *s)
+			len++;
+
+		s += csize;
+		len += csize;
+		max_src_len -= csize;
+	}
+out:
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -2168,3 +2235,21 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return dst;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_strlen_n                                                  *
+ *                                                                            *
+ * Purpose: return the string length to fit into a database field of the      *
+ *          specified size                                                    *
+ *                                                                            *
+ * Return value: the string length in bytes                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_strlen_n(const char *text, size_t maxlen)
+{
+#ifdef HAVE_IBM_DB2
+	return zbx_strlen_utf8_nbytes(text, maxlen);
+#else
+	return zbx_strlen_utf8_nchars(text, maxlen);
+#endif
+}

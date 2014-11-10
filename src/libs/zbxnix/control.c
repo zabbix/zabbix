@@ -19,81 +19,141 @@
 
 #include "control.h"
 
-/******************************************************************************
- *                                                                            *
- * Function: get_log_level_message                                            *
- *                                                                            *
- * Purpose: create runtime control message for log level changes based on     *
- *          the command line arguments                                        *
- *                                                                            *
- * Parameters: opt     - [IN] the command line argument                       *
- *                            (command with/without options)                  *
- *             command - [IN] the command for log level change                *
- *                            (increase/decrease)                             *
- *             message - [OUT] the message containing options                 *
- *                             for log level change                           *
- *                                                                            *
- * Return value: SUCCEEED - the message was created successfully              *
- *               FAIL     - otherwise                                         *
- *                                                                            *
- ******************************************************************************/
-int	get_log_level_message(const char *opt, int command, int *message)
+static int	parse_log_level_options(const char *opt, size_t len, int *scope, int *data)
 {
-	int	num = 0, scope, data;
+	int		num = 0;
+	const char	*rtc_options;
 
-	if ('\0' == *opt)
+	rtc_options = opt + len;
+
+	if ('\0' == *rtc_options)
 	{
-		scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
-		data = 0;
+		*scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
+		*data = 0;
 	}
-	else if ('=' != *opt)
+	else if ('=' != *rtc_options)
 	{
-		zbx_error("unknown log level control option: %s", opt);
+		zbx_error("invalid runtime control option: %s", opt);
 		return FAIL;
 	}
-	else if (0 != isdigit(*(++opt)))
+	else if (0 != isdigit(*(++rtc_options)))
 	{
-		if (FAIL == is_ushort(opt, &num) || 0 == num)
+		if (FAIL == is_ushort(rtc_options, &num) || 0 == num)
 		{
-			zbx_error("invalid log level control option: process identifier must be unsigned short"
-					" non-zero value");
+			zbx_error("invalid log level control target: invalid or unsupported process identifier");
 			return FAIL;
 		}
 
-		scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
-		data = num;
+		*scope = ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID;
+		*data = num;
 	}
 	else
 	{
-		char	*proc_name = NULL, *ptr;
+		char	*proc_name = NULL, *proc_num;
 		int	proc_type;
 
-		proc_name = zbx_strdup(proc_name, opt);
-
-		if (NULL != (ptr = strchr(proc_name, ',')))
+		if ('\0' == *rtc_options)
 		{
-			*ptr++ = '\0';
+			zbx_error("invalid log level control target: unspecified process identifier or type");
+			return FAIL;
+		}
 
-			if (FAIL == is_ushort(ptr, &num) || 0 == num)
+		proc_name = zbx_strdup(proc_name, rtc_options);
+
+		if (NULL != (proc_num = strchr(proc_name, ',')))
+			*proc_num++ = '\0';
+
+		if ('\0' == *proc_name)
+		{
+			zbx_error("invalid log level control target: unspecified process type");
+			zbx_free(proc_name);
+			return FAIL;
+		}
+
+		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
+		{
+			zbx_error("invalid log level control target: unknown process type \"%s\"", proc_name);
+			zbx_free(proc_name);
+			return FAIL;
+		}
+
+		if (NULL != proc_num)
+		{
+			if ('\0' == *proc_num)
 			{
-				zbx_error("invalid log level control option: process number must be unsigned short"
-						" non-zero value");
+				zbx_error("invalid log level control target: unspecified process number");
+				zbx_free(proc_name);
+				return FAIL;
+			}
+
+			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
+			{
+				zbx_error("invalid log level control target: invalid or unsupported process number "
+						"\"%s\"", proc_num);
 				zbx_free(proc_name);
 				return FAIL;
 			}
 		}
 
-		if (ZBX_PROCESS_TYPE_UNKNOWN == (proc_type = get_process_type_by_name(proc_name)))
-		{
-			zbx_error("invalid log level control option: unknown process type");
-			zbx_free(proc_name);
-			return FAIL;
-		}
-
 		zbx_free(proc_name);
 
-		scope = ZBX_RTC_LOG_SCOPE_PROC | proc_type;
-		data = num;
+		*scope = ZBX_RTC_LOG_SCOPE_PROC | proc_type;
+		*data = num;
+	}
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_rtc_options                                                *
+ *                                                                            *
+ * Purpose: parse runtime control options and create a runtime control        *
+ *          message                                                           *
+ *                                                                            *
+ * Parameters: opt         - [IN] the command line argument                   *
+ *             daemon_type - [IN] the daemon type                             *
+ *             message     - [OUT] the message containing options for log     *
+ *                                 level change or cache reload               *
+ *                                                                            *
+ * Return value: SUCCEED - the message was created successfully               *
+ *               FAIL    - an error occurred                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
+{
+	int	scope, data, command;
+
+	if (0 == strncmp(opt, ZBX_LOG_LEVEL_INCREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
+	{
+		command = ZBX_RTC_LOG_LEVEL_INCREASE;
+
+		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), &scope, &data))
+			return FAIL;
+
+	}
+	else if (0 == strncmp(opt, ZBX_LOG_LEVEL_DECREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
+	{
+		command = ZBX_RTC_LOG_LEVEL_DECREASE;
+
+		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
+			return FAIL;
+	}
+	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
+	{
+		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
+		scope = 0;
+		data = 0;
+	}
+	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
+	{
+		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
+		scope = 0;
+		data = 0;
+	}
+	else
+	{
+		zbx_error("invalid runtime control option: %s", opt);
+		return FAIL;
 	}
 
 	*message = ZBX_RTC_MAKE_MESSAGE(command, scope, data);

@@ -1046,4 +1046,51 @@ jQuery(function ($) {
 			verticalHeaderTables[table.attr('id')] = table;
 		});
 	};
+
+	/**
+	 * Sets a default submit button (via provided selector string) to input and select form elements so
+	 * "Enter" keypress does not just grab first submit button in the form. If submit button can not be
+	 * located, the keypress event is bubbled up.
+	 *
+	 * @param {string} selector			selector that is used to get default button element in form
+	 *
+	 * @throws exception if submit button selector is not string
+	 *
+	 * @return {object}
+	 */
+	$.fn.enterSubmit = function (selector) {
+		if (typeof selector !== 'string') {
+			throw Error('Invalid input type. String required, got ' + typeof selector);
+		}
+
+		// Take only form elements.
+		$(this).filter('form').each(function () {
+			var form = $(this);
+
+			function keypressHandler(e) {
+				// Ignore everything that is not "Enter" key.
+				if ((e.which && e.which != 13) || (e.keyCode && e.keyCode != 13)) {
+					return true;
+				}
+
+				// Look for submit button in form.
+				var submitButton = $(selector, form);
+
+				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
+				if (submitButton.length == 0) {
+					return true;
+				}
+				else {
+					submitButton.click();
+					return false;
+				}
+			}
+
+			// Attach to inputs and selects (both those that exist now and that will be created in this form).
+			form.on('keypress', 'input', keypressHandler);
+			form.on('keypress', 'select', keypressHandler);
+		});
+
+		return this;
+	};
 });

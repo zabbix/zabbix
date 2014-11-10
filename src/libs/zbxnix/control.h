@@ -23,6 +23,6 @@
 #include "common.h"
 #include "zbxself.h"
 
-int	get_log_level_message(const char *opt, int command, int *message);
+int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message);
 
 #endif

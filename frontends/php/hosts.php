@@ -714,7 +714,8 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 		'ipmi_password' => getRequest('ipmi_password', ''),
 		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
 		'host_inventory' => getRequest('host_inventory', array()),
-		'templates' => getRequest('templates', array())
+		'templates' => getRequest('templates', array()),
+		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
 	);
 
 	// sort templates
@@ -734,12 +735,6 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
 	));
 	order_result($data['proxies'], 'host');
-
-	// get inventories
-	if ($data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-		$data['inventories'] = getHostInventories();
-		$data['inventories'] = zbx_toHash($data['inventories'], 'db_field');
-	}
 
 	// get templates data
 	$data['linkedTemplates'] = null;
@@ -805,6 +800,8 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -825,10 +822,10 @@ else {
 	// filter
 	$filterTable = new CTable('', 'filter filter-center');
 	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
+		array(array(bold(_('Name')), ' '._('like').' '), new CTextBox('filter_host', $filter['host'], 20)),
+		array(array(bold(_('DNS')), ' '._('like').' '), new CTextBox('filter_dns', $filter['dns'], 20)),
+		array(array(bold(_('IP')), ' '._('like').' '), new CTextBox('filter_ip', $filter['ip'], 20)),
+		array(bold(_('Port')), ' ', new CTextBox('filter_port', $filter['port'], 20))
 	));
 
 	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
