@@ -23,26 +23,21 @@
 #include "log.h"
 #include "zbxjson.h"
 
-static int	get_result_table_col_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t cnt)
+static int	get_result_table_column_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t num)
 {
-	int		ret = FAIL, i, j, rc;
+	int		ret = FAIL, i, j;
 	char		str[MAX_STRING_LEN];
-	SQLSMALLINT	ret_len;
+	SQLRETURN	rc;
+	SQLSMALLINT	len;
 
-	for (i = 0; i < cnt; i++)
+	for (i = 0; i < num; i++)
 	{
-		rc = SQLColAttribute(dbh->hstmt, i + 1, SQL_DESC_LABEL, str, MAX_STRING_LEN, &ret_len, NULL);
+		rc = SQLColAttribute(dbh->hstmt, i + 1, SQL_DESC_LABEL, str, sizeof(str), &len, NULL);
 
-		if (rc != SQL_SUCCESS || MAX_STRING_LEN <= ret_len || '\0' == str[0])
+		if (SQL_SUCCESS != rc || MAX_STRING_LEN <= len || '\0' == *str)
 		{
-			if (0 < i)
-			{
-				for (j = 0; j < i; j++)
-				{
-					zbx_free(buffer[j]);
-					buffer[j] = NULL;
-				}
-			}
+			for (j = 0; j < i; j++)
+				zbx_free(buffer[j]);
 
 			break;
 		}
@@ -50,7 +45,7 @@ static int	get_result_table_col_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t c
 		buffer[i] = zbx_strdup(NULL, str);
 	}
 
-	if (i == cnt)
+	if (i == num)
 		ret = SUCCEED;
 
 	return ret;
@@ -59,6 +54,7 @@ static int	get_result_table_col_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t c
 static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*__function_name = "db_odbc_discovery";
+
 	int		ret = NOTSUPPORTED, failure = 0, i, j;
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
@@ -67,87 +63,79 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, item->params);
 
-	do
+	if (2 != request->nparam)
 	{
-		if (2 != request->nparam)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			break;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
 
-		if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
-			break;
-		}
+	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		goto out;
+	}
 
-		if (NULL != odbc_DBselect(&dbh, item->params))
-		{
-			column_names = zbx_malloc(NULL, sizeof(char *) * dbh.col_num);
+	if (NULL != odbc_DBselect(&dbh, item->params))
+	{
+		column_names = zbx_malloc(NULL, sizeof(char *) * dbh.col_num);
 
-			if (SUCCEED == get_result_table_col_names(&dbh, column_names, dbh.col_num))
+		if (SUCCEED == get_result_table_column_names(&dbh, column_names, dbh.col_num))
+		{
+			for (i = 0; i < dbh.col_num && 0 == failure; i++)
 			{
-				for (i = 0; i < dbh.col_num && 0 == failure; i++)
+				char	*str = column_names[i];
+
+				for (j = 0; '\0' != str[j]; j++)
 				{
-					char	*str = column_names[i];
-					size_t	str_len = strlen(str);
+					if (0 != isalpha(str[j]))
+						str[j] = toupper(str[j]);
 
-					for (j = 0; j < str_len; j++ )
+					if (SUCCEED != is_macro_char(str[j]))
 					{
-						if (FAIL == is_macro_char(toupper(str[j])))
-						{
-							failure = 1;
-							break;
-						}
-
-						if (0 != isalpha(str[j]) && 0 == isupper(str[j]))
-							str[j] = toupper(str[j]);
+						failure = 1;
+						break;
 					}
 				}
+			}
 
-				if (0 == failure)
+			if (0 == failure)
+			{
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+				zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+				while (NULL != (row = odbc_DBfetch(&dbh)))
 				{
-					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-					zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+					zbx_json_addobject(&json, NULL);
 
-					while (NULL != (row = odbc_DBfetch(&dbh)))
+					for (i = 0; i < dbh.col_num; i++)
 					{
-						zbx_json_addobject(&json, NULL);
-
-						for (i = 0; i < dbh.col_num; i++)
-						{
-							zbx_snprintf(colname, MAX_STRING_LEN, "{#%s}",
-								column_names[i]);
-
-							zbx_json_addstring(&json, colname, row[i], ZBX_JSON_TYPE_STRING);
-
-							zbx_free(column_names[i]);
-						}
-
-						zbx_json_close(&json);
+						zbx_snprintf(colname, MAX_STRING_LEN, "{#%s}", column_names[i]);
+						zbx_json_addstring(&json, colname, row[i], ZBX_JSON_TYPE_STRING);
+						zbx_free(column_names[i]);
 					}
 
 					zbx_json_close(&json);
-
-					SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
-
-					zbx_json_free(&json);
-
-					ret = SUCCEED;
 				}
-			}
-			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to obtain resulting tables column names"));
 
-			zbx_free(column_names);
+				zbx_json_close(&json);
+
+				SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
+
+				zbx_json_free(&json);
+
+				ret = SUCCEED;
+			}
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
 
-		odbc_DBclose(&dbh);
+		zbx_free(column_names);
 	}
-	while(0);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 
+	odbc_DBclose(&dbh);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -156,6 +144,7 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*__function_name = "db_odbc_select";
+
 	int		ret = NOTSUPPORTED;
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
@@ -168,38 +157,39 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 		goto out;
 	}
 
-	if (SUCCEED == odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
+	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
 	{
-		if (NULL != odbc_DBselect(&dbh, item->params))
-		{
-			if (NULL != (row = odbc_DBfetch(&dbh)))
-			{
-				if (NULL == row[0])
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
-				}
-				else if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
-				{
-					ret = SUCCEED;
-				}
-			}
-			else
-			{
-				const char	*last_error = get_last_odbc_strerror();
+		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		goto out;
+	}
 
-				if ('\0' != *last_error)
-					SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
-				else
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
+	if (NULL != odbc_DBselect(&dbh, item->params))
+	{
+		if (NULL != (row = odbc_DBfetch(&dbh)))
+		{
+			if (NULL == row[0])
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
+			}
+			else if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
+			{
+				ret = SUCCEED;
 			}
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		{
+			const char	*last_error = get_last_odbc_strerror();
 
-		odbc_DBclose(&dbh);
+			if ('\0' != *last_error)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
+		}
 	}
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+
+	odbc_DBclose(&dbh);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -219,14 +209,11 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_db";
-	ZBX_ODBC_DBH	dbh;
-	ZBX_ODBC_ROW	row;
+
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
 
