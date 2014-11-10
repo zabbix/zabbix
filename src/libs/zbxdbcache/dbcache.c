@@ -2198,7 +2198,7 @@ static void	DCvacuum_text()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text_free:%d/%d",
 			__function_name, cache->text_free, CONFIG_TEXT_CACHE_SIZE);
 
-	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= cache->text_free)
+	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= (unsigned int)cache->text_free)
 		goto exit;
 
 	cache->last_text = cache->text;
@@ -3078,3 +3078,4 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	return nextid;
 }
+
