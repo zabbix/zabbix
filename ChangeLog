@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+...G...... [ZBXNEXT-2006] added {#FSDRIVETYPE} macro to vfs.fs.discovery on Windows (asaveljevs)
 .......PS. [ZBXNEXT-207] added a runtime control option to force execution of housekeeper (igors, wiper)
 ........S. [ZBXNEXT-1799] added support of low-level discovery macros in the "IPMI sensor" field (Sasha)
 ........S. [ZBXNEXT-2079] added support of low-level discovery macros in the "Units" field (Sasha)
