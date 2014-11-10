@@ -91,7 +91,7 @@ $graph->setSTime($timeline['stime']);
 if (getRequest('batch')) {
 	// set a default header
 	if (count($hostNames) == 1) {
-		$graph->setHeader($hostNames[0].NAME_DELIMITER . _('Item values'));
+		$graph->setHeader($hostNames[0].NAME_DELIMITER._('Item values'));
 	}
 	else {
 		$graph->setHeader(_('Item values'));

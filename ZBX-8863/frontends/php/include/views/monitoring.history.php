@@ -31,8 +31,8 @@ $headerPlaintext = array();
 
 $hostNames = array();
 foreach ($this->data['items'] as $itemData) {
-	if (!in_array($itemData['hosts'][0]['name'], $hostNames)) {
-		$hostNames[] = $itemData['hosts'][0]['name'];
+	if (!array_key_exists($itemData['hosts'][0]['name'], $hostNames)) {
+		$hostNames[$itemData['hosts'][0]['name']] = $itemData['hosts'][0]['name'];
 	}
 }
 
