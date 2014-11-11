@@ -285,6 +285,10 @@ class CMenuPopupHelper {
 		);
 
 		if ($scripts) {
+			foreach ($scripts as &$script) {
+				$script['name'] = implode('/', splitPath($script['name'], false));
+			}
+			unset($script);
 			CArrayHelper::sort($scripts, array('name'));
 
 			$data['hostid'] = $hostId;
