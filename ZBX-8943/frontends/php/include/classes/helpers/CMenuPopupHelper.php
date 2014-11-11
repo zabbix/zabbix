@@ -241,9 +241,10 @@ class CMenuPopupHelper {
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
-				$script['name'] = trim(preg_replace('/([^\\\\])\\\\{1}([^\/\\\\])/', '$1$2', $script['name']), '\\');
+				$script['name'] = implode('/', splitPath($script['name'], false));
 			}
 			unset($script);
+
 			CArrayHelper::sort($scripts, array('name'));
 
 			foreach (array_values($scripts) as $script) {
