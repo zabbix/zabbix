@@ -153,6 +153,8 @@ jQuery(function($) {
 
 	createPlaceholders();
 
+	$('form').enterSubmit('input[type=submit].main');
+
 	// redirect buttons
 	$('button[data-url]').click(function() {
 		var button = $(this);
