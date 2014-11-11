@@ -298,9 +298,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -532,7 +532,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
@@ -982,9 +982,9 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			subject_dyn = zbx_strdup(NULL, action->shortdata);
 			message_dyn = zbx_strdup(NULL, action->longdata);
 
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
 					&subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
 					&message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
 
 			escalation->esc_step = 0;

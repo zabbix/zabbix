@@ -1515,8 +1515,8 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 
 		lld_remove_lost_resources(&items, lifetime, lastcheck);
 
-		zbx_vector_ptr_clean(&items, (zbx_mem_free_func_t)lld_item_free);
-		del_itemappids.values_num = 0;
+		zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)lld_item_free);
+		zbx_vector_uint64_clear(&del_itemappids);
 	}
 	DBfree_result(result);
 
