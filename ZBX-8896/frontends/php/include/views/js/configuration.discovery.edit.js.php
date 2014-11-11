@@ -72,7 +72,7 @@
 				<tr id="newCheckAuthProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
-						<div class="jqueryinputset">
+						<div class="jqueryinputset radioset">
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_0" type="radio" checked="checked"
 								value="<?php echo ITEM_AUTHPROTOCOL_MD5; ?>" />
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_1" type="radio"
@@ -89,7 +89,7 @@
 				<tr id="newCheckPrivProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
-						<div class="jqueryinputset">
+						<div class="jqueryinputset radioset">
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_0" type="radio" checked="checked"
 								value="<?php echo ITEM_PRIVPROTOCOL_DES; ?>" />
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_1" type="radio"
