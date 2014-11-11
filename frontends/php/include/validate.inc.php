@@ -386,6 +386,19 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$message = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption);
 		}
 	}
+	elseif ($type == T_ZBX_JSON) {
+		if (!is_string($var)) {
+			$error = true;
+			$message = _s('Field "%1$s" is not a JSON-encoded array.', $caption);
+		}
+		else {
+			$var = CJs::decodeJson($var);
+			if (!is_array($var)) {
+				$error = true;
+				$message = _s('Field "%1$s" is not a JSON-encoded array.', $caption);
+			}
+		}
+	}
 
 	if ($error) {
 		if ($flags & P_SYS) {
@@ -420,7 +433,7 @@ function check_field(&$fields, &$field, $checks) {
 	}
 	list($type, $opt, $flags, $validation, $exception, $caption) = $checks;
 
-	if ($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field] == '') {
+	if ($flags & P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field] == '') {
 		unset_request($field);
 	}
 

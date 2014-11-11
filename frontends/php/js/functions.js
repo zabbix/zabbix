@@ -297,44 +297,44 @@ function getNextColor(paletteType) {
 }
 
 /**
- * Used for php ctweenbox object.
- * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
- * Moving perserves alphabetical order.
+ * Used by CTweenBox class.
+ * Moves item from 'source' multiselect to 'target' multiselect. Sets values of items in left multiselect as JSON
+ * array to input named variableName in form named formName.
  *
- * @formname string	form name where hidden fields will be added
- * @objname string	unique name for hidden field naming
- * @from string		from select id
- * @to string		to select id
- * @action string	action to perform with hidden field
+ * Moving preserves alphabetical order.
  *
- * @return true
+ * @formName string     form name where values input exists
+ * @variableName string input name for left multiselect option values
+ * @source string       source multiselect ID
+ * @target string       target multiselect ID
+ * @action string       action to perform with hidden field ("add" or "rmv")
  */
-function moveListBoxSelectedItem(formname, objname, from, to, action) {
-	to = jQuery('#' + to);
+function moveListBoxSelectedItem(formName, variableName, source, target, action) {
+	target = jQuery('#' + target);
+	source = jQuery('#' + source);
 
-	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
-		var notApp = true;
-		to.find('option').each(function(j, toel) {
-			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
-				jQuery(toel).before(fromel);
-				notApp = false;
+	source.find('option:selected').each(function(i, selectedElement) {
+		var notAppended = true;
+		target.find('option').each(function (j, elementInTarget) {
+			if (elementInTarget.innerHTML.toLowerCase() > selectedElement.innerHTML.toLowerCase()) {
+				jQuery(elementInTarget).before(selectedElement);
+				notAppended = false;
 				return false;
 			}
 		});
-		if (notApp) {
-			to.append(fromel);
-		}
-		fromel = jQuery(fromel);
-		if (action.toLowerCase() == 'add') {
-			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
-				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' type='hidden'>");
-		}
-		else if (action.toLowerCase() == 'rmv') {
-			jQuery('#' + objname + '_' + fromel.val()).remove();
+		if (notAppended) {
+			target.append(selectedElement);
 		}
 	});
 
-	return true;
+	var valuesSource = (action == 'add') ? target : source;
+	var currentValues = [];
+	jQuery('option', valuesSource).each(function(key, value) {
+		currentValues.push(jQuery(value).val());
+	});
+
+	// JSONize and store current values to input element.
+	jQuery('form[name="' + formName + '"]').find('input[name="' + variableName + '"]').val(JsonParser.stringify(currentValues));
 }
 
 /**
