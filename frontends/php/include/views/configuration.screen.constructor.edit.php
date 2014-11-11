@@ -641,7 +641,7 @@ if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TR
 		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
 		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
 	);
-	$screenFormList->addRow(_('Style'), new CDiv($styleRadioButton, 'jqueryinputset'));
+	$screenFormList->addRow(_('Style'), new CDiv($styleRadioButton, 'jqueryinputset radioset'));
 }
 elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
 	$styleRadioButton = array(
@@ -650,7 +650,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 		new CRadioButton('style', STYLE_TOP, null, 'style_'.STYLE_TOP, $style == STYLE_TOP),
 		new CLabel(_('Top'), 'style_'.STYLE_TOP)
 	);
-	$screenFormList->addRow(_('Hosts location'), new CDiv($styleRadioButton, 'jqueryinputset'));
+	$screenFormList->addRow(_('Hosts location'), new CDiv($styleRadioButton, 'jqueryinputset radioset'));
 }
 else {
 	$screenFormList->addVar('style', 0);
@@ -698,7 +698,7 @@ if (in_array($resourceType, $resourcesWithHAlign)) {
 		new CRadioButton('halign', HALIGN_RIGHT, null, 'halign_'.HALIGN_RIGHT, $halign == HALIGN_RIGHT),
 		new CLabel(_('Right'), 'halign_'.HALIGN_RIGHT)
 	);
-	$screenFormList->addRow(_('Horizontal align'), new CDiv($hAlignRadioButton, 'jqueryinputset'));
+	$screenFormList->addRow(_('Horizontal align'), new CDiv($hAlignRadioButton, 'jqueryinputset radioset'));
 }
 else {
 	$screenFormList->addVar('halign', 0);
@@ -713,7 +713,7 @@ $vAlignRadioButton = array(
 	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
 );
 $screenFormList->addRow(
-	_('Vertical align'), new CDiv($vAlignRadioButton, 'jqueryinputset'), false, null, 'nowrap'
+	_('Vertical align'), new CDiv($vAlignRadioButton, 'jqueryinputset radioset'), false, null, 'nowrap'
 );
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
