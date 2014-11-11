@@ -141,7 +141,7 @@ $authProtocol = new CDiv(
 		new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
 		new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 	),
-	'jqueryinputset',
+	'jqueryinputset radioset',
 	'authprotocol_div'
 );
 $itemFormList->addRow(
@@ -171,7 +171,7 @@ $privProtocol = new CDiv(
 		new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
 		new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 	),
-	'jqueryinputset',
+	'jqueryinputset radioset',
 	'privprotocol_div'
 );
 $itemFormList->addRow(

@@ -312,7 +312,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 // clearing the float
 $clearFixDiv = new CDiv();

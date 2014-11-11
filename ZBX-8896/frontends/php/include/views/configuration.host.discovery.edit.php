@@ -130,7 +130,7 @@ $authProtocolRadioButton = array(
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 );
 $itemFormList->addRow(_('Authentication protocol'),
-	new CDiv($authProtocolRadioButton, 'jqueryinputset'),
+	new CDiv($authProtocolRadioButton, 'jqueryinputset radioset'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -144,7 +144,7 @@ $privProtocolRadioButton = array(
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 );
 $itemFormList->addRow(_('Privacy protocol'),
-	new CDiv($privProtocolRadioButton, 'jqueryinputset'),
+	new CDiv($privProtocolRadioButton, 'jqueryinputset radioset'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),

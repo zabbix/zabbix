@@ -175,6 +175,7 @@ textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
 .radio { margin: 2px 2px 2px 0; vertical-align: top; }
+.radioset .ui-button { height: 18px; }
 .checkbox { padding: 0; border: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
 .formrow .listInfoText { margin-left: 1%; }
