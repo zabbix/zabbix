@@ -316,7 +316,6 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 
 	if (-1 == (res = select(0, NULL, &fdw, &fde, ptv)))
 	{
-
 		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
@@ -324,12 +323,10 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 	if (0 == FD_ISSET(s->socket, &fdw))
 	{
 		if (0 != FD_ISSET(s->socket, &fde))
-		{
 			*error = zbx_strdup(*error, "Connection refused.");
-			return FAIL;
-		}
+		else
+			*error = zbx_strdup(*error, "A connection timeout occured.");
 
-		*error = zbx_strdup(*error, "A connection timeout occured.");
 		return FAIL;
 	}
 
@@ -514,10 +511,10 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_TCP_HEADER_DATA		"ZBXD"
-#define ZBX_TCP_HEADER_VERSION		"\1"
-#define ZBX_TCP_HEADER			ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
-#define ZBX_TCP_HEADER_LEN		5
+#define ZBX_TCP_HEADER_DATA	"ZBXD"
+#define ZBX_TCP_HEADER_VERSION	"\1"
+#define ZBX_TCP_HEADER		ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
+#define ZBX_TCP_HEADER_LEN	5
 
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
