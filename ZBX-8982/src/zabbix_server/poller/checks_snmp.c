@@ -620,6 +620,16 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	return ret;
 }
 
+static void	zbx_snmp_dump_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len)
+{
+	size_t	i, offset = 0;
+
+	*buffer = '\0';
+
+	for (i = 0; i < objid_len; i++)
+		offset += zbx_snprintf(buffer + offset, buffer_len - offset, ".%lu", (unsigned long)objid[i]);
+}
+
 #define ZBX_OID_INDEX_STRING	0
 #define ZBX_OID_INDEX_NUMERIC	1
 
@@ -1093,20 +1103,34 @@ retry:
 
 			j = mapping[i];
 
-			if (1 != mapping_num && (parsed_oid_lens[j] != var->name_length ||
-					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid))))
+			if (parsed_oid_lens[j] != var->name_length ||
+					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
 			{
-				/* Validation of response OID matching the request is only done for bulk requests. */
-				/* Otherwise, there would be no way to monitor devices that are very non-conformant. */
+				char	sent_oid[ITEM_SNMP_OID_LEN_MAX], received_oid[ITEM_SNMP_OID_LEN_MAX];
 
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
-						" variable bindings that do not match the request", items[0].host.host);
+				zbx_snmp_dump_oid(sent_oid, sizeof(sent_oid), parsed_oids[j], parsed_oid_lens[j]);
+				zbx_snmp_dump_oid(received_oid, sizeof(received_oid), var->name, var->name_length);
 
-				zbx_strlcpy(error, "Invalid SNMP response: variable bindings do not match the request.",
-						max_error_len);
+				if (1 != mapping_num)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+							" variable bindings that do not match the request:"
+							" sent \"%s\", received \"%s\"",
+							items[0].host.host, sent_oid, received_oid);
 
-				ret = NOTSUPPORTED;
-				break;
+					zbx_strlcpy(error, "Invalid SNMP response: variable bindings do not match the"
+							" request.", max_error_len);
+
+					ret = NOTSUPPORTED;
+					break;
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "SNMP response from host \"%s\" contains"
+							" variable bindings that do not match the request:"
+							" sent \"%s\", received \"%s\"",
+							items[0].host.host, sent_oid, received_oid);
+				}
 			}
 
 			/* process received data */
@@ -1147,10 +1171,9 @@ retry:
 		if (0 > i || i >= mapping_num)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
-					" an out of bounds error index", items[0].host.host);
+					" an out of bounds error index: %ld", items[0].host.host, response->errindex);
 
-			zbx_snprintf(error, max_error_len, "Invalid SNMP response: error index out of bounds (%ld).",
-					response->errindex);
+			zbx_strlcpy(error, "Invalid SNMP response: error index out of bounds.", max_error_len);
 
 			ret = NOTSUPPORTED;
 			goto exit;
