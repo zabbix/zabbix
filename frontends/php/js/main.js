@@ -1094,3 +1094,49 @@ jQuery(function ($) {
 		return this;
 	};
 });
+
+(function($) {
+	/**
+	 * Attaches "onchange" listener that updates value of specified input with JSON value of changed element. The target
+	 * input can be set directly or resolved from selector string.
+	 *
+	 * Supported options:
+	 * - targetSelector		- specify a selector string that resolves to element to store JSON into
+	 * - target				- specify which element to use to store JSON into
+	 *
+	 * @param options
+	 */
+	$.fn.setJsonOnChange = function (options) {
+		options = $.extend({}, options);
+
+		if (options.targetSelector != null) {
+			options.target = $(options.targetSelector);
+		}
+
+		if (options.target == null) {
+			return;
+		}
+
+		$(this).on('change', function() {
+			options.target.val(JsonParser.stringify($(this).val()));
+		});
+
+		return this;
+	}
+})(jQuery);
+
+/**
+ * This module is used to ensure correct functions are invoked because Prototype clobbers "stringify" on window.JSON object.
+ * Dependency on Prototype will be removed in future.
+ */
+var JsonParser = (function() {
+	return {
+		stringify: function(object) {
+			return Object.toJSON(object)
+		},
+
+		parse: function(jsonString) {
+			return JSON.parse(jsonString);
+		}
+	};
+})();
