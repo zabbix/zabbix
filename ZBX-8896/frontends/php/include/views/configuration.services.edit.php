@@ -284,22 +284,17 @@ $servicesForm->addItem($servicesTab);
 
 // append buttons to form
 if ($service['serviceid']) {
-	if ($service['dependencies']) {
-		$btnDelete = null;
-	}
-	else {
-		$btnDelete = new CButtonDelete(
+	$buttons = array(new CButtonCancel());
+	if (!$service['dependencies']) {
+		array_unshift($buttons, new CButtonDelete(
 			'Delete selected service?',
 			url_param('form').url_param('serviceid').'&saction=1'
-		);
+		));
 	}
 
 	$servicesForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
-		array (
-			$btnDelete,
-			new CButtonCancel()
-		)
+		$buttons
 	));
 }
 else {
