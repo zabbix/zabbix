@@ -96,6 +96,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
+	zbx_timespec_t	ts;
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -116,7 +117,9 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+		zbx_timespec(&ts);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, ts.ns);
 
 		if (SUCCEED != (ret = put_data_to_server(&sock, j, &error)))
 		{

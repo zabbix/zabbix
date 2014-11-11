@@ -17,19 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
+#ifndef ZABBIX_MACROCACHE_H
+#define ZABBIX_MACROCACHE_H
 
+#include "zbxtypes.h"
 #include "zbxalgo.h"
-#include "vectorimpl.h"
 
-ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
-ZBX_PTR_VECTOR_IMPL(str, char *);
-ZBX_PTR_VECTOR_IMPL(ptr, void *);
-ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t);
-ZBX_VECTOR_IMPL(uint64_pair, zbx_uint64_pair_t);
-
-void	zbx_ptr_free(void *data)
+/* user macro cache object */
+typedef struct
 {
-	zbx_free(data);
+	/* the object id, for example trigger id */
+	zbx_uint64_t		objectid;
+	/* the macro source hosts */
+	zbx_vector_uint64_t	hostids;
+	/* the macro:value pairs */
+	zbx_vector_ptr_pair_t	macros;
 }
+zbx_umc_object_t;
+
+#endif
