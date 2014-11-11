@@ -21,12 +21,12 @@
 
 include('include/views/js/administration.users.edit.js.php');
 
-$userWidget = new CWidget();
-
 if ($this->data['is_profile']) {
+	$userWidget = new CWidget(null, 'profile');
 	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
+	$userWidget = new CWidget();
 	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
 }
 
@@ -230,7 +230,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 if ($this->data['is_profile']) {
 	$zbxSounds = getSounds();
 
-	$userMessagingFormList = new CFormList('userMessagingFormList');
+	$userMessagingFormList = new CFormList();
 	$userMessagingFormList->addRow(_('Frontend messaging'), new CCheckBox('messages[enabled]', $this->data['messages']['enabled'], null, 1));
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
@@ -288,45 +288,6 @@ if ($this->data['is_profile']) {
 	}
 
 	$userMessagingFormList->addRow(_('Trigger severity'), $triggersTable, false, 'triggers_row');
-
-	zbx_add_post_js("
-		jQuery('#messages_enabled').bind('click', function() {
-			if (this.checked
-					&& !jQuery(\"input[id='messages_triggers.recovery']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_0']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_1']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_2']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_3']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_4']\").is(':checked')
-					&& !jQuery(\"input[id='messages_triggers.severities_5']\").is(':checked')) {
-				jQuery(\"input[id='messages_triggers.recovery']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_0']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_1']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_2']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_3']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_4']\").attr('checked', true);
-				jQuery(\"input[id='messages_triggers.severities_5']\").attr('checked', true);
-			}
-
-			// enable/disable childs fields
-			if (this.checked) {
-				jQuery('#messagingTab input, #messagingTab select').removeAttr('disabled');
-			}
-			else {
-				jQuery('#messagingTab input, #messagingTab select').attr('disabled', 'disabled');
-				jQuery('#messages_enabled').removeAttr('disabled');
-			}
-		});
-
-		// initial state: enable/disable childs fields
-		if (jQuery('#messages_enabled').is(':checked')) {
-			jQuery('#messagingTab input, #messagingTab select').removeAttr('disabled');
-		}
-		else {
-			jQuery('#messagingTab input, #messagingTab select').attr('disabled', 'disabled');
-			jQuery('#messages_enabled').removeAttr('disabled');
-		}"
-	);
 }
 
 // append form lists to tab
