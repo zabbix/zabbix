@@ -3865,7 +3865,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		tr = (DC_TRIGGER *)triggers->values[i];
 
 		tr->expression = zbx_strdup(NULL, tr->expression_orig);
-		zbx_remove_whitespace(tr->expression);
 
 		/* add trigger macros to user macro cache */
 		zbx_umc_add_expression(&macro_cache, tr->triggerid, tr->expression);
