@@ -16,7 +16,7 @@
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" maxlength="64" value="#{iface.dns}" />
 	</td>
 	<td class="interface-connect-to">
-		<div class="jqueryinputset">
+		<div class="jqueryinputset radioset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
 			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
 			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label><label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
