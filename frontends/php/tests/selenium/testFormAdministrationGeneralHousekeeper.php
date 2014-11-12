@@ -296,7 +296,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');
-			$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons']/div/div/button[1]");
+			$this->zbxTestClick("//button[@type='button']/span[text()='Reset defaults']");
 		}
 		else {
 			// events and alerts

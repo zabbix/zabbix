@@ -614,47 +614,41 @@ class CXmlImport18 {
 		}
 
 		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])) {
-			$images = $importMaps['zabbix_export']['images'];
-			$images_to_add = array();
-			$images_to_update = array();
-			foreach ($images as $image) {
-				$dbImage = API::Image()->get(array(
-					'output' => array('imageid'),
-					'filter' => array('name' => $image['name']),
-					'limit' => 1
-				));
+			$allImages = $importMaps['zabbix_export']['images'];
 
-				if ($dbImage && $rules['images']['updateExisting']) {
-					$dbImage = reset($dbImage);
-					$image['imageid'] = $dbImage['imageid'];
+			$allImages = zbx_toHash($allImages, 'name');
 
-					// image will be decoded in class.image.php
+			$dbImages = API::Image()->get(array(
+				'output' => array('imageid', 'name'),
+				'filter' => array('name' => zbx_objectValues($allImages, 'name')),
+			));
+			$dbImages = zbx_toHash($dbImages, 'name');
+
+			$imagesToCreate = array();
+			$imagesToUpdate = array();
+
+			foreach ($allImages as $imageName => $image) {
+				if (isset($dbImages[$imageName])) {
+					$image['imageid'] = $dbImages[$imageName]['imageid'];
 					$image['image'] = $image['encodedImage'];
-					unset($image['encodedImage']);
 
-					$images_to_update[] = $image;
+					unset($image['encodedImage'], $image['imagetype']);
+					$imagesToUpdate[] = $image;
 				}
-				elseif (!$dbImage && $rules['images']['createMissing']) {
-					// No need to decode_base64
+				else {
 					$image['image'] = $image['encodedImage'];
 
 					unset($image['encodedImage']);
-					$images_to_add[] = $image;
+					$imagesToCreate[] = $image;
 				}
 			}
 
-			if (!empty($images_to_add)) {
-				$result = API::Image()->create($images_to_add);
-				if (!$result) {
-					throw new Exception(_('Cannot add image.'));
-				}
+			if ($rules['images']['createMissing'] && $imagesToCreate) {
+				API::Image()->create($imagesToCreate);
 			}
 
-			if (!empty($images_to_update)) {
-				$result = API::Image()->update($images_to_update);
-				if (!$result) {
-					throw new Exception(_('Cannot update image.'));
-				}
+			if ($rules['images']['updateExisting'] && $imagesToUpdate) {
+				API::Image()->update($imagesToUpdate);
 			}
 		}
 
@@ -817,18 +811,35 @@ class CXmlImport18 {
 				}
 
 				foreach ($link['linktriggers'] as &$linktrigger) {
-					$db_triggers = API::Trigger()->get(array(
-						'filter' => array($linktrigger['triggerid']),
-						'output' => array('triggerid')
+					$triggerData = $linktrigger['triggerid'];
+
+					$dbTriggers = API::Trigger()->get(array(
+						'output' => array('triggerid', 'expression'),
+						'filter' => array('host' => $triggerData['host'], 'description' => $triggerData['description']),
+						'expandExpression' => true
 					));
-					if (empty($db_triggers)) {
-						$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
-								$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);
+
+					$error = _s('Cannot find trigger "%1$s" used in map "%2$s".',
+						$triggerData['host'].':'.$triggerData['description'], $sysmap['name']
+					);
+
+					if (!$dbTriggers) {
 						throw new Exception($error);
 					}
 
-					$tmp = reset($db_triggers);
-					$linktrigger['triggerid'] = $tmp['triggerid'];
+					$dbTriggerId = null;
+					foreach ($dbTriggers as $dbTrigger) {
+						if ($dbTrigger['expression'] === $triggerData['expression']) {
+							$dbTriggerId = $dbTrigger['triggerid'];
+							break;
+						}
+					}
+
+					if (!$dbTriggerId) {
+						throw new Exception($error);
+					}
+
+					$linktrigger['triggerid'] = $dbTriggerId;
 				}
 				unset($linktrigger);
 			}
@@ -1533,7 +1544,7 @@ class CXmlImport18 {
 						// we must know interface ids to assign them to items
 						$agent_interface_id = null;
 						$ipmi_interface_id = null;
-						$snmp_interfaces = array(); // hash 'port' => 'iterfaceid'
+						$snmp_interfaces = array(); // hash 'port' => 'interfaceid'
 
 						foreach ($interfaces as $interface) {
 							switch ($interface['type']) {

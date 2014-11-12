@@ -35,8 +35,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hosts' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groups' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'groupids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostids' =>							array(T_ZBX_JSON, O_OPT, P_SYS,	DB_ID,		null),
+	'groupids' =>							array(T_ZBX_JSON, O_OPT, P_SYS,	DB_ID,		null),
 	'groupid' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// maintenance
 	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
@@ -479,8 +479,8 @@ if (!empty($data['form'])) {
 
 	// get groups
 	$data['all_groups'] = API::HostGroup()->get(array(
-		'editable' => true,
 		'output' => array('groupid', 'name'),
+		'editable' => true,
 		'real_hosts' => true,
 		'preservekeys' => true
 	));
@@ -503,13 +503,12 @@ if (!empty($data['form'])) {
 	// selected hosts
 	$hostsSelected = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
+		'hostids' => $data['hostids'],
 		'real_hosts' => true,
-		'editable' => true,
-		'hostids' => $data['hostids']
+		'editable' => true
 	));
 	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
 	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
-	order_result($data['hosts'], 'name');
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);

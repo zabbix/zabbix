@@ -250,7 +250,7 @@ ZABBIX.apps.map = (function($) {
 						favobj: 'sysmap',
 						action: 'update',
 						sysmapid: this.sysmapid,
-						sysmap: Object.toJSON(this.data) // TODO: remove prototype method
+						sysmap: JsonParser.stringify(this.data)
 					},
 					error: function() {
 						throw new Error('Cannot update map.');
@@ -287,8 +287,8 @@ ZABBIX.apps.map = (function($) {
 						noselements: 1,
 						nolinks: 1,
 						nocalculations: 1,
-						selements: Object.toJSON(this.data.selements),
-						links: Object.toJSON(this.data.links),
+						selements: JsonParser.stringify(this.data.selements),
+						links: JsonParser.stringify(this.data.links),
 						base64image: (this.base64image ? 1 : 0)
 					},
 					success: $.proxy(function(data) {

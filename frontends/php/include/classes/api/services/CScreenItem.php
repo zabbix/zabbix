@@ -206,11 +206,33 @@ class CScreenItem extends CApiService {
 
 		$screenItems = zbx_toHash($screenItems, 'screenitemid');
 
-		$update = $screenItemIds = array();
+		$update = array();
+		$screenItemIds = array();
 
 		foreach ($screenItems as $screenItem) {
 			$screenItemId = $screenItem['screenitemid'];
 			unset($screenItem['screenitemid']);
+
+			// If screen item type (field "resourcetype") is set to one that does not use "resourceid" field,
+			// value of field "resourceid" is set to 0 for those resource types. Clock screen item type has
+			// more refined check.
+			if (isset($screenItem['resourcetype'])) {
+				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_CLOCK:
+						if (isset($screenItem['style']) && $screenItem['style'] != TIME_TYPE_HOST) {
+							$screenItem['resourceid'] = 0;
+						}
+						break;
+
+					case SCREEN_RESOURCE_ACTIONS:
+					case SCREEN_RESOURCE_HISTORY:
+					case SCREEN_RESOURCE_SERVER_INFO:
+					case SCREEN_RESOURCE_SYSTEM_STATUS:
+					case SCREEN_RESOURCE_URL:
+						$screenItem['resourceid'] = 0;
+						break;
+				}
+			}
 
 			$update[] = array(
 				'values' => $screenItem,
@@ -265,13 +287,16 @@ class CScreenItem extends CApiService {
 		}
 
 		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid'),
+			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
+				'style'),
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
 
-		$screenItems = $this->extendObjects($this->tableName(), $screenItems, array('screenid', 'x', 'y', 'rowspan', 'colspan'));
+		$screenItems = $this->extendObjects($this->tableName(), $screenItems,
+			array('screenid', 'x', 'y', 'rowspan', 'colspan', 'style')
+		);
 
 		$this->checkInput($screenItems, $dbScreenItems);
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
@@ -444,7 +469,15 @@ class CScreenItem extends CApiService {
 		$itemPrototypeIds = array();
 		$graphPrototypeIds = array();
 
-		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype', 'resourceid'));
+		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype'));
+
+		$validStyles = array(
+			SCREEN_RESOURCE_CLOCK => array(TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST),
+			SCREEN_RESOURCE_DATA_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
+			SCREEN_RESOURCE_HOSTS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL),
+			SCREEN_RESOURCE_TRIGGERS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL)
+		);
 
 		foreach ($screenItems as $screenItem) {
 			// check permissions
@@ -525,12 +558,17 @@ class CScreenItem extends CApiService {
 					break;
 
 				case SCREEN_RESOURCE_CLOCK:
-					if (isset($screenItem['style']) && $screenItem['style'] == TIME_TYPE_HOST) {
-						if (!$screenItem['resourceid']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
-						}
+					if (isset($screenItem['style'])) {
+						if ($screenItem['style'] == TIME_TYPE_HOST) {
+							if (!$screenItem['resourceid']) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
+							}
 
-						$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+						}
+						elseif ($screenItem['resourceid']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
+						}
 					}
 					break;
 
@@ -548,6 +586,15 @@ class CScreenItem extends CApiService {
 					}
 
 					$screenIds[$screenItem['resourceid']] = $screenItem['resourceid'];
+					break;
+
+				case SCREEN_RESOURCE_ACTIONS:
+				case SCREEN_RESOURCE_SERVER_INFO:
+				case SCREEN_RESOURCE_SYSTEM_STATUS:
+				case SCREEN_RESOURCE_URL:
+					if ($screenItem['resourceid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set resource ID for screen element.'));
+					}
 					break;
 			}
 
@@ -589,6 +636,11 @@ class CScreenItem extends CApiService {
 				if ($error) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect max columns provided for screen element.'));
 				}
+			}
+
+			if (isset($validStyles[$screenItem['resourcetype']])
+					&& !in_array($screenItem['style'], $validStyles[$screenItem['resourcetype']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect style provided for screen element.'));
 			}
 		}
 

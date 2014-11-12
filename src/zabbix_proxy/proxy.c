@@ -73,6 +73,7 @@ const char	*help_message[] = {
 	"",
 	"    Runtime control options:",
 	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "               Execute the housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
@@ -618,21 +619,6 @@ static void	zbx_load_config(void)
 	zbx_validate_config();
 }
 
-#ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(int flags)
-{
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-			break;
-		default:
-			break;
-	}
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_free_config                                                  *
@@ -677,35 +663,9 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
-				{
-					t.flags = ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_CONFIG_CACHE_RELOAD, 0, 0);
-				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
-							ZBX_RTC_LOG_LEVEL_INCREASE, &t.flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
-							ZBX_RTC_LOG_LEVEL_DECREASE, &t.flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					zbx_error("invalid runtime control option: %s", zbx_optarg);
+				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t.flags))
 					exit(EXIT_FAILURE);
-				}
+
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
@@ -774,7 +734,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
 #else
 #	define SNMP_FEATURE_STATUS 	" NO"
