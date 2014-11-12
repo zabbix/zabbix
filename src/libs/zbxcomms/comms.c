@@ -254,6 +254,100 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_socket_connect                                               *
+ *                                                                            *
+ * Purpose: connect to the specified address with an optional timeout value   *
+ *                                                                            *
+ * Parameters: s       - [IN] socket descriptor                               *
+ *             addr    - [IN] the address                                     *
+ *             addrlen - [IN] the length of addr structure                    *
+ *             timeout - [IN] the connection timeout (0 - system default)     *
+ *             error   - [OUT] the error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - connected successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Comments: Windows connect implementation uses internal timeouts which      *
+ *           cannot be changed. Because of that in Windows use nonblocking    *
+ *           connect, then wait for connection the specified timeout period   *
+ *           and if successful change socket back to blocking mode.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
+		char **error)
+{
+#if defined(_WINDOWS)
+	u_long		mode = 1;
+	FD_SET		fdw, fde;
+	int		res;
+	struct timeval	tv, *ptv;
+#endif
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+#if defined(_WINDOWS)
+	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
+	{
+		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+
+	FD_ZERO(&fdw);
+	FD_SET(s->socket, &fdw);
+
+	FD_ZERO(&fde);
+	FD_SET(s->socket, &fde);
+
+	if (0 != timeout)
+	{
+		tv.tv_sec = timeout;
+		tv.tv_usec = 0;
+		ptv = &tv;
+	}
+	else
+		ptv = NULL;
+
+	if (ZBX_TCP_ERROR == connect(s->socket, addr, addrlen) && WSAEWOULDBLOCK != zbx_sock_last_error())
+	{
+		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+
+	if (-1 == (res = select(0, NULL, &fdw, &fde, ptv)))
+	{
+		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+
+	if (0 == FD_ISSET(s->socket, &fdw))
+	{
+		if (0 != FD_ISSET(s->socket, &fde))
+			*error = zbx_strdup(*error, "Connection refused.");
+		else
+			*error = zbx_strdup(*error, "A connection timeout occured.");
+
+		return FAIL;
+	}
+
+	mode = 0;
+	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
+	{
+		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+#else
+	if (ZBX_TCP_ERROR == connect(s->socket, addr, addrlen))
+	{
+		*error = zbx_strdup(*error, strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tcp_connect                                                  *
  *                                                                            *
  * Purpose: connect to external host                                          *
@@ -272,7 +366,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
 	struct addrinfo	*ai_bind = NULL;
-	char		service[8];
+	char		service[8], *error = NULL;
 
 	ZBX_TCP_START();
 
@@ -320,13 +414,11 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
-
-	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
+	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, ai->ai_addrlen, timeout, &error))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
+		zbx_free(error);
 		goto out;
 	}
 
@@ -345,6 +437,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
+	char		*error = NULL;
 
 	ZBX_TCP_START();
 
@@ -393,13 +486,11 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		}
 	}
 
-	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
-
-	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in)))
+	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout, &error))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
+		zbx_free(error);
 		return FAIL;
 	}
 
@@ -420,10 +511,10 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_TCP_HEADER_DATA		"ZBXD"
-#define ZBX_TCP_HEADER_VERSION		"\1"
-#define ZBX_TCP_HEADER			ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
-#define ZBX_TCP_HEADER_LEN		5
+#define ZBX_TCP_HEADER_DATA	"ZBXD"
+#define ZBX_TCP_HEADER_VERSION	"\1"
+#define ZBX_TCP_HEADER		ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
+#define ZBX_TCP_HEADER_LEN	5
 
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
