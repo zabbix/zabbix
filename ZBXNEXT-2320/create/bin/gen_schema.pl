@@ -76,8 +76,10 @@ const ZBX_TABLE\ttables[] = {
 
 #if defined(HAVE_IBM_DB2)
 #	define ZBX_TYPE_LONGTEXT_LEN	2048
+#	define ZBX_TYPE_TEXT_LEN	2048
 #else
 #	define ZBX_TYPE_LONGTEXT_LEN	0
+#	define ZBX_TYPE_TEXT_LEN	65535
 #endif
 
 ";
@@ -305,7 +307,7 @@ sub process_field
 		}
 		elsif ($type eq "ZBX_TYPE_TEXT")
 		{
-			$length = 65535;
+			$length = "ZBX_TYPE_TEXT_LEN";
 		}
 		elsif ($type eq "ZBX_TYPE_SHORTTEXT")
 		{
