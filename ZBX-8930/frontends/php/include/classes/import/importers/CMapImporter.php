@@ -32,6 +32,7 @@ class CMapImporter extends CImporter {
 		$maps = zbx_toHash($maps, 'name');
 
 		$this->checkCircularMapReferences($maps);
+		$this->resolveMapImages($maps);
 
 		/**
 		 * Get all imported maps we want to import with removed elements and links
@@ -70,19 +71,20 @@ class CMapImporter extends CImporter {
 
 		// Form an array of maps that need to be updated with elements and links, respecting the create/update options
 		$mapsToUpdate = array();
-		foreach ($mapsToProcess as $mapActionKey => $mapActionArray) {
+		foreach ($mapsToProcess as $mapActionKey => $mapArray) {
 			if ($this->options['maps'][$mapActionKey] && $mapsToProcess[$mapActionKey]) {
 
-				foreach ($mapActionArray as $actionMapItem) {
-					if (array_key_exists($actionMapItem['name'], $maps)) {
-						$map = array(
-							'sysmapid' => $maps[$actionMapItem['name']]['sysmapid'],
-							'name' => $actionMapItem['name'],
-							'selements' => $maps[$actionMapItem['name']]['selements'],
-							'links' => $maps[$actionMapItem['name']]['links'],
-						);
-						$mapsToUpdate[] = $this->resolveMapReferences($map);
-					}
+				foreach ($mapArray as $mapItem) {
+					$map = array(
+						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
+						'name' => $mapItem['name'],
+						'selements' => $maps[$mapItem['name']]['selements'],
+						'links' => $maps[$mapItem['name']]['links']
+					);
+					$map = $this->resolveMapReferences($map);
+					// We remove the map name so API does not make an update query to the database
+					unset($map['name']);
+					$mapsToUpdate[] = $map;
 				}
 			}
 		}
@@ -191,25 +193,6 @@ class CMapImporter extends CImporter {
 	 * @return array
 	 */
 	protected function resolveMapReferences(array $map) {
-		// resolve icon map
-		if (!empty($map['iconmap'])) {
-			$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
-			if (!$map['iconmapid']) {
-				throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".', $map['iconmap']['name'], $map['name']));
-			}
-		}
-
-		if (!empty($map['background'])) {
-			$image = getImageByIdent($map['background']);
-
-			if (!$image) {
-				throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
-					$map['background']['name'], $map['name']
-				));
-			}
-			$map['backgroundid'] = $image['imageid'];
-		}
-
 		if (isset($map['selements'])) {
 			foreach ($map['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
@@ -302,5 +285,35 @@ class CMapImporter extends CImporter {
 		}
 
 		return $map;
+	}
+
+	/**
+	 * Resolves the iconmap and background images for the maps
+	 *
+	 * @param array $maps
+	 * @throws Exception
+	 */
+	protected function resolveMapImages(array &$maps)
+	{
+		foreach ($maps as &$map) {
+			if (!empty($map['iconmap'])) {
+				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+				if (!$map['iconmapid']) {
+					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".', $map['iconmap']['name'], $map['name']));
+				}
+			}
+
+			if (!empty($map['background'])) {
+				$image = getImageByIdent($map['background']);
+
+				if (!$image) {
+					throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
+						$map['background']['name'], $map['name']
+					));
+				}
+				$map['backgroundid'] = $image['imageid'];
+			}
+		}
+		unset($map);
 	}
 }
