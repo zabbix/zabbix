@@ -1004,102 +1004,6 @@ void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len)
 		}
 	}
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: ip6_in_list                                                      *
- *                                                                            *
- * Purpose: check if ip matches range of ip addresses                         *
- *                                                                            *
- * Parameters: list - [IN] comma-separated list of ip ranges                  *
- *                    12fc::2-55,::45,12fc::ff00/120                          *
- *             ip   - [IN] IPv6 ip address [12fc::2]                          *
- *                                                                            *
- * Return value: FAIL - out of range, SUCCEED - within the range              *
- *                                                                            *
- ******************************************************************************/
-static int	ip6_in_list(char *list, const char *ip)
-{
-	unsigned short	i[8], j[9], mask;
-	char		*start, *comma = NULL, *slash = NULL, *dash = NULL;
-	int		ret = FAIL;
-
-	if (FAIL == ip6_str2dig(ip, i))
-		return FAIL;
-
-	for (start = list; '\0' != *start;)
-	{
-		if (NULL != (comma = strchr(start, ',')))
-			*comma = '\0';
-
-		if (NULL != (dash = strchr(start, '-')))
-			*dash = '\0';
-		else if (NULL != (slash = strchr(start, '/')))
-			*slash = '\0';
-
-		if (FAIL == ip6_str2dig(start, j))
-			goto next;
-
-		if (i[0] != j[0] || i[1] != j[1] || i[2] != j[2] || i[3] != j[3] ||
-				i[4] != j[4] || i[5] != j[5] || i[6] != j[6])
-		{
-			goto next;
-		}
-
-		if (NULL != dash)
-		{
-			if (1 != sscanf(dash + 1, "%hx", &j[8]))
-				goto next;
-		}
-		else if (NULL != slash)
-		{
-			if (1 != sscanf(slash + 1, "%hu", &j[8]) || 112 > j[8] || j[8] > 128)
-				goto next;
-
-			mask = 0xffff << (128 - j[8]);
-			j[8] = j[7] | ~mask;
-			j[7] = j[7] & mask;
-		}
-		else
-			j[8] = j[7];
-
-		if (i[7] >= j[7] && i[7] <= j[8])
-		{
-			ret = SUCCEED;
-			break;
-		}
-next:
-		if (NULL != dash)
-		{
-			*dash = '-';
-			dash = NULL;
-		}
-		else if (NULL != slash)
-		{
-			*slash = '/';
-			slash = NULL;
-		}
-
-		if (comma != NULL)
-		{
-			*comma = ',';
-			start = comma + 1;
-			comma = NULL;
-		}
-		else
-			break;
-	}
-
-	if (dash != NULL)
-		*dash = '-';
-	else if (slash != NULL)
-		*slash = '/';
-
-	if (comma != NULL)
-		*comma = ',';
-
-	return ret;
-}
 #endif	/* HAVE_IPV6 */
 /******************************************************************************
  *                                                                            *
@@ -1130,102 +1034,6 @@ int	ip4_str2dig(const char *ip, unsigned int *ip_dig)
 
 /******************************************************************************
  *                                                                            *
- * Function: ip4_in_list                                                      *
- *                                                                            *
- * Purpose: check if ip matches range of ip addresses                         *
- *                                                                            *
- * Parameters: list - [IN] comma-separated list of ip ranges                  *
- *                    192.168.0.1-64,192.168.0.128,10.10.0.0/24               *
- *             ip   - [IN] IPv4 ip address [192.168.0.1]                      *
- *                                                                            *
- * Return value: FAIL - out of range, SUCCEED - within the range              *
- *                                                                            *
- ******************************************************************************/
-static int	ip4_in_list(char *list, const char *ip)
-{
-	unsigned short	i;
-	unsigned int	mask, ip_dig[2], first, last;
-	char		*start = NULL, *comma = NULL, *slash = NULL, *dash = NULL;
-	int		ret = FAIL;
-
-	if (SUCCEED != ip4_str2dig(ip, &ip_dig[0]))
-		return FAIL;
-
-	for (start = list; '\0' != *start;)
-	{
-		if (NULL != (comma = strchr(start, ',')))
-			*comma = '\0';
-
-		if (NULL != (dash = strchr(start, '-')))
-			*dash = '\0';
-		else if (NULL != (slash = strchr(start, '/')))
-			*slash = '\0';
-
-		if (SUCCEED != ip4_str2dig(start, &ip_dig[1]))
-			goto next;
-
-		if (NULL != dash)
-		{
-			if (1 != sscanf(dash + 1, "%hu", &i) || 255 < i)
-				goto next;
-
-			first = ip_dig[1];
-			last = (ip_dig[1] & 0xffffff00) + i;
-		}
-		else if (NULL != slash)
-		{
-			if (1 != sscanf(slash + 1, "%hu", &i) || 16 > i || i > 30)
-				goto next;
-
-			mask = 0xffffffff << (32 - i);
-			first = (ip_dig[1] & mask) + 1;
-			last = (ip_dig[1] | ~mask) - 1;
-		}
-		else
-		{
-			first = ip_dig[1];
-			last = ip_dig[1];
-		}
-
-		if (first <= ip_dig[0] && ip_dig[0] <= last)
-		{
-			ret = SUCCEED;
-			break;
-		}
-next:
-		if (NULL != dash)
-		{
-			*dash = '-';
-			dash = NULL;
-		}
-		else if (NULL != slash)
-		{
-			*slash = '/';
-			slash = NULL;
-		}
-
-		if (NULL != comma)
-		{
-			*comma = ',';
-			start = comma + 1;
-			comma = NULL;
-		}
-		else
-			break;
-	}
-
-	if (NULL != dash)
-		*dash = '-';
-	else if (NULL != slash)
-		*slash = '/';
-
-	if (NULL != comma)
-		*comma = ',';
-
-	return ret;
-}
-/******************************************************************************
- *                                                                            *
  * Function: ip_in_list                                                       *
  *                                                                            *
  * Purpose: check if ip matches range of ip addresses                         *
@@ -1237,19 +1045,55 @@ next:
  * Return value: FAIL - out of range, SUCCEED - within the range              *
  *                                                                            *
  ******************************************************************************/
-int	ip_in_list(char *list, const char *ip)
+int	ip_in_list(const char *list, const char *ip)
 {
 	const char	*__function_name = "ip_in_list";
+	zbx_range_t	iprange[8];
+	int		ipaddress[8], iptype;
+	char		*address = NULL;
+	size_t		address_alloc = 0, address_offset = 0;
+	const char	*ptr;
+
 
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __function_name, list, ip);
 
-	ret = ip4_in_list(list, ip);
-#if defined(HAVE_IPV6)
-	if (SUCCEED != ret)
-		ret = ip6_in_list(list, ip);
+	if (SUCCEED != iprange_parse(ip, iprange, &iptype))
+		goto out;
+
+#ifndef HAVE_IPV6
+	if (ZBX_IPRANGE_V6 == iptype)
+		goto out;
 #endif
+
+	iprange_first(iprange, iptype, ipaddress);
+
+	for (ptr = list; '\0' != *ptr; list = ptr + 1)
+	{
+		if (NULL == (ptr = strchr(list, ',')))
+			ptr = list + strlen(list);
+
+		address_offset = 0;
+		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, ptr - list);
+
+		if (SUCCEED != iprange_parse(address, iprange, &iptype))
+			continue;
+
+#ifndef HAVE_IPV6
+		if (ZBX_IPRANGE_V6 == iptype)
+			continue;
+#endif
+
+		if (SUCCEED == iprange_validate(iprange, iptype, ipaddress))
+		{
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	zbx_free(address);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1601,6 +1445,70 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 			return FAIL;	/* maximum value exceeded */
 
 		value_uint64 = value_uint64 * 10 + c;
+
+		str++;
+	}
+	if (min > value_uint64 || value_uint64 > max)
+		return FAIL;
+
+	if (NULL != value)
+	{
+		/* On little endian architecture the output value will be stored starting from the first bytes */
+		/* of 'value' buffer while on big endian architecture it will be stored starting from the last */
+		/* bytes. We handle it by storing the offset in the most significant byte of short value and   */
+		/* then use the first byte as source offset.                                                   */
+		unsigned short	value_offset = (unsigned short)((sizeof(zbx_uint64_t) - size) << 8);
+
+		memcpy(value, (unsigned char *)&value_uint64 + *((unsigned char *)&value_offset), size);
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_hex_n_range                                                   *
+ *                                                                            *
+ * Purpose: check if the string is unsigned hexadecimal integer within the    *
+ *          specified range and optionally store it into value parameter      *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             value - [OUT] a pointer to output buffer where the converted   *
+ *                     value is to be written (optional, can be NULL)         *
+ *             size  - [IN] size of the output buffer (optional)              *
+ *             min   - [IN] the minimum acceptable value                      *
+ *             max   - [IN] the maximum acceptable value                      *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - the string is not a hexadecimal number or its value  *
+ *                       is outside the specified range                       *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
+{
+	zbx_uint64_t		value_uint64 = 0, c;
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	int			len = 0;
+
+	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
+		return FAIL;
+
+	while ('\0' != *str && 0 < n--)
+	{
+		if ('0' <= *str && *str <= '9')
+			c = (zbx_uint64_t)(unsigned char)(*str - '0');
+		else if ('a' <= *str && *str <= 'f')
+			c = 10 + (zbx_uint64_t)(unsigned char)(*str - 'a');
+		else if ('A' <= *str && *str <= 'F')
+			c = 10 + (zbx_uint64_t)(unsigned char)(*str - 'A');
+		else
+			return FAIL;	/* not a hexadecimal digit */
+
+		if (20 <= ++len && ((max_uint64 - c) >> 4) < value_uint64)
+			return FAIL;	/* maximum value exceeded */
+
+		value_uint64 = (value_uint64 << 4) + c;
 
 		str++;
 	}
