@@ -1081,6 +1081,9 @@ retry:
 					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
 							" too many variable bindings", items[0].host.host);
 
+					if (1 != mapping_num)	/* give device a chance to handle a smaller request */
+						goto halve;
+
 					zbx_strlcpy(error, "Invalid SNMP response: too many variable bindings.",
 							max_error_len);
 
@@ -1094,6 +1097,9 @@ retry:
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
 						" too few variable bindings", items[0].host.host);
+
+				if (1 != mapping_num)	/* give device a chance to handle a smaller request */
+					goto halve;
 
 				zbx_strlcpy(error, "Invalid SNMP response: too few variable bindings.", max_error_len);
 
@@ -1118,11 +1124,7 @@ retry:
 							" sent \"%s\", received \"%s\"",
 							items[0].host.host, sent_oid, received_oid);
 
-					zbx_strlcpy(error, "Invalid SNMP response: variable bindings do not match the"
-							" request.", max_error_len);
-
-					ret = NOTSUPPORTED;
-					break;
+					goto halve;	/* give device a chance to handle a smaller request */
 				}
 				else
 				{
@@ -1223,7 +1225,7 @@ retry:
 		/* if querying with half the number of the last values does not work either, we resort to querying */
 		/* values one by one, and the next time configuration cache gives us items to query, it will give  */
 		/* us less. */
-
+halve:
 		if (*min_fail > mapping_num)
 			*min_fail = mapping_num;
 
