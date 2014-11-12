@@ -81,11 +81,11 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS.')
 				),
 				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
 				),
 				array(
@@ -133,8 +133,8 @@ class CHelpItems {
 					'description' => _('Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.')
 				),
 				array(
-					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>]',
-					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root].')
+					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
+					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root].')
 				),
 				array(
 					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',
@@ -343,11 +343,11 @@ class CHelpItems {
 					'description' => _('Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression')
 				),
 				array(
-					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
 				),
 				array(
-					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>]',
+					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
 				),
 				array(
@@ -395,8 +395,8 @@ class CHelpItems {
 					'description' => _('Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.')
 				),
 				array(
-					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>]',
-					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root].')
+					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
+					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root].')
 				),
 				array(
 					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',

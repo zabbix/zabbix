@@ -310,16 +310,17 @@ function valueComparisonFormForMultiplePeriods() {
 	$reportForm->addVar('sortorder', 0);
 
 	$groupids = getRequest('groupids', array());
-	$group_tb = new CTweenBox($reportForm, 'groupids', $groupids, 10);
+	$group_tb = new CTweenBox($reportForm, 'groupids', 10);
+	$group_tb->setSelectedValues($groupids);
 
 	$db_groups = API::HostGroup()->get(array(
-		'real_hosts' => true,
-		'output' => array('groupid', 'name')
+		'output' => array('groupid', 'name'),
+		'real_hosts' => true
 	));
+	// Order now because it is also used in combo box.
 	order_result($db_groups, 'name');
 	foreach ($db_groups as $group) {
-		$groupids[$group['groupid']] = $group['groupid'];
-		$group_tb->addItem($group['groupid'],$group['name']);
+		$group_tb->addItem($group['groupid'], $group['name']);
 	}
 
 	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
@@ -331,42 +332,35 @@ function valueComparisonFormForMultiplePeriods() {
 		$cmbGroups->addItem($group['groupid'], $group['name']);
 	}
 
-	$td_groups = new CCol(array(_('Group'), SPACE, $cmbGroups));
-	$td_groups->setAttribute('style', 'text-align: right;');
+	$host_tb = new CTweenBox($reportForm, 'hostids', 10);
+	$host_tb->setSelectedValues($hostids);
 
-	$host_tb = new CTweenBox($reportForm, 'hostids', $hostids, 10);
-
-	$options = array(
-		'real_hosts' => true,
-		'output' => array('hostid', 'name')
-	);
-	if ($groupid > 0) {
-		$options['groupids'] = $groupid;
-	}
-	$db_hosts = API::Host()->get($options);
-	$db_hosts = zbx_toHash($db_hosts, 'hostid');
-	order_result($db_hosts, 'name');
-
-	foreach ($db_hosts as $hnum => $host) {
-		$host_tb->addItem($host['hostid'],$host['name']);
-	}
-
-	$options = array(
-		'real_hosts' => true,
+	// Get and add all hosts that are selected (to be on left side).
+	$db_hosts = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
 		'hostids' => $hostids,
-	);
-	$db_hosts2 = API::Host()->get($options);
-	order_result($db_hosts2, 'name');
-	foreach ($db_hosts2 as $hnum => $host) {
+		'real_hosts' => true,
+		'preservekeys' => true
+	));
+	foreach ($db_hosts as $host) {
+		$host_tb->addItem($host['hostid'], $host['name']);
+	}
+
+	// Get and add either ALL hosts or ones in selected group (to be on right side).
+	$db_hosts2 = API::Host()->get(array(
+		'output' => array('hostid', 'name'),
+		'groupids' => $groupid > 0 ? $groupid : null,
+		'real_hosts' => true
+	));
+	foreach ($db_hosts2 as $host) {
 		if (!isset($db_hosts[$host['hostid']])) {
 			$host_tb->addItem($host['hostid'], $host['name']);
 		}
 	}
 
 	$reportForm->addRow(_('Hosts'),
-		$host_tb->Get(_('Selected hosts'),
-		array(_('Other hosts | Group').SPACE, $cmbGroups)
+		$host_tb->get(_('Selected hosts'),
+		array(_('Other hosts | Group').' ', $cmbGroups)
 	));
 
 	$reporttimetab = new CTable(null,'calendar');

@@ -270,32 +270,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				opt_r++;
-				if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_INCREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE),
-							ZBX_RTC_LOG_LEVEL_INCREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-
-				}
-				else if (0 == strncmp(zbx_optarg, ZBX_LOG_LEVEL_DECREASE,
-						ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
-				{
-					if (SUCCEED != get_log_level_message(
-							zbx_optarg + ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE),
-							ZBX_RTC_LOG_LEVEL_DECREASE, &t->flags))
-					{
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					zbx_error("invalid runtime control option: %s", zbx_optarg);
+				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
 					exit(EXIT_FAILURE);
-				}
+
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 #endif
@@ -978,21 +955,19 @@ void	zbx_free_service_resources(void)
 		zbx_free(threads);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-#ifndef _WINDOWS
-	unload_modules();
-#endif
-	zabbix_close_log();
-
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
+#else
+	unload_modules();
 #endif
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
 }
 
 void	zbx_on_exit(void)
@@ -1007,12 +982,6 @@ void	zbx_on_exit(void)
 
 	exit(EXIT_SUCCESS);
 }
-
-#if defined(HAVE_SIGQUEUE)
-void	zbx_sigusr_handler(int flags)
-{
-}
-#endif
 
 int	main(int argc, char **argv)
 {

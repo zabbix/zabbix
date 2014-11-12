@@ -889,7 +889,7 @@ out:
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zbx_vector_ptr_clean(&itemapps, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&itemapps, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&itemapps);
 }
 
@@ -985,7 +985,7 @@ out:
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zbx_vector_ptr_clean(&prototypes, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&prototypes, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&prototypes);
 }
 
@@ -1053,7 +1053,7 @@ void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
  ******************************************************************************/
 void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
-	zbx_vector_ptr_clean(&rule->conditions, (zbx_mem_free_func_t)free_lld_rule_condition);
+	zbx_vector_ptr_clear_ext(&rule->conditions, (zbx_clean_func_t)free_lld_rule_condition);
 	zbx_vector_ptr_destroy(&rule->conditions);
 
 	zbx_vector_uint64_destroy(&rule->conditionids);
@@ -1098,10 +1098,10 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
 out:
-	zbx_vector_ptr_clean(&lld_rules, (zbx_mem_free_func_t)free_lld_rule_map);
+	zbx_vector_ptr_clear_ext(&lld_rules, (zbx_clean_func_t)free_lld_rule_map);
 	zbx_vector_ptr_destroy(&lld_rules);
 
-	zbx_vector_ptr_clean(&items, (zbx_mem_free_func_t)free_template_item);
+	zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)free_template_item);
 	zbx_vector_ptr_destroy(&items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
