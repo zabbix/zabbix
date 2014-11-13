@@ -620,7 +620,7 @@ class CScript extends CApiService {
 				continue;
 			}
 
-			$path = splitPath($script['name'],false);
+			$path = splitPath($script['name'], false);
 			$path = array_map('trim', $path);
 			$script['name'] = implode('/', $path);
 		}

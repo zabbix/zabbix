@@ -2244,12 +2244,13 @@ function uncheckTableRows($cookieId = null) {
 /**
  * Splitting string using slashes with escape backslash support and non-pair backslash cleanup
  *
- * @param string $path				string path to parse
- * @param bool   $stripSlashes		remove escaped slashes from the path pieces
+ * @param string $path					String path to parse
+ * @param bool   $stripSlashes			Remove escaped slashes from the path pieces
+ * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations
  *
  * @return array
  */
-function splitPath($path, $stripSlashes = true) {
+function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	$position = 0;
 
 	$escapeCharacters = '';
@@ -2266,10 +2267,11 @@ function splitPath($path, $stripSlashes = true) {
 				$escapeCharacters = $pathItemString = '';
 				continue;
 			}
-			// We have a backslash before the / - keep it as part of the item
+			// We have a backslash before the / - keep it as part of the item and clean escape char buffer
 			$pathItemString .= $escapeCharacters.$path[$position];
+			$escapeCharacters = '';
 		}
-		elseif ($path[$position] === '\\') {
+		elseif ($cleanupBackslashes && $path[$position] === '\\') {
 			// If we had a backslash before - this is an escaped backslash, keep it and empty char backlog
 			// This way we save only paired backslashes
 			if ($escapeCharacterCount === 1) {
