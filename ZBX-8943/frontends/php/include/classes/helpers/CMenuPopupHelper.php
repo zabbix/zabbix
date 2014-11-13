@@ -241,7 +241,7 @@ class CMenuPopupHelper {
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
-				$script['name'] = implode('/', splitPath($script['name'], false));
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
 			}
 			unset($script);
 
@@ -286,7 +286,7 @@ class CMenuPopupHelper {
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
-				$script['name'] = implode('/', splitPath($script['name'], false));
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
 			}
 			unset($script);
 			CArrayHelper::sort($scripts, array('name'));
