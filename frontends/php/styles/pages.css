@@ -127,6 +127,7 @@ table.tableinfo-overview-hint { width: 200px; }
 .top-triggers .filter .multiselect-wrapper { width: 280px; }
 .top-triggers .filter .multiselect { width: 216px; line-height: 12px; }
 .top-triggers .filter .link { margin-top: 2px; margin-left: 10px; display: inline-block; }
+.top-triggers .filter tr td.top { vertical-align: top; }
 
 /*history */
 .history .filter tr td { width: 50%; }
