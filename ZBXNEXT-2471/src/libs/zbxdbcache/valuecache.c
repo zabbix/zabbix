@@ -2197,8 +2197,6 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item, zbx_vector_history_
 	int		ret = SUCCEED, index, now;
 	zbx_vc_chunk_t	*chunk;
 
-	now = ZBX_VC_TIME();
-
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
 	{
 		/* return empty vector with success */
@@ -2221,8 +2219,10 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item, zbx_vector_history_
 	/* Otherwise the current request range is unknown and can't be compared */
 	/* to the maximum request range.                                        */
 	if (values->values_num == count)
+	{
+		now = ZBX_VC_TIME();
 		vch_item_update_range(item, now - values->values[values->values_num - 1].timestamp.sec, now);
-
+	}
 out:
 	if (values->values_num < count)
 	{
@@ -2330,7 +2330,6 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	int			index, ret = FAIL, hits = 0, misses = 0, now;
 	zbx_vc_chunk_t		*chunk;
 
-	now = ZBX_VC_TIME();
 	*found = 0;
 
 	if (NULL == item->tail || 0 < zbx_timespec_compare(&item->tail->slots[item->tail->first_value].timestamp, ts))
@@ -2366,6 +2365,7 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
 
+	now = ZBX_VC_TIME();
 	vch_item_update_range(item, now - value->timestamp.sec, now);
 
 	*found = 1;
