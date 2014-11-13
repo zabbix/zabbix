@@ -861,7 +861,7 @@ class CHostGroup extends CZBXAPI {
 		$oldRecords = DBfetchArray(DBselect(
 			'SELECT hg.hostid,hg.groupid,hg.hostgroupid'.
 			' FROM hosts_groups hg,hosts h'.
-			' WHERE '.dbConditionInt('hg.hostid', $objectIds).
+			' WHERE '.dbConditionInt('hg.groupid', $groupIds).
 				' AND hg.hostid=h.hostid'.
 				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 		));
@@ -987,8 +987,180 @@ class CHostGroup extends CZBXAPI {
 		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 		$templateIds = zbx_objectValues($data['templates'], 'templateid');
 
+		$dbGroups = $this->get(array(
+			'output' => array('groupid'),
+			'selectHosts' => array('hostid'),
+			'selectTemplates' => array('templateid'),
+			'groupids' => $groupIds
+		));
+
+		if (!$dbGroups) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// Collect group IDs that will added to given hosts and templates.
 		$groupIdsToAdd = array();
+
+		// Collect group IDs that will removed from given hosts and templates.
 		$groupIdsToRemove = array();
+
+		/*
+		 * When given hosts or templates belong to other groups and those group IDs are not passed in parameters,
+		 * those groups will be removed from given hosts and templates. Collect those host and template IDs
+		 * from groups that will be removed.
+		 */
+		$objectIds = array();
+
+		// Collect both given host and template IDs.
+		$currentObjectIds = array_merge($hostIds, $templateIds);
+		$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
+
+		// Collect both host and template IDs that also belong to given groups, but are not given in parameters.
+		$objectIdsToRemove = array();
+
+		/*
+		 * New or existing hosts have been passed in parameters. First check write permissions to hosts
+		 * and if hosts are not discovered. Then check if groups should be added and/or removed from given hosts.
+		 */
+		if ($hostIds) {
+			$dbHosts = API::Host()->get(array(
+				'output' => array('hostid'),
+				'selectGroups' => array('groupid'),
+				'hostids' => $hostIds,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			$this->validateHostsPermissions($hostIds, $dbHosts);
+
+			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+				'message' => _('Cannot update groups for discovered host "%1$s".')
+			)));
+
+			foreach ($dbHosts as $dbHost) {
+				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
+
+				// Validate groups that are added for current host.
+				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
+					$groupIdsToAdd[$groupId] = $groupId;
+				}
+
+				// Validate groups that are removed from current host.
+				foreach (array_diff($oldGroupIds, $groupIds) as $groupId) {
+					$groupIdsToRemove[$groupId] = $groupId;
+				}
+
+				if ($groupIdsToRemove) {
+					$objectIds[] = $dbHost['hostid'];
+				}
+			}
+		}
+
+		/*
+		 * Some existing hosts may not have been passed in parameters. In this case check what other hosts the groups
+		 * have and if those hosts can be removed from given groups. This will also validate those hosts permissions and
+		 * make sure hosts have at least one group left.
+		 */
+		foreach ($dbGroups as $dbGroup) {
+			foreach ($dbGroup['hosts'] as $dbHost) {
+				if (!isset($currentObjectIds[$dbHost['hostid']])) {
+					$objectIdsToRemove[$dbHost['hostid']] = $dbHost['hostid'];
+				}
+			}
+		}
+
+		/*
+		 * New or existing templates have been passed in parameters. First check write permissions to templates.
+		 * Then check if groups should be added and/or removed from given templates.
+		 */
+		if ($templateIds) {
+			$dbTemplates = API::Template()->get(array(
+				'output' => array('templateid'),
+				'selectGroups' => array('groupid'),
+				'templateids' => $templateIds,
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			$this->validateHostsPermissions($templateIds, $dbTemplates);
+
+			foreach ($dbTemplates as $dbTemplate) {
+				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
+
+				// Validate groups that are added for current template.
+				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
+					$groupIdsToAdd[$groupId] = $groupId;
+				}
+
+				// Validate groups that are removed from current template.
+				foreach (array_diff($oldGroupIds, $groupIds) as $groupId) {
+					$groupIdsToRemove[$groupId] = $groupId;
+				}
+
+				if ($groupIdsToRemove) {
+					$objectIds[] = $dbTemplate['templateid'];
+				}
+			}
+		}
+
+		/*
+		 * Some existing templates may not have been passed in parameters. In this case check what other templates the
+		 * groups have and if those templates can be removed from given groups. This will also validate those template
+		 * permissions and make sure templates have at least one group left.
+		 */
+		foreach ($dbGroups as $dbGroup) {
+			foreach ($dbGroup['templates'] as $dbTemplate) {
+				if (!isset($currentObjectIds[$dbTemplate['templateid']])) {
+					$objectIdsToRemove[$dbTemplate['templateid']] = $dbTemplate['templateid'];
+				}
+			}
+		}
+
+		// Continue to check new, existing or removable groups for given hosts and templates.
+		$groupIdsToUpdate = array_merge($groupIdsToAdd, $groupIdsToRemove);
+
+		// Validate write permissions only to changed (added/removed) groups for given hosts and templates.
+		if ($groupIdsToUpdate && !$this->isWritable($groupIdsToUpdate)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
+		}
+
+		// Check if groups can be removed from given hosts and templates. Only check if no groups are added.
+		if (!$groupIdsToAdd && $groupIdsToRemove) {
+			$unlinkableObjectIds = getUnlinkableHosts($groupIdsToRemove, $objectIds);
+
+			if (count($objectIds) != count($unlinkableObjectIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
+			}
+		}
+
+		// Check the other way around - if other existing hosts and templates from those groups are left without groups.
+		if ($objectIdsToRemove) {
+			$unlinkableObjectIds = getUnlinkableHosts($groupIds, $objectIdsToRemove);
+
+			if (count($objectIdsToRemove) != count($unlinkableObjectIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
+			}
+		}
+	}
+
+	/**
+	 * Validate write permissions to host groups that are removed from given hosts and templates. Also check
+	 * if host and template has at least one host group left.
+	 *
+	 * @param array $data
+	 * @param array $data['groupids']
+	 * @param array $data['hostids']
+	 * @param array $data['templateids']
+	 *
+	 * @throws APIException		if user has no write permissions to any of the given host groups or one of the hosts and
+	 *							templates is left without a host group
+	 */
+	protected function validateMassRemove(array $data) {
+		$groupIdsToRemove = array();
+		$hostIds = isset($data['hostids']) ? $data['hostids'] : array();
+		$templateIds = isset($data['templateids']) ? $data['templateids'] : array();
 		$objectIds = array();
 
 		if ($hostIds) {
@@ -1009,18 +1181,15 @@ class CHostGroup extends CZBXAPI {
 			foreach ($dbHosts as $dbHost) {
 				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
 
-				// validate groups that are added for current host
-				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
-					$groupIdsToAdd[$groupId] = $groupId;
-				}
+				// check if host belongs to the removable host group
+				$hostGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);
 
-				// validate groups that are removed from current host
-				foreach (array_diff($oldGroupIds, $groupIds) as $groupId) {
-					$groupIdsToRemove[$groupId] = $groupId;
-				}
-
-				if ($groupIdsToRemove) {
+				if ($hostGroupIdsToRemove) {
 					$objectIds[] = $dbHost['hostid'];
+
+					foreach ($hostGroupIdsToRemove as $groupId) {
+						$groupIdsToRemove[$groupId] = $groupId;
+					}
 				}
 			}
 		}
@@ -1035,101 +1204,6 @@ class CHostGroup extends CZBXAPI {
 			));
 
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
-
-			foreach ($dbTemplates as $dbTemplate) {
-				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');
-
-				// validate groups that are added for current host
-				foreach (array_diff($groupIds, $oldGroupIds) as $groupId) {
-					$groupIdsToAdd[$groupId] = $groupId;
-				}
-
-				// validate groups that are removed from current host
-				foreach (array_diff($oldGroupIds, $groupIds) as $groupId) {
-					$groupIdsToRemove[$groupId] = $groupId;
-				}
-
-				if ($groupIdsToRemove) {
-					$objectIds[] = $dbTemplate['templateid'];
-				}
-			}
-		}
-
-		$groupIdsToUpdate = array_merge($groupIdsToAdd, $groupIdsToRemove);
-
-		// validate write permissions only to changed (added/removed) groups for given hosts and templates
-		if ($groupIdsToUpdate && !$this->isWritable($groupIdsToUpdate)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
-		}
-
-		if ($groupIdsToRemove) {
-			$unlinkableObjectIds = getUnlinkableHosts($groupIdsToRemove, $objectIds);
-
-			if (count($objectIds) != count($unlinkableObjectIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
-			}
-		}
-	}
-
-	/**
-	 * Validate write permissions to host groups that are removed from given hosts and templates. Also check
-	 * if host and template has at least one host group left.
-	 *
-	 * @param array $data
-	 * @param array $data['groupids']
-	 * @param array $data['hostids']
-	 * @param array $data['templateids']
-	 *
-	 * @throws APIException		if user has no write permissions to any of the given host groups or one of the hosts and
-	 *							templates is left without a host group
-	 */
-	protected function validateMassRemove(array $data) {
-		$groupIdsToRemove = array();
-		$objectIds = array();
-
-		if ($data['hostids']) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
-				'selectGroups' => array('groupid'),
-				'hostids' => $data['hostids'],
-				'editable' => true,
-				'preservekeys' => true
-			));
-
-			$this->validateHostsPermissions($data['hostids'], $dbHosts);
-
-			$this->checkValidator($data['hostids'], new CHostNormalValidator(array(
-				'message' => _('Cannot update groups for discovered host "%1$s".')
-			)));
-
-			foreach ($dbHosts as $dbHost) {
-				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
-
-				// check if host belongs to the removable host group
-				$hostGroupIdsToRemove = array_intersect($data['groupids'], $oldGroupIds);
-
-				if ($hostGroupIdsToRemove) {
-					$objectIds[] = $dbHost['hostid'];
-
-					foreach ($hostGroupIdsToRemove as $groupId) {
-						$groupIdsToRemove[$groupId] = $groupId;
-					}
-				}
-			}
-		}
-
-		if ($data['templateids']) {
-			$dbTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
-				'selectGroups' => array('groupid'),
-				'templateids' => $data['templateids'],
-				'editable' => true,
-				'preservekeys' => true
-			));
-
-			$this->validateHostsPermissions($data['templateids'], $dbTemplates);
 
 			foreach ($dbTemplates as $dbTemplate) {
 				$oldGroupIds = zbx_objectValues($dbTemplate['groups'], 'groupid');

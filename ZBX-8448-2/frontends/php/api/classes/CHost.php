@@ -1329,10 +1329,30 @@ class CHost extends CHostGeneral {
 		 * host-template linkage, inventory update, macros update, must be done before this.
 		 */
 		if (isset($updateGroups)) {
-			API::HostGroup()->massUpdate(array(
-				'hosts' => $hosts,
-				'groups' => $updateGroups
+			$updateGroups = zbx_toArray($updateGroups);
+
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $hostids
 			));
+			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
+
+			$groupsToAdd = array_diff($newGroupIds, $hostGroupIds);
+			if ($groupsToAdd) {
+				$this->massAdd(array(
+					'hosts' => $hosts,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+			}
+
+			$groupIdsToDelete = array_diff($hostGroupIds, $newGroupIds);
+			if ($groupIdsToDelete) {
+				$this->massRemove(array(
+					'hostids' => $hostids,
+					'groupids' => $groupIdsToDelete
+				));
+			}
 		}
 
 		return array('hostids' => $inputHostIds);

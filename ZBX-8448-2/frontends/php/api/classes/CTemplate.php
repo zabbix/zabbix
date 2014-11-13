@@ -1064,10 +1064,30 @@ class CTemplate extends CHostGeneral {
 		 * host-template linking, macros update, must be done before this.
 		 */
 		if (isset($data['groups']) && is_array($data['groups'])) {
-			API::HostGroup()->massUpdate(array(
-				'templates' => $templates,
-				'groups' => $data['groups']
+			$updateGroups = zbx_toArray($data['groups']);
+
+			$templateGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'templateids' => $templateids
 			));
+			$templateGroupIds = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
+
+			$groupsToAdd = array_diff($newGroupIds, $templateGroupIds);
+			if ($groupsToAdd) {
+				$this->massAdd(array(
+					'templates' => $templates,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+			}
+
+			$groupIdsToDelete = array_diff($templateGroupIds, $newGroupIds);
+			if ($groupIdsToDelete) {
+				$this->massRemove(array(
+					'templateids' => $templateids,
+					'groupids' => $groupIdsToDelete
+				));
+			}
 		}
 
 		return array('templateids' => $templateids);
