@@ -91,8 +91,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#define LOCK_INFO	if (info->use_lock) zbx_mutex_lock(&info->mem_lock)
-#define UNLOCK_INFO	if (info->use_lock) zbx_mutex_unlock(&info->mem_lock)
+#define LOCK_INFO	if (1 == info->use_lock) zbx_mutex_lock(&info->mem_lock)
+#define UNLOCK_INFO	if (1 == info->use_lock) zbx_mutex_unlock(&info->mem_lock)
 
 static void	*ALIGN4(void *ptr);
 static void	*ALIGN8(void *ptr);

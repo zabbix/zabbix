@@ -26,10 +26,10 @@
 #include "sysinfo.h"
 
 static ZBX_PERF_STAT_DATA	ppsd;
-static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
+static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
 
-#define LOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_lock(&perfstat_access)
-#define UNLOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_unlock(&perfstat_access)
+#define LOCK_PERFCOUNTERS	zbx_mutex_lock(&perfstat_access)
+#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(&perfstat_access)
 
 /******************************************************************************
  *                                                                            *
