@@ -1264,14 +1264,12 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 {
 	int	hour, diff;
 
-	/* if the calculated range is zero we should force it to minimum range (that's why less or equal) */
-	if (item->current_range <= range)
-	{
-		item->current_range = range;
+	if (VC_MIN_RANGE > range)
+		range = VC_MIN_RANGE;
 
-		if (VC_MIN_RANGE > item->current_range)
-			item->current_range = VC_MIN_RANGE;
-	}
+	/* if the calculated range is zero we should force it to minimum range (that's why less or equal) */
+	if (item->current_range < range)
+		item->current_range = range;
 
 	hour = (now / SEC_PER_HOUR) & 0xff;
 
