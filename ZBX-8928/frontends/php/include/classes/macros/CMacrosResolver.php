@@ -631,7 +631,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$allowedItems = API::Item()->get(array(
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => array('itemid', 'value_type', 'lastvalue'),
+			'output' => array('itemid', 'value_type', 'lastvalue', 'lastclock'),
 			'preservekeys' => true
 		));
 
@@ -639,6 +639,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($items as $item) {
 			if (isset($allowedItems[$item['itemid']])) {
 				$item['lastvalue'] = $allowedItems[$item['itemid']]['lastvalue'];
+				$item['lastclock'] = $allowedItems[$item['itemid']]['lastclock'];
 				$hostKeyPairs[$item['host']][$item['key_']] = $item;
 			}
 		}
@@ -663,7 +664,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					// macro function is "last"
 					if ($function == 'last') {
-						$value = isset($item['lastvalue'])
+						$value = ($item['lastclock'] > 0)
 							? formatHistoryValue($item['lastvalue'], $item)
 							: UNRESOLVED_MACRO_STRING;
 					}
