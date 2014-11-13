@@ -25,9 +25,6 @@
 #	define ZBX_MUTEX		HANDLE
 #	define ZBX_MUTEX_NULL		NULL
 
-#	define ZBX_MUTEX_ERROR		0
-#	define ZBX_MUTEX_OK		1
-
 #	define ZBX_MUTEX_NAME		wchar_t *
 
 #	define ZBX_MUTEX_LOG		TEXT("ZBX_MUTEX_LOG")
@@ -36,10 +33,7 @@
 #else	/* not _WINDOWS */
 
 #	define ZBX_MUTEX		int
-#	define ZBX_MUTEX_NULL		0
-
-#	define ZBX_MUTEX_ERROR		-1
-#	define ZBX_MUTEX_OK		1
+#	define ZBX_MUTEX_NULL		-1
 
 #	define ZBX_MUTEX_NAME		int
 
@@ -61,6 +55,9 @@
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
 
 #endif	/* _WINDOWS */
+
+#define ZBX_MUTEX_ERROR		FAIL
+#define ZBX_MUTEX_OK		SUCEED
 
 #define zbx_mutex_create(mutex, name)		zbx_mutex_create_ext(mutex, name, 0)
 #define zbx_mutex_create_force(mutex, name)	zbx_mutex_create_ext(mutex, name, 1)
