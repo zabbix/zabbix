@@ -1511,8 +1511,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
 	char			*tmp = NULL, *sql = NULL, *error_esc;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset,
-				tmp_alloc = HOST_ERROR_LEN_MAX;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, sql_offset_tmp,
+				tmp_alloc = 4 * HOST_ERROR_LEN + 1;
 	int			availability_alloc = 0, availability_num = 0;
 	zbx_host_availability_t	*availability = NULL;
 
@@ -1550,7 +1550,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		tmp_offset = sql_offset;
+		sql_offset_tmp = sql_offset;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
@@ -1651,7 +1651,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		if (',' != sql[sql_offset])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
-			sql_offset = tmp_offset;
+			sql_offset = sql_offset_tmp;
 			sql[sql_offset] = '\0';
 			continue;
 		}
