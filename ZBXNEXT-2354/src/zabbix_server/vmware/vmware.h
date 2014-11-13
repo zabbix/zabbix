@@ -148,7 +148,7 @@ typedef struct
 	zbx_hashset_t 		counters;
 
 	/* list of entities to monitor with performance counters */
-	zbx_vector_ptr_t	entities;
+	zbx_hashset_t		entities;
 
 	/* The service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
