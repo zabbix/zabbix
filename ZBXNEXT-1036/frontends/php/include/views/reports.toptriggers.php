@@ -25,6 +25,8 @@ $topTriggers->addHeader(_('Most busy triggers top 100'));
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name',' zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
+$filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));
+$filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 $filterTable = new CTable(null, 'filter');
 $filterTable->setCellPadding(0);
@@ -49,7 +51,7 @@ $filterTable->addRow(
 			'inputcol'
 		),
 		new CCol(bold(_('From')), 'label'),
-		new CCol(array(createDateSelector('filter_from', 0, 'filter_timetill')))
+		new CCol(array(createDateSelector('filter_from', $this->data['filter']['filter_from'])))
 	)
 );
 
@@ -72,21 +74,24 @@ $filterTable->addRow(
 			'inputcol'
 		),
 		new CCol(bold(_('Till')), 'label'),
-		new CCol(array(createDateSelector('filter_till', 0, 'filter_timetill')))
+		new CCol(array(createDateSelector('filter_till', $this->data['filter']['filter_till'])))
 	)
 );
 
-$severtyComboBox = new CComboBox('severity', $this->data['filter']['severity']);
-$severtyComboBox->addItem(-1, _('All'));
-
 // get all severities
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severtyComboBox->addItem($severity, getSeverityName($severity, $this->data['config']));
+	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
+		in_array($severity, $this->data['filter']['severities']), '', 1
+	);
+
+	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
+	$severities[] = BR();
 }
+array_pop($severities);
 
 $filterTable->addRow(array(
-	new CCol(bold(_('Severity')), 'label'),
-	new CCol($severtyComboBox, 'inputcol'),
+	new CCol(bold(_('Severity')), 'label top'),
+	new CCol($severities, 'inputcol'),
 	new CCol(null, 'label'),
 	new CCol(array(
 		new CButton('quickTimeInput', _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
@@ -112,8 +117,8 @@ $filterTable->addRow(array(
 		new CButton('quickTimeInput', _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu link'
 		)
-	))
-));
+	), 'top')
+), 'top');
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
 $filterButton->useJQueryStyle('main');
@@ -132,7 +137,25 @@ $topTriggers->addFlicker($filterForm, CProfile::get('web.toptriggers.filter.stat
 $topTriggers->addPageHeader(_('Triggers top 100'));
 
 // table
-$table = new CTableInfo(($this->data['filterSet']) ? _('No values found.') : _('Specify some filter condition to see the values.'));
+$table = new CTableInfo(_('No triggers found.'));
+$table->setHeader(array(
+	_('Host'),
+	_('Trigger'),
+	_('Severity'),
+	_('Number of status changes')
+));
+
+foreach ($this->data['triggers'] as $trigger) {
+	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
+	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
+
+	$table->addRow(array(
+		$trigger['hostName'],
+		$triggerDescription,
+		getSeverityCell($trigger['priority'], $this->data['config']),
+		$trigger['cnt_event']
+	));
+}
 
 $topTriggers->addItem($table);
 
