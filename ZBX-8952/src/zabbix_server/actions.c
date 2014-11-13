@@ -136,7 +136,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 							break;
 						}
 					}
-
 					DBfree_result(result);
 				}
 				while (SUCCEED != ret && 0 != triggerid);
