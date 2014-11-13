@@ -1676,7 +1676,7 @@ Changes for 2.0.14rc1
 
 New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
-A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
