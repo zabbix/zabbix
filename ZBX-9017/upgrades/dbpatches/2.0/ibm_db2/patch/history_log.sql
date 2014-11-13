@@ -1,0 +1,12 @@
+ALTER TABLE history_log ALTER COLUMN id SET WITH DEFAULT NULL
+/
+REORG TABLE history_log
+/
+ALTER TABLE history_log ALTER COLUMN itemid SET WITH DEFAULT NULL
+/
+REORG TABLE history_log
+/
+ALTER TABLE history_log ADD ns integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE history_log
+/
