@@ -1160,7 +1160,7 @@ Changes for 2.1.8
 New features:
 .....J.... [ZBX-6404] added support for values of type java.lang.Double when toString() returns them in scientific format (asaveljevs)
 .......PS. [ZBXNEXT-78] added support for scientific notation for received values and item multipliers for items of type "Numeric (float)" (asaveljevs)
-...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (Igors, Andris, wiper)
+...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (igors, Andris, wiper)
 ..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
