@@ -41,9 +41,6 @@ class CTemplateImporter extends CImporter {
 		$this->checkCircularTemplateReferences($templates);
 
 		foreach ($templates as &$template) {
-			// screens are imported separately
-			unset($template['screens']);
-
 			if (!$this->options['templateLinkage']['createMissing']) {
 				unset($template['templates']);
 			}
