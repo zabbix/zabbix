@@ -111,8 +111,10 @@ $fields = array(
 	'multiplier' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'delta' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'), '(isset({add}) || isset({update})) && isset({value_type}) && '.
 		IN('0,3', 'value_type').'isset({data_type}) && {data_type} != '.ITEM_DATA_TYPE_BOOLEAN),
-	'formula' =>				array(T_ZBX_DBL_STR, O_OPT, null,		'({value_type} == 0 && {} != 0)||({value_type} == 3 && {} > 0)',
-		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')),
+	'formula' =>				array(T_ZBX_DBL_STR, O_OPT, null,
+		'({value_type} == 0 && {} != 0) || ({value_type} == 3 && {} > 0)',
+		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')
+	),
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -519,23 +521,34 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 // cleaning history for one item
-elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
+elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
 
-	DBstart();
+	$itemId = getRequest('itemid');
 
-	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
-		$result = delete_history_by_itemid($_REQUEST['itemid']);
+	$items = API::Item()->get(array(
+		'output' => array('key_'),
+		'itemids' => array($itemId),
+		'selectHosts' => array('name'),
+		'editable' => true
+	));
+
+	if ($items) {
+		DBstart();
+
+		$result = deleteHistoryByItemIds(array($itemId));
+
+		if ($result) {
+			$item = reset($items);
+			$host = reset($item['hosts']);
+
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
+				_('Host').' ['.$host['name'].'] '._('History cleared')
+			);
+		}
+
+		$result = DBend($result);
 	}
-
-	if ($result) {
-		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
-			_('Host').' ['.$host['name'].'] '._('History cleared')
-		);
-	}
-
-	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
@@ -767,27 +780,43 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') == 'item.massclearhistory' && hasRequest('group_itemid')) {
-	DBstart();
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
+		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
+	$result = false;
 
-	$result = delete_history_by_itemid(getRequest('group_itemid'));
+	$itemIds = getRequest('group_itemid');
 
-	foreach (getRequest('group_itemid') as $id) {
-		if (!$item = get_item_by_itemid($id)) {
-			continue;
+	$items = API::Item()->get(array(
+		'output' => array('itemid', 'key_'),
+		'itemids' => $itemIds,
+		'selectHosts' => array('name'),
+		'editable' => true
+	));
+
+	if ($items) {
+		DBstart();
+
+		$result = deleteHistoryByItemIds($itemIds);
+
+		if ($result) {
+			foreach ($items as $item) {
+				$host = reset($item['hosts']);
+
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+					_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+						_('History cleared')
+				);
+			}
 		}
-		$host = get_host_by_hostid($item['hostid']);
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-			_('Item').' ['.$item['key_'].'] ['.$id.'] '._('Host').' ['.$host['host'].'] '._('History cleared')
-		);
+
+		$result = DBend($result);
+
+		if ($result) {
+			uncheckTableRows(getRequest('hostid'));
+		}
 	}
 
-	$result = DBend($result);
-
-	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
-	}
-	show_messages($result, _('History cleared'), $result);
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && hasRequest('group_itemid')) {
 	DBstart();

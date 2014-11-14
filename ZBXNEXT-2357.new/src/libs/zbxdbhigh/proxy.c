@@ -1088,7 +1088,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						zbx_free(value->str);
 				}
 			}
-			zbx_vector_ptr_clean(&values, zbx_ptr_free);
+			zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 
 			if (f != fields_count)
 			{
@@ -2164,8 +2164,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			char	*allowed_hosts;
 
 			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], &allowed_hosts,
-					MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
+					&allowed_hosts, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
 			zbx_free(allowed_hosts);
 
@@ -2333,6 +2333,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	else
 		ret = SUCCEED;
 
+	if (SUCCEED == ret && 0 != proxy_hostid)
+		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+
 	p = NULL;
 	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
@@ -2369,7 +2372,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				}
 			}
 			else
-				av->ts.ns = -1;
+				av->ts.ns = proxy_timediff.ns;
 		}
 		else
 			zbx_timespec(&av->ts);

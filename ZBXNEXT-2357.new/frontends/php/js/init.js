@@ -152,4 +152,10 @@ jQuery(function($) {
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
+
+	$('[data-serialize-to-hidden]').each(function() {
+		$(this).setJsonOnChange({targetSelector: $(this).data('serialize-to-hidden')});
+	});
+
+	$('form').enterSubmit('input[type=submit].main');
 });

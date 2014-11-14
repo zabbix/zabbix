@@ -513,22 +513,22 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Details of scenario',
+				'title' => 'Details of web scenario',
 				'test_cases' => array(
 					array(
 						'url' => 'httpdetails.php?httptestid=94',
-						'text_present' => 'DETAILS OF SCENARIO'
+						'text_present' => 'DETAILS OF WEB SCENARIO'
 					),
 					array(
 						'url' => 'httpdetails.php?httptestid=9999999',
-						'text_not_present' => 'DETAILS OF SCENARIO',
+						'text_not_present' => 'DETAILS OF WEB SCENARIO',
 						'text_present' => array(
 							'ERROR: No permissions to referred object or it does not exist!'
 						)
 					),
 					array(
 						'url' => 'httpdetails.php?httptestid=abc',
-						'text_not_present' => 'DETAILS OF SCENARIO',
+						'text_not_present' => 'DETAILS OF WEB SCENARIO',
 						'text_present' => array(
 							'ERROR: Zabbix has received an incorrect request.',
 							'Field "httptestid" is not integer.'
@@ -536,7 +536,7 @@ class testUrlParameters extends CWebTest {
 					),
 					array(
 						'url' => 'httpdetails.php?httptestid=',
-						'text_not_present' => 'DETAILS OF SCENARIO',
+						'text_not_present' => 'DETAILS OF WEB SCENARIO',
 						'text_present' => array(
 							'ERROR: Zabbix has received an incorrect request.',
 							'Field "httptestid" is not integer.'
@@ -544,7 +544,7 @@ class testUrlParameters extends CWebTest {
 					),
 					array(
 						'url' => 'httpdetails.php?httptestid=-1',
-						'text_not_present' => 'DETAILS OF SCENARIO',
+						'text_not_present' => 'DETAILS OF WEB SCENARIO',
 						'text_present' => array(
 							'ERROR: Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "httptestid" field.'
@@ -552,7 +552,7 @@ class testUrlParameters extends CWebTest {
 					),
 					array(
 						'url' => 'httpdetails.php',
-						'text_not_present' => 'DETAILS OF SCENARIO',
+						'text_not_present' => 'DETAILS OF WEB SCENARIO',
 						'text_present' => array(
 							'ERROR: Zabbix has received an incorrect request.',
 							'Field "httptestid" is mandatory.'
