@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+........S. [ZBXNEXT-2471] improved value cache management by resetting item's cached range to the daily request range once per day (wiper)
 ...G...... [ZBXNEXT-2320] added agent crash handling on Windows to log its stack trace (wiper)
 ..FG...... [ZBXNEXT-1078] added 'proc.mem[]' 5th parameter (memtype) on AIX, FreeBSD, Linux, Solaris; thanks to Johan Fischer and gescheit for agent patches for Linux and FreeBSD (Andris)
 ...G...... [ZBXNEXT-2006] added {#FSDRIVETYPE} macro to vfs.fs.discovery on Windows (asaveljevs)
