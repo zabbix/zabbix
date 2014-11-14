@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// the host is not passed for item prototypes
-if (isset($this->data['host'])) {
+if ($this->data['parent_discoveryid'] == 0) {
 	$host = $this->data['host'];
 }
 
