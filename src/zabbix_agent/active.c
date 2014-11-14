@@ -595,7 +595,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_timespec_t			ts;
 	const char			*err_send_step = "";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d values:%d/%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
 
 	if (0 == buffer.count)
@@ -622,7 +622,8 @@ static int	send_buffer(const char *host, unsigned short port)
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, el->host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, el->key, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
+		if (NULL != el->value)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
 		if (0 != el->lastlogsize)
@@ -773,7 +774,8 @@ static int	process_value(
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key,
+			value ? value : "NULL");
 
 	send_buffer(server, port);
 
@@ -829,7 +831,8 @@ static int	process_value(
 	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
-	el->value = zbx_strdup(NULL, value);
+	if (NULL != value)
+		el->value = zbx_strdup(NULL, value);
 	el->state = state;
 
 	if (NULL != source)
@@ -1047,7 +1050,6 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 		goto out;
 	}
 
-	s_count = 0;
 	p_count = 0;
 	lastlogsize = metric->lastlogsize;
 
@@ -1119,26 +1121,31 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, provider, key_source, ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
-							ZBX_CASE_SENSITIVE))
+				if (SUCCEED != regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) ||
+						SUCCEED != regexp_match_ex(&regexps, str_severity, key_severity,
+								ZBX_IGNORE_CASE) ||
+						SUCCEED != regexp_match_ex(&regexps, provider, key_source,
+								ZBX_IGNORE_CASE) ||
+						SUCCEED != regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+								ZBX_CASE_SENSITIVE))
 				{
-					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
-							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
-							&severity, &logeventid, 1);
-					s_count++;
+					zbx_free(value);
 				}
-				p_count++;
+
+				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider, &severity,
+						&logeventid, 1);
 
 				zbx_free(source);
 				zbx_free(provider);
 				zbx_free(value);
 
+				p_count++;
+
 				if (SUCCEED == send_err)
 				{
+					s_count++;
+
 					metric->lastlogsize = lastlogsize;
 				}
 				else
@@ -1208,25 +1215,31 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-			if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+			if (SUCCEED != regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) ||
+					SUCCEED != regexp_match_ex(&regexps, str_severity, key_severity,
+							ZBX_IGNORE_CASE) ||
+					SUCCEED != regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) ||
+					SUCCEED != regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE))
 			{
-				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
-						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-						&logeventid, 1);
-				s_count++;
+				zbx_free(value);
 			}
-			p_count++;
+
+			send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+					ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
+					&logeventid, 1);
 
 			zbx_free(source);
 			zbx_free(value);
 
+			p_count++;
+
 			if (SUCCEED == send_err)
+			{
+				s_count++;
+
 				metric->lastlogsize = lastlogsize;
+			}
 			else
 			{
 				/* buffer is full, stop processing active checks */
