@@ -61,18 +61,9 @@ class C20ImportFormatter extends CImportFormatter {
 
 				CArrayHelper::convertFieldToArray($template, 'macros');
 				CArrayHelper::convertFieldToArray($template, 'groups');
-				CArrayHelper::convertFieldToArray($template, 'screens');
-
-				if (!empty($template['screens'])) {
-					foreach ($template['screens'] as &$screen) {
-						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
-					}
-
-					unset($screen);
-				}
 
 				$templatesData[] = CArrayHelper::getByKeys($template, array(
-					'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name', 'description'
+					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description'
 				));
 			}
 		}
