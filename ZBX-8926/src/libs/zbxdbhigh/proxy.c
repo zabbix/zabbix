@@ -1510,7 +1510,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_uint64_t		hostid;
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
-	char			*tmp = NULL, *sql = NULL, *error_esc;
+	char			*sql = NULL, *tmp = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, sql_offset_tmp,
 				tmp_alloc = 4 * HOST_ERROR_LEN + 1;
 	int			availability_alloc = 0, availability_num = 0;
@@ -1671,8 +1671,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DChost_update_availability(availability, availability_num);
 out:
 	zbx_free(availability);
-	zbx_free(sql);
 	zbx_free(tmp);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
