@@ -838,7 +838,7 @@ static int	process_value(
 		el->severity = *severity;
 	if (NULL != lastlogsize)
 		el->lastlogsize = *lastlogsize;
-	if (NULL != mtime) /* will be null for "eventlog" and "log" and the value will be 0, only "logrt" matters */
+	if (NULL != mtime)	/* will be null for "eventlog" and "log" and the value will be 0, only "logrt" matters */
 		el->mtime = *mtime;
 	if (NULL != timestamp)
 		el->timestamp = *timestamp;
@@ -846,7 +846,7 @@ static int	process_value(
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);
-	el->persistent	= persistent;
+	el->persistent = persistent;
 
 	if (0 != persistent)
 		buffer.pcount++;

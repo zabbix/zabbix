@@ -1601,14 +1601,14 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __function_name);
 		if (NULL != *logfiles_old)
 			print_logfile_list(*logfiles_old, *logfiles_num_old);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
-				" start_idx:%d)", *mtime, *lastlogsize, start_idx);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
+				" start_idx:%d)", __function_name, *mtime, *lastlogsize, start_idx);
 		if (NULL != logfiles)
 			print_logfile_list(logfiles, logfiles_num);
 		else
@@ -1868,7 +1868,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					if (SUCCEED == send_err)
 					{
 						*lastlogsize = lastlogsize1;
-						*big_rec = 1;		/* ignore the rest of this record */
+						*big_rec = 1;	/* ignore the rest of this record */
 					}
 
 					if ('\0' != *encoding)
