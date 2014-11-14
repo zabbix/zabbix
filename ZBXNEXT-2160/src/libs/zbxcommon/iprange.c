@@ -196,7 +196,7 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 		index++;
 check_fill:
 		/* check if the next group is empty */
-		if (':' == ptr[1])
+		if ('\0' != ptr[0] && ':' == ptr[1])
 		{
 			/* :: construct is allowed only once in address */
 			if (-1 != fill)
