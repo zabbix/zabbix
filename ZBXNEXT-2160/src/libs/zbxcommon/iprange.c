@@ -36,7 +36,9 @@ static void	iprange_apply_mask(zbx_range_t *range, unsigned int bits, unsigned i
 {
 	int	i;
 
-	for (i = groups - 1; bits > 0; bits -= group_bits, i--)
+	bits = (groups * group_bits) - bits;
+
+	for (i = groups - 1; 0 < bits && 0 <= i; bits -= group_bits, i--)
 	{
 		unsigned int	mask_empty, mask_fill, mask_bits = bits;
 
@@ -71,8 +73,7 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		/* if the ip mask is specified calculate the reverse bit count */
-		if (16 < (bits = 32 - atoi(end + 1)))
+		if (FAIL == is_uint32(end + 1, &bits))
 			return FAIL;
 	}
 	else
@@ -144,8 +145,7 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		/* if the ip mask is specified calculate the reverse bit count */
-		if (16 < (bits = 128 - atoi(end + 1)))
+		if (FAIL == is_uint32(end + 1, &bits))
 			return FAIL;
 	}
 	else
