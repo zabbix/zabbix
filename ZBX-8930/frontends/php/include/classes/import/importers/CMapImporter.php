@@ -32,7 +32,7 @@ class CMapImporter extends CImporter {
 		$maps = zbx_toHash($maps, 'name');
 
 		$this->checkCircularMapReferences($maps);
-		$this->resolveMapImages($maps);
+		$maps = $this->resolveMapElementReferences($maps);
 
 		/**
 		 * Get all imported maps we want to import with removed elements and links
@@ -292,18 +292,18 @@ class CMapImporter extends CImporter {
 	 *
 	 * @param array $maps
 	 * @throws Exception
+	 * @return array
 	 */
-	protected function resolveMapImages(array &$maps)
-	{
+	protected function resolveMapElementReferences(array $maps) {
 		foreach ($maps as &$map) {
-			if (!empty($map['iconmap'])) {
+			if (isset($map['iconmap']) && isset($map['iconmap']['name'])) {
 				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
 				if (!$map['iconmapid']) {
 					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".', $map['iconmap']['name'], $map['name']));
 				}
 			}
 
-			if (!empty($map['background'])) {
+			if (isset($map['background']) && isset($map['background']['name'])) {
 				$image = getImageByIdent($map['background']);
 
 				if (!$image) {
@@ -315,5 +315,6 @@ class CMapImporter extends CImporter {
 			}
 		}
 		unset($map);
+		return $maps;
 	}
 }
