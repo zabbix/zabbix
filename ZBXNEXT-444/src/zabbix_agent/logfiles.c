@@ -1852,24 +1852,24 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 					send_err = SUCCEED;
 
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
-					{
-						send_err = process_value(server, port, hostname, key, item_value, ITEM_STATE_NORMAL,
-								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
+					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
+							&item_value);
 
-						zbx_free(item_value);
+					send_err = process_value(server, port, hostname, key, item_value,
+							ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL, NULL,
+							NULL, 1);
 
-						if (SUCCEED == send_err)
-							(*s_count)--;
-					}
-					(*p_count)--;
+					zbx_free(item_value);
 
 					if (SUCCEED == send_err)
 					{
+						(*s_count)--;
+
 						*lastlogsize = lastlogsize1;
 						*big_rec = 1;	/* ignore the rest of this record */
 					}
+
+					(*p_count)--;
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -1911,21 +1911,23 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
 					send_err = SUCCEED;
 
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
-					{
-						send_err = process_value(server, port, hostname, key, item_value, ITEM_STATE_NORMAL,
-								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
+					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
+							&item_value);
 
-						zbx_free(item_value);
+					send_err = process_value(server, port, hostname, key, item_value,
+							ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL, NULL,
+							NULL, 1);
 
-						if (SUCCEED == send_err)
-							(*s_count)--;
-					}
-					(*p_count)--;
+					zbx_free(item_value);
 
 					if (SUCCEED == send_err)
+					{
+						(*s_count)--;
+
 						*lastlogsize = lastlogsize1;
+					}
+
+					(*p_count)--;
 
 					if ('\0' != *encoding)
 						zbx_free(value);
