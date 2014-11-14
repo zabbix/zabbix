@@ -177,6 +177,12 @@ class CTweenBox {
 		$leftListBoxId = $leftListBox->getAttribute('id');
 		$rightListBoxId = $rightListBox->getAttribute('id');
 
+		$add_btn = new CButton('add', '  &laquo;  ', null, 'button-form');
+		$add_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+		$rmv_btn = new CButton('remove', '  &raquo;  ', null, 'button-form');
+		$rmv_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
+
+
 		$moveToLeftListButton = new CButton('add', '  &laquo;  ', null, 'formlist');
 		$moveToLeftListButton->setAttribute(
 			'onclick',

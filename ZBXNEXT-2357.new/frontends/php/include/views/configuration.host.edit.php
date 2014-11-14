@@ -819,7 +819,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
@@ -895,7 +895,7 @@ if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_c
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid'))
+		array(new CButtonCancel(url_param('groupid')))
 	));
 }
 

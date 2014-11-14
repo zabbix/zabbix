@@ -117,7 +117,7 @@
 			<tr id="application-select-row">
 				<td><?php echo _('Application'); ?></td>
 				<td>
-					<input size="50" id="application" name="application" class="input text"><input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
+					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
 				</td>
 			</tr>
 
@@ -197,9 +197,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="elementApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="elementRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="elementClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<button id="elementApply" class="button element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
+					<button id="elementRemove" class="button element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
+					<button id="elementClose" class="button jqueryinput" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -298,9 +298,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="massApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="massRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="massClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<button id="massApply" class="element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
+					<button id="massRemove" class="element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
+					<button id="massClose" class="jqueryinput" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -411,9 +411,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="formLinkApply" type="button" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="formLinkRemove" type="button" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="formLinkClose" type="button" value="<?php echo CHtml::encode(_('Close')); ?>">
+					<button id="formLinkApply" type="button"><?php echo _('Apply') ?></button>
+					<button id="formLinkRemove" type="button"><?php echo _('Remove') ?></button>
+					<button id="formLinkClose" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>

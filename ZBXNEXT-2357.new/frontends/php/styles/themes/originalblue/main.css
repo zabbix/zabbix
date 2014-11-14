@@ -38,41 +38,42 @@ div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
 
-.input[readonly], .input[readonly]:hover {
-	border-color: #d0d0d0;
-	background: #eeeeee;
-	color: #000000;
+/* button */
+.button-plain { border: 1px solid #808080; }
+.button-plain:hover { border-color: black; }
+.button-plain[disabled], .button-plain[disabled]:hover {
+	border-color: #d0d0d0; background: #eeeeee; color: #aca899;
 }
 
+.link_menu { border-color: #3c3089; color: #3c3089; }
+.link_menu:hover { color: #6C80B9; border-color: #6C80B9; }
+.link_menu[disabled], .link_menu[disabled]:hover {
+	background-color: #ffffff; color: #aca899;
+}
+
+.ui-button.main { border-color: #ffaa33 !important; }
+.ui-button.main:hover { border-color: #dd7711 !important; }
+
+/* form input and form buttons */
+.input, .button-form { border: 1px solid #ACA899; background-color: white; }
+.input[readonly], .input[readonly]:hover, .input[readonly]:focus {
+	border-color: #d0d0d0; background: #eeeeee; color: #000000;
+}
 .input[disabled], .input[disabled]:hover,
-input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
-	border-color: #d0d0d0;
-	background: #eeeeee;
+.button-form[disabled], .button-form[disabled]:hover {
+	border-color: #d0d0d0; background: #eeeeee;
 	/* ignored by IE for <select> */
 	color: #aca899;
 }
 
+.input:focus, .input:hover { border-color: #6e8ab4; }
+
+.button-form { background: #fff; }
+.button-form:hover { border-color: #6e8ab4; }
+
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
 	color: #aca899;
-}
-
-.link_menu[disabled], .link_menu[disabled]:hover {
-	background-color: #ffffff;
-	color: #aca899;
-}
-
-/* disabled form buttons */
-.formtable .input.button[disabled]:hover {
-	background-color: #fafbfc;
-	border-color: #ced8e6;
-	color: #a8bfd4;
-}
-
-/* disabled save button */
-.formtable .jqueryinput.input.button[disabled]:hover {
-	border-color: #ffaa33;
-	color: #a8bfd4;
 }
 
 /* show non-gray background for disabled multiselect inputs on hover */

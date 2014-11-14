@@ -37,7 +37,7 @@ if (!$warning = $this->get('warning')) {
 
 	// if not - render a standard warning with a message
 	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $message);
-	$warning->setButtons(array(new CButton('login', _('Retry'), 'document.location.reload();', 'formlist')));
+	$warning->setButtons(array(new CButton('login', _('Retry'), 'document.location.reload();')));
 }
 
 $warning->show();

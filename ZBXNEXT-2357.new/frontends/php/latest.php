@@ -362,8 +362,7 @@ $filterTable->addRow(
 					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
 						'&srcfld1=groupid&multiselect=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			)),
 			'inputcol'
@@ -385,8 +384,7 @@ $filterTable->addRow(
 					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
 						'&real_hosts=1&multiselect=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			)),
 			'inputcol'
@@ -404,7 +402,7 @@ $filterTable->addRow(array(
 			new CButton('application_name', _('Select'),
 				'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
 					'&with_applications=1&dstfrm='.$filterForm->getName().'");',
-				'filter-select-button'
+				'button-form'
 			)
 		),
 		'inputcol'
@@ -414,10 +412,11 @@ $filterTable->addRow(array(
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-$filterButton->useJQueryStyle('main');
+$filterButton->setButtonClass('jqueryinput shadow');
+$filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-$resetButton->useJQueryStyle();
+$resetButton->setButtonClass('jqueryinput shadow');
 
 $divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');

@@ -145,7 +145,7 @@ else {
 			'&srcfld2=name'.
 			'&monitored_hosts=1'.
 			'&numeric=1");',
-		'T'
+		'button-plain'
 	);
 
 	$frmGItem->addRow(_('Parameter'), array($txtCondVal, $btnSelect));
