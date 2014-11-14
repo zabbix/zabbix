@@ -101,13 +101,38 @@ class CArrayHelper {
 	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
 	 */
 	public static function sort(array &$array, array $fields) {
+		/*
+		 * Behavior of uasort() is not defined when elements are equal, see
+		 * http://php.net/manual/en/function.uasort.php. Therefore, to prevent reordering of equal elements a new extra
+		 * "stabilizer" field is added and it's value is set to key of the element, so now there are no equal
+		 * elements in the array. Afterwards "stabilizer" field is removed from elements of the now ordered array.
+		 */
+
 		foreach ($fields as $fid => $field) {
 			if (!is_array($field)) {
 				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);
 			}
 		}
+
+		// Ensure key for "stabilizer" is unique.
+		$uniqueKeyName = uniqid('_');
+
+		// Add "stabilizer" field as last in sortable fields.
+		$fields[] = array('field' => $uniqueKeyName, 'order' => ZBX_SORT_UP);
+
+		// Add number of the element in the array as value for "stabilizer". This is last value in each array.
+		$counter = 0;
+		foreach ($array as &$value) {
+			$value[$uniqueKeyName] = $counter++;
+		}
+
 		self::$fields = $fields;
 		uasort($array, array('self', 'compare'));
+
+		// Remove "stabilizer" from sorted array.
+		foreach ($array as &$value) {
+			unset($value[$uniqueKeyName]);
+		}
 	}
 
 	/**
@@ -126,7 +151,8 @@ class CArrayHelper {
 			// if field is not set or is null, treat it as smallest string
 			// strnatcasecmp() has unexpected behaviour with null values
 			if (!isset($a[$field['field']]) && !isset($b[$field['field']])) {
-				$cmp = 0;
+				// If both elements do not have a field, use "stabilizer" (which is the last element) to decide.
+				$cmp = end($a) - end($b);
 			}
 			elseif (!isset($a[$field['field']])) {
 				$cmp = -1;
