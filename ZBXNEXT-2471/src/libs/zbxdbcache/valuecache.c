@@ -155,7 +155,7 @@ typedef struct
 
 	/* The range of the largest request in seconds.               */
 	/* Used to determine if data can be removed from cache.       */
-	int		max_range;
+	int		active_range;
 
 	/* The range for last 24 hours. Once per day the range is     */
 	/* synchronized (updated) with current_range and the current  */
@@ -1276,9 +1276,9 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 	if (0 > (diff = hour - item->range_sync_hour))
 		diff += 0xff;
 
-	if (item->max_range < item->daily_range || ZBX_VC_RANGE_SYNC_PERIOD < diff)
+	if (item->active_range < item->daily_range || ZBX_VC_RANGE_SYNC_PERIOD < diff)
 	{
-		item->max_range = item->daily_range;
+		item->active_range = item->daily_range;
 		item->daily_range = range;
 		item->range_sync_hour = hour;
 	}
@@ -1657,13 +1657,13 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 {
 	zbx_vc_chunk_t	*next;
 
-	if (0 != item->max_range)
+	if (0 != item->active_range)
 	{
 		zbx_vc_chunk_t	*tail = item->tail;
 		zbx_vc_chunk_t	*chunk = tail;
 		int		timestamp;
 
-		timestamp = ZBX_VC_TIME() - item->max_range;
+		timestamp = ZBX_VC_TIME() - item->active_range;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
@@ -1901,7 +1901,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	update_end = ZBX_VC_TIME();
 
 	/* check if the requested period is in the cached range */
-	if (0 != item->max_range && update_end - start <= item->max_range)
+	if (0 != item->active_range && update_end - start <= item->active_range)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required range */
@@ -2142,7 +2142,7 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_r
 	/* Check if maximum request range is not set and all data are cached.  */
 	/* Because that indicates there was a count based request with unknown */
 	/* range which might be greater than the current request range.        */
-	if (0 != item->max_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
+	if (0 != item->active_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
 		now = ZBX_VC_TIME();
 		vch_item_update_range(item, seconds + now - timestamp, now);
@@ -2225,7 +2225,7 @@ out:
 	if (values->values_num < count)
 	{
 		/* not enough data in db to fulfill the request */
-		item->max_range = 0;
+		item->active_range = 0;
 		item->daily_range = 0;
 		item->status = ZBX_ITEM_STATUS_CACHED_ALL;
 	}
