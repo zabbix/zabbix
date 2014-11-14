@@ -957,13 +957,13 @@ typedef struct
 }
 zbx_range_t;
 
-#define ZBX_IPRANGE_V4		0
-#define ZBX_IPRANGE_V6		1
+#define ZBX_IPRANGE_V4	0
+#define ZBX_IPRANGE_V6	1
 
 int	iprange_parse(const char *address, zbx_range_t *range, int *type);
-void	iprange_first(zbx_range_t *range, int type, int *address);
-int	iprange_next(zbx_range_t *range, int type, int *address);
-int	iprange_validate(zbx_range_t *range, int type, int *address);
+void	iprange_first(const zbx_range_t *range, int type, int *address);
+int	iprange_next(const zbx_range_t *range, int type, int *address);
+int	iprange_validate(const zbx_range_t *range, int type, const int *address);
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);

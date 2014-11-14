@@ -453,8 +453,7 @@ static void	process_rule(DB_DRULE *drule)
 	int		iptype, ipaddress[8];
 	zbx_range_t	iprange[8];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name,
-			drule->name, drule->iprange);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
@@ -469,7 +468,6 @@ static void	process_rule(DB_DRULE *drule)
 					drule->name, start);
 			goto next;
 		}
-
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == iptype)
 		{
@@ -478,11 +476,11 @@ static void	process_rule(DB_DRULE *drule)
 			goto next;
 		}
 #endif
-
 		iprange_first(iprange, iptype, ipaddress);
 
 		do
 		{
+#ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iptype)
 			{
 				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
@@ -491,10 +489,12 @@ static void	process_rule(DB_DRULE *drule)
 			}
 			else
 			{
+#endif
 				zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u", ipaddress[0], ipaddress[1], ipaddress[2],
 						ipaddress[3]);
+#ifdef HAVE_IPV6
 			}
-
+#endif
 			memset(&dhost, 0, sizeof(dhost));
 			host_status = -1;
 
@@ -506,7 +506,7 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			alarm(0);
 
-			if (drule->unique_dcheckid)
+			if (0 != drule->unique_dcheckid)
 				process_checks(drule, &dhost, &host_status, ip, dns, 1, now);
 			process_checks(drule, &dhost, &host_status, ip, dns, 0, now);
 
@@ -520,7 +520,6 @@ static void	process_rule(DB_DRULE *drule)
 			DBcommit();
 		}
 		while (SUCCEED == iprange_next(iprange, iptype, ipaddress));
-
 next:
 		if (NULL != comma)
 		{

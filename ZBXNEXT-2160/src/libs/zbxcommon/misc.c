@@ -1038,9 +1038,9 @@ int	ip4_str2dig(const char *ip, unsigned int *ip_dig)
  *                                                                            *
  * Purpose: check if ip matches range of ip addresses                         *
  *                                                                            *
- * Parameters: ip   - [IN] ip address                                         *
- *             list - [IN] comma-separated list of ip ranges                  *
- *                    192.168.0.1-64,192.168.0.128,10.10.0.0/24,12fc:21       *
+ * Parameters: list - [IN] comma-separated list of ip ranges                  *
+ *                    192.168.0.1-64,192.168.0.128,10.10.0.0/24,12fc::21      *
+ *             ip   - [IN] ip address                                         *
  *                                                                            *
  * Return value: FAIL - out of range, SUCCEED - within the range              *
  *                                                                            *
@@ -1048,25 +1048,22 @@ int	ip4_str2dig(const char *ip, unsigned int *ip_dig)
 int	ip_in_list(const char *list, const char *ip)
 {
 	const char	*__function_name = "ip_in_list";
+
+	int		iptype, ipaddress[8];
 	zbx_range_t	iprange[8];
-	int		ipaddress[8], iptype;
 	char		*address = NULL;
-	size_t		address_alloc = 0, address_offset = 0;
+	size_t		address_alloc = 0, address_offset;
 	const char	*ptr;
-
-
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __function_name, list, ip);
 
 	if (SUCCEED != iprange_parse(ip, iprange, &iptype))
 		goto out;
-
 #ifndef HAVE_IPV6
 	if (ZBX_IPRANGE_V6 == iptype)
 		goto out;
 #endif
-
 	iprange_first(iprange, iptype, ipaddress);
 
 	for (ptr = list; '\0' != *ptr; list = ptr + 1)
@@ -1079,12 +1076,10 @@ int	ip_in_list(const char *list, const char *ip)
 
 		if (SUCCEED != iprange_parse(address, iprange, &iptype))
 			continue;
-
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == iptype)
 			continue;
 #endif
-
 		if (SUCCEED == iprange_validate(iprange, iptype, ipaddress))
 		{
 			ret = SUCCEED;
@@ -1105,8 +1100,8 @@ out:
  *                                                                            *
  * Purpose: check if integer matches a list of integers                       *
  *                                                                            *
- * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
- *             value-  value                                                  *
+ * Parameters: list  - integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
+ *             value - integer to check                                       *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
@@ -1473,7 +1468,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
  *          specified range and optionally store it into value parameter      *
  *                                                                            *
  * Parameters: str   - [IN] string to check                                   *
- *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             n     - [IN] string length                                     *
  *             value - [OUT] a pointer to output buffer where the converted   *
  *                     value is to be written (optional, can be NULL)         *
  *             size  - [IN] size of the output buffer (optional)              *
@@ -1497,15 +1492,15 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
 	while ('\0' != *str && 0 < n--)
 	{
 		if ('0' <= *str && *str <= '9')
-			c = (zbx_uint64_t)(unsigned char)(*str - '0');
+			c = *str - '0';
 		else if ('a' <= *str && *str <= 'f')
-			c = 10 + (zbx_uint64_t)(unsigned char)(*str - 'a');
+			c = 10 + (*str - 'a');
 		else if ('A' <= *str && *str <= 'F')
-			c = 10 + (zbx_uint64_t)(unsigned char)(*str - 'A');
+			c = 10 + (*str - 'A');
 		else
 			return FAIL;	/* not a hexadecimal digit */
 
-		if (20 <= ++len && ((max_uint64 - c) >> 4) < value_uint64)
+		if (16 < ++len && (max_uint64 >> 4) < value_uint64)
 			return FAIL;	/* maximum value exceeded */
 
 		value_uint64 = (value_uint64 << 4) + c;
