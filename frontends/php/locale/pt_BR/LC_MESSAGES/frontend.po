@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-13 05:45+0200\n"
+"POT-Creation-Date: 2014-11-17 16:39+0200\n"
 "PO-Revision-Date: 2014-11-04 18:29+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -475,7 +475,7 @@ msgstr "Ativo até"
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
-#: include/views/configuration.item.massupdate.php:365
+#: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
 #: include/views/configuration.maintenance.edit.php:203
 #: include/views/configuration.screen.constructor.edit.php:749
@@ -530,7 +530,7 @@ msgstr "Adicionar host"
 msgid "Add link"
 msgstr "Adicionar link"
 
-#: include/views/configuration.item.massupdate.php:542
+#: include/views/configuration.item.massupdate.php:546
 msgid "Add new or existing applications"
 msgstr "Adicionar aplicação nova ou existente"
 
@@ -654,7 +654,7 @@ msgstr "Todos os links devem ter \"Nome\" e \"URL\" definidos"
 
 #: include/views/configuration.host.discovery.edit.php:249
 #: include/views/configuration.item.edit.php:387
-#: include/views/configuration.item.massupdate.php:453
+#: include/views/configuration.item.massupdate.php:457
 msgid "Allowed hosts"
 msgstr "Hosts permitidos"
 
@@ -780,8 +780,8 @@ msgstr "Tipo de área"
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.edit.php:379
-#: include/views/configuration.item.massupdate.php:420
-#: include/views/configuration.item.massupdate.php:434
+#: include/views/configuration.item.massupdate.php:424
+#: include/views/configuration.item.massupdate.php:438
 msgid "As is"
 msgstr "Sem alterar"
 
@@ -4215,12 +4215,12 @@ msgid "Delimiter"
 msgstr "Delimitador"
 
 #: include/views/configuration.item.edit.php:356
-#: include/views/configuration.item.massupdate.php:422
+#: include/views/configuration.item.massupdate.php:426
 msgid "Delta (simple change)"
 msgstr "Delta (alterações simples)"
 
 #: include/views/configuration.item.edit.php:355
-#: include/views/configuration.item.massupdate.php:421
+#: include/views/configuration.item.massupdate.php:425
 msgid "Delta (speed per second)"
 msgstr "Delta (alterações/seg)"
 
@@ -4258,7 +4258,7 @@ msgstr "Status de desenvolvimento"
 #: include/views/configuration.host.edit.php:394
 #: include/views/configuration.host.massupdate.php:153
 #: include/views/configuration.item.edit.php:431
-#: include/views/configuration.item.massupdate.php:554
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
 #: include/views/configuration.template.edit.php:175
@@ -6230,7 +6230,7 @@ msgid "History storage period"
 msgstr "Período de retenção do histórico"
 
 #: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.massupdate.php:377
+#: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
 msgstr "Período de retenção do histórico (em dias)"
 
@@ -7964,7 +7964,7 @@ msgstr "Intervalo"
 
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:296
-#: include/views/configuration.item.massupdate.php:357
+#: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
 msgstr "Intervalo (em segundos)"
 
@@ -8796,7 +8796,7 @@ msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - 
 msgstr "A origem de log da última entrada corresponde ao parâmetro T, então N NÃO É 1, 0 - outro caso"
 
 #: include/views/configuration.item.edit.php:347
-#: include/views/configuration.item.massupdate.php:411
+#: include/views/configuration.item.massupdate.php:415
 msgid "Log time format"
 msgstr "Formato de data no log"
 
@@ -9127,7 +9127,7 @@ msgid "Mask"
 msgstr "Máscara"
 
 #: hosts.php:1066 include/views/configuration.item.list.php:273
-#: include/views/configuration.item.massupdate.php:562
+#: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
 msgid "Mass update"
 msgstr "Atualização em massa"
@@ -9162,7 +9162,7 @@ msgstr "Maximizar"
 
 #: include/views/configuration.host.discovery.edit.php:241
 #: include/views/configuration.item.edit.php:308
-#: include/views/configuration.item.massupdate.php:368
+#: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr "A quantidade máxima de intervalos flexíveis foi alcançada"
 
@@ -9709,7 +9709,7 @@ msgstr "Novo elemento"
 #: disc_prototypes.php:49 host_discovery.php:58
 #: include/views/configuration.host.discovery.edit.php:245
 #: include/views/configuration.item.edit.php:312
-#: include/views/configuration.item.massupdate.php:372 items.php:51
+#: include/views/configuration.item.massupdate.php:376 items.php:51
 msgid "New flexible interval"
 msgstr "Novo intervalo flexível"
 
@@ -11040,16 +11040,16 @@ msgstr "Ou"
 #: include/views/configuration.item.massupdate.php:302
 #: include/views/configuration.item.massupdate.php:312
 #: include/views/configuration.item.massupdate.php:350
-#: include/views/configuration.item.massupdate.php:379
-#: include/views/configuration.item.massupdate.php:389
-#: include/views/configuration.item.massupdate.php:403
-#: include/views/configuration.item.massupdate.php:413
-#: include/views/configuration.item.massupdate.php:427
-#: include/views/configuration.item.massupdate.php:445
-#: include/views/configuration.item.massupdate.php:455
-#: include/views/configuration.item.massupdate.php:492
-#: include/views/configuration.item.massupdate.php:543
-#: include/views/configuration.item.massupdate.php:556
+#: include/views/configuration.item.massupdate.php:383
+#: include/views/configuration.item.massupdate.php:393
+#: include/views/configuration.item.massupdate.php:407
+#: include/views/configuration.item.massupdate.php:417
+#: include/views/configuration.item.massupdate.php:431
+#: include/views/configuration.item.massupdate.php:449
+#: include/views/configuration.item.massupdate.php:459
+#: include/views/configuration.item.massupdate.php:496
+#: include/views/configuration.item.massupdate.php:547
+#: include/views/configuration.item.massupdate.php:560
 #: include/views/configuration.triggers.massupdate.php:75
 #: include/views/configuration.triggers.massupdate.php:150
 msgid "Original"
@@ -11442,7 +11442,7 @@ msgstr "Executa uma consulta DNS. Caso seja bem sucedida retorna uma sequência 
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.massupdate.php:321
-#: include/views/configuration.item.massupdate.php:361
+#: include/views/configuration.item.massupdate.php:362
 #: include/views/configuration.maintenance.edit.php:102 popup_period.php:25
 #: popup_period.php:96 popup_period.php:136 report2.php:380 report3.php:62
 #: report4.php:102 report6.php:56 srv_status.php:159
@@ -12006,7 +12006,7 @@ msgstr "Remover selecionado"
 msgid "Replace"
 msgstr "Substituir"
 
-#: include/views/configuration.item.massupdate.php:491
+#: include/views/configuration.item.massupdate.php:495
 msgid "Replace applications"
 msgstr "Substituir aplicações"
 
@@ -13073,7 +13073,7 @@ msgstr[0] "Exibir não reconhecidos (%1$s dia)"
 msgstr[1] "Exibir não reconhecidos (%1$s dias)"
 
 #: include/views/configuration.item.edit.php:386
-#: include/views/configuration.item.massupdate.php:443
+#: include/views/configuration.item.massupdate.php:447
 msgid "Show value"
 msgstr "Mostrar valor"
 
@@ -13346,7 +13346,7 @@ msgstr "Estado do serviço. 0 - executando, 1 - pausado, 2 - início pendente, 3
 #: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.item.list.php:73
 #: include/views/configuration.item.list.php:151
-#: include/views/configuration.item.massupdate.php:401
+#: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:104 popup_media.php:134
 #: popup.php:973 popup.php:1095 srv_status.php:140 tr_status.php:290
@@ -13430,7 +13430,7 @@ msgid "Stop"
 msgstr "Parar"
 
 #: include/views/configuration.item.edit.php:366
-#: include/views/configuration.item.massupdate.php:425
+#: include/views/configuration.item.massupdate.php:429
 msgid "Store value"
 msgstr "Armazenar valor"
 
@@ -14044,7 +14044,7 @@ msgid "Trend storage period"
 msgstr "Período de retenção das estatísticas"
 
 #: include/views/configuration.item.edit.php:346
-#: include/views/configuration.item.massupdate.php:387
+#: include/views/configuration.item.massupdate.php:391
 msgid "Trend storage period (in days)"
 msgstr "Período de retenção das estatísticas (em dias)"
 
@@ -14769,7 +14769,7 @@ msgstr "Ligado"
 #: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
-#: include/views/configuration.item.massupdate.php:567
+#: include/views/configuration.item.massupdate.php:571
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.screen.constructor.edit.php:740
@@ -16326,7 +16326,7 @@ msgid "new"
 msgstr "novo"
 
 #: include/views/configuration.host.massupdate.php:80
-#: include/views/configuration.item.massupdate.php:504
+#: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "novo"
@@ -16465,7 +16465,7 @@ msgid "show icon mappings"
 msgstr "mostrar mapeamento de ícones"
 
 #: include/views/configuration.item.edit.php:384
-#: include/views/configuration.item.massupdate.php:438
+#: include/views/configuration.item.massupdate.php:442
 msgid "show value mappings"
 msgstr "mostrar mapeamento de valores"
 
