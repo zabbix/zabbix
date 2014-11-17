@@ -13,7 +13,6 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
-..F....... [ZBX-4785] fixed errors when POST request with too many variables breaks functionality (Krists)
 ........S. [ZBX-8542] improved performance and reduced configuration cache locking when evaluating trigger expressions (wiper)
 ...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)

@@ -101,7 +101,7 @@ RPC.Call = Class.create(RPC.Base, {
 		}
 
 		Object.extend(request, this.userParams.request);
-		request.postBody = JsonParser.stringify(body),
+		request.postBody = Object.toJSON(body),
 
 		new Ajax.Request(RPC.rpcurl(), request);
 	},
