@@ -49,7 +49,6 @@ Bug fixes:
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
-..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
 A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
