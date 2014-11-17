@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-17 16:45+0200\n"
-"PO-Revision-Date: 2014-10-30 09:49+0300\n"
+"POT-Creation-Date: 2014-11-17 16:53+0200\n"
+"PO-Revision-Date: 2014-11-03 13:27+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1414655374.0\n"
+"X-POOTLE-MTIME: 1415014026.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -275,7 +275,7 @@ msgstr "Konto zostało zablokowane na %s sekund"
 #: include/events.inc.php:197 include/events.inc.php:272
 #: include/views/configuration.action.edit.php:1083
 msgid "Ack"
-msgstr "Potw."
+msgstr "Potwierdzone"
 
 #: acknow.php:233 jsLoader.php:181 tr_status.php:678
 msgid "Acknowledge"
@@ -10595,7 +10595,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:186 include/actions.inc.php:374
 #: include/views/configuration.action.edit.php:1082
 msgid "Not Ack"
-msgstr "Niezatwierdzone"
+msgstr "Niepotwierdzone"
 
 #: include/forms.inc.php:614 include/forms.inc.php:795
 msgid "Not Templated items"
