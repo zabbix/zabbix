@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 11:17+0200\n"
+"POT-Creation-Date: 2014-11-17 16:45+0200\n"
 "PO-Revision-Date: 2014-10-18 05:18+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1626,11 +1626,6 @@ msgstr "No es posible eliminar la dependecia"
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
 msgstr "No se pudo eliminar la gráfica descubierta \"%1$s\"."
-
-#: include/classes/api/services/CHost.php:1314
-#, c-format
-msgid "Cannot delete discovered host \"%1$s\"."
-msgstr "No se pudo eliminar el equipo descubierto \"%1$s\"."
 
 #: include/classes/api/services/CItem.php:633
 #, c-format
@@ -4187,7 +4182,7 @@ msgstr "Se ha eliminado la regla de descubrimiento \"%1$s\" en \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Se ha eliminado la gráfica \"%1$s\" en \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1466
+#: include/classes/api/services/CHost.php:1453
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Se ha eliminado el equipo \"%1$s\"."
@@ -9313,8 +9308,8 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
-msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
-msgstr "Memoria usada por un proceso. <name> nombre del proceso (todos los procesos por omisión). <user> nombre del usuario (todos los usuarios por omisión). <mode> valores posibles: avg, max, min, sum (predeterminado). <cmdline> filtrar por instrucciones (admite expresiones regulares). Ejemplo: proc.mem[,root]."
+msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
+msgstr ""
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
 #: dashboard.php:388 dashboard.php:411 dashboard.php:434 dashboard.php:457
@@ -10334,7 +10329,7 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1659
+#: include/classes/api/services/CHost.php:1646
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
