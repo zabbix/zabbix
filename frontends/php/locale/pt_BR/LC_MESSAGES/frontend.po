@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-17 16:45+0200\n"
-"PO-Revision-Date: 2014-10-10 18:49+0300\n"
+"POT-Creation-Date: 2014-11-17 16:53+0200\n"
+"PO-Revision-Date: 2014-11-04 18:28+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412959745.0\n"
+"X-POOTLE-MTIME: 1415118492.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -11694,7 +11694,7 @@ msgstr "Problema em"
 
 #: srv_status.php:142
 msgid "Problem time"
-msgstr "Problema de hora"
+msgstr "Tempo com incidente"
 
 #: include/services.inc.php:25
 msgid "Problem, if all children have problems"
