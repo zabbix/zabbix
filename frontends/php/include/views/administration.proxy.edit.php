@@ -70,19 +70,16 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 }
 
 // append hosts to form list
-$hostsTweenBox = new CTweenBox($proxyForm, 'hosts');
-$hostsTweenBox->setSelectedValues($this->data['hosts']);
+$hostsTweenBox = new CTweenBox($proxyForm, 'hosts', $this->data['hosts']);
 foreach ($this->data['dbHosts'] as $host) {
 	// show only normal hosts, and discovered hosts monitored by the current proxy
 	// for new proxies display only normal hosts
-	if (($this->data['proxyid'] && idcmp($this->data['proxyid'], $host['proxy_hostid']))
-			|| $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if (($this->data['proxyid'] && idcmp($this->data['proxyid'], $host['proxy_hostid'])) || $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostsTweenBox->addItem(
 			$host['hostid'],
 			$host['name'],
-			!$host['proxy_hostid'] || ($this->data['proxyid']
-				&& bccomp($host['proxy_hostid'], $this->data['proxyid']) == 0
-				&& $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+			null,
+			empty($host['proxy_hostid']) || ($this->data['proxyid'] && bccomp($host['proxy_hostid'], $this->data['proxyid']) == 0 && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
 		);
 	}
 }
