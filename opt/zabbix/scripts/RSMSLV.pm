@@ -1919,8 +1919,31 @@ my $log_open = 0;
 
 sub __log
 {
-	my $priority = shift;
+	my $syslog_priority = shift;
 	my $msg = shift;
+
+	my $priority;
+
+	if ($syslog_priority eq 'info')
+	{
+		$priority = 'INF';
+	}
+	elsif ($syslog_priority eq 'err')
+	{
+		$priority = 'ERR';
+	}
+	elsif ($syslog_priority eq 'warning')
+	{
+		$priority = 'WRN';
+	}
+	elsif ($syslog_priority eq 'debug')
+	{
+		$priority = 'DBG';
+	}
+	else
+	{
+		$priority = 'UND';
+	}
 
 	my $cur_tld = $tld || "";
 
@@ -1943,7 +1966,7 @@ sub __log
 		openlog($ident, $logopt, $facility);
 	}
 
-	syslog($priority, $msg);
+	syslog($syslog_priority, ts_str() . " [$priority] $msg"); # first paramtere is not used in our rsyslog template
 
 	$prev_tld = $cur_tld;
 }
