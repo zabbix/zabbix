@@ -51,7 +51,7 @@ div.preloader {
 	background-color: #ffffff; color: #aca899;
 }
 
-.ui-button.main { border-color: #ffaa33 !important; }
+.ui-button.main, .ui-button.main[disabled]:hover { border-color: #ffaa33 !important; }
 .ui-button.main:hover { border-color: #dd7711 !important; }
 
 /* form input and form buttons */
