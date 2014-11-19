@@ -520,7 +520,7 @@ class CHostGroup extends CZBXAPI {
 		$updGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid', 'flags'),
+			'output' => array('groupid', 'flags', 'name'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
@@ -529,12 +529,11 @@ class CHostGroup extends CZBXAPI {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
-
 			$this->checkNoParameters(
 				$group,
 				array('internal'),
 				_('Cannot update "%1$s" for host group "%2$s".'),
-				$group['name']
+				isset($group['name']) ? $group['name'] : $updGroups[$group['groupid']]['name']
 			);
 		}
 
