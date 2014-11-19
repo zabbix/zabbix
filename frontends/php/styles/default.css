@@ -446,7 +446,7 @@ table.requirements select { width: 152px; }
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; }
 table.filter tr td {
-	height: 26px; vertical-align: middle; border-left: 0 !important;
+	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
 	padding: 0 2px 0 6px;
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
