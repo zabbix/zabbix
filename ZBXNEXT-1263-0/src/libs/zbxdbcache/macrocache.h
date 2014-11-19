@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
@@ -18,23 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_MACROCACHE_H
+#define ZABBIX_MACROCACHE_H
 
-$macrosForm = new CForm();
-$macrosForm->setName('macrosForm');
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 
-// tab
-$macrosTab = new CTabView();
+/* user macro cache object */
+typedef struct
+{
+	/* the object id, for example trigger id */
+	zbx_uint64_t		objectid;
+	/* the macro source hosts */
+	zbx_vector_uint64_t	hostids;
+	/* the macro:value pairs */
+	zbx_vector_ptr_pair_t	macros;
+}
+zbx_umc_object_t;
 
-$macrosView = new CView('common.macros', array(
-	'macros' => $this->get('macros')
-));
-$macrosTab->addTab('macros', _('Macros'), $macrosView->render());
-
-$saveButton = new CSubmit('update', _('Update'));
-$saveButton->attr('data-removed-count', 0);
-$saveButton->addClass('main');
-
-$macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(null, array($saveButton)));
-
-return $macrosForm;
+#endif
