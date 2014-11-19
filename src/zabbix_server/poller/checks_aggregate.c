@@ -460,7 +460,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
 	const char	*tmp, *groups, *itemkey, *funcp;
-	int		grp_func, item_func;
+	int		grp_func, item_func, params_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
@@ -500,7 +500,9 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (4 != get_rparams_num(&request))
+	params_num = get_rparams_num(&request);
+
+	if (3 > params_num || 4 < params_num)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -528,7 +530,13 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	funcp = get_rparam(&request, 3);
+	if (4 == params_num)
+		funcp = get_rparam(&request, 3);
+	else if (3 == params_num && ZBX_VALUE_FUNC_LAST != item_func)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
+		goto out;
+	}
 
 	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
 		goto out;

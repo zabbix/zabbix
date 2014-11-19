@@ -305,7 +305,8 @@ abstract class CItemGeneral extends CApiService {
 				$params = $itemKey->getParameters();
 
 				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))
-						|| count($params) != 4
+						|| count($params) > 4 || count($params) < 3
+						|| (count($params) == 3 && $params[2] !== 'last')
 						|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
