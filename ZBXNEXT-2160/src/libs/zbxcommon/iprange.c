@@ -367,3 +367,29 @@ int	iprange_validate(const zbx_range_t *range, int type, const int *address)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: iprange_get_address_count                                        *
+ *                                                                            *
+ * Purpose: get the number of addresses covered by the specified IP range     *
+ *                                                                            *
+ * Parameters: range   - [IN] the IP range array                              *
+ *             type    - [IN] the address type (see ZBX_IPRANGE_* defines)    *
+ *                                                                            *
+ * Return value: The number of addresses covered by the range.                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	iprange_get_address_count(const zbx_range_t *range, int type)
+{
+	int		i, groups;
+	zbx_uint64_t	total = 1;
+
+	groups = (ZBX_IPRANGE_V4 == type ? 4 : 8);
+
+	for (i = 0; i < groups; i++)
+		total *= (range[i].to - range[i].from) + 1;
+
+	return total;
+}
+

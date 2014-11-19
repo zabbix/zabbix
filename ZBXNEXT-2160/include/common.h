@@ -958,6 +958,7 @@ int	iprange_parse(const char *address, zbx_range_t *range, int *type);
 void	iprange_first(const zbx_range_t *range, int type, int *address);
 int	iprange_next(const zbx_range_t *range, int type, int *address);
 int	iprange_validate(const zbx_range_t *range, int type, const int *address);
+zbx_uint64_t	iprange_get_address_count(const zbx_range_t *range, int type);
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);

@@ -36,6 +36,8 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
+#define ZBX_DISOCVERER_IPRANGE_LIMIT	(64 * ZBX_KIBIBYTE)
+
 /******************************************************************************
  *                                                                            *
  * Function: proxy_update_service                                             *
@@ -466,6 +468,13 @@ static void	process_rule(DB_DRULE *drule)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
 					drule->name, start);
+			goto next;
+		}
+
+		if (ZBX_DISOCVERER_IPRANGE_LIMIT < iprange_get_address_count(iprange, iptype))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range exceeds %d KB address limit",
+					drule->name, ZBX_DISOCVERER_IPRANGE_LIMIT / ZBX_KIBIBYTE);
 			goto next;
 		}
 #ifndef HAVE_IPV6
