@@ -531,10 +531,12 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	if (4 == params_num)
+	{
 		funcp = get_rparam(&request, 3);
+	}
 	else if (3 == params_num && ZBX_VALUE_FUNC_LAST != item_func)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
