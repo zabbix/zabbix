@@ -961,6 +961,9 @@ FIELD		|value		|t_longtext	|''	|NOT NULL	|0
 FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|meta		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0
@@ -1279,4 +1282,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2040000	|2040000
+ROW		|2050003	|2050003

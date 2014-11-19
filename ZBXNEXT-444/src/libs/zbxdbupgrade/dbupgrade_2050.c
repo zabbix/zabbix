@@ -28,10 +28,41 @@
 
 #ifndef HAVE_SQLITE3
 
+static int	DBpatch_2050000(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_2050001(void)
+{
+	const ZBX_FIELD	field = {"lastlogsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_2050002(void)
+{
+	const ZBX_FIELD	field = {"mtime", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_2050003(void)
+{
+	const ZBX_FIELD	field = {"meta", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
 
 /* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(2050000, 0, 1)
+DBPATCH_ADD(2050001, 0, 1)
+DBPATCH_ADD(2050002, 0, 1)
+DBPATCH_ADD(2050003, 0, 1)
 
 DBPATCH_END()
