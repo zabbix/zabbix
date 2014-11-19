@@ -67,7 +67,7 @@ if (!$this->data['is_profile']) {
 		array(
 			$lstGroups,
 			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form'),
+				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form top'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
 				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
