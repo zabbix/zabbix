@@ -279,7 +279,7 @@ div.onajaxload { position: absolute; background-color: #000000; filter: alpha(op
 
 /* tween box table */
 .tweenBoxTable tr td { padding: 0; vertical-align: middle; height: 24px; }
-.tweenBoxTable .button { height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px; }
+.tweenBoxTable .button, .old-filter .tweenBoxTable .button { height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px; }
 
 /* page header */
 table.page_header { padding-right: 0; padding-left: 0; background-color: #FFF; border: 0; vertical-align: middle; }
