@@ -73,7 +73,7 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, 2, &bits, sizeof(bits), 0, 32))
+		if (FAIL == is_uint_n_range(end + 1, ZBX_MAX_UINT64_LEN, &bits, sizeof(bits), 0, 32))
 			return FAIL;
 	}
 	else
@@ -148,7 +148,7 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, 3, &bits, sizeof(bits), 0, 128))
+		if (FAIL == is_uint_n_range(end + 1, ZBX_MAX_UINT64_LEN, &bits, sizeof(bits), 0, 128))
 			return FAIL;
 	}
 	else
@@ -390,8 +390,8 @@ int	iprange_validate(const zbx_range_t *range, int type, const int *address)
  ******************************************************************************/
 zbx_uint64_t	iprange_volume(const zbx_range_t *range, int type)
 {
-	int		i, groups, n;
-	zbx_uint64_t	volume_new, volume = 1;
+	int		i, groups;
+	zbx_uint64_t	n, volume = 1;
 
 	groups = (ZBX_IPRANGE_V4 == type ? 4 : 8);
 
@@ -399,11 +399,10 @@ zbx_uint64_t	iprange_volume(const zbx_range_t *range, int type)
 	{
 		n = range[i].to - range[i].from + 1;
 
-		volume_new = volume * n;
-		if (volume_new / n != volume)
+		if (ZBX_MAX_UINT64 / n < volume)
 			return ZBX_MAX_UINT64;
 
-		volume = volume_new;
+		volume *= n;
 	}
 
 	return volume;

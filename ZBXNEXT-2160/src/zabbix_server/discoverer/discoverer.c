@@ -36,7 +36,7 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-#define ZBX_DISCOVERER_IPRANGE_LIMIT	(64 * ZBX_KIBIBYTE)
+#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 /******************************************************************************
  *                                                                            *
@@ -473,8 +473,8 @@ static void	process_rule(DB_DRULE *drule)
 
 		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(iprange, iptype))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range exceeds %d address limit",
-					drule->name, ZBX_DISCOVERER_IPRANGE_LIMIT);
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range \"%s\" exceeds %d address limit",
+					drule->name, start, ZBX_DISCOVERER_IPRANGE_LIMIT);
 			goto next;
 		}
 #ifndef HAVE_IPV6
