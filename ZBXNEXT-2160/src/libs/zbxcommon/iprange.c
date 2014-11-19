@@ -36,7 +36,7 @@ static void	iprange_apply_mask(zbx_range_t *range, unsigned int bits, unsigned i
 {
 	int	i;
 
-	bits = (groups * group_bits) - bits;
+	bits = groups * group_bits - bits;
 
 	for (i = groups - 1; 0 < bits && 0 <= i; bits -= group_bits, i--)
 	{
@@ -374,8 +374,8 @@ int	iprange_validate(const zbx_range_t *range, int type, const int *address)
  *                                                                            *
  * Purpose: get the number of addresses covered by the specified IP range     *
  *                                                                            *
- * Parameters: range   - [IN] the IP range array                              *
- *             type    - [IN] the address type (see ZBX_IPRANGE_* defines)    *
+ * Parameters: range - [IN] the IP range array                                *
+ *             type  - [IN] the address type (see ZBX_IPRANGE_* defines)      *
  *                                                                            *
  * Return value: The number of addresses covered by the range.                *
  *                                                                            *
@@ -388,8 +388,7 @@ zbx_uint64_t	iprange_get_address_count(const zbx_range_t *range, int type)
 	groups = (ZBX_IPRANGE_V4 == type ? 4 : 8);
 
 	for (i = 0; i < groups; i++)
-		total *= (range[i].to - range[i].from) + 1;
+		total *= range[i].to - range[i].from + 1;
 
 	return total;
 }
-
