@@ -99,14 +99,14 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_uint_n_range(address, len, &range[index].from, (size_t)4, 0LL, (1LL << 8) - 1))
+		if (FAIL == is_uint_n_range(address, len, &range[index].from, 4, 0, 255))
 			return FAIL;
 
 		/* if range is specified, extract the end value, otherwise set end value equal to the start value */
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_uint_n_range(dash, ptr - dash, &range[index].to, (size_t)4, 0LL, (1LL << 8) - 1))
+			if (FAIL == is_uint_n_range(dash, ptr - dash, &range[index].to, 4, 0, 255))
 				return FAIL;
 
 			if (range[index].to < range[index].from)
@@ -183,14 +183,14 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_hex_n_range(address, len, &range[index].from, (size_t)4, 0LL, (1LL << 16) - 1))
+		if (FAIL == is_hex_n_range(address, len, &range[index].from, 4, 0LL, (1LL << 16) - 1))
 			return FAIL;
 
 		/* if range is specified, extract the end value, otherwise set end value equal to the start value */
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_hex_n_range(dash, ptr - dash, &range[index].to, (size_t)4, 0LL, (1LL << 16) - 1))
+			if (FAIL == is_hex_n_range(dash, ptr - dash, &range[index].to, 4, 0LL, (1LL << 16) - 1))
 				return FAIL;
 
 			if (range[index].to < range[index].from)
