@@ -43,13 +43,13 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'host' => array(
 					'host' => 'Zabbix server',
 					'status' => '0',
-					'status' => 'My zabbix server',
+					'description' => 'My zabbix server',
 					'proxy' => ''
 				),
 				'host1' => array(
 					'host' => 'Linux server',
 					'status' => '0',
-					'status' => 'A linux server',
+					'description' => 'A linux server',
 					'proxy' => ''
 				),
 			)
