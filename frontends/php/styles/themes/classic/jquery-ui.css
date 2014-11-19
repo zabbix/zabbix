@@ -464,7 +464,3 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
 
 .classic .ui-progressbar { height: 2em; text-align: left; }
 .classic .ui-progressbar .ui-progressbar-value { margin: -1px; height: 100%; }
-
-/* Make checked checkboxes/radiobuttons have black label text */
-.classic .ui-button.ui-state-active .ui-button-text { color: #000; }
-.classic .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #555; }

@@ -71,6 +71,10 @@ div.preloader {
 .button-form { background: #fff; }
 .button-form:hover { border-color: #6e8ab4; }
 
+/* Make checked checkboxes/radiobuttons have black label text */
+.radioset .ui-button.ui-state-active .ui-button-text { color: #000000; }
+.radioset .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }
+
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
 	color: #aca899;
