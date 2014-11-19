@@ -38,7 +38,7 @@ static void	iprange_apply_mask(zbx_range_t *range, unsigned int bits, unsigned i
 
 	bits = groups * group_bits - bits;
 
-	for (i = groups - 1; 0 < bits && 0 <= i; bits -= group_bits, i--)
+	for (i = groups - 1; 0 < bits; bits -= group_bits, i--)
 	{
 		unsigned int	mask_empty, mask_fill, mask_bits = bits;
 
@@ -73,7 +73,7 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint32(end + 1, &bits))
+		if (FAIL == is_uint_n_range(end + 1, 2, &bits, sizeof(bits), 0, 32))
 			return FAIL;
 	}
 	else
@@ -107,6 +107,9 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 		{
 			dash++;
 			if (FAIL == is_uint_n_range(dash, ptr - dash, &range[index].to, (size_t)4, 0LL, (1LL << 8) - 1))
+				return FAIL;
+
+			if (range[index].to < range[index].from)
 				return FAIL;
 		}
 		else
@@ -145,7 +148,7 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint32(end + 1, &bits))
+		if (FAIL == is_uint_n_range(end + 1, 3, &bits, sizeof(bits), 0, 128))
 			return FAIL;
 	}
 	else
@@ -188,6 +191,9 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 		{
 			dash++;
 			if (FAIL == is_hex_n_range(dash, ptr - dash, &range[index].to, (size_t)4, 0LL, (1LL << 16) - 1))
+				return FAIL;
+
+			if (range[index].to < range[index].from)
 				return FAIL;
 		}
 		else
@@ -370,25 +376,35 @@ int	iprange_validate(const zbx_range_t *range, int type, const int *address)
 
 /******************************************************************************
  *                                                                            *
- * Function: iprange_get_address_count                                        *
+ * Function: iprange_volume                                                   *
  *                                                                            *
  * Purpose: get the number of addresses covered by the specified IP range     *
  *                                                                            *
  * Parameters: range - [IN] the IP range array                                *
  *             type  - [IN] the address type (see ZBX_IPRANGE_* defines)      *
  *                                                                            *
- * Return value: The number of addresses covered by the range.                *
+ * Return value: The number of addresses covered by the range or              *
+ *               ZBX_MAX_UINT64 if this number exceeds 64 bit unsigned        *
+ *               integer.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	iprange_get_address_count(const zbx_range_t *range, int type)
+zbx_uint64_t	iprange_volume(const zbx_range_t *range, int type)
 {
-	int		i, groups;
-	zbx_uint64_t	total = 1;
+	int		i, groups, n;
+	zbx_uint64_t	volume_new, volume = 1;
 
 	groups = (ZBX_IPRANGE_V4 == type ? 4 : 8);
 
 	for (i = 0; i < groups; i++)
-		total *= range[i].to - range[i].from + 1;
+	{
+		n = range[i].to - range[i].from + 1;
 
-	return total;
+		volume_new = volume * n;
+		if (volume_new / n != volume)
+			return ZBX_MAX_UINT64;
+
+		volume = volume_new;
+	}
+
+	return volume;
 }

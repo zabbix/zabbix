@@ -471,10 +471,10 @@ static void	process_rule(DB_DRULE *drule)
 			goto next;
 		}
 
-		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_get_address_count(iprange, iptype))
+		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(iprange, iptype))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range exceeds %d KB address limit",
-					drule->name, ZBX_DISCOVERER_IPRANGE_LIMIT / ZBX_KIBIBYTE);
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range exceeds %d address limit",
+					drule->name, ZBX_DISCOVERER_IPRANGE_LIMIT);
 			goto next;
 		}
 #ifndef HAVE_IPV6

@@ -99,6 +99,8 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
+#define ZBX_MAX_UINT64		(~__UINT64_C(0))
+
 typedef struct
 {
 	int	sec;	/* seconds */
@@ -958,7 +960,7 @@ int	iprange_parse(const char *address, zbx_range_t *range, int *type);
 void	iprange_first(const zbx_range_t *range, int type, int *address);
 int	iprange_next(const zbx_range_t *range, int type, int *address);
 int	iprange_validate(const zbx_range_t *range, int type, const int *address);
-zbx_uint64_t	iprange_get_address_count(const zbx_range_t *range, int type);
+zbx_uint64_t	iprange_volume(const zbx_range_t *range, int type);
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
