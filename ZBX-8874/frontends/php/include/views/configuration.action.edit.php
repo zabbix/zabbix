@@ -348,6 +348,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 $conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
+$conditionTable->setAttribute('data-submit-button-selector', '#add_condition');
 
 $conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted ui-corner-all'));
 
@@ -1048,6 +1049,7 @@ if (!empty($this->data['new_operation'])) {
 			SPACE.SPACE,
 			new CSubmit('cancel_new_opcondition', _('Cancel'), null, 'link_menu')
 		);
+		$newOperationConditionTable->setAttribute('data-submit-button-selector', '#add_opcondition');
 
 		$newOperationsTable->addRow(array(_('Operation condition'), new CDiv(array($newOperationConditionTable, $newOperationConditionFooter), 'objectgroup inlineblock border_dotted ui-corner-all')));
 	}
@@ -1057,6 +1059,9 @@ if (!empty($this->data['new_operation'])) {
 		SPACE.SPACE,
 		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
 	);
+
+	$newOperationsTable->setAttribute('data-submit-button-selector', '#add_operation');
+
 	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup floatleft border_dotted ui-corner-all'));
 }
 

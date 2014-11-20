@@ -1046,49 +1046,111 @@ jQuery(function ($) {
 			verticalHeaderTables[table.attr('id')] = table;
 		});
 	};
+});
+
+jQuery(function ($) {
 
 	/**
-	 * Sets a default submit button (via provided selector string) to input and select form elements so
-	 * "Enter" keypress does not just grab first submit button in the form. If submit button can not be
-	 * located, the keypress event is bubbled up.
+	 * Makes specific button to be clicked when "Enter" key is pressed while input or select element is
+	 * focused. If button is not specified or cannot be resolved, default behaviour happens, i.e. first found submit
+	 * button is clicked. It is possible to specify button for either specific element or for element group (i.e, a div
+	 * element or table). In both cases selector string of button to be clicked must be present in
+	 * "data-submit-button-selector" attribute. If value of attribute is set to "--ignore--" no button is clicked.
 	 *
-	 * @param {string} selector			selector that is used to get default button element in form
+	 * @param {string}	formLevelSubmitSelector		Specifies default submit button selector for whole form. Optional.
 	 *
-	 * @throws exception if submit button selector is not string
-	 *
-	 * @return {object}
+	 * @return {jQuery}
 	 */
-	$.fn.enterSubmit = function (selector) {
-		if (typeof selector !== 'string') {
-			throw Error('Invalid input type. String required, got ' + typeof selector);
-		}
+	$.fn.useSubmitButtonSelector = function(formLevelSubmitSelector) {
+		this.filter('form').each(function() {
 
-		// Take only form elements.
-		$(this).filter('form').each(function () {
 			var form = $(this);
 
-			function keypressHandler(e) {
-				// Ignore everything that is not "Enter" key.
-				if ((e.which && e.which != 13) || (e.keyCode && e.keyCode != 13)) {
-					return true;
-				}
-
-				// Look for submit button in form.
-				var submitButton = $(selector, form);
-
-				// If nothing is found, bubble up. Otherwise click found button and do not bubble.
-				if (submitButton.length == 0) {
-					return true;
-				}
-				else {
-					submitButton.click();
-					return false;
-				}
+			// If form level submit selector is given, add it to form.
+			if (formLevelSubmitSelector) {
+				form.attr('data-submit-button-selector', formLevelSubmitSelector);
 			}
 
-			// Attach to inputs and selects (both those that exist now and that will be created in this form).
-			form.on('keypress', 'input', keypressHandler);
-			form.on('keypress', 'select', keypressHandler);
+			// Add special submit button as first thing in form. This way we know for sure
+			// this button receives "click" when form is submitted using "Enter" key. Button is
+			// not shown and does not affect layout.
+			var mostFirstSubmitButton = $('<input>', {
+				type: 'submit',
+				style: 'position: absolute !important; clip: rect(0, 0, 0, 0);'
+			});
+			form.prepend(mostFirstSubmitButton);
+
+			// Bind to "focus" event of all inputs and selects in current form. This is needed because on IE
+			// selector ":focus" acts strange and doing it this way the behavior on is consistent on all browsers.
+			form.on('focus', 'input,select', function() {
+				if (this != mostFirstSubmitButton.get(0)) {
+					form.data('focused', $(this));
+				}
+			});
+
+			// Bind this event for our special submit button.
+			mostFirstSubmitButton.on('click', function(e) {
+
+				// This is used to remove our special submit button and click original default submit button.
+				function clickOriginalDefaultSubmitButton() {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					mostFirstSubmitButton.remove();
+					$('input[type=submit],button[type=submit]', form).first().click();
+				}
+
+				// Fetch focused element from form data. If no element is focused, click original
+				// default submit button.
+				var focused = form.data('focused');
+				if (!focused) {
+					clickOriginalDefaultSubmitButton();
+					return;
+				}
+
+				// Ensure that currently focused element is not a submit button of any sort. If so, leave this
+				// event handler.
+				var focusedTagName = focused.prop('tagName').toLowerCase();
+				var focusedType = focused.attr('type');
+				if ((focusedTagName == 'button' || focusedTagName == 'input') && focusedType == 'submit') {
+					return;
+				}
+
+				// Look for element where submit button selector string is stored. If not found, click original
+				// default submit button.
+				var buttonSelectorSource = focused.closest('[data-submit-button-selector]', form);
+				if (buttonSelectorSource.length == 0) {
+					clickOriginalDefaultSubmitButton();
+					return;
+				}
+
+				// Check for submit button selector string. If string is not found, click original default
+				// submit button.
+				var buttonSelector = buttonSelectorSource.data('submit-button-selector');
+				if (!buttonSelector) {
+					clickOriginalDefaultSubmitButton();
+					return;
+				}
+
+				// If button selector contains special value '--ignore--', no submit button will be clicked.
+				if (buttonSelector == '--ignore--') {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
+
+				// Try to locate submit button in current form using submit button selector. If submit button is not
+				// found, click original default submit button.
+				var pickedButton = $(buttonSelector, form);
+				if (pickedButton.length == 0) {
+					clickOriginalDefaultSubmitButton();
+					return;
+				}
+
+				// If all went well stop event propagation and click picked button.
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				pickedButton.first().click();
+			});
 		});
 
 		return this;

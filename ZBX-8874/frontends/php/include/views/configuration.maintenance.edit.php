@@ -147,8 +147,10 @@ if (isset($_REQUEST['new_timeperiod'])) {
 		new CSubmit('cancel_new_timeperiod', _('Cancel'), null, 'link_menu')
 	);
 
+	$timePeriodForm = get_timeperiod_form();
+	$timePeriodForm->setAttribute('data-submit-button-selector', '#add_timeperiod');
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		new CDiv(array(get_timeperiod_form(), $footer), 'objectgroup inlineblock border_dotted')
+		new CDiv(array($timePeriodForm, $footer), 'objectgroup inlineblock border_dotted')
 	);
 }
 

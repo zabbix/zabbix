@@ -364,6 +364,7 @@ $newFlexInt = new CDiv(array(
 	' ',
 	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 ), null, 'row-new-delay-flex-fields');
+$newFlexInt->setAttribute('data-submit-button-selector', '#add_delay_flex');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');

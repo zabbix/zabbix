@@ -21,7 +21,7 @@
 	</div>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
-	<div id="new_check_form">
+	<div id="new_check_form" data-submit-button-selector="#add_new_dcheck">
 		<div class="objectgroup inlineblock border_dotted ui-corner-all">
 			<table class="formElementTable">
 				<tbody>
