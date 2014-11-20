@@ -2846,7 +2846,7 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
 	char				*instance, *counter, *value;
-	int				i, j, values = 0;
+	int				i, j, values = 0, valid_data = 0;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_uint64_t			counterid;
 	zbx_vmware_perf_counter_t	*perfcounter;
@@ -2892,6 +2892,9 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 					zbx_vector_ptr_pair_append_ptr(&perfcounter->values, &perfvalue);
 					values++;
 
+					if (0 == valid_data && 0 != strcmp(value, "-1"))
+						valid_data = 1;
+
 					break;
 				}
 			}
@@ -2901,6 +2904,17 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		zbx_free(instance);
 		zbx_free(value);
 	}
+
+	/* No valid data found - all metrics has -1 value. In this case clear the counter values. */
+	if (0 == valid_data)
+	{
+		for (j = 0; j < entity->counters.values_num; j++)
+		{
+			perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
+			vmware_vector_ptr_pair_shared_clean(&perfcounter->values);
+		}
+	}
+
 out:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
