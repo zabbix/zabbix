@@ -19,7 +19,7 @@
 **/
 
 
-class C20ImportConverterTest extends PHPUnit_Framework_TestCase {
+class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 
 	public function testConvertGeneral() {
 		$this->assertConvert($this->createResult(), $this->createSource());
