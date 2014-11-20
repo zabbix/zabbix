@@ -540,8 +540,11 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
+	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func,
+			4 == params_num ? funcp : "0"))
+	{
 		goto out;
+	}
 
 	ret = SUCCEED;
 out:
