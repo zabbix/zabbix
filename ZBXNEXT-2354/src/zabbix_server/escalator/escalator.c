@@ -964,7 +964,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(userid, row[0]);
+			ZBX_DBROW2UINT64(userid, row[0]);
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
 			if (SUCCEED != check_perm2system(userid))

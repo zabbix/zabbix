@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-06 09:39+0300\n"
-"PO-Revision-Date: 2014-06-05 14:41+0300\n"
+"POT-Creation-Date: 2014-09-28 12:22+0300\n"
+"PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401972111.0\n"
+"X-POOTLE-MTIME: 1415002407.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -689,7 +689,7 @@ msgstr "Близится"
 msgid "Apr"
 msgstr "Апр"
 
-#: include/forms.inc.php:1712 include/func.inc.php:132
+#: include/forms.inc.php:1711 include/func.inc.php:132
 #: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "Апрель"
@@ -757,7 +757,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/forms.inc.php:1793
+#: include/forms.inc.php:1792
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
 
@@ -799,7 +799,7 @@ msgstr "Журнал аудита"
 msgid "Aug"
 msgstr "Авг"
 
-#: include/forms.inc.php:1704 include/func.inc.php:136
+#: include/forms.inc.php:1703 include/func.inc.php:136
 #: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "Август"
@@ -870,7 +870,7 @@ msgstr "Период хранения данных событий о автор�
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Период хранения данных событий о авторегистрациях и оповещениях (в днях) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:805
+#: include/views/configuration.host.edit.php:804
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -2737,7 +2737,7 @@ msgstr "Подчиненный"
 
 #: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
-msgstr "Chinese (zh_CN)"
+msgstr "Китайский (zh_CN)"
 
 #: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
@@ -2800,7 +2800,7 @@ msgstr "Часы"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:871
+#: include/views/configuration.host.edit.php:870
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2837,7 +2837,7 @@ msgid "Colour"
 msgstr "Цвет"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:383 jsLoader.php:163
+#: include/validate.inc.php:394 jsLoader.php:163
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Цвет \"%1$s\" не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
@@ -3478,7 +3478,7 @@ msgstr "Пользовательские слайды"
 
 #: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
-msgstr "Czech (cs_CZ)"
+msgstr "Чешский (cs_CZ)"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1369
 msgid "D"
@@ -3540,7 +3540,7 @@ msgstr "DNS имя"
 msgid "DOWN"
 msgstr "НЕДОСТУПНО"
 
-#: include/forms.inc.php:1661 include/maintenances.inc.php:36
+#: include/forms.inc.php:1660 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3642,7 +3642,7 @@ msgstr "Тип базы данных"
 msgid "Database user"
 msgstr "Имя пользователя от базы данных"
 
-#: include/forms.inc.php:1728 include/forms.inc.php:1789 jsrpc.php:137
+#: include/forms.inc.php:1727 include/forms.inc.php:1788 jsrpc.php:137
 msgid "Date"
 msgstr "Дата"
 
@@ -3662,12 +3662,12 @@ msgstr "Дата окончания обслуживания HW"
 msgid "Date HW purchased"
 msgstr "Дата покупки HW"
 
-#: include/forms.inc.php:1730 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1729 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:295 tr_status.php:297
 msgid "Day"
 msgstr "День"
 
-#: include/forms.inc.php:1762
+#: include/forms.inc.php:1761
 msgid "Day of month"
 msgstr "День месяца"
 
@@ -3687,8 +3687,8 @@ msgstr "День месяца > N"
 msgid "Day of month is NOT N"
 msgstr "День месяца NOT N"
 
-#: include/forms.inc.php:1690 include/forms.inc.php:1733
-#: include/forms.inc.php:1758
+#: include/forms.inc.php:1689 include/forms.inc.php:1732
+#: include/forms.inc.php:1757
 msgid "Day of week"
 msgstr "День недели"
 
@@ -3708,7 +3708,7 @@ msgstr "День недели > N"
 msgid "Day of week is NOT N"
 msgstr "День недели NOT N"
 
-#: include/forms.inc.php:1806 tr_status.php:295 tr_status.php:297
+#: include/forms.inc.php:1805 tr_status.php:295 tr_status.php:297
 msgid "Days"
 msgstr "Дни"
 
@@ -3730,7 +3730,7 @@ msgstr "Режим отладки обновлен"
 msgid "Dec"
 msgstr "Дек"
 
-#: include/forms.inc.php:1724 include/func.inc.php:140
+#: include/forms.inc.php:1723 include/func.inc.php:140
 #: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "Декабрь"
@@ -3979,7 +3979,7 @@ msgstr "Удалить выбранный прототип узла сети?"
 msgid "Delete selected host prototypes?"
 msgstr "Удалить выбранные прототипы узлов сети?"
 
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:872
 msgid "Delete selected host?"
 msgstr "Удалить выбранный узел сети?"
 
@@ -4412,7 +4412,7 @@ msgstr "Деактивировать выбранные триггеры?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:801
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4478,7 +4478,6 @@ msgstr "Объект обнаружения"
 #: include/actions.inc.php:70 include/audit.inc.php:44
 #: include/blocks.inc.php:1204 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
-#: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Правило обнаружения"
@@ -4530,6 +4529,7 @@ msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
 #: include/html.inc.php:512 include/html.inc.php:516
+#: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
@@ -4691,7 +4691,7 @@ msgstr "Длительность (сек)"
 
 #: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
-msgstr "Dutch (nl_NL)"
+msgstr "Голландский (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:638
 msgid "Dynamic item"
@@ -4985,7 +4985,7 @@ msgstr "Активировано"
 
 #: include/locales.inc.php:55
 msgid "English (en_GB)"
-msgstr "English (en_GB)"
+msgstr "Английский (en_GB)"
 
 #: include/locales.inc.php:56
 msgid "English (en_US)"
@@ -5006,7 +5006,7 @@ msgstr "Ошибка"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Ошибка в запросе поиска в таблице \"%1$s\"."
 
-#: httpdetails.php:163 httpdetails.php:236
+#: httpdetails.php:164 httpdetails.php:236
 #, c-format
 msgid "Error: %1$s"
 msgstr "Ошибка: %1$s"
@@ -5075,11 +5075,11 @@ msgstr "События"
 msgid "Events and alerts"
 msgstr "События и оповещения"
 
-#: include/forms.inc.php:1673
+#: include/forms.inc.php:1672
 msgid "Every day(s)"
 msgstr "Каждый день(и)"
 
-#: include/forms.inc.php:1680
+#: include/forms.inc.php:1679
 msgid "Every week(s)"
 msgstr "Каждую неделю(и)"
 
@@ -5103,7 +5103,7 @@ msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Выполнение WMI запроса и получение первого выбранного объекта."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
@@ -5256,7 +5256,7 @@ msgstr "Избранные"
 msgid "Feb"
 msgstr "Фев"
 
-#: include/forms.inc.php:1702 include/func.inc.php:130
+#: include/forms.inc.php:1701 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "Февраль"
@@ -5270,7 +5270,7 @@ msgstr "Поле"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Поле \"%1$s\" не может быть NULL."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:451
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Поле \"%1$s\" обязательно."
@@ -5295,12 +5295,12 @@ msgstr "Поле \"%1$s\" не список и не диапазон чисел.
 msgid "Field \"%1$s\" is not integer."
 msgstr "Поле \"%1$s\" не число."
 
-#: include/validate.inc.php:373
+#: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Поле \"%1$s\" не строка."
 
-#: include/validate.inc.php:452
+#: include/validate.inc.php:463
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Поле \"%1$s\" должно быть пропущено."
@@ -5386,7 +5386,7 @@ msgstr "Финиш"
 msgid "Finnish (fi_FI)"
 msgstr "Финский (fi_FI)"
 
-#: include/forms.inc.php:1740 include/maintenances.inc.php:118
+#: include/forms.inc.php:1739 include/maintenances.inc.php:118
 msgid "First"
 msgstr "Первый"
 
@@ -5417,19 +5417,19 @@ msgstr "Пароль для Гостя должен быть пустым"
 msgid "Formula"
 msgstr "Формула"
 
-#: include/forms.inc.php:1743 include/maintenances.inc.php:121
+#: include/forms.inc.php:1742 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "Четвертый"
 
 #: include/locales.inc.php:63
 msgid "French (fr_FR)"
-msgstr "French (fr_FR)"
+msgstr "Французский (fr_FR)"
 
 #: include/func.inc.php:230
 msgid "Fri"
 msgstr "Пт"
 
-#: include/forms.inc.php:1687 include/forms.inc.php:1755
+#: include/forms.inc.php:1686 include/forms.inc.php:1754
 #: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Пятница"
@@ -5459,7 +5459,7 @@ msgstr "Доступ к веб-интерфейсу обновлен"
 msgid "Frontend messaging"
 msgstr "Сообщения в веб-интерфейсе"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:871
 #: include/views/configuration.template.edit.php:478
 msgid "Full clone"
 msgstr "Полное клонирование"
@@ -5517,7 +5517,7 @@ msgstr "Сгенерировано за %s сек"
 
 #: include/locales.inc.php:64
 msgid "German (de_DE)"
-msgstr "German (de_DE)"
+msgstr "Немецкий (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:559
@@ -5781,7 +5781,7 @@ msgstr "График удален"
 
 #: include/locales.inc.php:65
 msgid "Greek (el_GR)"
-msgstr "Greek (el_GR)"
+msgstr "Греческий (el_GR)"
 
 #: include/views/configuration.sysmap.constructor.php:75
 #: include/views/js/configuration.sysmaps.js.php:64
@@ -6238,7 +6238,7 @@ msgstr "Интерфейс узла сети"
 msgid "Host inventories"
 msgstr "Инвентарные данные узлов сети"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:862
+#: hostinventories.php:26 include/views/configuration.host.edit.php:861
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Инвентарные данные узла сети"
@@ -6463,7 +6463,7 @@ msgstr "Узлы сети обновлены"
 msgid "Hourly"
 msgstr "Ежечасно"
 
-#: include/forms.inc.php:1808
+#: include/forms.inc.php:1807
 msgid "Hours"
 msgstr "Часы"
 
@@ -7496,12 +7496,12 @@ msgstr "Некорректные пользовательские данные �
 msgid "Incorrect user group."
 msgstr "Некорректная группа пользователей."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:502
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля."
 
-#: api/classes/CScreenItem.php:543 include/validate.inc.php:487
+#: api/classes/CScreenItem.php:543 include/validate.inc.php:498
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s."
@@ -7526,7 +7526,7 @@ msgstr "Некорректное значение \"%1$s\" для поля це�
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Некорректное значение поля \"%1$s\"."
 
-#: include/validate.inc.php:482
+#: include/validate.inc.php:493
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Некорректное значение для поля \"%1$s\": не может быть пустым."
@@ -8087,7 +8087,7 @@ msgstr "Идентификатор Jabber"
 msgid "Jan"
 msgstr "Янв"
 
-#: include/forms.inc.php:1697 include/func.inc.php:129
+#: include/forms.inc.php:1696 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "Январь"
@@ -8100,7 +8100,7 @@ msgstr "Japanese (ja_JP)"
 msgid "Jul"
 msgstr "Июл"
 
-#: include/forms.inc.php:1699 include/func.inc.php:135
+#: include/forms.inc.php:1698 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "Июль"
@@ -8109,7 +8109,7 @@ msgstr "Июль"
 msgid "Jun"
 msgstr "Июн"
 
-#: include/forms.inc.php:1722 include/func.inc.php:134
+#: include/forms.inc.php:1721 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "Июнь"
@@ -8212,7 +8212,7 @@ msgstr "Расположение подписи"
 msgid "Language"
 msgstr "Язык"
 
-#: include/forms.inc.php:1744 include/maintenances.inc.php:122
+#: include/forms.inc.php:1743 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "Последний"
 
@@ -8693,7 +8693,7 @@ msgstr "Обслуживание удалено"
 msgid "Maintenance period"
 msgstr "Период обслуживания"
 
-#: include/forms.inc.php:1803
+#: include/forms.inc.php:1802
 msgid "Maintenance period length"
 msgstr "Длительность периода обслуживания"
 
@@ -8725,7 +8725,7 @@ msgstr "Обслуживание без сбора данных"
 msgid "Mandatory parameter is missing."
 msgstr "Пропущен обязательный параметр."
 
-#: include/views/configuration.host.edit.php:803
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -8806,7 +8806,7 @@ msgstr "Карты сетей"
 msgid "Mar"
 msgstr "Мар"
 
-#: include/forms.inc.php:1707 include/func.inc.php:131
+#: include/forms.inc.php:1706 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "Март"
@@ -8942,7 +8942,7 @@ msgstr[0] "Максимальная длина видимого имени уз�
 msgstr[1] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
 msgstr[2] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
-#: include/forms.inc.php:1717 include/func.inc.php:133
+#: include/forms.inc.php:1716 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "Май"
@@ -9137,7 +9137,7 @@ msgstr "Минимальное значение за период T > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Минимальное значение за период T NOT N"
 
-#: include/forms.inc.php:1810
+#: include/forms.inc.php:1809
 msgid "Minutes"
 msgstr "Минут"
 
@@ -9209,7 +9209,7 @@ msgstr "Модель"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:1683 include/forms.inc.php:1751
+#: include/forms.inc.php:1682 include/forms.inc.php:1750
 #: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Понедельник"
@@ -9247,11 +9247,11 @@ msgstr "Мониторинг за файлом журнала с ротацие�
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr "Мониторинг за файлом журнала. шаблон - регулярное выражение"
 
-#: include/forms.inc.php:1726 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1725 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "Месяц"
 
-#: include/forms.inc.php:1663 include/maintenances.inc.php:40
+#: include/forms.inc.php:1662 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:405
 #: include/reports.inc.php:413 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9436,7 +9436,7 @@ msgstr "Карты сетей"
 msgid "Never"
 msgstr "Никогда"
 
-#: httpdetails.php:156 httpdetails.php:230
+#: httpdetails.php:157 httpdetails.php:230
 msgid "Never executed"
 msgstr "Никогда не выполнялось"
 
@@ -10328,7 +10328,7 @@ msgstr "Оповещения"
 msgid "Nov"
 msgstr "Ноя"
 
-#: include/forms.inc.php:1719 include/func.inc.php:139
+#: include/forms.inc.php:1718 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "Ноябрь"
@@ -10503,7 +10503,7 @@ msgstr "Числовой (целое положительное)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:151 httpdetails.php:240
+#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
 #: include/maps.inc.php:956 include/setup.inc.php:198
@@ -10564,7 +10564,7 @@ msgstr "Окт"
 msgid "Octal"
 msgstr "Восьмеричный"
 
-#: include/forms.inc.php:1714 include/func.inc.php:138
+#: include/forms.inc.php:1713 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "Октябрь"
@@ -10598,7 +10598,7 @@ msgstr "Один раз"
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
-#: include/forms.inc.php:1660 include/maintenances.inc.php:34
+#: include/forms.inc.php:1659 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "Единовременно"
 
@@ -10699,7 +10699,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" уже существует."
 
-#: include/validate.inc.php:464
+#: include/validate.inc.php:475
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операция не может быть выполнена из-за несанкционированного запроса."
 
@@ -11026,7 +11026,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:566
 msgid "Page received incorrect data"
 msgstr "Страница получила некорректные данные"
 
@@ -11155,7 +11155,7 @@ msgstr "Выполнение DNS запроса. При успехе возвр�
 msgid "Period"
 msgstr "Период"
 
-#: include/forms.inc.php:1665
+#: include/forms.inc.php:1664
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Тип периода"
@@ -12154,7 +12154,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Сб"
 
-#: include/forms.inc.php:1688 include/forms.inc.php:1756
+#: include/forms.inc.php:1687 include/forms.inc.php:1755
 #: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Суббота"
@@ -12189,7 +12189,7 @@ msgstr "Суббота"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:876
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -12413,7 +12413,7 @@ msgstr "Шаблон поиска пустой"
 msgid "Search/Filter elements limit"
 msgstr "Лимит элементов в поиске/фильтре"
 
-#: include/forms.inc.php:1741 include/maintenances.inc.php:119
+#: include/forms.inc.php:1740 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "Секунда"
 
@@ -12573,7 +12573,7 @@ msgstr "Сен"
 msgid "Separated"
 msgstr "Неподтвержденные отдельно"
 
-#: include/forms.inc.php:1709 include/func.inc.php:137
+#: include/forms.inc.php:1708 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "Сентябрь"
@@ -12914,7 +12914,7 @@ msgstr "Слайды"
 
 #: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
-msgstr "Slovak (sk_SK)"
+msgstr "Словацкий (sk_SK)"
 
 #: jsLoader.php:170
 msgid "Snooze"
@@ -12986,7 +12986,7 @@ msgstr "Источник"
 
 #: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
-msgstr "Spanish (es_ES)"
+msgstr "Испанский (es_ES)"
 
 #: api/classes/CAction.php:1385
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -13187,7 +13187,7 @@ msgstr "Сумма значений за период T NOT N"
 msgid "Sun"
 msgstr "Вс"
 
-#: include/forms.inc.php:1689 include/forms.inc.php:1757
+#: include/forms.inc.php:1688 include/forms.inc.php:1756
 #: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Воскресенье"
@@ -13218,7 +13218,7 @@ msgstr "Размер файла подкачки. Количество байт.
 
 #: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
-msgstr "Swedish (sv_SE)"
+msgstr "Шведский (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -13554,11 +13554,11 @@ msgstr[0] "Существует \"%1$d\" группа с внутренним д
 msgstr[1] "Существует \"%1$d\" группы с внутренним доступом к GUI."
 msgstr[2] "Существует \"%1$d\" групп с внутренним доступом к GUI."
 
-#: include/forms.inc.php:1742 include/maintenances.inc.php:120
+#: include/forms.inc.php:1741 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "Третий"
 
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:835
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
@@ -13587,7 +13587,7 @@ msgstr "Этот год"
 msgid "Thu"
 msgstr "Чт"
 
-#: include/forms.inc.php:1686 include/forms.inc.php:1754
+#: include/forms.inc.php:1685 include/forms.inc.php:1753
 #: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Четверг"
@@ -14030,7 +14030,7 @@ msgstr "Попытка чтения недоступного свойства \"
 msgid "Tue"
 msgstr "Вт"
 
-#: include/forms.inc.php:1684 include/forms.inc.php:1752
+#: include/forms.inc.php:1683 include/forms.inc.php:1751
 #: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Вторник"
@@ -14181,7 +14181,7 @@ msgstr "UTF-8"
 
 #: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
-msgstr "Ukrainian (uk_UA)"
+msgstr "Украинский (uk_UA)"
 
 #: include/nodes.inc.php:375
 msgid "Unable to remove local node."
@@ -14231,7 +14231,7 @@ msgid "Units"
 msgstr "Единица измерения"
 
 #: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:956 httpdetails.php:167 httpmon.php:170
+#: events.php:545 hosts.php:956 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14263,7 +14263,7 @@ msgstr "Неизвестно"
 msgid "Unknown action"
 msgstr "Неизвестное действие"
 
-#: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
+#: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
@@ -14735,7 +14735,7 @@ msgstr "BIOS uuid VMware гипервизора, <url> - VMware сервисны
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Размер ballooned памяти VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
 #: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14811,15 +14811,15 @@ msgstr "Версия VMware сервиса, <url> - VMware service URL"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер ballooned памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем committed дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер сжатой памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -14863,7 +14863,7 @@ msgstr "Состояние питания виртуальной машины VM
 
 #: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер частной памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:711
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14875,7 +14875,7 @@ msgstr "Размер разделяемой памяти у виртуально
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер swapped памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14883,11 +14883,11 @@ msgstr "Общий размер памяти виртуальной машины
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем uncommitted дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем unshared дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14929,24 +14929,25 @@ msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed 
 msgstr "Значение \"%1$s\" слишком длинное для поля \"%2$s\" - %3$d символов. Допустимая длина 2048 символов."
 
 #: include/validate.inc.php:333 include/validate.inc.php:357
+#: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет некорректный формат десятичного числа."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет слишком много цифр после запятой: оно не может иметь более чем %3$s цифр."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет слишком много цифр до запятой: оно не может иметь более чем %3$s цифр."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" слишком длинное: оно не может иметь более чем %3$s цифр до запятой и более чем %4$s цифр после запятой."
 
 #: include/classes/items/CHelpItems.php:891
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15152,11 +15153,11 @@ msgstr "Шаг веб-сценария \"%1$s\" уже существует."
 
 #: api/classes/CHttpTest.php:623
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "URL шага веб-сценария не может быть пустым."
 
 #: api/classes/CHttpTest.php:618
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Имя шага веб-сценария не может быть пустым."
 
 #: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
@@ -15176,7 +15177,7 @@ msgstr "Веб-сценарии"
 msgid "Wed"
 msgstr "Ср"
 
-#: include/forms.inc.php:1685 include/forms.inc.php:1753
+#: include/forms.inc.php:1684 include/forms.inc.php:1752
 #: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Среда"
@@ -15185,7 +15186,7 @@ msgstr "Среда"
 msgid "Week"
 msgstr "Неделя"
 
-#: include/forms.inc.php:1662 include/maintenances.inc.php:38
+#: include/forms.inc.php:1661 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:404
 #: include/reports.inc.php:412 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15575,7 +15576,7 @@ msgstr "Zabbix агент (активный)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегированный"
 
-#: include/validate.inc.php:502
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получил некорректный запрос."
 
@@ -15886,7 +15887,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr "Некорректный синтаксис около \"%1$s\""
+msgstr "некорректный синтаксис около \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
