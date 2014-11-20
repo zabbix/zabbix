@@ -49,7 +49,7 @@ $filterTable->addRow(array(
 	),
 ), 'host-inventories');
 
-$filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput');
+$filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
 $filter->main();
 
 $reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
