@@ -325,7 +325,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 		if (0 != FD_ISSET(s->socket, &fde))
 			*error = zbx_strdup(*error, "Connection refused.");
 		else
-			*error = zbx_strdup(*error, "A connection timeout occured.");
+			*error = zbx_strdup(*error, "A connection timeout occurred.");
 
 		return FAIL;
 	}
