@@ -73,7 +73,7 @@ static int	iprangev4_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, ZBX_MAX_UINT64_LEN, &bits, sizeof(bits), 0, 32))
+		if (FAIL == is_uint_range(end + 1, &bits, 0, 32))
 			return FAIL;
 	}
 	else
@@ -148,7 +148,7 @@ static int	iprangev6_parse(const char *address, zbx_range_t *range)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, ZBX_MAX_UINT64_LEN, &bits, sizeof(bits), 0, 128))
+		if (FAIL == is_uint_range(end + 1, &bits, 0, 128))
 			return FAIL;
 	}
 	else

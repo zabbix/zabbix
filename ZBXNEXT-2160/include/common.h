@@ -769,25 +769,25 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
 #define is_ushort(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0, 0xFFFF)
 
 #define is_uint32(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0xFFFFFFFF)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0, 0xFFFFFFFFFFFFFFFF)
 
 #define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, n, value, 8, 0x0, 0xFFFFFFFFFFFFFFFF)
 
 #define is_uint31(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFF)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFE)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
