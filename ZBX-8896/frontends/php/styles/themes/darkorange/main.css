@@ -442,7 +442,7 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 .input option { background: #2f2f2f; color: #ff5500; }
 
-.button-form:hover { border-color: #ff5500; }
+.button-form:hover { border-color: #ff5500; color: #ff5500; }
 
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
