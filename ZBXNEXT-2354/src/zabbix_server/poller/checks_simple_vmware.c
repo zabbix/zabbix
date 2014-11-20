@@ -221,6 +221,12 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 		goto out;
 	}
 
+	if (0 == perfcounter->values.values_num)
+	{
+		ret = SYSINFO_RET_OK;
+		goto out;
+	}
+
 	for (i = 0; i < perfcounter->values.values_num; i++)
 	{
 		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
