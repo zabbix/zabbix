@@ -40,7 +40,8 @@ static void	iprange_apply_mask(zbx_range_t *range, int bits, int groups, int gro
 
 	for (i = groups - 1; 0 < bits; bits -= group_bits, i--)
 	{
-		unsigned int	mask_empty, mask_fill, mask_bits = bits;
+		unsigned int	mask_empty, mask_fill;
+		int		mask_bits = bits;
 
 		if (mask_bits > group_bits)
 			mask_bits = group_bits;
