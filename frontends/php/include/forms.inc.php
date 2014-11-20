@@ -618,10 +618,10 @@ function getItemFilterForm(&$items) {
 		new CCol()
 	), 'item-list-row');
 
-	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput');
+	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 	$filter->main();
 
-	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput');
+	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
 	$div_buttons->setAttribute('style', 'padding: 4px 0px;');

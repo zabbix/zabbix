@@ -64,7 +64,7 @@ $filterTable->addRow(array(
 	array(bold(_('Action')), ' ', $actionComboBox),
 	array(bold(_('Resource')), ' ', $resourceComboBox)
 ));
-$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput');
+$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
 $filterButton->main();
 $resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));

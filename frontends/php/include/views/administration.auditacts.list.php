@@ -47,7 +47,7 @@ $filterTable->addRow(array(array(
 	)
 )));
 
-$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput');
+$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
 $filterButton->main();
 $resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
