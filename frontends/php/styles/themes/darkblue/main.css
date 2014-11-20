@@ -472,6 +472,8 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #b3c9d6; background-color: #2f6487; color: #fff; }
+
+.input:focus, .input:hover { border-color: #6e8ab4; }
 .input[readonly], .input[readonly]:hover, .input[readonly]:focus {
 	border-color: #4e738c; background: #2b495e; color: #ffffff;
 }
@@ -482,7 +484,6 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 	color: #aca899;
 }
 
-.input:focus, .input:hover { border-color: #6e8ab4; }
 .input option { background: #2F6487; color: #FFFFFF; }
 
 /* disabled <select> font color for IE 10+ */
