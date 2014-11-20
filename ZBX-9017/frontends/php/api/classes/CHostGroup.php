@@ -518,9 +518,9 @@ class CHostGroup extends CZBXAPI {
 
 		// permissions
 		$updGroups = $this->get(array(
+			'output' => array('groupid', 'flags', 'name'),
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid', 'flags', 'name'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
