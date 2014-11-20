@@ -144,7 +144,7 @@ a.weight_normal { font-weight: normal; }
 
 .button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 
-.ui-button { padding: 0; height: 20px; }
+.ui-button { padding: 0 4px; height: 23px; }
 
 .link_menu {
 	border: 0; border-bottom-width: 1px; border-bottom-style: dotted; background: none;
