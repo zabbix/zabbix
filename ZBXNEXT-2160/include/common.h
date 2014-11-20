@@ -775,10 +775,10 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
 	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0xFFFFFFFF)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0, 0xFFFFFFFFFFFFFFFF)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, 8, 0x0, 0xFFFFFFFFFFFFFFFF)
+	is_uint_n_range(str, n, value, 8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
 
 #define is_uint31(str, value) \
 	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFF)
