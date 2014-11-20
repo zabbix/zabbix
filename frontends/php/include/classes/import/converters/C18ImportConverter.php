@@ -68,6 +68,7 @@ class C18ImportConverter extends CConverter {
 		foreach ($content['hosts'] as &$host) {
 			$host = $this->renameKey($host, 'name', 'host');
 			$host = $this->convertHostInterfaces($host);
+			$host = $this->convertHostProfiles($host);
 
 			unset($host['groups']);
 			unset($host['useip']);
@@ -76,6 +77,8 @@ class C18ImportConverter extends CConverter {
 			unset($host['port']);
 			unset($host['ipmi_ip']);
 			unset($host['ipmi_port']);
+			unset($host['host_profile']);
+			unset($host['host_profiles_ext']);
 		}
 		unset($host);
 
@@ -198,6 +201,109 @@ class C18ImportConverter extends CConverter {
 		}
 
 		return $host;
+	}
+
+	/**
+	 * Convert host "host_profile" and "host_profiles_ext" elements and calculate "inventory_mode".
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertHostProfiles(array $host) {
+		$hasProfileData = (isset($host['host_profile']) || isset($host['host_profiles_ext']));
+
+		// if the host contains inventory data, set inventory to mode to manual, otherwise disable it
+		$host['inventory_mode'] = ($hasProfileData) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
+
+		if (!$hasProfileData) {
+			return $host;
+		}
+
+		// rename and merge profile fields
+		$inventory = array();
+		if (isset($host['host_profile'])) {
+			foreach ($host['host_profile'] as $key => $value) {
+				$newKey = $this->getNewProfileName($key);
+				$inventory[($newKey !== null) ? $newKey : $key] = $value;
+			}
+		}
+
+		if (isset($host['host_profiles_ext'])) {
+			foreach ($host['host_profiles_ext'] as $key => $value) {
+				$newKey = $this->getNewProfileName($key);
+				$key = ($newKey !== null) ? $newKey : $key;
+
+				// if renaming results in a duplicate inventory field, concatenate them
+				// this is the case with "notes" and "device_notes"
+				if (isset($inventory[$newKey])) {
+					$inventory[$newKey] .= "\r\n\r\n".$value;
+				}
+				else {
+					$inventory[$key] = $value;
+				}
+			}
+		}
+
+		$host['inventory'] = $inventory;
+
+		return $host;
+	}
+
+	/**
+	 * Map an old profile key name to the new inventory key name.
+	 *
+	 * @param string $oldName
+	 *
+	 * @return string|null
+	 */
+	protected function getNewProfileName($oldName) {
+		$map = array(
+			'devicetype' => 'type',
+			'serialno' => 'serialno_a',
+			'macaddress' => 'macaddress_a',
+			'hardware' => 'hardware_full',
+			'software' => 'software_full',
+			'device_type' => 'type_full',
+			'device_alias' => 'alias',
+			'device_os' => 'os_full',
+			'device_os_short' => 'os_short',
+			'device_serial' => 'serialno_b',
+			'device_tag' => 'asset_tag',
+			'ip_macaddress' => 'macaddress_b',
+			'device_hardware' => 'hardware',
+			'device_software' => 'software',
+			'device_app_01' => 'software_app_a',
+			'device_app_02' => 'software_app_b',
+			'device_app_03' => 'software_app_c',
+			'device_app_04' => 'software_app_d',
+			'device_app_05' => 'software_app_e',
+			'device_chassis' => 'chassis',
+			'device_model' => 'model',
+			'device_hw_arch' => 'hw_arch',
+			'device_vendor' => 'vendor',
+			'device_contract' => 'contract_number',
+			'device_who' => 'installer_name',
+			'device_status' => 'deployment_status',
+			'device_url_1' => 'url_a',
+			'device_url_2' => 'url_b',
+			'device_url_3' => 'url_c',
+			'device_networks' => 'host_networks',
+			'ip_subnet_mask' => 'host_netmask',
+			'ip_router' => 'host_router',
+			'oob_subnet_mask' => 'oob_netmask',
+			'date_hw_buy' => 'date_hw_purchase',
+			'site_street_1' => 'site_address_a',
+			'site_street_2' => 'site_address_b',
+			'site_street_3' => 'site_address_c',
+			'poc_1_phone_1' => 'poc_1_phone_a',
+			'poc_1_phone_2' => 'poc_1_phone_b',
+			'poc_2_phone_1' => 'poc_2_phone_a',
+			'poc_2_phone_2' => 'poc_2_phone_b',
+			'device_notes' => 'notes',
+		);
+
+		return (isset($map[$oldName])) ? $map[$oldName] : null;
 	}
 
 	/**
