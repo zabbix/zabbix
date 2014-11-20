@@ -32,7 +32,7 @@
  *                               (8 or 16)                                    *
  *                                                                            *
  ******************************************************************************/
-static void	iprange_apply_mask(zbx_range_t *range, unsigned int bits, unsigned int groups, unsigned int group_bits)
+static void	iprange_apply_mask(zbx_range_t *range, int bits, int groups, int group_bits)
 {
 	int	i;
 
