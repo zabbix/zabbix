@@ -57,9 +57,15 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 			),
 			'hosts' => array(
-				array(),
-				array(),
-				array(),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
 			)
 		));
 
@@ -77,9 +83,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		));
 		$result = $this->createResult(array(
 			'hosts' => array(
-				array(),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+				),
 				array(
 					'host' => 'Zabbix server',
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 				),
 			)
 		));
@@ -171,9 +180,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		));
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
-				array(),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
 				// host with an agent interface
 				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_AGENT,
@@ -197,9 +209,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					)
 				),
 				// missing interface data
-				array(),
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
 				// host with an IPMI interface
 				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_IPMI,
@@ -220,6 +235,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with an IPMI interface, fallback to "ip"
 				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_IPMI,
@@ -240,6 +256,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with SNMP interfaces
 				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_SNMP,
@@ -297,8 +314,176 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing item type
 				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'items' => array(
 						array()
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
+	public function testConvertHostProfiles() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(),
+				array(
+					'host_profile' => array(
+						'devicetype' => 'device type',
+						'name' => 'name',
+						'os' => 'os',
+						'serialno' => 'serial no',
+						'tag' => 'tag',
+						'macaddress' => 'mac address',
+						'hardware' => 'hardware',
+						'software' => 'software',
+						'contact' => 'contact',
+						'location' => 'location',
+						'notes' => 'notes',
+					),
+					'host_profiles_ext' => array(
+						'device_alias' => 'device alias',
+						'device_type' => 'device type',
+						'device_chassis' => 'device chassis',
+						'device_os' => 'device os',
+						'device_os_short' => 'device os short',
+						'device_hw_arch' => 'device hw arch',
+						'device_serial' => 'device serial',
+						'device_model' => 'device model',
+						'device_tag' => 'device tag',
+						'device_vendor' => 'device vendor',
+						'device_serial' => 'device serial',
+						'device_contract' => 'device contract',
+						'device_who' => 'device who',
+						'device_status' => 'device status',
+						'device_app_01' => 'device app 01',
+						'device_app_02' => 'device app 02',
+						'device_app_03' => 'device app 03',
+						'device_app_04' => 'device app 04',
+						'device_app_05' => 'device app 05',
+						'device_url_1' => 'device url 1',
+						'device_url_2' => 'device url 2',
+						'device_url_3' => 'device url 3',
+						'device_networks' => 'device networks',
+						'device_notes' => 'device notes',
+						'device_hardware' => 'device hardware',
+						'device_software' => 'device software',
+						'ip_subnet_mask' => 'ip subnet mask',
+						'ip_router' => 'ip router',
+						'ip_macaddress' => 'ip macaddress',
+						'oob_ip' => 'oob ip',
+						'oob_subnet_mask' => 'oob subnet mask',
+						'oob_router' => 'oob router',
+						'date_hw_buy' => 'date hw buy',
+						'date_hw_install' => 'date hw install',
+						'date_hw_expiry' => 'date hw expiry',
+						'date_hw_decomm' => 'date hw decomm',
+						'site_street_1' => 'site street 1',
+						'site_street_2' => 'site street 2',
+						'site_street_3' => 'site street 3',
+						'site_city' => 'site city',
+						'site_state' => 'site state',
+						'site_country' => 'site country',
+						'site_zip' => 'site zip',
+						'site_rack' => 'site rack',
+						'site_notes' => 'site notes',
+						'poc_1_name' => 'poc 1 name',
+						'poc_1_email' => 'poc 1 email',
+						'poc_1_phone_1' => 'poc 1 phone 1',
+						'poc_1_phone_2' => 'poc 1 phone 2',
+						'poc_1_cell' => 'poc 1 cell',
+						'poc_1_screen' => 'poc 1 screen',
+						'poc_1_notes' => 'poc 1 notes',
+						'poc_2_name' => 'poc 2 name',
+						'poc_2_email' => 'poc 2 email',
+						'poc_2_phone_1' => 'poc 2 phone 1',
+						'poc_2_phone_2' => 'poc 2 phone 2',
+						'poc_2_cell' => 'poc 2 cell',
+						'poc_2_screen' => 'poc 2 screen',
+						'poc_2_notes' => 'poc 2 notes',
+					)
+				)
+			)
+		));
+
+		$expectedResult = $this->createResult(array(
+			'hosts' => array(
+				array(
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'inventory_mode' => HOST_INVENTORY_MANUAL,
+					'inventory' => array(
+						'type' => 'device type',
+						'name' => 'name',
+						'os' => 'os',
+						'serialno_a' => 'serial no',
+						'tag' => 'tag',
+						'macaddress_a' => 'mac address',
+						'hardware_full' => 'hardware',
+						'software_full' => 'software',
+						'contact' => 'contact',
+						'location' => 'location',
+						'notes' => 'notes'."\r\n\r\n".'device notes',
+						'alias' => 'device alias',
+						'type_full' => 'device type',
+						'chassis' => 'device chassis',
+						'os_full' => 'device os',
+						'os_short' => 'device os short',
+						'hw_arch' => 'device hw arch',
+						'serialno_b' => 'device serial',
+						'model' => 'device model',
+						'asset_tag' => 'device tag',
+						'vendor' => 'device vendor',
+						'contract_number' => 'device contract',
+						'installer_name' => 'device who',
+						'deployment_status' => 'device status',
+						'software_app_a' => 'device app 01',
+						'software_app_b' => 'device app 02',
+						'software_app_c' => 'device app 03',
+						'software_app_d' => 'device app 04',
+						'software_app_e' => 'device app 05',
+						'url_a' => 'device url 1',
+						'url_b' => 'device url 2',
+						'url_c' => 'device url 3',
+						'host_networks' => 'device networks',
+						'hardware' => 'device hardware',
+						'software' => 'device software',
+						'host_netmask' => 'ip subnet mask',
+						'host_router' => 'ip router',
+						'macaddress_b' => 'ip macaddress',
+						'oob_ip' => 'oob ip',
+						'oob_netmask' => 'oob subnet mask',
+						'oob_router' => 'oob router',
+						'date_hw_purchase' => 'date hw buy',
+						'date_hw_install' => 'date hw install',
+						'date_hw_expiry' => 'date hw expiry',
+						'date_hw_decomm' => 'date hw decomm',
+						'site_address_a' => 'site street 1',
+						'site_address_b' => 'site street 2',
+						'site_address_c' => 'site street 3',
+						'site_city' => 'site city',
+						'site_state' => 'site state',
+						'site_country' => 'site country',
+						'site_zip' => 'site zip',
+						'site_rack' => 'site rack',
+						'site_notes' => 'site notes',
+						'poc_1_name' => 'poc 1 name',
+						'poc_1_email' => 'poc 1 email',
+						'poc_1_phone_a' => 'poc 1 phone 1',
+						'poc_1_phone_b' => 'poc 1 phone 2',
+						'poc_1_cell' => 'poc 1 cell',
+						'poc_1_screen' => 'poc 1 screen',
+						'poc_1_notes' => 'poc 1 notes',
+						'poc_2_name' => 'poc 2 name',
+						'poc_2_email' => 'poc 2 email',
+						'poc_2_phone_a' => 'poc 2 phone 1',
+						'poc_2_phone_b' => 'poc 2 phone 2',
+						'poc_2_cell' => 'poc 2 cell',
+						'poc_2_screen' => 'poc 2 screen',
+						'poc_2_notes' => 'poc 2 notes',
 					)
 				)
 			)
