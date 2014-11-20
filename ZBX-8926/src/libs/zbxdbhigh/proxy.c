@@ -1620,28 +1620,28 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, tmp_alloc);
+			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, &tmp, &tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, tmp_alloc);
+			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, &tmp, &tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, tmp_alloc);
+			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, &tmp, &tmp_alloc))
 		{
-			error_esc = DBdyn_escape_string_len(tmp, tmp_alloc);
+			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
 		}
