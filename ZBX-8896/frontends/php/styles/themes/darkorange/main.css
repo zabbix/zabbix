@@ -428,6 +428,8 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #dfdfdf; background-color: #2f2f2f; color: #fff; }
+
+.input:focus, .input:hover { border-color: #ff5500; color: #ff5500; }
 .input[readonly], .input[readonly]:hover, .input[readonly]:focus {
 	border-color: #444; background: #2f2f2f; color: #dfdfdf;
 }
@@ -438,7 +440,6 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 	color: #dfdfdf;
 }
 
-.input:focus, .input:hover { border-color: #ff5500; color: #ff5500; }
 .input option { background: #2f2f2f; color: #ff5500; }
 
 .button-form:hover { border-color: #ff5500; }

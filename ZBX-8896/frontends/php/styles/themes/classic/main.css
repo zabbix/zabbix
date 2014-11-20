@@ -164,6 +164,11 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #ACA899; background-color: white; }
+
+.button-form { background: #fff; }
+.button-form:hover { border-color: #6e8ab4; }
+
+.input:focus, .input:hover { border-color: #6e8ab4; }
 .input[readonly], .input[readonly]:hover, .input[readonly]:focus {
 	border-color: #d0d0d0; background: #eeeeee; color: #000000;
 }
@@ -174,11 +179,6 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 	color: #8a867a;
 	border-color: #d0d0d0;
 }
-
-.input:focus, .input:hover { border-color: #6e8ab4; }
-
-.button-form { background: #fff; }
-.button-form:hover { border-color: #6e8ab4; }
 
 /* Make checked checkboxes/radiobuttons have black label text */
 .radioset .ui-button.ui-state-active .ui-button-text { color: #000000; }
