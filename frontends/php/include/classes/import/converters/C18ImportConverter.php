@@ -27,7 +27,9 @@ class C18ImportConverter extends CConverter {
 		$content['version'] = '2.0';
 		$content = $this->convertTime($content);
 
+		$content = $this->separateTemplatesFromHosts($content);
 		$content = $this->convertHosts($content);
+		$content = $this->convertTemplates($content);
 		$content = $this->convertGroups($content);
 
 		$value['zabbix_export'] = $content;
@@ -48,6 +50,47 @@ class C18ImportConverter extends CConverter {
 		$content['date'] = date('Y-m-d\TH:i:s\Z', mktime($hours, $minutes, 0, $month, $day, $year));
 
 		unset($content['time']);
+
+		return $content;
+	}
+
+	/**
+	 * Separate templates and their elements from other hosts into the "templates" array.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function separateTemplatesFromHosts(array $content) {
+		if (!isset($content['hosts'])) {
+			return $content;
+		}
+
+		$templates = array();
+		foreach ($content['hosts'] as $i => $host) {
+			// skip hosts
+			if (isset($host['status']) && $host['status'] != HOST_STATUS_TEMPLATE) {
+				continue;
+			}
+
+			$template = array();
+			foreach (array('name', 'groups', 'items', 'templates', 'triggers', 'graphs') as $key) {
+				if (isset($host[$key])) {
+					$template[$key] = $host[$key];
+				}
+			}
+
+			$templates[] = $template;
+
+			unset($content['hosts'][$i]);
+		}
+
+		if ($templates) {
+			$content['templates'] = $templates;
+
+			// reset host keys
+			$content['hosts'] = array_values($content['hosts']);
+		}
 
 		return $content;
 	}
@@ -81,6 +124,29 @@ class C18ImportConverter extends CConverter {
 			unset($host['host_profiles_ext']);
 		}
 		unset($host);
+
+		return $content;
+	}
+
+	/**
+	 * Convert template elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertTemplates(array $content) {
+		if (!isset($content['templates'])) {
+			return $content;
+		}
+
+		$content = $this->mergeToRoot($content['templates'], $content, 'groups');
+		foreach ($content['templates'] as &$template) {
+			$template = $this->renameKey($template, 'name', 'template');
+
+			unset($template['groups']);
+		}
+		unset($template);
 
 		return $content;
 	}

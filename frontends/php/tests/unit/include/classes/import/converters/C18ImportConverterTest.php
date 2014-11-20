@@ -25,20 +25,77 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$this->assertConvert($this->createResult(), $this->createSource());
 	}
 
+	public function testTemplateSeparation() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'Template 1',
+				),
+				array(
+					'name' => 'Template 2',
+					'status' => HOST_STATUS_TEMPLATE
+				),
+				array(
+					'name' => 'Host 1',
+					'status' => HOST_STATUS_NOT_MONITORED
+				),
+				array(
+					'name' => 'Host 2',
+					'status' => HOST_STATUS_MONITORED
+				),
+			),
+		));
+
+		$expectedResult = $this->createResult(array(
+			'hosts' => array(
+				array(
+					'host' => 'Host 1',
+					'status' => HOST_STATUS_NOT_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'Host 2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+			),
+			'templates' => array(
+				array(
+					'template' => 'Template 1',
+				),
+				array(
+					'template' => 'Template 2'
+				),
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	public function testConvertGroups() {
 		$source = $this->createSource(array(
 			'hosts' => array(
-				array(),
 				array(
+					'status' => HOST_STATUS_MONITORED
+				),
+				array(
+					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
 						array('Zabbix server'),
 						array('Linux server'),
 					),
 				),
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
 						array('Zabbix server'),
 						array('My group'),
+					),
+				),
+				array(
+					'status' => HOST_STATUS_TEMPLATE,
+					'groups' => array(
+						array('Templates'),
 					),
 				)
 			),
@@ -55,17 +112,26 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				array(
 					'name' => 'My group'
 				),
+				array(
+					'name' => 'Templates'
+				),
 			),
 			'hosts' => array(
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
+			),
+			'templates' => array(
+				array()
 			)
 		));
 
@@ -75,8 +141,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 	public function testConvertHosts() {
 		$source = $this->createSource(array(
 			'hosts' => array(
-				array(),
 				array(
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'status' => HOST_STATUS_MONITORED,
 					'name' => 'Zabbix server',
 				),
 			)
@@ -84,9 +153,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$result = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 				),
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'host' => 'Zabbix server',
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 				),
@@ -96,12 +167,14 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testConvertHostInterfaces() {
-
 		$source = $this->createSource(array(
 			'hosts' => array(
-				array(),
+				array(
+					'status' => HOST_STATUS_MONITORED,
+				),
 				// host with an agent interface
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
@@ -117,11 +190,13 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing interface data
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 				),
 				// host with an IPMI interface
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_ip' => '127.0.0.2',
 					'ipmi_port' => '123',
@@ -134,6 +209,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with an IPMI interface, fallback to "ip"
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_port' => '123',
 					'items' => array(
@@ -145,6 +221,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with SNMP interfaces
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
@@ -172,6 +249,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing item type
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'items' => array(
 						array()
 					)
@@ -181,10 +259,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				// host with an agent interface
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
@@ -210,10 +290,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing interface data
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				// host with an IPMI interface
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
@@ -235,6 +317,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with an IPMI interface, fallback to "ip"
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
@@ -256,6 +339,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with SNMP interfaces
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
 						array(
@@ -314,6 +398,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing item type
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'items' => array(
 						array()
@@ -328,8 +413,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 	public function testConvertHostProfiles() {
 		$source = $this->createSource(array(
 			'hosts' => array(
-				array(),
 				array(
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'status' => HOST_STATUS_MONITORED,
 					'host_profile' => array(
 						'devicetype' => 'device type',
 						'name' => 'name',
@@ -411,9 +499,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_MANUAL,
 					'inventory' => array(
 						'type' => 'device type',
