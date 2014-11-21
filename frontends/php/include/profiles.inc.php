@@ -103,27 +103,37 @@ function update_config($configs) {
 		return false;
 	}
 
-	$currentConfig = select_config();
-
-	// check duplicate severity names and if name is empty.
-	$names = array();
+	$updateSeverity = false;
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		$varName = 'severity_name_'.$i;
-		if (!isset($configs[$varName]) || is_null($configs[$varName])) {
-			$configs[$varName] = $currentConfig[$varName];
+		if (isset($configs['severity_name_'.$i])) {
+			$updateSeverity = true;
+			break;
 		}
+	}
 
-		if ($configs[$varName] == '') {
-			error(_('Severity name cannot be empty.'));
-			return false;
-		}
+	if ($updateSeverity) {
+		$currentConfig = select_config();
 
-		if (isset($names[$configs[$varName]])) {
-			error(_s('Duplicate severity name "%s".', $configs[$varName]));
-			return false;
-		}
-		else {
-			$names[$configs[$varName]] = 1;
+		// check duplicate severity names and if name is empty.
+		$names = array();
+		for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
+			$varName = 'severity_name_'.$i;
+			if (!isset($configs[$varName]) || is_null($configs[$varName])) {
+				$configs[$varName] = $currentConfig[$varName];
+			}
+
+			if ($configs[$varName] == '') {
+				error(_('Severity name cannot be empty.'));
+				return false;
+			}
+
+			if (isset($names[$configs[$varName]])) {
+				error(_s('Duplicate severity name "%s".', $configs[$varName]));
+				return false;
+			}
+			else {
+				$names[$configs[$varName]] = 1;
+			}
 		}
 	}
 
