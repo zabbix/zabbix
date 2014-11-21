@@ -502,7 +502,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	params_num = get_rparams_num(&request);
 
-	if (3 > params_num || 4 < params_num)
+	if (3 > params_num || params_num > 4)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
