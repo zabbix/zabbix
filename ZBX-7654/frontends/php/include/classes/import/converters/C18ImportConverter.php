@@ -21,6 +21,17 @@
 
 class C18ImportConverter extends CConverter {
 
+	/**
+	 * Converter used for converting simple check item keys.
+	 *
+	 * @var C18ItemKeyConverter
+	 */
+	protected $itemKeyConverter;
+
+	public function __construct(C18ItemKeyConverter $itemKeyConverter) {
+		$this->itemKeyConverter = $itemKeyConverter;
+	}
+
 	public function convert($value) {
 		$content = $value['zabbix_export'];
 
@@ -112,6 +123,7 @@ class C18ImportConverter extends CConverter {
 			$host = $this->renameKey($host, 'name', 'host');
 			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertHostProfiles($host);
+			$host = $this->convertHostItems($host);
 
 			unset($host['groups']);
 			unset($host['useip']);
@@ -143,6 +155,7 @@ class C18ImportConverter extends CConverter {
 		$content = $this->mergeToRoot($content['templates'], $content, 'groups');
 		foreach ($content['templates'] as &$template) {
 			$template = $this->renameKey($template, 'name', 'template');
+			$template = $this->convertHostItems($template);
 
 			unset($template['groups']);
 		}
@@ -388,6 +401,35 @@ class C18ImportConverter extends CConverter {
 		$content['groups'] = array_values(zbx_toHash($content['groups'], 'name'));
 
 		return $content;
+	}
+
+	/**
+	 * Convert item elements.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertHostItems(array $host) {
+		if (!isset($host['items'])) {
+			return $host;
+		}
+
+		foreach ($host['items'] as &$item) {
+			$item = $this->renameKey($item, 'description', 'name');
+
+			// convert simple check keys
+			if (isset($item['key'])) {
+				$item['key'] = $this->itemKeyConverter->convert($item['key']);
+			}
+
+			if (isset($item['applications'])) {
+				$item['applications'] = $this->wrapChildren($item['applications'], 'name');
+			}
+		}
+		unset($item);
+
+		return $host;
 	}
 
 	protected function mergeToRoot(array $source, array $target, $key) {
