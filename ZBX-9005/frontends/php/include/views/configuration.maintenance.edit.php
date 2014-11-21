@@ -156,8 +156,7 @@ if (isset($_REQUEST['new_timeperiod'])) {
  * Hosts & groups tab
  */
 $hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
-$hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', 10);
-$hostTweenBox->setSelectedValues($this->data['hostids']);
+$hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
 foreach ($this->data['hosts'] as $host) {
 	$hostTweenBox->addItem($host['hostid'], $host['name']);
 }
@@ -170,8 +169,7 @@ $hostTable->addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts 
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
 $groupTable = new CTable(null, 'formElementTable');
-$groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', 10);
-$groupTweenBox->setSelectedValues($this->data['groupids']);
+$groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
 foreach ($this->data['all_groups'] as $group) {
 	$groupTweenBox->addItem($group['groupid'], $group['name']);
 }

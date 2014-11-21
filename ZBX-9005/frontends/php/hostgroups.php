@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hosts' =>			array(T_ZBX_JSON, O_OPT, P_SYS,	DB_ID,		null),
+	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// group
@@ -307,18 +307,21 @@ if (hasRequest('form')) {
 	$data['db_hosts'] = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
 		'groupids' => $data['twb_groupid'] ? $data['twb_groupid'] : null,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'templated_hosts' => true,
-		'editable' => true
+		'editable' => true,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
+	order_result($data['db_hosts'], 'name');
 
 	// get selected hosts
 	if ($data['hosts']) {
 		$data['r_hosts'] = API::Host()->get(array(
 			'output' => array('hostid', 'name', 'flags'),
 			'hostids' => $data['hosts'],
-			'templated_hosts' => true
+			'templated_hosts' => true,
+			'preservekeys' => true
 		));
+		order_result($data['r_hosts'], 'name');
 	}
 
 	// deletable groups

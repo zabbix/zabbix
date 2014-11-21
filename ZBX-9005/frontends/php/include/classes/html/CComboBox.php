@@ -90,16 +90,6 @@ class CComboBox extends CTag {
 			parent::addItem($citem);
 		}
 	}
-
-	/**
-	 * Adds an attribute to current element that says value of it must be JSONized and stored in
-	 * hidden specified $var.
-	 *
-	 * @param CVar $var
-	 */
-	public function serializeToVar(CVar $var) {
-		$this->attr('data-serialize-to-hidden', 'input[name='.$var->var_name.']');
-	}
 }
 
 class COptGroup extends CTag {
