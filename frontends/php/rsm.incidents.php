@@ -78,17 +78,13 @@ if (isset($_REQUEST['mark_incident']) && (CWebUser::getType() == USER_TYPE_ZABBI
 
 	$event = reset($event);
 
-	if (get_request('mark_incident') == INCIDENT_ACTIVE) {
-		$incidentType = _('Active');
+	if (get_request('mark_incident') == INCIDENT_ACTIVE || get_request('mark_incident') == INCIDENT_RESOLVED) {
 		$changeIncidentType = INCIDENT_FLAG_NORMAL;
-	}
-	elseif (get_request('mark_incident') == INCIDENT_RESOLVED) {
-		$incidentType = _('Resolved');
-		$changeIncidentType = INCIDENT_FLAG_NORMAL;
+		$auditLog = _('Unmarked as false positive');
 	}
 	else {
-		$incidentType = _('False positive');
 		$changeIncidentType = INCIDENT_FLAG_FALSE_POSITIVE;
+		$auditLog = _('Marked as false positive');
 	}
 
 	if ($event['false_positive'] != $changeIncidentType) {
@@ -135,7 +131,7 @@ if (isset($_REQUEST['mark_incident']) && (CWebUser::getType() == USER_TYPE_ZABBI
 			add_audit(
 				AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_INCIDENT,
-				' Incident ['.$event['eventid'].'] '.$incidentType
+				$event['eventid'].': '.$auditLog
 			);
 		}
 	}
