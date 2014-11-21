@@ -107,7 +107,7 @@ if ($data['form_refresh']) {
 	$data['ok_ack_style'] = getRequest('ok_ack_style');
 }
 else {
-	$config = select_config(false);
+	$config = select_config();
 	$data['ok_period'] = $config['ok_period'];
 	$data['blink_period'] = $config['blink_period'];
 	$data['problem_unack_color'] = $config['problem_unack_color'];

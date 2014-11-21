@@ -126,7 +126,7 @@ $cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
 
-if (hasRequest('update') || hasRequest('form_refresh')) {
+if (hasRequest('form_refresh')) {
 	$data['config']['discovery_groupid'] = getRequest('discovery_groupid');
 	$data['config']['alert_usrgrpid'] = getRequest('alert_usrgrpid');
 	$data['config']['refresh_unsupported'] = getRequest('refresh_unsupported');

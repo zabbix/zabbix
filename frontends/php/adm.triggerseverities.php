@@ -114,7 +114,7 @@ if ($data['form_refresh']) {
 	$data['config']['severity_color_5'] = getRequest('severity_color_5', '');
 }
 else {
-	$data['config'] = select_config(false);
+	$data['config'] = select_config();
 }
 
 $triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
