@@ -43,6 +43,9 @@ class C18ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
 			$data[] = array($key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]');
 		}
 
+		// keys that shouldn't be converted
+		$data[] = array('myitem', 'myitem');
+
 		return $data;
 	}
 
