@@ -76,9 +76,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED
 				),
 				array(
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
 						array('Zabbix server'),
@@ -86,6 +88,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 				),
 				array(
+					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
 						array('Zabbix server'),
@@ -93,6 +96,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 				),
 				array(
+					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
 					'groups' => array(
 						array('Templates'),
@@ -118,20 +122,25 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 			'hosts' => array(
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 			),
 			'templates' => array(
-				array()
+				array(
+					'template' => 'template'
+				)
 			)
 		));
 
@@ -142,23 +151,25 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 				),
 				array(
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'name' => 'Zabbix server',
 				),
 			)
 		));
 		$result = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 				),
 				array(
+					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'host' => 'Zabbix server',
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 				),
 			)
@@ -170,10 +181,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 				),
 				// host with an agent interface
 				array(
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
@@ -181,21 +194,25 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					'port' => '123',
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
 						),
 						array(
+							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
 						)
 					)
 				),
 				// missing interface data
 				array(
+					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 				),
 				// host with an IPMI interface
 				array(
+					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_ip' => '127.0.0.2',
@@ -203,55 +220,67 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					'items' => array(
 						// an IPMI item to test
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 						)
 					)
 				),
 				// host with an IPMI interface, fallback to "ip"
 				array(
+					'name' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_port' => '123',
 					'items' => array(
 						// an IPMI item to test
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 						)
 					)
 				),
 				// host with SNMP interfaces
 				array(
+					'name' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1'
 						),
 						array(
+							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
 							'snmp_port' => '2'
 						),
 						array(
+							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
 							'snmp_port' => '3'
 						),
 						array(
+							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1'
 						),
 						array(
+							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
 						),
 					)
 				),
 				// missing item type
 				array(
+					'name' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
 					'items' => array(
-						array()
+						array(
+							'key' => 'item1',
+						)
 					)
 				)
 			)
@@ -259,11 +288,13 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				// host with an agent interface
 				array(
+					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
@@ -279,10 +310,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
 							'interface_ref' => 'if0'
 						),
 						array(
+							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
 							'interface_ref' => 'if0'
 						)
@@ -290,11 +323,13 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// missing interface data
 				array(
+					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				// host with an IPMI interface
 				array(
+					'host' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
@@ -310,6 +345,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 							'interface_ref' => 'if0'
 						)
@@ -317,6 +353,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with an IPMI interface, fallback to "ip"
 				array(
+					'host' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
@@ -332,6 +369,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 							'interface_ref' => 'if0'
 						)
@@ -339,6 +377,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 				// host with SNMP interfaces
 				array(
+					'host' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'interfaces' => array(
@@ -372,36 +411,44 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					),
 					'items' => array(
 						array(
+							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1',
 							'interface_ref' => 'if0'
 						),
 						array(
+							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
 							'snmp_port' => '2',
 							'interface_ref' => 'if1'
 						),
 						array(
+							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
 							'snmp_port' => '3',
 							'interface_ref' => 'if2'
 						),
 						array(
+							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1',
 							'interface_ref' => 'if0'
 						),
 						array(
+							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
 						),
 					)
 				),
 				// missing item type
 				array(
+					'host' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'items' => array(
-						array()
+						array(
+							'key' => 'item1',
+						)
 					)
 				)
 			)
@@ -414,9 +461,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 				),
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'host_profile' => array(
 						'devicetype' => 'device type',
@@ -442,7 +491,6 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 						'device_model' => 'device model',
 						'device_tag' => 'device tag',
 						'device_vendor' => 'device vendor',
-						'device_serial' => 'device serial',
 						'device_contract' => 'device contract',
 						'device_who' => 'device who',
 						'device_status' => 'device status',
@@ -499,10 +547,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_MANUAL,
 					'inventory' => array(
@@ -586,12 +636,16 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 				),
 				array(
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'items' => array(
-						array(),
+						array(
+							'key' => 'item',
+						),
 						array(
 							'description' => 'My item',
 							'key' => 'ftp,1',
@@ -603,9 +657,12 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 					)
 				),
 				array(
+					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
 					'items' => array(
-						array(),
+						array(
+							'key' => 'item',
+						),
 						array(
 							'description' => 'My item',
 							'key' => 'ftp,1',
@@ -622,14 +679,18 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$expectedResult = $this->createResult(array(
 			'hosts' => array(
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'items' => array(
-						array(),
+						array(
+							'key' => 'item',
+						),
 						array(
 							'name' => 'My item',
 							'key' => 'net.tcp.service[ftp,,1]',
@@ -647,8 +708,11 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 			'templates' => array(
 				array(
+					'template' => 'template',
 					'items' => array(
-						array(),
+						array(
+							'key' => 'item',
+						),
 						array(
 							'name' => 'My item',
 							'key' => 'net.tcp.service[ftp,,1]',
@@ -662,6 +726,103 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 							)
 						)
 					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
+	public function testConvertTriggers() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'My trigger',
+							'comments' => 'Trigger from two hosts',
+							'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
+						),
+						array(
+							'description' => 'Simple check trigger',
+							'expression' => '{host:ftp,1.last(0)}'
+						),
+						array(
+							'description' => 'Macro trigger',
+							'expression' => '{{HOSTNAME}:item.last(0)}>0&{{HOST.HOST}:item.last(0)}>0'
+						),
+					)
+				),
+				array(
+					'name' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'My trigger',
+							'comments' => 'Trigger from two hosts',
+							'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
+						)
+					)
+				),
+				array(
+					'name' => 'template',
+					'status' => HOST_STATUS_TEMPLATE,
+					'triggers' => array(
+						array(
+							'description' => 'My trigger 2',
+							'expression' => '{template:item.last(0)}>0'
+						)
+					)
+				)
+			),
+		));
+
+		$expectedResult = $this->createResult(array(
+			'triggers' => array(
+				array(
+					'name' => 'My trigger',
+					'description' => 'Trigger from two hosts',
+					'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
+				),
+				array(
+					'name' => 'Simple check trigger',
+					'expression' => '{host:net.tcp.service[ftp,,1].last(0)}'
+				),
+				array(
+					'name' => 'Macro trigger',
+					'expression' => '{host2:item.last(0)}>0&{host2:item.last(0)}>0'
+				),
+				array(
+					'name' => 'My trigger 2',
+					'expression' => '{template:item.last(0)}>0'
+				),
+			),
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				)
+			),
+			'templates' => array(
+				array(
+					'template' => 'template',
 				)
 			)
 		));
@@ -695,7 +856,9 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 
 
 	protected function createConverter() {
-		return new C18ImportConverter(new C18ItemKeyConverter());
+		$itemKeyConverter = new C18ItemKeyConverter();
+
+		return new C18ImportConverter($itemKeyConverter, new C18TriggerConverter($itemKeyConverter));
 	}
 
 }
