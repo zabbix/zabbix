@@ -171,7 +171,7 @@ if ($config == 1) {
 				' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 				' max(value_max) as max,max(clock) as clock'.
 			' FROM trends '.
-			' WHERE itemid='.$itemid.
+			' WHERE itemid='.zbx_dbstr($itemid).
 				' AND clock>='.$timesince.
 				' AND clock<='.$timetill.
 			' GROUP BY itemid,'.$calc_field.
@@ -182,7 +182,7 @@ if ($config == 1) {
 				' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 				' max(value_max) as max,max(clock) as clock'.
 			' FROM trends_uint '.
-			' WHERE itemid='.$itemid.
+			' WHERE itemid='.zbx_dbstr($itemid).
 				' AND clock>='.$timesince.
 				' AND clock<='.$timetill.
 			' GROUP BY itemid,'.$calc_field.
@@ -310,9 +310,9 @@ elseif ($config == 2) {
 			$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$period['report_timesince'].
-					' AND clock<='.$period['report_timetill'].
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($period['report_timesince']).
+					' AND clock<='.zbx_dbstr($period['report_timetill']).
 				' GROUP BY itemid';
 			$result = DBselect($sql);
 			if ($row = DBfetch($result)) {
@@ -326,9 +326,9 @@ elseif ($config == 2) {
 			$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends_uint '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$period['report_timesince'].
-					' AND clock<='.$period['report_timetill'].
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($period['report_timesince']).
+					' AND clock<='.zbx_dbstr($period['report_timetill']).
 				' GROUP BY itemid';
 			$result = DBselect($sql);
 			if ($row = DBfetch($result)) {
