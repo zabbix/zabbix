@@ -1,12 +1,15 @@
 Changes for 2.4.3rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Italian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-8926] fixed bug in JSON parser that caused failures in data retrieval if the target buffer and the decoded data were the same size (Juris)
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
+.......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
-..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
 A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
@@ -488,6 +491,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
+.......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
@@ -1115,7 +1120,7 @@ Changes for 2.1.8
 New features:
 .....J.... [ZBX-6404] added support for values of type java.lang.Double when toString() returns them in scientific format (asaveljevs)
 .......PS. [ZBXNEXT-78] added support for scientific notation for received values and item multipliers for items of type "Numeric (float)" (asaveljevs)
-...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (Igors, Andris, wiper)
+...G...PS. [ZBXNEXT-1855] dynamic display of process current activity and statistics in "ps" and "top" (igors, Andris, wiper)
 ..F.....S. [ZBXNEXT-1806] changed the way nth day and nth week are calculated in maintenances (asaveljevs, Pavels)
 ..F....... [ZBX-7097] changed dashboard drag'n'drop widget placeholder color in the dark orange and dark blue themes (Pavels)
 A.F....... [ZBX-1357] updated Dutch, Finnish, Indonesian, Italian, Lithuanian, Persian, Portuguese (Portugal), Russian and Slovak translations; thanks to Zabbix translators (Richlv)
@@ -1632,9 +1637,10 @@ Changes for 2.0.14rc1
 
 New features:
 ...G...... [ZBX-8503] increased limitation of command length for remote commands with agent (Sasha)
-A.F....... [ZBX-1357] updated Polish and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces (asaveljevs)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)
