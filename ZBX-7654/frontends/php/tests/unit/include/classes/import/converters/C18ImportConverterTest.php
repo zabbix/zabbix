@@ -895,6 +895,202 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertGraphs() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'graphs' => array(
+						array(
+							'name' => 'graph1',
+							'graphtype' => GRAPH_TYPE_BAR,
+							'ymin_item_key' => 'host2:itemmin',
+							'ymax_item_key' => 'host2:itemmax',
+							'graph_elements' => array(
+								array(
+									'periods_cnt' => 5,
+									'item' => 'host2:item'
+								),
+							)
+						),
+						array(
+							'name' => 'graph2',
+							'ymin_item_key' => 'host2:ftp,1',
+							'ymax_item_key' => 'host2:ftp,2',
+							'graph_elements' => array(
+								array(
+									'item' => 'host2:ftp,3'
+								),
+								array(
+									'item' => '{HOSTNAME}:ftp,3'
+								),
+								array(
+									'item' => '{HOST.HOST}:ftp,3'
+								),
+							)
+						),
+						array(
+							'name' => 'two-host graph',
+							'graph_elements' => array(
+								array(
+									'item' => 'host2:item'
+								),
+								array(
+									'item' => 'host3:item'
+								),
+							)
+						),
+					)
+				),
+				array(
+					'name' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'graphs' => array(
+						array(
+							'name' => 'two-host graph',
+							'graph_elements' => array(
+								array(
+									'item' => 'host2:item'
+								),
+								array(
+									'item' => 'host3:item'
+								),
+							)
+						)
+					)
+				),
+				array(
+					'name' => 'template',
+					'status' => HOST_STATUS_TEMPLATE,
+					'graphs' => array(
+						array(
+							// same name as for the host graph but a different item
+							'name' => 'graph2',
+							'graph_elements' => array(
+								array(
+									'item' => 'template:item'
+								),
+							)
+						)
+					)
+				)
+			),
+		));
+
+		$expectedResult = $this->createResult(array(
+			'graphs' => array(
+				array(
+					'name' => 'graph1',
+					'type' => GRAPH_TYPE_BAR,
+					'ymin_item_1' => array(
+						'host' => 'host2',
+						'key' => 'itemmin'
+					),
+					'ymax_item_1' => array(
+						'host' => 'host2',
+						'key' => 'itemmax'
+					),
+					'graph_items' => array(
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'item'
+							)
+						),
+					)
+				),
+				array(
+					'name' => 'graph2',
+					'ymin_item_1' => array(
+						'host' => 'host2',
+						'key' => 'net.tcp.service[ftp,,1]'
+					),
+					'ymax_item_1' => array(
+						'host' => 'host2',
+						'key' => 'net.tcp.service[ftp,,2]'
+					),
+					'graph_items' => array(
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'net.tcp.service[ftp,,3]'
+							),
+						),
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'net.tcp.service[ftp,,3]'
+							),
+						),
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'net.tcp.service[ftp,,3]'
+							),
+						),
+					)
+				),
+				array(
+					'name' => 'two-host graph',
+					'graph_items' => array(
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'item'
+							),
+						),
+						array(
+							'item' => array(
+								'host' => 'host3',
+								'key' => 'item'
+							),
+						)
+					)
+				),
+				array(
+					'name' => 'graph2',
+					'graph_items' => array(
+						array(
+							'item' => array(
+								'host' => 'template',
+								'key' => 'item'
+							),
+						),
+					)
+				)
+			),
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+				),
+				array(
+					'host' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+				),
+			),
+			'templates' => array(
+				array(
+					'template' => 'template',
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	protected function createSource(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(

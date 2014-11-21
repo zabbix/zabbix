@@ -52,6 +52,7 @@ class C18ImportConverter extends CConverter {
 		$content = $this->convertGroups($content);
 
 		$content = $this->filterDuplicateTriggers($content);
+		$content = $this->filterDuplicateGraphs($content);
 
 		$value['zabbix_export'] = $content;
 
@@ -135,6 +136,7 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostProfiles($host);
 			$host = $this->convertHostItems($host);
 			$host = $this->convertHostTriggers($host, $host['host']);
+			$host = $this->convertHostGraphs($host, $host['host']);
 			$host = $this->convertHostTemplates($host);
 
 			unset($host['groups']);
@@ -149,11 +151,13 @@ class C18ImportConverter extends CConverter {
 		}
 		unset($host);
 
-		// since trigger conversion requires information about the host they belong to,
+		// since trigger and graph conversion requires information about the host they belong to,
 		// merge them after they are converted
 		$content = $this->mergeToRoot($content['hosts'], $content, 'triggers');
+		$content = $this->mergeToRoot($content['hosts'], $content, 'graphs');
 		foreach ($content['hosts'] as &$host) {
 			unset($host['triggers']);
+			unset($host['graphs']);
 		}
 
 		return $content;
@@ -176,17 +180,20 @@ class C18ImportConverter extends CConverter {
 			$template = $this->renameKey($template, 'name', 'template');
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
+			$template = $this->convertHostGraphs($template, $template['template']);
 			$template = $this->convertHostTemplates($template);
 
 			unset($template['groups']);
 		}
 		unset($template);
 
-		// since trigger conversion requires information about the host they belong to,
+		// since trigger and graph conversion requires information about the host they belong to,
 		// merge them after they are converted
 		$content = $this->mergeToRoot($content['templates'], $content, 'triggers');
+		$content = $this->mergeToRoot($content['templates'], $content, 'graphs');
 		foreach ($content['templates'] as &$host) {
 			unset($host['triggers']);
+			unset($host['graphs']);
 		}
 
 		return $content;
@@ -455,7 +462,7 @@ class C18ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Filters duplicate triggers from the array and returns an array of unique triggers.
+	 * Filters duplicate triggers from the array and returns the content with unique triggers.
 	 *
 	 * @param array $content
 	 *
@@ -544,6 +551,106 @@ class C18ImportConverter extends CConverter {
 		unset($item);
 
 		return $host;
+	}
+
+	/**
+	 * Convert graph elements.
+	 *
+	 * @param array 	$host
+	 * @param string 	$hostName	technical name of the host that the graphs were imported under
+	 *
+	 * @return array
+	 */
+	protected function convertHostGraphs(array $host, $hostName) {
+		if (!isset($host['graphs'])) {
+			return $host;
+		}
+
+		foreach ($host['graphs'] as &$graph) {
+			$graph = $this->renameKey($graph, 'graphtype', 'type');
+			$graph = $this->renameKey($graph, 'graph_elements', 'graph_items');
+			$graph = $this->renameKey($graph, 'ymin_item_key', 'ymin_item_1');
+			$graph = $this->renameKey($graph, 'ymax_item_key', 'ymax_item_1');
+			$graph = $this->convertGraphItemReference($graph, 'ymin_item_1');
+			$graph = $this->convertGraphItemReference($graph, 'ymax_item_1');
+
+			foreach ($graph['graph_items'] as &$graphItem) {
+				$graphItem = $this->convertGraphItemReference($graphItem, 'item', $hostName);
+
+				unset($graphItem['periods_cnt']);
+			}
+			unset($graph);
+		}
+		unset($graph);
+
+		return $host;
+	}
+
+	/**
+	 * Convert item references used in graphs.
+	 *
+	 * @param array 		$array		source array
+	 * @param string		$key		property under which the reference is stored
+	 * @param string|null 	$hostName	if set to some host name, host macros will be resolved into this host
+	 *
+	 * @return array
+	 */
+	protected function convertGraphItemReference(array $array, $key, $hostName = null) {
+		if (!isset($array[$key])) {
+			return $array;
+		}
+
+		list ($host, $itemKey) = explode(':', $array[$key]);
+
+		if ($hostName !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
+			$host = $hostName;
+		}
+
+		$array[$key] = array(
+			'host' => $host,
+			'key' => $this->itemKeyConverter->convert($itemKey)
+		);
+
+		return $array;
+	}
+
+	/**
+	 * Filters duplicate graphs from the array and returns the content with unique graphs.
+	 *
+	 * Graphs are assumed identical if their names and items are identical.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function filterDuplicateGraphs(array $content) {
+		if (!isset($content['graphs'])) {
+			return $content;
+		}
+
+		$existingGraphs = array();
+
+		$filteredGraphs = array();
+		foreach ($content['graphs'] as $graph) {
+			$name = $graph['name'];
+			$graphItems = $graph['graph_items'];
+
+			if (isset($existingGraphs[$name])) {
+				foreach ($existingGraphs[$name] as $existingGraphItems) {
+					if ($graphItems == $existingGraphItems) {
+						continue 2;
+					}
+				}
+			}
+
+			$filteredGraphs[] = $graph;
+
+			$existingGraphs[$name][] = $graphItems;
+		}
+
+		$content['graphs'] = $filteredGraphs;
+
+		return $content;
 	}
 
 	protected function mergeToRoot(array $source, array $target, $key) {
