@@ -2177,7 +2177,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == values[i].state || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
+		if (ITEM_STATE_NOTSUPPORTED == values[i].state ||
+				(NULL != values[i].value && 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED)))
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
@@ -2210,7 +2211,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					log->lastlogsize = values[i].lastlogsize;
 					log->mtime = values[i].mtime;
 
-					calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+					if (NULL != log->value)
+						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
@@ -2383,10 +2385,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
-			continue;
-
-		av->value = zbx_strdup(av->value, tmp);
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
+			av->value = zbx_strdup(av->value, tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
 			is_uint64(tmp, &av->lastlogsize);

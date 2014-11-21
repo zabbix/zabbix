@@ -35,7 +35,7 @@ AGENT_VALUE
 	zbx_timespec_t	ts;
 	char		host_name[HOST_HOST_LEN_MAX];
 	char		key[ITEM_KEY_LEN * 4 + 1];
-	char		*value;
+	char		*value;	/* is null in case of lastlogsize update */
 	char		*source;
 	zbx_uint64_t	lastlogsize;
 	int		mtime;

@@ -58,6 +58,11 @@ static int		ZBX_HISTORY_SIZE = 0;	/* must be greater than ZBX_SYNC_MAX */
 
 #define ZBX_IDS_SIZE	10
 
+/* Possible values of "meta" field in "proxy_history" table. */
+/* LASTLOGSIZE_UPDATE_YES means the record is just for updating lastlogsize of an item. */
+#define LASTLOGSIZE_UPDATE_NO	0
+#define LASTLOGSIZE_UPDATE_YES	1
+
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -76,17 +81,17 @@ static ZBX_DC_IDS	*ids = NULL;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	history_value_t	value_orig;
-	history_value_t	value;			/* used as source for log items */
+	history_value_t	value_orig;	/* is empty in case of lastlogsize update */
+	history_value_t	value;		/* used as source for log items */
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
 	int		mtime;
-	int		num;			/* number of continuous values with the same itemid */
+	int		num;		/* number of continuous values with the same itemid */
 	unsigned char	value_type;
-	unsigned char	value_null;
+	unsigned char	value_undef;	/* unsupported or undefined (delta) */
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
 	unsigned char	state;
@@ -669,7 +674,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT && history[i].value_type != ITEM_VALUE_TYPE_UINT64)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_trends)
+		if (0 != history[i].value_undef || 0 == history[i].keep_trends)
 			continue;
 
 		DCadd_trend(&history[i], &trends, &trends_alloc, &trends_num);
@@ -756,7 +761,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null)
+		if (0 != history[i].value_undef)
 			continue;
 
 		itemids[item_num] = history[i].itemid;
@@ -860,7 +865,7 @@ static void	DCcalculate_item_delta_float(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 			if (SUCCEED != DBchk_double(h->value.dbl))
 			{
 				h->state = ITEM_STATE_NOTSUPPORTED;
-				h->value_null = 1;
+				h->value_undef = 1;
 			}
 
 			break;
@@ -876,11 +881,11 @@ static void	DCcalculate_item_delta_float(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 				if (SUCCEED != DBchk_double(h->value.dbl))
 				{
 					h->state = ITEM_STATE_NOTSUPPORTED;
-					h->value_null = 1;
+					h->value_undef = 1;
 				}
 			}
 			else
-				h->value_null = 1;
+				h->value_undef = 1;
 
 			break;
 		case ITEM_STORE_SIMPLE_CHANGE:
@@ -892,11 +897,11 @@ static void	DCcalculate_item_delta_float(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 				if (SUCCEED != DBchk_double(h->value.dbl))
 				{
 					h->state = ITEM_STATE_NOTSUPPORTED;
-					h->value_null = 1;
+					h->value_undef = 1;
 				}
 			}
 			else
-				h->value_null = 1;
+				h->value_undef = 1;
 
 			break;
 	}
@@ -943,7 +948,7 @@ static void	DCcalculate_item_delta_uint64(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 			}
 			else
-				h->value_null = 1;
+				h->value_undef = 1;
 
 			break;
 		case ITEM_STORE_SIMPLE_CHANGE:
@@ -953,7 +958,7 @@ static void	DCcalculate_item_delta_uint64(DC_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 			}
 			else
-				h->value_null = 1;
+				h->value_undef = 1;
 
 			break;
 	}
@@ -1119,7 +1124,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 	if (HOST_INVENTORY_AUTOMATIC != item->host.inventory_mode)
 		return;
 
-	if (1 == h->value_null || NULL == (inventory_field = DBget_inventory_field(item->inventory_link)))
+	if (0 != h->value_undef || NULL == (inventory_field = DBget_inventory_field(item->inventory_link)))
 		return;
 
 	switch (h->value_type)
@@ -1269,11 +1274,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 	zbx_vector_ptr_destroy(&inventory_values);
 
-	/* disable processing of deleted and disabled items by setting value_null */
+	/* disable processing of deleted and disabled items by setting value_undef */
 	for (i = 0; i < history_num; i++)
 	{
 		if (FAIL == zbx_vector_uint64_bsearch(&ids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			history[i].value_null = 1;
+			history[i].value_undef = 1;
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -1382,7 +1387,7 @@ static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1412,7 +1417,7 @@ static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1442,7 +1447,7 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1475,7 +1480,7 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
 		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1509,12 +1514,12 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
 				history[i].timestamp, (NULL != history[i].value.str ? history[i].value.str : ""),
-				history[i].severity, history[i].value_orig.str, history[i].logeventid);
+				history[i].severity, history[i].value_orig.str,	history[i].logeventid);
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -1542,7 +1547,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null || 0 == history[i].keep_history)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
 		switch (history[i].value_type)
@@ -1599,7 +1604,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (0 != history[i].value_null || 0 == history[i].keep_history)
+			if (0 != history[i].value_undef || 0 == history[i].keep_history)
 				continue;
 
 			switch (history[i].value_type)
@@ -1689,7 +1694,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
-			"value", "logeventid", NULL);
+			"value", "logeventid", "lastlogsize", "mtime", "meta",  NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1700,8 +1705,10 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
-				history[i].timestamp, NULL !=  history[i].value.str ? history[i].value.str : "",
-				history[i].severity, history[i].value_orig.str, history[i].logeventid);
+				history[i].timestamp, NULL != history[i].value.str ? history[i].value.str : "",
+				history[i].severity, NULL != history[i].value_orig.str ? history[i].value_orig.str : "",
+				history[i].logeventid, history[i].lastlogsize, history[i].mtime,
+				(NULL != history[i].value_orig.str ? LASTLOGSIZE_UPDATE_NO : LASTLOGSIZE_UPDATE_YES));
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -1977,9 +1984,14 @@ int	DCsync_history(int sync_type)
 						/* break; is not missing here */
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
-						history[history_num].value_orig.str =
-								zbx_strdup(NULL, cache->history[f].value_orig.str);
-						cache->text_free += strlen(cache->history[f].value_orig.str) + 1;
+						/* is null in case of lastlogsize update */
+						if (NULL != cache->history[f].value_orig.str)
+						{
+							history[history_num].value_orig.str =
+									zbx_strdup(NULL,
+									cache->history[f].value_orig.str);
+							cache->text_free += strlen(cache->history[f].value_orig.str) + 1;
+						}
 						break;
 				}
 			}
@@ -2387,7 +2399,7 @@ static void	DCadd_history_dbl(dc_item_value_t *value)
 	history->value_type = ITEM_VALUE_TYPE_FLOAT;
 	history->value_orig.dbl = value->value.value_dbl;
 	history->value.dbl = 0;
-	history->value_null = 0;
+	history->value_undef = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_float_counter++;
@@ -2407,7 +2419,7 @@ static void	DCadd_history_uint(dc_item_value_t *value)
 	history->value_type = ITEM_VALUE_TYPE_UINT64;
 	history->value_orig.ui64 = value->value.value_uint;
 	history->value.ui64 = 0;
-	history->value_null = 0;
+	history->value_undef = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_uint_counter++;
@@ -2426,7 +2438,7 @@ static void	DCadd_history_str(dc_item_value_t *value)
 	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_STR;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
-	history->value_null = 0;
+	history->value_undef = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_str_counter++;
@@ -2445,7 +2457,7 @@ static void	DCadd_history_text(dc_item_value_t *value)
 	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
-	history->value_null = 0;
+	history->value_undef = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
@@ -2465,7 +2477,7 @@ static void	DCadd_history_lld(dc_item_value_t *value)
 	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_TEXT;
 	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
-	history->value_null = 0;
+	history->value_undef = 0;
 
 	cache->stats.history_counter++;
 	cache->stats.history_text_counter++;
@@ -2483,8 +2495,12 @@ static void	DCadd_history_log(dc_item_value_t *value)
 	history->ts = value->ts;
 	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_LOG;
-	DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
-	history->value_null = 0;
+	if (0 != value->value.value_str.len)
+		DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
+	else
+		history->value_orig.str = NULL;
+
+	history->value_undef = 0;
 	history->timestamp = value->timestamp;
 
 	if (0 != value->source.len)
@@ -2513,7 +2529,7 @@ static void	DCadd_history_notsupported(dc_item_value_t *value)
 	history->ts = value->ts;
 	history->state = ITEM_STATE_NOTSUPPORTED;
 	DCadd_text(&history->value_orig.err, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
-	history->value_null = 1;
+	history->value_undef = 1;
 
 	cache->stats.notsupported_counter++;
 }
@@ -2619,7 +2635,10 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->value_type = ITEM_VALUE_TYPE_LOG;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	if (NULL != value_orig)
+		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	else
+		item_value->value.value_str.len = 0;
 	item_value->timestamp = timestamp;
 	if (NULL != source && '\0' != *source)
 		item_value->source.len = zbx_db_strlen_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
@@ -2630,15 +2649,23 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->lastlogsize = lastlogsize;
 	item_value->mtime = mtime;
 
-	dc_string_buffer_realloc(item_value->value.value_str.len + item_value->source.len);
-	item_value->value.value_str.pvalue = string_values_offset;
-	memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
-	string_values_offset += item_value->value.value_str.len;
-	if (0 != item_value->source.len)
+	if (item_value->value.value_str.len + item_value->source.len > 0)
 	{
-		item_value->source.pvalue = string_values_offset;
-		memcpy(&string_values[string_values_offset], source, item_value->source.len);
-		string_values_offset += item_value->source.len;
+		dc_string_buffer_realloc(item_value->value.value_str.len + item_value->source.len);
+
+		if (0 != item_value->value.value_str.len)
+		{
+			item_value->value.value_str.pvalue = string_values_offset;
+			memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+			string_values_offset += item_value->value.value_str.len;
+		}
+
+		if (0 != item_value->source.len)
+		{
+			item_value->source.pvalue = string_values_offset;
+			memcpy(&string_values[string_values_offset], source, item_value->source.len);
+			string_values_offset += item_value->source.len;
+		}
 	}
 }
 
