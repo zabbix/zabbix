@@ -24,12 +24,20 @@ class C18ImportConverter extends CConverter {
 	/**
 	 * Converter used for converting simple check item keys.
 	 *
-	 * @var C18ItemKeyConverter
+	 * @var CConverter
 	 */
 	protected $itemKeyConverter;
 
-	public function __construct(C18ItemKeyConverter $itemKeyConverter) {
+	/**
+	 * Converter used for converting trigger expressions.
+	 *
+	 * @var CConverter
+	 */
+	protected $triggerConverter;
+
+	public function __construct(CConverter $itemKeyConverter, CConverter $triggerConverter) {
 		$this->itemKeyConverter = $itemKeyConverter;
+		$this->triggerConverter = $triggerConverter;
 	}
 
 	public function convert($value) {
@@ -42,6 +50,8 @@ class C18ImportConverter extends CConverter {
 		$content = $this->convertHosts($content);
 		$content = $this->convertTemplates($content);
 		$content = $this->convertGroups($content);
+
+		$content = $this->filterDuplicateTriggers($content);
 
 		$value['zabbix_export'] = $content;
 
@@ -124,6 +134,7 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertHostProfiles($host);
 			$host = $this->convertHostItems($host);
+			$host = $this->convertHostTriggers($host, $host['host']);
 
 			unset($host['groups']);
 			unset($host['useip']);
@@ -136,6 +147,13 @@ class C18ImportConverter extends CConverter {
 			unset($host['host_profiles_ext']);
 		}
 		unset($host);
+
+		// since trigger conversion requires information about the host they belong to,
+		// merge them after they are converted
+		$content = $this->mergeToRoot($content['hosts'], $content, 'triggers');
+		foreach ($content['hosts'] as &$host) {
+			unset($host['triggers']);
+		}
 
 		return $content;
 	}
@@ -156,10 +174,18 @@ class C18ImportConverter extends CConverter {
 		foreach ($content['templates'] as &$template) {
 			$template = $this->renameKey($template, 'name', 'template');
 			$template = $this->convertHostItems($template);
+			$template = $this->convertHostTriggers($template, $template['template']);
 
 			unset($template['groups']);
 		}
 		unset($template);
+
+		// since trigger conversion requires information about the host they belong to,
+		// merge them after they are converted
+		$content = $this->mergeToRoot($content['templates'], $content, 'triggers');
+		foreach ($content['templates'] as &$host) {
+			unset($host['triggers']);
+		}
 
 		return $content;
 	}
@@ -404,6 +430,77 @@ class C18ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Converts triggers elements.
+	 *
+	 * @param array 	$host
+	 * @param string 	$hostName 	technical name of the host that the triggers were imported under
+	 *
+	 * @return array
+	 */
+	protected function convertHostTriggers(array $host, $hostName) {
+		if (!isset($host['triggers'])) {
+			return $host;
+		}
+
+		foreach ($host['triggers'] as &$trigger) {
+			$trigger = $this->renameKey($trigger, 'description', 'name');
+			$trigger = $this->renameKey($trigger, 'comments', 'description');
+			$trigger = $this->convertTriggerExpression($trigger, $hostName);
+		}
+		unset($trigger);
+
+		return $host;
+	}
+
+	/**
+	 * Filters duplicate triggers from the array and returns an array of unique triggers.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function filterDuplicateTriggers(array $content) {
+		if (!isset($content['triggers'])) {
+			return $content;
+		}
+
+		$existingTriggers = array();
+
+		$filteredTriggers = array();
+		foreach ($content['triggers'] as $trigger) {
+			$name = $trigger['name'];
+			$expression = $trigger['expression'];
+
+			if (!isset($existingTriggers[$name]) && !isset($existingTriggers[$name][$expression])) {
+				$filteredTriggers[] = $trigger;
+
+				$existingTriggers[$name][$expression] = true;
+			}
+		}
+
+		$content['triggers'] = $filteredTriggers;
+
+		return $content;
+	}
+
+	/**
+	 * Convert trigger expression and replace host macros.
+	 *
+	 * @param array 	$trigger
+	 * @param string 	$hostName	technical name of the host that the trigger was imported under
+	 *
+	 * @return string
+	 */
+	protected function convertTriggerExpression(array $trigger, $hostName) {
+		$trigger['expression'] = $this->triggerConverter->convert($trigger['expression']);
+
+		$trigger['expression'] = str_replace('{HOSTNAME}', $hostName, $trigger['expression']);
+		$trigger['expression'] = str_replace('{HOST.HOST}', $hostName, $trigger['expression']);
+
+		return $trigger;
+	}
+
+	/**
 	 * Convert item elements.
 	 *
 	 * @param array $host
@@ -419,9 +516,7 @@ class C18ImportConverter extends CConverter {
 			$item = $this->renameKey($item, 'description', 'name');
 
 			// convert simple check keys
-			if (isset($item['key'])) {
-				$item['key'] = $this->itemKeyConverter->convert($item['key']);
-			}
+			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 
 			if (isset($item['applications'])) {
 				$item['applications'] = $this->wrapChildren($item['applications'], 'name');
