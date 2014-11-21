@@ -29,12 +29,14 @@ function getLastEvent($problemTrigger) {
 	$result = null;
 
 	$lastProblemEvent = DBfetch(DBselect(
-		'SELECT e.eventid,MAX(e.clock) clock,e.false_positive'.
+		'SELECT e.eventid,e.clock,e.false_positive'.
 		' FROM events e'.
 		' WHERE e.objectid='.$problemTrigger.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.value='.TRIGGER_VALUE_TRUE
+			' AND e.value='.TRIGGER_VALUE_TRUE.
+		' ORDER BY e.clock DESC',
+		1
 	));
 
 	if ($lastProblemEvent && $lastProblemEvent['false_positive'] == INCIDENT_FLAG_NORMAL) {
@@ -54,7 +56,7 @@ function getLastEvent($problemTrigger) {
  * @return int
  */
 function getPreEvents($objectid, $clock, $eventid) {
-	$result = null;
+	$result = $eventid;
 
 	$beforeEvents = DBselect(
 		'SELECT e.eventid,e.clock,e.value'.
@@ -63,8 +65,8 @@ function getPreEvents($objectid, $clock, $eventid) {
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock<='.$clock.
-			' AND e.eventid!='.$eventid.
-		' LIMIT 2'
+			' AND e.eventid!='.$eventid,
+		2
 	);
 
 	if ($beforeEvents) {
