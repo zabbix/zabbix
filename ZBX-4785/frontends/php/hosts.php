@@ -44,6 +44,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groups' =>			array(T_ZBX_JSON, O_OPT, P_SYS,			DB_ID,		null),
+	'mass_groups' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
@@ -287,10 +288,10 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		}
 
 		if (isset($visible['groups'])) {
-			if (isset($_REQUEST['groups'])) {
+			if (hasRequest('mass_groups')) {
 				$replaceHostGroupsIds = $newHostGroupIds
-					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
-					: $_REQUEST['groups'];
+					? array_unique(array_merge(getRequest('mass_groups'), $newHostGroupIds))
+					: getRequest('mass_groups');
 			}
 			elseif ($newHostGroupIds) {
 				$replaceHostGroupsIds = $newHostGroupIds;
@@ -703,7 +704,7 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 		'visible' => getRequest('visible', array()),
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
-		'groups' => getRequest('groups', array()),
+		'mass_groups' => getRequest('mass_groups', array()),
 		'newgroup' => getRequest('newgroup', ''),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),

@@ -34,9 +34,9 @@ $hostFormList = new CFormList('hostFormList');
 
 // replace host groups
 $hostGroupsToReplace = null;
-if (isset($_REQUEST['groups'])) {
+if (hasRequest('mass_groups')) {
 	$getHostGroups = API::HostGroup()->get(array(
-		'groupids' => $_REQUEST['groups'],
+		'groupids' => getRequest('mass_groups'),
 		'output' => array('groupid', 'name'),
 		'editable' => true
 	));
@@ -49,12 +49,12 @@ if (isset($_REQUEST['groups'])) {
 }
 
 $replaceGroups = new CDiv(new CMultiSelect(array(
-	'name' => 'groups[]',
+	'name' => 'mass_groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array('editable' => true),
 	'data' => $hostGroupsToReplace,
 	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=groups_&srcfld1=groupid'.
+		'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=mass_groups_&srcfld1=groupid'.
 			'&writeonly=1&multiselect=1',
 		'width' => 450,
 		'height' => 450
