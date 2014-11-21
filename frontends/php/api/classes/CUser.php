@@ -681,7 +681,7 @@ class CUser extends CZBXAPI {
 		$mediaids = array();
 		$userids = array();
 
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
 
@@ -719,7 +719,7 @@ class CUser extends CZBXAPI {
 	public function deleteMedia($mediaids) {
 		$mediaids = zbx_toArray($mediaids);
 
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
@@ -749,7 +749,7 @@ class CUser extends CZBXAPI {
 		$newMedias = zbx_toArray($mediaData['medias']);
 		$users = zbx_toArray($mediaData['users']);
 
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
 		}
 

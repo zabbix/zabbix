@@ -286,7 +286,7 @@ class CImage extends CZBXAPI {
 		$images = zbx_toArray($images);
 		$imageids = array();
 
-			if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
@@ -401,7 +401,7 @@ class CImage extends CZBXAPI {
 
 		$images = zbx_toArray($images);
 
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -510,7 +510,7 @@ class CImage extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty parameters'));
 		}
 
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 

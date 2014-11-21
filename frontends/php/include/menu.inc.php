@@ -323,7 +323,9 @@ $ZBX_MENU = array(
 	),
 	'login' => array(
 		'label'					=> _('Login'),
-		'user_type'				=> array(0),
+		'user_type'				=>	array(USER_TYPE_EBERO, USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE,
+			USER_TYPE_COMPLIANCE, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+		),
 		'default_page_id'		=> 0,
 		'hide_node_selection'	=> 1,
 		'force_disable_all_nodes'=> true,
