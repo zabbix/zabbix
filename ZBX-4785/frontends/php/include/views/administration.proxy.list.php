@@ -36,7 +36,7 @@ $proxyForm->setName('proxyForm');
 // create table
 $proxyTable = new CTableInfo(_('No proxies found.'));
 $proxyTable->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'hosts');"),
+	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'mass_hosts');"),
 	make_sorting_header(_('Name'), 'host', $this->data['sort'], $this->data['sortorder']),
 	_('Mode'),
 	_('Last seen (age)'),
@@ -85,7 +85,7 @@ foreach ($this->data['proxies'] as $proxy) {
 	}
 
 	$proxyTable->addRow(array(
-		new CCheckBox('hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
+		new CCheckBox('mass_hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
 		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']) : '',
 		(isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) ? _('Active') : _('Passive'),
 		$lastAccess,
@@ -113,7 +113,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
+zbx_add_post_js('chkbxRange.pageGoName = "mass_hosts";');
 
 // append table to form
 $proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

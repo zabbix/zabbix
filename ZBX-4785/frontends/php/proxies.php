@@ -35,6 +35,7 @@ $fields = array(
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({add}) || isset({update})'),
 	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && {status} == '.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_JSON, O_OPT, P_SYS,	DB_ID,		null),
+	'mass_hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -57,32 +58,38 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (isset($_REQUEST['proxyid'])) {
+if (hasRequest('proxyid')) {
 	$dbProxy = API::Proxy()->get(array(
-		'proxyids' => getRequest('proxyid'),
-		'selectHosts' => array('hostid', 'host'),
-		'selectInterface' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('hostid'),
+		'proxyids' => getRequest('proxyid')
 	));
 
 	if (!$dbProxy) {
 		access_deny();
 	}
 }
-if (isset($_REQUEST['action'])) {
-	if (!isset($_REQUEST['hosts']) || !is_array($_REQUEST['hosts'])) {
-		access_deny();
+if (hasRequest('action')) {
+	$hostIds = array();
+	if (hasRequest('hosts')) {
+		$hostIds = getRequest('hosts');
+	}
+	else if (hasRequest('mass_hosts')) {
+		$hostIds = getRequest('mass_hosts');
 	}
 	else {
-		$dbProxyChk = API::Proxy()->get(array(
-			'proxyids' => $_REQUEST['hosts'],
-			'selectHosts' => array('hostid', 'host'),
-			'selectInterface' => API_OUTPUT_EXTEND,
-			'countOutput' => true
-		));
-		if ($dbProxyChk != count($_REQUEST['hosts'])) {
-			access_deny();
-		}
+		access_deny();
+	}
+
+	if (!$hostIds || !is_array($hostIds)) {
+		access_deny();
+	}
+
+	$dbProxyChk = API::Proxy()->get(array(
+		'countOutput' => true,
+		'proxyids' => $hostIds
+	));
+	if ($dbProxyChk != count($hostIds)) {
+		access_deny();
 	}
 }
 
@@ -149,11 +156,11 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['proxyid'])) {
 	unset($_REQUEST['proxyid'], $_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.massdisable')) && hasRequest('hosts')) {
+elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.massdisable')) && hasRequest('mass_hosts')) {
 	$result = true;
-	$enable =(getRequest('action') == 'proxy.massenable');
+	$enable = (getRequest('action') == 'proxy.massenable');
 	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = getRequest('hosts');
+	$hosts = getRequest('mass_hosts');
 
 	DBstart();
 
@@ -193,10 +200,10 @@ elseif (str_in_array(getRequest('action'), array('proxy.massenable', 'proxy.mass
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'proxy.massdelete' && hasRequest('hosts')) {
+elseif (hasRequest('action') && getRequest('action') == 'proxy.massdelete' && hasRequest('mass_hosts')) {
 	DBstart();
 
-	$result = API::Proxy()->delete(getRequest('hosts'));
+	$result = API::Proxy()->delete(getRequest('mass_hosts'));
 	$result = DBend($result);
 
 	if ($result) {
