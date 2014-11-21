@@ -582,6 +582,93 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertItems() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'status' => HOST_STATUS_MONITORED,
+					'items' => array(
+						array(),
+						array(
+							'description' => 'My item',
+							'key' => 'ftp,1',
+							'applications' => array(
+								array('Application 1'),
+								array('Application 2'),
+							)
+						)
+					)
+				),
+				array(
+					'status' => HOST_STATUS_TEMPLATE,
+					'items' => array(
+						array(),
+						array(
+							'description' => 'My item',
+							'key' => 'ftp,1',
+							'applications' => array(
+								array('Application 1'),
+								array('Application 2'),
+							)
+						)
+					)
+				)
+			),
+		));
+
+		$expectedResult = $this->createResult(array(
+			'hosts' => array(
+				array(
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'items' => array(
+						array(),
+						array(
+							'name' => 'My item',
+							'key' => 'net.tcp.service[ftp,,1]',
+							'applications' => array(
+								array(
+									'name' => 'Application 1'
+								),
+								array(
+									'name' => 'Application 2'
+								),
+							)
+						)
+					)
+				)
+			),
+			'templates' => array(
+				array(
+					'items' => array(
+						array(),
+						array(
+							'name' => 'My item',
+							'key' => 'net.tcp.service[ftp,,1]',
+							'applications' => array(
+								array(
+									'name' => 'Application 1'
+								),
+								array(
+									'name' => 'Application 2'
+								),
+							)
+						)
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	protected function createSource(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(
@@ -608,7 +695,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 
 
 	protected function createConverter() {
-		return new C18ImportConverter();
+		return new C18ImportConverter(new C18ItemKeyConverter());
 	}
 
 }
