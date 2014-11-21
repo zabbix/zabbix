@@ -830,6 +830,71 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertHostTemplates() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'templates' => array(
+						array('template1'),
+						array('template2'),
+					)
+				),
+				array(
+					'name' => 'template',
+					'status' => HOST_STATUS_TEMPLATE,
+					'templates' => array(
+						array('template1'),
+						array('template2'),
+					)
+				)
+			),
+		));
+
+		$expectedResult = $this->createResult(array(
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'templates' => array(
+						array(
+							'name' => 'template1'
+						),
+						array(
+							'name' => 'template2'
+						),
+					)
+				)
+			),
+			'templates' => array(
+				array(
+					'template' => 'template',
+					'templates' => array(
+						array(
+							'name' => 'template1'
+						),
+						array(
+							'name' => 'template2'
+						),
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	protected function createSource(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(
