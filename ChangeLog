@@ -48,6 +48,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Italian translations; tha
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-8926] fixed bug in JSON parser that caused failures in data retrieval if the target buffer and the decoded data were the same size (Juris)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
