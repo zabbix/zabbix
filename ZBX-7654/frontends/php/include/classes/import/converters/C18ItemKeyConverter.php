@@ -56,14 +56,14 @@ class C18ItemKeyConverter extends CConverter {
 		$port = (isset($value[1])) ? $value[1] : '';
 
 		if (in_array($key, $keys)) {
-			$newKey = 'net.tcp.service['.$key.',,'.$port.']';
+			$key = 'net.tcp.service['.$key.',,'.$port.']';
 		}
 		elseif (in_array($key, $perfKeys)) {
 			list($key, $perfSuffix) = explode('_', $key);
-			$newKey = 'net.tcp.service.perf['.$key.',,'.$port.']';
+			$key = 'net.tcp.service.perf['.$key.',,'.$port.']';
 		}
 
-		return $newKey;
+		return $key;
 	}
 
 }
