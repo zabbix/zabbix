@@ -411,7 +411,9 @@ $filterTable->addRow(array(
 	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'inputcol'),
 ));
 
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
+$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
+	'jqueryinput shadow'
+);
 $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');

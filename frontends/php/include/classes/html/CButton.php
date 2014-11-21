@@ -28,7 +28,8 @@ class CButton extends CTag implements CButtonInterface {
 	 */
 	protected $buttonClass;
 
-	public function __construct($name = 'button', $caption = '', $action = null, $buttonClass = 'button-plain shadow ui-corner-all') {
+	public function __construct($name = 'button', $caption = '', $action = null,
+			$buttonClass = 'button-plain shadow ui-corner-all') {
 		parent::__construct('button', 'yes', $caption, 'button');
 		$this->setAttribute('type', 'button');
 

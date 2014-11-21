@@ -52,7 +52,7 @@ $filterTable->addRow(array(
 $filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
 $filter->main();
 
-$reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput');
+$reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
 $divButtons = new CDiv(array($filter, SPACE, $reset));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
