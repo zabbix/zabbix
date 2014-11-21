@@ -452,8 +452,8 @@ static void	process_rule(DB_DRULE *drule)
 	DB_DHOST	dhost;
 	int		host_status, now;
 	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
-	int		iptype, ipaddress[8];
-	zbx_range_t	iprange[8];
+	int		ipaddress[8];
+	zbx_iprange_t	iprange;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
 
@@ -464,33 +464,33 @@ static void	process_rule(DB_DRULE *drule)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
 
-		if (SUCCEED != iprange_parse(start, iprange, &iptype))
+		if (SUCCEED != iprange_parse(&iprange, start))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
 					drule->name, start);
 			goto next;
 		}
 
-		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(iprange, iptype))
+		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(&iprange))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range \"%s\" exceeds %d address limit",
 					drule->name, start, ZBX_DISCOVERER_IPRANGE_LIMIT);
 			goto next;
 		}
 #ifndef HAVE_IPV6
-		if (ZBX_IPRANGE_V6 == iptype)
+		if (ZBX_IPRANGE_V6 == iprange.type)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
 					" but IPv6 support not compiled in", drule->name, start);
 			goto next;
 		}
 #endif
-		iprange_first(iprange, iptype, ipaddress);
+		iprange_first(&iprange, ipaddress);
 
 		do
 		{
 #ifdef HAVE_IPV6
-			if (ZBX_IPRANGE_V6 == iptype)
+			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
 				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
 						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
@@ -528,7 +528,7 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBcommit();
 		}
-		while (SUCCEED == iprange_next(iprange, iptype, ipaddress));
+		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
 		if (NULL != comma)
 		{

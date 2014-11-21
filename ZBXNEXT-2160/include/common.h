@@ -953,14 +953,24 @@ typedef struct
 }
 zbx_range_t;
 
+typedef struct
+{
+	zbx_range_t	range[8];
+	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
+	unsigned char	type;
+	/* 1 if the range was defined with network mask, 0 otherwise */
+	unsigned char   mask;
+}
+zbx_iprange_t;
+
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
 
-int	iprange_parse(const char *address, zbx_range_t *range, int *type);
-void	iprange_first(const zbx_range_t *range, int type, int *address);
-int	iprange_next(const zbx_range_t *range, int type, int *address);
-int	iprange_validate(const zbx_range_t *range, int type, const int *address);
-zbx_uint64_t	iprange_volume(const zbx_range_t *range, int type);
+int	iprange_parse(zbx_iprange_t *range, const char *address);
+void	iprange_first(const zbx_iprange_t *range, int *address);
+int	iprange_next(const zbx_iprange_t *range, int *address);
+int	iprange_validate(const zbx_iprange_t *range, const int *address);
+zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);

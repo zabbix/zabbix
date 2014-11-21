@@ -891,8 +891,8 @@ int	ip_in_list(const char *list, const char *ip)
 {
 	const char	*__function_name = "ip_in_list";
 
-	int		iptype, ipaddress[8];
-	zbx_range_t	iprange[8];
+	int		ipaddress[8];
+	zbx_iprange_t	iprange;
 	char		*address = NULL;
 	size_t		address_alloc = 0, address_offset;
 	const char	*ptr;
@@ -900,13 +900,13 @@ int	ip_in_list(const char *list, const char *ip)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __function_name, list, ip);
 
-	if (SUCCEED != iprange_parse(ip, iprange, &iptype))
+	if (SUCCEED != iprange_parse(&iprange, ip))
 		goto out;
 #ifndef HAVE_IPV6
-	if (ZBX_IPRANGE_V6 == iptype)
+	if (ZBX_IPRANGE_V6 == iprange.type)
 		goto out;
 #endif
-	iprange_first(iprange, iptype, ipaddress);
+	iprange_first(&iprange, ipaddress);
 
 	for (ptr = list; '\0' != *ptr; list = ptr + 1)
 	{
@@ -916,13 +916,13 @@ int	ip_in_list(const char *list, const char *ip)
 		address_offset = 0;
 		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, ptr - list);
 
-		if (SUCCEED != iprange_parse(address, iprange, &iptype))
+		if (SUCCEED != iprange_parse(&iprange, address))
 			continue;
 #ifndef HAVE_IPV6
-		if (ZBX_IPRANGE_V6 == iptype)
+		if (ZBX_IPRANGE_V6 == iprange.type)
 			continue;
 #endif
-		if (SUCCEED == iprange_validate(iprange, iptype, ipaddress))
+		if (SUCCEED == iprange_validate(&iprange, ipaddress))
 		{
 			ret = SUCCEED;
 			break;
