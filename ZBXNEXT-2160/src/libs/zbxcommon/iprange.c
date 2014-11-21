@@ -70,7 +70,7 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
  *                                                                            *
  * Function: iprangev4_parse                                                  *
  *                                                                            *
- * Purpose: parse IPv4 address into range array                               *
+ * Purpose: parse IPv4 address into IP range structure                        *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
  *             address - [IN] the IP address                                  *
@@ -152,7 +152,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
  *                                                                            *
  * Function: iprangev6_parse                                                  *
  *                                                                            *
- * Purpose: parse IPv6 address into range array                               *
+ * Purpose: parse IPv6 address into IP range structure                        *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
  *             address - [IN] the IP address                                  *
@@ -210,18 +210,15 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_hex_n_range(address, len, &iprange->range[index].from, 4, 0LL, (1LL << 16) - 1))
+		if (FAIL == is_hex_n_range(address, len, &iprange->range[index].from, 4, 0, (1 << 16) - 1))
 			return FAIL;
 
 		/* if range is specified, extract the end value, otherwise set end value equal to the start value */
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_hex_n_range(dash, ptr - dash, &iprange->range[index].to, 4, 0LL,
-					(1LL << 16) - 1))
-			{
+			if (FAIL == is_hex_n_range(dash, ptr - dash, &iprange->range[index].to, 4, 0, (1 << 16) - 1))
 				return FAIL;
-			}
 
 			if (iprange->range[index].to < iprange->range[index].from)
 				return FAIL;
@@ -285,7 +282,7 @@ check_fill:
  *                                                                            *
  * Function: iprange_parse                                                    *
  *                                                                            *
- * Purpose: parse IP address (v4 or v6) into range array                      *
+ * Purpose: parse IP address (v4 or v6) into IP range structure               *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
  *             address - [IN] the IP address                                  *
@@ -326,7 +323,7 @@ void	iprange_first(const zbx_iprange_t *iprange, int *address)
 
 	/* exclude network address if the IPv4 range was specified with network mask */
 	if (ZBX_IPRANGE_V4 == iprange->type && 0 != iprange->mask)
-		iprange_next(iprange, address);
+		address[groups - 1]++;
 }
 
 /******************************************************************************
@@ -439,7 +436,7 @@ zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange)
 		volume *= n;
 	}
 
-	/* exclude network and broadcast address if the IPv4 range was specified with network mask */
+	/* exclude network and broadcast addresses if the IPv4 range was specified with network mask */
 	if (ZBX_IPRANGE_V4 == iprange->type && 0 != iprange->mask)
 		volume -= 2;
 
