@@ -13,7 +13,6 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
-..F....... [ZBX-4785] fixed errors when POST request with too many variables breaks functionality (Krists)
 ........S. [ZBX-8542] improved performance and reduced configuration cache locking when evaluating trigger expressions (wiper)
 ...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)
@@ -44,13 +43,14 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.3rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Italian translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
-..F....... [ZBX-8874] fixed possible wrong submit button activation when multiple submit buttons are present and "Enter" key is used to submit (Krists)
 .......PS. [ZBX-8476] fixed queue being calculated incorrectly when there is even a slight time difference between server and proxy (asaveljevs)
 A......... [ZBX-8832] fixed template application inheritance when linking template other templates (Krists)
 A.F....... [ZBX-8979] fixed undefined indexes in the profiler on early version of PHP 5.3 (Pavels)
@@ -532,6 +532,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
@@ -1680,6 +1681,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces (asaveljevs)
 ........S. [ZBX-8948] fixed memory leak when checking Template condition during action processing (wiper)

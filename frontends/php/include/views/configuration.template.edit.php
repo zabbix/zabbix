@@ -100,15 +100,15 @@ $templateList->addRow(_('Visible name'), $visiblenameTB);
 
 // FORM ITEM : Groups tween box [  ] [  ]
 // get all Groups
-$group_tb = new CTweenBox($frmHost, 'groups', 10);
-$group_tb->setSelectedValues($groups);
-$all_groups = API::HostGroup()->get(array(
-	'output' => array('groupid', 'name'),
-	'editable' => true
-));
+$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
+$options = array(
+	'editable' => 1,
+	'output' => API_OUTPUT_EXTEND
+);
+$all_groups = API::HostGroup()->get($options);
 order_result($all_groups, 'name');
 
-foreach ($all_groups as $group) {
+foreach ($all_groups as $gnum => $group) {
 	$group_tb->addItem($group['groupid'], $group['name']);
 }
 $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
@@ -134,34 +134,37 @@ foreach ($all_groups as $gnum => $group) {
 	$cmbGroups->addItem($group['groupid'], $group['name']);
 }
 
-$host_tb = new CTweenBox($frmHost, 'hosts', 20);
-$host_tb->setSelectedValues($hosts_linked_to);
+$host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 20);
 
 // get hosts from selected twb_groupid combo
-$db_hosts = API::Host()->get(array(
-	'output' => array('hostid', 'name'),
+$params = array(
 	'groupids' => $twb_groupid,
-	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-	'templated_hosts' => true,
-	'editable' => true
-));
-foreach ($db_hosts as $db_host) {
-	// add all except selected hosts
+	'templated_hosts' => 1,
+	'editable' => 1,
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+);
+$db_hosts = API::Host()->get($params);
+order_result($db_hosts, 'name');
+
+foreach ($db_hosts as $hnum => $db_host) {
 	if (isset($hosts_linked_to[$db_host['hostid']])) {
 		continue;
-	}
+	} // add all except selected hosts
 	$host_tb->addItem($db_host['hostid'], $db_host['name']);
 }
 
 // select selected hosts and add them
-$db_hosts = API::Host()->get(array(
-	'output' => array('hostid', 'name', 'flags'),
+$params = array(
 	'hostids' => $hosts_linked_to,
-	'templated_hosts' => true,
-	'editable' => true
-));
-foreach ($db_hosts as $db_host) {
-	$host_tb->addItem($db_host['hostid'], $db_host['name'], $db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL);
+	'templated_hosts' => 1,
+	'editable' => 1,
+	'output' => API_OUTPUT_EXTEND
+);
+$db_hosts = API::Host()->get($params);
+order_result($db_hosts, 'name');
+foreach ($db_hosts as $hnum => $db_host) {
+	$host_tb->addItem($db_host['hostid'], $db_host['name'], null, ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
 }
 
 $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(
