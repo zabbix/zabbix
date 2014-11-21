@@ -125,7 +125,7 @@ if ($data['form_refresh']) {
 	$data['config']['server_check_interval'] = getRequest('server_check_interval', 0);
 }
 else {
-	$data['config'] = select_config(false);
+	$data['config'] = select_config();
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);

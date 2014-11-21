@@ -83,7 +83,7 @@ if (hasRequest('form_refresh')) {
 	$data['config']['work_period'] = getRequest('work_period');
 }
 else {
-	$data['config'] = select_config(false);
+	$data['config'] = select_config();
 }
 
 $workingTimeForm = new CView('administration.general.workingtime.edit', $data);
