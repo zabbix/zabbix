@@ -135,6 +135,7 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostProfiles($host);
 			$host = $this->convertHostItems($host);
 			$host = $this->convertHostTriggers($host, $host['host']);
+			$host = $this->convertHostTemplates($host);
 
 			unset($host['groups']);
 			unset($host['useip']);
@@ -175,6 +176,7 @@ class C18ImportConverter extends CConverter {
 			$template = $this->renameKey($template, 'name', 'template');
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
+			$template = $this->convertHostTemplates($template);
 
 			unset($template['groups']);
 		}
@@ -498,6 +500,23 @@ class C18ImportConverter extends CConverter {
 		$trigger['expression'] = str_replace('{HOST.HOST}', $hostName, $trigger['expression']);
 
 		return $trigger;
+	}
+
+	/**
+	 * Convert templates linked to a host
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertHostTemplates(array $host) {
+		if (!isset($host['templates'])) {
+			return $host;
+		}
+
+		$host['templates'] = $this->wrapChildren($host['templates'], 'name');
+
+		return $host;
 	}
 
 	/**
