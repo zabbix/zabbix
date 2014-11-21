@@ -126,14 +126,14 @@ $cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
 
-if (hasRequest('form_refresh')) {
+if (hasRequest('update') || hasRequest('form_refresh')) {
 	$data['config']['discovery_groupid'] = getRequest('discovery_groupid');
 	$data['config']['alert_usrgrpid'] = getRequest('alert_usrgrpid');
 	$data['config']['refresh_unsupported'] = getRequest('refresh_unsupported');
 	$data['config']['snmptrap_logging'] = getRequest('snmptrap_logging');
 }
 else {
-	$data['config'] = select_config(false);
+	$data['config'] = select_config();
 }
 
 $data['discovery_groups'] = API::HostGroup()->get(array(
