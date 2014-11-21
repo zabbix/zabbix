@@ -60,7 +60,9 @@ check_fields($fields);
  */
 if (hasRequest('proxyid')) {
 	$dbProxy = API::Proxy()->get(array(
-		'output' => array('hostid'),
+		'output' => array('hostid', 'host', 'status', 'description'),
+		'selectHosts' => array('hostid'),
+		'selectInterface' => array('interfaceid', 'hostid', 'dns', 'ip', 'useip', 'port'),
 		'proxyids' => getRequest('proxyid')
 	));
 
