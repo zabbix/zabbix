@@ -55,7 +55,7 @@ class CComboItem extends CTag {
 	/**
 	 * Enable or disable the element.
 	 *
-	 * @param $value
+	 * @param bool $value
 	 */
 	public function setEnabled($value) {
 		if ($value) {

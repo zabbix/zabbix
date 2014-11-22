@@ -142,7 +142,7 @@ a.weight_normal { font-weight: normal; }
 .button { height: auto; line-height: normal; cursor: pointer; }
 .button:disabled { cursor: default; }
 
-.button-plain { margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
+.button-plain { margin: 1px 2px 1px 1px; background: #f0f0f0 url('../images/gradients/button.gif') repeat-x top left; }
 
 .ui-button { padding: 0 4px; height: 23px; }
 
@@ -281,7 +281,9 @@ div.onajaxload { position: absolute; background-color: #000000; filter: alpha(op
 
 /* tween box table */
 .tweenBoxTable tr td { padding: 0; vertical-align: middle; height: 24px; }
-.tweenBoxTable .button, .old-filter .tweenBoxTable .button { height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px; }
+.tweenBoxTable .button, .old-filter .tweenBoxTable .button {
+	height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px;
+}
 
 /* page header */
 table.page_header { padding-right: 0; padding-left: 0; background-color: #FFF; border: 0; vertical-align: middle; }
@@ -414,7 +416,8 @@ table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
 table.warningTable tr.content { vertical-align: text-top; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
-table.warningTable .button { background: #fff; border: 1px solid #ACA899;
+table.warningTable .button {
+	background: #fff; border: 1px solid #aca899;
 	margin: 0 2px 0 0; height: 20px; padding-top: 2px; padding-bottom: 2px;
 }
 table.warningTable .button:hover { border-color: #6e8ab4; }
@@ -448,8 +451,7 @@ table.requirements select { width: 152px; }
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; }
 table.filter tr td {
-	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
-	padding: 0 2px 0 6px;
+	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px;
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
 table.filter tr td.controls { text-align: center; }
@@ -468,7 +470,8 @@ table.filter.sub-filter tr td:first-child { width: 8%; }
 /* old-style filter */
 .old-filter .form_row_l { text-align: right; }
 .old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
-.old-filter .button-form { height: 16px; vertical-align: baseline; }
+.old-filter .button-form { height: 16px; }
+.old-filter .input, .old-filter .button-form { vertical-align: middle; }
 
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }

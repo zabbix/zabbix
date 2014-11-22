@@ -21,7 +21,8 @@
 
 class CSubmit extends CButton {
 
-	public function __construct($name = 'submit', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
+	public function __construct($name = 'submit', $caption = '', $action = null,
+			$class = 'button-plain shadow ui-corner-all') {
 		parent::__construct($name, $caption, $action, $class);
 		$this->setAttribute('type', 'submit');
 		$this->setAttribute('value', $caption);

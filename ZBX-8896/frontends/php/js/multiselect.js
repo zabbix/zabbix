@@ -472,10 +472,6 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var popupBlock = $('<div>', {
-					'class': 'select-popup'
-				});
-
 				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
