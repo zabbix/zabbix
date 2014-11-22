@@ -135,7 +135,7 @@ else {
 
 	$txtCondVal = new CTextBox('name', $caption, 50, true);
 
-	$btnSelect = new CSubmit('btn1', _('Select'),
+	$btnSelect = new CButton('btn1', _('Select'),
 		'return PopUp("popup.php?'.
 			'dstfrm='.$frmGItem->GetName().
 			'&dstfld1=itemid'.
