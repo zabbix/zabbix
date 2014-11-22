@@ -182,7 +182,7 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 
 /* Make checked checkboxes/radiobuttons have black label text */
 .radioset .ui-button.ui-state-active .ui-button-text { color: #000000; }
-.radioset .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }
+.radioset .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #555; }
 
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
