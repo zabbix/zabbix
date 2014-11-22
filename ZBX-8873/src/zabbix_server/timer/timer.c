@@ -289,7 +289,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-			" order by clock desc,eventid desc",
+			" order by eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
@@ -325,7 +325,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-			" order by clock desc,eventid desc",
+			" order by eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
@@ -346,20 +346,21 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 	}
 
 	/* check for value inside maintenance period */
-	result = DBselect(
+	zbx_snprintf(sql, sizeof(sql),
 			"select value"
 			" from events"
 			" where source=%d"
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock between %d and %d"
-				" and value=%d"
-			" order by object desc,objectid desc,eventid desc",
+				" and value=%d",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_from, maintenance_to - 1,
 			*value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 		*value_inside = atoi(row[0]);
