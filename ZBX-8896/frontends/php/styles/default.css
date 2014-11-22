@@ -174,14 +174,16 @@ input.macro { text-transform: uppercase; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
-.radio { margin: 2px 2px 2px 0; vertical-align: top; border: 0 !important; }
+.radio { margin: 2px 2px 2px 0; vertical-align: top; }
 .radioset .ui-button { height: 18px; }
-.checkbox { padding: 0; border: 0 !important; }
+.checkbox { padding: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
 .textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
+/* reset checkbox and radio input styles */
+.input.radio, .input.checkbox { border: 0; background: none; height: auto; }
 
 /* transparent - must be after input! */
 .transparent { border: 0; background-color: transparent; }
