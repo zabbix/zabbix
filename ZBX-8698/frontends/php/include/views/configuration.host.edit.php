@@ -149,9 +149,11 @@ $clearTemplates = array_diff($clearTemplates, array_keys($templateIds));
 natcasesort($templateIds);
 
 // whether this is a discovered host
-$isDiscovered = getRequest('hostid')
-	&& ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-	&& ($this->data['form'] == 'update');
+$isDiscovered = (
+	getRequest('hostid')
+	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+	&& $this->data['form'] === 'update'
+);
 
 $divTabs = new CTabView();
 if (!hasRequest('form_refresh')) {
