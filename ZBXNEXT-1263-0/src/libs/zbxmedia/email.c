@@ -275,7 +275,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* connect to and receive an initial greeting from SMTP server */
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0))
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0, ZBX_TCP_SEC_PLAIN))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_tcp_strerror());

@@ -40,7 +40,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 	*value_int = 0;
 
-	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_PLAIN)))
 		goto out;
 
 	if (NULL != request)

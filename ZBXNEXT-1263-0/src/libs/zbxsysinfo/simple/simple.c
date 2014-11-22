@@ -138,7 +138,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_PLAIN)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s)))
 		{
@@ -218,7 +218,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 
 	*value_int = 0;
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
+	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_PLAIN))
 	{
 #ifdef _WINDOWS
 		ioctlsocket(s.socket, FIONBIO, &argp);	/* non-zero value sets the socket to non-blocking */
