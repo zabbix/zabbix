@@ -125,6 +125,8 @@ if ($queryData) {
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
 			'eventobject' => $eventSource['object'],
+			'sortfield' => 'alertid',
+			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
 		)));
 	}
