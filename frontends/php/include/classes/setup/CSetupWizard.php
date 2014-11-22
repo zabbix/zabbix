@@ -230,7 +230,7 @@ class CSetupWizard extends CForm {
 			$message = array(
 				_('Please correct all issues and press "Retry" button'),
 				BR(),
-				new CSubmit('retry', _('Retry'))
+				new CSubmit('retry', _('Retry'), null, 'jqueryinput')
 			);
 		}
 		// OK or warning
@@ -519,13 +519,13 @@ class CSetupWizard extends CForm {
 
 		return array(
 			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
+			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'jqueryinput'), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
 					'Press the "Download configuration file" button, download the configuration file ',
 					'and save it as ', BR(),
 					'"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"', BR(), BR(),
-					new CSubmit('save_config', 'Download configuration file'),
+					new CSubmit('save_config', 'Download configuration file', null, 'jqueryinput'),
 					BR(), BR()
 				)
 				: array(
