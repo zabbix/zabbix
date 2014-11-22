@@ -53,7 +53,7 @@ class CButton extends CTag implements CButtonInterface {
 	/**
 	 * Enable or disable the element.
 	 *
-	 * @param $value
+	 * @param bool $value
 	 */
 	public function setEnabled($value) {
 		if ($value) {

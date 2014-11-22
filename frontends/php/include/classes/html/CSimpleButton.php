@@ -50,7 +50,7 @@ class CSimpleButton extends CTag implements CButtonInterface {
 	/**
 	 * Enable or disable the element.
 	 *
-	 * @param $value
+	 * @param bool $value
 	 */
 	public function setEnabled($value) {
 		if ($value) {
@@ -62,7 +62,7 @@ class CSimpleButton extends CTag implements CButtonInterface {
 	}
 
 	/**
-	 * @param string $class
+	 * @see CButtonInterface::setButtonClass()
 	 */
 	public function setButtonClass($class) {
 		$this->buttonClass = $class;

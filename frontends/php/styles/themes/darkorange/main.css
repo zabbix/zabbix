@@ -411,17 +411,13 @@ span.link:hover{ color: #FF8800; }
 span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
 /* button */
-.button-plain { border: 1px solid #FF5500; background: #2f2f2f; color: #FF5500; }
-.button-plain:hover { border-color: #ff8800; color: #dfdfdf; background: #FF5500; }
-.button-plain[disabled], .button-plain[disabled]:hover {
-	border-color: #444; background: #2f2f2f; color: #dfdfdf;
-}
+.button-plain { border: 1px solid #ff5500; background: #2f2f2f; color: #ff5500; }
+.button-plain:hover { border-color: #ff8800; color: #dfdfdf; background: #ff5500; }
+.button-plain[disabled], .button-plain[disabled]:hover { border-color: #444; background: #2f2f2f; color: #dfdfdf; }
 
 .link_menu { border-color: #ff5500; color: #ff5500; }
 .link_menu:hover { color: #ff8800; border-color: #ff8800; }
-.link_menu[disabled], .link_menu[disabled]:hover {
-	background: none; color: #dfdfdf; border-color: #ff5500;
-}
+.link_menu[disabled], .link_menu[disabled]:hover { background: none; color: #dfdfdf; border-color: #ff5500; }
 
 .ui-button.main { border-color: #ff5500 !important; }
 .ui-button.main:hover { border-color: #ff5500 !important; }
