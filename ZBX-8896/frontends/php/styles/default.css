@@ -453,7 +453,7 @@ table.filter tr td.label { border-right: 0 !important; text-align: right; }
 table.filter tr td.controls { text-align: center; }
 table.filter tr td.controls .ui-button { margin: 1px; }
 table.filter .text { height: 16px; }
-table.filter .button-form { height: 20px; }
+table.filter .button-form { height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */ }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
