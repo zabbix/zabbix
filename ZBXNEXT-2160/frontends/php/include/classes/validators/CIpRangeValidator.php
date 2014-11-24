@@ -123,13 +123,13 @@ class CIpRangeValidator extends CValidator {
 					$rangeParts = explode('-', $part);
 					// Check that we got only 2 parts - start and end
 					if (count($rangeParts) != 2) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 
 					// Check that IP part conforms to IPv4 definition format
 					if (!preg_match('/^([0-9]{1,3}-[0-9]{1,3})$/', $part)) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 
@@ -138,7 +138,7 @@ class CIpRangeValidator extends CValidator {
 
 					// Check that end IP is not bigger that 255 and start IP is smaller than end
 					if (($to_value > 255) || ($from_value > $to_value)) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 					$ipsInRange = $to_value - $from_value + 1;
@@ -156,7 +156,7 @@ class CIpRangeValidator extends CValidator {
 			}
 
 			if (!validate_ipv4(implode('.', $ipPartsForValidation), $arr)) {
-				$this->setError(_s('Invalid IPv4 format "%1$s".', $ipRange));
+				$this->setError(_s('Incorrect IPv4 format "%1$s".', $ipRange));
 				return false;
 			}
 		}
@@ -171,13 +171,13 @@ class CIpRangeValidator extends CValidator {
 					// Check that we got only 2 parts - start and end
 					$rangeParts = explode('-', $part);
 					if (count($rangeParts) != 2) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 
 					// Check that IP part conforms to IPv6 definition format
 					if (!preg_match('/^([a-f0-9]{1,4}-[a-f0-9]{1,4})$/i', $part)) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 
@@ -186,7 +186,7 @@ class CIpRangeValidator extends CValidator {
 
 					// Check that end IP is not bigger that 65535 and start IP is smaller than end
 					if (($to_value > 65535) || ($from_value > $to_value)) {
-						$this->setError(_s('Invalid IP range format "%1$s".', $ipRange));
+						$this->setError(_s('Incorrect IP range format "%1$s".', $ipRange));
 						return false;
 					}
 					$ipsInRange = $to_value - $from_value + 1;
@@ -203,12 +203,12 @@ class CIpRangeValidator extends CValidator {
 			}
 
 			if (!validate_ipv6(implode(':', $ipPartsForValidation))) {
-				$this->setError(_s('Invalid IPv6 format "%1$s".', $ipRange));
+				$this->setError(_s('Incorrect IPv6 format "%1$s".', $ipRange));
 				return false;
 			}
 		}
 		else {
-			$this->setError(_s('Invalid IPv4 format "%1$s".', $ipRange));
+			$this->setError(_s('Incorrect IPv4 format "%1$s".', $ipRange));
 			return false;
 		}
 
