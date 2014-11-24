@@ -440,9 +440,7 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$buttons = array(
-		new CSubmit('clone', _('Clone'))
-	);
+	$buttons = array(new CSubmit('clone', _('Clone')));
 
 	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
 		$buttons[] = new CButtonQMessage(

@@ -293,9 +293,7 @@ $httpForm->addItem($httpTab);
 
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
-	$buttons = array(
-		new CSubmit('clone', _('Clone'))
-	);
+	$buttons = array(new CSubmit('clone', _('Clone')));
 
 	if ($this->data['templated'] == 0) {
 		$buttons[] = new CButtonDelete(

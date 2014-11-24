@@ -347,7 +347,7 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
-	$buttons[] = new CSubmit('clone', _('Clone'));
+	$buttons = array(new CSubmit('clone', _('Clone')));
 
 	if (!$this->data['limited']) {
 		$buttons[] = new CButtonDelete(
