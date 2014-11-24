@@ -138,57 +138,52 @@ a.weight_normal { font-weight: normal; }
 
 .parent-discovery, a.parent-discovery, a.parent-discovery:hover	{ color: #999900; }
 
+/* buttons */
+.button { height: auto; line-height: normal; cursor: pointer; }
+.button:disabled { cursor: default; }
+
+.button-plain { margin: 1px 2px 1px 1px; background: #f0f0f0 url('../images/gradients/button.gif') repeat-x top left; }
+
+.ui-button { padding: 0 4px; height: 23px; }
+.radioset .ui-button { height: 18px; padding: 0; }
+
+.link_menu {
+	border: 0; border-bottom-width: 1px; border-bottom-style: dotted; background: none;
+	text-decoration: none; padding: 1px 1px 0 1px; margin: 0; cursor: pointer;
+}
+span.link_menu { height: 16px; }
+.link_menu[disabled], .link_menu[disabled]:hover { cursor: default; border: 0; }
+
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
 form { margin: 0; }
-.input {
+.input, .button {
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
-	border: 1px solid #ACA899; background-color: white; margin: 0 2px 0 0; height: 12px;
 }
-.input:focus { border-color: #6e8ab4; }
-.input:hover { border-color: #6e8ab4; }
+.input, .button-form { margin: 0 2px 0 0; height: 12px; }
+.button-form { height: 20px; }
 .input option { color: #000000; }
 .select {
 	margin: 0 2px 0 0; height: 14px; line-height: 14px; max-width: 314px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
 }
 select[multiple="multiple"], select.openView { height: auto; }
-input.formlist { padding-top: 2px; padding-bottom: 2px; }
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
 input[type="file"] { height: auto; }
-input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #fff; height: 20px; }
-input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
-input[type="button"].input[disabled].formlist,
-input[type="submit"].input[disabled].formlist { cursor: default; background: #fff; border-color: #aca899; }
-input.jqueryinput,
-.jqueryinputset input[type="button"],
-.jqueryinputset input[type="submit"] { height: auto; }
 .text, .multiselect { padding-left: 2px; padding-right: 2px }
 input.macro { text-transform: uppercase; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
 .radio { margin: 2px 2px 2px 0; vertical-align: top; }
-.checkbox { padding: 0; border: 0; }
+.checkbox { padding: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
 .textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
-.button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
-.button:hover { border-color: black; cursor: pointer; }
-
-/* button displayed as link */
-.link_menu {
-	height: 16px; border: 0; border-bottom: 1px dotted #3C3089; background: none; color: #3C3089;
-	text-decoration: none; padding: 1px 1px 0 1px; margin: 0; cursor: pointer;
-}
-.link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
-.link_menu[disabled] { color: #ddd; cursor: default; border: 0; background-color: white; }
-.link_menu[disabled]:hover { border: 0; }
+.input.radio { border: 0; height: auto; }
+.checkbox { height: auto; }
 
 /* transparent - must be after input! */
 .transparent { border: 0; background-color: transparent; }
@@ -228,8 +223,7 @@ div.footer .formtable { display: table; width: 100%; }
 div.footer .formrow { display: table-row; }
 div.footer .formrow .dt { width: 20%; display: table-cell; }
 div.footer .formrow .dd { margin-left: 10px; }
-div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
-div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
+div.footer .ui-button { margin: 1px; }
 
 /* object list */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -287,9 +281,9 @@ div.onajaxload { position: absolute; background-color: #000000; filter: alpha(op
 
 /* tween box table */
 .tweenBoxTable tr td { padding: 0; vertical-align: middle; height: 24px; }
-.tweenBoxTable tr td input { margin: 5px; padding: 5px; }
-.tweenBoxTable input[type="button"] { height: auto; }
-#groups_tweenbox input[type="button"].formlist { margin-top: 1px; }
+.tweenBoxTable .button, .old-filter .tweenBoxTable .button {
+	height: auto; margin: 5px 5px 0 5px; padding: 5px; width: 29px;
+}
 
 /* page header */
 table.page_header { padding-right: 0; padding-left: 0; background-color: #FFF; border: 0; vertical-align: middle; }
@@ -398,8 +392,6 @@ table.right_table .deny option { color: #CC0000; }
 
 /* graph */
 table.graph { width: 100%; text-align: center; }
-#graphTab input[type="button"].formlist { margin-top: 1px; }
-doesnotexist:-o-prefocus, #graphTab .formlist select { padding-top: 1px; padding-bottom: 3px; } /* opera */
 
 /* menu */
 table.menu { height: 2.8em; }
@@ -424,6 +416,11 @@ table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
 table.warningTable tr.content { vertical-align: text-top; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
+table.warningTable .button {
+	background: #fff; border: 1px solid #aca899;
+	margin: 0 2px 0 0; height: 20px; padding-top: 2px; padding-bottom: 2px;
+}
+table.warningTable .button:hover { border-color: #6e8ab4; }
 
 /* history */
 table.history { color: #448; margin: 0 0 0 2px; }
@@ -454,14 +451,13 @@ table.requirements select { width: 152px; }
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; }
 table.filter tr td {
-	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
-	padding: 0 2px 0 6px;
+	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px;
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
 table.filter tr td.controls { text-align: center; }
+table.filter tr td.controls .ui-button { margin: 1px; }
 table.filter .text { height: 16px; }
-table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
-table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; }
+table.filter .button-form { height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */ }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -474,7 +470,8 @@ table.filter.sub-filter tr td:first-child { width: 8%; }
 /* old-style filter */
 .old-filter .form_row_l { text-align: right; }
 .old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
-.old-filter .filter-button { height: 16px; }
+.old-filter .button-form { height: 16px; }
+.old-filter .input, .old-filter .button-form { vertical-align: middle; }
 
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }
@@ -532,7 +529,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	border: 1px solid #5897FB;
 }
 .multiselect-button { width: 50px; height: 20px; float: left; }
-.multiselect-button .select-popup { margin-left: 8px; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
@@ -601,7 +597,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* modal window */
 .ui-widget-overlay { z-index: 1000; }
-.ui-dialog { z-index: 1001; opacity: 1; }
+.ui-dialog { z-index: 1001; opacity: 1; min-width: 170px; }
 
 /* trigger expression */
 .trigger-expression, table.tableinfo .trigger-expression { white-space: pre-wrap; }
