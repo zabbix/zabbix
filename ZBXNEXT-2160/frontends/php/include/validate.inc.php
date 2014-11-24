@@ -106,97 +106,6 @@ function validate_ip($str, &$arr) {
 	return false;
 }
 
-/**
- * Validate IP mask. IP/bits.
- * bits range for IPv4: 16 - 30
- * bits range for IPv6: 112 - 128
- *
- * @param string $ip_range
- *
- * @return bool
- */
-function validate_ip_range_mask($ip_range) {
-	$parts = explode('/', $ip_range);
-
-	if (count($parts) != 2) {
-		return false;
-	}
-	$ip = $parts[0];
-	$bits = $parts[1];
-
-	if (validate_ipv4($ip, $arr)) {
-		return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 30;
-	}
-	elseif (ZBX_HAVE_IPV6 && validate_ipv6($ip, $arr)) {
-		return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
-	}
-	else {
-		return false;
-	}
-}
-
-/*
- * Validate IP range. ***.***.***.***[-***]
- */
-function validate_ip_range_range($ip_range) {
-	$parts = explode('-', $ip_range);
-	if (($parts_count = count($parts)) > 2) {
-		return false;
-	}
-
-	if (validate_ipv4($parts[0], $arr)) {
-		$ip_parts = explode('.', $parts[0]);
-
-		if ($parts_count == 2) {
-			if (!preg_match('/^([0-9]{1,3})$/', $parts[1])) {
-				return false;
-			}
-			sscanf($ip_parts[3], "%d", $from_value);
-			sscanf($parts[1], "%d", $to_value);
-
-			if (($to_value > 255) || ($from_value > $to_value)) {
-				return false;
-			}
-		}
-	}
-	elseif (ZBX_HAVE_IPV6 && validate_ipv6($parts[0])) {
-		$ip_parts = explode(':', $parts[0]);
-		$ip_parts_count = count($ip_parts);
-
-		if ($parts_count == 2) {
-			if (!preg_match('/^([a-f0-9]{1,4})$/i', $parts[1])) {
-				return false;
-			}
-			sscanf($ip_parts[$ip_parts_count - 1], "%x", $from_value);
-			sscanf($parts[1], "%x", $to_value);
-
-			if ($from_value > $to_value) {
-				return false;
-			}
-		}
-	}
-	else {
-		return false;
-	}
-	return true;
-}
-
-function validate_ip_range($str) {
-	foreach (explode(',', $str) as $ip_range) {
-		if (strpos($ip_range, '/') !== false) {
-			if (!validate_ip_range_mask($ip_range)) {
-				return false;
-			}
-		}
-		else {
-			if (!validate_ip_range_range($ip_range)) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 function validate_port_list($str) {
 	foreach (explode(',', $str) as $port_range) {
 		$port_range = explode('-', $port_range);
@@ -301,9 +210,10 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_IP_RANGE) {
-		if (!validate_ip_range($var)) {
+		$ipRangeValidator = new CIpRangeValidator();
+		if (!$ipRangeValidator->validate($var)) {
 			$error = true;
-			$message = _s('Field "%1$s" is not IP range.', $caption);
+			$message = _s('Field "%1$s" is not IP range: %1$s', $caption, $ipRangeValidator->getError());
 		}
 	}
 	elseif ($type == T_ZBX_INT_RANGE) {

@@ -209,12 +209,13 @@ class CDRule extends CApiService {
 		}
 
 		$proxies = array();
+		$ipRangeValidator = new CIpRangeValidator();
 		foreach ($dRules as $dRule) {
 			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
-			elseif (!validate_ip_range($dRule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+			elseif (!$ipRangeValidator->validate($dRule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $ipRangeValidator->getError());
 			}
 
 			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
