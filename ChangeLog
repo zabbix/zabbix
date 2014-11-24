@@ -13,6 +13,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ..F....... [ZBX-8888] fixed history.php showing data for 11 more seconds than the defined interval (arvids)
 ..F.....S. [ZBX-9005] fixed aggregate item check to make forth parameter not mandatory when third parameter is set to 'last' (igors)
 ...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
@@ -50,6 +51,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Italian translations; tha
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ...G...PS. [ZBX-8926] fixed bug in JSON parser that caused failures in data retrieval if the target buffer and the decoded data were the same size (Juris)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
@@ -536,6 +538,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
