@@ -990,7 +990,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
 
