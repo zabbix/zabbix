@@ -117,7 +117,7 @@
 			<tr id="application-select-row">
 				<td><?php echo _('Application'); ?></td>
 				<td>
-					<input size="50" id="application" name="application" class="input text"><input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
+					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
 				</td>
 			</tr>
 
@@ -188,7 +188,9 @@
 							<tbody id="urlContainer"></tbody>
 							<tfoot>
 							<tr>
-								<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
+								<td colspan="3">
+									<button type="button" id="newSelementUrl" class="button link_menu"><?php echo _('Add'); ?></button>
+								</td>
 							</tr>
 							</tfoot>
 						</table>
@@ -197,9 +199,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="elementApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="elementRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="elementClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<button id="elementApply" class="button element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
+					<button id="elementRemove" class="button element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
+					<button id="elementClose" class="button jqueryinput" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -298,9 +300,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="massApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="massRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="massClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<button id="massApply" class="element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
+					<button id="massRemove" class="element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
+					<button id="massClose" class="jqueryinput" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -401,7 +403,7 @@
 							<tfoot>
 							<tr>
 								<td colspan="4">
-									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?php echo _('Add'); ?></span>
+									<button type="button" class="button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?php echo _('Add'); ?></button>
 								</td>
 							</tr>
 							</tfoot>
@@ -411,9 +413,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="formLinkApply" type="button" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="formLinkRemove" type="button" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="formLinkClose" type="button" value="<?php echo CHtml::encode(_('Close')); ?>">
+					<button id="formLinkApply" type="button"><?php echo _('Apply') ?></button>
+					<button id="formLinkRemove" type="button"><?php echo _('Remove') ?></button>
+					<button id="formLinkClose" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -423,7 +425,9 @@
 
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<tr>
-		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
+		<td>
+			<button type="button" class="button link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></button>
+		</td>
 		<td>#{toElementName}</td>
 		<td class="pre">#{linktriggers}</td>
 	</tr>
@@ -431,7 +435,9 @@
 
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
 	<tr>
-		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
+		<td>
+			<button type="button" class="button link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></button>
+		</td>
 		<td>#{fromElementName}</td>
 		<td>#{toElementName}</td>
 		<td class="pre">#{linktriggers}</td>
@@ -457,7 +463,7 @@
 			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
 		</td>
 		<td>
-			<span class="link_menu triggerRemove" data-linktriggerid="#{linktriggerid}""><?php echo _('Remove'); ?></span>
+			<button type="button" class="button link_menu triggerRemove" data-linktriggerid="#{linktriggerid}"><?php echo _('Remove'); ?></button>
 		</td>
 	</tr>
 </script>
@@ -466,7 +472,9 @@
 	<tr id="urlrow_#{selementurlid}" class="even_row">
 		<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
 		<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
-		<td><span class="link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></span></td>
+		<td>
+			<button type="button" class="button link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></button>
+		</td>
 	</tr>
 </script>
 

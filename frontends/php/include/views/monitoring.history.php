@@ -231,7 +231,7 @@ else {
 			);
 			$filterTable->addRow(array(
 				new CCol(bold(_('Graph type').':'), 'label'),
-				new CCol(new CSpan($graphType, 'jqueryinputset'), 'buttoncol')
+				new CCol(new CSpan($graphType, 'jqueryinputset radioset'), 'buttoncol')
 			));
 
 			$filterForm = new CForm('GET');
