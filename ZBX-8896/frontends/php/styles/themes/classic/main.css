@@ -162,6 +162,7 @@ table.suggest tr.highlight { background-color: #4F70A8; }
 
 /* form input and form buttons */
 .input, .button-form { border: 1px solid #aca899; background-color: white; }
+.checkbox { border: none; }
 
 .button-form { background: #fff; }
 .button-form:hover { border-color: #6e8ab4; }
