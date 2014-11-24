@@ -1168,6 +1168,41 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testConvertScreens() {
+		$source = $this->createSource(array(
+			'screens' => array(
+				array(),
+				array(
+					'screenitems' => array(
+						array(
+							'resourceid' => array(
+								'key_' => 'itemkey',
+							),
+						)
+					)
+				)
+			)
+		));
+
+		$expectedResult = $this->createResult(array(
+			'screens' => array(
+				array(),
+				array(
+					'screen_items' => array(
+						array(
+							'resource' => array(
+								'key' => 'itemkey',
+							),
+						)
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+
+	}
+
 	protected function createSource(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(

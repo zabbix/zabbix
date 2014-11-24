@@ -53,6 +53,8 @@ class C18ImportConverter extends CConverter {
 
 		$content = $this->convertSysmaps($content);
 
+		$content = $this->convertScreens($content);
+
 		$content = $this->filterDuplicateTriggers($content);
 		$content = $this->filterDuplicateGraphs($content);
 
@@ -698,6 +700,37 @@ class C18ImportConverter extends CConverter {
 			}
 		}
 		unset($map);
+
+		return $content;
+	}
+
+	/**
+	 * Convert screen elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertScreens(array $content) {
+		if (!isset($content['screens'])) {
+			return $content;
+		}
+
+		foreach ($content['screens'] as &$screen) {
+			$screen = $this->renameKey($screen, 'screenitems', 'screen_items');
+
+			if (isset($screen['screen_items'])) {
+				foreach ($screen['screen_items'] as &$screenItem) {
+					$screenItem = $this->renameKey($screenItem, 'resourceid', 'resource');
+
+					if (isset($screenItem['resource'])) {
+						$screenItem['resource'] = $this->renameKey($screenItem['resource'], 'key_', 'key');
+					}
+				}
+				unset($screenItem);
+			}
+		}
+		unset($screen);
 
 		return $content;
 	}
