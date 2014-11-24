@@ -16,7 +16,8 @@ SUBDIRS = \
 	escalator \
 	proxypoller \
 	selfmon \
-	vmware
+	vmware \
+	api
 
 sbin_PROGRAMS = zabbix_server
 
@@ -44,6 +45,7 @@ zabbix_server_LDADD = \
 	proxypoller/libzbxproxypoller.a \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
+	api/libzbxapi.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
@@ -69,6 +71,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
+	
 
 zabbix_server_LDADD += @SERVER_LIBS@
 
