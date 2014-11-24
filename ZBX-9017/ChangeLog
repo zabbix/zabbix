@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)
 ..F....... [ZBX-8850] fixed fatal error in graph generation when there is no data and ZBX_UNITS_ROUNDOFF_LOWER_LIMIT is set to "2" (Krists)
