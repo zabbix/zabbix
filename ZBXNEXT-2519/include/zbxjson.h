@@ -94,6 +94,7 @@ typedef enum
 	ZBX_JSON_TYPE_INT,
 	ZBX_JSON_TYPE_ARRAY,
 	ZBX_JSON_TYPE_OBJECT,
+	ZBX_JSON_TYPE_BOOL,
 	ZBX_JSON_TYPE_NULL
 }
 zbx_json_type_t;
@@ -142,11 +143,14 @@ const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char 
 		size_t *string_alloc, int *is_null);
 const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
+const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, int *is_null);
+
 int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len);
 int		zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
 int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
 int		zbx_json_count(const struct zbx_json_parse *jp);
+
 
 #endif /* ZABBIX_ZJSON_H */

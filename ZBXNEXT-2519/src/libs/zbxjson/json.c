@@ -374,9 +374,10 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 		return ZBX_JSON_TYPE_ARRAY;
 	if ('{' == *p)
 		return ZBX_JSON_TYPE_OBJECT;
-	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
+	if (0 == strncmp(p, "null", 4))
 		return ZBX_JSON_TYPE_NULL;
-
+	if (0 == strncmp(p, "true", 4) || 0 == strncmp(p, "false", 4))
+		return ZBX_JSON_TYPE_BOOL;
 	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"", p);
 
 	return ZBX_JSON_TYPE_UNKNOWN;
@@ -700,6 +701,7 @@ static const char	*zbx_json_decodevalue(const char *p, char *string, size_t size
 	{
 		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
+		case ZBX_JSON_TYPE_BOOL:
 			if (NULL != is_null)
 				*is_null = 0;
 
@@ -717,7 +719,7 @@ static const char	*zbx_json_decodevalue(const char *p, char *string, size_t size
 	}
 }
 
-static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, int *is_null)
+const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, int *is_null)
 {
 	size_t	len;
 
@@ -725,6 +727,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	{
 		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
+		case ZBX_JSON_TYPE_BOOL:
 			if (NULL != is_null)
 				*is_null = 0;
 
