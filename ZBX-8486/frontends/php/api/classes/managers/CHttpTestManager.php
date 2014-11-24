@@ -436,7 +436,7 @@ class CHttpTestManager {
 		));
 
 		$dbCursor = DBselect(
-			'SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+			'SELECT i1.itemid AS parentid,i2.itemid AS childid'.
 			' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
 			' WHERE hti1.httptestid='.zbx_dbstr($parentId).
 				' AND hti2.httptestid='.zbx_dbstr($childId).
@@ -446,13 +446,13 @@ class CHttpTestManager {
 		);
 		while ($dbItems = DBfetch($dbCursor)) {
 			DB::update('items', array(
-				'values' => array('templateid' => $dbItems['parentId']),
-				'where' => array('itemid' => $dbItems['childId'])
+				'values' => array('templateid' => $dbItems['parentid']),
+				'where' => array('itemid' => $dbItems['childid'])
 			));
 		}
 
 		$dbCursor = DBselect(
-			'SELECT i1.itemid AS parentId,i2.itemid AS childId'.
+			'SELECT i1.itemid AS parentid,i2.itemid AS childid'.
 			' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
 			' WHERE hs1.httptestid='.zbx_dbstr($parentId).
 				' AND hs2.httptestid='.zbx_dbstr($childId).
@@ -464,8 +464,8 @@ class CHttpTestManager {
 		);
 		while ($dbItems = DBfetch($dbCursor)) {
 			DB::update('items', array(
-				'values' => array('templateid' => $dbItems['parentId']),
-				'where' => array('itemid' => $dbItems['childId'])
+				'values' => array('templateid' => $dbItems['parentid']),
+				'where' => array('itemid' => $dbItems['childid'])
 			));
 		}
 	}
@@ -549,8 +549,10 @@ class CHttpTestManager {
 	 * @return bool
 	 */
 	protected function compareHttpSteps(array $httpTest, array $exHttpTest) {
-		$firstHash = $secondHash = '';
+		$firstHash = '';
+		$secondHash = '';
 
+		CArrayHelper::sort($httpTest['steps'], array('no'));
 		foreach ($httpTest['steps'] as $step) {
 			$firstHash .= $step['no'].$step['name'];
 		}
@@ -565,7 +567,7 @@ class CHttpTestManager {
 			$secondHash .= $dbHttpStep['no'].$dbHttpStep['name'];
 		}
 
-		return $firstHash == $secondHash;
+		return $firstHash === $secondHash;
 	}
 
 	/**
