@@ -414,7 +414,7 @@ $filterTable->addRow(array(
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-$filterButton->useJQueryStyle('main');
+$filterButton->useJQueryStyle();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 $resetButton->useJQueryStyle();
