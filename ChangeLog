@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
 ..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
 ..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
