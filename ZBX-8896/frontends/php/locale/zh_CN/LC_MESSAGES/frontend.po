@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 11:17+0200\n"
+"POT-Creation-Date: 2014-11-17 16:45+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1614,11 +1614,6 @@ msgstr "无法删除相依关係"
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
-
-#: include/classes/api/services/CHost.php:1314
-#, c-format
-msgid "Cannot delete discovered host \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItem.php:633
@@ -4147,7 +4142,7 @@ msgstr "已删除: 发现规则 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 图表 \"%1$s\" 于 \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1466
+#: include/classes/api/services/CHost.php:1453
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
@@ -9244,7 +9239,7 @@ msgstr "记忆体限制: %s"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
-msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
+msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
 msgstr ""
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
@@ -10264,7 +10259,7 @@ msgstr "没有系统存取的许可权"
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1659
+#: include/classes/api/services/CHost.php:1646
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
