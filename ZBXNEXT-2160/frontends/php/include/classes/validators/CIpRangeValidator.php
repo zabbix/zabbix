@@ -78,7 +78,7 @@ class CIpRangeValidator extends CValidator {
 				$this->setError(_s('Invalid mask format in "%s".', $ipMask));
 			}
 			if ($bits >= 16) {
-				$this->setError(_s('Provided network mask "%s" contains more than %d IPs ".', $ipMask, $this->ipCountLimit));
+				$this->setError(_s('Provided network mask "%s" contains more than %d IPs.', $ipMask, $this->ipCountLimit));
 			}
 			if ($bits <= 30) {
 				$this->setError(_s('Provided network mask "%s" is too small.', $ipMask));
