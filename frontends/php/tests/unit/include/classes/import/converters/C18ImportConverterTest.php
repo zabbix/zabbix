@@ -19,11 +19,7 @@
 **/
 
 
-class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
-
-	public function testConvertGeneral() {
-		$this->assertConvert($this->createResult(), $this->createSource());
-	}
+class C18ImportConverterTest extends CImportConverterTest {
 
 	public function testTemplateSeparation() {
 		$source = $this->createSource(array(
@@ -46,7 +42,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'Host 1',
@@ -105,7 +101,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$result = $this->createResult(array(
+		$result = $this->createExpectedResult(array(
 			'groups' => array(
 				array(
 					'name' => 'Zabbix server'
@@ -160,7 +156,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				),
 			)
 		));
-		$result = $this->createResult(array(
+		$result = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'host1',
@@ -285,7 +281,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 				)
 			)
 		));
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'host1',
@@ -544,7 +540,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'host1',
@@ -676,7 +672,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'host1',
@@ -783,7 +779,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'triggers' => array(
 				array(
 					'name' => 'My trigger',
@@ -856,7 +852,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
 				array(
 					'host' => 'host1',
@@ -982,7 +978,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			),
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'graphs' => array(
 				array(
 					'name' => 'graph1',
@@ -1130,7 +1126,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'maps' => array(
 				array(),
 				array(
@@ -1184,7 +1180,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			)
 		));
 
-		$expectedResult = $this->createResult(array(
+		$expectedResult = $this->createExpectedResult(array(
 			'screens' => array(
 				array(),
 				array(
@@ -1213,7 +1209,7 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-	protected function createResult(array $data = array()) {
+	protected function createExpectedResult(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(
 				'version' => '2.0',
@@ -1221,12 +1217,6 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 			), $data)
 		);
 	}
-
-	protected function assertConvert(array $expectedResult, array $source) {
-		$result = $this->createConverter()->convert($source);
-		$this->assertEquals($expectedResult, $result);
-	}
-
 
 	protected function createConverter() {
 		$itemKeyConverter = new C18ItemKeyConverter();
