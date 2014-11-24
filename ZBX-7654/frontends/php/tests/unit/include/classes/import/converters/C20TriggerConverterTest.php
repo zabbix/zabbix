@@ -19,7 +19,7 @@
 **/
 
 
-class C24TriggerConverterTest extends PHPUnit_Framework_TestCase {
+class C20TriggerConverterTest extends PHPUnit_Framework_TestCase {
 
 	public function testConvertProvider() {
 		return array(
@@ -71,7 +71,7 @@ class C24TriggerConverterTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedConvertedExpression
 	 */
 	public function testConvert($expression, $expectedConvertedExpression) {
-		$converter = new C24TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
+		$converter = new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
 		$this->assertEquals($expectedConvertedExpression, $converter->convert($expression));
 	}
 

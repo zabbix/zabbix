@@ -1366,7 +1366,7 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 
 	protected function getFormatter($source) {
 		$formatter = new C20ImportFormatter(
-			new C24TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'))
+			new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'))
 		);
 
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);

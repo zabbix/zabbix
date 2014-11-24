@@ -873,7 +873,7 @@ class CXmlImport18 {
 	}
 
 	public static function parseMain($rules) {
-		$triggerExpressionConverter = new C24TriggerConverter(
+		$triggerExpressionConverter = new C20TriggerConverter(
 			new CFunctionMacroParser(),
 			new CMacroParser('#')
 		);
