@@ -51,6 +51,8 @@ class C18ImportConverter extends CConverter {
 		$content = $this->convertTemplates($content);
 		$content = $this->convertGroups($content);
 
+		$content = $this->convertSysmaps($content);
+
 		$content = $this->filterDuplicateTriggers($content);
 		$content = $this->filterDuplicateGraphs($content);
 
@@ -649,6 +651,53 @@ class C18ImportConverter extends CConverter {
 		}
 
 		$content['graphs'] = $filteredGraphs;
+
+		return $content;
+	}
+
+	/**
+	 * Convert map elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertSysmaps(array $content) {
+		if (!isset($content['sysmaps'])) {
+			return $content;
+		}
+
+		$content = $this->renameKey($content, 'sysmaps', 'maps');
+		foreach ($content['maps'] as &$map) {
+			if (isset($map['selements'])) {
+				foreach ($map['selements'] as &$selement) {
+					$selement = $this->renameKey($selement, 'elementid', 'selement');
+
+					if (isset($selement['elementtype']) && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						unset($selement['selement']['host']);
+					}
+
+					unset($selement['selementid']);
+				}
+
+				unset($selement);
+			}
+
+			if (isset($map['links'])) {
+				foreach ($map['links'] as &$link) {
+					if (isset($link['linktriggers'])) {
+						foreach ($link['linktriggers'] as &$linkTrigger) {
+							$linkTrigger = $this->renameKey($linkTrigger, 'triggerid', 'trigger');
+
+							unset($linkTrigger['trigger']['host']);
+						}
+						unset($linkTrigger);
+					}
+				}
+				unset($link);
+			}
+		}
+		unset($map);
 
 		return $content;
 	}

@@ -1091,6 +1091,83 @@ class C18ImportConverterTest extends PHPUnit_Framework_TestCase {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertSysmaps() {
+		$source = $this->createSource(array(
+			'sysmaps' => array(
+				array(),
+				array(
+					'selements' => array(
+						array(
+							'selementid' => 1,
+							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+							'elementid' => array(
+								'host' => 'host',
+							)
+						),
+						array(
+							'selementid' => 2,
+							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+							'elementid' => array(
+								'host' => 'host',
+								'description' => 'trigger'
+							)
+						)
+					),
+					'links' => array(
+						array(),
+							array(
+								'linktriggers' => array(
+									array(
+										'triggerid' => array(
+										'host' => 'host',
+										'description' => 'trigger'
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+		));
+
+		$expectedResult = $this->createResult(array(
+			'maps' => array(
+				array(),
+				array(
+					'selements' => array(
+						array(
+							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+							'selement' => array(
+								'host' => 'host'
+							)
+						),
+						array(
+							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+							'selement' => array(
+								'description' => 'trigger'
+							)
+						)
+					),
+					'links' => array(
+						array(),
+							array(
+								'linktriggers' => array(
+									array(
+										'trigger' => array(
+										'description' => 'trigger'
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+
+	}
+
 	protected function createSource(array $data = array()) {
 		return array(
 			'zabbix_export' => array_merge(array(
