@@ -123,19 +123,13 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (!empty(e)) {
-		if (IE) {
-			e.cancelBubble = true;
-			e.returnValue = false;
-
-			if (IE9 && e.preventDefault) {
-				e.preventDefault();
-			}
-		}
-		else {
-			e.stopPropagation();
-			e.preventDefault();
-		}
+	if (!IE8) {
+		e.stopPropagation();
+		e.preventDefault();
+	}
+	if (IE) {
+		e.cancelBubble = true;
+		e.returnValue = false;
 	}
 
 	return false;

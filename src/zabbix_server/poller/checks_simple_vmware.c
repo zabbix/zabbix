@@ -330,7 +330,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 	if (!ISSET_LOG(result))
 		set_log_result_empty(result);
 
-	zbx_vector_str_clean(&keys);
+	zbx_vector_str_clear_ext(&keys, zbx_ptr_free);
 	zbx_vector_str_destroy(&keys);
 
 	ret = SYSINFO_RET_OK;
@@ -2438,7 +2438,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_json_close(&json_data);
 
-	zbx_vector_str_clean(&disks);
+	zbx_vector_str_clear_ext(&disks, zbx_ptr_free);
 	zbx_vector_str_destroy(&disks);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));

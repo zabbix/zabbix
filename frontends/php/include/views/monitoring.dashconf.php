@@ -118,7 +118,7 @@ $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 $dashconfForm->addItem($dashconfTab);
 $dashconfForm->addItem(makeFormFooter(
 	new CSubmit('update', _('Update')),
-	new CButtonCancel()
+	array(new CButtonCancel())
 ));
 
 $dashconfWidget->addItem($dashconfForm);

@@ -1685,11 +1685,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
 				$buttons[] = new CButton('login', _('Login'),
-					'javascript: document.location = "index.php?request='.$url.'";', 'formlist'
+					'javascript: document.location = "index.php?request='.$url.'";', 'button'
 				);
 			}
 			$buttons[] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "dashboard.php"', 'formlist'
+				'javascript: document.location = "dashboard.php"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login
@@ -1701,7 +1701,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 			);
 			$buttons = array(
-				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
 			);
 		}
 
