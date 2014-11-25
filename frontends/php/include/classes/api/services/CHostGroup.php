@@ -475,7 +475,7 @@ class CHostGroup extends CApiService {
 		$updGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid', 'flags'),
+			'output' => array('groupid', 'flags', 'name'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
