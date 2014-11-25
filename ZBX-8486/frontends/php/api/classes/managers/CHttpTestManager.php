@@ -557,13 +557,14 @@ class CHttpTestManager {
 			$firstHash .= $step['no'].$step['name'];
 		}
 
-		$dbCursor = DBselect(
+		$dbHttpTestSteps = DBfetchArray(DBselect(
 			'SELECT hs.name,hs.no'.
 			' FROM httpstep hs'.
-			' WHERE hs.httptestid='.zbx_dbstr($exHttpTest['httptestid']).
-			' ORDER BY hs.no'
-		);
-		while ($dbHttpStep = DBfetch($dbCursor)) {
+			' WHERE hs.httptestid='.zbx_dbstr($exHttpTest['httptestid'])
+		));
+
+		CArrayHelper::sort($dbHttpTestSteps, array('no'));
+		foreach ($dbHttpTestSteps as $dbHttpStep) {
 			$secondHash .= $dbHttpStep['no'].$dbHttpStep['name'];
 		}
 
