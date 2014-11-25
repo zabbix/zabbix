@@ -11,8 +11,9 @@
 			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<input class="input link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove"
-				name="macros_#{rowNum}_remove" value="<?php echo _('Remove'); ?>">
+			<button type="button" class="button link_menu element-table-remove" id="macros_#{rowNum}_remove" name="macros_#{rowNum}_remove">
+				<?php echo _('Remove'); ?>
+			</button>
 		</td>
 	</tr>
 </script>
