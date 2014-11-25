@@ -568,7 +568,7 @@ class CHttpTestManager {
 			$secondHash .= $dbHttpStep['no'].$dbHttpStep['name'];
 		}
 
-		return $firstHash === $secondHash;
+		return ($firstHash === $secondHash);
 	}
 
 	/**
