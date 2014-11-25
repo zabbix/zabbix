@@ -3393,7 +3393,7 @@ size_t	DCconfig_get_host_items_by_keypart(DC_ITEM **items, zbx_uint64_t hostid, 
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)items_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)items_num);
 
 	return items_num;
 }

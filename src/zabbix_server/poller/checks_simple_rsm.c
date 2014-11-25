@@ -382,11 +382,35 @@ static int	zbx_get_rrset_to_verify(const ldns_pkt *pkt, const ldns_rdf *owner, l
 			if (NULL == (*result = ldns_rr_list_new()))
 				goto out;
 
-			if (NULL != rrset && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(rrset)))
-				goto out;
+			if (NULL != rrset && 0 != ldns_rr_list_rr_count(rrset))
+			{
+				int		rv;
+				ldns_rr_list	*cloned_rrset;
 
-			if (NULL != rrset2 && 0 == ldns_rr_list_push_rr_list(*result, ldns_rr_list_clone(rrset2)))
-				goto out;
+				if (NULL == (cloned_rrset = ldns_rr_list_clone(rrset)))
+					goto out;
+
+				rv = ldns_rr_list_push_rr_list(*result, cloned_rrset);
+				ldns_rr_list_free(cloned_rrset);
+
+				if (false == rv)
+					goto out;
+			}
+
+			if (NULL != rrset2 && 0 != ldns_rr_list_rr_count(rrset2))
+			{
+				int		rv;
+				ldns_rr_list	*cloned_rrset;
+
+				if (NULL == (cloned_rrset = ldns_rr_list_clone(rrset2)))
+					goto out;
+
+				rv = ldns_rr_list_push_rr_list(*result, cloned_rrset);
+				ldns_rr_list_free(cloned_rrset);
+
+				if (false == rv)
+					goto out;
+			}
 
 			break;
 		case ZBX_COVERED_TYPE_DS:
@@ -1017,12 +1041,31 @@ static int	zbx_parse_rdds_item(DC_ITEM *item, char *host, size_t host_size)
 	return SUCCEED;
 }
 
+static void	free_items(DC_ITEM *items, size_t items_num)
+{
+	if (0 != items_num)
+	{
+		DC_ITEM	*item;
+		size_t	i;
+
+		for (i = 0; i < items_num; i++)
+		{
+			item = &items[i];
+
+			zbx_free(item->key);
+			zbx_free(item->params);
+		}
+
+		zbx_free(items);
+	}
+}
+
 static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *domain, DC_ITEM **out_items,
 		FILE *log_fd)
 {
 	char		*keypart, host[ZBX_HOST_BUF_SIZE];
 	const char	*p;
-	DC_ITEM		*in_items = NULL;
+	DC_ITEM		*in_items = NULL, *in_item;
 	size_t		i, in_items_num, out_items_num = 0, out_items_alloc = 8, keypart_size;
 
 	/* get items from config cache */
@@ -1035,40 +1078,35 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 	/* filter out invalid items */
 	for (i = 0; i < in_items_num; i++)
 	{
-		ZBX_STRDUP(in_items[i].key, in_items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&in_items[i].key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
+		in_item = &in_items[i];
+
+		ZBX_STRDUP(in_item->key, in_item->key_orig);
+		in_item->params = NULL;
+
+		if (SUCCEED != substitute_key_macros(&in_item->key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
 		{
 			/* problem with key macros, skip it */
-			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_items[i].key_orig);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_item->key_orig);
 			continue;
 		}
 
-		in_items[i].params = NULL;
-		if (SUCCEED != zbx_parse_dns_item(&in_items[i], host, sizeof(host)))
+		if (SUCCEED != zbx_parse_dns_item(in_item, host, sizeof(host)))
 		{
 			/* unexpected item key syntax, skip it */
-			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_items[i].key);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_item->key);
 			continue;
 		}
 
 		if (0 != strcmp(host, domain))
 		{
 			/* first parameter does not match expected domain name, skip it */
-			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_items[i].key, domain);
-			zbx_free(in_items[i].key);
-			zbx_free(in_items[i].params);
+			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_item->key, domain);
 			continue;
 		}
 
-		p = in_items[i].key + keypart_size;
+		p = in_item->key + keypart_size;
 		if (0 != strncmp(p, "rtt[", 4) && 0 != strncmp(p, "upd[", 4))
-		{
-			zbx_free(in_items[i].params);
-			zbx_free(in_items[i].key);
 			continue;
-		}
 
 		if (0 == out_items_num)
 		{
@@ -1080,17 +1118,16 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 			*out_items = zbx_realloc(*out_items, out_items_alloc * sizeof(DC_ITEM));
 		}
 
-		memcpy(&(*out_items)[out_items_num], &in_items[i], sizeof(DC_ITEM));
-		(*out_items)[out_items_num].key = in_items[i].key;
-		(*out_items)[out_items_num].params = in_items[i].params;
-		in_items[i].key = NULL;
-		in_items[i].params = NULL;
+		memcpy(&(*out_items)[out_items_num], in_item, sizeof(DC_ITEM));
+		(*out_items)[out_items_num].key = in_item->key;
+		(*out_items)[out_items_num].params = in_item->params;
+		in_item->key = NULL;
+		in_item->params = NULL;
 
 		out_items_num++;
 	}
 
-	if (0 != in_items_num)
-		zbx_free(in_items);
+	free_items(in_items, in_items_num);
 
 	return out_items_num;
 }
@@ -1530,16 +1567,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		}
 	}
 
-	if (0 != items_num)
-	{
-		for (i = 0; i < items_num; i++)
-		{
-			zbx_free(items[i].key);
-			zbx_free(items[i].params);
-		}
-
-		zbx_free(items);
-	}
+	free_items(items, items_num);
 
 	for (i = 0; i < nss_num; i++)
 	{
@@ -1626,7 +1654,7 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 {
 	char		*keypart, host[ZBX_HOST_BUF_SIZE];
 	const char	*p;
-	DC_ITEM		*in_items = NULL;
+	DC_ITEM		*in_items = NULL, *in_item;
 	size_t		i, in_items_num, out_items_num = 0, out_items_alloc = 8, keypart_size;
 
 	/* get items from config cache */
@@ -1639,36 +1667,36 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 	/* filter out invalid items */
 	for (i = 0; i < in_items_num; i++)
 	{
-		ZBX_STRDUP(in_items[i].key, in_items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&in_items[i].key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
+		in_item = &in_items[i];
+
+		ZBX_STRDUP(in_item->key, in_item->key_orig);
+		in_item->params = NULL;
+
+		if (SUCCEED != substitute_key_macros(&in_item->key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
 		{
 			/* problem with key macros, skip it */
-			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_items[i].key_orig);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_item->key_orig);
 			continue;
 		}
 
-		if (SUCCEED != zbx_parse_rdds_item(&in_items[i], host, sizeof(host)))
+		if (SUCCEED != zbx_parse_rdds_item(in_item, host, sizeof(host)))
 		{
 			/* unexpected item key syntax, skip it */
-			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_items[i].key);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_item->key);
 			continue;
 		}
 
 		if (0 != strcmp(host, domain))
 		{
 			/* first parameter does not match expected domain name, skip it */
-			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_items[i].key, domain);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_item->key, domain);
 			continue;
 		}
 
-		p = in_items[i].key + keypart_size;
+		p = in_item->key + keypart_size;
 		if (0 != strncmp(p, "43.ip[", 6) && 0 != strncmp(p, "43.rtt[", 7) && 0 != strncmp(p, "43.upd[", 7) &&
 				0 != strncmp(p, "80.ip[", 6) && 0 != strncmp(p, "80.rtt[", 7))
 		{
-			zbx_free(in_items[i].key);
 			continue;
 		}
 
@@ -1682,17 +1710,16 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 			*out_items = zbx_realloc(*out_items, out_items_alloc * sizeof(DC_ITEM));
 		}
 
-		memcpy(&(*out_items)[out_items_num], &in_items[i], sizeof(DC_ITEM));
-		(*out_items)[out_items_num].key = in_items[i].key;
-		(*out_items)[out_items_num].params = in_items[i].params;
-		in_items[i].key = NULL;
-		in_items[i].params = NULL;
+		memcpy(&(*out_items)[out_items_num], in_item, sizeof(DC_ITEM));
+		(*out_items)[out_items_num].key = in_item->key;
+		(*out_items)[out_items_num].params = in_item->params;
+		in_item->key = NULL;
+		in_item->params = NULL;
 
 		out_items_num++;
 	}
 
-	if (0 != in_items_num)
-		zbx_free(in_items);
+	free_items(in_items, in_items_num);
 
 	return out_items_num;
 }
@@ -2414,13 +2441,7 @@ out:
 		zbx_add_value_uint(item, item->nextcheck, rdds_result);
 	}
 
-	if (0 != items_num)
-	{
-		for (i = 0; i < items_num; i++)
-			zbx_free(items[i].key);
-
-		zbx_free(items);
-	}
+	free_items(items, items_num);
 
 	if (NULL != res)
 	{
@@ -2724,11 +2745,8 @@ static int	command_login(const char *epp_commands, const char *name, SSL *ssl, i
 
 	ret = SUCCEED;
 out:
-	if (NULL != data)
-		zbx_free(data);
-
-	if (NULL != tmpl)
-		zbx_free(tmpl);
+	zbx_free(data);
+	zbx_free(tmpl);
 
 	return ret;
 }
@@ -2793,11 +2811,8 @@ static int	command_update(const char *epp_commands, const char *name, SSL *ssl, 
 
 	ret = SUCCEED;
 out:
-	if (NULL != data)
-		zbx_free(data);
-
-	if (NULL != tmpl)
-		zbx_free(tmpl);
+	zbx_free(data);
+	zbx_free(tmpl);
 
 	return ret;
 }
@@ -2857,11 +2872,8 @@ static int	command_info(const char *epp_commands, const char *name, SSL *ssl, in
 
 	ret = SUCCEED;
 out:
-	if (NULL != data)
-		zbx_free(data);
-
-	if (NULL != tmpl)
-		zbx_free(tmpl);
+	zbx_free(data);
+	zbx_free(tmpl);
 
 	return ret;
 }
@@ -2905,11 +2917,8 @@ static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, 
 
 	ret = SUCCEED;
 out:
-	if (NULL != data)
-		zbx_free(data);
-
-	if (NULL != tmpl)
-		zbx_free(tmpl);
+	zbx_free(data);
+	zbx_free(tmpl);
 
 	return ret;
 }
@@ -2940,7 +2949,7 @@ static size_t	zbx_get_epp_items(const char *keyname, DC_ITEM *item, const char *
 {
 	char		*keypart, host[ZBX_HOST_BUF_SIZE];
 	const char	*p;
-	DC_ITEM		*in_items = NULL;
+	DC_ITEM		*in_items = NULL, *in_item;
 	size_t		i, in_items_num, out_items_num = 0, out_items_alloc = 8, keypart_size;
 
 	/* get items from config cache */
@@ -2953,40 +2962,35 @@ static size_t	zbx_get_epp_items(const char *keyname, DC_ITEM *item, const char *
 	/* filter out invalid items */
 	for (i = 0; i < in_items_num; i++)
 	{
-		ZBX_STRDUP(in_items[i].key, in_items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&in_items[i].key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
+		in_item = &in_items[i];
+
+		ZBX_STRDUP(in_item->key, in_item->key_orig);
+		in_item->params = NULL;
+
+		if (SUCCEED != substitute_key_macros(&in_item->key, NULL, item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0))
 		{
 			/* problem with key macros, skip it */
-			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_items[i].key_orig);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: cannot substitute key macros", in_item->key_orig);
 			continue;
 		}
 
-		in_items[i].params = NULL;
-		if (SUCCEED != zbx_parse_epp_item(&in_items[i], host, sizeof(host)))
+		if (SUCCEED != zbx_parse_epp_item(in_item, host, sizeof(host)))
 		{
 			/* unexpected item key syntax, skip it */
-			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_items[i].key);
-			zbx_free(in_items[i].key);
+			zbx_rsm_warnf(log_fd, "%s: unexpected key syntax", in_item->key);
 			continue;
 		}
 
 		if (0 != strcmp(host, domain))
 		{
 			/* first parameter does not match expected domain name, skip it */
-			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_items[i].key, domain);
-			zbx_free(in_items[i].key);
-			zbx_free(in_items[i].params);
+			zbx_rsm_warnf(log_fd, "%s: first parameter does not match host %s", in_item->key, domain);
 			continue;
 		}
 
-		p = in_items[i].key + keypart_size;
+		p = in_item->key + keypart_size;
 		if (0 != strncmp(p, "ip[", 3) && 0 != strncmp(p, "rtt[", 4))
-		{
-			zbx_free(in_items[i].key);
-			zbx_free(in_items[i].params);
 			continue;
-		}
 
 		if (0 == out_items_num)
 		{
@@ -2998,17 +3002,16 @@ static size_t	zbx_get_epp_items(const char *keyname, DC_ITEM *item, const char *
 			*out_items = zbx_realloc(*out_items, out_items_alloc * sizeof(DC_ITEM));
 		}
 
-		memcpy(&(*out_items)[out_items_num], &in_items[i], sizeof(DC_ITEM));
-		(*out_items)[out_items_num].key = in_items[i].key;
-		(*out_items)[out_items_num].params = in_items[i].params;
-		in_items[i].key = NULL;
-		in_items[i].params = NULL;
+		memcpy(&(*out_items)[out_items_num], in_item, sizeof(DC_ITEM));
+		(*out_items)[out_items_num].key = in_item->key;
+		(*out_items)[out_items_num].params = in_item->params;
+		in_item->key = NULL;
+		in_item->params = NULL;
 
 		out_items_num++;
 	}
 
-	if (0 != in_items_num)
-		zbx_free(in_items);
+	free_items(in_items, in_items_num);
 
 	return out_items_num;
 }
@@ -3770,18 +3773,7 @@ out:
 		}
 	}
 
-	if (0 != items_num)
-	{
-		int	i;
-
-		for (i = 0; i < items_num; i++)
-		{
-			zbx_free(items[i].key);
-			zbx_free(items[i].params);
-		}
-
-		zbx_free(items);
-	}
+	free_items(items, items_num);
 
 	zbx_free(epp_servercertmd5);
 	zbx_free(epp_testprefix);
