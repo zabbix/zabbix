@@ -82,21 +82,17 @@ $hostGroupForm->show();
 			return close_window();
 		}
 
-		var resultValue = {};
 		jQuery('#groups input[type=checkbox]').each(function() {
 			var obj = jQuery(this);
 
 			if (obj.attr('name') !== 'all_groups' && obj.prop('checked')) {
 				var id = obj.data('id');
 
-				resultValue[id] = {
-					id: id,
-					permission: obj.data('permission'),
-					name: obj.data('name')
-				};
+				add_variable('input', 'new_right[' + id + '][permission]', obj.data('permission'), formName,
+					parentDocument);
+				add_variable('input', 'new_right[' + id + '][name]', obj.data('name'), formName, parentDocument);
 			}
 		});
-		add_variable('input', 'new_right', JsonParser.stringify(resultValue), formName, parentDocument);
 
 		parentDocument.forms[formName].submit();
 

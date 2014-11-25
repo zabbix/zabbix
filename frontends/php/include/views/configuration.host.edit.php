@@ -198,12 +198,12 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', 10);
-	$grp_tb->setSelectedValues($hostGroups);
+	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
 	$all_groups = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
-		'editable' => true
+		'editable' => true,
+		'output' => API_OUTPUT_EXTEND
 	));
+	order_result($all_groups, 'name');
 	foreach ($all_groups as $group) {
 		$grp_tb->addItem($group['groupid'], $group['name']);
 	}
@@ -819,7 +819,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
@@ -895,7 +895,7 @@ if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_c
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid'))
+		array(new CButtonCancel(url_param('groupid')))
 	));
 }
 

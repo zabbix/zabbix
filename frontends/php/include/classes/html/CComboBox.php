@@ -61,7 +61,7 @@ class CComboBox extends CTag {
 		parent::addItem($group);
 	}
 
-	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
+	public function addItem($value, $caption = '', $selected = null, $enabled = true, $class = null) {
 		if ($value instanceof CComboItem || $value instanceof COptGroup) {
 			parent::addItem($value);
 		}
@@ -92,13 +92,17 @@ class CComboBox extends CTag {
 	}
 
 	/**
-	 * Adds an attribute to current element that says value of it must be JSONized and stored in
-	 * hidden specified $var.
+	 * Enable or disable the element.
 	 *
-	 * @param CVar $var
+	 * @param $value
 	 */
-	public function serializeToVar(CVar $var) {
-		$this->attr('data-serialize-to-hidden', 'input[name='.$var->var_name.']');
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
+		}
 	}
 }
 
