@@ -88,7 +88,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function separateTemplatesFromHosts(array $content) {
-		if (!isset($content['hosts'])) {
+		if (!isset($content['hosts']) || !$content['hosts']) {
 			return $content;
 		}
 
@@ -129,7 +129,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHosts(array $content) {
-		if (!isset($content['hosts'])) {
+		if (!isset($content['hosts']) || !$content['hosts']) {
 			return $content;
 		}
 
@@ -141,7 +141,8 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostItems($host);
 			$host = $this->convertHostTriggers($host, $host['host']);
 			$host = $this->convertHostGraphs($host, $host['host']);
-			$host = $this->convertHostTemplates($host);
+
+			$host = $this->wrapChildren($host, 'templates', 'name');
 
 			unset($host['groups']);
 			unset($host['useip']);
@@ -185,7 +186,8 @@ class C18ImportConverter extends CConverter {
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
 			$template = $this->convertHostGraphs($template, $template['template']);
-			$template = $this->convertHostTemplates($template);
+
+			$template = $this->wrapChildren($template, 'templates', 'name');
 
 			unset($template['groups']);
 		}
@@ -232,7 +234,7 @@ class C18ImportConverter extends CConverter {
 		$hasIpmiItem = false;
 		$snmpItems = array();
 
-		if (isset($host['items'])) {
+		if (isset($host['items']) && $host['items']) {
 			foreach ($host['items'] as $item) {
 				if (!isset($item['type'])) {
 					continue;
@@ -290,7 +292,7 @@ class C18ImportConverter extends CConverter {
 		}
 
 		// map items to new interfaces
-		if (isset($host['items'])) {
+		if (isset($host['items']) && $host['items']) {
 			foreach ($host['items'] as &$item) {
 				if (!isset($item['type'])) {
 					continue;
@@ -329,7 +331,9 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostProfiles(array $host) {
-		$hasProfileData = (isset($host['host_profile']) || isset($host['host_profiles_ext']));
+		$hasProfileData = (isset($host['host_profile']) && $host['host_profile']
+			|| isset($host['host_profiles_ext']) && $host['host_profiles_ext']
+		);
 
 		// if the host contains inventory data, set inventory to mode to manual, otherwise disable it
 		$host['inventory_mode'] = ($hasProfileData) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
@@ -340,14 +344,14 @@ class C18ImportConverter extends CConverter {
 
 		// rename and merge profile fields
 		$inventory = array();
-		if (isset($host['host_profile'])) {
+		if (isset($host['host_profile']) && $host['host_profile']) {
 			foreach ($host['host_profile'] as $key => $value) {
 				$newKey = $this->getNewProfileName($key);
 				$inventory[($newKey !== null) ? $newKey : $key] = $value;
 			}
 		}
 
-		if (isset($host['host_profiles_ext'])) {
+		if (isset($host['host_profiles_ext']) && $host['host_profiles_ext']) {
 			foreach ($host['host_profiles_ext'] as $key => $value) {
 				$newKey = $this->getNewProfileName($key);
 				$key = ($newKey !== null) ? $newKey : $key;
@@ -436,7 +440,7 @@ class C18ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$content['groups'] = $this->wrapChildren($content['groups'], 'name');
+		$content = $this->wrapChildren($content, 'groups', 'name');
 		$content['groups'] = array_values(zbx_toHash($content['groups'], 'name'));
 
 		return $content;
@@ -451,7 +455,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostTriggers(array $host, $hostName) {
-		if (!isset($host['triggers'])) {
+		if (!isset($host['triggers']) || !$host['triggers']) {
 			return $host;
 		}
 
@@ -514,23 +518,6 @@ class C18ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert templates linked to a host
-	 *
-	 * @param array $host
-	 *
-	 * @return array
-	 */
-	protected function convertHostTemplates(array $host) {
-		if (!isset($host['templates'])) {
-			return $host;
-		}
-
-		$host['templates'] = $this->wrapChildren($host['templates'], 'name');
-
-		return $host;
-	}
-
-	/**
 	 * Convert item elements.
 	 *
 	 * @param array $host
@@ -538,7 +525,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostItems(array $host) {
-		if (!isset($host['items'])) {
+		if (!isset($host['items']) || !$host['items']) {
 			return $host;
 		}
 
@@ -548,9 +535,7 @@ class C18ImportConverter extends CConverter {
 			// convert simple check keys
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 
-			if (isset($item['applications'])) {
-				$item['applications'] = $this->wrapChildren($item['applications'], 'name');
-			}
+			$item = $this->wrapChildren($item, 'applications', 'name');
 		}
 		unset($item);
 
@@ -566,7 +551,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostGraphs(array $host, $hostName) {
-		if (!isset($host['graphs'])) {
+		if (!isset($host['graphs']) || !$host['graphs']) {
 			return $host;
 		}
 
@@ -665,13 +650,13 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertSysmaps(array $content) {
-		if (!isset($content['sysmaps'])) {
+		if (!isset($content['sysmaps']) || !$content['sysmaps']) {
 			return $content;
 		}
 
 		$content = $this->renameKey($content, 'sysmaps', 'maps');
 		foreach ($content['maps'] as &$map) {
-			if (isset($map['selements'])) {
+			if (isset($map['selements']) && $map['selements']) {
 				foreach ($map['selements'] as &$selement) {
 					$selement = $this->renameKey($selement, 'elementid', 'selement');
 
@@ -685,9 +670,9 @@ class C18ImportConverter extends CConverter {
 				unset($selement);
 			}
 
-			if (isset($map['links'])) {
+			if (isset($map['links']) && $map['links']) {
 				foreach ($map['links'] as &$link) {
-					if (isset($link['linktriggers'])) {
+					if (isset($link['linktriggers']) && $link['linktriggers']) {
 						foreach ($link['linktriggers'] as &$linkTrigger) {
 							$linkTrigger = $this->renameKey($linkTrigger, 'triggerid', 'trigger');
 
@@ -712,14 +697,14 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertScreens(array $content) {
-		if (!isset($content['screens'])) {
+		if (!isset($content['screens']) || !$content['screens']) {
 			return $content;
 		}
 
 		foreach ($content['screens'] as &$screen) {
 			$screen = $this->renameKey($screen, 'screenitems', 'screen_items');
 
-			if (isset($screen['screen_items'])) {
+			if (isset($screen['screen_items']) && $screen['screen_items']) {
 				foreach ($screen['screen_items'] as &$screenItem) {
 					$screenItem = $this->renameKey($screenItem, 'resourceid', 'resource');
 
@@ -739,7 +724,7 @@ class C18ImportConverter extends CConverter {
 		$values = (isset($target[$key])) ? $target[$key] : array();
 
 		foreach ($source as $sourceItem) {
-			if (!isset($sourceItem[$key])) {
+			if (!isset($sourceItem[$key]) || !$sourceItem[$key]) {
 				continue;
 			}
 
@@ -756,16 +741,22 @@ class C18ImportConverter extends CConverter {
 		return $target;
 	}
 
-	protected function wrapChildren($array, $key) {
+	protected function wrapChildren(array $array, $key, $wrapperKey) {
+		if (!isset($array[$key]) || !$array[$key]) {
+			return $array;
+		}
+
 		$result = array();
 
-		foreach ($array as $content) {
+		foreach ($array[$key] as $content) {
 			$result[] = array(
-				$key => $content[0]
+				$wrapperKey => $content[0]
 			);
 		}
 
-		return $result;
+		$array[$key] = $result;
+
+		return $array;
 	}
 
 	protected function renameKey(array $array, $source, $target) {

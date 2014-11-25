@@ -22,6 +22,15 @@
 class C20ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertItems() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createExpectedResult(array())
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('items' => '')),
+			$this->createExpectedResult(array('items' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'items' => array(
 				array(),
@@ -44,6 +53,15 @@ class C20ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertTriggers() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createExpectedResult(array())
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('triggers' => '')),
+			$this->createExpectedResult(array('triggers' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'triggers' => array(
 				array(
@@ -64,12 +82,24 @@ class C20ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertDiscoveryRules() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createExpectedResult(array())
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('discovery_rules' => '')),
+			$this->createExpectedResult(array('discovery_rules' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'discovery_rules' => array(
 				array(),
 				array(
 					'status' => ITEM_STATUS_NOTSUPPORTED,
 					'filter' => array()
+				),
+				array(
+					'filter' => ''
 				),
 				array(
 					'filter' => ':'
@@ -86,6 +116,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 				array(
 					'status' => ITEM_STATUS_ACTIVE,
 					'filter' => array()
+				),
+				array(
+					'filter' => ''
 				),
 				array(),
 				array(
@@ -112,6 +145,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 			'discovery_rules' => array(
 				array(),
 				array(
+					'trigger_prototypes' => ''
+				),
+				array(
 					'trigger_prototypes' => array(
 						array(
 							'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
@@ -124,6 +160,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 		$expectedResult = $this->createExpectedResult(array(
 			'discovery_rules' => array(
 				array(),
+				array(
+					'trigger_prototypes' => ''
+				),
 				array(
 					'trigger_prototypes' => array(
 						array(
