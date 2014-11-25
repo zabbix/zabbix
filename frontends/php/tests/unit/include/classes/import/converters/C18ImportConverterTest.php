@@ -88,23 +88,23 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
-						array('Zabbix server'),
-						array('Linux server'),
+						'Zabbix server',
+						'Linux server',
 					),
 				),
 				array(
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => array(
-						array('Zabbix server'),
-						array('My group'),
+						'Zabbix server',
+						'My group',
 					),
 				),
 				array(
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
 					'groups' => array(
-						array('Templates'),
+						'Templates',
 					),
 				),
 				array(
@@ -694,8 +694,8 @@ class C18ImportConverterTest extends CImportConverterTest {
 							'description' => 'My item',
 							'key' => 'ftp,1',
 							'applications' => array(
-								array('Application 1'),
-								array('Application 2'),
+								'Application 1',
+								'Application 2',
 							)
 						)
 					)
@@ -711,8 +711,8 @@ class C18ImportConverterTest extends CImportConverterTest {
 							'description' => 'My item',
 							'key' => 'ftp,1',
 							'applications' => array(
-								array('Application 1'),
-								array('Application 2'),
+								'Application 1',
+								'Application 2',
 							)
 						)
 					)
@@ -919,16 +919,16 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'templates' => array(
-						array('template1'),
-						array('template2'),
+						'template1',
+						'template2',
 					)
 				),
 				array(
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
 					'templates' => array(
-						array('template1'),
-						array('template2'),
+						'template1',
+						'template2',
 					)
 				)
 			),
