@@ -13,7 +13,6 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
 ..F....... [ZBX-8888] fixed history.php showing data for 11 more seconds than the defined interval (arvids)
 ..F.....S. [ZBX-9005] fixed aggregate item check to make forth parameter not mandatory when third parameter is set to 'last' (igors)
 ...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
