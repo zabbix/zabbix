@@ -392,6 +392,7 @@
 
 /* Net-SNMP is used */
 #ifdef HAVE_NETSNMP
+#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
 #	include <net-snmp/net-snmp-config.h>
 #	include <net-snmp/net-snmp-includes.h>
 #endif

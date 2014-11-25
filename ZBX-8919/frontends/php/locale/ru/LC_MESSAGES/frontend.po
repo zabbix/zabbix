@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-28 12:22+0300\n"
-"PO-Revision-Date: 2014-06-05 14:41+0300\n"
+"PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401972111.0\n"
+"X-POOTLE-MTIME: 1415002407.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2737,7 +2737,7 @@ msgstr "Подчиненный"
 
 #: include/locales.inc.php:58
 msgid "Chinese (zh_CN)"
-msgstr "Chinese (zh_CN)"
+msgstr "Китайский (zh_CN)"
 
 #: include/locales.inc.php:59
 msgid "Chinese (zh_TW)"
@@ -3478,7 +3478,7 @@ msgstr "Пользовательские слайды"
 
 #: include/locales.inc.php:60
 msgid "Czech (cs_CZ)"
-msgstr "Czech (cs_CZ)"
+msgstr "Чешский (cs_CZ)"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1369
 msgid "D"
@@ -4691,7 +4691,7 @@ msgstr "Длительность (сек)"
 
 #: include/locales.inc.php:61
 msgid "Dutch (nl_NL)"
-msgstr "Dutch (nl_NL)"
+msgstr "Голландский (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:638
 msgid "Dynamic item"
@@ -4985,7 +4985,7 @@ msgstr "Активировано"
 
 #: include/locales.inc.php:55
 msgid "English (en_GB)"
-msgstr "English (en_GB)"
+msgstr "Английский (en_GB)"
 
 #: include/locales.inc.php:56
 msgid "English (en_US)"
@@ -5103,7 +5103,7 @@ msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Выполнение WMI запроса и получение первого выбранного объекта."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
@@ -5423,7 +5423,7 @@ msgstr "Четвертый"
 
 #: include/locales.inc.php:63
 msgid "French (fr_FR)"
-msgstr "French (fr_FR)"
+msgstr "Французский (fr_FR)"
 
 #: include/func.inc.php:230
 msgid "Fri"
@@ -5517,7 +5517,7 @@ msgstr "Сгенерировано за %s сек"
 
 #: include/locales.inc.php:64
 msgid "German (de_DE)"
-msgstr "German (de_DE)"
+msgstr "Немецкий (de_DE)"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:559
@@ -5781,7 +5781,7 @@ msgstr "График удален"
 
 #: include/locales.inc.php:65
 msgid "Greek (el_GR)"
-msgstr "Greek (el_GR)"
+msgstr "Греческий (el_GR)"
 
 #: include/views/configuration.sysmap.constructor.php:75
 #: include/views/js/configuration.sysmaps.js.php:64
@@ -12914,7 +12914,7 @@ msgstr "Слайды"
 
 #: include/locales.inc.php:79
 msgid "Slovak (sk_SK)"
-msgstr "Slovak (sk_SK)"
+msgstr "Словацкий (sk_SK)"
 
 #: jsLoader.php:170
 msgid "Snooze"
@@ -12986,7 +12986,7 @@ msgstr "Источник"
 
 #: include/locales.inc.php:80
 msgid "Spanish (es_ES)"
-msgstr "Spanish (es_ES)"
+msgstr "Испанский (es_ES)"
 
 #: api/classes/CAction.php:1385
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -13218,7 +13218,7 @@ msgstr "Размер файла подкачки. Количество байт.
 
 #: include/locales.inc.php:81
 msgid "Swedish (sv_SE)"
-msgstr "Swedish (sv_SE)"
+msgstr "Шведский (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -14181,7 +14181,7 @@ msgstr "UTF-8"
 
 #: include/locales.inc.php:83
 msgid "Ukrainian (uk_UA)"
-msgstr "Ukrainian (uk_UA)"
+msgstr "Украинский (uk_UA)"
 
 #: include/nodes.inc.php:375
 msgid "Unable to remove local node."
@@ -14735,7 +14735,7 @@ msgstr "BIOS uuid VMware гипервизора, <url> - VMware сервисны
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Размер ballooned памяти VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
 #: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14811,15 +14811,15 @@ msgstr "Версия VMware сервиса, <url> - VMware service URL"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер ballooned памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем committed дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер сжатой памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -14863,7 +14863,7 @@ msgstr "Состояние питания виртуальной машины VM
 
 #: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер частной памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:711
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14875,7 +14875,7 @@ msgstr "Размер разделяемой памяти у виртуально
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Размер swapped памяти VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14883,11 +14883,11 @@ msgstr "Общий размер памяти виртуальной машины
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем uncommitted дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Объем unshared дискового места VMware виртуальной машины, <url> - VMware сервисный URL, <uuid> - имя хоста VMware виртуальной машины"
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14932,22 +14932,22 @@ msgstr "Значение \"%1$s\" слишком длинное для поля 
 #: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет некорректный формат десятичного числа."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет слишком много цифр после запятой: оно не может иметь более чем %3$s цифр."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" имеет слишком много цифр до запятой: оно не может иметь более чем %3$s цифр."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "Значение \"%2$s\" из \"%1$s\" слишком длинное: оно не может иметь более чем %3$s цифр до запятой и более чем %4$s цифр после запятой."
 
 #: include/classes/items/CHelpItems.php:891
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15153,11 +15153,11 @@ msgstr "Шаг веб-сценария \"%1$s\" уже существует."
 
 #: api/classes/CHttpTest.php:623
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "URL шага веб-сценария не может быть пустым."
 
 #: api/classes/CHttpTest.php:618
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Имя шага веб-сценария не может быть пустым."
 
 #: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
@@ -15887,7 +15887,7 @@ msgstr "в"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr "Некорректный синтаксис около \"%1$s\""
+msgstr "некорректный синтаксис около \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
