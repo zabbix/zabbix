@@ -423,6 +423,12 @@ class CHostGroup extends CApiService {
 			if (!isset($group['name']) || zbx_empty($group['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
+			$this->checkNoParameters(
+				$group,
+				array('internal'),
+				_('Cannot set "%1$s" for host group "%2$s".'),
+				$group['name']
+			);
 		}
 
 		// check host name duplicates
@@ -478,6 +484,12 @@ class CHostGroup extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+			$this->checkNoParameters(
+				$group,
+				array('internal'),
+				_('Cannot update "%1$s" for host group "%2$s".'),
+				isset($group['name']) ? $group['name'] : $updGroups[$group['groupid']]['name']
+			);
 		}
 
 		// name duplicate check
