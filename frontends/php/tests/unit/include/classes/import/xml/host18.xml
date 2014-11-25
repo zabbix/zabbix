@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export version="1.0" date="25.11.14" time="12.21">
+    <hosts>
+        <host name="host">
+            <proxy_hostid>0</proxy_hostid>
+            <useip>1</useip>
+            <dns></dns>
+            <ip>0.0.0.0</ip>
+            <port>10050</port>
+            <status>0</status>
+            <useipmi>0</useipmi>
+            <ipmi_ip></ipmi_ip>
+            <ipmi_port>623</ipmi_port>
+            <ipmi_authtype>-1</ipmi_authtype>
+            <ipmi_privilege>2</ipmi_privilege>
+            <ipmi_username></ipmi_username>
+            <ipmi_password></ipmi_password>
+            <groups>
+                <group>Linux servers</group>
+            </groups>
+            <triggers/>
+            <items/>
+            <templates/>
+            <graphs/>
+            <macros/>
+        </host>
+    </hosts>
+    <dependencies/>
+</zabbix_export>

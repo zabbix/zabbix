@@ -20,24 +20,65 @@
 
 
 /**
- * Import formatter for version 2.0
+ * Import formatter
  */
-class C20ImportFormatter extends CImportFormatter {
+class СImportDataAdapter {
 
 	/**
-	 * Converter for trigger expressions.
+	 * @var array configuration import data
+	 */
+	protected $data;
+
+	/**
+	 * Object used for converting older import versions.
 	 *
-	 * @var C20TriggerConverter
+	 * @var CConverterChain
 	 */
-	protected $triggerExpressionConverter;
+	protected $converterChain;
 
 	/**
-	 * @param C20TriggerConverter $triggerExpressionConverter
+	 * Current import version.
+	 *
+	 * @var string
 	 */
-	public function __construct(C20TriggerConverter $triggerExpressionConverter) {
-		$this->triggerExpressionConverter = $triggerExpressionConverter;
+	protected $currentVersion;
+
+	/**
+	 * @param string            $currentVersion     current import version
+	 * @param CConverterChain   $converterChain     object used for converting older import versions
+	 */
+	public function __construct($currentVersion, CConverterChain $converterChain) {
+		$this->currentVersion = $currentVersion;
+		$this->converterChain = $converterChain;
 	}
 
+	/**
+	 * Set the data and initialize the adapter.
+	 *
+	 * @param array $data   import data
+	 *
+	 * @throws InvalidArgumentException     if the data is invalid
+	 */
+	public function load(array $data) {
+		$version = $data['zabbix_export']['version'];
+
+		if ($this->currentVersion != $version) {
+			// check if this import version is supported
+			if (!$this->converterChain->hasConverter($version)) {
+				throw new InvalidArgumentException(_s('Unsupported import version "%1$s"', $version));
+			}
+
+			$data = $this->converterChain->convert($data, $version);
+		}
+
+		$this->data = $data['zabbix_export'];
+	}
+
+	/**
+	 * Get groups from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getGroups() {
 		if (!isset($this->data['groups'])) {
 			return array();
@@ -46,6 +87,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return array_values($this->data['groups']);
 	}
 
+	/**
+	 * Get templates from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getTemplates() {
 		$templatesData = array();
 
@@ -71,6 +117,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $templatesData;
 	}
 
+	/**
+	 * Get hosts from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getHosts() {
 		$hostsData = array();
 
@@ -82,11 +133,6 @@ class C20ImportFormatter extends CImportFormatter {
 
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
-						// set bulk default value
-						if (!isset($interface['bulk'])) {
-							$interface['bulk'] = SNMP_BULK_ENABLED;
-						}
-
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 					}
 				}
@@ -118,6 +164,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $hostsData;
 	}
 
+	/**
+	 * Get applications from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getApplications() {
 		$applicationsData = array();
 		if (isset($this->data['hosts'])) {
@@ -143,6 +194,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $applicationsData;
 	}
 
+	/**
+	 * Get items from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getItems() {
 		$itemsData = array();
 
@@ -150,11 +206,6 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
-						// if a host item has the "Not supported" status, convert it to "Active"
-						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
-							$item['status'] = ITEM_STATUS_ACTIVE;
-						}
-
 						$item = $this->formatItem($item);
 
 						$itemsData[$host['host']][$item['key_']] = $item;
@@ -178,6 +229,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $itemsData;
 	}
 
+	/**
+	 * Get discovery rules from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getDiscoveryRules() {
 		$discoveryRulesData = array();
 
@@ -185,11 +241,6 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['discovery_rules'])) {
 					foreach ($host['discovery_rules'] as $item) {
-						// if a discovery rule has the "Not supported" status, convert it to "Active"
-						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
-							$item['status'] = ITEM_STATUS_ACTIVE;
-						}
-
 						$item = $this->formatDiscoveryRule($item);
 
 						$discoveryRulesData[$host['host']][$item['key_']] = $item;
@@ -213,6 +264,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $discoveryRulesData;
 	}
 
+	/**
+	 * Get graphs from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getGraphs() {
 		$graphsData = array();
 
@@ -231,14 +287,17 @@ class C20ImportFormatter extends CImportFormatter {
 		return $graphsData;
 	}
 
+	/**
+	 * Get triggers from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getTriggers() {
 		$triggersData = array();
 
 		if (!empty($this->data['triggers'])) {
 			foreach ($this->data['triggers'] as $trigger) {
 				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
-
-				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 
 				$triggersData[] = $this->renameTriggerFields($trigger);
 			}
@@ -247,6 +306,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $triggersData;
 	}
 
+	/**
+	 * Get images from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getImages() {
 		$imagesData = array();
 
@@ -259,6 +323,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $imagesData;
 	}
 
+	/**
+	 * Get maps from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getMaps() {
 		$mapsData = array();
 
@@ -287,6 +356,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $mapsData;
 	}
 
+	/**
+	 * Get screens from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getScreens() {
 		$screensData = array();
 
@@ -303,6 +377,11 @@ class C20ImportFormatter extends CImportFormatter {
 		return $screensData;
 	}
 
+	/**
+	 * Get template screens from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getTemplateScreens() {
 		$screensData = array();
 
@@ -364,8 +443,6 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($discoveryRule['trigger_prototypes'])) {
 			foreach ($discoveryRule['trigger_prototypes'] as &$trigger) {
-				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
-
 				$trigger = $this->renameTriggerFields($trigger);
 			}
 			unset($trigger);
@@ -396,30 +473,8 @@ class C20ImportFormatter extends CImportFormatter {
 		}
 
 		if (!empty($discoveryRule['filter'])) {
-			// array filter structure
 			if (is_array($discoveryRule['filter'])) {
 				CArrayHelper::convertFieldToArray($discoveryRule['filter'], 'conditions');
-			}
-			// string {#MACRO}:value syntax
-			else {
-				list ($filterMacro, $filterValue) = explode(':', $discoveryRule['filter']);
-				if ($filterMacro) {
-					$discoveryRule['filter'] = array(
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'formula' => '',
-						'conditions' => array(
-							array(
-								'macro' => $filterMacro,
-								'value' => $filterValue,
-								'operator' => CONDITION_OPERATOR_REGEXP,
-							)
-						)
-					);
-				}
-				// if the macro is empty, ignore the filter
-				else {
-					unset($discoveryRule['filter']);
-				}
 			}
 		}
 
@@ -464,5 +519,24 @@ class C20ImportFormatter extends CImportFormatter {
 			'ymax_type_1' => 'ymax_type',
 			'graph_items' => 'gitems'
 		));
+	}
+
+	/**
+	 * Renames array elements keys according to given map.
+	 *
+	 * @param array $data
+	 * @param array $fieldMap
+	 *
+	 * @return array
+	 */
+	protected function renameData(array $data, array $fieldMap) {
+		foreach ($data as $key => $value) {
+			if (isset($fieldMap[$key])) {
+				$data[$fieldMap[$key]] = $value;
+				unset($data[$key]);
+			}
+		}
+
+		return $data;
 	}
 }

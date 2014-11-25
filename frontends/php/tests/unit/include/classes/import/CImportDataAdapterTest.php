@@ -19,7 +19,7 @@
 **/
 
 
-class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
+class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Cached XMl sources
@@ -29,26 +29,26 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	protected $sources = array();
 
 	public function testEmptyXml() {
-		$formatter = $this->getFormatter($this->getEmptyXml());
+		$adapter = $this->getAdapter($this->getEmptyXml());
 
-		$this->assertEquals($formatter->getGroups(), array());
-		$this->assertEquals($formatter->getHosts(), array());
-		$this->assertEquals($formatter->getTemplates(), array());
-		$this->assertEquals($formatter->getApplications(), array());
-		$this->assertEquals($formatter->getItems(), array());
-		$this->assertEquals($formatter->getTriggers(), array());
-		$this->assertEquals($formatter->getGraphs(), array());
-		$this->assertEquals($formatter->getDiscoveryRules(), array());
-		$this->assertEquals($formatter->getTemplateScreens(), array());
-		$this->assertEquals($formatter->getScreens(), array());
-		$this->assertEquals($formatter->getImages(), array());
-		$this->assertEquals($formatter->getMaps(), array());
+		$this->assertEquals($adapter->getGroups(), array());
+		$this->assertEquals($adapter->getHosts(), array());
+		$this->assertEquals($adapter->getTemplates(), array());
+		$this->assertEquals($adapter->getApplications(), array());
+		$this->assertEquals($adapter->getItems(), array());
+		$this->assertEquals($adapter->getTriggers(), array());
+		$this->assertEquals($adapter->getGraphs(), array());
+		$this->assertEquals($adapter->getDiscoveryRules(), array());
+		$this->assertEquals($adapter->getTemplateScreens(), array());
+		$this->assertEquals($adapter->getScreens(), array());
+		$this->assertEquals($adapter->getImages(), array());
+		$this->assertEquals($adapter->getMaps(), array());
 	}
 
 	public function testGetGroups() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getGroups(), array(
+		$this->assertEquals($adapter->getGroups(), array(
 			array (
 				'name' => 'Linux servers',
 			),
@@ -62,9 +62,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetHosts() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getHosts(), array (
+		$this->assertEquals($adapter->getHosts(), array (
 			array (
 				'inventory' => '',
 				'proxy' => '',
@@ -249,9 +249,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetTemplates() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getTemplates(), array (
+		$this->assertEquals($adapter->getTemplates(), array (
 			array (
 				'groups' => array (
 					array (
@@ -295,9 +295,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetApplications() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getApplications(), array (
+		$this->assertEquals($adapter->getApplications(), array (
 			'export-host' => array (
 				'app' => array (
 					'name' => 'app',
@@ -312,9 +312,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetItems() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getItems(), array (
+		$this->assertEquals($adapter->getItems(), array (
 			'export-host' => array (
 				'item' => array (
 					'name' => 'item',
@@ -489,9 +489,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetTriggers() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getTriggers(), array (
+		$this->assertEquals($adapter->getTriggers(), array (
 			array (
 				'expression' => '{export-host:item.last(0)}<>0',
 				'url' => '',
@@ -546,9 +546,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetGraphs() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getGraphs(), array (
+		$this->assertEquals($adapter->getGraphs(), array (
 			array (
 				'name' => 'simple',
 				'width' => '900',
@@ -617,9 +617,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetDiscoveryRules() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getDiscoveryRules(), array (
+		$this->assertEquals($adapter->getDiscoveryRules(), array (
 			'export-host' => array (
 				'empty-lld-rule' => array (
 					'name' => 'empty-lld-rule',
@@ -1088,9 +1088,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetTemplateScreens() {
-		$formatter = $this->getFormatter($this->getHostAndTemplateXml());
+		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($formatter->getTemplateScreens(), array (
+		$this->assertEquals($adapter->getTemplateScreens(), array (
 			'export-template' => array (
 				'screen' => array (
 					'name' => 'screen',
@@ -1126,9 +1126,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetImages() {
-		$formatter = $this->getFormatter($this->getMapXml());
+		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($formatter->getImages(), array (
+		$this->assertEquals($adapter->getImages(), array (
 			array (
 				'name' => 'Server_(96)',
 				'imagetype' => '1',
@@ -1138,9 +1138,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetMaps() {
-		$formatter = $this->getFormatter($this->getMapXml());
+		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($formatter->getMaps(), array (
+		$this->assertEquals($adapter->getMaps(), array (
 			array (
 				'name' => 'empty-map',
 				'width' => '800',
@@ -1323,9 +1323,9 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetScreens() {
-		$formatter = $this->getFormatter($this->getScreenXml());
+		$adapter = $this->getAdapter($this->getScreenXml());
 
-		$this->assertEquals($formatter->getScreens(), array (
+		$this->assertEquals($adapter->getScreens(), array (
 			array (
 				'name' => 'empty-screen',
 				'hsize' => '1',
@@ -1364,16 +1364,77 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 		));
 	}
 
-	protected function getFormatter($source) {
-		$formatter = new C20ImportFormatter(
-			new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'))
+	public function testConversion() {
+		$adapter = $this->getAdapter($this->get18Xml());
+
+		$this->assertEquals(
+			array(
+				array(
+					'name' => 'Linux servers'
+				)
+			),
+			$adapter->getGroups()
 		);
 
-		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
-		$data = $reader->read($source);
-		$formatter->setData($data['zabbix_export']);
+		$this->assertEquals(
+			array(
+				array(
+					'macros' => array(),
+					'interfaces' => array (
+						array (
+							'type' => 1,
+							'useip' => '1',
+							'ip' => '0.0.0.0',
+							'dns' => '',
+							'port' => '10050',
+							'interface_ref' => 'if0',
+							'main' => 1,
+						),
+					),
+					'host' => 'host',
+					'status' => '0',
+					'ipmi_authtype' => '-1',
+					'ipmi_privilege' => '2',
+					'ipmi_username' => '',
+					'ipmi_password' => '',
+					'inventory_mode' => -1,
+				),
+			),
+			$adapter->getHosts()
+		);
+	}
 
-		return $formatter;
+	public function testUnsupportedVersion() {
+		$xml = '<?xml version="1.0" encoding="UTF-8"?>
+			<zabbix_export>
+				<version>0.1</version>
+				<date>2014-11-14T09:41:02Z</date>
+			</zabbix_export>';
+
+		$this->setExpectedException('InvalidArgumentException', 'Unsupported import version "0.1"');
+		$this->getAdapter($xml);
+	}
+
+	protected function getAdapter($source) {
+		$converterChain = new CConverterChain();
+		$itemKeyConverter = new C18ItemKeyConverter();
+		$converterChain->addConverter('1.0',
+			new C18ImportConverter($itemKeyConverter, new C18TriggerConverter($itemKeyConverter))
+		);
+		$converterChain->addConverter('2.0',
+			new C20ImportConverter(new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#')))
+		);
+
+		$adapter = new СImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
+
+		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
+		$adapter->load($reader->read($source));
+
+		return $adapter;
+	}
+
+	protected function get18Xml() {
+		return $this->getFile('host18.xml');
 	}
 
 	protected function getEmptyXml() {
@@ -1398,7 +1459,7 @@ class C20ImportFormatterTest extends PHPUnit_Framework_TestCase {
 
 	protected function getFile($name) {
 		if (!isset($this->sources[$name])) {
-			$this->sources[$name] = file_get_contents(__DIR__.'/'.$name);
+			$this->sources[$name] = file_get_contents(__DIR__.'/xml/'.$name);
 		}
 
 		return $this->sources[$name];
