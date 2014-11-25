@@ -750,7 +750,7 @@ class C18ImportConverter extends CConverter {
 
 		foreach ($array[$key] as $content) {
 			$result[] = array(
-				$wrapperKey => $content[0]
+				$wrapperKey => $content
 			);
 		}
 
