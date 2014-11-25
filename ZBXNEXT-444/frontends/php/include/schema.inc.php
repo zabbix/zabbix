@@ -4296,6 +4296,24 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'lastlogsize' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_UINT,
+				'length' => 20,
+				'default' => '0',
+			),
+			'mtime' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'meta' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'proxy_dhistory' => array(
