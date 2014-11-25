@@ -22,6 +22,15 @@
 class C18ImportConverterTest extends CImportConverterTest {
 
 	public function testTemplateSeparation() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource()
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('hosts' => '')),
+			$this->createSource(array('hosts' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
@@ -97,7 +106,12 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'groups' => array(
 						array('Templates'),
 					),
-				)
+				),
+				array(
+					'name' => 'host4',
+					'status' => HOST_STATUS_MONITORED,
+					'groups' => ''
+				),
 			),
 		));
 
@@ -132,6 +146,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
+				array(
+					'host' => 'host4',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
 			),
 			'templates' => array(
 				array(
@@ -144,6 +163,15 @@ class C18ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertHosts() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource()
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('hosts' => '')),
+			$this->createSource(array('hosts' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
@@ -463,6 +491,12 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
+					'host_profile' => '',
+					'host_profiles_ext' => '',
+				),
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
 					'host_profile' => array(
 						'devicetype' => 'device type',
 						'name' => 'name',
@@ -542,6 +576,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 
 		$expectedResult = $this->createExpectedResult(array(
 			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
@@ -638,9 +677,18 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
+					'items' => ''
+				),
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
 					'items' => array(
 						array(
 							'key' => 'item',
+						),
+						array(
+							'key' => 'item',
+							'applications' => ''
 						),
 						array(
 							'description' => 'My item',
@@ -683,9 +731,19 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'items' => ''
+				),
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
 					'items' => array(
 						array(
 							'key' => 'item',
+						),
+						array(
+							'key' => 'item',
+							'applications' => ''
 						),
 						array(
 							'name' => 'My item',
@@ -735,6 +793,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => ''
 				),
 				array(
 					'name' => 'host2',
@@ -806,6 +869,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -827,11 +895,25 @@ class C18ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertHostTemplates() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource()
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('hosts' => '')),
+			$this->createSource(array('hosts' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'hosts' => array(
 				array(
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'templates' => ''
 				),
 				array(
 					'name' => 'host2',
@@ -858,6 +940,12 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'templates' => ''
 				),
 				array(
 					'host' => 'host2',
@@ -897,6 +985,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'graphs' => ''
 				),
 				array(
 					'name' => 'host2',
@@ -1067,6 +1160,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 					'inventory_mode' => HOST_INVENTORY_DISABLED
 				),
 				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
@@ -1088,9 +1186,22 @@ class C18ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertSysmaps() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource()
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('sysmaps' => '')),
+			$this->createSource(array('sysmaps' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'sysmaps' => array(
 				array(),
+				array(
+					'selements' => '',
+					'links' => '',
+				),
 				array(
 					'selements' => array(
 						array(
@@ -1111,10 +1222,13 @@ class C18ImportConverterTest extends CImportConverterTest {
 					),
 					'links' => array(
 						array(),
-							array(
-								'linktriggers' => array(
-									array(
-										'triggerid' => array(
+						array(
+							'linktriggers' => ''
+						),
+						array(
+							'linktriggers' => array(
+								array(
+									'triggerid' => array(
 										'host' => 'host',
 										'description' => 'trigger'
 									)
@@ -1129,6 +1243,10 @@ class C18ImportConverterTest extends CImportConverterTest {
 		$expectedResult = $this->createExpectedResult(array(
 			'maps' => array(
 				array(),
+				array(
+					'selements' => '',
+					'links' => '',
+				),
 				array(
 					'selements' => array(
 						array(
@@ -1146,10 +1264,13 @@ class C18ImportConverterTest extends CImportConverterTest {
 					),
 					'links' => array(
 						array(),
-							array(
-								'linktriggers' => array(
-									array(
-										'trigger' => array(
+						array(
+							'linktriggers' => ''
+						),
+						array(
+							'linktriggers' => array(
+								array(
+									'trigger' => array(
 										'description' => 'trigger'
 									)
 								)
@@ -1165,9 +1286,21 @@ class C18ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertScreens() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource()
+		);
+		$this->assertConvert(
+			$this->createExpectedResult(array('screens' => '')),
+			$this->createSource(array('screens' => ''))
+		);
+
 		$source = $this->createSource(array(
 			'screens' => array(
 				array(),
+				array(
+					'screenitems' => ''
+				),
 				array(
 					'screenitems' => array(
 						array(
@@ -1183,6 +1316,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 		$expectedResult = $this->createExpectedResult(array(
 			'screens' => array(
 				array(),
+				array(
+					'screen_items' => ''
+				),
 				array(
 					'screen_items' => array(
 						array(

@@ -54,7 +54,7 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	public function convertItems(array $content) {
-		if (!isset($content['items'])) {
+		if (!isset($content['items']) || !$content['items']) {
 			return $content;
 		}
 
@@ -76,7 +76,7 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	public function convertTriggers(array $content) {
-		if (!isset($content['triggers'])) {
+		if (!isset($content['triggers']) || !$content['triggers']) {
 			return $content;
 		}
 
@@ -96,7 +96,7 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	public function convertDiscoveryRules(array $content) {
-		if (!isset($content['discovery_rules'])) {
+		if (!isset($content['discovery_rules']) || !$content['discovery_rules']) {
 			return $content;
 		}
 
@@ -121,7 +121,7 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	public function convertTriggerPrototypes(array $rule) {
-		if (!isset($rule['trigger_prototypes'])) {
+		if (!isset($rule['trigger_prototypes']) || !$rule['trigger_prototypes']) {
 			return $rule;
 		}
 
@@ -150,7 +150,7 @@ class C20ImportConverter extends CConverter {
 			return $rule;
 		}
 		// string filters were exported as "{#MACRO}:regex"
-		elseif (!is_array($rule['filter'])) {
+		elseif ($rule['filter'] && !is_array($rule['filter'])) {
 			list ($filterMacro, $filterValue) = explode(':', $rule['filter']);
 			$rule['filter'] = array(
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
