@@ -418,14 +418,14 @@ function str2mem($val) {
 }
 
 function mem2str($size) {
-	$prefix = _x('B', 'Byte short');
+	$prefix = 'B';
 	if ($size > 1048576) {
 		$size = $size / 1048576;
-		$prefix = _x('M', 'Mega short');
+		$prefix = 'M';
 	}
 	elseif ($size > 1024) {
 		$size = $size / 1024;
-		$prefix = _x('K', 'Kilo short');
+		$prefix = 'K';
 	}
 
 	return round($size, 6).$prefix;
@@ -660,15 +660,15 @@ function convert_units($options = array()) {
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
-			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
-			array('pow' => 3, 'short' => _x('G', 'Giga short'), 'long' => _('Giga')),
-			array('pow' => 4, 'short' => _x('T', 'Tera short'), 'long' => _('Tera')),
-			array('pow' => 5, 'short' => _x('P', 'Peta short'), 'long' => _('Peta')),
-			array('pow' => 6, 'short' => _x('E', 'Exa short'), 'long' => _('Exa')),
-			array('pow' => 7, 'short' => _x('Z', 'Zetta short'), 'long' => _('Zetta')),
-			array('pow' => 8, 'short' => _x('Y', 'Yotta short'), 'long' => _('Yotta'))
+			array('pow' => 0, 'short' => ''),
+			array('pow' => 1, 'short' => 'K'),
+			array('pow' => 2, 'short' => 'M'),
+			array('pow' => 3, 'short' => 'G'),
+			array('pow' => 4, 'short' => 'T'),
+			array('pow' => 5, 'short' => 'P'),
+			array('pow' => 6, 'short' => 'E'),
+			array('pow' => 7, 'short' => 'Z'),
+			array('pow' => 8, 'short' => 'Y')
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
@@ -678,7 +678,7 @@ function convert_units($options = array()) {
 	}
 
 
-	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $options['value']);
+	$valUnit = array('pow' => 0, 'short' => '', 'value' => $options['value']);
 
 	if ($options['pow'] === false || $options['value'] == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
@@ -710,7 +710,6 @@ function convert_units($options = array()) {
 	switch ($options['convert']) {
 		case 0: $options['units'] = trim($options['units']);
 		case 1: $desc = $valUnit['short']; break;
-		case 2: $desc = $valUnit['long']; break;
 	}
 
 	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
