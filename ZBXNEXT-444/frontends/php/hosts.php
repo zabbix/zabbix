@@ -43,7 +43,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groups' =>			array(T_ZBX_JSON, O_OPT, P_SYS,			DB_ID,		null),
+	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
@@ -828,11 +828,14 @@ else {
 		array(bold(_('Port')), ' ', new CTextBox('filter_port', $filter['port'], 20))
 	));
 
-	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$filterButton->useJQueryStyle('main');
+	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
+		'jqueryinput shadow'
+	);
+	$filterButton->main();
 
-	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$resetButton->useJQueryStyle();
+	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();',
+		'jqueryinput shadow'
+	);
 
 	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');

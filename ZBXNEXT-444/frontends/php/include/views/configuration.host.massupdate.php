@@ -337,6 +337,9 @@ $hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 $hostForm->addItem($hostTab);
 
 // append buttons to form
-$hostForm->addItem(makeFormFooter(new CSubmit('masssave', _('Update')), new CButtonCancel(url_param('groupid'))));
+$hostForm->addItem(makeFormFooter(
+	new CSubmit('masssave', _('Update')),
+	array(new CButtonCancel(url_param('groupid')))
+));
 
 return $hostForm;

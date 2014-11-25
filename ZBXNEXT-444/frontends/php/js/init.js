@@ -148,14 +148,18 @@ jQuery(function($) {
 	});
 
 	// create jquery buttons
-	$('input.jqueryinput').button();
+	$('.jqueryinput').button();
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
 
-	$('[data-serialize-to-hidden]').each(function() {
-		$(this).setJsonOnChange({targetSelector: $(this).data('serialize-to-hidden')});
-	});
+	// redirect buttons
+	$('button[data-url]').click(function() {
+		var button = $(this);
+		var confirmation = button.data('confirmation');
 
-	$('form').enterSubmit('input[type=submit].main');
+		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
+			window.location = button.data('url');
+		}
+	})
 });

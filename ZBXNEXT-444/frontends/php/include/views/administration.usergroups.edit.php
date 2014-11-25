@@ -26,11 +26,7 @@ $userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
 $userGroupForm = new CForm();
 $userGroupForm->setName('userGroupsForm');
 $userGroupForm->addVar('form', $this->data['form']);
-$groupRightsArray = array();
-foreach($this->data['group_rights'] as $groupRight) {
-	$groupRightsArray[$groupRight['id']] = $groupRight['permission'];
-}
-$userGroupForm->addVar('group_rights', CJs::encodeJson($groupRightsArray));
+$userGroupForm->addVar('group_rights', $this->data['group_rights']);
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addVar('usrgrpid', $this->data['usrgrpid']);
 }
@@ -51,8 +47,7 @@ foreach ($this->data['usergroups'] as $group) {
 }
 
 // append user tweenbox to form list
-$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', 10);
-$usersTweenBox->setSelectedValues($this->data['group_users']);
+$usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $this->data['group_users'], 10);
 foreach ($this->data['users'] as $user) {
 	$usersTweenBox->addItem($user['userid'], getUserFullname($user));
 }
@@ -85,50 +80,51 @@ $permissionsFormList = new CFormList('permissionsFormList');
 $permissionsTable = new CTable(null, 'right_table');
 $permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
-$rightToDelReadWriteVar = new CVar('right_to_del_read_write', CJs::encodeJson(array()));
-$lstReadWrite = new CListBox(null, null, 20);
-$lstReadWrite->serializeToVar($rightToDelReadWriteVar);
-$userGroupForm->addItem($rightToDelReadWriteVar);
-
-$rightToDelReadOnlyVar = new CVar('right_to_del_read_only', CJs::encodeJson(array()));
-$lstReadOnly = new CListBox(null, null, 20);
-$lstReadOnly->serializeToVar($rightToDelReadOnlyVar);
-$userGroupForm->addItem($rightToDelReadOnlyVar);
-
-$rightToDelDenyVar = new CVar('right_to_del_deny', CJs::encodeJson(array()));
-$lstDeny = new CListBox(null, null, 20);
-$lstDeny->serializeToVar($rightToDelDenyVar);
-$userGroupForm->addItem($rightToDelDenyVar);
+$lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
+$lstRead = new CListBox('right_to_del[read_only][]', null, 20);
+$lstDeny = new CListBox('right_to_del[deny][]', null, 20);
 
 foreach ($this->data['group_rights'] as $id => $rights) {
 	if ($rights['permission'] == PERM_DENY) {
 		$lstDeny->addItem($id, $rights['name']);
 	}
 	elseif ($rights['permission'] == PERM_READ) {
-		$lstReadOnly->addItem($id, $rights['name']);
+		$lstRead->addItem($id, $rights['name']);
 	}
 	elseif ($rights['permission'] == PERM_READ_WRITE) {
-		$lstReadWrite->addItem($id, $rights['name']);
+		$lstWrite->addItem($id, $rights['name']);
 	}
 }
 
 $permissionsTable->addRow(array(
-	new CCol($lstReadWrite, 'read_write'),
-	new CCol($lstReadOnly, 'read_only'),
+	new CCol($lstWrite, 'read_write'),
+	new CCol($lstRead, 'read_only'),
 	new CCol($lstDeny, 'deny')
 ));
 $permissionsTable->addRow(array(
 	array(
-		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."', 450, 450);", 'formlist'),
-		new CSubmit('del_read_write', _('Delete selected'), null, 'formlist')
+		new CButton('add_read_write', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ_WRITE."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
 	),
 	array(
-		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ."', 450, 450);", 'formlist'),
-		new CSubmit('del_read_only', _('Delete selected'), null, 'formlist')
+		new CButton('add_read_only', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
 	),
 	array(
-		new CButton('add_deny', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_DENY."', 450, 450);", 'formlist'),
-		new CSubmit('del_deny', _('Delete selected'), null, 'formlist')
+		new CButton('add_deny', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_DENY."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')
 	)
 ));
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);
@@ -159,7 +155,7 @@ if (isset($this->data['usrgrpid'])) {
 else {
 	$userGroupForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('config'))
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 

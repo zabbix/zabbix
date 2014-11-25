@@ -43,13 +43,11 @@ $fields = array(
 	'gui_access' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'),
 	'users_status' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'debug_mode' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
-	'new_right' =>			array(T_ZBX_JSON, O_OPT, null,	null,		null),
-	'right_to_del_read_write' => array(T_ZBX_JSON, O_OPT, null,	null,		null),
-	'right_to_del_read_only' => array(T_ZBX_JSON, O_OPT, null,	null,		null),
-	'right_to_del_deny' =>	array(T_ZBX_JSON, O_OPT, null,	null,		null),
+	'new_right' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'right_to_del' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'group_users_to_del' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'group_users' =>		array(T_ZBX_JSON, O_OPT, null,	null,		null),
-	'group_rights' =>		array(T_ZBX_JSON, O_OPT, null,	null,		null),
+	'group_users' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'group_rights' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'set_users_status' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'set_gui_access' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null),
 	'set_debug_mode' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -121,46 +119,50 @@ elseif (hasRequest('action')) {
 /*
  * Actions
  */
-$groupRights = array();
-foreach (getRequest('group_rights', array()) as $groupId => $permission) {
-	$groupRights[$groupId] = array('id' => $groupId, 'permission' => $permission);
-}
-if (hasRequest('del_deny') && hasRequest('right_to_del_deny')) {
-	foreach (getRequest('right_to_del_deny', array()) as $id) {
-		if (!isset($groupRights[$id])) {
+if (isset($_REQUEST['del_deny']) && isset($_REQUEST['right_to_del']['deny'])) {
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
+
+	foreach ($_REQUEST['right_to_del']['deny'] as $name) {
+		if (!isset($_REQUEST['group_rights'][$name])) {
 			continue;
 		}
 
-		if ($groupRights[$id]['permission'] == PERM_DENY) {
-			unset($groupRights[$id]);
+		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_DENY) {
+			unset($_REQUEST['group_rights'][$name]);
 		}
 	}
 }
-elseif (hasRequest('del_read_only') && hasRequest('right_to_del_read_only')) {
-	foreach (getRequest('right_to_del_read_only') as $id) {
-		if (!isset($groupRights[$id])) {
+elseif (isset($_REQUEST['del_read_only']) && isset($_REQUEST['right_to_del']['read_only'])) {
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
+
+	foreach ($_REQUEST['right_to_del']['read_only'] as $name) {
+		if (!isset($_REQUEST['group_rights'][$name])) {
 			continue;
 		}
 
-		if ($groupRights[$id]['permission'] == PERM_READ) {
-			unset($groupRights[$id]);
+		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_READ) {
+			unset($_REQUEST['group_rights'][$name]);
 		}
 	}
 }
-elseif (hasRequest('del_read_write') && hasRequest('right_to_del_read_write')) {
-	foreach (getRequest('right_to_del_read_write') as $id) {
-		if (!isset($groupRights[$id])) {
+elseif (isset($_REQUEST['del_read_write']) && isset($_REQUEST['right_to_del']['read_write'])) {
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
+
+	foreach ($_REQUEST['right_to_del']['read_write'] as $name) {
+		if (!isset($_REQUEST['group_rights'][$name])) {
 			continue;
 		}
 
-		if ($groupRights[$id]['permission'] == PERM_READ_WRITE) {
-			unset($groupRights[$id]);
+		if ($_REQUEST['group_rights'][$name]['permission'] == PERM_READ_WRITE) {
+			unset($_REQUEST['group_rights'][$name]);
 		}
 	}
 }
-elseif (hasRequest('new_right')) {
-	foreach (getRequest('new_right', array()) as $id => $right) {
-		$groupRights[$id] = array(
+elseif (isset($_REQUEST['new_right'])) {
+	$_REQUEST['group_rights'] = getRequest('group_rights', array());
+
+	foreach ($_REQUEST['new_right'] as $id => $right) {
+		$_REQUEST['group_rights'][$id] = array(
 			'name' => $right['name'],
 			'permission' => $right['permission'],
 			'id' => $id
@@ -174,7 +176,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'gui_access' => getRequest('gui_access'),
 		'debug_mode' => getRequest('debug_mode'),
 		'userids' => getRequest('group_users', array()),
-		'rights' => array_values($groupRights)
+		'rights' => array_values(getRequest('group_rights', array()))
 	);
 
 	DBstart();
@@ -428,23 +430,12 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
-		// Add host group names.
-		$dbGroupsForGroupRights = API::HostGroup()->get(array(
-			'output' => array('name'),
-			'groupids' => array_keys($groupRights),
-			'preservekeys' => true
-		));
-		foreach($groupRights as $groupId => &$groupRight) {
-			$groupRight['name'] = $dbGroupsForGroupRights[$groupId]['name'];
-		}
-		unset($groupRight);
-
 		$data['name'] = getRequest('gname', '');
 		$data['users_status'] = getRequest('users_status', GROUP_STATUS_ENABLED);
 		$data['gui_access'] = getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM);
 		$data['debug_mode'] = getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED);
 		$data['group_users'] = getRequest('group_users', array());
-		$data['group_rights'] = $groupRights;
+		$data['group_rights'] = getRequest('group_rights', array());
 	}
 
 	$data['selected_usrgrp'] = getRequest('selusrgrp', 0);
