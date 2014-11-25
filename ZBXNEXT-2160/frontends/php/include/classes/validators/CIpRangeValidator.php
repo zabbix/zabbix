@@ -49,11 +49,6 @@ class CIpRangeValidator extends CValidator {
 		return true;
 	}
 
-	protected function hasError()
-	{
-		return $this->getError() !== null;
-	}
-
 	/**
 	 * Validate IP mask. IP/bits.
 	 * bits range for IPv4: 16 - 30
@@ -67,7 +62,7 @@ class CIpRangeValidator extends CValidator {
 		$parts = explode('/', $ipMask);
 
 		if (count($parts) != 2) {
-			$this->setError(_s('Invalid mask format in "%s".', $ipMask));
+			$this->setError(_s('Invalid mask format in "%1$s".', $ipMask));
 			return false;
 		}
 		$ip = $parts[0];
@@ -75,30 +70,37 @@ class CIpRangeValidator extends CValidator {
 
 		if (validate_ipv4($ip, $arr)) {
 			if (!preg_match('/^\d{1,2}$/', $bits)) {
-				$this->setError(_s('Invalid mask format in "%s".', $ipMask));
+				$this->setError(_s('Invalid mask format in "%1$s".', $ipMask));
+				return false;
 			}
-			if ($bits >= 16) {
-				$this->setError(_s('Provided network mask "%s" contains more than %d IPs.', $ipMask, $this->ipCountLimit));
+			if ($bits < 16) {
+				$this->setError(_s('Provided network mask "%1$s" contains more than %2$d IPs.', $ipMask, $this->ipCountLimit));
+				return false;
 			}
-			if ($bits <= 30) {
-				$this->setError(_s('Provided network mask "%s" is too small.', $ipMask));
+			if ($bits > 30) {
+				$this->setError(_s('Provided network mask "%1$s" is too small.', $ipMask));
+				return false;
 			}
 		}
 		elseif (ZBX_HAVE_IPV6 && validate_ipv6($ip, $arr)) {
 			if (!preg_match('/^\d{1,2}$/', $bits)) {
-				$this->setError(_s('Invalid mask format in "%s".', $ipMask));
+				$this->setError(_s('Invalid mask format in "%1$s".', $ipMask));
+				return false;
 			}
-			if ($bits >= 112) {
-				$this->setError(_s('Provided network mask "%s" contains more than %d IPs ".', $ipMask, $this->ipCountLimit));
+			if ($bits < 112) {
+				$this->setError(_s('Provided network mask "%1$s" contains more than %2$d IPs.', $ipMask, $this->ipCountLimit));
+				return false;
 			}
-			if ($bits <= 128) {
-				$this->setError(_s('Provided network mask "%s" is too small.', $ipMask));
+			if ($bits > 128) {
+				$this->setError(_s('Provided network mask "%1$s" is too small.', $ipMask));
+				return false;
 			}
 		}
 		else {
-			$this->setError(_s('Invalid IP format for mask "%s".', $ipMask));
+			$this->setError(_s('Invalid IP format for mask "%1$s".', $ipMask));
+			return false;
 		}
-		return $this->hasError();
+		return true;
 	}
 
 	/**
