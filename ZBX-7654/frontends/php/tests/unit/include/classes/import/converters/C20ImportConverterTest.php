@@ -21,6 +21,44 @@
 
 class C20ImportConverterTest extends CImportConverterTest {
 
+	public function testConvertHosts() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(),
+				array(
+					'interfaces' => array(
+						array(
+							'type' => INTERFACE_TYPE_AGENT,
+						),
+						array(
+							'type' => INTERFACE_TYPE_SNMP,
+						)
+					)
+				),
+			)
+		));
+
+		$expectedResult = $this->createExpectedResult(array(
+			'hosts' => array(
+				array(),
+				array(
+					'interfaces' => array(
+						array(
+							'type' => INTERFACE_TYPE_AGENT,
+							'bulk' => SNMP_BULK_ENABLED
+						),
+						array(
+							'type' => INTERFACE_TYPE_SNMP,
+							'bulk' => SNMP_BULK_ENABLED
+						)
+					)
+				),
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	public function testConvertItems() {
 		$source = $this->createSource(array(
 			'hosts' => array(
