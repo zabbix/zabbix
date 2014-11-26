@@ -1428,14 +1428,16 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'selements' => array(
 						array(
+							'selementid' => 1,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-							'selement' => array(
+							'element' => array(
 								'host' => 'host'
 							)
 						),
 						array(
+							'selementid' => 2,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
-							'selement' => array(
+							'element' => array(
 								'description' => 'trigger'
 							)
 						)
