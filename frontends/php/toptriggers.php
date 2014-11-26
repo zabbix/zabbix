@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
@@ -120,10 +121,10 @@ if ($data['filter']['hostids']) {
 		'hostids' => $data['filter']['hostids']
 	));
 
-	foreach ($filterHosts as $host) {
+	foreach ($filterHosts as $filterHost) {
 		$data['multiSelectHostData'][] = array(
-			'id' => $host['hostid'],
-			'name' => $host['name']
+			'id' => $filterHost['hostid'],
+			'name' => $filterHost['name']
 		);
 	}
 }
@@ -185,11 +186,11 @@ while ($row = DBfetch($result)) {
 	$triggersEventCount[$row['objectid']] = $row['cnt_event'];
 }
 
-$triggers = API::Trigger()->get(array(
-	'triggerids' => array_keys($triggersEventCount),
+$data['triggers'] = API::Trigger()->get(array(
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
 	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
 	'selectHosts' => array('hostid', 'status', 'name'),
+	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
 	'preservekeys' => true,
 	'nopermissions' => true
@@ -197,7 +198,7 @@ $triggers = API::Trigger()->get(array(
 
 $hostIds = array();
 
-foreach ($triggers as $triggerId => $trigger) {
+foreach ($data['triggers'] as $triggerId => $trigger) {
 	$hostIds[$trigger['hosts'][0]['hostid']] = $trigger['hosts'][0]['hostid'];
 
 	$triggerItems = array();
@@ -215,36 +216,24 @@ foreach ($triggers as $triggerId => $trigger) {
 		);
 	}
 
-	$triggers[$triggerId]['items'] = $triggerItems;
-	$triggers[$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
+	$data['triggers'][$triggerId]['items'] = $triggerItems;
+	$data['triggers'][$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
 }
 
-CArrayHelper::sort($triggers, array(
+CArrayHelper::sort($data['triggers'], array(
 	array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN),
 	'host', 'description', 'priority'
 ));
 
-$hosts = API::Host()->get(array(
+$data['hosts'] = API::Host()->get(array(
 	'output' => array('hostid', 'status'),
-	'hostids' => $hostIds,
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
+	'hostids' => $hostIds,
 	'preservekeys' => true
 ));
 
-$scripts = API::Script()->getScriptsByHosts($hostIds);
-
-foreach ($triggers as $trigger) {
-	$hostId = $trigger['hosts'][0]['hostid'];
-
-	$trigger['hostName'] = new CSpan($trigger['hosts'][0]['name'],
-		'link_menu menu-host'.(($hosts[$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
-	);
-
-	$trigger['hostName']->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
-
-	$data['triggers'][] = $trigger;
-}
+$data['scripts'] = API::Script()->getScriptsByHosts($hostIds);
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

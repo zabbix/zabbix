@@ -18,19 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$topTriggers= new CWidget(null, 'top-triggers');
 
-$topTriggers->addHeader(_('Most busy triggers top 100'));
+require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
+
+$topTriggers = new CWidget(null, 'top-triggers');
+
+$topTriggers->addHeader(_('Report'));
 
 $filterForm = new CForm('get');
-$filterForm->setAttribute('name',' zbx_filter');
+$filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));
 $filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 $filterTable = new CTable(null, 'filter');
-$filterTable->setCellPadding(0);
-$filterTable->setCellSpacing(0);
 
 $filterTable->addRow(
 	array(
@@ -120,21 +121,21 @@ $filterTable->addRow(array(
 	), 'top')
 ), 'top');
 
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
+$filterButton = new CSubmit('filter_set', _('Filter'));
 $filterButton->useJQueryStyle('main');
 
-$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
+$resetButton = new CSubmit('filter_rst', _('Reset'));
 $resetButton->useJQueryStyle();
 
 $divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
-$divButtons->setAttribute('style', 'padding: 4px 0px;');
+$divButtons->addStyle('padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
 
 $filterForm->addItem($filterTable);
 
 $topTriggers->addFlicker($filterForm, CProfile::get('web.toptriggers.filter.state', 0));
-$topTriggers->addPageHeader(_('Triggers top 100'));
+$topTriggers->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
 
 // table
 $table = new CTableInfo(_('No triggers found.'));
@@ -146,11 +147,18 @@ $table->setHeader(array(
 ));
 
 foreach ($this->data['triggers'] as $trigger) {
+	$hostId = $trigger['hosts'][0]['hostid'];
+
+	$hostName = new CSpan($trigger['hosts'][0]['name'],
+		'link_menu menu-host'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+	);
+	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
+
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
 
 	$table->addRow(array(
-		$trigger['hostName'],
+		$hostName,
 		$triggerDescription,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$trigger['cnt_event']
@@ -158,7 +166,5 @@ foreach ($this->data['triggers'] as $trigger) {
 }
 
 $topTriggers->addItem($table);
-
-require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
 return $topTriggers;

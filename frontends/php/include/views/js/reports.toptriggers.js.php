@@ -1,4 +1,9 @@
 <script type="text/javascript">
+	/**
+	 * Set predefined time period in "Most busy triggers top 100" page filter
+	 *
+	 * @param int period
+	 */
 	function setPeriod(period) {
 		var date = new Date(),
 			newPeriod = [];
@@ -128,31 +133,12 @@
 		updatePeriod(newPeriod);
 	}
 
-	function daysInMonth(year, month) {
-		month++;
-		var days = 31;
-		if (month == 4 || month == 6 || month == 9 || month == 11) {
-			days = 30;
-		}
-		else if (month == 2) {
-			days = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
-		}
-		return days;
-	}
-
-	function addPad(value) {
-		var pad = '00';
-		value = value.toString();
-
-		return pad.substring(0, 2 - value.length) + value;
-	}
-
 	function updatePeriod(data) {
 		// add pad
-		data.fromMonth = addPad(data.fromMonth);
-		data.fromDay = addPad(data.fromDay);
-		data.tillMonth = addPad(data.tillMonth);
-		data.tillDay = addPad(data.tillDay);
+		data.fromMonth = appendZero(data.fromMonth);
+		data.fromDay = appendZero(data.fromDay);
+		data.tillMonth = appendZero(data.tillMonth);
+		data.tillDay = appendZero(data.tillDay);
 
 		// from
 		jQuery('#filter_from_year').val(data.fromYear);
