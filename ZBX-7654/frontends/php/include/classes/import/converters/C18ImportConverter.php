@@ -585,7 +585,7 @@ class C18ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertGraphItemReference(array $array, $key, $hostName = null) {
-		if (!isset($array[$key])) {
+		if (!isset($array[$key]) || !$array[$key]) {
 			return $array;
 		}
 
