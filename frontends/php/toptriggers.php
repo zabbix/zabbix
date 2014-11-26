@@ -182,7 +182,7 @@ elseif (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 }
 $sql .= ' AND '.dbConditionInt('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		' GROUP BY e.objectid'.
-		' ORDER BY cnt_event desc';
+		' ORDER BY cnt_event DESC';
 $result = DBselect($sql, 100);
 while ($row = DBfetch($result)) {
 	$triggersEventCount[$row['objectid']] = $row['cnt_event'];
@@ -201,7 +201,8 @@ $data['triggers'] = API::Trigger()->get(array(
 $hostIds = array();
 
 foreach ($data['triggers'] as $triggerId => $trigger) {
-	$hostIds[$trigger['hosts'][0]['hostid']] = $trigger['hosts'][0]['hostid'];
+	$hostId = $trigger['hosts'][0]['hostid'];
+	$hostIds[$hostId] = $hostId;
 
 	$triggerItems = array();
 
@@ -213,7 +214,8 @@ foreach ($data['triggers'] as $triggerId => $trigger) {
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? HISTORY_GRAPH : HISTORY_VALUES
+					? HISTORY_GRAPH
+					: HISTORY_VALUES
 			)
 		);
 	}
