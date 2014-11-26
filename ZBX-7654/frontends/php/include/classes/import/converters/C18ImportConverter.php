@@ -49,12 +49,12 @@ class C18ImportConverter extends CConverter {
 		$content = $this->separateTemplatesFromHosts($content);
 		$content = $this->convertHosts($content);
 		$content = $this->convertTemplates($content);
-		$content = $this->convertGroups($content);
 
 		$content = $this->convertSysmaps($content);
 
 		$content = $this->convertScreens($content);
 
+		$content = $this->filterDuplicateGroups($content);
 		$content = $this->filterDuplicateTriggers($content);
 		$content = $this->filterDuplicateGraphs($content);
 
@@ -133,7 +133,6 @@ class C18ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$content = $this->mergeToRoot($content['hosts'], $content, 'groups');
 		foreach ($content['hosts'] as &$host) {
 			$host = $this->renameKey($host, 'name', 'host');
 			$host = $this->convertHostInterfaces($host);
@@ -143,8 +142,8 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostGraphs($host, $host['host']);
 
 			$host = $this->wrapChildren($host, 'templates', 'name');
+			$host = $this->wrapChildren($host, 'groups', 'name');
 
-			unset($host['groups']);
 			unset($host['useip']);
 			unset($host['ip']);
 			unset($host['dns']);
@@ -156,8 +155,7 @@ class C18ImportConverter extends CConverter {
 		}
 		unset($host);
 
-		// since trigger and graph conversion requires information about the host they belong to,
-		// merge them after they are converted
+		$content = $this->mergeToRoot($content['hosts'], $content, 'groups');
 		$content = $this->mergeToRoot($content['hosts'], $content, 'triggers');
 		$content = $this->mergeToRoot($content['hosts'], $content, 'graphs');
 		foreach ($content['hosts'] as &$host) {
@@ -180,7 +178,6 @@ class C18ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$content = $this->mergeToRoot($content['templates'], $content, 'groups');
 		foreach ($content['templates'] as &$template) {
 			$template = $this->renameKey($template, 'name', 'template');
 			$template = $this->convertHostItems($template);
@@ -188,13 +185,11 @@ class C18ImportConverter extends CConverter {
 			$template = $this->convertHostGraphs($template, $template['template']);
 
 			$template = $this->wrapChildren($template, 'templates', 'name');
-
-			unset($template['groups']);
+			$template = $this->wrapChildren($template, 'groups', 'name');
 		}
 		unset($template);
 
-		// since trigger and graph conversion requires information about the host they belong to,
-		// merge them after they are converted
+		$content = $this->mergeToRoot($content['templates'], $content, 'groups');
 		$content = $this->mergeToRoot($content['templates'], $content, 'triggers');
 		$content = $this->mergeToRoot($content['templates'], $content, 'graphs');
 		foreach ($content['templates'] as &$host) {
@@ -429,19 +424,24 @@ class C18ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert groups merged into the "groups" element.
+	 * Filters duplicate host groups from the content.
 	 *
 	 * @param array $content
 	 *
 	 * @return array
 	 */
-	protected function convertGroups(array $content) {
+	protected function filterDuplicateGroups(array $content) {
 		if (!isset($content['groups'])) {
 			return $content;
 		}
 
-		$content = $this->wrapChildren($content, 'groups', 'name');
-		$content['groups'] = array_values(zbx_toHash($content['groups'], 'name'));
+		$groups = array();
+
+		foreach ($content['groups'] as $group) {
+			$groups[$group['name']] = $group;
+		}
+
+		$content['groups'] = array_values($groups);
 
 		return $content;
 	}

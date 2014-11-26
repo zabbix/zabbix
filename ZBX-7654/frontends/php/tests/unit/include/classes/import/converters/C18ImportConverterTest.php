@@ -107,11 +107,6 @@ class C18ImportConverterTest extends CImportConverterTest {
 						'Templates',
 					),
 				),
-				array(
-					'name' => 'host4',
-					'status' => HOST_STATUS_MONITORED,
-					'groups' => ''
-				),
 			),
 		));
 
@@ -139,22 +134,38 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'groups' => array(
+						array(
+							'name' => 'Zabbix server'
+						),
+						array(
+							'name' => 'Linux server'
+						),
+					),
 				),
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
-				),
-				array(
-					'host' => 'host4',
-					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'groups' => array(
+						array(
+							'name' => 'Zabbix server'
+						),
+						array(
+							'name' => 'My group'
+						),
+					),
 				),
 			),
 			'templates' => array(
 				array(
-					'template' => 'template'
+					'template' => 'template',
+					'groups' => array(
+						array(
+							'name' => 'Templates'
+						)
+					)
 				)
 			)
 		));
