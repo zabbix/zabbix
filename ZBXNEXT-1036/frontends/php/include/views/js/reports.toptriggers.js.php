@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	/**
-	 * Set predefined time period in "Most busy triggers top 100" page filter
+	 * Set predefined time period in "Most busy triggers top 100" page filter.
 	 *
 	 * @param int period
 	 */
@@ -133,8 +133,18 @@
 		updatePeriod(newPeriod);
 	}
 
+	/**
+	 * Update filter form, set new period in the filter input fields.
+	 *
+	 * @param int data['fromYear']	from year
+	 * @param int data['fromMonth']	from month
+	 * @param int data['fromDay']	from day
+	 * @param int data['tillYear']	till year
+	 * @param int data['tillMonth']	till month
+	 * @param int data['tillDay']	till day
+	 */
 	function updatePeriod(data) {
-		// add pad
+		// append zeroes
 		data.fromMonth = appendZero(data.fromMonth);
 		data.fromDay = appendZero(data.fromDay);
 		data.tillMonth = appendZero(data.tillMonth);

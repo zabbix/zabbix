@@ -532,7 +532,7 @@ function switchElementClass(obj, class1, class2) {
 }
 
 /**
- * Returns the file name of the given path
+ * Returns the file name of the given path.
  *
  * @param string path
  * @param string suffix
@@ -550,7 +550,7 @@ function basename(path, suffix) {
 }
 
 /**
- * Return the number of days in a month
+ * Return the number of days in a month.
  *
  * @param int year
  * @param int month
@@ -570,7 +570,7 @@ function daysInMonth(year, month) {
 }
 
 /**
- * Transform datetime parts to two digits e.g., 2 becomes 02
+ * Transform datetime parts to two digits e.g., 2 becomes 02.
  *
  * @param int val
  *
