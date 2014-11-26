@@ -259,40 +259,27 @@ foreach ($this->data['items'] as $item) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('item.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected items?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('item.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected items?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('item.massupdateform', _('Mass update'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('item.masscopyto', _('Copy selected to ...'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('item.massclearhistory', _('Clear history for selected'));
-$goOption->setAttribute('confirm', _('Delete history of selected items?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('item.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected items?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$itemForm->addItem(array(
+	$this->data['paging'],
+	$itemTable,
+	$this->data['paging'],
+	get_table_header(new CActionGoButtonGroup(
+		'group_itemid',
+		array(
+			'item.massenable' => array(_('Enable'), _('Enable selected items?')),
+			'item.massdisable' => array(_('Disable'), _('Disable selected items?')),
+			'item.massclearhistory' => array(_('Clear history'), _('Delete history of selected items?')),
+			'item.masscopyto' => _('Copy'),
+			'item.massupdateform' => _('Mass update'),
+			'item.massdelete' => array(_('Delete'), _('Delete selected items?'))
+		),
+		'action',
+		$this->data['hostid']
+	))
+));
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

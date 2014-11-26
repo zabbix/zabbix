@@ -110,27 +110,20 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('mediatype.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected media types?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('mediatype.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected media types?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('mediatype.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected media types?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
-
 // append table to form
-$mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$mediaTypeForm->addItem(array(
+	$this->data['paging'],
+	$mediaTypeTable,
+	$this->data['paging'],
+	get_table_header(new CActionGoButtonGroup(
+		'mediatypeids',
+		array(
+			'mediatype.massenable' => array(_('Enable'), _('Enable selected media types?')),
+			'mediatype.massdisable' => array(_('Disable'), _('Disable selected media types?')),
+			'mediatype.massdelete' => array(_('Delete'), _('Delete selected media types?'))
+		)
+	))
+));
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);

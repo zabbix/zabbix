@@ -106,30 +106,23 @@ foreach ($this->data['items'] as $item) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('itemprototype.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('itemprototype.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected item prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('itemprototype.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected item prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
-$itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$itemForm->addItem(array(
+	$this->data['paging'],
+	$itemTable,
+	$this->data['paging'],
+	get_table_header(new CActionGoButtonGroup(
+		'group_itemid',
+		array(
+			'itemprototype.massenable' => array(_('Enable'), _('Enable selected item prototypes?')),
+			'itemprototype.massdisable' => array(_('Disable'), _('Disable selected item prototypes?')),
+			'itemprototype.massdelete' => array(_('Delete'), _('Delete selected item prototypes?'))
+		),
+		$this->data['parent_discoveryid']
+	))
+));
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

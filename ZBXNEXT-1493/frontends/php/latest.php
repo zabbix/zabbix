@@ -884,14 +884,26 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$goBox = new CComboBox('graphtype', GRAPH_TYPE_STACKED, null, array(
-	GRAPH_TYPE_STACKED => _('Display stacked graph'),
-	GRAPH_TYPE_NORMAL => _('Display graph')
+$form->addItem(array(
+	$table,
+	get_table_header(new CGoButtonGroup(
+		'graphtype',
+		'itemids',
+		array(
+			GRAPH_TYPE_STACKED => _('Display stacked graph'),
+			GRAPH_TYPE_NORMAL => _('Display graph')
+		)
+	))
 ));
-$goBox->setAttribute('id', 'action');
-$goButton = new CSubmit('goButton', _('Go').' (0)');
 
-$form->addItem(array($table, get_table_header(array($goBox, $goButton))));
+//$form->addItem(array(
+//	$table,
+//	get_table_header(array(
+//		new CSpan('0 selected', null, 'selectedCount'),
+//		new CGoButton('graphtype', GRAPH_TYPE_STACKED, _('Display stacked graph')),
+//		new CGoButton('graphtype', GRAPH_TYPE_NORMAL, _('Display graph'))
+//	))
+//));
 
 $latestWidget->addItem($form);
 $latestWidget->show();

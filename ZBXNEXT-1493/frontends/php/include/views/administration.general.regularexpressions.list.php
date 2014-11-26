@@ -61,17 +61,12 @@ foreach($this->data['regexps'] as $regexpid => $regexp) {
 	));
 }
 
-$goBox = new CComboBox('action');
-
-$goOption = new CComboItem('regexp.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
-$goBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
-
-$regExpTable->setFooter(new CCol(array($goBox, $goButton)));
+$regExpTable->setFooter(new CCol(new CActionGoButtonGroup(
+	'regexpids',
+	array(
+		'regexp.massdelete' => array(_('Delete'), _('Delete selected regular expressions?'))
+	)
+)));
 
 $regExpForm->addItem($regExpTable);
 
