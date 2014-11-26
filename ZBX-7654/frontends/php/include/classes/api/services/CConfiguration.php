@@ -84,7 +84,7 @@ class CConfiguration extends CApiService {
 			new C20ImportConverter(new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#')))
 		);
 
-		$adapter = new СImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
+		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($data);
 
 		$configurationImport = new CConfigurationImport(
