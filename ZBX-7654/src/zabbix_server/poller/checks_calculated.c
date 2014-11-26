@@ -137,7 +137,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL,
+	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
 		ret = NOTSUPPORTED;
 

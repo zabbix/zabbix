@@ -253,15 +253,6 @@ class CTag extends CObject {
 		}
 	}
 
-	public function setEnabled($value = 'yes') {
-		if ((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0)) {
-			unset($this->attributes['disabled']);
-		}
-		elseif ((is_string($value) && ($value == 'no' || $value == 'disabled' || $value == 'off') || $value == '0') || (is_int($value) && $value == 0)) {
-			$this->attributes['disabled'] = 'disabled';
-		}
-	}
-
 	public function error($value) {
 		error('class('.get_class($this).') - '.$value);
 		return 1;
