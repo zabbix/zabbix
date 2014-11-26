@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 14:09+0200\n"
-"PO-Revision-Date: 2014-10-12 20:50+0300\n"
+"POT-Creation-Date: 2014-11-26 15:05+0200\n"
+"PO-Revision-Date: 2014-11-20 08:19+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1413139801.0\n"
+"X-POOTLE-MTIME: 1416464357.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -198,7 +198,7 @@ msgstr "5 minút"
 msgid "5 seconds"
 msgstr "5 sekúnd"
 
-#: include/views/monitoring.history.php:75
+#: include/views/monitoring.history.php:91
 msgid "500 latest values"
 msgstr "500 posledných hodnôt"
 
@@ -255,7 +255,7 @@ msgstr "Absolútny rozdiel medzi poslednou a predchádzajúcou hodnotou NIE JE N
 
 #: report3.php:83 srv_status.php:143
 msgid "Acceptable SLA"
-msgstr "Akceptovateľná SLA"
+msgstr "Akceptovaná SLA"
 
 #: sysmap.php:76
 msgid "Access denied!"
@@ -516,7 +516,7 @@ msgstr "Aktívny do"
 #: include/views/js/configuration.sysmap.edit.js.php:32
 #: include/views/js/configuration.sysmaps.js.php:191
 #: include/views/js/configuration.sysmaps.js.php:404
-#: include/views/monitoring.history.php:115 jsLoader.php:182
+#: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
 msgid "Add"
@@ -797,7 +797,7 @@ msgstr "Typ plochy"
 msgid "As is"
 msgstr "Ponechať"
 
-#: include/views/monitoring.history.php:79
+#: include/views/monitoring.history.php:95
 msgid "As plain text"
 msgstr "Ako obyčajný text"
 
@@ -1051,7 +1051,7 @@ msgstr "Bitové A poslednej hodnoty T a maska NIE JE N"
 
 #: include/classes/core/ZBase.php:251
 msgid "Black & Blue"
-msgstr "Čierna a modrá"
+msgstr "Čierno modrá"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
@@ -1287,7 +1287,7 @@ msgstr "Vypočíta MD5 kontrolný súčet súboru. Reťazec MD5 hash súboru. M�
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr "Výpočet SLA, akceptovateľná SLA (v %)"
+msgstr "Výpočet SLA, akceptovaná SLA (v %)"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:515
@@ -5542,7 +5542,7 @@ msgstr "Vyplnená oblasť"
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:146
+#: include/views/monitoring.history.php:162
 #: include/views/monitoring.overview.items.php:82 latest.php:420
 #: report2.php:383
 msgid "Filter"
@@ -5823,7 +5823,7 @@ msgstr "Čiara s gradientom"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:293
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:72 latest.php:578 latest.php:765
+#: include/views/monitoring.history.php:88 latest.php:578 latest.php:765
 #: report2.php:397
 msgid "Graph"
 msgstr "Graf"
@@ -5965,7 +5965,7 @@ msgstr "Sumár grafov"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:233 popup.php:1296 popup.php:1302
+#: include/views/monitoring.history.php:249 popup.php:1296 popup.php:1302
 msgid "Graph type"
 msgstr "Typ grafu"
 
@@ -6236,7 +6236,7 @@ msgstr "Skryť vypnuté spúšťače"
 msgid "Hide filter"
 msgstr "Skryť filter"
 
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:146
 msgid "Hide selected"
 msgstr "Skryť označené"
 
@@ -6684,7 +6684,7 @@ msgstr "Info o hostovi"
 #: include/views/monitoring.overview.items.php:58
 #: include/views/monitoring.overview.triggers.php:80
 msgid "Hosts location"
-msgstr "Umiestnenie hostov"
+msgstr "Zobrazenie hostov"
 
 #: hosts.php:362
 msgid "Hosts updated"
@@ -7143,7 +7143,7 @@ msgstr "Nesprávna hodnota SSL verifikácie certifikátu hosta pre web scenár \
 #: include/classes/api/services/CService.php:959
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr "Neplatná akceptovateľná SLA pre službu \"%1$s\"."
+msgstr "Neplatná akceptovaná SLA pre službu \"%1$s\"."
 
 #: include/classes/validators/CActionCondValidator.php:134
 msgid "Incorrect action condition discovery check."
@@ -8332,7 +8332,7 @@ msgstr "Položka používa rozhranie z nie nadriadeného hosta."
 msgid "Item uses incorrect interface type."
 msgstr "Položka používa neplatný typ rozhrania."
 
-#: chart.php:89
+#: chart.php:94 chart.php:97
 msgid "Item values"
 msgstr "Hodnoty položky"
 
@@ -8405,7 +8405,7 @@ msgstr "Položka skopírovaná"
 msgid "Items deleted"
 msgstr "Položky zmazané"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:139
 msgid "Items list"
 msgstr "Zoznam položiek"
 
@@ -9171,11 +9171,11 @@ msgstr "Marec"
 msgid "Mark elements on trigger status change"
 msgstr "Označ elementy pri zmene stavu spúšťača"
 
-#: include/views/monitoring.history.php:132
+#: include/views/monitoring.history.php:148
 msgid "Mark others"
 msgstr "Označiť ostatné"
 
-#: include/views/monitoring.history.php:131
+#: include/views/monitoring.history.php:147
 msgid "Mark selected"
 msgstr "Označiť vybrané"
 
@@ -9438,7 +9438,7 @@ msgstr[2] "Minimálna časová perióda na zobrazenie je %1$s hodín."
 #: include/views/common.filter.trigger.php:67
 #: include/views/configuration.sysmap.edit.php:132
 msgid "Minimum trigger severity"
-msgstr "Minimálna závažnosť spúšťača"
+msgstr "Minimálna závažnosť spúšťačov"
 
 #: popup_trexpr.php:269
 msgid "Minimum value for period T is < N"
@@ -10563,7 +10563,7 @@ msgid "None"
 msgstr "Žiadna"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1484 include/views/monitoring.history.php:226
+#: include/triggers.inc.php:1484 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "Normálny"
@@ -12055,7 +12055,7 @@ msgstr "Zmazať host"
 msgid "Remove link"
 msgstr "Zmazať linku"
 
-#: include/views/monitoring.history.php:120
+#: include/views/monitoring.history.php:136
 msgid "Remove selected"
 msgstr "Zmazať označené"
 
@@ -12843,13 +12843,13 @@ msgstr "Vybrať"
 msgid "Select prototype"
 msgstr "Označ prototyp"
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:140
 msgid "Select rows with value like"
 msgstr "Označ riadky s hodnotou obsahujúcou"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:145
+#: include/views/monitoring.history.php:161
 msgid "Selected"
 msgstr "Označené"
 
@@ -13072,7 +13072,7 @@ msgstr "Zobraziť udalosti max \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Zobrazovať udalosti nie staršie ako (v dňoch)"
+msgstr "Nezobrazovať udalosti staršie ako (v dňoch)"
 
 #: adm.gui.php:75
 #, c-format
@@ -13104,7 +13104,7 @@ msgstr "Zobrazovať legendu"
 msgid "Show lines"
 msgstr "Zobraziť riadky"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:145
 msgid "Show selected"
 msgstr "Zobraziť označené"
 
@@ -13356,7 +13356,7 @@ msgstr "Špecifikujte podmienku filtra pre zobrazenie hodnôt."
 msgid "Speed"
 msgstr "Rýchlosť"
 
-#: include/graphs.inc.php:25 include/views/monitoring.history.php:230
+#: include/graphs.inc.php:25 include/views/monitoring.history.php:246
 #: popup.php:1363
 msgid "Stacked"
 msgstr "Skladaný"
@@ -15463,7 +15463,7 @@ msgstr "Hodnota nejakého počítadla výkonu, kde parameter \"counter\" je poč
 msgid "Value: no data"
 msgstr "Hodnota: bez údajov"
 
-#: include/views/monitoring.history.php:74
+#: include/views/monitoring.history.php:90
 msgid "Values"
 msgstr "Hodnoty"
 
@@ -16127,15 +16127,15 @@ msgstr "všetky"
 msgid "all media"
 msgstr "všetky médiá"
 
-#: include/views/monitoring.history.php:139
+#: include/views/monitoring.history.php:155
 msgid "as Blue"
 msgstr "na modro"
 
-#: include/views/monitoring.history.php:138
+#: include/views/monitoring.history.php:154
 msgid "as Green"
 msgstr "na zeleno"
 
-#: include/views/monitoring.history.php:137
+#: include/views/monitoring.history.php:153
 msgid "as Red"
 msgstr "na červeno"
 
@@ -16486,7 +16486,7 @@ msgstr "regulárny výraz"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "zapamätať si výbery"
+msgstr "pamätať si vybrané položky"
 
 #: include/services.inc.php:69 include/services.inc.php:70
 #: include/services.inc.php:157

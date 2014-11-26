@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 14:09+0200\n"
-"PO-Revision-Date: 2014-11-12 10:33+0300\n"
+"POT-Creation-Date: 2014-11-26 15:05+0200\n"
+"PO-Revision-Date: 2014-11-21 15:12+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415781220.0\n"
+"X-POOTLE-MTIME: 1416575567.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -188,7 +188,7 @@ msgstr "5 minutos"
 msgid "5 seconds"
 msgstr "5 segundos"
 
-#: include/views/monitoring.history.php:75
+#: include/views/monitoring.history.php:91
 msgid "500 latest values"
 msgstr "últimos 500 valores"
 
@@ -504,7 +504,7 @@ msgstr "Ativo até"
 #: include/views/js/configuration.sysmap.edit.js.php:32
 #: include/views/js/configuration.sysmaps.js.php:191
 #: include/views/js/configuration.sysmaps.js.php:404
-#: include/views/monitoring.history.php:115 jsLoader.php:182
+#: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
 msgid "Add"
@@ -785,7 +785,7 @@ msgstr "Tipo de área"
 msgid "As is"
 msgstr "Sem alterar"
 
-#: include/views/monitoring.history.php:79
+#: include/views/monitoring.history.php:95
 msgid "As plain text"
 msgstr "Como texto puro"
 
@@ -5496,7 +5496,7 @@ msgstr "Região preenchida"
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:146
+#: include/views/monitoring.history.php:162
 #: include/views/monitoring.overview.items.php:82 latest.php:420
 #: report2.php:383
 msgid "Filter"
@@ -5777,7 +5777,7 @@ msgstr "Área gradiente"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:293
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:72 latest.php:578 latest.php:765
+#: include/views/monitoring.history.php:88 latest.php:578 latest.php:765
 #: report2.php:397
 msgid "Graph"
 msgstr "Gráfico"
@@ -5919,7 +5919,7 @@ msgstr "Somatória do gráfico"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:233 popup.php:1296 popup.php:1302
+#: include/views/monitoring.history.php:249 popup.php:1296 popup.php:1302
 msgid "Graph type"
 msgstr "Tipo do gráfico"
 
@@ -6189,7 +6189,7 @@ msgstr "Esconder triggers inativas"
 msgid "Hide filter"
 msgstr "Esconder filtro"
 
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:146
 msgid "Hide selected"
 msgstr "Esconder selecionados"
 
@@ -8281,7 +8281,7 @@ msgstr "O item utiliza uma interface de host que não é herdada."
 msgid "Item uses incorrect interface type."
 msgstr "O item usa uma interface de tipo inválido."
 
-#: chart.php:89
+#: chart.php:94 chart.php:97
 msgid "Item values"
 msgstr "Valores do item"
 
@@ -8354,7 +8354,7 @@ msgstr "Itens copiados"
 msgid "Items deleted"
 msgstr "Itens removidos"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:139
 msgid "Items list"
 msgstr "Lista de itens"
 
@@ -9124,11 +9124,11 @@ msgstr "Março"
 msgid "Mark elements on trigger status change"
 msgstr "Destacar elementos com modificação de status em trigger"
 
-#: include/views/monitoring.history.php:132
+#: include/views/monitoring.history.php:148
 msgid "Mark others"
 msgstr "Marcar outros"
 
-#: include/views/monitoring.history.php:131
+#: include/views/monitoring.history.php:147
 msgid "Mark selected"
 msgstr "Marcar selecionados"
 
@@ -10516,7 +10516,7 @@ msgid "None"
 msgstr "Nenhum"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1484 include/views/monitoring.history.php:226
+#: include/triggers.inc.php:1484 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "Normal"
@@ -12007,7 +12007,7 @@ msgstr "Remover servidor"
 msgid "Remove link"
 msgstr "Remover link"
 
-#: include/views/monitoring.history.php:120
+#: include/views/monitoring.history.php:136
 msgid "Remove selected"
 msgstr "Remover selecionado"
 
@@ -12797,13 +12797,13 @@ msgstr "Selecionar"
 msgid "Select prototype"
 msgstr "Selecione o protótipo"
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:140
 msgid "Select rows with value like"
 msgstr "Selecionar registros com valores como"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:145
+#: include/views/monitoring.history.php:161
 msgid "Selected"
 msgstr "Selecionado"
 
@@ -12976,7 +12976,7 @@ msgstr "Sessão terminada, conecte-se novamente por favor."
 #: include/views/configuration.triggers.massupdate.php:69 popup.php:972
 #: report5.php:60 tr_logform.php:340 tr_status.php:289
 msgid "Severity"
-msgstr "Risco"
+msgstr "Severidade"
 
 #: include/views/configuration.screen.constructor.edit.php:436
 msgid "Severity (descending)"
@@ -13059,7 +13059,7 @@ msgstr "Mostrar legenda"
 msgid "Show lines"
 msgstr "Mostrar linhas"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:145
 msgid "Show selected"
 msgstr "Mostrar selecionados"
 
@@ -13310,7 +13310,7 @@ msgstr "Especifique alguma condição de filtro para visualizar os valores."
 msgid "Speed"
 msgstr "Velocidade"
 
-#: include/graphs.inc.php:25 include/views/monitoring.history.php:230
+#: include/graphs.inc.php:25 include/views/monitoring.history.php:246
 #: popup.php:1363
 msgid "Stacked"
 msgstr "Pilha"
@@ -14910,7 +14910,7 @@ msgstr "Usar multiplicador customizado"
 
 #: popup_media.php:129
 msgid "Use if severity"
-msgstr "Usar se risco"
+msgstr "Usar se severidade"
 
 #: include/views/administration.mediatypes.list.php:42
 msgid "Used in actions"
@@ -15410,7 +15410,7 @@ msgstr "Valor de qualquer contador de performance, onde \"counter\" é o parâme
 msgid "Value: no data"
 msgstr "Valor: sem dados"
 
-#: include/views/monitoring.history.php:74
+#: include/views/monitoring.history.php:90
 msgid "Values"
 msgstr "Valores"
 
@@ -16073,15 +16073,15 @@ msgstr "todos"
 msgid "all media"
 msgstr "todas as mídias"
 
-#: include/views/monitoring.history.php:139
+#: include/views/monitoring.history.php:155
 msgid "as Blue"
 msgstr "em Azul"
 
-#: include/views/monitoring.history.php:138
+#: include/views/monitoring.history.php:154
 msgid "as Green"
 msgstr "em Verde"
 
-#: include/views/monitoring.history.php:137
+#: include/views/monitoring.history.php:153
 msgid "as Red"
 msgstr "em Vermelho"
 
