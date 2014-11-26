@@ -37,9 +37,9 @@ class C20ImportConverter extends CConverter {
 
 		$content['version'] = '3.0';
 
-		$content = $this->convertItems($content);
+		$content = $this->convertHosts($content);
+		$content = $this->convertTemplates($content);
 		$content = $this->convertTriggers($content);
-		$content = $this->convertDiscoveryRules($content);
 
 		$value['zabbix_export'] = $content;
 
@@ -47,25 +47,66 @@ class C20ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert item elements.
+	 * Convert host elements.
 	 *
 	 * @param array $content
 	 *
 	 * @return array
 	 */
-	public function convertItems(array $content) {
-		if (!isset($content['items']) || !$content['items']) {
+	protected function convertHosts(array $content) {
+		if (!isset($content['hosts']) || !$content['hosts']) {
 			return $content;
 		}
 
-		foreach ($content['items'] as &$item) {
+		foreach ($content['hosts'] as &$host) {
+			$host = $this->convertItems($host);
+			$host = $this->convertDiscoveryRules($host);
+		}
+		unset($host);
+
+		return $content;
+	}
+
+	/**
+	 * Convert template elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertTemplates(array $content) {
+		if (!isset($content['templates']) || !$content['templates']) {
+			return $content;
+		}
+
+		foreach ($content['templates'] as &$template) {
+			$template = $this->convertDiscoveryRules($template);
+		}
+		unset($template);
+
+		return $content;
+	}
+
+	/**
+	 * Convert item elements.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertItems(array $host) {
+		if (!isset($host['items']) || !$host['items']) {
+			return $host;
+		}
+
+		foreach ($host['items'] as &$item) {
 			if (isset($item['status']) && $item['status'] == ITEM_STATUS_NOTSUPPORTED) {
 				$item['status'] = ITEM_STATUS_ACTIVE;
 			}
 		}
 		unset($item);
 
-		return $content;
+		return $host;
 	}
 
 	/**
@@ -75,7 +116,7 @@ class C20ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	public function convertTriggers(array $content) {
+	protected function convertTriggers(array $content) {
 		if (!isset($content['triggers']) || !$content['triggers']) {
 			return $content;
 		}
@@ -91,16 +132,16 @@ class C20ImportConverter extends CConverter {
 	/**
 	 * Convert discovery rule elements.
 	 *
-	 * @param array $content
+	 * @param array $host
 	 *
 	 * @return array
 	 */
-	public function convertDiscoveryRules(array $content) {
-		if (!isset($content['discovery_rules']) || !$content['discovery_rules']) {
-			return $content;
+	protected function convertDiscoveryRules(array $host) {
+		if (!isset($host['discovery_rules']) || !$host['discovery_rules']) {
+			return $host;
 		}
 
-		foreach ($content['discovery_rules'] as &$rule) {
+		foreach ($host['discovery_rules'] as &$rule) {
 			if (isset($rule['status']) && $rule['status'] == ITEM_STATUS_NOTSUPPORTED) {
 				$rule['status'] = ITEM_STATUS_ACTIVE;
 			}
@@ -110,7 +151,7 @@ class C20ImportConverter extends CConverter {
 		}
 		unset($rule);
 
-		return $content;
+		return $host;
 	}
 
 	/**
@@ -120,7 +161,7 @@ class C20ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	public function convertTriggerPrototypes(array $rule) {
+	protected function convertTriggerPrototypes(array $rule) {
 		if (!isset($rule['trigger_prototypes']) || !$rule['trigger_prototypes']) {
 			return $rule;
 		}
