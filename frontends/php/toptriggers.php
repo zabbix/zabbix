@@ -64,19 +64,21 @@ $timeTill = hasRequest('filter_till') ? zbxDateToTime(getRequest('filter_till'))
 if (hasRequest('filter_set')) {
 	// prepare severity array
 	$severities = hasRequest('severities') ? array_keys(getRequest('severities')) : array();
+
 	CProfile::updateArray('web.toptriggers.filter.severities', $severities, PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', array()), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', array()), PROFILE_TYPE_STR);
+	CProfile::update('web.toptriggers.filter.from', $timeFrom, PROFILE_TYPE_STR);
+	CProfile::update('web.toptriggers.filter.till', $timeTill, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
 	CProfile::deleteIdx('web.toptriggers.filter.severities');
 	CProfile::deleteIdx('web.toptriggers.filter.groupids');
 	CProfile::deleteIdx('web.toptriggers.filter.hostids');
+	CProfile::delete('web.toptriggers.filter.from');
+	CProfile::delete('web.toptriggers.filter.till');
 	DBend();
-
-	$timeFrom = $today;
-	$timeTill = $tomorrow;
 }
 
 if (!hasRequest('filter_set')) {
@@ -92,8 +94,8 @@ $data['filter'] = array(
 	'severities' => CProfile::getArray('web.toptriggers.filter.severities', $defaultSeverities),
 	'groupids' => CProfile::getArray('web.toptriggers.filter.groupids'),
 	'hostids' => CProfile::getArray('web.toptriggers.filter.hostids'),
-	'filter_from' => $timeFrom,
-	'filter_till' => $timeTill
+	'filter_from' => CProfile::get('web.toptriggers.filter.from', $today),
+	'filter_till' => CProfile::get('web.toptriggers.filter.till', $tomorrow)
 );
 
 
@@ -137,8 +139,8 @@ $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' WHERE t.triggerid=e.objectid'.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.clock>='.zbx_dbstr($timeFrom).
-			' AND e.clock<='.zbx_dbstr($timeTill).
+			' AND e.clock>='.zbx_dbstr($data['filter']['filter_from']).
+			' AND e.clock<='.zbx_dbstr($data['filter']['filter_till']).
 			' AND '.dbConditionInt('t.priority', $data['filter']['severities']);
 
 if ($data['filter']['hostids']) {
