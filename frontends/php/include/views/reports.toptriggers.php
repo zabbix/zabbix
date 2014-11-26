@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
 $topTriggers = new CWidget(null, 'top-triggers');
-
 $topTriggers->addHeader(_('Report'));
 
 $filterForm = new CForm('get');
