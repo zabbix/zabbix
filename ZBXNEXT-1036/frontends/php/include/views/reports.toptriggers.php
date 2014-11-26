@@ -47,27 +47,27 @@ $periodTable->addRow(array(
 $periodTable->addRow(array(
 	new CCol(null, 'label'),
 	new CCol(array(
-		new CButton('quickTimeInput', _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
-		new CButton('quickTimeInput', _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
+		new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
+		new CButton(null, _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
 			'link_menu period-link'
 		),
-		new CButton('quickTimeInput', _('Current week'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');',
+		new CButton(null, _('Current week'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');',
 			'link_menu period-link'
 		),
-		new CButton('quickTimeInput', _('Current month'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');',
+		new CButton(null, _('Current month'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');',
 			'link_menu period-link'
 		),
-		new CButton('quickTimeInput', _('Current year'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');',
+		new CButton(null, _('Current year'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');',
 			'link_menu period-link'
 		),
 		BR(),
-		new CButton('quickTimeInput', _('Last week'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');',
+		new CButton(null, _('Last week'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');',
 			'link_menu'
 		),
-		new CButton('quickTimeInput', _('Last month'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');',
+		new CButton(null, _('Last month'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');',
 			'link_menu period-link'
 		),
-		new CButton('quickTimeInput', _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
+		new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu period-link'
 		)
 	))
