@@ -1221,6 +1221,82 @@ class C18ImportConverterTest extends CImportConverterTest {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertMacros() {
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'macros' => ''
+				),
+				array(
+					'name' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'macros' => array(
+						array(
+							'name' => '{$MACRO}',
+							'value' => 'value',
+						)
+					)
+				),
+				array(
+					'name' => 'template',
+					'status' => HOST_STATUS_TEMPLATE,
+					'macros' => array(
+						array(
+							'name' => '{$MACRO}',
+							'value' => 'value',
+						)
+					)
+				),
+			),
+		));
+
+		$expectedResult = $this->createExpectedResult(array(
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'macros' => ''
+				),
+				array(
+					'host' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'macros' => array(
+						array(
+							'macro' => '{$MACRO}',
+							'value' => 'value',
+						)
+					)
+				)
+			),
+			'templates' => array(
+				array(
+					'template' => 'template',
+					'macros' => array(
+						array(
+							'macro' => '{$MACRO}',
+							'value' => 'value',
+						)
+					)
+				)
+			)
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	public function testConvertSysmaps() {
 		$this->assertConvert(
 			$this->createExpectedResult(array()),

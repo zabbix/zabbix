@@ -100,7 +100,7 @@ class C18ImportConverter extends CConverter {
 			}
 
 			$template = array();
-			foreach (array('name', 'groups', 'items', 'templates', 'triggers', 'graphs') as $key) {
+			foreach (array('name', 'groups', 'items', 'templates', 'triggers', 'graphs', 'macros') as $key) {
 				if (isset($host[$key])) {
 					$template[$key] = $host[$key];
 				}
@@ -140,6 +140,7 @@ class C18ImportConverter extends CConverter {
 			$host = $this->convertHostItems($host);
 			$host = $this->convertHostTriggers($host, $host['host']);
 			$host = $this->convertHostGraphs($host, $host['host']);
+			$host = $this->convertHostMacros($host);
 
 			$host = $this->wrapChildren($host, 'templates', 'name');
 			$host = $this->wrapChildren($host, 'groups', 'name');
@@ -183,6 +184,7 @@ class C18ImportConverter extends CConverter {
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
 			$template = $this->convertHostGraphs($template, $template['template']);
+			$template = $this->convertHostMacros($template);
 
 			$template = $this->wrapChildren($template, 'templates', 'name');
 			$template = $this->wrapChildren($template, 'groups', 'name');
@@ -640,6 +642,26 @@ class C18ImportConverter extends CConverter {
 		$content['graphs'] = $filteredGraphs;
 
 		return $content;
+	}
+
+	/**
+	 * Converts host macro elements.
+	 *
+	 * @param array 	$host
+	 *
+	 * @return array
+	 */
+	protected function convertHostMacros(array $host) {
+		if (!isset($host['macros']) || !$host['macros']) {
+			return $host;
+		}
+
+		foreach ($host['macros'] as &$macro) {
+			$macro = $this->renameKey($macro, 'name', 'macro');
+		}
+		unset($macro);
+
+		return $host;
 	}
 
 	/**
