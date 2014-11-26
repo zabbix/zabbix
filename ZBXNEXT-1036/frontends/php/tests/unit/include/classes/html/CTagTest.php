@@ -21,40 +21,21 @@
 
 abstract class CTagTest extends PHPUnit_Framework_TestCase {
 
-	abstract public function itemProvider();
+	public abstract function constructProvider();
 
 	/**
-	 * @dataProvider itemProvider
+	 * @dataProvider constructProvider
 	 *
-	 * @param $items
-	 * @param $expectedResult
+	 * @param array $params
+	 * @param string $expectedHtml
 	 */
-	public function testContruct($items, $expectedResult) {
-		$tag = $this->createTag($items);
-		$this->assertEquals($expectedResult, (string) $tag);
+	public function testConstruct(array $params, $expectedHtml) {
+		$tag = call_user_func_array(array($this, 'createTag'), $params);
+		$this->assertEquals($expectedHtml, (string) $tag);
 	}
 
 	/**
-	 * @dataProvider itemProvider
-	 *
-	 * @param $items
-	 * @param $expectedResult
-	 */
-	public function testAddItems($items, $expectedResult) {
-		$tag = $this->createTag();
-		$tag->addItem($items);
-		$this->assertEquals($expectedResult, (string) $tag);
-	}
-
-	abstract public function testClass();
-	abstract public function testId();
-
-	/**
-	 * @param mixed $items
-	 * @param string $class
-	 * @param string $id
-	 *
 	 * @return CTag
 	 */
-	abstract public function createTag($items = null, $class = null, $id = null);
+	abstract protected function createTag();
 }

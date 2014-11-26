@@ -73,8 +73,6 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 			}
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "unexpected exception [%08X] in process_eventlog()",
-					excpointers->ExceptionRecord->ExceptionCode);
 			disposition = EXCEPTION_CONTINUE_SEARCH;
 			break;
 	}

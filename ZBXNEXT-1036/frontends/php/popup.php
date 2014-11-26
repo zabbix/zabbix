@@ -470,7 +470,7 @@ if (isset($onlyHostid)) {
 
 	$cmbHosts = new CComboBox('hostid', $hostid);
 	$cmbHosts->addItem($hostid, $host['name']);
-	$cmbHosts->setEnabled('disabled');
+	$cmbHosts->setEnabled(false);
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
@@ -691,7 +691,7 @@ elseif ($srctbl == 'templates') {
 		if (isset($excludeids[$template['templateid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -765,7 +765,7 @@ elseif ($srctbl == 'hosts') {
 		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -840,7 +840,7 @@ elseif ($srctbl == 'host_templates') {
 		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -910,7 +910,7 @@ elseif ($srctbl == 'host_groups') {
 		if (isset($excludeids[$hostgroup['groupid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}

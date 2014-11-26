@@ -121,11 +121,10 @@ $filterTable->addRow(array(
 	), 'top')
 ), 'top');
 
-$filterButton = new CSubmit('filter_set', _('Filter'));
-$filterButton->useJQueryStyle('main');
+$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
+$filterButton->main();
 
-$resetButton = new CSubmit('filter_rst', _('Reset'));
-$resetButton->useJQueryStyle();
+$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
 $divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 $divButtons->addStyle('padding: 4px 0px;');
