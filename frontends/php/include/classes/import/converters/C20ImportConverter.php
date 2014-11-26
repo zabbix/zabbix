@@ -59,6 +59,7 @@ class C20ImportConverter extends CConverter {
 		}
 
 		foreach ($content['hosts'] as &$host) {
+			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertItems($host);
 			$host = $this->convertDiscoveryRules($host);
 		}
@@ -105,6 +106,28 @@ class C20ImportConverter extends CConverter {
 			}
 		}
 		unset($item);
+
+		return $host;
+	}
+
+	/**
+	 * Convert interface elements.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertHostInterfaces(array $host) {
+		if (!isset($host['interfaces'])) {
+			return $host;
+		}
+
+		foreach ($host['interfaces'] as &$interface) {
+			if (!isset($interface['bulk'])) {
+				$interface['bulk'] = SNMP_BULK_ENABLED;
+			}
+		}
+		unset($interface);
 
 		return $host;
 	}
