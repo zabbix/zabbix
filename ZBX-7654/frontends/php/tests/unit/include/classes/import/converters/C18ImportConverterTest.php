@@ -1387,7 +1387,12 @@ class C18ImportConverterTest extends CImportConverterTest {
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 							'elementid' => array(
 								'host' => 'host',
-							)
+							),
+							'iconid_off' => array(),
+							'iconid_on' => array(),
+							'iconid_disabled' => array(),
+							'iconid_maintenance' => array(),
+							'iconid_unknown' => array(),
 						),
 						array(
 							'selementid' => 2,
@@ -1432,7 +1437,11 @@ class C18ImportConverterTest extends CImportConverterTest {
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 							'element' => array(
 								'host' => 'host'
-							)
+							),
+							'icon_off' => array(),
+							'icon_on' => array(),
+							'icon_disabled' => array(),
+							'icon_maintenance' => array(),
 						),
 						array(
 							'selementid' => 2,

@@ -680,10 +680,16 @@ class C18ImportConverter extends CConverter {
 			if (isset($map['selements']) && $map['selements']) {
 				foreach ($map['selements'] as &$selement) {
 					$selement = $this->renameKey($selement, 'elementid', 'element');
+					$selement = $this->renameKey($selement, 'iconid_off', 'icon_off');
+					$selement = $this->renameKey($selement, 'iconid_on', 'icon_on');
+					$selement = $this->renameKey($selement, 'iconid_disabled', 'icon_disabled');
+					$selement = $this->renameKey($selement, 'iconid_maintenance', 'icon_maintenance');
 
 					if (isset($selement['elementtype']) && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 						unset($selement['element']['host']);
 					}
+
+					unset($selement['iconid_unknown']);
 				}
 
 				unset($selement);
