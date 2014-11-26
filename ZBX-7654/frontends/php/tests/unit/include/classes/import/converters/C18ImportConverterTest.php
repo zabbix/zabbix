@@ -56,12 +56,16 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'Host 1',
 					'status' => HOST_STATUS_NOT_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 				array(
 					'host' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 			),
 			'templates' => array(
@@ -129,12 +133,16 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'groups' => array(
 						array(
 							'name' => 'Zabbix server'
@@ -147,7 +155,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'groups' => array(
 						array(
 							'name' => 'Zabbix server'
@@ -200,12 +210,16 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 			)
 		));
@@ -325,13 +339,17 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
 				),
 				// host with an agent interface
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_AGENT,
@@ -360,13 +378,17 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				// host with an IPMI interface
 				array(
 					'host' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_IPMI,
@@ -390,7 +412,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_IPMI,
@@ -414,7 +438,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'interfaces' => array(
 						array(
 							'type' => INTERFACE_TYPE_SNMP,
@@ -479,7 +505,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'items' => array(
 						array(
 							'key' => 'item1',
@@ -590,18 +618,22 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
-				),
-				array(
-					'host' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
-				),
-				array(
-					'host' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_MANUAL,
 					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
+				),
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					)
+				),
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_MANUAL,
 						'type' => 'device type',
 						'name' => 'name',
 						'os' => 'os',
@@ -736,18 +768,24 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'items' => ''
 				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'items' => array(
 						array(
 							'key' => 'item',
@@ -877,22 +915,30 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				)
 			),
 			'templates' => array(
@@ -950,18 +996,24 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'templates' => ''
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'templates' => array(
 						array(
 							'name' => 'template1'
@@ -1193,22 +1245,30 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 			),
 			'templates' => array(
@@ -1261,18 +1321,24 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 				),
 				array(
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'macros' => ''
 				),
 				array(
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
 					'macros' => array(
 						array(
 							'macro' => '{$MACRO}',

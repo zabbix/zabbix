@@ -333,18 +333,19 @@ class C18ImportConverter extends CConverter {
 		);
 
 		// if the host contains inventory data, set inventory to mode to manual, otherwise disable it
-		$host['inventory_mode'] = ($hasProfileData) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
+		$host['inventory'] = array(
+			'inventory_mode' => ($hasProfileData) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED
+		);
 
 		if (!$hasProfileData) {
 			return $host;
 		}
 
 		// rename and merge profile fields
-		$inventory = array();
 		if (isset($host['host_profile']) && $host['host_profile']) {
 			foreach ($host['host_profile'] as $key => $value) {
 				$newKey = $this->getNewProfileName($key);
-				$inventory[($newKey !== null) ? $newKey : $key] = $value;
+				$host['inventory'][($newKey !== null) ? $newKey : $key] = $value;
 			}
 		}
 
@@ -355,16 +356,14 @@ class C18ImportConverter extends CConverter {
 
 				// if renaming results in a duplicate inventory field, concatenate them
 				// this is the case with "notes" and "device_notes"
-				if (isset($inventory[$newKey])) {
-					$inventory[$newKey] .= "\r\n\r\n".$value;
+				if (isset($host['inventory'][$newKey])) {
+					$host['inventory'][$newKey] .= "\r\n\r\n".$value;
 				}
 				else {
-					$inventory[$key] = $value;
+					$host['inventory'][$key] = $value;
 				}
 			}
 		}
-
-		$host['inventory'] = $inventory;
 
 		return $host;
 	}
