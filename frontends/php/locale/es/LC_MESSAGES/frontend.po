@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-17 16:39+0200\n"
+"POT-Creation-Date: 2014-11-26 14:09+0200\n"
 "PO-Revision-Date: 2014-10-24 21:58+0300\n"
 "Last-Translator: Luis <luislopez72@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2283,6 +2283,11 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostGroup.php:429
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2394,6 +2399,11 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostGroup.php:490
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2438,7 +2448,7 @@ msgstr ""
 msgid "Cannot update a discovered graph."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:493
+#: include/classes/api/services/CHostGroup.php:505
 msgid "Cannot update a discovered host group."
 msgstr ""
 
@@ -2488,9 +2498,9 @@ msgstr "No es posible actualizar el grupo"
 msgid "Cannot update group."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:748
-#: include/classes/api/services/CHostGroup.php:806
-#: include/classes/api/services/CHostGroup.php:866
+#: include/classes/api/services/CHostGroup.php:760
+#: include/classes/api/services/CHostGroup.php:818
+#: include/classes/api/services/CHostGroup.php:878
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -4891,8 +4901,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:635
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:465
-#: include/classes/api/services/CHostGroup.php:536
+#: include/classes/api/services/CHostGroup.php:471
+#: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
 #: include/classes/api/services/CHost.php:1293
 #: include/classes/api/services/CHostPrototype.php:906
@@ -5988,7 +5998,7 @@ msgstr ""
 msgid "Group"
 msgstr "Grupo"
 
-#: include/classes/api/services/CHostGroup.php:568
+#: include/classes/api/services/CHostGroup.php:580
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr ""
@@ -6358,24 +6368,24 @@ msgstr[1] ""
 msgid "Host group"
 msgstr "Grupo del equipo"
 
-#: include/classes/api/services/CHostGroup.php:431
-#: include/classes/api/services/CHostGroup.php:443
-#: include/classes/api/services/CHostGroup.php:508
+#: include/classes/api/services/CHostGroup.php:437
+#: include/classes/api/services/CHostGroup.php:449
+#: include/classes/api/services/CHostGroup.php:520
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:612
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:581
+#: include/classes/api/services/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:555
+#: include/classes/api/services/CHostGroup.php:567
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -6393,7 +6403,7 @@ msgid "Host group label type"
 msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:424
-#: include/classes/api/services/CHostGroup.php:500
+#: include/classes/api/services/CHostGroup.php:512
 msgid "Host group name cannot be empty."
 msgstr ""
 
@@ -10275,13 +10285,13 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
 #: include/classes/api/services/CHostGeneral.php:140
-#: include/classes/api/services/CHostGroup.php:478
-#: include/classes/api/services/CHostGroup.php:550
-#: include/classes/api/services/CHostGroup.php:735
-#: include/classes/api/services/CHostGroup.php:797
-#: include/classes/api/services/CHostGroup.php:851
-#: include/classes/api/services/CHostGroup.php:860
-#: include/classes/api/services/CHostGroup.php:883
+#: include/classes/api/services/CHostGroup.php:484
+#: include/classes/api/services/CHostGroup.php:562
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:863
+#: include/classes/api/services/CHostGroup.php:872
+#: include/classes/api/services/CHostGroup.php:895
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10473,7 +10483,7 @@ msgid "No value maps found."
 msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:142
-#: include/classes/screens/CScreenHistory.php:252
+#: include/classes/screens/CScreenHistory.php:244
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:442
 msgid "No values found."
@@ -10843,8 +10853,8 @@ msgstr ""
 msgid "Once"
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:813
-#: include/classes/api/services/CHostGroup.php:947
+#: include/classes/api/services/CHostGroup.php:825
+#: include/classes/api/services/CHostGroup.php:959
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -13943,7 +13953,7 @@ msgid "Timeout"
 msgstr "Timeout"
 
 #: include/classes/screens/CScreenHistory.php:145
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:245
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -15259,7 +15269,7 @@ msgstr ""
 #: include/blocks.inc.php:804 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:151
-#: include/classes/screens/CScreenHistory.php:253 include/reports.inc.php:170
+#: include/classes/screens/CScreenHistory.php:245 include/reports.inc.php:170
 #: include/views/administration.general.valuemapping.edit.php:40
 #: include/views/common.macros.php:38 tr_testexpr.php:50
 #, c-format

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-17 16:39+0200\n"
+"POT-Creation-Date: 2014-11-26 14:09+0200\n"
 "PO-Revision-Date: 2014-10-24 12:30+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -2225,6 +2225,11 @@ msgstr "ディスカバリルールにはチェックの設定が必須です"
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "コマンドを送信できません。Zabbixサーバー\"%1$s\"との接続を確認してください。"
 
+#: include/classes/api/services/CHostGroup.php:429
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2336,6 +2341,11 @@ msgstr "発見されたトリガーの\"%1$s\"を更新できません"
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
 
+#: include/classes/api/services/CHostGroup.php:490
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2380,7 +2390,7 @@ msgstr "テンプレートスクリーン\"%1$s\"の\"templateid\"を更新で�
 msgid "Cannot update a discovered graph."
 msgstr "発見されたグラフを更新できません"
 
-#: include/classes/api/services/CHostGroup.php:493
+#: include/classes/api/services/CHostGroup.php:505
 msgid "Cannot update a discovered host group."
 msgstr "発見されたホストグループを更新できません"
 
@@ -2430,9 +2440,9 @@ msgstr "グループを更新できません"
 msgid "Cannot update group."
 msgstr "グループを更新できません"
 
-#: include/classes/api/services/CHostGroup.php:748
-#: include/classes/api/services/CHostGroup.php:806
-#: include/classes/api/services/CHostGroup.php:866
+#: include/classes/api/services/CHostGroup.php:760
+#: include/classes/api/services/CHostGroup.php:818
+#: include/classes/api/services/CHostGroup.php:878
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "発見されたホスト\"%1$s\"のグループを更新できません"
@@ -4840,8 +4850,8 @@ msgstr "ホストが空白です。"
 #: include/classes/api/services/CDRule.php:635
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:465
-#: include/classes/api/services/CHostGroup.php:536
+#: include/classes/api/services/CHostGroup.php:471
+#: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
 #: include/classes/api/services/CHost.php:1293
 #: include/classes/api/services/CHostPrototype.php:906
@@ -5937,7 +5947,7 @@ msgstr "グリッド"
 msgid "Group"
 msgstr "グループ"
 
-#: include/classes/api/services/CHostGroup.php:568
+#: include/classes/api/services/CHostGroup.php:580
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "ホストのプロトタイプで利用されているためグループ\"%1$s\"は削除できません。"
@@ -6301,24 +6311,24 @@ msgstr[0] "ホストを有効にしました"
 msgid "Host group"
 msgstr "ホストグループ"
 
-#: include/classes/api/services/CHostGroup.php:431
-#: include/classes/api/services/CHostGroup.php:443
-#: include/classes/api/services/CHostGroup.php:508
+#: include/classes/api/services/CHostGroup.php:437
+#: include/classes/api/services/CHostGroup.php:449
+#: include/classes/api/services/CHostGroup.php:520
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "ホストグループ\"%1$s\"はすでに存在しています。"
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:612
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "グローバルスクリプトに利用されているためホストグループ\"%1$s\"を削除できません。"
 
-#: include/classes/api/services/CHostGroup.php:581
+#: include/classes/api/services/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "いくつかのホストが所属しているためホストグループ\"%1$s\"を削除できません。"
 
-#: include/classes/api/services/CHostGroup.php:555
+#: include/classes/api/services/CHostGroup.php:567
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "ホストグループ\"%1$s\"は内部的に使用されているため削除できません。"
@@ -6336,7 +6346,7 @@ msgid "Host group label type"
 msgstr "ホストグループのラベルタイプ"
 
 #: include/classes/api/services/CHostGroup.php:424
-#: include/classes/api/services/CHostGroup.php:500
+#: include/classes/api/services/CHostGroup.php:512
 msgid "Host group name cannot be empty."
 msgstr "ホストグループ名が設定されていません。"
 
@@ -10207,13 +10217,13 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
 #: include/classes/api/services/CHostGeneral.php:140
-#: include/classes/api/services/CHostGroup.php:478
-#: include/classes/api/services/CHostGroup.php:550
-#: include/classes/api/services/CHostGroup.php:735
-#: include/classes/api/services/CHostGroup.php:797
-#: include/classes/api/services/CHostGroup.php:851
-#: include/classes/api/services/CHostGroup.php:860
-#: include/classes/api/services/CHostGroup.php:883
+#: include/classes/api/services/CHostGroup.php:484
+#: include/classes/api/services/CHostGroup.php:562
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:863
+#: include/classes/api/services/CHostGroup.php:872
+#: include/classes/api/services/CHostGroup.php:895
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10405,7 +10415,7 @@ msgid "No value maps found."
 msgstr "値のマッピングが設定されていません。"
 
 #: include/classes/screens/CScreenHistory.php:142
-#: include/classes/screens/CScreenHistory.php:252
+#: include/classes/screens/CScreenHistory.php:244
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:442
 msgid "No values found."
@@ -10775,8 +10785,8 @@ msgstr "ステータスが変化したトリガーの点滅期間"
 msgid "Once"
 msgstr "一度だけ"
 
-#: include/classes/api/services/CHostGroup.php:813
-#: include/classes/api/services/CHostGroup.php:947
+#: include/classes/api/services/CHostGroup.php:825
+#: include/classes/api/services/CHostGroup.php:959
 msgid "One of the objects is left without a host group."
 msgstr "ホストグループが設定されていないオブジェクトが残っています"
 
@@ -13869,7 +13879,7 @@ msgid "Timeout"
 msgstr "タイムアウト"
 
 #: include/classes/screens/CScreenHistory.php:145
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:245
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -15179,7 +15189,7 @@ msgstr "VMware仮想マシンの稼働秒数、<url> - VMwareサービスURL、<
 #: include/blocks.inc.php:804 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:151
-#: include/classes/screens/CScreenHistory.php:253 include/reports.inc.php:170
+#: include/classes/screens/CScreenHistory.php:245 include/reports.inc.php:170
 #: include/views/administration.general.valuemapping.edit.php:40
 #: include/views/common.macros.php:38 tr_testexpr.php:50
 #, c-format

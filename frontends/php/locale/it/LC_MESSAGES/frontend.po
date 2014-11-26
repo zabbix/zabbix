@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 10:29+0200\n"
+"POT-Creation-Date: 2014-11-26 14:09+0200\n"
 "PO-Revision-Date: 2014-11-10 17:46+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2269,6 +2269,11 @@ msgstr "Impossibile salvare regola di discovery senza controlli."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Impossibile inviare comando, controlla connessione al server Zabbix \"%1$s\"."
 
+#: include/classes/api/services/CHostGroup.php:429
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2380,6 +2385,11 @@ msgstr "Impossibile aggiornare \"%1$s\" per un trigger discoverato."
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Impossibile aggiornate \"%1$s\" per l'azione \"%2$s\"."
 
+#: include/classes/api/services/CHostGroup.php:490
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2424,7 +2434,7 @@ msgstr "Impossibile aggiornare \"templateid\" per il template schermata \"%1$s\"
 msgid "Cannot update a discovered graph."
 msgstr "Impossibile aggiornare un grafico discoverato."
 
-#: include/classes/api/services/CHostGroup.php:493
+#: include/classes/api/services/CHostGroup.php:505
 msgid "Cannot update a discovered host group."
 msgstr "Impossibile aggionrare un gruppo host discoverato."
 
@@ -2474,9 +2484,9 @@ msgstr "Impossibile aggiornare il gruppo"
 msgid "Cannot update group."
 msgstr "Impossibile aggiornare il gruppo."
 
-#: include/classes/api/services/CHostGroup.php:748
-#: include/classes/api/services/CHostGroup.php:806
-#: include/classes/api/services/CHostGroup.php:866
+#: include/classes/api/services/CHostGroup.php:760
+#: include/classes/api/services/CHostGroup.php:818
+#: include/classes/api/services/CHostGroup.php:878
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Impossibile aggiornare gruppi per l'host discoverato \"%1$s\"."
@@ -4888,8 +4898,8 @@ msgstr "Host vuoto."
 #: include/classes/api/services/CDRule.php:635
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:465
-#: include/classes/api/services/CHostGroup.php:536
+#: include/classes/api/services/CHostGroup.php:471
+#: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
 #: include/classes/api/services/CHost.php:1293
 #: include/classes/api/services/CHostPrototype.php:906
@@ -5985,7 +5995,7 @@ msgstr "Griglia"
 msgid "Group"
 msgstr "Gruppo"
 
-#: include/classes/api/services/CHostGroup.php:568
+#: include/classes/api/services/CHostGroup.php:580
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Il gruppo \"%1$s\" non può esser rimosso, perchè è utilizzato da un prototipo host."
@@ -6353,24 +6363,24 @@ msgstr[1] "Host abilitati"
 msgid "Host group"
 msgstr "Gruppo host"
 
-#: include/classes/api/services/CHostGroup.php:431
-#: include/classes/api/services/CHostGroup.php:443
-#: include/classes/api/services/CHostGroup.php:508
+#: include/classes/api/services/CHostGroup.php:437
+#: include/classes/api/services/CHostGroup.php:449
+#: include/classes/api/services/CHostGroup.php:520
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Il gruppo host \"%1$s\" esiste già."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:612
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Il gruppo host \"%1$s\" non può esser rimosso, in quanto è utilizzato in uno script globale."
 
-#: include/classes/api/services/CHostGroup.php:581
+#: include/classes/api/services/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Il gruppo host \"%1$s\" non può esser rimosso, in quanto alcuni host dipendono da esso."
 
-#: include/classes/api/services/CHostGroup.php:555
+#: include/classes/api/services/CHostGroup.php:567
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Il gruppo host \"%1$s\" non può esser rimosso, in quanto alcuni host dipendono da esso."
@@ -6388,7 +6398,7 @@ msgid "Host group label type"
 msgstr "Tipo etichetta gruppo host"
 
 #: include/classes/api/services/CHostGroup.php:424
-#: include/classes/api/services/CHostGroup.php:500
+#: include/classes/api/services/CHostGroup.php:512
 msgid "Host group name cannot be empty."
 msgstr "Il nome del gruppo host non può esser vuoto."
 
@@ -10270,13 +10280,13 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
 #: include/classes/api/services/CHostGeneral.php:140
-#: include/classes/api/services/CHostGroup.php:478
-#: include/classes/api/services/CHostGroup.php:550
-#: include/classes/api/services/CHostGroup.php:735
-#: include/classes/api/services/CHostGroup.php:797
-#: include/classes/api/services/CHostGroup.php:851
-#: include/classes/api/services/CHostGroup.php:860
-#: include/classes/api/services/CHostGroup.php:883
+#: include/classes/api/services/CHostGroup.php:484
+#: include/classes/api/services/CHostGroup.php:562
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:863
+#: include/classes/api/services/CHostGroup.php:872
+#: include/classes/api/services/CHostGroup.php:895
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10468,7 +10478,7 @@ msgid "No value maps found."
 msgstr "Nessun valore mappa trovato."
 
 #: include/classes/screens/CScreenHistory.php:142
-#: include/classes/screens/CScreenHistory.php:252
+#: include/classes/screens/CScreenHistory.php:244
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:442
 msgid "No values found."
@@ -10838,8 +10848,8 @@ msgstr "Al cambio di stato i trigger lampeggiano per"
 msgid "Once"
 msgstr "Una volta"
 
-#: include/classes/api/services/CHostGroup.php:813
-#: include/classes/api/services/CHostGroup.php:947
+#: include/classes/api/services/CHostGroup.php:825
+#: include/classes/api/services/CHostGroup.php:959
 msgid "One of the objects is left without a host group."
 msgstr "Uno degli oggetti è rimasto senza gruppo host."
 
@@ -13938,7 +13948,7 @@ msgid "Timeout"
 msgstr "Timeout"
 
 #: include/classes/screens/CScreenHistory.php:145
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:245
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -15254,7 +15264,7 @@ msgstr "VMware machine virtuale uptime, <url> - URL servizio VMware, <uuid> - no
 #: include/blocks.inc.php:804 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:151
-#: include/classes/screens/CScreenHistory.php:253 include/reports.inc.php:170
+#: include/classes/screens/CScreenHistory.php:245 include/reports.inc.php:170
 #: include/views/administration.general.valuemapping.edit.php:40
 #: include/views/common.macros.php:38 tr_testexpr.php:50
 #, c-format
