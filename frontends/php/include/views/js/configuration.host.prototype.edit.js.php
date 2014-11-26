@@ -5,7 +5,7 @@
 				placeholder="{#MACRO}">
 		</td>
 		<td>
-			<input type="button" class="link_menu group-prototype-remove" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" />
+			<button type="button" class="button link_menu group-prototype-remove" name="remove"><?php echo _('Remove') ?></button>
 			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
@@ -29,7 +29,7 @@
 				addGroupPrototypeRow({})
 			});
 
-		jQuery('#tbl_group_prototypes').on('click', 'input.group-prototype-remove', function() {
+		jQuery('#tbl_group_prototypes').on('click', '.group-prototype-remove', function() {
 			jQuery(this).closest('.form_row').remove();
 		});
 
@@ -45,7 +45,7 @@
 		<?php endforeach ?>
 
 		<?php if ($hostPrototype['templateid']): ?>
-			jQuery("#tbl_group_prototypes").find('input').prop("disabled", "disabled");
+			jQuery("#tbl_group_prototypes").find('input, .button').prop("disabled", "disabled");
 		<?php endif ?>
 	});
 </script>

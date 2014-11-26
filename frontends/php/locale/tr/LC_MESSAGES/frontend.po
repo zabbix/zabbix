@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 11:17+0200\n"
+"POT-Creation-Date: 2014-11-17 16:45+0200\n"
 "PO-Revision-Date: 2014-02-02 00:22+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -1627,11 +1627,6 @@ msgstr ""
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
-
-#: include/classes/api/services/CHost.php:1314
-#, c-format
-msgid "Cannot delete discovered host \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItem.php:633
@@ -4177,7 +4172,7 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1466
+#: include/classes/api/services/CHost.php:1453
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
@@ -9287,7 +9282,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
-msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
+msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
 msgstr ""
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
@@ -10308,7 +10303,7 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1659
+#: include/classes/api/services/CHost.php:1646
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047

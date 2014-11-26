@@ -181,7 +181,8 @@ div.hintbox {
 #zbx_search input[type=text] {
 	margin-right: 0; vertical-align: top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD;
 }
-#zbx_search input.button { margin: 0 3px 0 0; height: 18px; line-height: 17px; padding-top: 0; padding-bottom: 0; }
+#zbx_search .button { margin: 0 3px 0 0; height: 18px; padding-top: 0; padding-bottom: 0; }
+#zbx_search .button .ui-button-text { line-height: normal; padding: 0 1em; }
 #search_wdgt { padding: 5px; }
 #search_wdgt .widget { display: inline-block; }
 
