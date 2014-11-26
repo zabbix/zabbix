@@ -498,12 +498,6 @@ calendar.prototype = {
 		this.createDaysTab();
 	},
 
-	daysInFeb: function(year) {
-		// February has 29 days in any year evenly divisible by four,
-		// EXCEPT for centurial years which are not also divisible by 400.
-		return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
-	},
-
 	createDaysTab: function() {
 		this.clndr_days.update('');
 		var table = document.createElement('table');
