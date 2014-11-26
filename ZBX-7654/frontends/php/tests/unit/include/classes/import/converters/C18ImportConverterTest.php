@@ -1492,6 +1492,10 @@ class C18ImportConverterTest extends CImportConverterTest {
 				),
 				array(
 					'screenitems' => array(
+						// resource is exported as "0" if it's not used
+						array(
+							'resourceid' => '0'
+						),
 						array(
 							'resourceid' => array(
 								'key_' => 'itemkey',
@@ -1510,6 +1514,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 				),
 				array(
 					'screen_items' => array(
+						array(
+							'resource' => '0'
+						),
 						array(
 							'resource' => array(
 								'key' => 'itemkey',
