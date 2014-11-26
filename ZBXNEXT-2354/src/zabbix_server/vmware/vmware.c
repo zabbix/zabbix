@@ -2716,7 +2716,10 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 	while (NULL != (entity = zbx_hashset_iter_next(&iter)))
 	{
 		if (0 != entity->last_seen && entity->last_seen < now)
+		{
+			vmware_shared_perf_entity_clean(entity);
 			zbx_hashset_iter_remove(&iter);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entities:%d", __function_name, service->entities.num_data);
@@ -3227,10 +3230,11 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->lastaccess = now;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
-			__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
 
 	zbx_hashset_create_ext(&service->counters, ZBX_VMWARE_COUNTERS_INIT_SIZE, vmware_counter_hash_func,
-			vmware_counter_compare_func, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+			vmware_counter_compare_func, NULL, __vm_mem_malloc_func, __vm_mem_realloc_func,
+			__vm_mem_free_func);
 
 	zbx_vector_ptr_append(&vmware->services, service);
 
