@@ -1389,6 +1389,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '10050',
 							'interface_ref' => 'if0',
 							'main' => 1,
+							'bulk' => 1
 						),
 					),
 					'host' => 'host',
@@ -1398,6 +1399,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ipmi_username' => '',
 					'ipmi_password' => '',
 					'inventory_mode' => -1,
+					'inventory' => array(),
 					'groups' =>	array(
 						array(
 							'name' => 'Linux servers'
