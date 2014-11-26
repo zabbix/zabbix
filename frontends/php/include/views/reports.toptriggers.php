@@ -70,7 +70,7 @@ $periodTable->addRow(array(
 		new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu period-link'
 		)
-	))
+	), 'quick-input')
 ));
 
 $periods = new CCol($periodTable, 'top');
