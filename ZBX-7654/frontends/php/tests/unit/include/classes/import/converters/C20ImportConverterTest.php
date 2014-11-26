@@ -22,29 +22,36 @@
 class C20ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertItems() {
-		$this->assertConvert(
-			$this->createExpectedResult(array()),
-			$this->createExpectedResult(array())
-		);
-		$this->assertConvert(
-			$this->createExpectedResult(array('items' => '')),
-			$this->createExpectedResult(array('items' => ''))
-		);
-
 		$source = $this->createSource(array(
-			'items' => array(
+			'hosts' => array(
 				array(),
 				array(
-					'status' => ITEM_STATUS_NOTSUPPORTED
+					'items' => ''
+				),
+				array(
+					'items' => array(
+						array(),
+						array(
+							'status' => ITEM_STATUS_NOTSUPPORTED
+						)
+					)
 				)
 			)
 		));
 
 		$expectedResult = $this->createExpectedResult(array(
-			'items' => array(
+			'hosts' => array(
 				array(),
 				array(
-					'status' => ITEM_STATUS_ACTIVE
+					'items' => ''
+				),
+				array(
+					'items' => array(
+						array(),
+						array(
+							'status' => ITEM_STATUS_ACTIVE
+						)
+					)
 				)
 			)
 		));
@@ -82,54 +89,107 @@ class C20ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function testConvertDiscoveryRules() {
-		$this->assertConvert(
-			$this->createExpectedResult(array()),
-			$this->createExpectedResult(array())
-		);
-		$this->assertConvert(
-			$this->createExpectedResult(array('discovery_rules' => '')),
-			$this->createExpectedResult(array('discovery_rules' => ''))
-		);
-
 		$source = $this->createSource(array(
-			'discovery_rules' => array(
+			'hosts' => array(
 				array(),
 				array(
-					'status' => ITEM_STATUS_NOTSUPPORTED,
-					'filter' => array()
+					'discovery_rules' => ''
 				),
 				array(
-					'filter' => ''
-				),
+					'discovery_rules' => array(
+						array(),
+						array(
+							'status' => ITEM_STATUS_NOTSUPPORTED,
+							'filter' => array()
+						),
+						array(
+							'filter' => ''
+						),
+						array(
+							'filter' => ':'
+						),
+						array(
+							'filter' => '{#MACRO}:regex'
+						),
+					)
+				)
+			),
+			'templates' => array(
 				array(
-					'filter' => ':'
-				),
-				array(
-					'filter' => '{#MACRO}:regex'
-				),
+					'discovery_rules' => array(
+						array(),
+						array(
+							'filter' => array()
+						),
+						array(
+							'filter' => ''
+						),
+						array(
+							'filter' => ':'
+						),
+						array(
+							'filter' => '{#MACRO}:regex'
+						),
+					)
+				)
 			)
 		));
 
 		$expectedResult = $this->createExpectedResult(array(
-			'discovery_rules' => array(
+			'hosts' => array(
 				array(),
 				array(
-					'status' => ITEM_STATUS_ACTIVE,
-					'filter' => array()
+					'discovery_rules' => ''
 				),
 				array(
-					'filter' => ''
-				),
-				array(),
+					'discovery_rules' => array(
+						array(),
+						array(
+							'status' => ITEM_STATUS_ACTIVE,
+							'filter' => array()
+						),
+						array(
+							'filter' => ''
+						),
+						array(),
+						array(
+							'filter' => array(
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'formula' => '',
+								'conditions' => array(
+									array(
+										'macro' => '{#MACRO}',
+										'value' => 'regex',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+									)
+								)
+							)
+						)
+					)
+				)
+			),
+			'templates' => array(
 				array(
-					'filter' => array(
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'formula' => '',
-						'conditions' => array(
-							array(
-								'macro' => '{#MACRO}',
-								'value' => 'regex',
-								'operator' => CONDITION_OPERATOR_REGEXP,
+					'discovery_rules' => array(
+						array(),
+						array(
+							'filter' => array()
+						),
+						array(
+							'filter' => ''
+						),
+						array(),
+						array(
+							'filter' => array(
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'formula' => '',
+								'conditions' => array(
+									array(
+										'macro' => '{#MACRO}',
+										'value' => 'regex',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+									)
+								)
 							)
 						)
 					)
@@ -142,15 +202,19 @@ class C20ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertTriggerPrototypes() {
 		$source = $this->createSource(array(
-			'discovery_rules' => array(
-				array(),
+			'hosts' => array(
 				array(
-					'trigger_prototypes' => ''
-				),
-				array(
-					'trigger_prototypes' => array(
+					'discovery_rules' => array(
+						array(),
 						array(
-							'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
+							'trigger_prototypes' => ''
+						),
+						array(
+							'trigger_prototypes' => array(
+								array(
+									'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
+								)
+							)
 						)
 					)
 				)
@@ -158,15 +222,19 @@ class C20ImportConverterTest extends CImportConverterTest {
 		));
 
 		$expectedResult = $this->createExpectedResult(array(
-			'discovery_rules' => array(
-				array(),
+			'hosts' => array(
 				array(
-					'trigger_prototypes' => ''
-				),
-				array(
-					'trigger_prototypes' => array(
+					'discovery_rules' => array(
+						array(),
 						array(
-							'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
+							'trigger_prototypes' => ''
+						),
+						array(
+							'trigger_prototypes' => array(
+								array(
+									'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
+								)
+							)
 						)
 					)
 				)
