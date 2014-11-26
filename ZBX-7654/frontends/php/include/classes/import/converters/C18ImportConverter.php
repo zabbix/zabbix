@@ -679,13 +679,11 @@ class C18ImportConverter extends CConverter {
 		foreach ($content['maps'] as &$map) {
 			if (isset($map['selements']) && $map['selements']) {
 				foreach ($map['selements'] as &$selement) {
-					$selement = $this->renameKey($selement, 'elementid', 'selement');
+					$selement = $this->renameKey($selement, 'elementid', 'element');
 
 					if (isset($selement['elementtype']) && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						unset($selement['selement']['host']);
+						unset($selement['element']['host']);
 					}
-
-					unset($selement['selementid']);
 				}
 
 				unset($selement);
