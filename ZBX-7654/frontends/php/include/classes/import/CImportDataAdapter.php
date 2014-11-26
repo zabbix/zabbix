@@ -22,7 +22,7 @@
 /**
  * Import formatter
  */
-class СImportDataAdapter {
+class CImportDataAdapter {
 
 	/**
 	 * @var array configuration import data
