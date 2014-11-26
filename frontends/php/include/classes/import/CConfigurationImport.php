@@ -25,7 +25,7 @@
 class CConfigurationImport {
 
 	/**
-	 * @var СImportDataAdapter
+	 * @var CImportDataAdapter
 	 */
 	protected $adapter;
 
@@ -96,11 +96,11 @@ class CConfigurationImport {
 	/**
 	 * Import configuration data.
 	 *
-	 * @param СImportDataAdapter $adapter
+	 * @param CImportDataAdapter $adapter
 	 *
 	 * @return bool
 	 */
-	public function import(СImportDataAdapter $adapter) {
+	public function import(CImportDataAdapter $adapter) {
 		$this->adapter = $adapter;
 
 		// parse all import for references to resolve them all together with less sql count

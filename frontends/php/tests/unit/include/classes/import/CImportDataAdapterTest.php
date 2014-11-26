@@ -1430,7 +1430,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 			new C20ImportConverter(new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#')))
 		);
 
-		$adapter = new СImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
+		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$adapter->load($reader->read($source));
