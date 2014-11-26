@@ -71,7 +71,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.toptriggers.filter.till', $timeTill, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
-	DBStart();
+	DBstart();
 	CProfile::deleteIdx('web.toptriggers.filter.severities');
 	CProfile::deleteIdx('web.toptriggers.filter.groupids');
 	CProfile::deleteIdx('web.toptriggers.filter.hostids');
@@ -106,10 +106,10 @@ if ($data['filter']['groupids'] !== null) {
 		'groupids' => $data['filter']['groupids']
 	));
 
-	foreach ($filterGroups as $group) {
+	foreach ($filterGroups as $filterGroup) {
 		$data['multiSelectHostGroupData'][] = array(
-			'id' => $group['groupid'],
-			'name' => $group['name']
+			'id' => $filterGroup['groupid'],
+			'name' => $filterGroup['name']
 		);
 	}
 }
@@ -163,8 +163,8 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN && ($data['filter']['groupids']
 }
 elseif (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 	// add permission filter
-	$userid = CWebUser::$data['userid'];
-	$userGroups = getUserGroupsByUserId($userid);
+	$userId = CWebUser::$data['userid'];
+	$userGroups = getUserGroupsByUserId($userId);
 	$sql .= ' AND EXISTS ('.
 				'SELECT NULL'.
 				' FROM functions f,items i,hosts_groups hgg'.
