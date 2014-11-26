@@ -279,7 +279,7 @@ calendar.prototype = {
 			result = true;
 		}
 		else if (d > 28 && result) {
-			if (d <= daysInMonth(this.sdt.getFullYear()), this.sdt.getMonth()) {
+			if (d <= daysInMonth(this.sdt.getFullYear(), this.sdt.getMonth())) {
 				this.sdt.setDate(d);
 				result = true;
 			}
