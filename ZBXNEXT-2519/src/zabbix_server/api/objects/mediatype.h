@@ -20,6 +20,8 @@
 #ifndef ZABBIX_API_MEDIATYPE_H
 #define ZABBIX_API_MEDIATYPE_H
 
+#include "../api.h"
+
 extern const zbx_api_field_t zbx_api_class_mediatype[];
 
 int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **result);
