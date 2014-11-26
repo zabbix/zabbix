@@ -419,7 +419,7 @@ function valueComparisonFormForMultiplePeriods() {
 			'&srcfld1=itemid'.
 			'&srcfld2=name'.
 			'&monitored_hosts=1");',
-		'T'
+		'button-form'
 	);
 
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));

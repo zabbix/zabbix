@@ -238,6 +238,9 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/include/classes/html/CRedirectButtonTest.php -text
+frontends/php/tests/unit/include/classes/html/CSubmitButtonTest.php -text
+frontends/php/tests/unit/include/classes/html/CSubmitTest.php -text
 frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml

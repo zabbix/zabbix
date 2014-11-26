@@ -78,6 +78,9 @@ typedef struct
 	int		process_num;
 	unsigned char	process_type;
 	void		*args;
+#ifdef _WINDOWS
+	ZBX_THREAD_ENTRY_POINTER(entry);
+#endif
 }
 zbx_thread_args_t;
 

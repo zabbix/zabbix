@@ -287,3 +287,6 @@ div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }
 
 /* httptest */
 .httptest-popup #retrieve_mode_2 { margin-left: 10px; }
+
+/* profile */
+.profile #messagingTab #triggers_row td { padding-bottom: 1px; }

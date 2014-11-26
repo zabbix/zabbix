@@ -25,7 +25,8 @@ class CButtonQMessage extends CSubmit {
 	public $msg;
 	public $name;
 
-	public function __construct($name, $caption, $msg = null, $vars = null, $class = null) {
+	public function __construct($name, $caption, $msg = null, $vars = null,
+			$class = 'button-plain shadow ui-corner-all') {
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;

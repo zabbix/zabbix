@@ -66,4 +66,9 @@ class CRadioButtonList extends CDiv {
 	public function makeVertical() {
 		$this->orientation = self::ORIENTATION_VERTICAL;
 	}
+
+	public function useJQueryStyle() {
+		parent::useJQueryStyle();
+		$this->addClass('radioset');
+	}
 }
