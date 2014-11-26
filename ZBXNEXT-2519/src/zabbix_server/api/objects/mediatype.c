@@ -50,7 +50,7 @@ zbx_api_mediatype_get_t;
 
 
 /* TODO: wrap into class defining other object properties if necessary */
-const zbx_api_field_t zbx_api_class_mediatype[] = {
+const zbx_api_field_t zbx_api_object_mediatype[] = {
 		{"mediatypeid", ZBX_TYPE_ID, ZBX_API_FIELD_FLAG_SORTABLE},
 		{"type", ZBX_TYPE_INT, ZBX_API_FIELD_FLAG_REQUIRED},
 		{"description", ZBX_TYPE_CHAR,  ZBX_API_FIELD_FLAG_REQUIRED},
@@ -63,27 +63,6 @@ const zbx_api_field_t zbx_api_class_mediatype[] = {
 		{"status", ZBX_TYPE_INT, 0},
 		{NULL}
 };
-
-/* move into user class file */
-const zbx_api_field_t zbx_api_class_user[] = {
-		{"userid", ZBX_TYPE_ID, ZBX_API_FIELD_FLAG_SORTABLE},
-		{"alias", ZBX_TYPE_CHAR, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
-		{"name", ZBX_TYPE_CHAR, 0},
-		{"surname", ZBX_TYPE_CHAR, 0},
-		{"url", ZBX_TYPE_CHAR, 0},
-		{"autologin", ZBX_TYPE_INT, 0},
-		{"autologout", ZBX_TYPE_INT, 0},
-		{"lang", ZBX_TYPE_CHAR, 0},
-		{"refresh", ZBX_TYPE_INT,  0},
-		{"type", ZBX_TYPE_INT, 0},
-		{"theme", ZBX_TYPE_CHAR,  0},
-		{"attempt_failed", ZBX_TYPE_INT, 0},
-		{"attempt_ip", ZBX_TYPE_CHAR, 0},
-		{"attempt_clock", ZBX_TYPE_INT, 0},
-		{"rows_per_page", ZBX_TYPE_INT, 0},
-		{NULL}
-};
-
 
 static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *json, char **error);
 static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self);
@@ -105,7 +84,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	{
 		const char	*next = p;
 
-		if (SUCCEED != zbx_api_get_parse(&self->options, zbx_api_class_mediatype, name, jp, &next, error))
+		if (SUCCEED != zbx_api_get_parse(&self->options, zbx_api_object_mediatype, name, jp, &next, error))
 			goto out;
 
 		if (next != p)
@@ -142,7 +121,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		else if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS))
 		{
 			if (SUCCEED != zbx_api_get_param_query(ZBX_API_MEDIATYPE_GET_TAG_USERIDS, &next,
-					zbx_api_class_user, &self->select_users, error))
+					zbx_api_object_user, &self->select_users, error))
 			{
 				goto out;
 			}
@@ -158,12 +137,12 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	if (ZBX_API_QUERY_FIELDS == self->options.output.type)
 	{
 		/* ensure that selected output contains mediatypeid field required to select users */
-		if (SUCCEED != zbx_api_get_add_output_field(&self->options, zbx_api_class_mediatype, "mediatypeid",
+		if (SUCCEED != zbx_api_get_add_output_field(&self->options, zbx_api_object_mediatype, "mediatypeid",
 				error))
 			goto out;
 	}
 
-	if (SUCCEED != zbx_api_get_finalize(&self->options, zbx_api_class_mediatype, error))
+	if (SUCCEED != zbx_api_get_finalize(&self->options, zbx_api_object_mediatype, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -187,8 +166,6 @@ static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self)
 	zbx_vector_uint64_destroy(&self->mediaids);
 	zbx_vector_uint64_destroy(&self->mediatypeids);
 }
-
-
 
 /* TODO: investigate if it would be possible to create a generic output formatting function */
 static void	zbx_api_mediatype_get_prepare_output(zbx_api_mediatype_get_t *self, zbx_api_get_result_t *result,
@@ -287,5 +264,3 @@ out:
 
 	return ret;
 }
-
-

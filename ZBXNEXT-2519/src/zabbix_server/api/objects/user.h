@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_API_MEDIATYPE_H
-#define ZABBIX_API_MEDIATYPE_H
+#ifndef ZABBIX_API_USER_H
+#define ZABBIX_API_USER_H
 
 #include "../api.h"
 
-extern const zbx_api_field_t zbx_api_object_mediatype[];
-
-int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **result);
+extern const zbx_api_field_t zbx_api_object_user[];
 
 
 #endif
