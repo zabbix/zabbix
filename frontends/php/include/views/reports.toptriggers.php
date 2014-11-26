@@ -45,8 +45,7 @@ $filterTable->addRow(
 					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
 						'&srcfld1=groupid&multiselect=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			)),
 			'inputcol'
@@ -68,8 +67,7 @@ $filterTable->addRow(
 					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
 						'&real_hosts=1&multiselect=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			)),
 			'inputcol'
@@ -97,26 +95,26 @@ $filterTable->addRow(array(
 	new CCol(array(
 		new CButton('quickTimeInput', _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
 		new CButton('quickTimeInput', _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
-			'link_menu link'
+			'link_menu period-link'
 		),
 		new CButton('quickTimeInput', _('Current week'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');',
-			'link_menu link'
+			'link_menu period-link'
 		),
 		new CButton('quickTimeInput', _('Current month'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');',
-			'link_menu link'
+			'link_menu period-link'
 		),
 		new CButton('quickTimeInput', _('Current year'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');',
-			'link_menu link'
+			'link_menu period-link'
 		),
 		BR(),
 		new CButton('quickTimeInput', _('Last week'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');',
 			'link_menu'
 		),
 		new CButton('quickTimeInput', _('Last month'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');',
-			'link_menu link'
+			'link_menu period-link'
 		),
 		new CButton('quickTimeInput', _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
-			'link_menu link'
+			'link_menu period-link'
 		)
 	), 'top')
 ), 'top');
