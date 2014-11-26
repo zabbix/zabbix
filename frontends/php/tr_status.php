@@ -814,17 +814,12 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$goComboBox = new CComboBox('action');
-	$goComboBox->addItem('trigger.bulkacknowledge', _('Bulk acknowledge'));
-
-	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
-
-	$showEventColumn
-		? zbx_add_post_js('chkbxRange.pageGoName = "events";')
-		: zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
-
-	$footer = get_table_header(array($goComboBox, $goButton));
+	$footer = get_table_header(new CActionGoButtonGroup(
+		$showEventColumn ? 'events' : 'triggers',
+		array(
+			'trigger.bulkacknowledge' => _('Bulk acknowledge')
+		)
+	));
 }
 
 $triggerForm->addItem(array($paging, $triggerTable, $paging, $footer));

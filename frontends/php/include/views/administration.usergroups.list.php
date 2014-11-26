@@ -126,35 +126,22 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	));
 }
 
-// append GO buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('usergroup.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('usergroup.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('usergroup.massenabledebug', _('Enable debug mode'));
-$goOption->setAttribute('confirm', _('Enable debug mode in selected groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('usergroup.massdisabledebug', _('Disable debug mode'));
-$goOption->setAttribute('confirm', _('Disable debug mode in selected groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('usergroup.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected groups?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
-
 // append table to form
-$userGroupsForm->addItem(array($this->data['paging'], $userGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$userGroupsForm->addItem(array(
+	$this->data['paging'],
+	$userGroupTable,
+	$this->data['paging'],
+	get_table_header(new CActionGoButtonGroup(
+		'group_groupid',
+		array(
+			'usergroup.massenable' => array(_('Enable'), _('Enable selected groups?')),
+			'usergroup.massdisable' => array(_('Disable'), _('Disable selected groups?')),
+			'usergroup.massenabledebug' => array(_('Enable debug mode'), _('Enable debug mode in selected groups?')),
+			'usergroup.massdisabledebug' => array(_('Disable debug mode'), _('Disable debug mode in selected groups?')),
+			'usergroup.massdelete' => array(_('Delete'), _('Delete selected groups?'))
+		)
+	))
+));
 
 // append form to widget
 $userGroupsWidget->addItem($userGroupsForm);

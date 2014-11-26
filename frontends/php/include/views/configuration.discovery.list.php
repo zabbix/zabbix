@@ -62,27 +62,20 @@ foreach ($data['drules'] as $drule) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('drule.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected discovery rules?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('drule.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected discovery rules?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('drule.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected discovery rules?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id','goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
-
 // append table to form
-$discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$discoveryForm->addItem(array(
+	$this->data['paging'],
+	$discoveryTable,
+	$this->data['paging'],
+	get_table_header(new CActionGoButtonGroup(
+		'g_druleid',
+		array(
+			'drule.massenable' => array(_('Enable'), _('Enable selected discovery rules?')),
+			'drule.massdisable' => array(_('Disable'), _('Disable selected discovery rules?')),
+			'drule.massdelete' => array(_('Delete'), _('Delete selected discovery rules?'))
+		)
+	))
+));
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);
