@@ -130,6 +130,7 @@ table.tableinfo-overview-hint { width: 200px; }
 .top-triggers .filter .top { vertical-align: top; }
 .top-triggers .filter .period-table { margin-left: auto; margin-right: auto; }
 .top-triggers .filter .period-table td { border-style: none none; }
+.top-triggers .filter .period-table .quick-input { white-space: nowrap; }
 
 /*history */
 .history .filter tr td { width: 50%; }
