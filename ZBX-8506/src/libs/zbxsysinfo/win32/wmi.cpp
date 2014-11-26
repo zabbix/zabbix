@@ -216,6 +216,9 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 out:
 	VariantClear(&vtProp);
 
+	if (0 != pclsObj)
+		pclsObj->Release();
+
 	if (0 != pEnumerator)
 		pEnumerator->Release();
 
