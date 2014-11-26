@@ -733,7 +733,7 @@ class C18ImportConverter extends CConverter {
 				foreach ($screen['screen_items'] as &$screenItem) {
 					$screenItem = $this->renameKey($screenItem, 'resourceid', 'resource');
 
-					if (isset($screenItem['resource'])) {
+					if (isset($screenItem['resource']) && $screenItem['resource'] !== '0') {
 						$screenItem['resource'] = $this->renameKey($screenItem['resource'], 'key_', 'key');
 					}
 				}
