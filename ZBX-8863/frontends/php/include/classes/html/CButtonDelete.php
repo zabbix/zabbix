@@ -21,7 +21,7 @@
 
 class CButtonDelete extends CButtonQMessage {
 
-	public function __construct($msg = null, $vars = null, $class = null) {
+	public function __construct($msg = null, $vars = null, $class = 'button-plain shadow ui-corner-all') {
 		parent::__construct('delete', _('Delete'), $msg, $vars, $class);
 	}
 }

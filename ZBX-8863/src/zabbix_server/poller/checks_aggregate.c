@@ -317,7 +317,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
  *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *
  *             groups    - [IN] list of comma-separated host groups           *
  *             itemkey   - [IN] item key to aggregate                         *
- *             item_func - [IN] one ofZBX_VALUE_FUNC_*                        *
+ *             item_func - [IN] one of ZBX_VALUE_FUNC_*                       *
  *             param     - [IN] item_func parameter (optional)                *
  *                                                                            *
  * Return value: SUCCEED - aggregate item evaluated successfully              *
@@ -337,7 +337,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	unsigned int			seconds;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
-			__function_name, grp_func, groups, itemkey, item_func, param);
+			__function_name, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
 
 	now = time(NULL);
 
@@ -459,8 +459,8 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
-	const char	*tmp, *groups, *itemkey, *funcp;
-	int		grp_func, item_func;
+	const char	*tmp, *groups, *itemkey, *funcp = NULL;
+	int		grp_func, item_func, params_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
@@ -500,7 +500,9 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (4 != get_rparams_num(&request))
+	params_num = get_rparams_num(&request);
+
+	if (3 > params_num || params_num > 4)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -528,7 +530,15 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	funcp = get_rparam(&request, 3);
+	if (4 == params_num)
+	{
+		funcp = get_rparam(&request, 3);
+	}
+	else if (3 == params_num && ZBX_VALUE_FUNC_LAST != item_func)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
 
 	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
 		goto out;

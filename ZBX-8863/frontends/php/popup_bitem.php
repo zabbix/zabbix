@@ -135,7 +135,7 @@ else {
 
 	$txtCondVal = new CTextBox('name', $caption, 50, true);
 
-	$btnSelect = new CSubmit('btn1', _('Select'),
+	$btnSelect = new CButton('btn1', _('Select'),
 		'return PopUp("popup.php?'.
 			'dstfrm='.$frmGItem->GetName().
 			'&dstfld1=itemid'.
@@ -145,7 +145,7 @@ else {
 			'&srcfld2=name'.
 			'&monitored_hosts=1'.
 			'&numeric=1");',
-		'T'
+		'button-plain'
 	);
 
 	$frmGItem->addRow(_('Parameter'), array($txtCondVal, $btnSelect));
