@@ -128,6 +128,8 @@ table.tableinfo-overview-hint { width: 200px; }
 .top-triggers .filter .multiselect { width: 216px; line-height: 12px; }
 .top-triggers .filter .period-link { margin-left: 10px; }
 .top-triggers .filter .top { vertical-align: top; }
+.top-triggers .filter .period-table { margin-left: auto; margin-right: auto; }
+.top-triggers .filter .period-table td { border-style: none none; }
 
 /*history */
 .history .filter tr td { width: 50%; }

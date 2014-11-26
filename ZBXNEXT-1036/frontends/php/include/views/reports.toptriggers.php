@@ -33,64 +33,19 @@ $filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter'][
 
 $filterTable = new CTable(null, 'filter');
 
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Host groups')), 'label'),
-		new CCol(new CMultiSelect(
-			array(
-				'name' => 'groupids[]',
-				'objectName' => 'hostGroup',
-				'data' => $this->data['multiSelectHostGroupData'],
-				'popup' => array(
-					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-						'&srcfld1=groupid&multiselect=1',
-					'width' => 450,
-					'height' => 450
-				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('From')), 'label'),
-		new CCol(array(createDateSelector('filter_from', $this->data['filter']['filter_from'])))
-	)
-);
+$periodTable = new CTable(null, 'period-table');
 
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Hosts')), 'label'),
-		new CCol(new CMultiSelect(
-			array(
-				'name' => 'hostids[]',
-				'objectName' => 'hosts',
-				'data' => $this->data['multiSelectHostData'],
-				'popup' => array(
-					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1',
-					'width' => 450,
-					'height' => 450
-				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('Till')), 'label'),
-		new CCol(array(createDateSelector('filter_till', $this->data['filter']['filter_till'])))
-	)
-);
+$periodTable->addRow(array(
+	new CCol(bold(_('From')), 'label'),
+	new CCol(array(createDateSelector('filter_from', $this->data['filter']['filter_from'])))
+));
 
-// get all severities
-for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
-		in_array($severity, $this->data['filter']['severities']), '', 1
-	);
+$periodTable->addRow(array(
+	new CCol(bold(_('Till')), 'label'),
+	new CCol(array(createDateSelector('filter_till', $this->data['filter']['filter_till'])))
+));
 
-	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
-	$severities[] = BR();
-}
-array_pop($severities);
-
-$filterTable->addRow(array(
-	new CCol(bold(_('Severity')), 'label top'),
-	new CCol($severities, 'inputcol'),
+$periodTable->addRow(array(
 	new CCol(null, 'label'),
 	new CCol(array(
 		new CButton('quickTimeInput', _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
@@ -116,8 +71,64 @@ $filterTable->addRow(array(
 		new CButton('quickTimeInput', _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu period-link'
 		)
-	), 'top')
-), 'top');
+	))
+));
+
+$periods = new CCol($periodTable, 'top');
+$periods->setRowSpan(3);
+
+$filterTable->addRow(array(
+	new CCol(bold(_('Host groups')), 'label'),
+	new CCol(new CMultiSelect(
+		array(
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $this->data['multiSelectHostGroupData'],
+			'popup' => array(
+				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
+		)),
+		'inputcol'
+	),
+	$periods
+));
+
+$filterTable->addRow(array(
+	new CCol(bold(_('Hosts')), 'label'),
+	new CCol(new CMultiSelect(
+		array(
+			'name' => 'hostids[]',
+			'objectName' => 'hosts',
+			'data' => $this->data['multiSelectHostData'],
+			'popup' => array(
+				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
+					'&real_hosts=1&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
+		)),
+		'inputcol'
+	)
+));
+
+// get all severities
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
+		in_array($severity, $this->data['filter']['severities']), '', 1
+	);
+
+	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
+	$severities[] = BR();
+}
+array_pop($severities);
+
+$filterTable->addRow(array(
+	new CCol(bold(_('Severity')), 'label top'),
+	new CCol($severities, 'inputcol')
+));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
 $filterButton->main();
