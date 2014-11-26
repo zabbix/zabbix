@@ -998,6 +998,17 @@ class C18ImportConverterTest extends CImportConverterTest {
 						array(
 							'name' => 'graph1',
 							'graphtype' => GRAPH_TYPE_BAR,
+							'ymin_item_key' => '',
+							'ymax_item_key' => '',
+							'graph_elements' => array(
+								array(
+									'item' => 'host2:item'
+								),
+							)
+						),
+						array(
+							'name' => 'graph2',
+							'graphtype' => GRAPH_TYPE_BAR,
 							'ymin_item_key' => 'host2:itemmin',
 							'ymax_item_key' => 'host2:itemmax',
 							'graph_elements' => array(
@@ -1008,7 +1019,7 @@ class C18ImportConverterTest extends CImportConverterTest {
 							)
 						),
 						array(
-							'name' => 'graph2',
+							'name' => 'graph3',
 							'ymin_item_key' => 'host2:ftp,1',
 							'ymax_item_key' => 'host2:ftp,2',
 							'graph_elements' => array(
@@ -1076,6 +1087,20 @@ class C18ImportConverterTest extends CImportConverterTest {
 				array(
 					'name' => 'graph1',
 					'type' => GRAPH_TYPE_BAR,
+					'ymin_item_1' => '',
+					'ymax_item_1' => '',
+					'graph_items' => array(
+						array(
+							'item' => array(
+								'host' => 'host2',
+								'key' => 'item'
+							)
+						),
+					)
+				),
+				array(
+					'name' => 'graph2',
+					'type' => GRAPH_TYPE_BAR,
 					'ymin_item_1' => array(
 						'host' => 'host2',
 						'key' => 'itemmin'
@@ -1094,7 +1119,7 @@ class C18ImportConverterTest extends CImportConverterTest {
 					)
 				),
 				array(
-					'name' => 'graph2',
+					'name' => 'graph3',
 					'ymin_item_1' => array(
 						'host' => 'host2',
 						'key' => 'net.tcp.service[ftp,,1]'
