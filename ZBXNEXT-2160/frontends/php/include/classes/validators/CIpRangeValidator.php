@@ -74,7 +74,7 @@ class CIpRangeValidator extends CValidator {
 				return false;
 			}
 			if ($bits < 16) {
-				$this->setError(_s('Provided network mask "%1$s" contains more than %2$d IPs.', $ipMask, $this->ipCountLimit));
+				$this->setError(_s('Provided network mask "%1$s" contains more than %2$s IPs.', $ipMask, $this->ipCountLimit));
 				return false;
 			}
 			if ($bits > 30) {
@@ -88,7 +88,7 @@ class CIpRangeValidator extends CValidator {
 				return false;
 			}
 			if ($bits < 112) {
-				$this->setError(_s('Provided network mask "%1$s" contains more than %2$d IPs.', $ipMask, $this->ipCountLimit));
+				$this->setError(_s('Provided network mask "%1$s" contains more than %2$s IPs.', $ipMask, $this->ipCountLimit));
 				return false;
 			}
 			if ($bits > 128) {
@@ -216,7 +216,7 @@ class CIpRangeValidator extends CValidator {
 
 		// Check if IP count in the given range is bigger that the limit
 		if (!$this->skipIpCountLimit && $ipCount > $this->ipCountLimit) {
-			$this->setError(_s('IP count in range "%1$s" is above %2$d.', $ipRange, $this->ipCountLimit));
+			$this->setError(_s('IP count in range "%1$s" is above %2$s.', $ipRange, $this->ipCountLimit));
 			return false;
 		}
 
