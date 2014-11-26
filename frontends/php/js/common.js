@@ -526,7 +526,7 @@ function switchElementClass(obj, class1, class2) {
 }
 
 /**
- * Returns the file name of the given path
+ * Returns the file name of the given path.
  *
  * @param string path
  * @param string suffix
@@ -541,4 +541,35 @@ function basename(path, suffix) {
 	}
 
 	return name;
+}
+
+/**
+ * Return the number of days in a month.
+ *
+ * @param int year
+ * @param int month
+ *
+ * @return int
+ */
+function daysInMonth(year, month) {
+	month++;
+	var days = 31;
+	if (month == 4 || month == 6 || month == 9 || month == 11) {
+		days = 30;
+	}
+	else if (month == 2) {
+		days = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+	}
+	return days;
+}
+
+/**
+ * Transform datetime parts to two digits e.g., 2 becomes 02.
+ *
+ * @param int val
+ *
+ * @return string
+ */
+function appendZero(val) {
+	return val < 10 ? '0' + val : val;
 }
