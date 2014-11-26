@@ -84,6 +84,47 @@ static const char *zbx_api_get_tags[] = {
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_api_value_validate                                           *
+ *                                                                            *
+ * Purpose: validates if the value contains acceptable data for its type      *
+ *                                                                            *
+ * Parameters: value - [IN] the value to validate                             *
+ *             type  - [IN] the value type (see ZBX_TYPE_* defines)           *
+ *                                                                            *
+ * Return value: SUCCEED - the validation was successful                      *
+ *               FAIL    - the value contains invalid data                    *
+ *                                                                            *
+ * Comments: Object is an associative array and is stored as ptr pair vector. *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_value_validate(const char *value, int type)
+{
+	switch (type)
+	{
+		case ZBX_TYPE_ID:
+		case ZBX_TYPE_UINT:
+			return is_uint64(value, NULL);
+		case ZBX_TYPE_INT:
+			if ('-' == *value)
+				value++;
+			return is_uint31(value, NULL);
+		case ZBX_TYPE_FLOAT:
+		{
+			char	*float_chars = ".,-+eE";
+
+			while ('\0' != *value)
+			{
+				if (0 == isdigit((unsigned char)*value) && NULL == strchr(float_chars, *value))
+					return FAIL;
+			}
+			return SUCCEED;
+		}
+	}
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_api_register_param                                           *
  *                                                                            *
  * Purpose: checks conflicting parameters and marks parameter as parsed       *
@@ -98,7 +139,7 @@ static const char *zbx_api_get_tags[] = {
  *                         is returned in error parameter.                    *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_get_register_param(zbx_api_get_t *self, int paramid, int mask, char **error)
+static int	zbx_api_get_register_param(zbx_api_get_options_t *self, int paramid, int mask, char **error)
 {
 	if (0 != (self->parameters & mask))
 	{
@@ -151,7 +192,7 @@ static int	zbx_api_get_register_param(zbx_api_get_t *self, int paramid, int mask
  *                         returned in error parameter.                       *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_get_validate_param_dependency(const zbx_api_get_t *self, int paramid, int requiredid,
+static int	zbx_api_get_validate_param_dependency(const zbx_api_get_options_t *self, int paramid, int requiredid,
 		char **error)
 {
 	if (0 != (self->parameters & (1 << paramid)) && 0 == (self->parameters & (1 << requiredid)))
@@ -166,16 +207,34 @@ static int	zbx_api_get_validate_param_dependency(const zbx_api_get_t *self, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_sort_free                                                *
+ * Function: zbx_api_db_free_columns                                          *
  *                                                                            *
- * Purpose: frees sort data                                                   *
+ * Purpose: frees result set columns                                          *
  *                                                                            *
- * Parameters: self - [IN] the sort data                                      *
+ * Parameters: columns - [IN] the columns to free                             *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_api_sort_free(zbx_api_sort_t *self)
+static void	zbx_api_db_free_columns(zbx_vector_str_t *columns)
 {
-	zbx_free(self->field);
+	zbx_vector_str_clear_ext(columns, zbx_ptr_free);
+	zbx_vector_str_destroy(columns);
+	zbx_free(columns);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_query_result_free                                        *
+ *                                                                            *
+ * Purpose: frees query result set                                            *
+ *                                                                            *
+ * Parameters: self - [IN] the result set to free                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_query_result_free(zbx_api_query_result_t *self)
+{
+	zbx_free(self->name);
+	zbx_vector_ptr_clear_ext(&self->rows, (zbx_mem_free_func_t)zbx_api_db_free_rows);
+	zbx_vector_ptr_destroy(&self->rows);
 	zbx_free(self);
 }
 
@@ -191,7 +250,7 @@ static void	zbx_api_sort_free(zbx_api_sort_t *self)
 void	zbx_api_query_init(zbx_api_query_t *self)
 {
 	self->type = ZBX_API_QUERY_NONE;
-	zbx_vector_str_create(&self->fields);
+	zbx_vector_ptr_create(&self->fields);
 }
 
 /******************************************************************************
@@ -205,8 +264,7 @@ void	zbx_api_query_init(zbx_api_query_t *self)
  ******************************************************************************/
 void	zbx_api_query_free(zbx_api_query_t *self)
 {
-	zbx_vector_str_clear_ext(&self->fields, zbx_ptr_free);
-	zbx_vector_str_destroy(&self->fields);
+	zbx_vector_ptr_destroy(&self->fields);
 }
 
 /******************************************************************************
@@ -474,6 +532,104 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_api_get_param_filter                                         *
+ *                                                                            *
+ * Purpose: gets filter exact or like fields from json data                   *
+ *                                                                            *
+ * Parameters: param  - [IN] the parameter name                               *
+ *             next   - [IN/OUT] the next character in json data buffer       *
+ *             fields - [IN] an array of available fields                     *
+ *             value  - [OUT] the parsed value                                *
+ *             error  - [OUT] the error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was parsed successfully.             *
+ *               FAIL    - the parsing failed, the error message is stored    *
+ *                         in error parameter.                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_get_param_filter(const char *param, const char **next, const zbx_api_field_t *fields, int like,
+		zbx_vector_ptr_pair_t *value, char **error)
+{
+	zbx_vector_ptr_pair_t	objects;
+	int			ret = FAIL, i;
+	const zbx_api_field_t	*field;
+	zbx_ptr_pair_t		pair;
+
+	zbx_vector_ptr_pair_create(&objects);
+
+	if (SUCCEED != zbx_api_get_param_object(param, next, &objects, error))
+		goto out;
+
+	for (i = 0; i < objects.values_num; i++)
+	{
+		if (NULL == (field = zbx_api_field_get(fields, (char *)objects.values[i].first)))
+		{
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field name \"%s\"",
+					param, (char *)objects.values[i].first);
+			goto out;
+		}
+
+		pair.first = (void *)field;
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_INT:
+				if (0 != like)
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
+							param, (char *)objects.values[i].second);
+					goto out;
+				}
+				if (SUCCEED != zbx_api_value_validate((char *)objects.values[i].second, field->type))
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" value",
+							param, (char *)objects.values[i].second);
+					goto out;
+				}
+
+				/* in the case of numeric values simply move the value to filter */
+				pair.second = objects.values[i].second;
+				objects.values[i].second = NULL;
+				break;
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_LONGTEXT:
+			case ZBX_TYPE_SHORTTEXT:
+				if (0 == like)
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
+							param, (char *)objects.values[i].second);
+					goto out;
+				}
+				/* fall through to char type processing */
+			case ZBX_TYPE_CHAR:
+				pair.second = DBdyn_escape_like_pattern(objects.values[i].second);
+				zbx_free(objects.values[i].second);
+				break;
+		}
+
+		zbx_vector_ptr_pair_append(value, pair);
+
+		/* free the field name and move ownership of field value to filter */
+		zbx_free(objects.values[i].first);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_api_vector_ptr_pair_clear(&objects);
+
+	if (SUCCEED != ret)
+		zbx_api_vector_ptr_pair_clear(value);
+
+	zbx_vector_ptr_pair_destroy(&objects);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_api_get_param_array                                          *
  *                                                                            *
  * Purpose: gets array type parameter from json data                          *
@@ -574,10 +730,11 @@ out:
  *                                                                            *
  * Purpose: gets query type parameter from json data                          *
  *                                                                            *
- * Parameters: param - [IN] the parameter name                                *
- *             next  - [IN/OUT] the next character in json data buffer        *
- *             value - [OUT] the parsed value                                 *
- *             error - [OUT] the error message                                *
+ * Parameters: param  - [IN] the parameter name                               *
+ *             next   - [IN/OUT] the next character in json data buffer       *
+ *             fields - [IN] an array of available object fields              *
+ *             value  - [OUT] the parsed value                                *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the parameter was parsed successfully.             *
  *               FAIL    - the parsing failed, the error message is stored    *
@@ -589,17 +746,43 @@ out:
  *           defines) and fields contain the defined field names.             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_param_query(const char *param, const char **next, zbx_api_query_t *value, char **error)
+int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_field_t *fields,
+		zbx_api_query_t *value, char **error)
 {
 	char			*data = NULL;
-	int			ret = FAIL;
+	int			ret = FAIL, i;
+	const zbx_api_field_t	*field;
 
 	if ('[' == **next)
 	{
-		if (SUCCEED != zbx_api_get_param_array(param, next, &value->fields, error))
-			goto out;
+		zbx_vector_str_t	outfields;
 
-		value->type = ZBX_API_QUERY_FIELDS;
+		zbx_vector_str_create(&outfields);
+
+		if (SUCCEED == (ret = zbx_api_get_param_array(param, next, &outfields, error)))
+		{
+			for (i = 0; i < outfields.values_num; i++)
+			{
+				field = zbx_api_field_get(fields, outfields.values[i]);
+				if (NULL == field)
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" query field \"%s\"",
+							param, outfields.values[i]);
+					ret = FAIL;
+
+					break;
+				}
+				zbx_vector_ptr_append(&value->fields, (void *)field);
+			}
+
+			if (SUCCEED == ret)
+				value->type = ZBX_API_QUERY_FIELDS;
+			else
+				zbx_vector_ptr_clear(&value->fields);
+		}
+
+		zbx_vector_str_clear_ext(&outfields, zbx_ptr_free);
+		zbx_vector_str_destroy(&outfields);
 	}
 	else
 	{
@@ -608,6 +791,9 @@ int	zbx_api_get_param_query(const char *param, const char **next, zbx_api_query_
 
 		if (NULL == data || 0 == strcmp(data, ZBX_API_PARAM_QUERY_EXTEND))
 		{
+			for (field = fields; NULL != field->name; field++)
+				zbx_vector_ptr_append(&value->fields, (void *)field);
+
 			value->type = ZBX_API_QUERY_ALL;
 		}
 		else if (0 == strcmp(data, ZBX_API_PARAM_QUERY_COUNT))
@@ -619,8 +805,9 @@ int	zbx_api_get_param_query(const char *param, const char **next, zbx_api_query_
 			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 		}
+
+		ret = SUCCEED;
 	}
-	ret = SUCCEED;
 out:
 	zbx_free(data);
 
@@ -732,9 +919,9 @@ out:
  * Parameters: self - [IN] the common get request parameter data              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_get_init(zbx_api_get_t *self)
+void	zbx_api_get_init(zbx_api_get_options_t *self)
 {
-	memset(self, 0, sizeof(zbx_api_get_t));
+	memset(self, 0, sizeof(zbx_api_get_options_t));
 
 	zbx_api_query_init(&self->output);
 	self->output.type = ZBX_API_QUERY_ALL;
@@ -751,6 +938,7 @@ void	zbx_api_get_init(zbx_api_get_t *self)
  * Purpose: parses get request common parameter                               *
  *                                                                            *
  * Parameters: self      - [IN] the common get request parameter data         *
+ *             fields    - [IN] an array of object fields                     *
  *             parameter - [IN] the parameter name                            *
  *             json      - [IN] the json data                                 *
  *             next      - [IN/OUT] the next character in json data buffer    *
@@ -761,22 +949,27 @@ void	zbx_api_get_init(zbx_api_get_t *self)
  *                         in error parameter.                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_json_parse *json, const char **next,
-		char **error)
+int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *parameter,
+		struct zbx_json_parse *json, const char **next, char **error)
 {
 	int		ret = FAIL;
 	unsigned char	flag;
 
 	if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_OUTPUT]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_OUTPUT, ZBX_API_PARAM_OUTPUT_CONFLICT, error))
-			goto out;
-
-		if (SUCCEED != zbx_api_get_param_query(zbx_api_get_tags[ZBX_API_PARAM_OUTPUT], next, &self->output,
+		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_OUTPUT, ZBX_API_PARAM_OUTPUT_CONFLICT,
 				error))
 		{
 			goto out;
 		}
+
+		if (SUCCEED != zbx_api_get_param_query(zbx_api_get_tags[ZBX_API_PARAM_OUTPUT], next, fields,
+				&self->output, error))
+		{
+			goto out;
+		}
+
+		self->output_field_count = self->output.fields.values_num;
 	}
 	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_OUTPUTCOUNT]))
 	{
@@ -890,7 +1083,7 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_FILTER, 1 << ZBX_API_PARAM_FILTER, error))
 			goto out;
 
-		if (SUCCEED != zbx_api_get_param_object(zbx_api_get_tags[ZBX_API_PARAM_FILTER], next,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_get_tags[ZBX_API_PARAM_FILTER], next, fields, 0,
 				&self->filter.exact, error))
 		{
 			goto out;
@@ -901,7 +1094,7 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SEARCH, 1 << ZBX_API_PARAM_SEARCH, error))
 			goto out;
 
-		if (SUCCEED != zbx_api_get_param_object(zbx_api_get_tags[ZBX_API_PARAM_SEARCH], next,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_get_tags[ZBX_API_PARAM_SEARCH], next, fields, 1,
 				&self->filter.like, error))
 		{
 			goto out;
@@ -909,7 +1102,7 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 	}
 	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD]))
 	{
-		zbx_vector_str_t	fields;
+		zbx_vector_str_t	sortfields;
 		int			i, rc;
 
 		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SORTFIELD, ZBX_API_PARAM_SORTFIELD_CONFLICT,
@@ -918,15 +1111,15 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			goto out;
 		}
 
-		zbx_vector_str_create(&fields);
+		zbx_vector_str_create(&sortfields);
 
 		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD], next,
-				&fields, error)))
+				&sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortorder parameter */
-			if (0 == self->sort.values_num && 0 != fields.values_num)
+			if (0 == self->sort.values_num && 0 != sortfields.values_num)
 			{
-				for (i = 0; i < fields.values_num; i++)
+				for (i = 0; i < sortfields.values_num; i++)
 				{
 					zbx_api_sort_t	*sort;
 
@@ -937,7 +1130,7 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			}
 
 			/* check that sortfield items match sortoder items */
-			if (fields.values_num != self->sort.values_num)
+			if (sortfields.values_num != self->sort.values_num)
 			{
 				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
@@ -947,25 +1140,35 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			}
 
 			/* copy sort fields */
-			for (i = 0; i < fields.values_num; i++)
+			for (i = 0; i < sortfields.values_num; i++)
 			{
 				zbx_api_sort_t	*sort = (zbx_api_sort_t *)self->sort.values[i];
 
-				sort->field = fields.values[i];
+				if (NULL == (sort->field = zbx_api_field_get(fields, sortfields.values[i])))
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"",
+							zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD],
+							sortfields.values[i]);
+
+					zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
+					rc = FAIL;
+					break;
+				}
+
 			}
 
 			/* clear the field vector without freeing fields, as they are copied to options sort data */
-			zbx_vector_str_clear(&fields);
+			zbx_vector_str_clear_ext(&sortfields, zbx_ptr_free);
 		}
 
-		zbx_vector_str_destroy(&fields);
+		zbx_vector_str_destroy(&sortfields);
 
 		if (SUCCEED != rc)
 			goto out;
 	}
 	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SORTORDER]))
 	{
-		zbx_vector_str_t	fields;
+		zbx_vector_str_t	sortfields;
 		int			i, rc;
 
 		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SORTORDER,
@@ -974,15 +1177,15 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			goto out;
 		}
 
-		zbx_vector_str_create(&fields);
+		zbx_vector_str_create(&sortfields);
 
 		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_get_tags[ZBX_API_PARAM_SORTORDER], next,
-				&fields, error)))
+				&sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortfield parameter */
-			if (0 == self->sort.values_num && 0 != fields.values_num)
+			if (0 == self->sort.values_num && 0 != sortfields.values_num)
 			{
-				for (i = 0; i < fields.values_num; i++)
+				for (i = 0; i < sortfields.values_num; i++)
 				{
 					zbx_api_sort_t	*sort;
 
@@ -993,7 +1196,7 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			}
 
 			/* check that sortfield items match sortoder items */
-			if (fields.values_num != self->sort.values_num)
+			if (sortfields.values_num != self->sort.values_num)
 			{
 				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
@@ -1003,31 +1206,30 @@ int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_jso
 			}
 
 			/* set field sort order */
-			for (i = 0; i < fields.values_num; i++)
+			for (i = 0; i < sortfields.values_num; i++)
 			{
 				zbx_api_sort_t	*sort = (zbx_api_sort_t *)self->sort.values[i];
 
-				if (0 == strcmp(fields.values[i], "ASC"))
+				if (0 == strcmp(sortfields.values[i], "ASC"))
 				{
 					sort->order = ZBX_API_SORT_ASC;
 				}
-				else if (0 == strcmp(fields.values[i], "DESC"))
+				else if (0 == strcmp(sortfields.values[i], "DESC"))
 				{
 					sort->order = ZBX_API_SORT_DESC;
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"", fields.values[i]);
+					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"", sortfields.values[i]);
 					rc = FAIL;
 					break;
 				}
 			}
 
-			zbx_vector_str_clear_ext(&fields, zbx_ptr_free);
-			zbx_vector_str_clear(&fields);
+			zbx_vector_str_clear_ext(&sortfields, zbx_ptr_free);
 		}
 
-		zbx_vector_str_destroy(&fields);
+		zbx_vector_str_destroy(&sortfields);
 
 		if (SUCCEED != rc)
 			goto out;
@@ -1038,23 +1240,48 @@ out:
 	return ret;
 }
 
+int	zbx_api_get_add_output_field(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *name,
+		char **error)
+{
+	const zbx_api_field_t	*field;
+	int			ret = FAIL, i;
+
+	if (NULL == (field = zbx_api_field_get(fields, name)))
+	{
+		*error = zbx_dsprintf(*error, "invalid additional output field name \"%s\"", name);
+		goto out;
+	}
+
+	ret = SUCCEED;
+
+	for (i = 0; i < self->output.fields.values_num; i++)
+	{
+		if (self->output.fields.values[i] == field)
+			goto out;
+	}
+
+	zbx_vector_ptr_append(&self->output.fields, (void *)field);
+out:
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_validate                                             *
+ * Function: zbx_api_get_finalize                                             *
  *                                                                            *
- * Purpose: validates get request common parameters                           *
+ * Purpose: finalizes common get request and validates it                     *
  *                                                                            *
  * Parameters: self      - [IN] the common get request parameter data         *
  *             error     - [OUT] the error message                            *
  *                                                                            *
- * Return value: SUCCEED - the parameters were validated parsed successfully. *
- *               FAIL    - the validation failed failed, the error message is *
- *                         stored in error parameter.                         *
+ * Return value: SUCCEED - the request was finalized successfully.            *
+ *               FAIL    - the validation failed failed.                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_validate(const zbx_api_get_t *self, char **error)
+int	zbx_api_get_finalize(zbx_api_get_options_t *self, const zbx_api_field_t *fields, char **error)
 {
+	int	i;
+
 	if (SUCCEED != zbx_api_get_validate_param_dependency(self, ZBX_API_PARAM_EXCLUDESEARCH, ZBX_API_PARAM_SEARCH,
 			error))
 	{
@@ -1089,6 +1316,28 @@ int	zbx_api_get_validate(const zbx_api_get_t *self, char **error)
 		return FAIL;
 	}
 
+	/* translate '*' to '%' if wildcard search option is enabled */
+	if (0 != (self->filter.options & ZBX_API_FILTER_OPTION_WILDCARD))
+	{
+		for (i = 0; i < self->filter.like.values_num; i++)
+		{
+			char	*ptr;
+
+			for (ptr = (char *)self->filter.like.values[i].second; '\0' != *ptr; ptr++)
+			{
+				if ('*' == *ptr)
+					*ptr = '%';
+			}
+		}
+	}
+
+	if (0 != self->output_indexed)
+	{
+		if (SUCCEED != zbx_api_get_add_output_field(self, fields, "mediatypeid", error))
+			return FAIL;
+
+	}
+
 	return SUCCEED;
 }
 
@@ -1101,9 +1350,9 @@ int	zbx_api_get_validate(const zbx_api_get_t *self, char **error)
  * Parameters: self      - [IN] the common get request parameter data         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_get_free(zbx_api_get_t *self)
+void	zbx_api_get_free(zbx_api_get_options_t *self)
 {
-	zbx_vector_ptr_clear_ext(&self->sort, (zbx_mem_free_func_t)zbx_api_sort_free);
+	zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&self->sort);
 
 	zbx_api_filter_free(&self->filter);
@@ -1133,5 +1382,403 @@ const zbx_api_field_t	*zbx_api_field_get(const zbx_api_field_t *fields, const ch
 	}
 
 	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_query_field_index                                        *
+ *                                                                            *
+ * Purpose: searches for the specified field in a querie's fields vector      *
+ *                                                                            *
+ * Parameters: query - [IN] the query                                         *
+ *             name  - [IN] the field name                                    *
+ *                                                                            *
+ * Return value: The index of the field in queries fields vector or -1        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_query_field_index(const zbx_api_query_t *query, const char *name)
+{
+	int	i;
+
+	for (i = 0; i < query->fields.values_num; i++)
+	{
+		zbx_api_field_t	*field = (zbx_api_field_t *)query->fields.values[i];
+
+		if (0 == strcmp(field->name, name))
+			return i;
+	}
+
+	return -1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_sql_add_query                                            *
+ *                                                                            *
+ * Purpose: adds query data to sql statement                                  *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] the sql statement                        *
+ *             sql_alloc  - [IN/OUT] the allocated size of sql statement      *
+ *             sql_offset - [IN/OUT] the sql statement end offset             *
+ *             query      - [IN] the query to add                             *
+ *             table      - [IN] the source table name                        *
+ *             alias      - [IN] the source table alias                       *
+ *                                                                            *
+ * Comments: This function formats sql select statement beginning. For        *
+ *           ZBX_API_QUERY_COUNT queries it will have format:                 *
+ *              select count(*) from <table> <alias>                          *
+ *           while for other queries it will have format:                     *
+ *              select <alias>.<f1>,<alias>.<f2>... from <table <alias>       *
+ *           where <f1>, <f2>.. are field names from query fields list.       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_query_t *query,
+		const char *table, const char *alias)
+{
+	int	i;
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "select ");
+
+	if (ZBX_API_QUERY_COUNT == query->type)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "count(*)");
+	}
+	else
+	{
+		for (i = 0; i < query->fields.values_num; i++)
+		{
+			const zbx_api_field_t	*field = (const zbx_api_field_t *)query->fields.values[i];
+
+			if (0 < i)
+				zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ',');
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s.%s", alias, field->name);
+		}
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " from %s %s", table, alias);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_sql_add_filter                                           *
+ *                                                                            *
+ * Purpose: adds filter data to sql statement                                 *
+ *                                                                            *
+ * Parameters: sql           - [IN/OUT] the sql statement                     *
+ *             sql_alloc     - [IN/OUT] the allocated size of sql statement   *
+ *             sql_offset    - [IN/OUT] the sql statement end offset          *
+ *             filter        - [IN] the filter to add                         *
+ *             alias         - [IN] the source table alias                    *
+ *             sql_condition - [IN/OUT] the sql condition inserted before     *
+ *                             next filter rule. It is set to 'where'  if     *
+ *                             there were no where rules added before and     *
+ *                             'and'/'or' for the rest of filter rule         *
+ *                             depending on ZBX_API_FILTER_OPTION_ANY flag.   *
+ *                                                                            *
+ * Comments: This function adds a set of exact match rules specified in       *
+ *           filter.exact vector and a set of 'like' match rules specified in *
+ *           filter.like vector.                                              *
+ *           The exact and like matching rules are already validated and      *
+ *           escaped if necessary during request parsing.                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_sql_add_filter(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_filter_t *filter,
+		const char *alias, const char **sql_condition)
+{
+	int	i;
+
+	if (0 != filter->exact.values_num)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, *sql_condition);
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+		if (0 != (filter->options & ZBX_API_FILTER_OPTION_ANY))
+			*sql_condition = " or ";
+		else
+			*sql_condition = " and ";
+
+		for (i = 0; i < filter->exact.values_num; i++)
+		{
+			zbx_ptr_pair_t		*pair = &filter->exact.values[i];
+			const zbx_api_field_t	*field = (const zbx_api_field_t *)pair->first;
+
+			if (0 != i)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, *sql_condition);
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s.%s=", alias, field->name);
+
+			switch (field->type)
+			{
+				case ZBX_TYPE_ID:
+				case ZBX_TYPE_FLOAT:
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s", (char *)pair->second);
+					break;
+				case ZBX_TYPE_CHAR:
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s'", (char *)pair->second);
+					break;
+			}
+		}
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+		*sql_condition = " and";
+	}
+
+	if (0 != filter->like.values_num)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, *sql_condition);
+
+		if (0 != (filter->options & ZBX_API_FILTER_OPTION_EXCLUDE))
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not");
+
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+		if (0 != (filter->options & ZBX_API_FILTER_OPTION_ANY))
+			*sql_condition = " or ";
+		else
+			*sql_condition = " and ";
+
+		for (i = 0; i < filter->like.values_num; i++)
+		{
+			zbx_ptr_pair_t		*pair = &filter->like.values[i];
+			const zbx_api_field_t	*field = (const zbx_api_field_t *)pair->first;
+
+			if (0 != i)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, *sql_condition);
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s.%s like '", alias, field->name);
+
+			if (0 == (filter->options & ZBX_API_FILTER_OPTION_START))
+				zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '%');
+
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, (char *)pair->second);
+
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "%' escape '");
+			zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ZBX_SQL_LIKE_ESCAPE_CHAR);
+			zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
+		}
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+		*sql_condition = " and";
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_sql_add_sort                                             *
+ *                                                                            *
+ * Purpose: adds sort data to sql statement                                   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] the sql statement                        *
+ *             sql_alloc  - [IN/OUT] the allocated size of sql statement      *
+ *             sql_offset - [IN/OUT] the sql statement end offset             *
+ *             sort       - [IN] the sort order to add                        *
+ *             alias      - [IN] the source table alias                       *
+ *                                                                            *
+ * Comments: This function adds order by clause from the sort vector fields.  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *sort,
+		const char *alias)
+{
+	const char	*sql_condition = " order by", *order;
+	int		i;
+
+	for (i = 0; i < sort->values_num; i++)
+	{
+		zbx_api_sort_t	*field = (zbx_api_sort_t *)sort->values[i];
+
+		order = (ZBX_API_SORT_ASC == field->order ? "asc" : "desc");
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s %s.%s %s", sql_condition, alias, field->field->name,
+				order);
+		sql_condition = ",";
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_db_fetch_rows                                            *
+ *                                                                            *
+ * Purpose: perform sql select, fetch and store the resulting rows            *
+ *                                                                            *
+ * Parameters: sql         - [IN] the sql statement                           *
+ *             columns_num - [IN] the number of columns in result set,        *
+ *                                0 - count(*) request                        *
+ *             rows_num    - [IN] the maximum number of rows in result set,   *
+ *                                0 - unlimited                               *
+ *             rows        - [OUT] the fetched rows                           *
+ *                                                                            *
+ * Comments: The result set is stored as ptr vector (rows) of str vectors     *
+ *           (columns).                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *rows)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		i;
+
+	if (0 == rows_num)
+		result = DBselect("%s", sql);
+	else
+		result = DBselectN(sql, rows_num);
+
+	/* reserve 1 column for count(*) requests - they don't have output fields */
+	if (0 == fields_num)
+		fields_num = 1;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_vector_str_t	*columns;
+
+		columns = (zbx_vector_str_t *)zbx_malloc(NULL, sizeof(zbx_vector_str_t));
+		zbx_vector_str_create(columns);
+
+		for (i = 0; i < fields_num; i++)
+		{
+			char	*value = NULL;
+
+			if (SUCCEED != DBis_null(row[i]))
+				value = zbx_strdup(value, row[i]);
+
+			zbx_vector_str_append(columns, value);
+		}
+
+		zbx_vector_ptr_append(rows, columns);
+	}
+
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_db_fetch_query                                           *
+ *                                                                            *
+ * Purpose: fetches a query based on a key field from result set              *
+ *                                                                            *
+ * Parameters: sql           - [IN/OUT] the sql statement                     *
+ *             sql_alloc     - [IN/OUT] the allocated size of sql statement   *
+ *             sql_offset    - [IN/OUT] the sql statement end offset          *
+ *             column_name   - [IN] the name of query column                  *
+ *             query         - [IN] the query defining output fields          *
+ *             result        - [IN/OUT] the result containing input rows and  *
+ *                                      retrieved result set                  *
+ *             key_index     - [IN] the index of key column in input result   *
+ *                                  set                                       *
+ *                                                                            *
+ * Comments: This function performs subqueries for each input result set row  *
+ *           based on initial query specified in sql and the field value      *
+ *           specified by key_index. The resulting rows are stored in         *
+ *           result.queries vector.                                           *
+ *           The sql query has the following format:                          *
+ *             select <field1>,<field2>... from <table> where.... <key>=      *
+ *           The query is finished by appending field value from input result *
+ *           set key_index column.                                            *
+ *           Note that only fields of type ID are should to be used as key    *
+ *           fields.                                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
+		const zbx_api_query_t *query, zbx_api_get_result_t *result, int key_index)
+{
+	int			i;
+	size_t			sql_offset_original = *sql_offset;
+	zbx_api_query_result_t *qr;
+
+	/* create a new query and add to the result */
+	qr = (zbx_api_query_result_t *)zbx_malloc(NULL, sizeof(zbx_api_query_result_t));
+	qr->name = zbx_strdup(NULL, column_name);
+	qr->query = query;
+	zbx_vector_ptr_create(&qr->rows);
+
+	zbx_vector_ptr_append(&result->queries, qr);
+
+	for (i = 0; i < result->rows.values_num; i++)
+	{
+		zbx_vector_str_t	*columns = (zbx_vector_str_t *)result->rows.values[i];
+		zbx_vector_ptr_t	*rows;
+
+		/* finish the query by appending key field value to the sql template*/
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, columns->values[key_index]);
+
+		/* create the result set row vector */
+		rows = (zbx_vector_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_ptr_t));
+		zbx_vector_ptr_create(rows);
+
+		/* fetch the result set */
+		zbx_api_db_fetch_rows(*sql, query->fields.values_num, 0, rows);
+
+		/* store the fetched rows to result.queries rows vector */
+		zbx_vector_ptr_append(&qr->rows, rows);
+
+		/* restore the query template */
+		*sql_offset = sql_offset_original;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_get_result_init                                          *
+ *                                                                            *
+ * Purpose: initializes api get request result storage                        *
+ *                                                                            *
+ * Parameters: self - [IN] the get request result storage                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_get_result_init(zbx_api_get_result_t *self)
+{
+	zbx_vector_ptr_create(&self->rows);
+	zbx_vector_ptr_create(&self->queries);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_get_result_clean                                         *
+ *                                                                            *
+ * Purpose: releases resources allocated by get request result storage        *
+ *                                                                            *
+ * Parameters: self - [IN] the get request result storage                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_get_result_clean(zbx_api_get_result_t *self)
+{
+	zbx_vector_ptr_clear_ext(&self->queries, (zbx_mem_free_func_t)zbx_api_query_result_free);
+	zbx_vector_ptr_destroy(&self->queries);
+
+	zbx_api_db_clean_rows(&self->rows);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_db_clean_rows                                            *
+ *                                                                            *
+ * Purpose: releases resources allocated to store result set (rows)           *
+ *                                                                            *
+ * Parameters: self - [IN] the result set data (rows)                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows)
+{
+	zbx_vector_ptr_clear_ext(rows, (zbx_mem_free_func_t)zbx_api_db_free_columns);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_db_free_rows                                             *
+ *                                                                            *
+ * Purpose: frees resources allocated to store result set (rows)              *
+ *                                                                            *
+ * Parameters: self - [IN] the result set data (rows)                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows)
+{
+	zbx_api_db_clean_rows(rows);
+	zbx_vector_ptr_destroy(rows);
+	zbx_free(rows);
 }
 

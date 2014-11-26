@@ -20,24 +20,9 @@
 #ifndef ZABBIX_API_MEDIATYPE_H
 #define ZABBIX_API_MEDIATYPE_H
 
-#include "api.h"
+extern const zbx_api_field_t zbx_api_class_mediatype[];
 
-typedef struct
-{
-	zbx_vector_uint64_t	mediatypeids;
+int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **result);
 
-	zbx_vector_uint64_t	mediaids;
-
-	zbx_vector_uint64_t	userids;
-
-	zbx_api_query_t		select_users;
-
-	zbx_api_get_t		options;
-}
-zbx_api_mediatype_get_t;
-
-
-int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *json, char **error);
-void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self);
 
 #endif

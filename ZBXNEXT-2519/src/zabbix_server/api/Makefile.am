@@ -2,4 +2,4 @@
 
 noinst_LIBRARIES = libzbxapi.a
 
-libzbxapi_a_SOURCES = api.c api.h mediatype.c mediatype.h
+libzbxapi_a_SOURCES = api.c api.h objects/mediatype.c objects/mediatype.h

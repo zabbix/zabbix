@@ -20,6 +20,8 @@
 #ifndef ZABBIX_API_H
 #define ZABBIX_API_H
 
+#include "db.h"
+
 /* if set then filter matches if any item matches */
 #define ZBX_API_FILTER_OPTION_ANY	1
 /* if set then * wildcard is allowed for LIKE type filters */
@@ -48,6 +50,18 @@
 
 #define ZBX_API_PARAM_NAME_SIZE		256
 
+/* object field definition */
+typedef struct
+{
+	/* field name */
+	char		*name;
+	/* ZBX_TYPE_ */
+	unsigned char	type;
+	/* see ZBX_API_FIELD_FLAG_* defines */
+	unsigned int	flags;
+}
+zbx_api_field_t;
+
 /* filter definition */
 typedef struct
 {
@@ -67,7 +81,7 @@ zbx_api_filter_t;
 typedef struct
 {
 	/* a vector of output fields */
-	zbx_vector_str_t	fields;
+	zbx_vector_ptr_t	fields;
 
 	/* the query type, see ZBX_API_QUERY_* defines */
 	unsigned char		type;
@@ -78,10 +92,10 @@ zbx_api_query_t;
 typedef struct
 {
 	/* sort field */
-	char		*field;
+	const zbx_api_field_t	*field;
 
 	/* sorting order, see ZBX_API_SORT_* defines */
-	unsigned char	order;
+	unsigned char		order;
 }
 zbx_api_sort_t;
 
@@ -107,38 +121,63 @@ typedef struct
 	/* output, countOutput */
 	zbx_api_query_t		output;
 
+	/* the number of output fields specified in query */
+	int			output_field_count;
+
 	/* sort, sortOrder (a vector of zbx_api_sort_t structures) */
 	zbx_vector_ptr_t	sort;
 }
-zbx_api_get_t;
+zbx_api_get_options_t;
+
+/* data returned by get request sub query (select<Object> parameter) */
+typedef struct
+{
+	/* the sub query name */
+	char			*name;
+
+	/* the sub query */
+	const zbx_api_query_t	*query;
+
+	/* a vector of result sets matching main query rows by index */
+	zbx_vector_ptr_t	rows;
+}
+zbx_api_query_result_t;
+
+/* data retrieved by API get request */
+/* TODO: create nice diagram illustrating result storage */
+typedef struct
+{
+	/* the retrieved rows containing columns specified by get request output option */
+	zbx_vector_ptr_t	rows;
+
+	/* A vector of sub query results (zbx_api_query_result_t).      */
+	/* Those sub queries are specified by select<Object> parameters */
+	/* And performed for each row retrieved by the main query.      */
+	zbx_vector_ptr_t	queries;
+}
+zbx_api_get_result_t;
 
 /* object field flags */
 #define ZBX_API_FIELD_FLAG_SORTABLE	1
 #define ZBX_API_FIELD_FLAG_REQUIRED	2
 #define ZBX_API_FIELD_FLAG_CALCULATED	4
 
-/* object field definition */
-typedef struct
-{
-	/* field name */
-	char		*name;
-	/* ZBX_TYPE_ */
-	unsigned char	type;
-	/* see ZBX_API_FIELD_FLAG_* defines */
-	unsigned int	flags;
-}
-zbx_api_field_t;
 
-void	zbx_api_get_init(zbx_api_get_t *self);
-int	zbx_api_get_parse(zbx_api_get_t *self, const char *parameter, struct zbx_json_parse *json, const char **next,
+
+void	zbx_api_get_init(zbx_api_get_options_t *self);
+int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *parameter,
+		struct zbx_json_parse *json, const char **next, char **error);
+
+int	zbx_api_get_finalize( zbx_api_get_options_t *self, const zbx_api_field_t *fields, char **error);
+int	zbx_api_get_add_output_field(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *name,
 		char **error);
-int	zbx_api_get_validate(const zbx_api_get_t *self, char **error);
-void	zbx_api_get_free(zbx_api_get_t *self);
+void	zbx_api_get_free(zbx_api_get_options_t *self);
 
 void	zbx_api_query_init(zbx_api_query_t *self);
 void	zbx_api_query_free(zbx_api_query_t *self);
 
-int	zbx_api_get_param_query(const char *param, const char **next, zbx_api_query_t *value, char **error);
+int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_field_t *fields,
+		zbx_api_query_t *value, char **error);
 int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *value, char **error);
 int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *value, char **error);
 int	zbx_api_get_param_int(const char *param, const char **next, int *value, char **error);
@@ -146,6 +185,30 @@ int	zbx_api_get_param_object(const char *param, const char **next, zbx_vector_pt
 int	zbx_api_get_param_string_or_array(const char *param, const char **next, zbx_vector_str_t *value, char **error);
 int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_uint64_t *value, char **error);
 
+void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_query_t *query,
+		const char *table, const char *alias);
+void	zbx_api_sql_add_filter(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_filter_t *filter,
+		const char *alias, const char **sql_condition);
+void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *sort,
+		const char *alias);
+
+void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows);
+void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows);
+
+void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *resultset);
+void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
+		const zbx_api_query_t *query, zbx_api_get_result_t *result, int key_index);
+
+void	zbx_api_get_result_init(zbx_api_get_result_t *self);
+void	zbx_api_get_result_clean(zbx_api_get_result_t *self);
+
+
 const zbx_api_field_t	*zbx_api_field_get(const zbx_api_field_t *fields, const char *name);
+int	zbx_api_query_field_index(const zbx_api_query_t *query, const char *name);
+
+/* TODO: investigate if it's possible to reuse dbschema definition */
+extern const zbx_api_field_t zbx_api_class_mediatype[];
+
+extern const zbx_api_field_t zbx_api_class_user[];
 
 #endif
