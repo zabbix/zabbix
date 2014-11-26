@@ -120,7 +120,7 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .filter .multiselect-wrapper { width: 280px; }
 .latest-mon .filter .multiselect { width: 216px; line-height: 12px; }
 
-/* triggers top 100*/
+/* triggers top 100 */
 .top-triggers .filter .label { width: 15%; }
 .top-triggers .filter .inputcol { min-width: 277px; width: 35%; }
 .top-triggers .filter .inputcol .checkbox { margin-top: 4px; }

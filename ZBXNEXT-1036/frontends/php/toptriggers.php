@@ -50,7 +50,6 @@ if (hasRequest('filterState')) {
 }
 
 $data['config'] = select_config();
-$data['triggers'] = array();
 
 /*
  * Filter
@@ -133,6 +132,7 @@ if ($data['filter']['hostids']) {
 
 // data generation
 $triggersEventCount = array();
+
 // get 100 triggerids with max event count
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' FROM triggers t,events e'.
