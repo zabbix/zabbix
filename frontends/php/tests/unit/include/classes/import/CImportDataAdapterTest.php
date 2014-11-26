@@ -1398,6 +1398,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ipmi_username' => '',
 					'ipmi_password' => '',
 					'inventory_mode' => -1,
+					'groups' =>	array(
+						array(
+							'name' => 'Linux servers'
+						)
+					),
 				),
 			),
 			$adapter->getHosts()
