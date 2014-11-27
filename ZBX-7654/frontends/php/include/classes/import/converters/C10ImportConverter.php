@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Converter for converting import data from 1.8 to 2.0.
+ */
 class C10ImportConverter extends CConverter {
 
 	/**
@@ -157,9 +160,9 @@ class C10ImportConverter extends CConverter {
 		}
 		unset($host);
 
-		$content = $this->mergeToRoot($content['hosts'], $content, 'groups');
-		$content = $this->mergeToRoot($content['hosts'], $content, 'triggers');
-		$content = $this->mergeToRoot($content['hosts'], $content, 'graphs');
+		$content = $this->mergeTo($content['hosts'], $content, 'groups');
+		$content = $this->mergeTo($content['hosts'], $content, 'triggers');
+		$content = $this->mergeTo($content['hosts'], $content, 'graphs');
 		foreach ($content['hosts'] as &$host) {
 			unset($host['triggers']);
 			unset($host['graphs']);
@@ -192,9 +195,9 @@ class C10ImportConverter extends CConverter {
 		}
 		unset($template);
 
-		$content = $this->mergeToRoot($content['templates'], $content, 'groups');
-		$content = $this->mergeToRoot($content['templates'], $content, 'triggers');
-		$content = $this->mergeToRoot($content['templates'], $content, 'graphs');
+		$content = $this->mergeTo($content['templates'], $content, 'groups');
+		$content = $this->mergeTo($content['templates'], $content, 'triggers');
+		$content = $this->mergeTo($content['templates'], $content, 'graphs');
 		foreach ($content['templates'] as &$host) {
 			unset($host['triggers']);
 			unset($host['graphs']);
@@ -601,6 +604,8 @@ class C10ImportConverter extends CConverter {
 	protected function convertTriggerExpression(array $trigger, $hostName) {
 		$trigger['expression'] = $this->triggerConverter->convert($trigger['expression']);
 
+		// replace host macros with the host name
+		// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
 		$trigger['expression'] = str_replace('{HOSTNAME}', $hostName, $trigger['expression']);
 		$trigger['expression'] = str_replace('{HOST.HOST}', $hostName, $trigger['expression']);
 
@@ -681,6 +686,8 @@ class C10ImportConverter extends CConverter {
 
 		list ($host, $itemKey) = explode(':', $array[$key], 2);
 
+		// replace host macros with the host name
+		// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
 		if ($hostName !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
 			$host = $hostName;
 		}
@@ -834,7 +841,16 @@ class C10ImportConverter extends CConverter {
 		return $content;
 	}
 
-	protected function mergeToRoot(array $source, array $target, $key) {
+	/**
+	 * Merges all of the values from each element of $source stored in the $key property to the $key property of $target.
+	 *
+	 * @param array $source
+	 * @param array $target
+	 * @param string $key
+	 *
+	 * @return array    $target array with the new values
+	 */
+	protected function mergeTo(array $source, array $target, $key) {
 		$values = (isset($target[$key])) ? $target[$key] : array();
 
 		foreach ($source as $sourceItem) {
@@ -855,6 +871,15 @@ class C10ImportConverter extends CConverter {
 		return $target;
 	}
 
+	/**
+	 * Adds a $wrapperKey property for each element of $key in $array and moves it's value to the new property.
+	 *
+	 * @param array $array
+	 * @param string $key
+	 * @param string $wrapperKey
+	 *
+	 * @return array
+	 */
 	protected function wrapChildren(array $array, $key, $wrapperKey) {
 		if (!isset($array[$key]) || !$array[$key]) {
 			return $array;
@@ -873,6 +898,15 @@ class C10ImportConverter extends CConverter {
 		return $array;
 	}
 
+	/**
+	 * Renames the $source key in $array to $target.
+	 *
+	 * @param array $array
+	 * @param string $source
+	 * @param string $target
+	 *
+	 * @return array
+	 */
 	protected function renameKey(array $array, $source, $target) {
 		if (!isset($array[$source])) {
 			return $array;
