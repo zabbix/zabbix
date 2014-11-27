@@ -951,6 +951,272 @@ class C18ImportConverterTest extends CImportConverterTest {
 		$this->assertConvert($expectedResult, $source);
 	}
 
+	public function testConvertTriggerDependencies() {
+		$this->assertConvert(
+			$this->createExpectedResult(array()),
+			$this->createSource(array())
+		);
+
+		// dependencies as an empty string
+		$source = $this->createSource(array(
+			'dependencies' => ''
+		));
+		$expectedResult = $this->createExpectedResult(array());
+		$this->assertConvert($expectedResult, $source);
+
+		// missing hosts
+		$source = $this->createSource(array(
+			'dependencies' => array()
+		));
+		$expectedResult = $this->createExpectedResult(array());
+		$this->assertConvert($expectedResult, $source);
+
+		// hosts have no triggers
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+				)
+			),
+			'dependencies' => array(
+				array(
+					'description' => 'host1:trigger',
+					'depends' => 'host2:trigger',
+				)
+			)
+		));
+		$expectedResult = $this->createExpectedResult(array(
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+			)
+		));
+		$this->assertConvert($expectedResult, $source);
+
+		// the used triggers are missing
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(),
+				),
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'trigger',
+							'expression' => '{host2:item.last()}>0'
+						)
+					),
+				),
+				array(
+					'name' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'trigger2',
+							'expression' => '{host3:item.last()}>0'
+						)
+					),
+				)
+			),
+			'dependencies' => array(
+				array(
+					'description' => 'host1:trigger',
+					'depends' => 'host1:trigger2',
+				),
+				// target trigger missing
+				array(
+					'description' => 'host2:trigger',
+					'depends' => 'host2:trigger2',
+				),
+				// source trigger missing
+				array(
+					'description' => 'host3:trigger',
+					'depends' => 'host3:trigger2',
+				)
+			)
+		));
+		$expectedResult = $this->createExpectedResult(array(
+			'triggers' => array(
+				array(
+					'name' => 'trigger',
+					'expression' => '{host2:item.last()}>0'
+				),
+				array(
+					'name' => 'trigger2',
+					'expression' => '{host3:item.last()}>0'
+				),
+			),
+			'hosts' => array(
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+				array(
+					'host' => 'host3',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+			)
+		));
+		$this->assertConvert($expectedResult, $source);
+
+		$source = $this->createSource(array(
+			'hosts' => array(
+				array(
+					'name' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'common-trigger',
+							'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}'
+						),
+					)
+				),
+				// check the case when hosts are in a different order than in the expression
+				array(
+					'name' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'triggers' => array(
+						array(
+							'description' => 'common-trigger',
+							'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}'
+						),
+						array(
+							'description' => 'dep-trigger',
+							'expression' => '{host1:item.last(0)}'
+						),
+					)
+				),
+				array(
+					'name' => 'template1',
+					'status' => HOST_STATUS_TEMPLATE,
+					'triggers' => array(
+						array(
+							'description' => 'common-trigger',
+							'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}'
+						),
+					)
+				),
+				array(
+					'name' => 'template2',
+					'status' => HOST_STATUS_TEMPLATE,
+					'triggers' => array(
+						array(
+							'description' => 'common-trigger',
+							'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}'
+						),
+						array(
+							'description' => 'dep-trigger',
+							'expression' => '{template1:item.last(0)}'
+						),
+					)
+				),
+			),
+			'dependencies' => array(
+				array(
+					'description' => 'host1:common-trigger',
+					'depends' => 'host1:dep-trigger'
+				),
+				array(
+					'description' => 'template1:common-trigger',
+					'depends' => 'template2:dep-trigger'
+				),
+			)
+		));
+
+		$expectedResult = $this->createExpectedResult(array(
+			'triggers' => array(
+				array(
+					'name' => 'common-trigger',
+					'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}',
+					'dependencies' => array(
+						array(
+							'name' => 'dep-trigger',
+							'expression' => '{host1:item.last(0)}'
+						)
+					)
+				),
+				array(
+					'name' => 'dep-trigger',
+					'expression' => '{host1:item.last(0)}'
+				),
+				array(
+					'name' => 'common-trigger',
+					'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}',
+					'dependencies' => array(
+						array(
+							'name' => 'dep-trigger',
+							'expression' => '{template1:item.last(0)}'
+						)
+					)
+				),
+				array(
+					'name' => 'dep-trigger',
+					'expression' => '{template1:item.last(0)}'
+				),
+			),
+			'hosts' => array(
+				array(
+					'host' => 'host2',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+				array(
+					'host' => 'host1',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => array(
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					),
+				),
+			),
+			'templates' => array(
+				array(
+					'template' => 'template1'
+				),
+				array(
+					'template' => 'template2'
+				),
+			),
+		));
+
+		$this->assertConvert($expectedResult, $source);
+	}
+
 	public function testConvertHostTemplates() {
 		$this->assertConvert(
 			$this->createExpectedResult(array()),

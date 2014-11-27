@@ -316,8 +316,10 @@ class CConfigurationImport {
 				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
 			}
 
-			foreach ($trigger['dependencies'] as $dependency) {
-				$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+			if (isset($trigger['dependencies'])) {
+				foreach ($trigger['dependencies'] as $dependency) {
+					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+				}
 			}
 		}
 
@@ -1180,24 +1182,27 @@ class CConfigurationImport {
 			if ($triggerId) {
 				$deps = array();
 
-				foreach ($trigger['dependencies'] as $dependency) {
-					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-					if (!$depTriggerId) {
-						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
-							$trigger['description'],
-							$dependency['name']
-						));
+				if (isset($trigger['dependencies'])) {
+					foreach ($trigger['dependencies'] as $dependency) {
+						$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+						if (!$depTriggerId) {
+							throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
+								$trigger['description'],
+								$dependency['name']
+							));
+						}
+
+						$deps[] = array('triggerid' => $depTriggerId);
 					}
 
-					$deps[] = array('triggerid' => $depTriggerId);
+					$trigger['dependencies'] = $deps;
 				}
 
-				$trigger['dependencies'] = $deps;
 				$trigger['triggerid'] = $triggerId;
 				$triggersToUpdate[] = $trigger;
 			}
 			else {
-				$triggersToCreateDependencies[] = $trigger['dependencies'];
+				$triggersToCreateDependencies[] = isset($trigger['dependencies']) ? $trigger['dependencies'] : array();
 				unset($trigger['dependencies']);
 				$triggersToCreate[] = $trigger;
 			}
