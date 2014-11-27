@@ -43,19 +43,17 @@ static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
+	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
 	DIR		*dir;
 	struct dirent	*entries;
-	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1;
-	zbx_uint64_t	value = 0;
-	int		do_task;
-	double		memsize = 0;
-	zbx_uint64_t	proccount = 0;
+	int		fd = -1, do_task, proccount = 0;
+	zbx_uint64_t	mem_size = 0, byte_value = 0;
+	double		pct_size = 0.0, pct_value = 0.0;
+	size_t		*p_value;
 
-	if (4 < request->nparam)
+	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -99,6 +97,25 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+	memtype = get_rparam(request, 4);
+
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vsize"))
+	{
+		p_value = &psinfo.pr_size;	/* size of process image in Kbytes */
+	}
+	else if (0 == strcmp(memtype, "rss"))
+	{
+		p_value = &psinfo.pr_rssize;	/* resident set size in Kbytes */
+	}
+	else if (0 == strcmp(memtype, "pmem"))
+	{
+		p_value = NULL;			/* for % of system memory used by process */
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -116,9 +133,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != zbx_stat(tmp, &buf))
-			continue;
-
 		if (-1 == (fd = open(tmp, O_RDONLY)))
 			continue;
 
@@ -134,19 +148,40 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 			continue;
 
-		value = psinfo.pr_size;
-		value <<= 10;	/* kB to Byte */
+		if (NULL != p_value)
+		{
+			/* pr_size or pr_rssize in Kbytes */
+			byte_value = *p_value << 10;	/* kB to Byte */
 
-		if (0 == proccount++)
-			memsize = value;
+			if (0 != proccount++)
+			{
+				if (ZBX_DO_MAX == do_task)
+					mem_size = MAX(mem_size, byte_value);
+				else if (ZBX_DO_MIN == do_task)
+					mem_size = MIN(mem_size, byte_value);
+				else
+					mem_size += byte_value;
+			}
+			else
+				mem_size = byte_value;
+		}
 		else
 		{
-			if (ZBX_DO_MAX == do_task)
-				memsize = MAX(memsize, value);
-			else if (ZBX_DO_MIN == do_task)
-				memsize = MIN(memsize, value);
+			/* % of system memory used by process, measured in 16-bit binary fractions in the range */
+			/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
+			pct_value = (double)((int)psinfo.pr_pctmem * 100)/32768.0;
+
+			if (0 != proccount++)
+			{
+				if (ZBX_DO_MAX == do_task)
+					pct_size = MAX(pct_size, pct_value);
+				else if (ZBX_DO_MIN == do_task)
+					pct_size = MIN(pct_size, pct_value);
+				else
+					pct_size += pct_value;
+			}
 			else
-				memsize += value;
+				pct_size = pct_value;
 		}
 	}
 
@@ -154,10 +189,20 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 != fd)
 		close(fd);
 
-	if (ZBX_DO_AVG == do_task)
-		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
+	if (NULL != p_value)
+	{
+		if (ZBX_DO_AVG == do_task)
+			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : (double)mem_size / (double)proccount);
+		else
+			SET_UI64_RESULT(result, mem_size);
+	}
 	else
-		SET_UI64_RESULT(result, memsize);
+	{
+		if (ZBX_DO_AVG == do_task)
+			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
+		else
+			SET_DBL_RESULT(result, pct_size);
+	}
 
 	return SYSINFO_RET_OK;
 }
