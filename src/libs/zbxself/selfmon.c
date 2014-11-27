@@ -292,7 +292,7 @@ void	init_selfmon_collector(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
+	if (FAIL == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
 		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(EXIT_FAILURE);

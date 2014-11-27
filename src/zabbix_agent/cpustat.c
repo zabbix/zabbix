@@ -167,7 +167,7 @@ clean:
 	}
 
 #else	/* not _WINDOWS */
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
+	if (FAIL == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
 		zbx_error("unable to create mutex for cpu collector");
 		exit(EXIT_FAILURE);

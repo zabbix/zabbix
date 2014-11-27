@@ -56,9 +56,6 @@
 
 #endif	/* _WINDOWS */
 
-#define ZBX_MUTEX_ERROR		FAIL
-#define ZBX_MUTEX_OK		SUCCEED
-
 #define zbx_mutex_create(mutex, name)		zbx_mutex_create_ext(mutex, name, 0)
 #define zbx_mutex_create_force(mutex, name)	zbx_mutex_create_ext(mutex, name, 1)
 #define zbx_mutex_lock(mutex)			__zbx_mutex_lock(__FILE__, __LINE__, mutex)

@@ -614,7 +614,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 	{
 		(*info)->use_lock = 1;
 
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
+		if (FAIL == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for %s", descr);
 			exit(EXIT_FAILURE);
