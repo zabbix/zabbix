@@ -635,7 +635,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 						httpstep.required, NULL))
 				{
 					if (0 != regerr)
-						zbx_snprintf(&err_str, &alloc_len, &offset, "pattern compilation failed: %s: '%s'", httpstep.required, regerrstr);
+					{
+						zbx_snprintf_alloc(err_str, &alloc_len, &offset,
+								"pattern compilation failed: \"%s\": %s",
+								httpstep.required, regerrstr);
+					}
 					else
 						err_str = zbx_strdup(err_str, "required pattern not found");
 				}

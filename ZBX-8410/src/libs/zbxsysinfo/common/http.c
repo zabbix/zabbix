@@ -243,7 +243,8 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 		else
 		{
-			zbx_snprintf_alloc(&tmperr, &alloc_len, &offset, "Failed to compile regular expression: '%s': %s", regexp, regerrstr);
+			zbx_snprintf_alloc(&tmperr, &alloc_len, &offset, "Cannot compile regular expression: '%s': %s",
+					regexp, regerrstr);
 			SET_STR_RESULT(result, tmperr);
 			zbx_free(tmperr);
 		}
