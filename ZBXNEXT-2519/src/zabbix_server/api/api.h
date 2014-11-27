@@ -31,14 +31,6 @@
 /* if set then inverses LIKE filter */
 #define ZBX_API_FILTER_OPTION_EXCLUDE	8
 
-/* query not defined */
-#define ZBX_API_QUERY_NONE		0
-/* query the specified list of fields */
-#define ZBX_API_QUERY_FIELDS		1
-/* query all object fields */
-#define ZBX_API_QUERY_ALL		2
-/* query the number of selected objects */
-#define ZBX_API_QUERY_COUNT		3
 
 #define ZBX_API_PARAM_QUERY_EXTEND	"extend"
 #define ZBX_API_PARAM_QUERY_COUNT	"count"
@@ -49,6 +41,23 @@
 #define ZBX_API_SORT_DESC		1
 
 #define ZBX_API_PARAM_NAME_SIZE		256
+
+/* json result tags */
+#define ZBX_API_RESULT_TAG_JSONRPC	"jsonrpc"
+#define ZBX_API_RESULT_TAG_ID		"id"
+#define ZBX_API_RESULT_TAG_RESULT	"result"
+#define ZBX_API_RESULT_TAG_ERROR	"error"
+#define ZBX_API_RESULT_TAG_ERRCODE	"code"
+#define ZBX_API_RESULT_TAG_ERRMESSAGE	"message"
+#define ZBX_API_RESULT_TAG_ERRDATA	"data"
+
+/* api request data */
+typedef struct
+{
+	zbx_uint64_t	id;
+	int		type;
+}
+zbx_api_user_t;
 
 /* object field definition */
 typedef struct
@@ -80,11 +89,22 @@ zbx_api_filter_t;
 /* query parameter definition */
 typedef struct
 {
-	/* a vector of output fields */
+	/* a vector of output fields, when empty query is interpreted as select count(*) */
 	zbx_vector_ptr_t	fields;
 
-	/* the query type, see ZBX_API_QUERY_* defines */
-	unsigned char		type;
+	/* The number of fields specified by the request.                                */
+	/* During processing fields required to fetch referred data might be added to    */
+	/* fields vector, so fields_num should be used to determine the number of        */
+	/* columns when creating response json.                                          */
+	int			fields_num;
+
+	/* Index of the key field in fields list vector.                                  */
+	/* For main query the key field is the object id field if preservekeys is set or  */
+	/* 0 otherwise.                                                                   */
+	/* For sub queries the key field is the main query result field, used to execute  */
+	/* sub queries.                                                                   */
+	/* If they key_index is -1 then the query is not active.                          */
+	int		key;
 }
 zbx_api_query_t;
 
@@ -121,13 +141,109 @@ typedef struct
 	/* output, countOutput */
 	zbx_api_query_t		output;
 
-	/* the number of output fields specified in query */
-	int			output_field_count;
+	/* the starting index of hidden fields that are retrieved from database, */
+	/* but not returned with the rest of fields                              */
+	int			output_num;
 
 	/* sort, sortOrder (a vector of zbx_api_sort_t structures) */
 	zbx_vector_ptr_t	sort;
 }
-zbx_api_get_options_t;
+zbx_api_getoptions_t;
+
+/*
+ * The result sets from database queries are usually stored as ptr vectors
+ * of rows, each containing str vector of columns, as shown below:
+ *
+ *            .--------------------.
+ *            |        rows        |
+ *            | <zbx_vector_ptr_t> |
+ *            |--------------------|
+ *         .--| row1               |
+ *      .--|--| row2               |
+ *      |  |  | ...                |
+ *   .--|--|--| rowN               |
+ *   |  |  |  '--------------------'
+ *   |  |  |
+ *   |  |  |  .--------------------.
+ *   |  |  '->|      columns       |
+ *   |  |     | <zbx_vector_str_t> |
+ *   |  |     |--------------------|
+ *   |  |     | column1            |
+ *   |  |     | column2            |
+ *   |  |     | ...                |
+ *   |  |     | columnK            |
+ *   |  |     '--------------------'
+ *   |  |
+ *   |  |     .--------------------.
+ *   |  '---->|      columns       |
+ *   |        | <zbx_vector_str_t> |
+ *   |        |--------------------|
+ *   |        | column1            |
+ *   |        | column2            |
+ *   |        | ...                |
+ *   |        | columnK            |
+ *   |        '--------------------'
+ *   |
+ *   |                . . .
+ *   |
+ *   |        .--------------------.
+ *   '------->|      columns       |
+ *            | <zbx_vector_str_t> |
+ *            |--------------------|
+ *            | column1            |
+ *            | column2            |
+ *            | ...                |
+ *            | columnK            |
+ *            '--------------------'
+ *
+ * All values are stored as strings except nulls that have NULL value.
+ *
+ * The result set of the main request query is stored in zbx_api_get_result_t structure
+ * rows vector. For example when executing mediatype.get request the rows vector will
+ * contain the requested data from media_type table.
+ *
+ * If the request has sub queries (defined with select<Objects> request parameter) then
+ * for every sub query a zbx_api_query_result_t structure is created and added to
+ * zbx_api_get_result_t structure queries vector. This data basically is an additional
+ * column to the main result set, with a result set per row.
+ *
+ * Then the sub queries are executed for each main result set (rows) row and the returned
+ * result sets are stored corresponding zbx_api_query_result_t structure rows vector, matching
+ * the main result set row by row.
+ *
+ *       .--------------------.
+ *       |      queries       |
+ *       | <zbx_vector_ptr_t> |
+ *       |--------------------|
+ *   .---| query1             |
+ *   |   | ...                |
+ *   | .-| queryQ             |
+ *   | | '--------------------'
+ *   | |
+ *   | '------------------------------------------------.
+ *   |                                                  |
+ *   '-----------------.                                |
+ *	               v                                v
+ *       .--------------------------.     .--------------------------.
+ *       |        columnK+1         |     |        columnK+Q         |
+ *       | <zbx_api_query_result_t> |     | <zbx_api_query_result_t> |
+ *       |--------------------------|     |--------------------------|
+ *       | name                     |     | name                     |
+ *       | query                    | ... | query                    |
+ *       | rows[]                   |     | rows[]                   |
+ *       |   resultset1             |     |   resultset1             |
+ *       |   resultset2             |     |   resultset2             |
+ *       |      ...                 |     |      ...                 |
+ *       |   resultsetN             |     |   resultsetN             |
+ *       '--------------------------'     '--------------------------'
+ *
+ * The resultsetX result sets stored in query rows matches the rows of the main result set:
+ *   row1 -> resultset1
+ *   row2 -> resultset2
+ *      ...
+ *   rowN -> resultsetN
+ */
+
 
 /* data returned by get request sub query (select<Object> parameter) */
 typedef struct
@@ -144,7 +260,6 @@ typedef struct
 zbx_api_query_result_t;
 
 /* data retrieved by API get request */
-/* TODO: create nice diagram illustrating result storage */
 typedef struct
 {
 	/* the retrieved rows containing columns specified by get request output option */
@@ -164,14 +279,14 @@ zbx_api_get_result_t;
 
 
 
-void	zbx_api_get_init(zbx_api_get_options_t *self);
-int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *parameter,
+void	zbx_api_getoptions_init(zbx_api_getoptions_t *self);
+int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *fields, const char *parameter,
 		struct zbx_json_parse *json, const char **next, char **error);
 
-int	zbx_api_get_finalize( zbx_api_get_options_t *self, const zbx_api_field_t *fields, char **error);
-int	zbx_api_get_add_output_field(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *name,
-		char **error);
-void	zbx_api_get_free(zbx_api_get_options_t *self);
+int	zbx_api_getoptions_finalize( zbx_api_getoptions_t *self, const zbx_api_field_t *fields, char **error);
+int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_field_t *fields,
+		const char *name, int *index, char **error);
+void	zbx_api_getoptions_free(zbx_api_getoptions_t *self);
 
 void	zbx_api_query_init(zbx_api_query_t *self);
 void	zbx_api_query_free(zbx_api_query_t *self);
@@ -195,20 +310,23 @@ void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, con
 void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows);
 void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows);
 
-void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *resultset);
-void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
-		const zbx_api_query_t *query, zbx_api_get_result_t *result, int key_index);
+int	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *resultset, char **error);
+int	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
+		const zbx_api_query_t *query, zbx_api_get_result_t *result, char **error);
 
 void	zbx_api_get_result_init(zbx_api_get_result_t *self);
 void	zbx_api_get_result_clean(zbx_api_get_result_t *self);
 
 
-const zbx_api_field_t	*zbx_api_field_get(const zbx_api_field_t *fields, const char *name);
-int	zbx_api_query_field_index(const zbx_api_query_t *query, const char *name);
+const zbx_api_field_t	*zbx_api_object_get_field(const zbx_api_field_t *fields, const char *name);
 
-/* TODO: investigate if it's possible to reuse dbschema definition */
-extern const zbx_api_field_t zbx_api_class_mediatype[];
-
-extern const zbx_api_field_t zbx_api_class_user[];
+void	zbx_api_json_init(struct zbx_json *json, const char *id);
+void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);
+void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *options, zbx_api_get_result_t *result);
+void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, const zbx_vector_str_t *columns,
+		const zbx_vector_ptr_t *queries, int row);
+void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
+		const zbx_vector_ptr_t *rows);
+void	zbx_api_json_add_error(struct zbx_json *json, const char *error);
 
 #endif

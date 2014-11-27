@@ -338,6 +338,14 @@ void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
 }
 
+void	zbx_json_addint(struct zbx_json *j, const char *name, int value)
+{
+	char	buffer[16];
+
+	zbx_snprintf(buffer, sizeof(buffer), "%d", value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
+}
+
 int	zbx_json_close(struct zbx_json *j)
 {
 	if (1 == j->level)

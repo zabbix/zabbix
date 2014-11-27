@@ -26,13 +26,12 @@
 
 #include "../api.h"
 #include "mediatype.h"
-
+#include "user.h"
 
 #define ZBX_API_MEDIATYPE_GET_TAG_MEDIATYPEIDS	"mediatypeids"
 #define ZBX_API_MEDIATYPE_GET_TAG_MEDIAIDS	"mediaids"
 #define ZBX_API_MEDIATYPE_GET_TAG_USERIDS	"userids"
 #define ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS	"selectUsers"
-
 
 typedef struct
 {
@@ -44,7 +43,7 @@ typedef struct
 
 	zbx_api_query_t		select_users;
 
-	zbx_api_get_options_t		options;
+	zbx_api_getoptions_t		options;
 }
 zbx_api_mediatype_get_t;
 
@@ -78,14 +77,17 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	zbx_vector_uint64_create(&self->userids);
 	zbx_api_query_init(&self->select_users);
 
-	zbx_api_get_init(&self->options);
+	zbx_api_getoptions_init(&self->options);
 
 	while (NULL != (p = zbx_json_pair_next(jp, p, name, sizeof(name))))
 	{
 		const char	*next = p;
 
-		if (SUCCEED != zbx_api_get_parse(&self->options, zbx_api_object_mediatype, name, jp, &next, error))
+		if (SUCCEED != zbx_api_getoptions_parse(&self->options, zbx_api_object_mediatype, name, jp, &next,
+				error))
+		{
 			goto out;
+		}
 
 		if (next != p)
 		{
@@ -120,7 +122,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 		else if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS))
 		{
-			if (SUCCEED != zbx_api_get_param_query(ZBX_API_MEDIATYPE_GET_TAG_USERIDS, &next,
+			if (SUCCEED != zbx_api_get_param_query(ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS, &next,
 					zbx_api_object_user, &self->select_users, error))
 			{
 				goto out;
@@ -134,16 +136,23 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 	}
 
-	if (ZBX_API_QUERY_FIELDS == self->options.output.type)
+	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, zbx_api_object_mediatype, error))
+		goto out;
+
+	if (-1 != self->select_users.key)
 	{
+		if (0 == self->options.output.fields.values_num)
+		{
+			*error = zbx_dsprintf(*error, "parameter \"selectUsers\" cannot be used with"
+					"parameter \"countOutput\"");
+			goto out;
+		}
+
 		/* ensure that selected output contains mediatypeid field required to select users */
-		if (SUCCEED != zbx_api_get_add_output_field(&self->options, zbx_api_object_mediatype, "mediatypeid",
-				error))
+		if (SUCCEED != zbx_api_getoptions_add_output_field(&self->options, zbx_api_object_mediatype,
+				"mediatypeid", &self->select_users.key, error))
 			goto out;
 	}
-
-	if (SUCCEED != zbx_api_get_finalize(&self->options, zbx_api_object_mediatype, error))
-		goto out;
 
 	ret = SUCCEED;
 
@@ -158,7 +167,7 @@ out:
 
 static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self)
 {
-	zbx_api_get_free(&self->options);
+	zbx_api_getoptions_free(&self->options);
 
 	zbx_api_query_free(&self->select_users);
 
@@ -167,13 +176,7 @@ static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self)
 	zbx_vector_uint64_destroy(&self->mediatypeids);
 }
 
-/* TODO: investigate if it would be possible to create a generic output formatting function */
-static void	zbx_api_mediatype_get_prepare_output(zbx_api_mediatype_get_t *self, zbx_api_get_result_t *result,
-		char **output)
-{
-}
-
-int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **output)
+int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_request, struct zbx_json *output)
 {
 	zbx_api_mediatype_get_t	mediatype;
 	struct zbx_json_parse	jp_params;
@@ -192,11 +195,23 @@ int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **output)
 	if (SUCCEED != zbx_api_mediatype_get_init(&mediatype, &jp_params, &error))
 		goto out;
 
+	zbx_api_get_result_init(&result);
+
+	if ((USER_TYPE_ZABBIX_ADMIN != user->type || 0 != mediatype.options.filter_editable) &&
+			USER_TYPE_SUPER_ADMIN != user->type)
+	{
+		/* reset indexed output for empty queries */
+		mediatype.options.output_indexed = 0;
+		goto skip_query;
+	}
+
 	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.options.output, "media_type", "mt");
 
 	if (0 != mediatype.userids.values_num || 0 != mediatype.mediaids.values_num)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",media m%s mt.mediatypeid=m.mediatypeid", sql_condition);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",media m%s mt.mediatypeid=m.mediatypeid",
+				sql_condition);
+
 		sql_condition = " and";
 	}
 
@@ -231,24 +246,33 @@ int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **output)
 
 	zbx_api_sql_add_sort(&sql, &sql_alloc, &sql_offset, &mediatype.options.sort, "mt");
 
-	zbx_api_get_result_init(&result);
+	DBbegin();
 
-	zbx_api_db_fetch_rows(sql, mediatype.options.output.fields.values_num, mediatype.options.limit, &result.rows);
-
-	if (ZBX_API_QUERY_NONE != mediatype.select_users.type)
+	if (SUCCEED != zbx_api_db_fetch_rows(sql, mediatype.options.output.fields.values_num, mediatype.options.limit,
+			&result.rows, &error))
 	{
-		int	key_index;
+		DBrollback();
+		goto out;
+	}
 
+	if (-1 != mediatype.select_users.key)
+	{
 		sql_offset = 0;
 		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.select_users, "users", "u");
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",media m where u.userid=m.userid and m.mediatypeid=");
 
-		key_index = zbx_api_query_field_index(&mediatype.options.output, "mediatypeid");
-		zbx_api_db_fetch_query(&sql, &sql_alloc, &sql_offset, "selectUsers", &mediatype.select_users, &result,
-				key_index);
+		if (SUCCEED != zbx_api_db_fetch_query(&sql, &sql_alloc, &sql_offset, "users", &mediatype.select_users,
+				&result, &error))
+		{
+			DBrollback();
+			goto out;
+		}
 	}
 
-	zbx_api_mediatype_get_prepare_output(&mediatype, &result, output);
+	DBcommit();
+
+skip_query:
+	zbx_api_json_add_result(output, &mediatype.options, &result);
 
 	zbx_api_get_result_clean(&result);
 
@@ -257,9 +281,8 @@ int	zbx_api_mediatype_get(struct zbx_json_parse *jp_request, char **output)
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
-	{
-		/* TODO: prepare error response */
-	}
+		zbx_api_json_add_error(output, error);
+
 	zbx_free(error);
 
 	return ret;

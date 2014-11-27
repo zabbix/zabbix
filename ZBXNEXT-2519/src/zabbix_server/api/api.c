@@ -38,7 +38,7 @@
 #define ZBX_API_PARAM_SORTORDER			11
 #define ZBX_API_PARAM_STARTSEARCH		12
 
-#define zbx_api_get_PARAMS_TOTAL		13
+#define ZBX_API_GETOPTIONS_PARAMS_TOTAL		13
 
 /* conflicting field definitions */
 #define ZBX_API_PARAM_OUTPUT_CONFLICT	\
@@ -66,9 +66,9 @@
 	((1 << ZBX_API_PARAM_OUTPUTCOUNT) | (1 << ZBX_API_PARAM_SORTFIELD))
 
 /* common get request parameter names */
-static const char *zbx_api_get_tags[] = {
+static const char *zbx_api_getoptions_tags[] = {
 		"output",
-		"outputCount",
+		"countOutput",
 		"editable",
 		"excludeSearch",
 		"filter",
@@ -125,21 +125,21 @@ static int	zbx_api_value_validate(const char *value, int type)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_register_param                                           *
+ * Function: zbx_api_getoptions_register_param                                *
  *                                                                            *
  * Purpose: checks conflicting parameters and marks parameter as parsed       *
  *                                                                            *
  * Parameters: self    - [IN] common get request options                      *
  *             paramid - [IN] the parameter to check                          *
  *             mask    - [IN] the mask of conflicting parameters              *
- *             error    - [OUT] the error message                             *
+ *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the parameter was registered successfully.         *
  *               FAIL    - parameter conflict was found, the error message    *
  *                         is returned in error parameter.                    *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_get_register_param(zbx_api_get_options_t *self, int paramid, int mask, char **error)
+static int	zbx_api_getoptions_register_param(zbx_api_getoptions_t *self, int paramid, int mask, char **error)
 {
 	if (0 != (self->parameters & mask))
 	{
@@ -147,19 +147,20 @@ static int	zbx_api_get_register_param(zbx_api_get_options_t *self, int paramid, 
 
 		mask &= self->parameters;
 
-		for (i = 0; i < zbx_api_get_PARAMS_TOTAL; i++)
+		for (i = 0; i < ZBX_API_GETOPTIONS_PARAMS_TOTAL; i++)
 		{
 			if (0 != (mask & (1 << i)))
 			{
 				if (paramid != i)
 				{
-					*error = zbx_dsprintf(*error, "parameter \"%s\" conflicts with parameter \"%s\"",
-							zbx_api_get_tags[paramid], zbx_api_get_tags[i]);
+					*error = zbx_dsprintf(*error, "parameter \"%s\" conflicts with parameter"
+							" \"%s\"", zbx_api_getoptions_tags[paramid],
+							zbx_api_getoptions_tags[i]);
 				}
 				else
 				{
 					*error = zbx_dsprintf(*error, "duplicate parameter \"%s\" found",
-							zbx_api_get_tags[paramid]);
+							zbx_api_getoptions_tags[paramid]);
 				}
 
 				return FAIL;
@@ -178,7 +179,7 @@ static int	zbx_api_get_register_param(zbx_api_get_options_t *self, int paramid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_validate_param_dependency                            *
+ * Function: zbx_api_getoptions_validate_dependency                           *
  *                                                                            *
  * Purpose: validates common get request parameter dependency                 *
  *                                                                            *
@@ -192,13 +193,13 @@ static int	zbx_api_get_register_param(zbx_api_get_options_t *self, int paramid, 
  *                         returned in error parameter.                       *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_get_validate_param_dependency(const zbx_api_get_options_t *self, int paramid, int requiredid,
+static int	zbx_api_getoptions_validate_dependency(const zbx_api_getoptions_t *self, int paramid, int requiredid,
 		char **error)
 {
 	if (0 != (self->parameters & (1 << paramid)) && 0 == (self->parameters & (1 << requiredid)))
 	{
 		*error = zbx_dsprintf(*error, "parameter \"%s\" requires parameter \"%s\" to be defined",
-				zbx_api_get_tags[paramid], zbx_api_get_tags[requiredid]);
+				zbx_api_getoptions_tags[paramid], zbx_api_getoptions_tags[requiredid]);
 		return FAIL;
 	}
 
@@ -249,7 +250,8 @@ static void	zbx_api_query_result_free(zbx_api_query_result_t *self)
  ******************************************************************************/
 void	zbx_api_query_init(zbx_api_query_t *self)
 {
-	self->type = ZBX_API_QUERY_NONE;
+	self->key = -1;
+	self->fields_num = 0;
 	zbx_vector_ptr_create(&self->fields);
 }
 
@@ -562,7 +564,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 
 	for (i = 0; i < objects.values_num; i++)
 	{
-		if (NULL == (field = zbx_api_field_get(fields, (char *)objects.values[i].first)))
+		if (NULL == (field = zbx_api_object_get_field(fields, (char *)objects.values[i].first)))
 		{
 			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field name \"%s\"",
 					param, (char *)objects.values[i].first);
@@ -763,7 +765,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		{
 			for (i = 0; i < outfields.values_num; i++)
 			{
-				field = zbx_api_field_get(fields, outfields.values[i]);
+				field = zbx_api_object_get_field(fields, outfields.values[i]);
 				if (NULL == field)
 				{
 					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" query field \"%s\"",
@@ -775,9 +777,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 				zbx_vector_ptr_append(&value->fields, (void *)field);
 			}
 
-			if (SUCCEED == ret)
-				value->type = ZBX_API_QUERY_FIELDS;
-			else
+			if (SUCCEED != ret)
 				zbx_vector_ptr_clear(&value->fields);
 		}
 
@@ -793,12 +793,10 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		{
 			for (field = fields; NULL != field->name; field++)
 				zbx_vector_ptr_append(&value->fields, (void *)field);
-
-			value->type = ZBX_API_QUERY_ALL;
 		}
 		else if (0 == strcmp(data, ZBX_API_PARAM_QUERY_COUNT))
 		{
-			value->type = ZBX_API_QUERY_COUNT;
+			value->key = 0;
 		}
 		else
 		{
@@ -808,6 +806,9 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 
 		ret = SUCCEED;
 	}
+
+	value->key = 0;
+	value->fields_num = value->fields.values_num;
 out:
 	zbx_free(data);
 
@@ -912,20 +913,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_init                                                 *
+ * Function: zbx_api_getoptions_init                                          *
  *                                                                            *
  * Purpose: initializes common get request parameters                         *
  *                                                                            *
  * Parameters: self - [IN] the common get request parameter data              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_get_init(zbx_api_get_options_t *self)
+void	zbx_api_getoptions_init(zbx_api_getoptions_t *self)
 {
-	memset(self, 0, sizeof(zbx_api_get_options_t));
+	memset(self, 0, sizeof(zbx_api_getoptions_t));
 
 	zbx_api_query_init(&self->output);
-	self->output.type = ZBX_API_QUERY_ALL;
-
 	zbx_api_filter_init(&self->filter);
 
 	zbx_vector_ptr_create(&self->sort);
@@ -933,7 +932,7 @@ void	zbx_api_get_init(zbx_api_get_options_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_parse                                                *
+ * Function: zbx_api_getoptions_parse                                         *
  *                                                                            *
  * Purpose: parses get request common parameter                               *
  *                                                                            *
@@ -949,84 +948,96 @@ void	zbx_api_get_init(zbx_api_get_options_t *self)
  *                         in error parameter.                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *parameter,
+int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *fields, const char *parameter,
 		struct zbx_json_parse *json, const char **next, char **error)
 {
 	int		ret = FAIL;
 	unsigned char	flag;
 
-	if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_OUTPUT]))
+	if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUT]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_OUTPUT, ZBX_API_PARAM_OUTPUT_CONFLICT,
-				error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_OUTPUT,
+				ZBX_API_PARAM_OUTPUT_CONFLICT, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_query(zbx_api_get_tags[ZBX_API_PARAM_OUTPUT], next, fields,
+		if (SUCCEED != zbx_api_get_param_query(zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUT], next, fields,
 				&self->output, error))
 		{
 			goto out;
 		}
 
-		self->output_field_count = self->output.fields.values_num;
+		self->output_num = self->output.fields.values_num;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_OUTPUTCOUNT]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUTCOUNT]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_OUTPUTCOUNT,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_OUTPUTCOUNT,
 				ZBX_API_PARAM_OUTPUTCOUNT_CONFLICT, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_get_tags[ZBX_API_PARAM_OUTPUTCOUNT], next, &flag, error))
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUTCOUNT], next, &flag,
+				error))
+		{
 			goto out;
+		}
 
 		if (0 != flag)
-			self->output.type = ZBX_API_QUERY_COUNT;
+			self->output.key = 0;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_EDITABLE]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_EDITABLE]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_EDITABLE, 1 << ZBX_API_PARAM_EDITABLE, error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_EDITABLE,
+				1 << ZBX_API_PARAM_EDITABLE, error))
+		{
 			goto out;
+		}
 
-		if (SUCCEED != zbx_api_get_param_bool(zbx_api_get_tags[ZBX_API_PARAM_EDITABLE], next,
+		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_EDITABLE], next,
 				&self->filter_editable, error))
 		{
 			goto out;
 		}
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_LIMIT]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_LIMIT]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_LIMIT, ZBX_API_PARAM_LIMIT_CONFLICT, error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_LIMIT,
+				ZBX_API_PARAM_LIMIT_CONFLICT, error))
+		{
 			goto out;
+		}
 
-		if (SUCCEED != zbx_api_get_param_int(zbx_api_get_tags[ZBX_API_PARAM_LIMIT], next, &self->limit, error))
+		if (SUCCEED != zbx_api_get_param_int(zbx_api_getoptions_tags[ZBX_API_PARAM_LIMIT], next, &self->limit,
+				error))
+		{
 			goto out;
+		}
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_PRESERVEKEYS]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_PRESERVEKEYS]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_PRESERVEKEYS,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_PRESERVEKEYS,
 				ZBX_API_PARAM_PRESERVEKEYS_CONFLICT, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_get_tags[ZBX_API_PARAM_PRESERVEKEYS], next,
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_PRESERVEKEYS], next,
 				&self->output_indexed, error))
 		{
 			goto out;
 		}
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_EXCLUDESEARCH]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_EXCLUDESEARCH]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_EXCLUDESEARCH,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_EXCLUDESEARCH,
 				1 << ZBX_API_PARAM_EXCLUDESEARCH, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_get_tags[ZBX_API_PARAM_EXCLUDESEARCH], next, &flag,
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_EXCLUDESEARCH], next, &flag,
 				error))
 		{
 			goto out;
@@ -1035,86 +1046,98 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 		if (0 != flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_EXCLUDE;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_STARTSEARCH]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_STARTSEARCH, 1 << ZBX_API_PARAM_STARTSEARCH,
-				error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_STARTSEARCH,
+				1 << ZBX_API_PARAM_STARTSEARCH, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_get_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag, error))
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag,
+				error))
+		{
 			goto out;
+		}
 
 		if (0 != flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_START;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SEARCHBYANY]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHBYANY]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SEARCHBYANY, 1 << ZBX_API_PARAM_SEARCHBYANY,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_SEARCHBYANY,
+				1 << ZBX_API_PARAM_SEARCHBYANY, error))
+		{
+			goto out;
+		}
+
+		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag,
 				error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_bool(zbx_api_get_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag, error))
-			goto out;
-
 		if (0 != flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_ANY;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SEARCHWILDCARDSENABLED,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_SEARCHWILDCARDSENABLED,
 				1 << ZBX_API_PARAM_SEARCHWILDCARDSENABLED, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_bool(zbx_api_get_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED], next,
-				&flag, error))
+		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED],
+				next, &flag, error))
 			goto out;
 
 		if (0 != flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_WILDCARD;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_FILTER]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_FILTER]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_FILTER, 1 << ZBX_API_PARAM_FILTER, error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_FILTER, 1 << ZBX_API_PARAM_FILTER,
+				error))
+		{
 			goto out;
+		}
 
-		if (SUCCEED != zbx_api_get_param_filter(zbx_api_get_tags[ZBX_API_PARAM_FILTER], next, fields, 0,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_getoptions_tags[ZBX_API_PARAM_FILTER], next, fields, 0,
 				&self->filter.exact, error))
 		{
 			goto out;
 		}
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SEARCH]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCH]))
 	{
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SEARCH, 1 << ZBX_API_PARAM_SEARCH, error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_SEARCH, 1 << ZBX_API_PARAM_SEARCH,
+				error))
+		{
 			goto out;
+		}
 
-		if (SUCCEED != zbx_api_get_param_filter(zbx_api_get_tags[ZBX_API_PARAM_SEARCH], next, fields, 1,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCH], next, fields, 1,
 				&self->filter.like, error))
 		{
 			goto out;
 		}
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD]))
 	{
 		zbx_vector_str_t	sortfields;
 		int			i, rc;
 
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SORTFIELD, ZBX_API_PARAM_SORTFIELD_CONFLICT,
-				error))
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_SORTFIELD,
+				ZBX_API_PARAM_SORTFIELD_CONFLICT, error))
 		{
 			goto out;
 		}
 
 		zbx_vector_str_create(&sortfields);
 
-		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD], next,
-				&sortfields, error)))
+		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
+				next, &sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortorder parameter */
 			if (0 == self->sort.values_num && 0 != sortfields.values_num)
@@ -1134,8 +1157,8 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 			{
 				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
-						zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD],
-						zbx_api_get_tags[ZBX_API_PARAM_SORTORDER]);
+						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
+						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER]);
 				rc = FAIL;
 			}
 
@@ -1144,10 +1167,10 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 			{
 				zbx_api_sort_t	*sort = (zbx_api_sort_t *)self->sort.values[i];
 
-				if (NULL == (sort->field = zbx_api_field_get(fields, sortfields.values[i])))
+				if (NULL == (sort->field = zbx_api_object_get_field(fields, sortfields.values[i])))
 				{
 					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"",
-							zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD],
+							zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
 							sortfields.values[i]);
 
 					zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
@@ -1166,12 +1189,12 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 		if (SUCCEED != rc)
 			goto out;
 	}
-	else if (0 == strcmp(parameter, zbx_api_get_tags[ZBX_API_PARAM_SORTORDER]))
+	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER]))
 	{
 		zbx_vector_str_t	sortfields;
 		int			i, rc;
 
-		if (SUCCEED != zbx_api_get_register_param(self, ZBX_API_PARAM_SORTORDER,
+		if (SUCCEED != zbx_api_getoptions_register_param(self, ZBX_API_PARAM_SORTORDER,
 				ZBX_API_PARAM_SORTORDER_CONFLICT, error))
 		{
 			goto out;
@@ -1179,8 +1202,8 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 
 		zbx_vector_str_create(&sortfields);
 
-		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_get_tags[ZBX_API_PARAM_SORTORDER], next,
-				&sortfields, error)))
+		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER],
+				next, &sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortfield parameter */
 			if (0 == self->sort.values_num && 0 != sortfields.values_num)
@@ -1200,8 +1223,8 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 			{
 				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
-						zbx_api_get_tags[ZBX_API_PARAM_SORTFIELD],
-						zbx_api_get_tags[ZBX_API_PARAM_SORTORDER]);
+						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
+						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER]);
 				rc = FAIL;
 			}
 
@@ -1220,7 +1243,8 @@ int	zbx_api_get_parse(zbx_api_get_options_t *self, const zbx_api_field_t *fields
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"", sortfields.values[i]);
+					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"",
+							sortfields.values[i]);
 					rc = FAIL;
 					break;
 				}
@@ -1240,13 +1264,31 @@ out:
 	return ret;
 }
 
-int	zbx_api_get_add_output_field(zbx_api_get_options_t *self, const zbx_api_field_t *fields, const char *name,
-		char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_getoptions_add_output_field                              *
+ *                                                                            *
+ * Purpose: checks if the specified field is in output fields vector and adds *
+ *          it if necessary                                                   *
+ *                                                                            *
+ * Parameters: self   - [IN] the common get request parameter data            *
+ *             fields - [IN] an array of object fields                        *
+ *             name   - [IN] the field name                                   *
+ *             index  - [OUT] the index of the field in output fields vector  *
+ *             error  - [OUT] the error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the field was found or added                       *
+ *               FAIL    - no field with the specified name was found in      *
+ *                         fields vector                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_field_t *fields, const char *name,
+		int *index, char **error)
 {
 	const zbx_api_field_t	*field;
 	int			ret = FAIL, i;
 
-	if (NULL == (field = zbx_api_field_get(fields, name)))
+	if (NULL == (field = zbx_api_object_get_field(fields, name)))
 	{
 		*error = zbx_dsprintf(*error, "invalid additional output field name \"%s\"", name);
 		goto out;
@@ -1262,33 +1304,38 @@ int	zbx_api_get_add_output_field(zbx_api_get_options_t *self, const zbx_api_fiel
 
 	zbx_vector_ptr_append(&self->output.fields, (void *)field);
 out:
+	if (SUCCEED == ret)
+		*index = i;
+
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_finalize                                             *
+ * Function: zbx_api_getoptions_finalize                                      *
  *                                                                            *
  * Purpose: finalizes common get request and validates it                     *
  *                                                                            *
- * Parameters: self      - [IN] the common get request parameter data         *
- *             error     - [OUT] the error message                            *
+ * Parameters: self   - [IN] the common get request parameter data            *
+ *             fields - [IN] an array of object fields                        *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the request was finalized successfully.            *
  *               FAIL    - the validation failed failed.                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_finalize(zbx_api_get_options_t *self, const zbx_api_field_t *fields, char **error)
+int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_field_t *fields, char **error)
 {
-	int	i;
+	int			i;
+	const zbx_api_field_t	*field;
 
-	if (SUCCEED != zbx_api_get_validate_param_dependency(self, ZBX_API_PARAM_EXCLUDESEARCH, ZBX_API_PARAM_SEARCH,
+	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_EXCLUDESEARCH, ZBX_API_PARAM_SEARCH,
 			error))
 	{
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_api_get_validate_param_dependency(self, ZBX_API_PARAM_SEARCHWILDCARDSENABLED,
+	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_SEARCHWILDCARDSENABLED,
 			ZBX_API_PARAM_SEARCH, error))
 	{
 		return FAIL;
@@ -1299,18 +1346,19 @@ int	zbx_api_get_finalize(zbx_api_get_options_t *self, const zbx_api_field_t *fie
 			0 != (self->parameters & (1 << ZBX_API_PARAM_SEARCHBYANY)))
 	{
 		*error = zbx_dsprintf(*error, "parameter \"%s\" requires either parameter \"%s\" or parameter \"%s\""
-				" to be defined", zbx_api_get_tags[ZBX_API_PARAM_SEARCHBYANY],
-				zbx_api_get_tags[ZBX_API_PARAM_FILTER], zbx_api_get_tags[ZBX_API_PARAM_SEARCH]);
+				" to be defined", zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHBYANY],
+				zbx_api_getoptions_tags[ZBX_API_PARAM_FILTER],
+				zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCH]);
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_api_get_validate_param_dependency(self, ZBX_API_PARAM_SORTFIELD, ZBX_API_PARAM_SORTORDER,
+	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_SORTFIELD, ZBX_API_PARAM_SORTORDER,
 			error))
 	{
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_api_get_validate_param_dependency(self, ZBX_API_PARAM_SORTORDER, ZBX_API_PARAM_SORTFIELD,
+	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_SORTORDER, ZBX_API_PARAM_SORTFIELD,
 			error))
 	{
 		return FAIL;
@@ -1331,10 +1379,25 @@ int	zbx_api_get_finalize(zbx_api_get_options_t *self, const zbx_api_field_t *fie
 		}
 	}
 
+	/* if output was not set add all fields, as 'extend' is the default output option */
+	if (-1 == self->output.key)
+	{
+		for (field = fields; NULL != field->name; field++)
+			zbx_vector_ptr_append(&self->output.fields, (void *)field);
+
+		self->output.fields_num = self->output.fields.values_num;
+		self->output.key = 0;
+	}
+
 	if (0 != self->output_indexed)
 	{
-		if (SUCCEED != zbx_api_get_add_output_field(self, fields, "mediatypeid", error))
+		/* if indexed output is set ensure that object id (first field in object definition) */
+		/* is also retrieved.                                                                */
+		if (SUCCEED != zbx_api_getoptions_add_output_field(self, fields, fields->name, &self->output.key,
+				error))
+		{
 			return FAIL;
+		}
 
 	}
 
@@ -1343,14 +1406,14 @@ int	zbx_api_get_finalize(zbx_api_get_options_t *self, const zbx_api_field_t *fie
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_free                                                 *
+ * Function: zbx_api_getoptions_free                                          *
  *                                                                            *
  * Purpose: frees get request common parameters                               *
  *                                                                            *
- * Parameters: self      - [IN] the common get request parameter data         *
+ * Parameters: self - [IN] the common get request parameter data              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_get_free(zbx_api_get_options_t *self)
+void	zbx_api_getoptions_free(zbx_api_getoptions_t *self)
 {
 	zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&self->sort);
@@ -1361,7 +1424,7 @@ void	zbx_api_get_free(zbx_api_get_options_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_field_get                                                *
+ * Function: zbx_api_object_get_field                                         *
  *                                                                            *
  * Purpose: searches for the specified field in a fields array                *
  *                                                                            *
@@ -1371,7 +1434,7 @@ void	zbx_api_get_free(zbx_api_get_options_t *self)
  * Return value: The found field or NULL if no field had the specified name.  *
  *                                                                            *
  ******************************************************************************/
-const zbx_api_field_t	*zbx_api_field_get(const zbx_api_field_t *fields, const char *name)
+const zbx_api_field_t	*zbx_api_object_get_field(const zbx_api_field_t *fields, const char *name)
 {
 	const zbx_api_field_t	*field;
 
@@ -1382,33 +1445,6 @@ const zbx_api_field_t	*zbx_api_field_get(const zbx_api_field_t *fields, const ch
 	}
 
 	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_api_query_field_index                                        *
- *                                                                            *
- * Purpose: searches for the specified field in a querie's fields vector      *
- *                                                                            *
- * Parameters: query - [IN] the query                                         *
- *             name  - [IN] the field name                                    *
- *                                                                            *
- * Return value: The index of the field in queries fields vector or -1        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_api_query_field_index(const zbx_api_query_t *query, const char *name)
-{
-	int	i;
-
-	for (i = 0; i < query->fields.values_num; i++)
-	{
-		zbx_api_field_t	*field = (zbx_api_field_t *)query->fields.values[i];
-
-		if (0 == strcmp(field->name, name))
-			return i;
-	}
-
-	return -1;
 }
 
 /******************************************************************************
@@ -1439,7 +1475,7 @@ void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "select ");
 
-	if (ZBX_API_QUERY_COUNT == query->type)
+	if (0 == query->fields.values_num)
 	{
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "count(*)");
 	}
@@ -1611,25 +1647,35 @@ void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, con
  *             rows_num    - [IN] the maximum number of rows in result set,   *
  *                                0 - unlimited                               *
  *             rows        - [OUT] the fetched rows                           *
+ *             error       - [OUT] error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were fetched successfully                 *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: The result set is stored as ptr vector (rows) of str vectors     *
  *           (columns).                                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *rows)
+int	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vector_ptr_t *rows, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		i;
+	int		ret = FAIL, i, col_num;
 
 	if (0 == rows_num)
 		result = DBselect("%s", sql);
 	else
 		result = DBselectN(sql, rows_num);
 
+	if (NULL == result)
+	{
+		/* TODO: fetch the correct SQL error message ? */
+		*error = zbx_dsprintf(*error, "an SQL error occurred while executing: %s", sql);
+		goto out;
+	}
+
 	/* reserve 1 column for count(*) requests - they don't have output fields */
-	if (0 == fields_num)
-		fields_num = 1;
+	col_num = (0 == fields_num ? 1 : fields_num);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1638,7 +1684,7 @@ void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_ve
 		columns = (zbx_vector_str_t *)zbx_malloc(NULL, sizeof(zbx_vector_str_t));
 		zbx_vector_str_create(columns);
 
-		for (i = 0; i < fields_num; i++)
+		for (i = 0; i < col_num; i++)
 		{
 			char	*value = NULL;
 
@@ -1652,6 +1698,10 @@ void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_ve
 	}
 
 	DBfree_result(result);
+
+	ret = SUCCEED;
+out:
+	return ret;
 }
 
 /******************************************************************************
@@ -1667,8 +1717,10 @@ void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_ve
  *             query         - [IN] the query defining output fields          *
  *             result        - [IN/OUT] the result containing input rows and  *
  *                                      retrieved result set                  *
- *             key_index     - [IN] the index of key column in input result   *
- *                                  set                                       *
+ *             error         - [OUT] error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were fetched successfully                 *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function performs subqueries for each input result set row  *
  *           based on initial query specified in sql and the field value      *
@@ -1682,10 +1734,10 @@ void	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_ve
  *           fields.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
-		const zbx_api_query_t *query, zbx_api_get_result_t *result, int key_index)
+int	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *column_name,
+		const zbx_api_query_t *query, zbx_api_get_result_t *result, char **error)
 {
-	int			i;
+	int			ret = FAIL, i;
 	size_t			sql_offset_original = *sql_offset;
 	zbx_api_query_result_t *qr;
 
@@ -1703,14 +1755,15 @@ void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, c
 		zbx_vector_ptr_t	*rows;
 
 		/* finish the query by appending key field value to the sql template*/
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, columns->values[key_index]);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, columns->values[query->key]);
 
 		/* create the result set row vector */
 		rows = (zbx_vector_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_ptr_t));
 		zbx_vector_ptr_create(rows);
 
 		/* fetch the result set */
-		zbx_api_db_fetch_rows(*sql, query->fields.values_num, 0, rows);
+		if (SUCCEED != zbx_api_db_fetch_rows(*sql, query->fields.values_num, 0, rows, error))
+			goto out;
 
 		/* store the fetched rows to result.queries rows vector */
 		zbx_vector_ptr_append(&qr->rows, rows);
@@ -1718,6 +1771,11 @@ void	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, c
 		/* restore the query template */
 		*sql_offset = sql_offset_original;
 	}
+	ret = SUCCEED;
+
+	/* TODO: handle SQL error  */
+out:
+	return ret;
 }
 
 /******************************************************************************
@@ -1780,5 +1838,118 @@ void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows)
 	zbx_api_db_clean_rows(rows);
 	zbx_vector_ptr_destroy(rows);
 	zbx_free(rows);
+}
+
+void	zbx_api_json_init(struct zbx_json *json, const char *id)
+{
+	zbx_json_init(json, 1024);
+
+	zbx_json_addstring(json, ZBX_API_RESULT_TAG_JSONRPC, "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ID, id, ZBX_JSON_TYPE_STRING);
+}
+
+
+void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
+		const zbx_vector_ptr_t *rows)
+{
+	int	i;
+
+	if (0 == query->fields.values_num)
+	{
+		zbx_api_json_add_count(json, name, rows);
+	}
+	else
+	{
+		zbx_json_addarray(json, name);
+
+		for (i = 0; i < rows->values_num; i++)
+		{
+			zbx_json_addobject(json, NULL);
+			zbx_api_json_add_row(json, query, rows->values[i], NULL, 0);
+			zbx_json_close(json);
+		}
+
+		zbx_json_close(json);
+	}
+}
+
+void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, const zbx_vector_str_t *columns,
+		const zbx_vector_ptr_t *queries, int row)
+{
+	int	i;
+
+	for (i = 0; i < query->fields_num; i++)
+	{
+		const zbx_api_field_t	*field = (const zbx_api_field_t *)query->fields.values[i];
+
+		zbx_json_addstring(json, field->name, columns->values[i], ZBX_JSON_TYPE_STRING);
+	}
+
+	if (NULL != queries)
+	{
+		for (i = 0; i < queries->values_num; i++)
+		{
+			zbx_api_query_result_t *qr = (zbx_api_query_result_t *)queries->values[i];
+
+			zbx_api_json_add_query(json, qr->name, qr->query, qr->rows.values[row]);
+		}
+	}
+}
+
+void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows)
+{
+	zbx_vector_str_t	*columns = (zbx_vector_str_t *)rows->values[0];
+
+	zbx_json_addstring(json, name, columns->values[0], ZBX_JSON_TYPE_STRING);
+}
+
+void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *options, zbx_api_get_result_t *result)
+{
+	int	i;
+
+	if (0 == options->output.fields.values_num)
+	{
+		zbx_api_json_add_count(json, ZBX_API_RESULT_TAG_RESULT, &result->rows);
+		return;
+	}
+
+	if (0 == options->output_indexed)
+	{
+		zbx_json_addarray(json, ZBX_API_RESULT_TAG_RESULT);
+
+		for (i = 0; i < result->rows.values_num; i++)
+		{
+			zbx_json_addobject(json, NULL);
+			zbx_api_json_add_row(json, &options->output, result->rows.values[i], &result->queries, i);
+			zbx_json_close(json);
+		}
+	}
+	else
+	{
+		zbx_json_addobject(json, ZBX_API_RESULT_TAG_RESULT);
+
+		for (i = 0; i < result->rows.values_num; i++)
+		{
+			zbx_vector_str_t	*columns = (zbx_vector_str_t *)result->rows.values[i];
+
+			zbx_json_addobject(json, columns->values[options->output.key]);
+			zbx_api_json_add_row(json, &options->output, columns, &result->queries, i);
+			zbx_json_close(json);
+		}
+	}
+
+	zbx_json_close(json);
+}
+
+void	zbx_api_json_add_error(struct zbx_json *json, const char *error)
+{
+	zbx_json_addobject(json, ZBX_API_RESULT_TAG_ERROR);
+	zbx_json_addint(json, ZBX_API_RESULT_TAG_ERRCODE, -32602);
+	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ERRMESSAGE, "Invalid params.", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ERRDATA, NULL == error ? "unknown error" : error,
+			ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(json);
 }
 
