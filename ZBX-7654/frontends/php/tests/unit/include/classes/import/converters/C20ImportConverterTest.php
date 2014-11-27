@@ -100,11 +100,11 @@ class C20ImportConverterTest extends CImportConverterTest {
 	public function testConvertTriggers() {
 		$this->assertConvert(
 			$this->createExpectedResult(array()),
-			$this->createExpectedResult(array())
+			$this->createSource(array())
 		);
 		$this->assertConvert(
 			$this->createExpectedResult(array('triggers' => '')),
-			$this->createExpectedResult(array('triggers' => ''))
+			$this->createSource(array('triggers' => ''))
 		);
 
 		$source = $this->createSource(array(
