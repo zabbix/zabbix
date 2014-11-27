@@ -2405,7 +2405,7 @@ void	zbx_vc_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
+	if (FAIL == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
 	{
 		zbx_error("cannot create mutex for value cache");
 		exit(EXIT_FAILURE);

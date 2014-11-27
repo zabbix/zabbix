@@ -809,7 +809,7 @@ out:
 
 void	zbx_create_itservices_lock()
 {
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
+	if (FAIL == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
 	{
 		zbx_error("cannot create mutex for IT services");
 		exit(EXIT_FAILURE);
