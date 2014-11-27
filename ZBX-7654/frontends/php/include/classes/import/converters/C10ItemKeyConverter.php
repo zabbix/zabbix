@@ -22,7 +22,7 @@
 /**
  * A converted for converting simple check item keys from 1.8 format to 2.0.
  */
-class C18ItemKeyConverter extends CConverter {
+class C10ItemKeyConverter extends CConverter {
 
 	public function convert($value) {
 		$keys = array(

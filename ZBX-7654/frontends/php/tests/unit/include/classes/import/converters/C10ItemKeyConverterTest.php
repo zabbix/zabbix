@@ -19,30 +19,45 @@
 **/
 
 
-class C18TriggerConverterTest extends PHPUnit_Framework_TestCase {
+class C10ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
 
 	public function dataProvider() {
-		return array(
-			array('{h1:item.last(0)}=0', '{h1:item.last(0)}=0'),
-			array('{h1:ftp.item.last(0)}=0', '{h1:ftp.item.last(0)}=0'),
-			array('{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0'),
-			array('{h1:ftp,1.last(0)}=0&{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:net.tcp.service[ftp,,1].last(0)}=0'),
-
-			// these test cases are incorrect but are added to preserve the historical behavior
-			array('{h1:ftp.last(0)}=0', '{h1:ftp.last(0)}=0'),
-			array('{h1:ftp,1.last(0)}=0&{h1:ftp,2.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:ftp,2.last(0)}=0'),
+		$keys = array(
+			'tcp',
+			'ftp',
+			'http',
+			'imap',
+			'ldap',
+			'nntp',
+			'ntp',
+			'pop',
+			'smtp',
+			'ssh'
 		);
+
+		$data = array();
+		foreach ($keys as $key) {
+			$data[] = array($key, 'net.tcp.service['.$key.',,]');
+			$data[] = array($key.',1', 'net.tcp.service['.$key.',,1]');
+			$data[] = array($key.'_perf', 'net.tcp.service.perf['.$key.',,]');
+			$data[] = array($key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]');
+		}
+
+		// keys that shouldn't be converted
+		$data[] = array('myitem', 'myitem');
+
+		return $data;
 	}
 
 	/**
 	 * @dataProvider dataProvider
 	 *
-	 * @param $expression
+	 * @param $key
 	 * @param $expectedResult
 	 */
-	public function testConvert($expression, $expectedResult) {
-		$converter = new C18TriggerConverter(new C18ItemKeyConverter());
-		$result = $converter->convert($expression);
+	public function testConvert($key, $expectedResult) {
+		$converter = new C10ItemKeyConverter();
+		$result = $converter->convert($key);
 
 		$this->assertEquals($expectedResult, $result);
 	}

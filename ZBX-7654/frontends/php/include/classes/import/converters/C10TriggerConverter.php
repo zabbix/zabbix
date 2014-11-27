@@ -22,7 +22,7 @@
 /**
  * A converted for converting 1.8 trigger expressions.
  */
-class C18TriggerConverter extends CConverter {
+class C10TriggerConverter extends CConverter {
 
 	/**
 	 * Converted used to convert simple check item keys.

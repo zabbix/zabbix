@@ -19,7 +19,7 @@
 **/
 
 
-class C18ImportConverter extends CConverter {
+class C10ImportConverter extends CConverter {
 
 	/**
 	 * Converter used for converting simple check item keys.
