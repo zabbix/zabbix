@@ -115,17 +115,17 @@ class CSetupWizard extends CForm {
 		}
 
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$next = new CSubmit('next['.$this->getStep().']', _('Next').SPACE.'&raquo;');
+			$next = new CSubmit('next['.$this->getStep().']', _('Next').SPACE.'&raquo;', null, 'jqueryinput');
 		}
 		else {
-			$next = new CSubmit('finish', _('Finish'));
+			$next = new CSubmit('finish', _('Finish'), null, 'jqueryinput');
 		}
 
 		if (isset($this->HIDE_CANCEL_BUTTON) && $this->HIDE_CANCEL_BUTTON) {
 			$cancel = null;
 		}
 		else {
-			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
+			$cancel = new CDiv(new CSubmit('cancel', _('Cancel'), null, 'jqueryinput'), 'footer_left');
 		}
 
 		if ($this->DISABLE_NEXT_BUTTON) {
@@ -135,7 +135,7 @@ class CSetupWizard extends CForm {
 		// if the user is not logged in (first setup run) hide the "previous" button on the final step
 		if ($this->getStep()
 				&& ((CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) || $this->getStep() < 5)) {
-			$back = new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'));
+			$back = new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'), null, 'jqueryinput');
 		}
 		else {
 			$back = null;
@@ -230,7 +230,7 @@ class CSetupWizard extends CForm {
 			$message = array(
 				_('Please correct all issues and press "Retry" button'),
 				BR(),
-				new CSubmit('retry', _('Retry'))
+				new CSubmit('retry', _('Retry'), null, 'jqueryinput')
 			);
 		}
 		// OK or warning
@@ -351,7 +351,7 @@ class CSetupWizard extends CForm {
 					new CSpan(array(_('OK'), BR()), 'ok')
 					: new CSpan(array(_('Fail'), BR()), 'fail')
 					: null,
-				new  CSubmit('retry', 'Test connection')
+				new  CSubmit('retry', 'Test connection', null, 'jqueryinput')
 			), 'info_bar')
 
 		);
@@ -519,13 +519,13 @@ class CSetupWizard extends CForm {
 
 		return array(
 			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
+			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'jqueryinput'), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
 					'Press the "Download configuration file" button, download the configuration file ',
 					'and save it as ', BR(),
 					'"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"', BR(), BR(),
-					new CSubmit('save_config', 'Download configuration file'),
+					new CSubmit('save_config', 'Download configuration file', null, 'jqueryinput'),
 					BR(), BR()
 				)
 				: array(

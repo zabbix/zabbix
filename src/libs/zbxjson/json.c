@@ -638,7 +638,7 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 
 	p++;
 
-	while ('\0' != *p && out - start < size - 1)
+	while ('\0' != *p)
 	{
 		switch (*p)
 		{
@@ -652,6 +652,9 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 			default:
 				*out++ = *p++;
 		}
+
+		if (out - start == size)
+			break;
 	}
 
 	return NULL;
