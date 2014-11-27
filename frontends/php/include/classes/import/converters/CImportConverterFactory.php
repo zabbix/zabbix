@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Factory for creating import conversions.
+ */
 class CImportConverterFactory extends CRegistryFactory {
 
 	public function __construct(array $objects = array()) {

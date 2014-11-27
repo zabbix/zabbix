@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Converter for converting import data from 1.8 to 2.0.
+ */
 class C20ImportConverter extends CConverter {
 
 	/**
