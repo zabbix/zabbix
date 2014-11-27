@@ -46,6 +46,7 @@ class C18ImportConverter extends CConverter {
 		$content['version'] = '2.0';
 		$content = $this->convertTime($content);
 
+		$content = $this->convertDependencies($content);
 		$content = $this->separateTemplatesFromHosts($content);
 		$content = $this->convertHosts($content);
 		$content = $this->convertTemplates($content);
@@ -471,6 +472,93 @@ class C18ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Allocate the dependencies from the root element to the trigger elements and convert them to a new format.
+	 *
+	 * Dependencies, that cannot be resolved are skipped.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertDependencies(array $content) {
+		// we cannot import dependencies if hosts are missing
+		if (!isset($content['dependencies']) || !$content['dependencies'] || !isset($content['hosts'])) {
+			unset($content['dependencies']);
+
+			return $content;
+		}
+
+		// build a description-expression trigger index with references to the triggers in the content
+		$descriptionExpressionIndex = array();
+		foreach ($content['hosts'] as $hostKey => $host) {
+			if (!isset($host['triggers']) || !$host['triggers']) {
+				continue;
+			}
+
+			foreach ($host['triggers'] as $triggerKey => $trigger) {
+				$descriptionExpressionIndex[$trigger['description']][$trigger['expression']][] =
+					&$content['hosts'][$hostKey]['triggers'][$triggerKey];
+			}
+		}
+
+		$hosts = zbx_toHash($content['hosts'], 'name');
+
+		foreach ($content['dependencies'] as $dependency) {
+			list($sourceHost, $sourceDescription) = explode(':', $dependency['description'], 2);
+			list($targetHost, $targetDescription) = explode(':', $dependency['depends'], 2);
+
+			// if one of the hosts is missing from the data or doesn't have any triggers, skip this dependency
+			if (!isset($hosts[$sourceHost]) || !isset($hosts[$sourceHost]['triggers'])
+				|| !isset($hosts[$targetHost]) || !isset($hosts[$sourceHost]['triggers'])) {
+
+				continue;
+			}
+
+			// find the target trigger
+			// use the first trigger with the same description
+			$targetTrigger = null;
+			foreach ($hosts[$targetHost]['triggers'] as $trigger) {
+				if ($trigger['description'] === $targetDescription) {
+					$targetTrigger = $trigger;
+
+					break;
+				}
+			}
+
+			// if the target trigger wasn't found - skip this dependency
+			if (!$targetTrigger) {
+				continue;
+			}
+
+			// find the source trigger and add the dependencies to all of the copies of the trigger
+			foreach ($hosts[$targetHost]['triggers'] as $trigger) {
+				if ($trigger['description'] === $sourceDescription) {
+					// if the source trigger is not present in the data - skip this dependency
+					if (!isset($descriptionExpressionIndex[$trigger['description']])
+							|| !isset($descriptionExpressionIndex[$trigger['description']][$trigger['expression']])) {
+
+						continue 2;
+					}
+
+					// working with references to triggers in the content here
+					foreach ($descriptionExpressionIndex[$trigger['description']][$trigger['expression']] as &$trigger) {
+						$trigger['dependencies'][] = array(
+							'name' => $targetTrigger['description'],
+							'expression' => $targetTrigger['expression'],
+						);
+					}
+					unset($trigger);
+				}
+			}
+		}
+
+		$content['hosts'] = array_values($hosts);
+		unset($content['dependencies']);
+
+		return $content;
+	}
+
+	/**
 	 * Filters duplicate triggers from the array and returns the content with unique triggers.
 	 *
 	 * @param array $content
@@ -489,11 +577,12 @@ class C18ImportConverter extends CConverter {
 			$name = $trigger['name'];
 			$expression = $trigger['expression'];
 
-			if (!isset($existingTriggers[$name]) && !isset($existingTriggers[$name][$expression])) {
-				$filteredTriggers[] = $trigger;
-
-				$existingTriggers[$name][$expression] = true;
+			if (isset($existingTriggers[$name]) && isset($existingTriggers[$name][$expression])) {
+				continue;
 			}
+
+			$filteredTriggers[] = $trigger;
+			$existingTriggers[$name][$expression] = true;
 		}
 
 		$content['triggers'] = $filteredTriggers;
@@ -590,7 +679,7 @@ class C18ImportConverter extends CConverter {
 			return $array;
 		}
 
-		list ($host, $itemKey) = explode(':', $array[$key]);
+		list ($host, $itemKey) = explode(':', $array[$key], 2);
 
 		if ($hostName !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
 			$host = $hostName;
