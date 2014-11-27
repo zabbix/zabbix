@@ -19,7 +19,7 @@
 **/
 
 
-class C18ImportConverterTest extends CImportConverterTest {
+class C10ImportConverterTest extends CImportConverterTest {
 
 	public function testTemplateSeparation() {
 		$this->assertConvert(
@@ -1817,9 +1817,9 @@ class C18ImportConverterTest extends CImportConverterTest {
 	}
 
 	protected function createConverter() {
-		$itemKeyConverter = new C18ItemKeyConverter();
+		$itemKeyConverter = new C10ItemKeyConverter();
 
-		return new C18ImportConverter($itemKeyConverter, new C18TriggerConverter($itemKeyConverter));
+		return new C10ImportConverter($itemKeyConverter, new C10TriggerConverter($itemKeyConverter));
 	}
 
 }

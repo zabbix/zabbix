@@ -1423,14 +1423,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function getAdapter($source) {
+		$importConverterFactory = new CImportConverterFactory();
+
 		$converterChain = new CConverterChain();
-		$itemKeyConverter = new C18ItemKeyConverter();
-		$converterChain->addConverter('1.0',
-			new C18ImportConverter($itemKeyConverter, new C18TriggerConverter($itemKeyConverter))
-		);
-		$converterChain->addConverter('2.0',
-			new C20ImportConverter(new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#')))
-		);
+		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
+		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 
