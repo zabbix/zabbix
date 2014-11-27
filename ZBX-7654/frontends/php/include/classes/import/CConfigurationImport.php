@@ -96,7 +96,7 @@ class CConfigurationImport {
 	/**
 	 * Import configuration data.
 	 *
-	 * @param CImportDataAdapter $adapter
+	 * @param CImportDataAdapter $adapter   an object to provide access to the imported data
 	 *
 	 * @return bool
 	 */
