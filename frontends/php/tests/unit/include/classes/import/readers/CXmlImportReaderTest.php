@@ -21,17 +21,13 @@
 
 class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 
-	public function testRead() {
+	public function testReadAttributes() {
 		$xml = '<hosts>
 				<host host="Zabbix server">
 					<status>0</status>
-					<description>My zabbix server</description>
-					<proxy></proxy>
 				</host>
 				<host host="Linux server">
 					<status>0</status>
-					<description>A linux server</description>
-					<proxy></proxy>
 				</host>
 			</hosts>';
 
@@ -43,14 +39,10 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'host' => array(
 					'host' => 'Zabbix server',
 					'status' => '0',
-					'description' => 'My zabbix server',
-					'proxy' => ''
 				),
 				'host1' => array(
 					'host' => 'Linux server',
 					'status' => '0',
-					'description' => 'A linux server',
-					'proxy' => ''
 				),
 			)
 		));
