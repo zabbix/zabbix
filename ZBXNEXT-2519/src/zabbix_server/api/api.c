@@ -273,9 +273,9 @@ void	zbx_api_query_free(zbx_api_query_t *self)
  *                                                                            *
  * Function: zbx_api_vector_ptr_pair_clear                                    *
  *                                                                            *
- * Purpose: clears ptr pair vector consisting of key=>value string mapping    *
+ * Purpose: clears ptr pair vector. used to store key=>value string mapping   *
  *                                                                            *
- * Parameters: vector - [IN] the sort vector to clear                         *
+ * Parameters: vector - [IN] the vector to clear                              *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_api_vector_ptr_pair_clear(zbx_vector_ptr_pair_t *vector)
@@ -287,6 +287,26 @@ static void	zbx_api_vector_ptr_pair_clear(zbx_vector_ptr_pair_t *vector)
 		zbx_free(vector->values[i].first);
 		zbx_free(vector->values[i].second);
 	}
+
+	zbx_vector_ptr_pair_clear(vector);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_filter_vector_clear                                      *
+ *                                                                            *
+ * Purpose: clears ptr pair vector used to store <field>=>value mapping,      *
+ *          where <field> is constant reference to filter field.              *
+ *                                                                            *
+ * Parameters: vector - [IN] the vector to clear                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_filter_vector_clear(zbx_vector_ptr_pair_t *vector)
+{
+	int	i;
+
+	for (i = 0; i < vector->values_num; i++)
+		zbx_free(vector->values[i].second);
 
 	zbx_vector_ptr_pair_clear(vector);
 }
@@ -318,8 +338,8 @@ static void	zbx_api_filter_init(zbx_api_filter_t *self)
  ******************************************************************************/
 static void	zbx_api_filter_free(zbx_api_filter_t *self)
 {
-	zbx_api_vector_ptr_pair_clear(&self->like);
-	zbx_api_vector_ptr_pair_clear(&self->exact);
+	zbx_api_filter_vector_clear(&self->like);
+	zbx_api_filter_vector_clear(&self->exact);
 
 	zbx_vector_ptr_pair_destroy(&self->like);
 	zbx_vector_ptr_pair_destroy(&self->exact);
@@ -620,7 +640,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 
 	ret = SUCCEED;
 out:
-	zbx_api_vector_ptr_pair_clear(&objects);
+	zbx_api_filter_vector_clear(&objects);
 
 	if (SUCCEED != ret)
 		zbx_api_vector_ptr_pair_clear(value);
@@ -1840,6 +1860,16 @@ void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows)
 	zbx_free(rows);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_init                                                *
+ *                                                                            *
+ * Purpose: initializes json data for api responses                           *
+ *                                                                            *
+ * Parameters: json - [IN] the json data structure                            *
+ *             id   - [IN] the response id                                    *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_init(struct zbx_json *json, const char *id)
 {
 	zbx_json_init(json, 1024);
@@ -1848,7 +1878,18 @@ void	zbx_api_json_init(struct zbx_json *json, const char *id)
 	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ID, id, ZBX_JSON_TYPE_STRING);
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_add_query                                           *
+ *                                                                            *
+ * Purpose: adds a sub query result to json data                              *
+ *                                                                            *
+ * Parameters: json  - [IN] the json data structure                           *
+ *             name  - [IN] the query name                                    *
+ *             query - [IN] the query data                                    *
+ *             rows  - [IN] the query result                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
 		const zbx_vector_ptr_t *rows)
 {
@@ -1873,6 +1914,20 @@ void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_a
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_add_row                                             *
+ *                                                                            *
+ * Purpose: adds a single query row to json data                              *
+ *                                                                            *
+ * Parameters: json    - [IN] the json data structure                         *
+ *             query   - [IN] the query data                                  *
+ *             columns - [IN] the row to add                                  *
+ *             queries - [IN] the sub query vector. Should be NULL when       *
+ *                            used for sub query rows                         *
+ *             row     - [IN] the row index                                   *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, const zbx_vector_str_t *columns,
 		const zbx_vector_ptr_t *queries, int row)
 {
@@ -1896,6 +1951,17 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_add_count                                           *
+ *                                                                            *
+ * Purpose: adds count(*) request results to json data                        *
+ *                                                                            *
+ * Parameters: json - [IN] the json data structure                            *
+ *             name - [IN] the column name                                    *
+ *             rows - [IN] the query result set                               *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows)
 {
 	zbx_vector_str_t	*columns = (zbx_vector_str_t *)rows->values[0];
@@ -1903,6 +1969,17 @@ void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_v
 	zbx_json_addstring(json, name, columns->values[0], ZBX_JSON_TYPE_STRING);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_add_result                                          *
+ *                                                                            *
+ * Purpose: adds get request result to json data                              *
+ *                                                                            *
+ * Parameters: json    - [IN] the json data structure                         *
+ *             options - [IN] the common get request options                  *
+ *             result  - [IN] the request result data                         *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *options, zbx_api_get_result_t *result)
 {
 	int	i;
@@ -1941,6 +2018,16 @@ void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *option
 	zbx_json_close(json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_json_add_error                                           *
+ *                                                                            *
+ * Purpose: adds error response to json data                                  *
+ *                                                                            *
+ * Parameters: json  - [IN] the json data structure                           *
+ *             error - [IN] the error message                                 *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_api_json_add_error(struct zbx_json *json, const char *error)
 {
 	zbx_json_addobject(json, ZBX_API_RESULT_TAG_ERROR);
