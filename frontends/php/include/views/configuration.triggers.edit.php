@@ -82,7 +82,7 @@ $addExpressionButton = new CButton(
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
 		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()), 800, 265);',
-	'formlist'
+	'button-form top'
 );
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
@@ -91,7 +91,7 @@ $expressionRow = array($expressionTextBox, $addExpressionButton);
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
-	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'formlist');
+	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'button-form top');
 	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
 	if ($this->data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
@@ -101,7 +101,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
 		// add button
-		$addExpressionButton = new CSubmit('add_expression', _('Add'), null, 'formlist');
+		$addExpressionButton = new CSubmit('add_expression', _('Add'), null, 'button-form');
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
@@ -109,21 +109,21 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 	else {
 		// add button
-		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'formlist');
+		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'button-form');
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
-		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'formlist');
+		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'button-form');
 		if ($this->data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $orExpressionButton);
 
 		// replace button
-		$replaceExpressionButton = new CSubmit('replace_expression', _('Replace'), null, 'formlist');
+		$replaceExpressionButton = new CSubmit('replace_expression', _('Replace'), null, 'button-form');
 		if ($this->data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
@@ -356,7 +356,7 @@ if (!empty($this->data['triggerid'])) {
 else {
 	$triggersForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+		array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 	));
 }
 

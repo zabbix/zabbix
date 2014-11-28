@@ -73,6 +73,7 @@ const char	*help_message[] = {
 	"",
 	"    Runtime control options:",
 	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "               Execute the housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
@@ -618,21 +619,6 @@ static void	zbx_load_config(void)
 	zbx_validate_config();
 }
 
-#ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(int flags)
-{
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-			break;
-		default:
-			break;
-	}
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_free_config                                                  *
@@ -748,7 +734,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
 #else
 #	define SNMP_FEATURE_STATUS 	" NO"
