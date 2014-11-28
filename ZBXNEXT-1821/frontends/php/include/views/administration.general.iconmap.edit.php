@@ -152,7 +152,7 @@ if (isset($this->data['iconmapid'])) {
 else {
 	$iconMapForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 

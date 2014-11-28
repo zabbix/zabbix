@@ -187,18 +187,18 @@ $sysmapForm->addItem($sysmapTab);
 // append buttons to form
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	$sysmapForm->addItem(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			array (
-				new	CButton('clone', _('Clone')),
-				new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
-				new CButtonCancel()
-			)
+		new CSubmit('update', _('Update')),
+		array (
+			new	CButton('clone', _('Clone')),
+			new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
+			new CButtonCancel()
+		)
 	));
 }
 else {
 	$sysmapForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 
