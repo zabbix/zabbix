@@ -1,6 +1,8 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-1036] improved "Most busy triggers top 100" page filter (Oleg)
+..F....... [ZBXNEXT-2602] minor design and layout improvements (Pavels)
 ........S. [ZBXNEXT-2471] improved value cache management by resetting item's cached range to the daily request range once per day (wiper)
 ...G...... [ZBXNEXT-2320] added agent crash handling on Windows to log its stack trace (wiper)
 ..FG...... [ZBXNEXT-1078] added 'proc.mem[]' 5th parameter (memtype) on AIX, FreeBSD, Linux, Solaris; thanks to Johan Fischer and gescheit for agent patches for Linux and FreeBSD (Andris)
@@ -12,6 +14,8 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8934] removed translation for the bytes unit prefixes (KB, MB, etc) (arvids)
+..F....... [ZBX-8888] fixed history.php showing data for 11 more seconds than the defined interval (arvids)
 ..F.....S. [ZBX-9005] fixed aggregate item check to make forth parameter not mandatory when third parameter is set to 'last' (igors)
 ...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
 ........S. [ZBX-8542] improved performance and reduced configuration cache locking when evaluating trigger expressions (wiper)
@@ -44,10 +48,16 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.3rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese and Italian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translations; thanks to Zabbix translators (Richlv)
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
+..F....... [ZBX-8863] fixed ad-hoc graphs with multiple items for the same host not showing the hosts name (arvids)
+..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
+A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
+..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ...G...PS. [ZBX-8926] fixed bug in JSON parser that caused failures in data retrieval if the target buffer and the decoded data were the same size (Juris)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
@@ -534,6 +544,11 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
+..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
+A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
+..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
+..F....... [ZBX-8928] fixed history-related macros to obey the ZBX_HISTORY_PERIOD (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .......PS. [ZBX-8982] turned strict OID validation off for single-variable SNMP requests (asaveljevs)
 .......PS. [ZBX-8328] fixed UTF-8 string truncation for IBM DB2 databases to fit the column width (wiper)

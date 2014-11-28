@@ -407,9 +407,6 @@ button.ui-button-icons-only { width: 3.7em; }
 .darkorange .ui-button-text-icon-secondary .ui-button-text, .darkorange .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .darkorange .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
 
-/* no icon support for input elements, provide padding by default */
-input.ui-button { padding: .3em 1em; }
-
 /*button icon element(s) */
 .darkorange .ui-button-icon-only .ui-icon, .darkorange .ui-button-text-icon-primary .ui-icon, .darkorange .ui-button-text-icon-secondary .ui-icon, .darkorange .ui-button-text-icons .ui-icon, .darkorange .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
 .darkorange .ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }

@@ -116,7 +116,7 @@ if (isset($this->data['slideshowid'])) {
 else {
 	$slideForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 
