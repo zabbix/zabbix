@@ -1382,7 +1382,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	const char		*__function_name = "DBget_history_log_value";
 
 	DC_ITEM			item;
-	int			ret = FAIL, found, errcode = FAIL;
+	int			ret = FAIL, errcode = FAIL;
 	zbx_timespec_t		ts = {clock, ns};
 	zbx_history_record_t	value;
 
@@ -1393,7 +1393,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
 
-	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value, &found) || 1 != found)
+	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
 		goto out;
 
 	switch (request)
@@ -1513,7 +1513,6 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		zbx_uint64_t		valuemapid;
 		zbx_history_record_t	vc_value;
 		zbx_timespec_t		ts;
-		int			found;
 
 		ts.sec = time(NULL);
 		ts.ns = 999999999;
@@ -1521,7 +1520,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
 			char	tmp[MAX_STRING_LEN];
 
@@ -1557,7 +1556,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL, found;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1580,7 +1579,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
