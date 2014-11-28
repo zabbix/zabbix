@@ -2242,11 +2242,11 @@ function uncheckTableRows($cookieId = null) {
 }
 
 /**
- * Splitting string using slashes with escape backslash support and non-pair backslash cleanup
+ * Splitting string using slashes with escape backslash support and non-pair backslash cleanup.
  *
- * @param string $path					String path to parse
- * @param bool   $stripSlashes			Remove escaped slashes from the path pieces
- * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations
+ * @param string $path					String path to parse.
+ * @param bool   $stripSlashes			Remove escaped slashes from the path pieces.
+ * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations.
  *
  * @return array
  */
@@ -2258,23 +2258,24 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	$pathItemString = '';
 
 	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {
-		// Determine how many escape characters we already have in the backlog
+		// Determine how many escape characters we already have in the backlog.
 		$escapeCharacterCount = strlen($escapeCharacters);
 		if ($path[$position] === '/') {
-			// If we have no escape chars previously - save item into the array and move on
-			if ($escapeCharacterCount === 0) {
+			// If we have no escape chars previously - save item into the array and move on.
+			if ($escapeCharacterCount == 0) {
 				$pathItemsArray[] = $pathItemString;
-				$escapeCharacters = $pathItemString = '';
+				$escapeCharacters = '';
+				$pathItemString = '';
 				continue;
 			}
-			// We have a backslash before the / - keep it as part of the item and clean escape char buffer
+			// We have a backslash before the / - keep it as part of the item and clean escape char buffer.
 			$pathItemString .= $escapeCharacters.$path[$position];
 			$escapeCharacters = '';
 		}
 		elseif ($cleanupBackslashes && $path[$position] === '\\') {
-			// If we had a backslash before - this is an escaped backslash, keep it and empty char backlog
-			// This way we save only paired backslashes
-			if ($escapeCharacterCount === 1) {
+			// If we had a backslash before - this is an escaped backslash, keep it and empty char backlog.
+			// This way we save only paired backslashes.
+			if ($escapeCharacterCount == 1) {
 				$pathItemString .= $escapeCharacters.$path[$position];
 				$escapeCharacters = '';
 			}
@@ -2284,13 +2285,13 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 			}
 		}
 		else {
-			// A regular character - save it and move on. If previous char was a backslash - it is dropped
+			// A regular character - save it and move on. If previous char was a backslash - it is dropped.
 			$pathItemString .= $path[$position];
 			$escapeCharacters = '';
 		}
 	}
-	// Save the path tail
-	if (strlen($pathItemString) !== 0) {
+	// Save the path tail.
+	if (strlen($pathItemString) != 0) {
 		$pathItemsArray[] = $pathItemString;
 	}
 
