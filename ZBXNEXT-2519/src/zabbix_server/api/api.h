@@ -51,6 +51,10 @@
 #define ZBX_API_RESULT_TAG_ERRMESSAGE	"message"
 #define ZBX_API_RESULT_TAG_ERRDATA	"data"
 
+
+#define ZBX_API_ACCESS_READ		0
+#define ZBX_API_ACCESS_WRITE		1
+
 /* api request data */
 typedef struct
 {
@@ -126,10 +130,10 @@ typedef struct
 	unsigned int		parameters;
 
 	/* preservekeys */
-	unsigned char		output_indexed;
+	unsigned char		output_byid;
 
 	/* editable */
-	unsigned char		filter_editable;
+	unsigned char		access;
 
 	/* limit */
 	int			limit;
@@ -322,7 +326,8 @@ const zbx_api_field_t	*zbx_api_object_get_field(const zbx_api_field_t *fields, c
 
 void	zbx_api_json_init(struct zbx_json *json, const char *id);
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);
-void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *options, zbx_api_get_result_t *result);
+void	zbx_api_json_add_result(struct zbx_json *json, const zbx_api_getoptions_t *options,
+		const zbx_api_get_result_t *result);
 void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, const zbx_vector_str_t *columns,
 		const zbx_vector_ptr_t *queries, int row);
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,

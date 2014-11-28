@@ -153,13 +153,13 @@ static int	zbx_api_getoptions_register_param(zbx_api_getoptions_t *self, int par
 			{
 				if (paramid != i)
 				{
-					*error = zbx_dsprintf(*error, "parameter \"%s\" conflicts with parameter"
+					*error = zbx_dsprintf(*error, "Parameter \"%s\" conflicts with parameter"
 							" \"%s\"", zbx_api_getoptions_tags[paramid],
 							zbx_api_getoptions_tags[i]);
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "duplicate parameter \"%s\" found",
+					*error = zbx_dsprintf(*error, "Duplicate parameter \"%s\" found",
 							zbx_api_getoptions_tags[paramid]);
 				}
 
@@ -198,7 +198,7 @@ static int	zbx_api_getoptions_validate_dependency(const zbx_api_getoptions_t *se
 {
 	if (0 != (self->parameters & (1 << paramid)) && 0 == (self->parameters & (1 << requiredid)))
 	{
-		*error = zbx_dsprintf(*error, "parameter \"%s\" requires parameter \"%s\" to be defined",
+		*error = zbx_dsprintf(*error, "Parameter \"%s\" requires parameter \"%s\" to be defined",
 				zbx_api_getoptions_tags[paramid], zbx_api_getoptions_tags[requiredid]);
 		return FAIL;
 	}
@@ -369,7 +369,7 @@ int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -406,7 +406,7 @@ int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -422,7 +422,7 @@ int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 
 		}
@@ -459,7 +459,7 @@ int	zbx_api_get_param_int(const char *param, const char **next, int *value, char
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -472,7 +472,7 @@ int	zbx_api_get_param_int(const char *param, const char **next, int *value, char
 
 		if (SUCCEED != is_uint31(ptr, value))
 		{
-			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 		}
 
@@ -516,7 +516,7 @@ int	zbx_api_get_param_object(const char *param, const char **next, zbx_vector_pt
 
 	if (SUCCEED != zbx_json_brackets_open(*next, &jp))
 	{
-		*error = zbx_dsprintf(*error, "cannot open object parameter \"%s\"", param);
+		*error = zbx_dsprintf(*error, "Cannot open object parameter \"%s\"", param);
 		goto out;
 	}
 
@@ -526,7 +526,7 @@ int	zbx_api_get_param_object(const char *param, const char **next, zbx_vector_pt
 	{
 		if (NULL == (p = zbx_json_decodevalue_dyn(p, &data, &data_alloc, &is_null)))
 		{
-			*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
+			*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
 			goto out;
 		}
 
@@ -586,7 +586,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 	{
 		if (NULL == (field = zbx_api_object_get_field(fields, (char *)objects.values[i].first)))
 		{
-			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field name \"%s\"",
+			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field name \"%s\"",
 					param, (char *)objects.values[i].first);
 			goto out;
 		}
@@ -601,13 +601,13 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_INT:
 				if (0 != like)
 				{
-					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
+					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
 				if (SUCCEED != zbx_api_value_validate((char *)objects.values[i].second, field->type))
 				{
-					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" value",
+					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" value",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
@@ -621,7 +621,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_SHORTTEXT:
 				if (0 == like)
 				{
-					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
+					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
@@ -678,7 +678,7 @@ int	zbx_api_get_param_array(const char *param, const char **next, zbx_vector_str
 
 	if (SUCCEED != zbx_json_brackets_open(*next, &jp))
 	{
-		*error = zbx_dsprintf(*error, "cannot open parameter \"%s\" value array", param);
+		*error = zbx_dsprintf(*error, "Cannot open parameter \"%s\" value array", param);
 		goto out;
 	}
 
@@ -729,7 +729,7 @@ int	zbx_api_get_param_string(const char *param, const char **next, char **value,
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -788,7 +788,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 				field = zbx_api_object_get_field(fields, outfields.values[i]);
 				if (NULL == field)
 				{
-					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" query field \"%s\"",
+					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" query field \"%s\"",
 							param, outfields.values[i]);
 					ret = FAIL;
 
@@ -820,7 +820,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 		}
 
@@ -944,6 +944,8 @@ void	zbx_api_getoptions_init(zbx_api_getoptions_t *self)
 {
 	memset(self, 0, sizeof(zbx_api_getoptions_t));
 
+	self->access = ZBX_API_ACCESS_READ;
+
 	zbx_api_query_init(&self->output);
 	zbx_api_filter_init(&self->filter);
 
@@ -972,7 +974,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 		struct zbx_json_parse *json, const char **next, char **error)
 {
 	int		ret = FAIL;
-	unsigned char	flag;
+	unsigned char	value_flag, value_bool;
 
 	if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUT]))
 	{
@@ -998,13 +1000,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUTCOUNT], next, &flag,
-				error))
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_OUTPUTCOUNT], next,
+				&value_flag, error))
 		{
 			goto out;
 		}
 
-		if (0 != flag)
+		if (0 != value_flag)
 			self->output.key = 0;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_EDITABLE]))
@@ -1016,10 +1018,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 		}
 
 		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_EDITABLE], next,
-				&self->filter_editable, error))
+				&value_bool, error))
 		{
 			goto out;
 		}
+
+		if (0 != value_bool)
+			self->access = ZBX_API_ACCESS_WRITE;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_LIMIT]))
 	{
@@ -1044,7 +1049,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 		}
 
 		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_PRESERVEKEYS], next,
-				&self->output_indexed, error))
+				&self->output_byid, error))
 		{
 			goto out;
 		}
@@ -1057,13 +1062,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_EXCLUDESEARCH], next, &flag,
-				error))
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_EXCLUDESEARCH], next,
+				&value_flag, error))
 		{
 			goto out;
 		}
 
-		if (0 != flag)
+		if (0 != value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_EXCLUDE;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH]))
@@ -1074,13 +1079,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag,
-				error))
+		if (SUCCEED != zbx_api_get_param_flag(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next,
+				&value_flag, error))
 		{
 			goto out;
 		}
 
-		if (0 != flag)
+		if (0 != value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_START;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHBYANY]))
@@ -1091,13 +1096,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next, &flag,
-				error))
+		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_STARTSEARCH], next,
+				&value_flag, error))
 		{
 			goto out;
 		}
 
-		if (0 != flag)
+		if (0 != value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_ANY;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED]))
@@ -1109,10 +1114,10 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 		}
 
 		if (SUCCEED != zbx_api_get_param_bool(zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHWILDCARDSENABLED],
-				next, &flag, error))
+				next, &value_flag, error))
 			goto out;
 
-		if (0 != flag)
+		if (0 != value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_WILDCARD;
 	}
 	else if (0 == strcmp(parameter, zbx_api_getoptions_tags[ZBX_API_PARAM_FILTER]))
@@ -1175,7 +1180,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			/* check that sortfield items match sortoder items */
 			if (sortfields.values_num != self->sort.values_num)
 			{
-				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
+				*error = zbx_dsprintf(*error, "The number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
 						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
 						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER]);
@@ -1189,7 +1194,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 
 				if (NULL == (sort->field = zbx_api_object_get_field(fields, sortfields.values[i])))
 				{
-					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"",
+					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"",
 							zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
 							sortfields.values[i]);
 
@@ -1241,7 +1246,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 			/* check that sortfield items match sortoder items */
 			if (sortfields.values_num != self->sort.values_num)
 			{
-				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
+				*error = zbx_dsprintf(*error, "The number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
 						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTFIELD],
 						zbx_api_getoptions_tags[ZBX_API_PARAM_SORTORDER]);
@@ -1263,7 +1268,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"",
+					*error = zbx_dsprintf(*error, "Invalid sort order \"%s\"",
 							sortfields.values[i]);
 					rc = FAIL;
 					break;
@@ -1310,7 +1315,7 @@ int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_ap
 
 	if (NULL == (field = zbx_api_object_get_field(fields, name)))
 	{
-		*error = zbx_dsprintf(*error, "invalid additional output field name \"%s\"", name);
+		*error = zbx_dsprintf(*error, "Invalid additional output field name \"%s\"", name);
 		goto out;
 	}
 
@@ -1365,7 +1370,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_field_
 			0 == (self->parameters & (1 << ZBX_API_PARAM_FILTER)) &&
 			0 != (self->parameters & (1 << ZBX_API_PARAM_SEARCHBYANY)))
 	{
-		*error = zbx_dsprintf(*error, "parameter \"%s\" requires either parameter \"%s\" or parameter \"%s\""
+		*error = zbx_dsprintf(*error, "Parameter \"%s\" requires either parameter \"%s\" or parameter \"%s\""
 				" to be defined", zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCHBYANY],
 				zbx_api_getoptions_tags[ZBX_API_PARAM_FILTER],
 				zbx_api_getoptions_tags[ZBX_API_PARAM_SEARCH]);
@@ -1409,7 +1414,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_field_
 		self->output.key = 0;
 	}
 
-	if (0 != self->output_indexed)
+	if (0 != self->output_byid)
 	{
 		/* if indexed output is set ensure that object id (first field in object definition) */
 		/* is also retrieved.                                                                */
@@ -1690,7 +1695,7 @@ int	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vec
 	if (NULL == result)
 	{
 		/* TODO: fetch the correct SQL error message ? */
-		*error = zbx_dsprintf(*error, "an SQL error occurred while executing: %s", sql);
+		*error = zbx_dsprintf(*error, "An SQL error occurred while executing: %s", sql);
 		goto out;
 	}
 
@@ -1980,7 +1985,8 @@ void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_v
  *             result  - [IN] the request result data                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *options, zbx_api_get_result_t *result)
+void	zbx_api_json_add_result(struct zbx_json *json, const zbx_api_getoptions_t *options,
+		const zbx_api_get_result_t *result)
 {
 	int	i;
 
@@ -1990,7 +1996,7 @@ void	zbx_api_json_add_result(struct zbx_json *json, zbx_api_getoptions_t *option
 		return;
 	}
 
-	if (0 == options->output_indexed)
+	if (0 == options->output_byid || 0 == result->rows.values_num)
 	{
 		zbx_json_addarray(json, ZBX_API_RESULT_TAG_RESULT);
 

@@ -130,7 +130,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "invalid parameter \"%s\"", name);
+			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\"", name);
 			goto out;
 
 		}
@@ -143,7 +143,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	{
 		if (0 == self->options.output.fields.values_num)
 		{
-			*error = zbx_dsprintf(*error, "parameter \"selectUsers\" cannot be used with"
+			*error = zbx_dsprintf(*error, "Parameter \"selectUsers\" cannot be used with"
 					"parameter \"countOutput\"");
 			goto out;
 		}
@@ -188,7 +188,7 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_dsprintf(error, "cannot open parameters");
+		error = zbx_dsprintf(error, "Cannot open parameters");
 		goto out;
 	}
 
@@ -197,11 +197,9 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 
 	zbx_api_get_result_init(&result);
 
-	if ((USER_TYPE_ZABBIX_ADMIN != user->type || 0 != mediatype.options.filter_editable) &&
+	if ((USER_TYPE_ZABBIX_ADMIN != user->type || ZBX_API_ACCESS_WRITE == mediatype.options.access) &&
 			USER_TYPE_SUPER_ADMIN != user->type)
 	{
-		/* reset indexed output for empty queries */
-		mediatype.options.output_indexed = 0;
 		goto skip_query;
 	}
 
