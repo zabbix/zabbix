@@ -21,15 +21,16 @@
 
 class CConfigurationExportBuilder {
 
-	const EXPORT_VERSION = '2.0';
-
 	/**
 	 * @var array
 	 */
 	protected $data = array();
 
-	public function __construct() {
-		$this->data['version'] = self::EXPORT_VERSION;
+	/**
+	 * @param $version  current export version
+	 */
+	public function __construct($version) {
+		$this->data['version'] = $version;
 		$this->data['date'] = date('Y-m-d\TH:i:s\Z', time() - date('Z'));
 	}
 
