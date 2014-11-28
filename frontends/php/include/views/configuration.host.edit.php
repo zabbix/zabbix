@@ -289,7 +289,7 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
+	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
 
 	$buttonRow = new CRow(array($buttonCol));
@@ -304,7 +304,7 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
+	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
 
 	$buttonRow = new CRow(array($buttonCol));
