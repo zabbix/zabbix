@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
+"POT-Creation-Date: 2014-11-26 13:50+0200\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2244,6 +2244,11 @@ msgstr "Nu se poate salva regula de detecție fără verificări."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Nu se poate trimite comanda, verificați conexiunea cu serverul Zabbix \"%1$s\"."
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2342,6 +2347,11 @@ msgstr "Nu se poate actualiza \"%1$s\" pentru un trigger detectat."
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nu se poate actualiza \"%1$s\" pentru acțiunea \"%2$s\"."
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2386,7 +2396,7 @@ msgstr "Nu se poate actualiza \"templateid\" pentru prototipul trigger-ului \"%1
 msgid "Cannot update a discovered graph."
 msgstr "Nu se poate actualiza un grafic bazat pe detecție."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "Nu se poate actualiza un grup de servere bazat pe detecție."
 
@@ -2436,8 +2446,8 @@ msgstr "Nu se poate actualiza grupul"
 msgid "Cannot update group."
 msgstr "Nu se poate actualiza grupul."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Nu se pot actualiza grupurile pentru serverul detectat \"%1$s\"."
@@ -3502,8 +3512,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALII SCENARIU"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "DEZACTIVAT"
 
@@ -4785,7 +4795,7 @@ msgstr "Golire server."
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5815,7 +5825,7 @@ msgstr "Grilă"
 msgid "Group"
 msgstr "Grup"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Grupul \"%1$s\" nu poate fi șters, pentru că este utilizat de un server prototip "
@@ -6185,22 +6195,22 @@ msgstr[2] "Servere activate"
 msgid "Host group"
 msgstr "Grup server"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Grupul server \"%1$s\" există deja."
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Grupul server \"%1$s\" nu poate fi șters, pentru că este utilizat într-un script global."
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Grupul server \"%1$s\" nu poate fi șters, pentru că unele servere depind de el."
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Grupul server \"%1$s\" este intern și nu poate fi șters."
@@ -6217,7 +6227,7 @@ msgstr "Problemele grupui de servere"
 msgid "Host group label type"
 msgstr "Tipul etichetei grupului de servere"
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr "Numele grupului de servere nu poate fi gol."
 
@@ -6750,7 +6760,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Dacă crezi ca acest mesaj este greșit, te rog să consulți administratorii pentru obținerea permisiunilor necesare."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -8587,7 +8597,7 @@ msgstr "Adresă MAC A"
 msgid "MAC address B"
 msgstr "Adresă MAC B"
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "ÎNTREȚINERE"
 
@@ -8660,7 +8670,7 @@ msgstr "Macro-uri"
 msgid "Macros updated"
 msgstr "Macro-uri actualizate"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9987,10 +9997,10 @@ msgstr "Nicio permisiune de acces la sistem."
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10161,7 +10171,7 @@ msgid "No value maps found."
 msgstr "Nicio hartă de valori găsită."
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10504,8 +10514,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10593,7 +10603,7 @@ msgstr "Statusul pornit modifică triggerii să lumineze pentru "
 msgid "Once"
 msgstr "Odată"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr "Unul dintre obiecte este lăsat fără grup servere."
 
@@ -11020,7 +11030,7 @@ msgstr "Extensie xmlwriter PHP lipsă."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLEMĂ"
@@ -11361,7 +11371,7 @@ msgstr "Nivel privilegiat"
 msgid "Probably php-ldap module is missing."
 msgstr "Probabil lipsește modului php-ldap."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problemă"
@@ -11387,8 +11397,8 @@ msgstr "Problemă, dacă toți copiii au probleme"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problemă, dacă cel puțin un copil are o problemă"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Probleme"
 
@@ -13658,7 +13668,7 @@ msgid "Timeout"
 msgstr "Pauză"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14193,7 +14203,7 @@ msgstr "Incapabil să selecteze configurația."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Incapabil să încarce fișierul pentru că \"file_uploads\" este dezactivat."
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Nerecunoscut"
 
@@ -14894,7 +14904,7 @@ msgstr "Perioadă de funcționare fără oprire mașină virtuală VMware, <url>
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format

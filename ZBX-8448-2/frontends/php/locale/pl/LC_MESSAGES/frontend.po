@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 01:11+0300\n"
-"PO-Revision-Date: 2014-09-26 21:55+0300\n"
+"POT-Creation-Date: 2014-11-26 13:50+0200\n"
+"PO-Revision-Date: 2014-11-03 13:27+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1411761318.0\n"
+"X-POOTLE-MTIME: 1415014060.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -249,7 +249,7 @@ msgstr "Konto zostało zablokowane na %s sekund"
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1055
 msgid "Ack"
-msgstr "Potw."
+msgstr "Potwierdzone"
 
 #: acknow.php:230 jsLoader.php:199 tr_status.php:713
 msgid "Acknowledge"
@@ -1200,12 +1200,12 @@ msgstr "Informacje CPU - wyświetla domyślnie wszystkie informacje o wszystkich
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr "Obciążenie CPU. Obciążenie procesora, cpu i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie wszystkie. Jeżeli tryb jest pusty, przyjęte będzie avg1. Uwaga, to nie jest skala procentowa."
+msgstr "Obciążenie CPU. Obciążenie procesora. cpu i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie all. Jeżeli tryb jest pusty, przyjęte będzie avg1. Uwaga, to nie jest skala procentowa."
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Użycie CPU. Obciążenie procesora w procentach, cpu, type i mode są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie all. Jeżeli type jest pusty, przyjęty będzie user. Jeżeli mode jest pusty, przyjęte będzie avg1."
+msgstr "Użycie CPU. Obciążenie procesora w procentach. cpu, typ i tryb są opcjonalne. Jeżeli cpu jest puste, przyjęte będzie all. Jeżeli typ jest pusty, przyjęty będzie user. Jeżeli tryb jest pusty, przyjęte będzie avg1."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1224,7 +1224,7 @@ msgstr "Oblicza sumę kontrolną podanego pliku. Suma kontrolna jest obliczana p
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr "Oblicza przestrzeń dyskową dla podanego wolumenu. Przestrzeń w KB. Jeżeli tryb jest pusty, użyte będzie ogółem. W przypadku wolumenów zamontowanych zwrócona zostanie niezajęta przestrzeń dyskowa dla lokalnego systemu plików. Przykład: vfs.fs.size[/tmp,free]."
+msgstr "Oblicz przestrzeń dyskową dla podanego wolumenu. Przestrzeń w KB. Jeżeli tryb jest pusty, przyjęte będzie total. W przypadku zamontowanych wolumenów, zwrócona zostanie wolna przestrzeń dla lokalnego systemu plików. Przykład: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:96
 #: include/views/configuration.graph.edit.php:154
@@ -1458,7 +1458,7 @@ msgstr "Nie można dodać scenariusza sieci www"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr "Nie można zmienić autoryzacji"
+msgstr "Nie można zmienić uwierzytelniania"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -2244,6 +2244,11 @@ msgstr "Nie można zapisać reguły wykrywania bez testów."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Nie można wydać polecenia, sprawdź połączenie z serwerem Zabbix'a \"%1$s\"."
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2342,6 +2347,11 @@ msgstr "Nie można zaktualizować \"%1$s\" dla wykrytego wyzwalacza."
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" dla akcji \"%2$s\"."
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2386,7 +2396,7 @@ msgstr "Nie można zaktualizować \"templateid\" dla prototypu wyzwalacza \"%1$s
 msgid "Cannot update a discovered graph."
 msgstr "Nie można zaktualizować wykrytego wykresu."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "Nie można zaktualizować grupy wykrytych hostów."
 
@@ -2436,8 +2446,8 @@ msgstr "Nie można zaktualizować grupy"
 msgid "Cannot update group."
 msgstr "Nie można zaktualizować grupy."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Nie można zaktualizować grup dla wykrytego hosta \"%1$s\"."
@@ -3146,7 +3156,7 @@ msgstr ""
 "Odmowa połączenia do serwera Zabbix \"%s\". Możliwe przyczyny:\n"
 "1. Błędne IP/DNS serwera w \"zabbix.conf.php\";\n"
 "2. Usługa środowiska (np. SELinux) blokuje połączenie;\n"
-"3. Serwer Zabbix nie został działa;\n"
+"3. Serwer Zabbix nie działa;\n"
 "4. Zapora blokuje połączenia TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:279
@@ -3503,8 +3513,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "SZCZEGÓŁY SCENARIUSZA"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "WYŁĄCZONE"
 
@@ -3514,7 +3524,7 @@ msgstr "WYKRYTY"
 
 #: include/menu.inc.php:242
 msgid "DM"
-msgstr "Proxy"
+msgstr "MR"
 
 #: events.php:509 events.php:518 hosts.php:779
 #: include/views/administration.proxy.edit.php:62
@@ -4289,11 +4299,11 @@ msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
 
 #: popup_trexpr.php:203
 msgid "Difference between last and previous value is = N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest = N"
 
 #: popup_trexpr.php:199
 msgid "Difference between last and previous value is > N"
-msgstr "Różnica między ostatnią i poprzednią wartością jest < N"
+msgstr "Różnica między ostatnią i poprzednią wartością jest > N"
 
 #: popup_trexpr.php:207
 msgid "Difference between last and previous value is NOT N"
@@ -4786,7 +4796,7 @@ msgstr "Pusty host."
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5116,7 +5126,7 @@ msgstr "Wykonaj na"
 
 #: include/items.inc.php:1333 include/views/configuration.item.edit.php:195
 msgid "Executed script"
-msgstr "Wykonany skrypt"
+msgstr "Wykonywany skrypt"
 
 #: jsLoader.php:106
 msgid "Execution confirmation"
@@ -5816,7 +5826,7 @@ msgstr "Siatka"
 msgid "Group"
 msgstr "Grupa"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Nie można usunąć grupy \"%1$s\", jest używana przez prototyp hosta."
@@ -6049,7 +6059,7 @@ msgstr "Okres przechowywania danych historii (w dniach) \"%1$s\"."
 
 #: include/screens.inc.php:31
 msgid "History of actions"
-msgstr "Historia działań"
+msgstr "Historia akcji"
 
 #: include/screens.inc.php:32
 msgid "History of events"
@@ -6186,22 +6196,22 @@ msgstr[2] "Włączono hosty"
 msgid "Host group"
 msgstr "Grupa hostów"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Grupa hostów \"%1$s\" już istnieje."
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Nie można usunąć grupy hostów \"%1$s\", jest użyta w skrypcie globalnym."
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Nie można usunąć grupy hostów \"%1$s\", istnieją hosty, które od niej są zależne."
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Grupa hostów \"%1$s\" jest grupą wewnętrzną i nie można jej usunąć."
@@ -6218,7 +6228,7 @@ msgstr "Problemy grupy hostów"
 msgid "Host group label type"
 msgstr "Typ etykiety grupy hostów"
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr "Nazwa grupy hostów nie może być pusta."
 
@@ -6751,7 +6761,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "W przypadku, gdy ten komunikat jest błędny należy skontaktować się z administratorami celem nadania uprawnień."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7049,12 +7059,12 @@ msgstr "Błędne argumenty przekazane do metody."
 #: api/classes/CDRule.php:353
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
-msgstr "Błędny protokół autoryzacji dla reguły wyszukiwania \"%1$s\"."
+msgstr "Błędny protokół uwierzytelniania dla reguły wyszukiwania \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr "Błędny protokół autoryzacji dla pozycji \"%1$s\"."
+msgstr "Błędny protokół uwierzytelniania dla pozycji \"%1$s\"."
 
 #: api/classes/CService.php:1145
 #, c-format
@@ -7800,7 +7810,7 @@ msgstr "Nie można filtrować według hasła użytkownika."
 
 #: include/page_header.php:234
 msgid "It is not possible to logout from HTTP authentication."
-msgstr "Nie można się wylogować z autoryzacji HTTP."
+msgstr "Nie można się wylogować z uwierzytelniania HTTP."
 
 #: api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
@@ -7967,7 +7977,7 @@ msgstr "Pozycja wykorzystuje niepoprawny typ interfejsu."
 
 #: api/classes/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał odświeżania."
+msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał aktualizacji."
 
 #: api/classes/CItemGeneral.php:440
 #, c-format
@@ -8527,7 +8537,7 @@ msgstr "Logowanie się nie powiodło \"%s\"."
 #: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do autoryzacji HTTP."
+msgstr "Nazwa logowania \"%1$s\" nie jest zgodna z nazwą \"%2$s\" użytą do uwierzytelniania HTTP."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -8555,11 +8565,11 @@ msgstr "Stracone"
 
 #: include/actions.inc.php:1155
 msgid "Low-level discovery rule in \"normal\" state"
-msgstr "Nisko-poziomowa reguła wykrywania w stanie \"normalny\""
+msgstr "Niskopoziomowa reguła wykrywania w stanie \"normalny\""
 
 #: include/actions.inc.php:1154
 msgid "Low-level discovery rule in \"not supported\" state"
-msgstr "Nisko-poziomowa reguła wykrywania w stanie \"niewspierany\""
+msgstr "Niskopoziomowa reguła wykrywania w stanie \"niewspierany\""
 
 #: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
@@ -8588,7 +8598,7 @@ msgstr "MAC adres A"
 msgid "MAC address B"
 msgstr "MAC adres B"
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "UTRZYMANIE"
 
@@ -8661,7 +8671,7 @@ msgstr "Makra"
 msgid "Macros updated"
 msgstr "Zaktualizowano makra"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9621,16 +9631,16 @@ msgstr "Nie znaleziono wpisów audytu."
 #: api/classes/CAction.php:1354
 #, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Nie określono typu autoryzacji dla polecenia operacji akcji \"%s\"."
+msgstr "Nie określono typu uwierzytelniania dla polecenia operacji akcji \"%s\"."
 
 #: api/classes/CAction.php:1358 api/classes/CAction.php:1372
 #, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Nie określono nazwy użytkownika do autoryzacji dla polecenia operacji akcji \"%s\"."
+msgstr "Nie określono nazwy użytkownika do uwierzytelniania dla polecenia operacji akcji \"%s\"."
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
-msgstr "Nie określono nazwy użytkownika do autoryzacji."
+msgstr "Nie określono nazwy użytkownika do uwierzytelniania."
 
 #: api/classes/CAction.php:1341
 msgid "No command specified for action operation."
@@ -9988,10 +9998,10 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10162,7 +10172,7 @@ msgid "No value maps found."
 msgstr "Nie znaleziono map wartości."
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10255,7 +10265,7 @@ msgstr "Widok normalny"
 #: include/actions.inc.php:256
 #: include/views/configuration.action.edit.php:1054
 msgid "Not Ack"
-msgstr "Niezatwierdzone"
+msgstr "Niepotwierdzone"
 
 #: include/forms.inc.php:631 include/forms.inc.php:814
 msgid "Not Templated items"
@@ -10442,7 +10452,7 @@ msgstr "Liczba niewspieranych pozycji w bazie danych Zabbix."
 
 #: include/blocks.inc.php:781
 msgid "Number of users (online)"
-msgstr "Liczba użytkowników (online)"
+msgstr "Liczba użytkowników (zalogowanych)"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:503
@@ -10505,8 +10515,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10594,7 +10604,7 @@ msgstr "Przy zmianie stanu wyzwalacze migają przez"
 msgid "Once"
 msgstr "Raz"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z obiektów nadal nie ma grupy hostów."
 
@@ -11021,7 +11031,7 @@ msgstr "Brak rozszerzenia PHP xmlwriter."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLEM"
@@ -11362,7 +11372,7 @@ msgstr "Poziom uprawnień"
 msgid "Probably php-ldap module is missing."
 msgstr "Prawdopodobnie nie ma modułu php-ldap."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problem"
@@ -11388,8 +11398,8 @@ msgstr "Problem, jeśli wszyscy potomkowie mają problem"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problem, jeśli przynajmniej jeden potomek ma problem"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemy"
 
@@ -12774,7 +12784,7 @@ msgstr "Wyświetl wyzwalacze"
 
 #: tr_status.php:297
 msgid "Show unacknowledged"
-msgstr "Wyświetl niezatwierdzone"
+msgstr "Wyświetl niepotwierdzone"
 
 #: include/views/configuration.item.edit.php:437
 #: include/views/configuration.item.massupdate.php:447
@@ -13172,11 +13182,11 @@ msgstr "Suma wartości z okresu T jest < N"
 
 #: popup_trexpr.php:355
 msgid "Sum of values of a period T is = N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest = N"
 
 #: popup_trexpr.php:350
 msgid "Sum of values of a period T is > N"
-msgstr "Suma wartości z okresu T jest < N"
+msgstr "Suma wartości z okresu T jest > N"
 
 #: popup_trexpr.php:360
 msgid "Sum of values of a period T is NOT N"
@@ -13221,7 +13231,7 @@ msgstr "Szwedzki (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr "Zmiana metody autoryzacji spowoduje zresetowanie wszystkich sesji poza tą! Kontynuować?"
+msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji poza tą! Kontynuować?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:150
 msgid "System default"
@@ -13497,12 +13507,12 @@ msgstr "Interfejs użytkownika nie jest zgodny z bazą danych Zabbix. Aktualna w
 #: include/views/configuration.hostgroups.list.php:137
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: include/html.inc.php:596
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć hosta i zostanie on wykasowany z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć hosta i zostanie on wykasowany za %1$s (%2$s o %3$s)."
 
 #: api/classes/CImage.php:492
 #, c-format
@@ -13523,7 +13533,7 @@ msgstr[2] "Obraz został użyty w mapach %1$s."
 #: include/views/configuration.item.list.php:127
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nie można wykryć pozycji i zostanie ona wykasowana z %1$s (na %2$s w %3$s)."
+msgstr "Nie można wykryć pozycji i zostanie ona wykasowana za %1$s (%2$s o %3$s)."
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -13659,7 +13669,7 @@ msgid "Timeout"
 msgstr "Przekroczenie czasu"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14195,7 +14205,7 @@ msgstr "Nie można wybrać konfiguracji."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Nie można załadować pliku ponieważ jest wyłączone \"file_uploads\"."
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Niepotwierdzone"
 
@@ -14261,7 +14271,7 @@ msgstr "Nieznany"
 
 #: auditlogs.php:155
 msgid "Unknown action"
-msgstr "Nieznane działanie"
+msgstr "Nieznana akcja"
 
 #: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
@@ -14711,7 +14721,7 @@ msgstr "Użytkownicy"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Users (online)"
-msgstr "Użytkownicy (online)"
+msgstr "Użytkownicy (zalogowani)"
 
 #: users.php:354
 msgid "Users unblocked"
@@ -14896,7 +14906,7 @@ msgstr "Czas działania maszyny wirtualnej VMware, <url> - URL usługi VMware, <
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format
@@ -14932,22 +14942,22 @@ msgstr "Wartość \"%1$s\" jest zbyt długa dla pola \"%2$s\" - %3$d znaków. Do
 #: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr "Wartość \\\"%2$s\\\" z \\\"%1$s\\\" ma niepoprawny format dziesiętny."
+msgstr "Wartość \"%2$s\" z \"%1$s\" ma niepoprawny format dziesiętny."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr "Wartość \\\"%2$s\\\" z \\\"%1$s\\\" ma zbyt dużo cyfr po kropce: nie może być więcej cyfr niż %3$s."
+msgstr "Wartość \"%2$s\" z \"%1$s\" ma zbyt dużo cyfr po kropce: nie może być więcej cyfr niż %3$s."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr "Wartość \\\"%2$s\\\" z \\\"%1$s\\\" ma zbyt dużo cyfr przed kropką: nie może być więcej cyfr niż %3$s."
+msgstr "Wartość \"%2$s\" z \"%1$s\" ma zbyt dużo cyfr przed kropką: nie może być więcej cyfr niż %3$s."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr "Wartość \\\"%2$s\\\" z \\\"%1$s\\\" jest zbyt długa: nie może być więcej cyfr niż %3$s przed kropką i więcej cyfr niż %4$s po kropce."
+msgstr "Wartość \"%2$s\" z \"%1$s\" jest zbyt długa: nie może być więcej cyfr niż %3$s przed kropką i więcej cyfr niż %4$s po kropce."
 
 #: include/classes/items/CHelpItems.php:891
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15586,7 +15596,7 @@ msgstr "Wewnętrzny Zabbixa"
 
 #: include/perm.inc.php:48
 msgid "Zabbix internal authentication"
-msgstr "Wewnętrze uwierzytelnianie Zabbixa"
+msgstr "Wewnętrzne uwierzytelnianie Zabbixa"
 
 #: include/classes/class.cserverinfo.php:37
 #: include/classes/class.cserverinfo.php:38 include/setup.inc.php:432
@@ -15922,7 +15932,7 @@ msgstr "podobne"
 
 #: include/events.inc.php:68
 msgid "low-level discovery rule"
-msgstr "nisko-poziomowa reguła wykrywania"
+msgstr "niskopoziomowa reguła wykrywania"
 
 #: include/func.inc.php:566
 msgctxt "minute short"

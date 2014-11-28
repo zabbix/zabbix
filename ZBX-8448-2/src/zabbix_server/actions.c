@@ -124,7 +124,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 					triggerid = 0;
 
-					if (NULL != (row = DBfetch(result)))
+					while (NULL != (row = DBfetch(result)))
 					{
 						ZBX_STR2UINT64(hostid, row[0]);
 						ZBX_STR2UINT64(triggerid, row[1]);

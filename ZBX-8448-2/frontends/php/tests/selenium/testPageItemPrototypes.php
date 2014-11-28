@@ -62,7 +62,7 @@ class testPageItemPrototypes extends CWebTest {
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 		$this->zbxTestDropdownHasOptions('go', array(
-			'Activate selected',
+			'Enable selected',
 			'Disable selected',
 			'Delete selected'
 		));
