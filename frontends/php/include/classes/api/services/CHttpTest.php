@@ -273,7 +273,7 @@ class CHttpTest extends CApiService {
 			unset($httpTest['templateid']);
 
 			if (!isset($httpTest['agent']) || (isset($httpTest['agent']) && zbx_empty($httpTest['agent']))) {
-				$httpTest['agent'] = 'Zabbix';
+				$httpTest['agent'] = ZBX_DEFAULT_AGENT;
 			}
 
 			if (!isset($httpTest['hostid']) && isset($httpTest['applicationid'])) {

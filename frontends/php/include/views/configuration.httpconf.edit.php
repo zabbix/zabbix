@@ -111,7 +111,7 @@ $agentComboBox->addItemsInGroup(_('Safari'), array(
 	'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.57.2 (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2' => 'Safari 5.1.7 (Windows)'
 ));
 $agentComboBox->addItemsInGroup(_('Others'), array(
-	'Zabbix' => 'Zabbix',
+	'Zabbix' => ZBX_DEFAULT_AGENT,
 	'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25' => 'Safari 6.0 (iPad)',
 	'Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5' => 'Safari 5.0.2 (iPhone)',
 	'Mozilla/5.0 (Linux; U; Android 4.0.3; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30' => 'Android Webkit Browser',
