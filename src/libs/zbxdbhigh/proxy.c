@@ -1853,7 +1853,10 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		int		timestamp;
 		int		severity;
 		int		logeventid;
+		zbx_uint64_t	lastlogsize;
+		int		mtime;
 		unsigned char	state;
+		unsigned char	meta;
 	}
 	zbx_history_data_t;
 
@@ -1882,7 +1885,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 try_again:
 	zbx_snprintf(sql, sizeof(sql),
-			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
+			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,lastlogsize,mtime,meta,state"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
@@ -1930,7 +1933,10 @@ try_again:
 		hd->timestamp = atoi(row[4]);
 		hd->severity = atoi(row[6]);
 		hd->logeventid = atoi(row[8]);
-		hd->state = (unsigned char)atoi(row[9]);
+		ZBX_STR2UINT64(hd->lastlogsize, row[9]);
+		hd->mtime = atoi(row[10]);
+		hd->meta = (unsigned char)atoi(row[11]);
+		hd->state = (unsigned char)atoi(row[12]);
 
 		len1 = strlen(row[5]) + 1;
 		len2 = strlen(row[7]) + 1;
@@ -1973,24 +1979,34 @@ try_again:
 
 		zbx_json_addobject(j, NULL);
 
+		hd = &data[i];
+
 		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, dc_items[i].host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, data[i].clock);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, data[i].ns);
-		if (0 != data[i].timestamp)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, data[i].timestamp);
-		if ('\0' != string_buffer[data[i].psource])
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
+
+		/* meta information update (log size and mtime) record does not need those */
+		if (0 == hd->meta)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[data[i].psource],
-					ZBX_JSON_TYPE_STRING);
+			if (0 != hd->timestamp)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
+			if ('\0' != string_buffer[hd->psource])
+			{
+				zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
+						ZBX_JSON_TYPE_STRING);
+			}
+			if (0 != hd->severity)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
+			if (0 != hd->logeventid)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 		}
-		if (0 != data[i].severity)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, data[i].severity);
-		zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[data[i].pvalue], ZBX_JSON_TYPE_STRING);
-		if (0 != data[i].logeventid)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, data[i].logeventid);
-		if (0 != data[i].state)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, data[i].state);
+
+		if (0 != hd->state)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
 
 		zbx_json_close(j);
 
@@ -2214,6 +2230,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					log->logeventid = values[i].logeventid;
 					log->lastlogsize = values[i].lastlogsize;
 					log->mtime = values[i].mtime;
+					log->meta = values[i].meta;
 
 					if (NULL != log->value)
 						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
@@ -2412,6 +2429,10 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
 			av->state = (unsigned char)atoi(tmp);
+
+		/* meta information update (log size and mtime) */
+		if (NULL == av->value)
+			av->meta = 1;
 
 		values_num++;
 
