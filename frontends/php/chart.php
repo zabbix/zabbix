@@ -61,11 +61,15 @@ foreach ($itemIds as $itemId) {
 	}
 }
 
-// sort items
+$hostNames = array();
 foreach ($items as &$item) {
 	$item['hostname'] = $item['hosts'][0]['name'];
+	if (!in_array($item['hostname'], $hostNames)) {
+		$hostNames[] = $item['hostname'];
+	}
 }
 unset($item);
+// sort items
 CArrayHelper::sort($items, array('name', 'hostname', 'itemid'));
 
 /*
@@ -86,7 +90,12 @@ $graph->setSTime($timeline['stime']);
 // change how the graph will be displayed if more than one item is selected
 if (getRequest('batch')) {
 	// set a default header
-	$graph->setHeader(_('Item values'));
+	if (count($hostNames) == 1) {
+		$graph->setHeader($hostNames[0].NAME_DELIMITER._('Item values'));
+	}
+	else {
+		$graph->setHeader(_('Item values'));
+	}
 
 	// hide triggers
 	$graph->showTriggers(false);

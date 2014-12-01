@@ -159,9 +159,9 @@ elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 				show_messages($result, $messageSuccess, $messageFailed);
 			}
 		}
-	}
-	elseif (hasRequest('test')) {
-		show_messages($login, _('LDAP login successful'), _('LDAP login was not successful'));
+		elseif (hasRequest('test')) {
+			show_messages($login, _('LDAP login successful'), _('LDAP login was not successful'));
+		}
 	}
 }
 elseif ($config['authentication_type'] == ZBX_AUTH_HTTP) {

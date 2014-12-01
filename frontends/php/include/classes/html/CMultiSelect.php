@@ -62,8 +62,7 @@ class CMultiSelect extends CTag {
 			'popup' => array(
 				'parameters' => isset($options['popup']['parameters']) ? $options['popup']['parameters'] : null,
 				'width' => isset($options['popup']['width']) ? $options['popup']['width'] : null,
-				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null,
-				'buttonClass' => isset($options['popup']['buttonClass']) ? $options['popup']['buttonClass'] : null
+				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null
 			)
 		);
 

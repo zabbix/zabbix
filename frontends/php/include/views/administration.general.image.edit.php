@@ -61,7 +61,7 @@ if (isset($this->data['imageid'])) {
 else {
 	$imageForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 

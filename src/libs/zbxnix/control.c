@@ -144,6 +144,12 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 		scope = 0;
 		data = 0;
 	}
+	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
+	{
+		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
+		scope = 0;
+		data = 0;
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);
